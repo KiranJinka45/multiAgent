@@ -1,0 +1,35 @@
+{
+  "project_name": "antigravity-todo",
+  "version": "1.0.0",
+  "description": "A persistent, multi-user To-Do list with history tracking.",
+  "tech_stack": {
+    "frontend": "Next.js 14 (App Router)",
+    "styling": "TailwindCSS + Shadcn/UI",
+    "database": "Supabase (PostgreSQL)",
+    "auth": "Supabase Auth",
+    "deployment": "Vercel"
+  },
+  "db_schema": {
+    "profiles": {
+      "id": "uuid (primary key, references auth.users)",
+      "email": "text",
+      "created_at": "timestamp"
+    },
+    "tasks": {
+      "id": "uuid (primary key)",
+      "user_id": "uuid (references profiles.id)",
+      "title": "text",
+      "description": "text (optional)",
+      "is_completed": "boolean (default: false)",
+      "completed_at": "timestamp (nullable)",
+      "created_at": "timestamp"
+    }
+  },
+  "user_stories": [
+    "User can sign up/login to save tasks.",
+    "User can create a new task with a title.",
+    "User can toggle task completion status.",
+    "User can view 'Active' vs 'History' (Completed) tasks.",
+    "User can delete tasks."
+  ]
+}

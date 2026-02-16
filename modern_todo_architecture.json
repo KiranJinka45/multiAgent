@@ -1,0 +1,22 @@
+{
+  "project_name": "Modern Dark To-Do",
+  "tech_stack": {
+    "frontend": "HTML5, Tailwind CSS, Lucide Icons",
+    "storage": "Browser LocalStorage",
+    "styling": "Dark Mode (Zinc/Slate palette)"
+  },
+  "db_schema": {
+    "Task": {
+      "id": "string (uuid)",
+      "text": "string",
+      "completed": "boolean",
+      "createdAt": "timestamp"
+    }
+  },
+  "user_stories": [
+    "User can add a new task",
+    "User can toggle task completion status",
+    "User can delete a task",
+    "Tasks persist after page refresh"
+  ]
+}

@@ -1,0 +1,75 @@
+<html>
+  <head>
+    <title>Dark Mode To-Do List</title>
+    <style>
+      body {
+        background-color: #333;
+        color: #fff;
+        font-family: Arial, sans-serif;
+        text-align: center;
+      }
+      .todo-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .todo-item {
+        background-color: #444;
+        padding: 10px;
+        border-bottom: 1px solid #555;
+      }
+      .todo-item:last-child {
+        border-bottom: none;
+      }
+      .todo-item.checked {
+        text-decoration: line-through;
+        opacity: 0.5;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Dark Mode To-Do List</h1>
+    <input id="new-todo" type="text" placeholder="New To-Do">
+    <button id="add-todo">Add</button>
+    <ul id="todo-list" class="todo-list"></ul>
+    <script>
+      const todoList = document.getElementById('todo-list');
+      const newTodoInput = document.getElementById('new-todo');
+      const addTodoButton = document.getElementById('add-todo');
+      let todos = JSON.parse(localStorage.getItem('todos')) || [];
+      
+      function renderTodos() {
+        todoList.innerHTML = '';
+        todos.forEach((todo, index) => {
+          const todoItem = document.createElement('li');
+          todoItem.classList.add('todo-item');
+          todoItem.innerHTML = `<input type="checkbox" ${todo.checked ? 'checked' : ''}> <span>${todo.text}</span> <button class="remove">Remove</button>`;
+          todoList.appendChild(todoItem);
+          
+          todoItem.querySelector('input[type="checkbox"]').addEventListener('change', () => {
+            todo.checked = !todo.checked;
+            localStorage.setItem('todos', JSON.stringify(todos));
+          });
+          
+          todoItem.querySelector('.remove').addEventListener('click', () => {
+            todos.splice(index, 1);
+            localStorage.setItem('todos', JSON.stringify(todos));
+            renderTodos();
+          });
+        });
+      }
+      
+      addTodoButton.addEventListener('click', () => {
+        const newTodoText = newTodoInput.value.trim();
+        if (newTodoText) {
+          todos.push({ text: newTodoText, checked: false });
+          localStorage.setItem('todos', JSON.stringify(todos));
+          newTodoInput.value = '';
+          renderTodos();
+        }
+      });
+      
+      renderTodos();
+    </script>
+  </body>
+</html>

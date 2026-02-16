@@ -1,0 +1,28 @@
+{
+  "project_name": "anti-todo",
+  "tech_stack": {
+    "frontend": "Next.js 14 (App Router)",
+    "styling": "TailwindCSS + Shadcn UI",
+    "database": "Supabase (PostgreSQL)",
+    "auth": "Supabase Auth",
+    "icons": "Lucide React",
+    "deployment": "Vercel"
+  },
+  "db_schema": {
+    "tasks": {
+      "id": "uuid (primary key)",
+      "user_id": "uuid (references auth.users)",
+      "title": "text",
+      "is_completed": "boolean (default: false)",
+      "created_at": "timestamp with time zone",
+      "completed_at": "timestamp with time zone (nullable)"
+    }
+  },
+  "user_stories": [
+    "User can create an account and log in.",
+    "User can add new tasks to their list.",
+    "User can mark tasks as completed (moves to history).",
+    "User can view a history of completed tasks.",
+    "User can delete tasks from history or active list."
+  ]
+}
