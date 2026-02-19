@@ -64,7 +64,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                                 <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-900/20">
                                     <div className="w-3 h-3 bg-white rounded-full"></div>
                                 </div>
-                                <span className="font-bold text-lg tracking-tight text-white">AntiGravity</span>
+                                <span className="font-bold text-lg tracking-tight text-white">MultiAgent</span>
                             </div>
                             <button
                                 onClick={onClose}

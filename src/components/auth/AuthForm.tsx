@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, Github, Chrome } from "lucide-react";
 import { userAuthSchema, userRegisterSchema, type UserAuthSchema, type UserRegisterSchema } from "@/lib/validations/auth";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useSearchParams, useRouter } from "next/navigation";
 
@@ -50,9 +51,10 @@ export function AuthForm() {
 
     // Reset forms when mode changes
     useEffect(() => {
-        loginForm.reset();
+        const email = searchParams.get("email") || "";
+        loginForm.reset({ email, password: "" });
         registerForm.reset();
-    }, [mode, loginForm, registerForm]);
+    }, [mode, loginForm, registerForm, searchParams]);
 
     async function onLogin(data: UserAuthSchema) {
         if (!supabase) return;
@@ -64,15 +66,38 @@ export function AuthForm() {
             });
 
             if (error) {
-                console.error("Login error:", error.message);
-                // TODO: Show toast notification
+                // Handle specific error cases without clogging console
+                if (error.message.includes("Email not confirmed")) {
+                    toast.warning("Email not verified", {
+                        description: "Please check your inbox and click the verification link.",
+                        duration: 5000,
+                    });
+                } else if (error.message.includes("Invalid login credentials")) {
+                    toast.error("Invalid credentials", {
+                        description: "Please check your email and password.",
+                    });
+                } else if (error.status === 429) {
+                    toast.error("Too many attempts", {
+                        description: "Please wait a moment before trying again.",
+                    });
+                } else {
+                    // Log genuine unexpected errors
+                    console.error("Login error:", error.message);
+                    toast.error("Login failed", {
+                        description: error.message,
+                    });
+                }
                 return;
             }
 
+            toast.success("Login successful", {
+                description: "Welcome back, Commander.",
+            });
             router.refresh();
             router.push("/");
-        } catch (error) {
+        } catch (error: any) {
             console.error("Login error:", error);
+            toast.error("An unexpected error occurred.");
         } finally {
             setIsLoading(false);
         }
@@ -91,15 +116,32 @@ export function AuthForm() {
             });
 
             if (error) {
-                console.error("Register error:", error.message);
-                // TODO: Show toast notification
+                if (error.message.includes("rate limit") || error.status === 429) {
+                    toast.error("Rate limit exceeded", {
+                        description: "Please wait a while before trying to register again.",
+                    });
+                } else if (error.message.includes("User already registered")) {
+                    toast.error("Account exists", {
+                        description: "This email is already registered. Please login.",
+                    });
+                } else {
+                    console.error("Register error:", error.message);
+                    toast.error("Registration failed", {
+                        description: error.message,
+                    });
+                }
                 return;
             }
 
-            // TODO: Show success message (check email)
-            console.log("Registration successful, check email");
-        } catch (error) {
+            toast.success("Registration successful!", {
+                description: "Please check your email to verify your account.",
+            });
+
+            // Redirect to login page with email pre-filled
+            router.push(`/login?email=${encodeURIComponent(data.email)}`);
+        } catch (error: any) {
             console.error("Register error:", error);
+            toast.error("An unexpected error occurred.");
         } finally {
             setIsLoading(false);
         }

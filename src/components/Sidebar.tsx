@@ -1,8 +1,12 @@
 'use client';
 
-import { LucideIcon, LayoutDashboard, ListTodo, CheckSquare, Settings } from 'lucide-react';
+import { LucideIcon, LayoutDashboard, ListTodo, CheckSquare, Settings, MessageSquare, LogOut } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { chatService } from '@/lib/chat-service';
+import { Chat } from '@/types/chat';
 
 type SidebarItemProps = {
     icon: LucideIcon;
@@ -15,15 +19,15 @@ const SidebarItem = ({ icon: Icon, label, href, active }: SidebarItemProps) => (
     <Link
         href={href}
         className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all duration-300 group border ${active
-            ? 'bg-[#151515] border-white/5 text-white shadow-lg shadow-black/20'
-            : 'border-transparent hover:bg-[#151515] hover:border-white/5 text-neutral-500 hover:text-neutral-200'
+            ? 'bg-accent border-border text-foreground shadow-lg shadow-black/5'
+            : 'border-transparent hover:bg-accent hover:border-border text-muted-foreground hover:text-foreground'
             }`}
     >
-        <Icon size={20} className={active ? 'text-blue-500' : 'group-hover:text-white transition-colors duration-300'} />
+        <Icon size={20} className={active ? 'text-primary' : 'group-hover:text-foreground transition-colors duration-300'} />
         <span className="font-medium text-sm tracking-wide">{label}</span>
         {active && (
             <div className="ml-auto flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)] animate-pulse"></div>
+                <div className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(59,130,246,0.6)] animate-pulse"></div>
             </div>
         )}
     </Link>
@@ -31,17 +35,62 @@ const SidebarItem = ({ icon: Icon, label, href, active }: SidebarItemProps) => (
 
 export default function Sidebar() {
     const pathname = usePathname();
+    const router = useRouter();
+    const [chats, setChats] = useState<Chat[]>([]);
+    const [user, setUser] = useState<any>(null);
+    const supabase = createClientComponentClient();
+
+    const fetchChats = async () => {
+        if (!user) return;
+        const data = await chatService.getChats();
+        setChats(data);
+    };
+
+    useEffect(() => {
+        fetchChats();
+
+        const channel = supabase
+            .channel('schema-db-changes')
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'chats',
+                },
+                (payload) => {
+                    fetchChats();
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [user, supabase]); // Re-run when user changes
+
+    useEffect(() => {
+        const getUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            setUser(user);
+        };
+        getUser();
+    }, []);
+
+    const handleNewMission = () => {
+        router.push('/');
+    };
 
     return (
-        <aside className="fixed left-0 top-0 h-screen w-64 bg-[#0a0a0a]/95 backdrop-blur-xl border-r border-white/5 p-4 flex flex-col hidden md:flex z-50">
+        <aside className="fixed left-0 top-0 h-screen w-64 bg-background/95 backdrop-blur-xl border-r border-border p-4 flex flex-col hidden md:flex z-50 transition-colors duration-300">
             <div className="mb-6">
-                <button className="w-full flex items-center gap-3 px-3 py-3 rounded-xl border border-white/10 hover:bg-white/5 transition-colors text-left group">
-                    <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors">
-                        <span className="font-bold text-lg">+</span>
+                <button onClick={handleNewMission} className="w-full flex items-center gap-3 px-3 py-3 rounded-xl border border-input hover:bg-accent transition-colors text-left group">
+                    <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center group-hover:bg-accent/80 transition-colors">
+                        <span className="font-bold text-lg text-foreground">+</span>
                     </div>
                     <div>
-                        <span className="block text-sm font-medium text-white">New Mission</span>
-                        <span className="block text-xs text-neutral-500">Start fresh orbit</span>
+                        <span className="block text-sm font-medium text-foreground">New Mission</span>
+                        <span className="block text-xs text-muted-foreground">Start fresh orbit</span>
                     </div>
                 </button>
             </div>
@@ -72,32 +121,51 @@ export default function Sidebar() {
                 </div>
 
                 <div>
-                    <h3 className="px-4 text-xs font-semibold text-neutral-500 mb-2 uppercase tracking-wider">Archives</h3>
+                    <h3 className="px-4 text-xs font-semibold text-neutral-500 mb-2 uppercase tracking-wider">Chats</h3>
                     <nav className="space-y-0.5">
-                        <div className="px-4 py-2 text-sm text-neutral-400 hover:text-white cursor-pointer truncate transition-colors">
-                            Project Alpha Launch
-                        </div>
-                        <div className="px-4 py-2 text-sm text-neutral-400 hover:text-white cursor-pointer truncate transition-colors">
-                            Q3 Goals Review
-                        </div>
-                        <div className="px-4 py-2 text-sm text-neutral-400 hover:text-white cursor-pointer truncate transition-colors">
-                            Design System System
-                        </div>
+                        {chats.map((chat) => (
+                            <Link
+                                key={chat.id}
+                                href={`/c/${chat.id}`}
+                                className={`block px-4 py-2 text-sm truncate transition-colors ${pathname === `/c/${chat.id}`
+                                    ? 'text-white bg-white/5 font-medium'
+                                    : 'text-neutral-400 hover:text-white hover:bg-white/5'
+                                    }`}
+                            >
+                                {chat.title}
+                            </Link>
+                        ))}
+                        {chats.length === 0 && (
+                            <div className="px-4 py-2 text-sm text-neutral-600 italic">
+                                {user ? 'No chats yet' : 'Sign in to see history'}
+                            </div>
+                        )}
                     </nav>
                 </div>
             </div>
 
-            <div className="mt-auto pt-4 border-t border-white/5">
-                <Link href="/login" className="flex items-center gap-3 px-4 py-3 w-full rounded-xl hover:bg-white/5 transition-colors text-left group">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-xs font-bold ring-2 ring-transparent group-hover:ring-white/20 transition-all">
-                        K
-                    </div>
-                    <div className="flex-1 min-w-0">
-                        <span className="block text-sm font-medium text-white truncate">Kiran</span>
-                        <span className="block text-xs text-neutral-500 truncate group-hover:text-blue-400 transition-colors">Sign In / Up &rarr;</span>
-                    </div>
-                    <Settings size={16} className="text-neutral-500 group-hover:text-white transition-colors" />
+            <div className="mt-auto border-t border-border pt-4 space-y-2">
+                <Link href="/settings" className="flex items-center gap-3 px-3 py-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent transition-colors text-sm font-medium group">
+                    <Settings transform="grow-20" size={18} className="group-hover:rotate-90 transition-transform duration-500" />
+                    <span>Settings</span>
                 </Link>
+
+                {user ? (
+                    <div className="flex items-center gap-3 px-3 py-2 rounded-xl bg-accent/50 border border-border">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white shadow-lg shadow-blue-500/20">
+                            {user.email?.[0].toUpperCase()}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium text-foreground truncate">{user.user_metadata?.full_name || 'User'}</div>
+                            <div className="text-xs text-muted-foreground truncate">{user.email}</div>
+                        </div>
+                    </div>
+                ) : (
+                    <Link href="/login" className="flex items-center gap-3 px-3 py-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent transition-colors text-sm font-medium group">
+                        <LogOut size={18} className="group-hover:translate-x-1 transition-transform" />
+                        <span>Sign In</span>
+                    </Link>
+                )}
             </div>
         </aside>
     );

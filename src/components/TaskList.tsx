@@ -1,14 +1,17 @@
 
 'use client';
 
-import { Check, Trash2, Clock } from 'lucide-react';
+import { Check, Trash2, Clock, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+import ReactMarkdown from 'react-markdown';
 
 export type Task = {
     id: string;
     title: string;
     completed: boolean;
     createdAt: string;
+    isAi?: boolean;
 };
 
 type TaskListProps = {
@@ -39,31 +42,44 @@ export default function TaskList({ tasks, onToggle, onDelete }: TaskListProps) {
                         exit={{ opacity: 0, scale: 0.95 }}
                         transition={{ duration: 0.2 }}
                         key={task.id}
-                        className={`group flex items-center p-3 rounded-xl transition-colors duration-200 ${task.completed
-                            ? 'opacity-50'
-                            : 'hover:bg-[#1a1a1a]'
+                        className={`group flex items-start p-4 rounded-xl transition-colors duration-200 ${task.isAi
+                            ? 'bg-[#1e1e1e] border border-blue-500/20 shadow-lg shadow-blue-500/5'
+                            : task.completed
+                                ? 'opacity-50'
+                                : 'hover:bg-[#1a1a1a]'
                             }`}
                     >
-                        <button
-                            onClick={() => onToggle(task.id)}
-                            className={`w-5 h-5 rounded border flex items-center justify-center mr-4 transition-all duration-200 ${task.completed
-                                ? 'bg-neutral-500 border-neutral-500 text-black'
-                                : 'border-neutral-600 hover:border-neutral-400 hover:bg-neutral-800'
-                                }`}
-                        >
-                            {task.completed && <Check size={14} strokeWidth={3} />}
-                        </button>
-
-                        <div className="flex-1 min-w-0">
-                            <p
-                                className={`text-base font-medium truncate transition-all ${task.completed ? 'text-neutral-500 line-through' : 'text-neutral-200'
+                        {!task.isAi && (
+                            <button
+                                onClick={() => onToggle(task.id)}
+                                className={`w-5 h-5 mt-1 rounded border flex items-center justify-center mr-4 transition-all duration-200 shrink-0 ${task.completed
+                                    ? 'bg-neutral-500 border-neutral-500 text-black'
+                                    : 'border-neutral-600 hover:border-neutral-400 hover:bg-neutral-800'
                                     }`}
                             >
-                                {task.title}
-                            </p>
-                            <div className="flex items-center gap-2 mt-1 text-xs text-neutral-600">
-                                <span>Today</span>
+                                {task.completed && <Check size={14} strokeWidth={3} />}
+                            </button>
+                        )}
+
+                        {task.isAi && (
+                            <div className="mr-4 mt-1 text-blue-400 shrink-0">
+                                <Sparkles size={18} />
                             </div>
+                        )}
+
+                        <div className="flex-1 min-w-0 overflow-hidden">
+                            <div className={`text-base ${task.isAi ? 'text-neutral-200 prose prose-invert max-w-none prose-sm' : task.completed ? 'text-neutral-500 line-through' : 'text-neutral-200'}`}>
+                                {task.isAi ? (
+                                    <ReactMarkdown>{task.title}</ReactMarkdown>
+                                ) : (
+                                    task.title
+                                )}
+                            </div>
+                            {!task.isAi && (
+                                <div className="flex items-center gap-2 mt-1 text-xs text-neutral-600">
+                                    <span>Today</span>
+                                </div>
+                            )}
                         </div>
 
                         <button

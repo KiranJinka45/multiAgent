@@ -26,7 +26,7 @@ export default function LoginPage() {
 
             <main className="w-full px-4 relative z-10">
                 <div className="mb-8 text-center">
-                    <h2 className="text-xl font-semibold tracking-tight text-white/90">AntiGravity</h2>
+                    <h2 className="text-xl font-semibold tracking-tight text-white/90">MultiAgent</h2>
                 </div>
                 <Suspense fallback={<div>Loading...</div>}>
                     <AuthForm />
