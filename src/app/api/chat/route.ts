@@ -1,13 +1,19 @@
 import { Groq } from 'groq-sdk';
 import { NextResponse } from 'next/server';
 
-const groq = new Groq({
-    apiKey: process.env.GROQ_API_KEY,
-});
+// Initialize Groq inside the handler or with a check to avoid top-level crashes if API key is missing
+const getGroqClient = () => {
+    const apiKey = process.env.GROQ_API_KEY;
+    if (!apiKey) {
+        throw new Error('GROQ_API_KEY is not configured in environment variables');
+    }
+    return new Groq({ apiKey });
+};
 
 export async function POST(req: Request) {
     try {
-        const { message, model } = await req.json();
+        const body = await req.json().catch(() => ({}));
+        const { message, model } = body;
 
         if (!message) {
             return NextResponse.json({ error: 'Message is required' }, { status: 400 });
@@ -29,6 +35,7 @@ export async function POST(req: Request) {
             systemPrompt += ' You are in Pro mode. Provide advanced reasoning, comprehensive answers, and expert-level insights.';
         }
 
+        const groq = getGroqClient();
         const stream = await groq.chat.completions.create({
             messages: [
                 {
@@ -48,25 +55,37 @@ export async function POST(req: Request) {
         const encoder = new TextEncoder();
         const customStream = new ReadableStream({
             async start(controller) {
-                for await (const chunk of stream) {
-                    const content = chunk.choices[0]?.delta?.content || '';
-                    if (content) {
-                        controller.enqueue(encoder.encode(content));
+                try {
+                    for await (const chunk of stream) {
+                        const content = chunk.choices[0]?.delta?.content || '';
+                        if (content) {
+                            controller.enqueue(encoder.encode(content));
+                        }
                     }
+                } catch (err) {
+                    console.error('Error during streaming:', err);
+                    controller.error(err);
+                } finally {
+                    controller.close();
                 }
-                controller.close();
             },
         });
 
         return new Response(customStream, {
             headers: {
-                'Content-Type': 'text/plain; charset=utf-8',
-                'Transfer-Encoding': 'chunked',
+                'Content-Type': 'text/event-stream; charset=utf-8',
+                'Cache-Control': 'no-cache',
+                'Connection': 'keep-alive',
             },
         });
     } catch (error: any) {
-        console.error('Groq API Error:', error);
+        console.error('Chat API Error:', error);
         const errorMessage = error?.message || error?.toString() || 'Unknown error';
-        return NextResponse.json({ error: `Groq/AI Error: ${errorMessage}` }, { status: 500 });
+
+        // Return a clean JSON error for non-streaming failures
+        return NextResponse.json(
+            { error: `MultiAgent Error: ${errorMessage}` },
+            { status: error?.status || 500 }
+        );
     }
 }

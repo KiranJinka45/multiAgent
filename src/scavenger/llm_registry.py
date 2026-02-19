@@ -32,7 +32,7 @@ if not key:
     print("Error: GOOGLE_API_KEY not found.")
 else:
     genai.configure(api_key=key)
-    model = genai.GenerativeModel('gemini-3-flash-preview')
+    model = genai.GenerativeModel('gemini-1.5-flash')
     response = model.generate_content("Hello")
     print(response.text)
 """
@@ -151,7 +151,7 @@ start_registry = {
         name="Google Gemini",
         free_tier_limits="15 RPM, 1.5k RPD. High capacity, large context.",
         setup_snippet=GEMINI_SNIPPET,
-        model_id="gemini-3-flash-preview" 
+        model_id="gemini-1.5-flash" 
     ),
     "huggingface": LLMProvider(
         name="HuggingFace API",
