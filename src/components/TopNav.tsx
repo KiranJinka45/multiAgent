@@ -64,9 +64,9 @@ export default function TopNav({ onOpenMobileMenu }: TopNavProps) {
                 </AnimatePresence>
 
                 {/* Model Selector */}
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-accent transition-colors cursor-pointer group">
-                    <span className="text-lg font-semibold text-foreground/90 tracking-tight">
-                        MultiAgent <span className="text-muted-foreground font-medium ml-1">1.0 Pro</span>
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl hover:bg-accent transition-colors cursor-pointer group">
+                    <span className="text-[15px] font-semibold text-foreground/90 tracking-tight">
+                        MultiAgent <span className="text-muted-foreground font-medium ml-0.5 text-[13px]">1.0 Pro</span>
                     </span>
                     <ChevronDown size={14} className="text-muted-foreground group-hover:text-foreground transition-colors" />
                 </div>

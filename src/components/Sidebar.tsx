@@ -1,6 +1,6 @@
 'use client';
 
-import { LucideIcon, LayoutDashboard, ListTodo, CheckSquare, Settings, MessageSquare, LogOut, MoreHorizontal, Share2, Users, Edit3, Pin, Archive, Trash2, Sparkles, PanelLeft, ChevronDown } from 'lucide-react';
+import { LucideIcon, LayoutDashboard, ListTodo, CheckSquare, Settings, MessageSquare, LogOut, MoreHorizontal, Share2, Users, Edit3, Pin, Archive, Trash2, Sparkles, PanelLeft, ChevronDown, Image, LayoutGrid, Compass, Box, FolderPlus, Search } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState, useRef, useCallback } from 'react';
@@ -20,18 +20,13 @@ type SidebarItemProps = {
 const SidebarItem = ({ icon: Icon, label, href, active }: SidebarItemProps) => (
     <Link
         href={href}
-        className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all duration-300 group border ${active
-            ? 'bg-accent border-border text-foreground shadow-lg shadow-black/5'
-            : 'border-transparent hover:bg-accent hover:border-border text-muted-foreground hover:text-foreground'
+        className={`flex items-center gap-2.5 px-3 py-2 rounded-lg cursor-pointer transition-all duration-300 group ${active
+            ? 'bg-accent text-foreground'
+            : 'hover:bg-accent/50 text-muted-foreground hover:text-foreground'
             }`}
     >
-        <Icon size={20} className={active ? 'text-primary' : 'group-hover:text-foreground transition-colors duration-300'} />
-        <span className="font-medium text-sm tracking-wide">{label}</span>
-        {active && (
-            <div className="ml-auto flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(59,130,246,0.6)] animate-pulse"></div>
-            </div>
-        )}
+        <Icon size={16} className={active ? 'text-primary' : 'group-hover:text-foreground transition-colors duration-300'} />
+        <span className="font-medium text-[13px] tracking-tight">{label}</span>
     </Link>
 );
 
@@ -180,24 +175,35 @@ export default function Sidebar() {
                         </button>
                     </div>
 
-                    <div className="mb-6 px-2">
+                    <div className="mb-4 px-1">
                         <button
                             onClick={handleNewMission}
-                            className="w-full flex items-center gap-3 px-3 py-2 rounded-xl bg-accent/50 border border-border/50 hover:bg-accent transition-all group whitespace-nowrap overflow-hidden"
+                            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg bg-accent/40 hover:bg-accent transition-all group whitespace-nowrap overflow-hidden"
                         >
-                            <Edit3 size={18} className="text-foreground shrink-0" />
-                            <span className="text-sm font-medium text-foreground truncate">New Mission</span>
-                            <span className="ml-auto text-[10px] text-muted-foreground font-mono opacity-0 group-hover:opacity-100 transition-opacity shrink-0">Ctrl+Shift+O</span>
+                            <Edit3 size={16} className="text-foreground shrink-0" />
+                            <span className="text-[13px] font-medium text-foreground truncate">New chat</span>
+                            <span className="ml-auto text-[9px] text-muted-foreground font-mono opacity-0 group-hover:opacity-100 transition-opacity shrink-0">Ctrl+Shift+O</span>
                         </button>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto space-y-6">
+                    <div className="flex-1 overflow-y-auto space-y-4 px-1">
                         <div>
-                            <h3 className="px-4 text-xs font-semibold text-neutral-500 mb-2 uppercase tracking-wider">Orbit Control</h3>
+                            <nav className="space-y-0.5">
+                                <SidebarItem icon={Search} label="Search chats" href="#" />
+                                <SidebarItem icon={Image} label="Images" href="#" />
+                                <SidebarItem icon={LayoutGrid} label="Apps" href="#" />
+                                <SidebarItem icon={Compass} label="Codex" href="#" />
+                                <SidebarItem icon={Box} label="GPTs" href="#" />
+                                <SidebarItem icon={FolderPlus} label="Projects" href="#" />
+                            </nav>
+                        </div>
+
+                        <div>
+                            <h3 className="px-3 text-[10px] font-semibold text-neutral-500 mb-1.5 uppercase tracking-widest">History</h3>
                             <nav className="space-y-0.5">
                                 <SidebarItem
                                     icon={LayoutDashboard}
-                                    label="Mission Center"
+                                    label="Chat Center"
                                     href="/"
                                     active={pathname === '/'}
                                 />
@@ -217,15 +223,15 @@ export default function Sidebar() {
                         </div>
 
                         <div>
-                            <h3 className="px-4 text-xs font-semibold text-neutral-500 mb-2 uppercase tracking-wider">Chats</h3>
+                            <h3 className="px-3 text-[10px] font-semibold text-neutral-500 mb-1.5 uppercase tracking-widest">Chats</h3>
                             <nav className="space-y-0.5">
                                 {chats.map((chat) => (
                                     <div key={chat.id} className="relative group/chat">
                                         <Link
                                             href={`/c/${chat.id}`}
-                                            className={`flex items-center gap-3 px-4 py-2 text-sm rounded-lg transition-all pr-10 ${pathname === `/c/${chat.id}`
-                                                ? 'text-foreground bg-accent border border-border/50 shadow-sm'
-                                                : 'text-muted-foreground hover:text-foreground hover:bg-accent/50 hover:border-border/20 border border-transparent'
+                                            className={`flex items-center gap-2.5 px-3 py-1.5 text-[13px] rounded-lg transition-all pr-8 ${pathname === `/c/${chat.id}`
+                                                ? 'text-foreground bg-accent'
+                                                : 'text-muted-foreground hover:text-foreground hover:bg-accent/30'
                                                 }`}
                                         >
                                             <MessageSquare size={14} className={pathname === `/c/${chat.id}` ? 'text-primary' : 'text-muted-foreground group-hover/chat:text-foreground'} />
@@ -325,23 +331,19 @@ export default function Sidebar() {
 
                                 <div
                                     onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                                    className="flex items-center gap-3 px-3 py-3 rounded-xl bg-accent/30 border border-border/50 hover:bg-accent/50 transition-colors cursor-pointer group"
+                                    className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-accent/20 hover:bg-accent/40 transition-colors cursor-pointer group"
                                 >
-                                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-red-500 to-orange-600 flex items-center justify-center text-xs font-bold text-white shadow-lg shadow-red-500/20 shrink-0 capitalize">
+                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-red-500 to-orange-600 flex items-center justify-center text-[10px] font-bold text-white shadow-lg shrink-0 capitalize">
                                         {user.user_metadata?.full_name
                                             ? user.user_metadata.full_name.split(' ').map((n: any) => n[0]).join('').substring(0, 2)
                                             : user.email?.[0]}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <div className="text-sm font-bold text-foreground truncate tracking-tight">
+                                        <div className="text-[13px] font-semibold text-foreground truncate tracking-tight">
                                             {user.user_metadata?.full_name || (user.email?.includes('kiranjinkakumar') ? 'Kiran Jinka' : 'User')}
                                         </div>
-                                        <div className="text-xs text-muted-foreground font-medium flex items-center gap-1">
-                                            <span>Go</span>
-                                            <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                                        </div>
                                     </div>
-                                    <ChevronDown size={14} className={`text-muted-foreground transition-transform duration-300 ${isProfileMenuOpen ? 'rotate-180' : ''}`} />
+                                    <ChevronDown size={12} className={`text-muted-foreground transition-transform duration-300 ${isProfileMenuOpen ? 'rotate-180' : ''}`} />
                                 </div>
                             </>
                         ) : (

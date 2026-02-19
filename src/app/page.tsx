@@ -37,7 +37,7 @@ export default function Dashboard() {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) {
                 toast("Authentication Recommended", {
-                    description: "Please login to allow you to save your mission progress.",
+                    description: "Please login to allow you to save your chat progress.",
                     action: {
                         label: "Login",
                         onClick: () => router.push("/login")
@@ -67,11 +67,11 @@ export default function Dashboard() {
             if (!newChat) {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) {
-                    toast.error("Please login to start a mission", {
+                    toast.error("Please login to start a chat", {
                         action: { label: "Login", onClick: () => router.push("/login") }
                     });
                 } else {
-                    toast.error(`Start mission failed: ${chatError?.message || "Unknown error"}`);
+                    toast.error(`Start chat failed: ${chatError?.message || "Unknown error"}`);
                 }
                 return;
             }
@@ -215,7 +215,7 @@ export default function Dashboard() {
                             <div className="flex flex-col items-center justify-center min-h-[70vh] text-center space-y-8 relative">
                                 {/* Custom MultiAgent Doodle */}
                                 <div className="mb-8 relative py-12 px-4 group">
-                                    <h1 className="text-6xl md:text-8xl font-black tracking-tighter flex items-center justify-center select-none">
+                                    <h1 className="text-5xl md:text-7xl font-black tracking-tighter flex items-center justify-center select-none">
                                         {/* Stylized M */}
                                         <span className="text-blue-500 animate-in slide-in-from-left-8 duration-700">M</span>
                                         {/* Stylized u with pulse */}
@@ -235,7 +235,7 @@ export default function Dashboard() {
                                     <div className="absolute -top-2 -right-8 w-24 h-24 bg-blue-500/10 blur-3xl rounded-full" />
                                     <div className="absolute -bottom-4 -left-12 w-32 h-32 bg-purple-500/10 blur-3xl rounded-full" />
 
-                                    <div className="mt-6 text-2xl md:text-3xl font-semibold text-muted-foreground/80 tracking-tight animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300">
+                                    <div className="mt-6 text-xl md:text-2xl font-semibold text-muted-foreground/80 tracking-tight animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300">
                                         Where should we start?
                                     </div>
                                 </div>
