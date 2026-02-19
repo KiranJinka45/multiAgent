@@ -8,9 +8,10 @@ import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 interface CodeBlockProps {
     language: string;
     value: string;
+    isStreaming?: boolean;
 }
 
-export default function CodeBlock({ language, value }: CodeBlockProps) {
+export default function CodeBlock({ language, value, isStreaming }: CodeBlockProps) {
     const [isCopied, setIsCopied] = useState(false);
 
     const copyToClipboard = async () => {
@@ -24,7 +25,7 @@ export default function CodeBlock({ language, value }: CodeBlockProps) {
         <div className="relative w-full rounded-lg overflow-hidden my-4 border border-white/10 bg-[#1e1e1e]">
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-2 bg-[#2d2d2d] border-b border-white/5">
-                <span className="text-xs font-medium text-neutral-400 lowercase">{language || 'text'}</span>
+                <span className="text-xs font-medium text-neutral-400 lowercase">{language || 'text'} {isStreaming && <span className="ml-2 animate-pulse text-primary">• generating</span>}</span>
                 <button
                     onClick={copyToClipboard}
                     className="flex items-center gap-1.5 text-xs text-neutral-400 hover:text-white transition-colors"
@@ -45,22 +46,29 @@ export default function CodeBlock({ language, value }: CodeBlockProps) {
 
             {/* Code */}
             <div className="custom-scrollbar overflow-x-auto">
-                <SyntaxHighlighter
-                    language={language || 'text'}
-                    style={atomDark}
-                    customStyle={{
-                        margin: 0,
-                        padding: '1.5rem',
-                        background: 'transparent',
-                        fontSize: '0.875rem',
-                        lineHeight: '1.5',
-                    }}
-                    wrapLines={true}
-                    showLineNumbers={false}
-                    PreTag="div"
-                >
-                    {value}
-                </SyntaxHighlighter>
+                {isStreaming ? (
+                    <pre className="p-6 text-sm font-mono leading-relaxed text-neutral-300 bg-transparent whitespace-pre">
+                        <code>{value}</code>
+                        <span className="inline-block w-1.5 h-4 ml-0.5 bg-primary/80 animate-pulse align-middle" />
+                    </pre>
+                ) : (
+                    <SyntaxHighlighter
+                        language={language || 'text'}
+                        style={atomDark}
+                        customStyle={{
+                            margin: 0,
+                            padding: '1.5rem',
+                            background: 'transparent',
+                            fontSize: '0.875rem',
+                            lineHeight: '1.5',
+                        }}
+                        wrapLines={true}
+                        showLineNumbers={false}
+                        PreTag="div"
+                    >
+                        {value}
+                    </SyntaxHighlighter>
+                )}
             </div>
         </div>
     );

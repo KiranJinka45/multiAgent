@@ -78,6 +78,17 @@ export default function ChatList({ messages, onEdit }: ChatListProps) {
                                         </div>
                                     ) : (
                                         <div className="prose dark:prose-invert prose-p:leading-relaxed prose-pre:bg-transparent prose-pre:p-0 max-w-none">
+                                            {/* Thinking Mode UI Concept */}
+                                            {msg.content.includes('Thinking...') && (
+                                                <div className="mb-4 p-3 bg-accent/30 border-l-2 border-primary rounded-r-lg text-sm text-muted-foreground italic flex items-start gap-2 animate-in fade-in duration-700">
+                                                    <Sparkles size={14} className="mt-1 shrink-0 text-primary" />
+                                                    <div>
+                                                        <span className="font-semibold block mb-1 not-italic">Thought Process</span>
+                                                        {msg.content.split('\n\n')[0]}
+                                                    </div>
+                                                </div>
+                                            )}
+
                                             <ReactMarkdown
                                                 components={{
                                                     code({ node, inline, className, children, ...props }: any) {
@@ -93,10 +104,21 @@ export default function ChatList({ messages, onEdit }: ChatListProps) {
                                                                 {children}
                                                             </code>
                                                         );
+                                                    },
+                                                    img({ node, ...props }: any) {
+                                                        return (
+                                                            <div className="my-4 overflow-hidden rounded-2xl border border-border bg-muted/30 shadow-2xl animate-in zoom-in-95 duration-500">
+                                                                <img
+                                                                    {...props}
+                                                                    className="w-full h-auto object-cover max-h-[600px] hover:scale-[1.02] transition-transform duration-500 cursor-zoom-in"
+                                                                    loading="lazy"
+                                                                />
+                                                            </div>
+                                                        );
                                                     }
                                                 }}
                                             >
-                                                {msg.content}
+                                                {msg.content.includes('Thinking...') ? msg.content.substring(msg.content.indexOf('\n\n') + 2) : msg.content}
                                             </ReactMarkdown>
                                         </div>
                                     )}

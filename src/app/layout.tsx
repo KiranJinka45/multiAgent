@@ -12,6 +12,7 @@ export const metadata: Metadata = {
 };
 
 import { Toaster } from 'sonner';
+import { SidebarProvider } from '@/context/SidebarContext';
 
 export default function RootLayout({
   children,
@@ -21,15 +22,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} antialiased selection:bg-blue-500/30`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-          <Toaster position="top-center" richColors theme="dark" />
-        </ThemeProvider>
+        <SidebarProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+            <Toaster position="top-center" richColors theme="dark" />
+          </ThemeProvider>
+        </SidebarProvider>
       </body>
     </html>
   );

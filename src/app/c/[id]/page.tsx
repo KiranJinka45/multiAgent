@@ -11,11 +11,22 @@ import MobileMenu from '@/components/MobileMenu';
 import TopNav from '@/components/TopNav';
 import ChatList from '@/components/ChatList';
 import TaskInput, { TaskInputHandle } from '@/components/TaskInput';
+import Canvas from '@/components/Canvas';
 
 export default function ChatPage({ params }: { params: { id: string } }) {
     const [messages, setMessages] = useState<Message[]>([]);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
+
+    // Canvas State
+    const [isCanvasOpen, setIsCanvasOpen] = useState(false);
+    const [canvasData, setCanvasData] = useState<{
+        title: string;
+        content: string;
+        contentType: 'code' | 'markdown';
+        language?: string;
+    }>({ title: '', content: '', contentType: 'markdown' });
+
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const taskInputRef = useRef<TaskInputHandle>(null); // Add ref
     const router = useRouter();
@@ -37,10 +48,10 @@ export default function ChatPage({ params }: { params: { id: string } }) {
         scrollToBottom();
     }, [messages]);
 
-    const handleAiGeneration = async (prompt: string, model: string = 'Fast') => {
+    const handleAiGeneration = async (prompt: string, model: string = 'Fast', tool?: string) => {
         setIsGenerating(true);
         try {
-            // Optimistic update
+            // Optimistic update for user message
             const userMsg: Message = {
                 id: crypto.randomUUID(),
                 chat_id: params.id,
@@ -53,29 +64,113 @@ export default function ChatPage({ params }: { params: { id: string } }) {
             // Save user message to DB
             await chatService.addMessage(params.id, prompt, 'user');
 
+            // Placeholder for AI message
+            const aiMsgId = crypto.randomUUID();
+            const aiMsg: Message = {
+                id: aiMsgId,
+                chat_id: params.id,
+                content: '',
+                role: 'assistant',
+                created_at: new Date().toISOString(),
+            };
+            setMessages(prev => [...prev, aiMsg]);
+
             // Call API
-            const response = await fetch('/api/chat', {
+            let endpoint = '/api/chat';
+            if (tool === 'image') endpoint = '/api/generate-image';
+            else if (tool === 'research') endpoint = '/api/deep-research';
+            else if (tool === 'learning') endpoint = '/api/guided-learning';
+
+            const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: prompt, model }),
+                body: JSON.stringify({ message: prompt, prompt, model }),
             });
 
-            const data = await response.json();
+            if (!response.ok) throw new Error('Failed to fetch response');
 
-            if (data.response) {
-                const aiMsg: Message = {
-                    id: crypto.randomUUID(),
-                    chat_id: params.id,
-                    content: data.response,
-                    role: 'assistant',
-                    created_at: new Date().toISOString(),
-                };
-                setMessages(prev => [...prev, aiMsg]);
-
-                // Save assistant message to DB
-                await chatService.addMessage(params.id, data.response, 'assistant');
+            if (tool === 'image') {
+                const data = await response.json();
+                if (data.response) {
+                    setMessages(prev =>
+                        prev.map(msg => msg.id === aiMsgId ? { ...msg, content: data.response } : msg)
+                    );
+                    await chatService.addMessage(params.id, data.response, 'assistant');
+                }
             } else {
-                toast.error("Failed to generate content");
+                const reader = response.body?.getReader();
+                if (!reader) throw new Error('No reader available');
+
+                const textDecoder = new TextDecoder();
+                let fullResponse = '';
+                let isCanvasDetected = false;
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    const chunk = textDecoder.decode(value, { stream: true });
+                    fullResponse += chunk;
+
+                    // Early Canvas detection
+                    if (!isCanvasDetected && fullResponse.includes('```')) {
+                        isCanvasDetected = true;
+                        setIsCanvasOpen(true);
+                    }
+
+                    // Strict redundancy fix: Strip ALL code blocks for chat display
+                    let chatDisplayContent = fullResponse;
+                    if (isCanvasDetected) {
+                        // Aggressively replace the first match of a code block (and everything following)
+                        // with a clean notice, while generation is active.
+                        chatDisplayContent = fullResponse.replace(/```[\s\S]*$/, '\n\n> **[View Code in Canvas]**');
+
+                        // Sync current code to Canvas
+                        const codeMatch = fullResponse.match(/```(\w+)?\n([\s\S]*?)(?:```|$)/);
+                        if (codeMatch) {
+                            setCanvasData(prev => ({
+                                ...prev,
+                                title: "Generated Code",
+                                content: codeMatch[2],
+                                contentType: 'code',
+                                language: codeMatch[1] || 'typescript'
+                            }));
+                        }
+                    }
+
+                    // Update the placeholder AI message
+                    setMessages(prev =>
+                        prev.map(msg =>
+                            msg.id === aiMsgId ? { ...msg, content: chatDisplayContent } : msg
+                        )
+                    );
+                }
+
+                // Save final assistant message to DB
+                if (fullResponse) {
+                    await chatService.addMessage(params.id, fullResponse, 'assistant');
+
+                    // Final check to sync Canvas one last time in case stream ended abruptly
+                    if (fullResponse.includes('```')) {
+                        const codeBlockMatch = fullResponse.match(/```(\w+)?\n([\s\S]*?)```/);
+                        if (codeBlockMatch) {
+                            setCanvasData({
+                                title: "Generated Code",
+                                content: codeBlockMatch[2],
+                                contentType: 'code',
+                                language: codeBlockMatch[1] || 'typescript'
+                            });
+                            setIsCanvasOpen(true);
+                        }
+                    } else if (fullResponse.length > 800) {
+                        setCanvasData({
+                            title: "Document",
+                            content: fullResponse,
+                            contentType: 'markdown'
+                        });
+                        setIsCanvasOpen(true);
+                    }
+                }
             }
 
         } catch (error) {
@@ -86,8 +181,8 @@ export default function ChatPage({ params }: { params: { id: string } }) {
         }
     };
 
-    const addMessage = useCallback((content: string, model: string = 'Fast') => {
-        handleAiGeneration(content, model);
+    const addMessage = useCallback((content: string, model: string = 'Fast', tool?: string) => {
+        handleAiGeneration(content, model, tool);
     }, [params.id]);
 
     const handleEdit = (msg: Message) => {
@@ -102,7 +197,10 @@ export default function ChatPage({ params }: { params: { id: string } }) {
             <Sidebar />
             <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
 
-            <main className="flex-1 flex flex-col h-full relative md:ml-64">
+            <main
+                style={{ marginLeft: 'var(--sidebar-width, 260px)' }}
+                className={`flex-1 flex flex-col h-full relative transition-[margin] duration-300 ease-in-out ${isCanvasOpen ? 'md:mr-[30%] xl:mr-[30%]' : ''}`}
+            >
                 <TopNav onOpenMobileMenu={() => setIsMobileMenuOpen(true)} />
                 <div className="fixed top-0 left-0 right-0 h-32 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />
 
@@ -117,6 +215,13 @@ export default function ChatPage({ params }: { params: { id: string } }) {
 
                 <TaskInput ref={taskInputRef} onAddTask={addMessage} />
             </main>
+
+            <Canvas
+                isOpen={isCanvasOpen}
+                onClose={() => setIsCanvasOpen(false)}
+                isGenerating={isGenerating}
+                {...canvasData}
+            />
         </div>
     );
 }

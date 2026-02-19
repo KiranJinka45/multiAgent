@@ -14,7 +14,7 @@ declare global {
 }
 
 type TaskInputProps = {
-    onAddTask: (title: string, model: ModelType) => void;
+    onAddTask: (title: string, model: ModelType, tool?: string) => void;
     centered?: boolean;
 };
 
@@ -35,8 +35,10 @@ const TaskInput = forwardRef<TaskInputHandle, TaskInputProps>(({ onAddTask, cent
     const [showToolsMenu, setShowToolsMenu] = useState(false);
     const [showModelMenu, setShowModelMenu] = useState(false);
     const [selectedModel, setSelectedModel] = useState<ModelType>('Fast');
+    const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
 
     const recognitionRef = useRef<SpeechRecognition | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useImperativeHandle(ref, () => ({
         setInput: (value: string) => setTitle(value),
@@ -85,23 +87,62 @@ const TaskInput = forwardRef<TaskInputHandle, TaskInputProps>(({ onAddTask, cent
         }
     };
 
+    const handleFeatureClick = (feature: string) => {
+        if (feature === 'Create images') {
+            setTitle('Generate an image: ');
+            setTimeout(() => inputRef.current?.focus(), 50);
+        } else if (feature === 'Deep Research') {
+            setTitle('Research topic: ');
+            setTimeout(() => inputRef.current?.focus(), 50);
+        } else if (feature === 'Guided Learning') {
+            setTitle('Teach me about: ');
+            setTimeout(() => inputRef.current?.focus(), 50);
+        } else if (feature === 'Upload files') {
+            fileInputRef.current?.click();
+        } else {
+            toast.info(`Selected: ${feature}`, {
+                description: "This feature is currently a UI mock."
+            });
+        }
+        setShowPlusMenu(false);
+        setShowToolsMenu(false);
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            setAttachedFiles(prev => [...prev, ...Array.from(e.target.files!)]);
+            toast.success(`${e.target.files.length} file(s) attached`);
+        }
+    };
+
+    const removeFile = (index: number) => {
+        setAttachedFiles(prev => prev.filter((_, i) => i !== index));
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (title.trim()) {
-            onAddTask(title, selectedModel);
+        if (title.trim() || attachedFiles.length > 0) {
+            let tool = undefined;
+            let prompt = title;
+
+            if (title.startsWith('Generate an image: ')) {
+                tool = 'image';
+                prompt = title.replace('Generate an image: ', '');
+            } else if (title.startsWith('Research topic: ')) {
+                tool = 'research';
+                prompt = title.replace('Research topic: ', '');
+            } else if (title.startsWith('Teach me about: ')) {
+                tool = 'learning';
+                prompt = title.replace('Teach me about: ', '');
+            }
+
+            onAddTask(prompt, selectedModel, tool);
             setTitle('');
+            setAttachedFiles([]);
             setShowPlusMenu(false);
             setShowToolsMenu(false);
             setShowModelMenu(false);
         }
-    };
-
-    const handleFeatureClick = (feature: string) => {
-        toast.info(`Selected: ${feature}`, {
-            description: "This feature is currently a UI mock."
-        });
-        setShowPlusMenu(false);
-        setShowToolsMenu(false);
     };
 
     // Conditional classes based on 'centered' prop
@@ -208,6 +249,32 @@ const TaskInput = forwardRef<TaskInputHandle, TaskInputProps>(({ onAddTask, cent
             </AnimatePresence>
 
             <form onSubmit={handleSubmit} className={`w-full relative ${centered ? '' : 'max-w-4xl mx-auto'}`}>
+                {/* Attached Files UI */}
+                <AnimatePresence>
+                    {attachedFiles.length > 0 && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 5 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 5 }}
+                            className="flex flex-wrap gap-2 mb-3 px-2"
+                        >
+                            {attachedFiles.map((file, idx) => (
+                                <div key={`${file.name}-${idx}`} className="flex items-center gap-2 px-3 py-1.5 bg-accent/50 border border-border rounded-xl text-xs font-medium text-foreground">
+                                    <FileText size={14} className="text-blue-400" />
+                                    <span className="max-w-[120px] truncate">{file.name}</span>
+                                    <button
+                                        type="button"
+                                        onClick={() => removeFile(idx)}
+                                        className="ml-1 p-0.5 hover:bg-background rounded-full transition-colors"
+                                    >
+                                        <Plus size={14} className="rotate-45" />
+                                    </button>
+                                </div>
+                            ))}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
                 <div className={inputWrapperClasses}>
                     {/* Left Actions */}
                     <button
@@ -280,6 +347,14 @@ const TaskInput = forwardRef<TaskInputHandle, TaskInputProps>(({ onAddTask, cent
                     </p>
                 )}
             </form>
+
+            <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                className="hidden"
+                onChange={handleFileChange}
+            />
         </div>
     );
 });
