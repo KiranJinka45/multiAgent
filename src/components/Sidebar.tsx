@@ -186,6 +186,14 @@ export default function Sidebar() {
                         </button>
                     </div>
 
+                    <div className="mb-6 px-1">
+                        <nav className="space-y-0.5">
+                            <SidebarItem icon={Search} label="Search" href="#" />
+                            <SidebarItem icon={FolderPlus} label="Projects" href="#" />
+                            <SidebarItem icon={Image} label="Images" href="#" />
+                        </nav>
+                    </div>
+
                     <div className="flex-1 overflow-y-auto space-y-4 px-1">
                         <div>
                             <h3 className="px-3 text-[10px] font-semibold text-neutral-500 mb-1.5 uppercase tracking-widest text-[#9b9b9b]">Your chats</h3>
