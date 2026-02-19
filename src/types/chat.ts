@@ -6,6 +6,9 @@ export interface Chat {
     title: string;
     created_at: string;
     updated_at: string;
+    is_pinned?: boolean;
+    is_archived?: boolean;
+    is_public?: boolean;
 }
 
 export interface Message {

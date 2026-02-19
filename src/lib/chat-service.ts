@@ -113,5 +113,47 @@ export const chatService = {
             return false;
         }
         return true;
+    },
+
+    // Toggle pin status
+    async togglePinned(chatId: string, isPinned: boolean): Promise<boolean> {
+        const { error } = await supabase
+            .from('chats')
+            .update({ is_pinned: isPinned })
+            .eq('id', chatId);
+
+        if (error) {
+            console.error('Error toggling pin:', error);
+            return false;
+        }
+        return true;
+    },
+
+    // Toggle archive status
+    async toggleArchived(chatId: string, isArchived: boolean): Promise<boolean> {
+        const { error } = await supabase
+            .from('chats')
+            .update({ is_archived: isArchived })
+            .eq('id', chatId);
+
+        if (error) {
+            console.error('Error toggling archive:', error);
+            return false;
+        }
+        return true;
+    },
+
+    // Toggle public status (Sharing)
+    async togglePublic(chatId: string, isPublic: boolean): Promise<boolean> {
+        const { error } = await supabase
+            .from('chats')
+            .update({ is_public: isPublic })
+            .eq('id', chatId);
+
+        if (error) {
+            console.error('Error toggling public status:', error);
+            return false;
+        }
+        return true;
     }
 };

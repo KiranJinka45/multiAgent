@@ -25,6 +25,10 @@ create policy "Users can view own chats" on chats for select using (auth.uid() =
 create policy "Users can insert own chats" on chats for insert with check (auth.uid() = user_id);
 create policy "Users can update own chats" on chats for update using (auth.uid() = user_id);
 create policy "Users can delete own chats" on chats for delete using (auth.uid() = user_id);
+-- Update chats table with new status columns
+alter table chats add column if not exists is_pinned boolean default false;
+alter table chats add column if not exists is_archived boolean default false;
+alter table chats add column if not exists is_public boolean default false;
 
 -- Policies for messages
 create policy "Users can view own messages" on messages for select using (

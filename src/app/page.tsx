@@ -212,10 +212,10 @@ export default function Dashboard() {
                 <div className="flex-1 overflow-y-auto w-full scroll-smooth">
                     <div className="max-w-4xl mx-auto w-full px-4 md:px-6 pt-20 pb-40">
                         {messages.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center min-h-[70vh] text-center space-y-8 relative">
+                            <div className="flex flex-col items-center justify-center min-h-[70vh] text-center space-y-4 relative">
                                 {/* Custom MultiAgent Doodle */}
-                                <div className="mb-8 relative py-12 px-4 group">
-                                    <h1 className="text-5xl md:text-7xl font-black tracking-tighter flex items-center justify-center select-none">
+                                <div className="mb-4 relative py-6 px-4 group">
+                                    <h1 className="text-4xl md:text-5xl font-black tracking-tighter flex items-center justify-center select-none">
                                         {/* Stylized M */}
                                         <span className="text-blue-500 animate-in slide-in-from-left-8 duration-700">M</span>
                                         {/* Stylized u with pulse */}
@@ -235,7 +235,7 @@ export default function Dashboard() {
                                     <div className="absolute -top-2 -right-8 w-24 h-24 bg-blue-500/10 blur-3xl rounded-full" />
                                     <div className="absolute -bottom-4 -left-12 w-32 h-32 bg-purple-500/10 blur-3xl rounded-full" />
 
-                                    <div className="mt-6 text-xl md:text-2xl font-semibold text-muted-foreground/80 tracking-tight animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300">
+                                    <div className="mt-3 text-lg md:text-xl font-semibold text-muted-foreground/80 tracking-tight animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300">
                                         Where should we start?
                                     </div>
                                 </div>

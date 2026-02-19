@@ -1,13 +1,19 @@
 'use client';
 
-import { LucideIcon, LayoutDashboard, ListTodo, CheckSquare, Settings, X } from 'lucide-react';
+import { LucideIcon, LayoutDashboard, ListTodo, CheckSquare, Settings, X, Search, MessageSquare, Pin } from 'lucide-react';
+import { Chat } from '@/types/chat';
+import SearchChatsModal from './SearchChatsModal';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { chatService } from '@/lib/chat-service';
 
 type MobileMenuProps = {
     isOpen: boolean;
     onClose: () => void;
+    chats?: Chat[];
 };
 
 type MenuItemProps = {
@@ -37,6 +43,42 @@ const MenuItem = ({ icon: Icon, label, href, active, onClick }: MenuItemProps) =
 
 export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     const pathname = usePathname();
+    const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+    const [chats, setChats] = useState<Chat[]>([]);
+    const [user, setUser] = useState<any>(null);
+    const supabase = createClientComponentClient();
+
+    const fetchChats = async () => {
+        if (!user) return;
+        const data = await chatService.getChats();
+        setChats(data);
+    };
+
+    useEffect(() => {
+        const getUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            setUser(user);
+        };
+        getUser();
+    }, []);
+
+    useEffect(() => {
+        if (user) {
+            fetchChats();
+            const channel = supabase
+                .channel('mobile-menu-changes')
+                .on(
+                    'postgres_changes',
+                    { event: '*', schema: 'public', table: 'chats' },
+                    () => fetchChats()
+                )
+                .subscribe();
+
+            return () => {
+                supabase.removeChannel(channel);
+            };
+        }
+    }, [user, supabase]);
 
     return (
         <AnimatePresence>
@@ -91,19 +133,45 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                                 <h3 className="px-4 text-xs font-semibold text-neutral-500 mb-2 uppercase tracking-wider">Orbit Control</h3>
                                 <nav className="space-y-0.5">
                                     <MenuItem icon={LayoutDashboard} label="Mission Center" href="/" active={pathname === '/'} onClick={onClose} />
+                                    <button
+                                        onClick={() => setIsSearchModalOpen(true)}
+                                        className="w-full flex items-center gap-4 px-4 py-4 rounded-xl transition-all text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200"
+                                    >
+                                        <Search size={24} strokeWidth={1.5} />
+                                        <span className="font-medium text-lg">Search chats</span>
+                                    </button>
                                     <MenuItem icon={ListTodo} label="My Tasks" href="/my-tasks" active={pathname === '/my-tasks'} onClick={onClose} />
                                     <MenuItem icon={CheckSquare} label="Completed" href="/completed" active={pathname === '/completed'} onClick={onClose} />
                                 </nav>
                             </div>
                             <div>
-                                <h3 className="px-4 text-xs font-semibold text-neutral-500 mb-2 uppercase tracking-wider">Archives</h3>
-                                <nav className="space-y-0.5">
-                                    <div onClick={onClose} className="px-4 py-3 text-lg text-neutral-400 font-medium hover:text-white cursor-pointer truncate transition-colors">
-                                        Project Alpha
-                                    </div>
-                                    <div onClick={onClose} className="px-4 py-3 text-lg text-neutral-400 font-medium hover:text-white cursor-pointer truncate transition-colors">
-                                        Q3 Goals
-                                    </div>
+                                <h3 className="px-4 text-xs font-semibold text-neutral-500 mb-2 uppercase tracking-wider">Recent Chats</h3>
+                                <nav className="space-y-0.5 max-h-48 overflow-y-auto">
+                                    {chats
+                                        .filter(chat => !chat.is_archived)
+                                        .sort((a, b) => {
+                                            if (a.is_pinned && !b.is_pinned) return -1;
+                                            if (!a.is_pinned && b.is_pinned) return 1;
+                                            return 0;
+                                        })
+                                        .slice(0, 5)
+                                        .map(chat => (
+                                            <Link
+                                                key={chat.id}
+                                                href={`/c/${chat.id}`}
+                                                onClick={onClose}
+                                                className="w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200"
+                                            >
+                                                <MessageSquare size={20} className="shrink-0" />
+                                                <div className="flex items-center gap-2 min-w-0 flex-1">
+                                                    {chat.is_pinned && <Pin size={12} className="text-primary fill-primary shrink-0" />}
+                                                    <span className="font-medium text-base truncate">{chat.title}</span>
+                                                </div>
+                                            </Link>
+                                        ))}
+                                    {chats.length === 0 && (
+                                        <div className="px-4 py-2 text-sm text-neutral-600 italic">No recent chats</div>
+                                    )}
                                 </nav>
                             </div>
                         </div>
@@ -123,6 +191,12 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     </motion.div>
                 </>
             )}
+
+            <SearchChatsModal
+                isOpen={isSearchModalOpen}
+                onClose={() => setIsSearchModalOpen(false)}
+                chats={chats}
+            />
         </AnimatePresence>
     );
 }
