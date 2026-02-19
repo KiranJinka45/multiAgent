@@ -188,42 +188,7 @@ export default function Sidebar() {
 
                     <div className="flex-1 overflow-y-auto space-y-4 px-1">
                         <div>
-                            <nav className="space-y-0.5">
-                                <SidebarItem icon={Search} label="Search chats" href="#" />
-                                <SidebarItem icon={Image} label="Images" href="#" />
-                                <SidebarItem icon={LayoutGrid} label="Apps" href="#" />
-                                <SidebarItem icon={Compass} label="Codex" href="#" />
-                                <SidebarItem icon={Box} label="GPTs" href="#" />
-                                <SidebarItem icon={FolderPlus} label="Projects" href="#" />
-                            </nav>
-                        </div>
-
-                        <div>
-                            <h3 className="px-3 text-[10px] font-semibold text-neutral-500 mb-1.5 uppercase tracking-widest">History</h3>
-                            <nav className="space-y-0.5">
-                                <SidebarItem
-                                    icon={LayoutDashboard}
-                                    label="Chat Center"
-                                    href="/"
-                                    active={pathname === '/'}
-                                />
-                                <SidebarItem
-                                    icon={ListTodo}
-                                    label="My Tasks"
-                                    href="/my-tasks"
-                                    active={pathname === '/my-tasks'}
-                                />
-                                <SidebarItem
-                                    icon={CheckSquare}
-                                    label="Completed"
-                                    href="/completed"
-                                    active={pathname === '/completed'}
-                                />
-                            </nav>
-                        </div>
-
-                        <div>
-                            <h3 className="px-3 text-[10px] font-semibold text-neutral-500 mb-1.5 uppercase tracking-widest">Chats</h3>
+                            <h3 className="px-3 text-[10px] font-semibold text-neutral-500 mb-1.5 uppercase tracking-widest text-[#9b9b9b]">Your chats</h3>
                             <nav className="space-y-0.5">
                                 {chats.map((chat) => (
                                     <div key={chat.id} className="relative group/chat">
@@ -235,7 +200,7 @@ export default function Sidebar() {
                                                 }`}
                                         >
                                             <MessageSquare size={14} className={pathname === `/c/${chat.id}` ? 'text-primary' : 'text-muted-foreground group-hover/chat:text-foreground'} />
-                                            <span className="truncate">{chat.title}</span>
+                                            <span className="truncate font-medium">{chat.title}</span>
                                         </Link>
 
                                         <button
