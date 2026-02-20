@@ -9,8 +9,11 @@ import Sidebar from '@/components/Sidebar';
 import MobileMenu from '@/components/MobileMenu';
 import TopNav from '@/components/TopNav';
 import { toast } from 'sonner';
+import { chatService } from '@/lib/chat-service';
+import { Archive, RotateCcw } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
 
-type SettingsTab = 'profile' | 'appearance' | 'security' | 'notifications';
+type SettingsTab = 'profile' | 'appearance' | 'security' | 'notifications' | 'archive';
 
 export default function SettingsPage() {
     const supabase = createClientComponentClient();
@@ -20,6 +23,7 @@ export default function SettingsPage() {
     const { theme, setTheme } = useTheme();
     const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
     const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+    const [archivedChats, setArchivedChats] = useState<any[]>([]);
 
     useEffect(() => {
         const getUser = async () => {
@@ -32,6 +36,18 @@ export default function SettingsPage() {
         };
         getUser();
     }, [supabase, router]);
+
+    useEffect(() => {
+        if (activeTab === 'archive') {
+            const fetchArchived = async () => {
+                // We'll fetch all and filter client-side for now as getChats returns all sorted
+                // A better approach would be a specific query but getChats is cached usually
+                const allChats = await chatService.getChats();
+                setArchivedChats(allChats.filter(chat => chat.is_archived));
+            };
+            fetchArchived();
+        }
+    }, [activeTab]);
 
     const handleSignOut = async () => {
         await supabase.auth.signOut();
@@ -179,6 +195,66 @@ export default function SettingsPage() {
                         </div>
                     </div>
                 );
+            case 'archive':
+                return (
+                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="bg-card border border-border rounded-2xl p-6">
+                            <h2 className="text-xl font-semibold mb-6 flex items-center gap-2 text-foreground">
+                                <Archive size={20} className="text-yellow-500" />
+                                Archived Chats
+                            </h2>
+                            <div className="space-y-2">
+                                {archivedChats.length === 0 ? (
+                                    <div className="text-center py-12 text-muted-foreground">
+                                        <Archive size={48} className="mx-auto mb-4 opacity-20" />
+                                        <p>No archived chats found</p>
+                                    </div>
+                                ) : (
+                                    archivedChats.map((chat) => (
+                                        <div key={chat.id} className="flex items-center justify-between p-4 rounded-xl bg-accent/50 border border-border hover:bg-accent/80 transition-colors">
+                                            <div>
+                                                <div className="font-medium text-foreground text-sm">{chat.title}</div>
+                                                <div className="text-xs text-muted-foreground mt-1">
+                                                    Archived {formatDistanceToNow(new Date(chat.updated_at), { addSuffix: true })}
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <button
+                                                    onClick={async () => {
+                                                        const success = await chatService.toggleArchived(chat.id, false);
+                                                        if (success) {
+                                                            setArchivedChats(prev => prev.filter(c => c.id !== chat.id));
+                                                            toast.success('Chat unarchived');
+                                                        }
+                                                    }}
+                                                    className="p-2 bg-background border border-border rounded-lg hover:bg-accent text-foreground transition-colors"
+                                                    title="Unarchive"
+                                                >
+                                                    <RotateCcw size={16} />
+                                                </button>
+                                                <button
+                                                    onClick={async () => {
+                                                        if (confirm('Permanently delete this chat?')) {
+                                                            const success = await chatService.deleteChat(chat.id);
+                                                            if (success) {
+                                                                setArchivedChats(prev => prev.filter(c => c.id !== chat.id));
+                                                                toast.success('Chat deleted');
+                                                            }
+                                                        }
+                                                    }}
+                                                    className="p-2 bg-destructive/10 border border-destructive/20 rounded-lg hover:bg-destructive/20 text-destructive transition-colors"
+                                                    title="Delete permanently"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                );
         }
     };
 
@@ -202,6 +278,7 @@ export default function SettingsPage() {
                                         { id: 'appearance', label: 'Appearance', icon: Monitor },
                                         { id: 'security', label: 'Security', icon: Shield },
                                         { id: 'notifications', label: 'Notifications', icon: Bell },
+                                        { id: 'archive', label: 'Archived Chats', icon: Archive },
                                     ].map((item) => (
                                         <button
                                             key={item.id}

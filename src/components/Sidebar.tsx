@@ -11,6 +11,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useSidebar } from '@/context/SidebarContext';
 import SearchChatsModal from './SearchChatsModal';
 import RenameModal from './RenameModal';
+import ShareModal from './ShareModal';
+import GroupChatModal from './GroupChatModal';
 import { toast } from 'sonner';
 
 type SidebarItemProps = {
@@ -43,7 +45,10 @@ export default function Sidebar() {
     const [activeMenu, setActiveMenu] = useState<string | null>(null);
     const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
     const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
+    const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+    const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
     const [chatToRename, setChatToRename] = useState<Chat | null>(null);
+    const [chatToShare, setChatToShare] = useState<Chat | null>(null);
     const sidebarRef = useRef<HTMLDivElement>(null);
     const supabase = createClientComponentClient();
 
@@ -155,6 +160,7 @@ export default function Sidebar() {
         const success = await chatService.togglePinned(chat.id, newStatus);
         if (success) {
             setChats(prev => prev.map(c => c.id === chat.id ? { ...c, is_pinned: newStatus } : c));
+            fetchChats(); // Force refresh to ensure sort order
             toast.success(newStatus ? 'Chat pinned' : 'Chat unpinned');
         }
         setActiveMenu(null);
@@ -167,6 +173,7 @@ export default function Sidebar() {
         const success = await chatService.toggleArchived(chat.id, newStatus);
         if (success) {
             setChats(prev => prev.map(c => c.id === chat.id ? { ...c, is_archived: newStatus } : c));
+            fetchChats(); // Force refresh
             toast.success(newStatus ? 'Chat archived' : 'Chat unarchived');
         }
         setActiveMenu(null);
@@ -185,12 +192,8 @@ export default function Sidebar() {
     const handleShare = async (chat: Chat, e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        const success = await chatService.togglePublic(chat.id, true);
-        if (success) {
-            const url = `${window.location.origin}/share/${chat.id}`;
-            navigator.clipboard.writeText(url);
-            toast.success('Public share link copied to clipboard');
-        }
+        setChatToShare(chat);
+        setIsShareModalOpen(true);
         setActiveMenu(null);
     };
 
@@ -248,8 +251,8 @@ export default function Sidebar() {
                                 <Search size={16} className="group-hover:text-foreground transition-colors duration-300" />
                                 <span className="font-medium text-[13px] tracking-tight">Search chats</span>
                             </button>
-                            <SidebarItem icon={FolderPlus} label="Projects" href="#" />
-                            <SidebarItem icon={Image} label="Images" href="#" />
+                            <SidebarItem icon={FolderPlus} label="Projects" href="/projects" />
+                            <SidebarItem icon={Image} label="Images" href="/images" />
                         </nav>
                     </div>
 
@@ -317,7 +320,7 @@ export default function Sidebar() {
                                                                     onClick={(e) => {
                                                                         e.preventDefault();
                                                                         e.stopPropagation();
-                                                                        toast.info('Group chat feature coming soon!');
+                                                                        setIsGroupModalOpen(true);
                                                                         setActiveMenu(null);
                                                                     }}
                                                                     className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-accent text-sm text-foreground transition-colors"
@@ -429,8 +432,8 @@ export default function Sidebar() {
                             </Link>
                         )}
                     </div>
-                </div>
-            </aside>
+                </div >
+            </aside >
 
             <SearchChatsModal
                 isOpen={isSearchModalOpen}
@@ -443,6 +446,33 @@ export default function Sidebar() {
                 onClose={() => setIsRenameModalOpen(false)}
                 onRename={handleRename}
                 initialTitle={chatToRename?.title || ''}
+            />
+
+            {
+                chatToShare && (
+                    <ShareModal
+                        isOpen={isShareModalOpen}
+                        onClose={() => setIsShareModalOpen(false)}
+                        chat={chatToShare}
+                    />
+                )
+            }
+
+            <GroupChatModal
+                isOpen={isGroupModalOpen}
+                onClose={() => setIsGroupModalOpen(false)}
+                onCreateGroup={async (name, members) => {
+                    // Create a pseudo-group chat
+                    const { chat, error } = await chatService.createChat(name);
+                    if (chat) {
+                        // In a real app, we'd add members to a relation table here
+                        // For now, we just create the chat
+                        await chatService.addMessage(chat.id, `Group created with members: ${members.join(', ')}`, 'assistant');
+                        setChats(prev => [chat, ...prev]);
+                        toast.success('Group chat created');
+                        router.push(`/c/${chat.id}`);
+                    }
+                }}
             />
         </>
     );

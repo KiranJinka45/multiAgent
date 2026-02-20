@@ -189,6 +189,21 @@ export default function Dashboard() {
         handleAiGeneration(content, model, tool);
     }, [router]);
 
+    const handleRegenerate = async (messageId: string) => {
+        // Find the assistant message
+        const msg = messages.find(m => m.id === messageId);
+        if (!msg) return;
+
+        // On the root page, we usually redirect to /c/[id] after first message.
+        // If we're still here, we can try to re-run.
+        const userPrompt = messages.find(m => m.role === 'user')?.content;
+        if (!userPrompt) return;
+
+        setMessages(prev => prev.filter(m => m.id !== messageId));
+        await chatService.deleteMessage(messageId);
+        handleAiGeneration(userPrompt);
+    };
+
     const handleEdit = (msg: Message) => {
         if (msg.role === 'user') {
             taskInputRef.current?.setInput(msg.content);
@@ -262,7 +277,11 @@ export default function Dashboard() {
                             </div>
                         ) : (
                             <div className="space-y-8 animate-in fade-in duration-500">
-                                <ChatList messages={messages} onEdit={handleEdit} />
+                                <ChatList
+                                    messages={messages}
+                                    onEdit={handleEdit}
+                                    onRegenerate={handleRegenerate}
+                                />
                                 <div ref={messagesEndRef} />
                             </div>
                         )}

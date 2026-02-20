@@ -279,7 +279,11 @@ const TaskInput = forwardRef<TaskInputHandle, TaskInputProps>(({ onAddTask, cent
                     {/* Left Actions */}
                     <button
                         type="button"
-                        onClick={() => setShowPlusMenu(!showPlusMenu)}
+                        onClick={() => {
+                            setShowPlusMenu(!showPlusMenu);
+                            setShowToolsMenu(false);
+                            setShowModelMenu(false);
+                        }}
                         className={`p-3 rounded-full transition-colors ${showPlusMenu ? 'bg-accent text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-accent'}`}
                     >
                         <Plus size={20} className={`transition-transform duration-300 ${showPlusMenu ? 'rotate-45' : ''}`} />
@@ -302,7 +306,11 @@ const TaskInput = forwardRef<TaskInputHandle, TaskInputProps>(({ onAddTask, cent
                         {!title && (
                             <button
                                 type="button"
-                                onClick={() => setShowToolsMenu(!showToolsMenu)}
+                                onClick={() => {
+                                    setShowToolsMenu(!showToolsMenu);
+                                    setShowPlusMenu(false);
+                                    setShowModelMenu(false);
+                                }}
                                 className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors text-sm font-medium ${showToolsMenu ? 'bg-accent text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-accent'}`}
                             >
                                 <Sparkles size={16} />
@@ -313,7 +321,11 @@ const TaskInput = forwardRef<TaskInputHandle, TaskInputProps>(({ onAddTask, cent
                         {/* Pro Selector (Visual only) */}
                         <button
                             type="button"
-                            onClick={() => setShowModelMenu(!showModelMenu)}
+                            onClick={() => {
+                                setShowModelMenu(!showModelMenu);
+                                setShowPlusMenu(false);
+                                setShowToolsMenu(false);
+                            }}
                             className="hidden sm:flex items-center gap-1 pl-3 pr-2 py-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded-full transition-colors text-sm font-medium"
                         >
                             <span>{selectedModel}</span>

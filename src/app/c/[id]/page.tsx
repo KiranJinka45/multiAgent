@@ -185,6 +185,34 @@ export default function ChatPage({ params }: { params: { id: string } }) {
         handleAiGeneration(content, model, tool);
     }, [params.id]);
 
+    const handleRegenerate = async (messageId: string) => {
+        const index = messages.findIndex(m => m.id === messageId);
+        if (index === -1) return;
+
+        // Find the user prompt that preceded this assistant response
+        let userPrompt = '';
+        for (let i = index - 1; i >= 0; i--) {
+            if (messages[i].role === 'user') {
+                userPrompt = messages[i].content;
+                break;
+            }
+        }
+
+        if (!userPrompt) {
+            toast.error("Could not find original prompt to regenerate");
+            return;
+        }
+
+        // Remove the current assistant message from state
+        setMessages(prev => prev.filter(m => m.id !== messageId));
+
+        // Remove from DB too for consistency
+        await chatService.deleteMessage(messageId);
+
+        // Re-trigger generation
+        handleAiGeneration(userPrompt);
+    };
+
     const handleEdit = (msg: Message) => {
         if (msg.role === 'user') {
             taskInputRef.current?.setInput(msg.content);
@@ -207,7 +235,11 @@ export default function ChatPage({ params }: { params: { id: string } }) {
                 <div className="flex-1 overflow-y-auto w-full scroll-smooth">
                     <div className="max-w-4xl mx-auto w-full px-4 md:px-6 pt-20 pb-40">
                         <div className="space-y-8 animate-in fade-in duration-500">
-                            <ChatList messages={messages} onEdit={handleEdit} />
+                            <ChatList
+                                messages={messages}
+                                onEdit={handleEdit}
+                                onRegenerate={handleRegenerate}
+                            />
                             <div ref={messagesEndRef} />
                         </div>
                     </div>

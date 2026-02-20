@@ -155,5 +155,19 @@ export const chatService = {
             return false;
         }
         return true;
+    },
+
+    // Delete a single message
+    async deleteMessage(messageId: string): Promise<boolean> {
+        const { error } = await supabase
+            .from('messages')
+            .delete()
+            .eq('id', messageId);
+
+        if (error) {
+            console.error('Error deleting message:', error);
+            return false;
+        }
+        return true;
     }
 };
