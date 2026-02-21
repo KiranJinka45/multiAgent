@@ -1,8 +1,8 @@
 'use client';
 
-import { LucideIcon, LayoutDashboard, ListTodo, CheckSquare, Settings, X, Search, MessageSquare, Pin } from 'lucide-react';
+import { LucideIcon, LayoutDashboard, ListTodo, CheckSquare, Settings, X, Github, MessageSquare, Pin } from 'lucide-react';
 import { Chat } from '@/types/chat';
-import SearchChatsModal from './SearchChatsModal';
+import { useSidebar } from '@/context/SidebarContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -43,7 +43,7 @@ const MenuItem = ({ icon: Icon, label, href, active, onClick }: MenuItemProps) =
 
 export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     const pathname = usePathname();
-    const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+    const { setIsGithubModalOpen } = useSidebar();
     const [chats, setChats] = useState<Chat[]>([]);
     const [user, setUser] = useState<any>(null);
     const supabase = createClientComponentClient();
@@ -134,11 +134,11 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                                 <nav className="space-y-0.5">
                                     <MenuItem icon={LayoutDashboard} label="Mission Center" href="/" active={pathname === '/'} onClick={onClose} />
                                     <button
-                                        onClick={() => setIsSearchModalOpen(true)}
+                                        onClick={() => { setIsGithubModalOpen(true); onClose(); }}
                                         className="w-full flex items-center gap-4 px-4 py-4 rounded-xl transition-all text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200"
                                     >
-                                        <Search size={24} strokeWidth={1.5} />
-                                        <span className="font-medium text-lg">Search chats</span>
+                                        <Github size={24} strokeWidth={1.5} />
+                                        <span className="font-medium text-lg">GitHub Integration</span>
                                     </button>
                                     <MenuItem icon={ListTodo} label="My Tasks" href="/my-tasks" active={pathname === '/my-tasks'} onClick={onClose} />
                                     <MenuItem icon={CheckSquare} label="Completed" href="/completed" active={pathname === '/completed'} onClick={onClose} />
@@ -192,11 +192,6 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 </>
             )}
 
-            <SearchChatsModal
-                isOpen={isSearchModalOpen}
-                onClose={() => setIsSearchModalOpen(false)}
-                chats={chats}
-            />
         </AnimatePresence>
     );
 }

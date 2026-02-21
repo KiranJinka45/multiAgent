@@ -1,62 +1,47 @@
 'use client';
 
-import { LucideIcon, LayoutDashboard, ListTodo, CheckSquare, Settings, MessageSquare, LogOut, MoreHorizontal, Share2, Users, Edit3, Pin, Archive, Trash2, Sparkles, PanelLeft, ChevronDown, Image, LayoutGrid, Compass, Box, FolderPlus, Search } from 'lucide-react';
-import Link from 'next/link';
+import { Sparkles, PanelLeft, Edit3, FolderPlus, Image, Github } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { chatService } from '@/lib/chat-service';
 import { Chat } from '@/types/chat';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useSidebar } from '@/context/SidebarContext';
-import SearchChatsModal from './SearchChatsModal';
+import { toast } from 'sonner';
+
+// Sub-components
+import { SidebarItem } from './sidebar/SidebarItem';
+import { SidebarChatList } from './sidebar/SidebarChatList';
+import { SidebarProfile } from './sidebar/SidebarProfile';
+
+// Original modals (keeping for now to avoid too many new files)
+import GithubIntegrationModal from './GithubIntegrationModal';
 import RenameModal from './RenameModal';
 import ShareModal from './ShareModal';
 import GroupChatModal from './GroupChatModal';
-import { toast } from 'sonner';
-
-type SidebarItemProps = {
-    icon: LucideIcon;
-    label: string;
-    href: string;
-    active?: boolean;
-};
-
-const SidebarItem = ({ icon: Icon, label, href, active }: SidebarItemProps) => (
-    <Link
-        href={href}
-        className={`flex items-center gap-2.5 px-3 py-2 rounded-lg cursor-pointer transition-all duration-300 group ${active
-            ? 'bg-accent text-foreground'
-            : 'hover:bg-accent/50 text-muted-foreground hover:text-foreground'
-            }`}
-    >
-        <Icon size={16} className={active ? 'text-primary' : 'group-hover:text-foreground transition-colors duration-300'} />
-        <span className="font-medium text-[13px] tracking-tight">{label}</span>
-    </Link>
-);
 
 export default function Sidebar() {
     const pathname = usePathname();
     const router = useRouter();
     const [chats, setChats] = useState<Chat[]>([]);
     const [user, setUser] = useState<any>(null);
-    const { isCollapsed, setIsCollapsed, width, setWidth } = useSidebar();
+    const { isCollapsed, setIsCollapsed, width, setWidth, isGithubModalOpen, setIsGithubModalOpen, isGithubConnected } = useSidebar();
     const [isResizing, setIsResizing] = useState(false);
-    const [activeMenu, setActiveMenu] = useState<string | null>(null);
-    const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+
+    // Modals state
     const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
     const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
-    const [chatToRename, setChatToRename] = useState<Chat | null>(null);
-    const [chatToShare, setChatToShare] = useState<Chat | null>(null);
+    const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
+
     const sidebarRef = useRef<HTMLDivElement>(null);
     const supabase = createClientComponentClient();
 
-    const fetchChats = async () => {
+    const fetchChats = useCallback(async () => {
         if (!user) return;
         const data = await chatService.getChats();
         setChats(data);
-    };
+    }, [user]);
 
     // Resizing logic
     const startResizing = useCallback((e: React.MouseEvent) => {
@@ -64,18 +49,14 @@ export default function Sidebar() {
         e.preventDefault();
     }, []);
 
-    const stopResizing = useCallback(() => {
-        setIsResizing(false);
-    }, []);
+    const stopResizing = useCallback(() => setIsResizing(false), []);
 
     const resize = useCallback((e: MouseEvent) => {
         if (isResizing) {
             const newWidth = e.clientX;
-            if (newWidth > 200 && newWidth < 480) {
-                setWidth(newWidth);
-            }
+            if (newWidth > 200 && newWidth < 480) setWidth(newWidth);
         }
-    }, [isResizing]);
+    }, [isResizing, setWidth]);
 
     useEffect(() => {
         window.addEventListener('mousemove', resize);
@@ -86,63 +67,30 @@ export default function Sidebar() {
         };
     }, [resize, stopResizing]);
 
-    // Handle outside clicks for context menu
-    useEffect(() => {
-        const handleClickOutside = () => setActiveMenu(null);
-        window.addEventListener('click', handleClickOutside);
-        return () => window.removeEventListener('click', handleClickOutside);
-    }, []);
-
-    useEffect(() => {
-        fetchChats();
-
-        const channel = supabase
-            .channel('schema-db-changes')
-            .on(
-                'postgres_changes',
-                {
-                    event: '*',
-                    schema: 'public',
-                    table: 'chats',
-                },
-                (payload) => {
-                    fetchChats();
-                }
-            )
-            .subscribe();
-
-        return () => {
-            supabase.removeChannel(channel);
-        };
-    }, [user, supabase]); // Re-run when user changes
-
-
-    const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-    const profileRef = useRef<HTMLDivElement>(null);
-
     useEffect(() => {
         const getUser = async () => {
             const { data: { user } } = await supabase.auth.getUser();
             setUser(user);
         };
         getUser();
-    }, []);
+    }, [supabase]);
 
-    // Handle outside clicks for profile menu
     useEffect(() => {
-        const handleClickOutside = (e: MouseEvent) => {
-            if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
-                setIsProfileMenuOpen(false);
-            }
-        };
-        window.addEventListener('click', handleClickOutside);
-        return () => window.removeEventListener('click', handleClickOutside);
-    }, []);
+        if (!user) return;
+        fetchChats();
 
+        const channel = supabase
+            .channel('sidebar-sync')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'chats' }, () => fetchChats())
+            .subscribe();
+
+        return () => { supabase.removeChannel(channel); };
+    }, [user, fetchChats, supabase]);
+
+    // Handlers
     const handleDeleteChat = async (id: string, e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (confirm('Are you sure you want to delete this mission?')) {
+        e.preventDefault(); e.stopPropagation();
+        if (confirm('Delete this chat permanently?')) {
             const success = await chatService.deleteChat(id);
             if (success) {
                 setChats(prev => prev.filter(c => c.id !== id));
@@ -150,327 +98,128 @@ export default function Sidebar() {
                 toast.success('Chat deleted');
             }
         }
-        setActiveMenu(null);
     };
 
     const handleTogglePin = async (chat: Chat, e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const newStatus = !chat.is_pinned;
-        const success = await chatService.togglePinned(chat.id, newStatus);
+        e.preventDefault(); e.stopPropagation();
+        const success = await chatService.togglePinned(chat.id, !chat.is_pinned);
         if (success) {
-            setChats(prev => prev.map(c => c.id === chat.id ? { ...c, is_pinned: newStatus } : c));
-            fetchChats(); // Force refresh to ensure sort order
-            toast.success(newStatus ? 'Chat pinned' : 'Chat unpinned');
+            fetchChats();
+            toast.success(chat.is_pinned ? 'Unpinned' : 'Pinned');
         }
-        setActiveMenu(null);
     };
 
     const handleToggleArchive = async (chat: Chat, e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const newStatus = !chat.is_archived;
-        const success = await chatService.toggleArchived(chat.id, newStatus);
+        e.preventDefault(); e.stopPropagation();
+        const success = await chatService.toggleArchived(chat.id, !chat.is_archived);
         if (success) {
-            setChats(prev => prev.map(c => c.id === chat.id ? { ...c, is_archived: newStatus } : c));
-            fetchChats(); // Force refresh
-            toast.success(newStatus ? 'Chat archived' : 'Chat unarchived');
+            fetchChats();
+            toast.success(chat.is_archived ? 'Restored' : 'Archived');
         }
-        setActiveMenu(null);
-    };
-
-    const handleRename = async (newTitle: string) => {
-        if (chatToRename) {
-            const success = await chatService.updateChatTitle(chatToRename.id, newTitle);
-            if (success) {
-                setChats(prev => prev.map(c => c.id === chatToRename.id ? { ...c, title: newTitle } : c));
-                toast.success('Chat renamed');
-            }
-        }
-    };
-
-    const handleShare = async (chat: Chat, e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setChatToShare(chat);
-        setIsShareModalOpen(true);
-        setActiveMenu(null);
-    };
-
-    const handleNewMission = () => {
-        router.push('/');
     };
 
     return (
         <>
-
             <aside
                 ref={sidebarRef}
                 style={{ width: isCollapsed ? 0 : width }}
-                className={`fixed left-0 top-0 h-screen bg-background/95 backdrop-blur-xl border-r border-border flex flex-col z-50 transition-[width] duration-300 ease-in-out ${isCollapsed ? '-translate-x-full overflow-hidden' : 'translate-x-0'} group/sidebar`}
+                className={`fixed left-0 top-0 h-screen bg-background border-r border-border flex flex-col z-50 transition-[width] duration-300 ease-in-out ${isCollapsed ? '-translate-x-full overflow-hidden' : 'translate-x-0'}`}
             >
                 {/* Resize Handle */}
-                <div
-                    onMouseDown={startResizing}
-                    className="absolute right-0 top-0 h-full w-1.5 cursor-col-resize group/resizer z-50 transition-colors"
-                >
-                    <div className="absolute inset-y-0 right-[4px] w-[1px] bg-border group-hover/resizer:bg-primary transition-colors h-full" />
+                <div onMouseDown={startResizing} className="absolute right-0 top-0 h-full w-1 cursor-col-resize group z-50">
+                    <div className="absolute inset-y-0 right-0 w-[1px] bg-border group-hover:bg-primary transition-colors h-full" />
                 </div>
 
-                <div className="p-4 h-full flex flex-col min-w-[260px]">
-                    {/* Sidebar Top: Logo + Toggle */}
-                    <div className="flex items-center justify-between mb-4 px-2">
-                        <div className="w-6 h-6 rounded-full bg-foreground flex items-center justify-center">
-                            <Sparkles size={14} className="text-background" />
+                <div className="p-4 h-full flex flex-col min-w-[260px] glass">
+                    {/* Header */}
+                    <div className="flex items-center justify-between mb-6 px-2">
+                        <div className="flex items-center gap-2 group cursor-pointer" onClick={() => router.push('/')}>
+                            <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20 rotate-3 group-hover:rotate-0 transition-transform duration-500">
+                                <Sparkles size={18} className="text-primary-foreground" />
+                            </div>
+                            <span className="font-black text-lg tracking-tighter">MultiAgent</span>
                         </div>
                         <button
                             onClick={() => setIsCollapsed(true)}
-                            className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                            className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent transition-all"
                         >
                             <PanelLeft size={20} />
                         </button>
                     </div>
 
-                    <div className="mb-4 px-1">
+                    {/* New Chat Button */}
+                    <div className="mb-6 px-1">
                         <button
-                            onClick={handleNewMission}
-                            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg bg-accent/40 hover:bg-accent transition-all group whitespace-nowrap overflow-hidden"
+                            onClick={() => router.push('/')}
+                            className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-2xl bg-foreground text-background hover:opacity-90 transition-all group shadow-xl shadow-foreground/10 active:scale-95"
                         >
-                            <Edit3 size={16} className="text-foreground shrink-0" />
-                            <span className="text-[13px] font-medium text-foreground truncate">New chat</span>
-                            <span className="ml-auto text-[9px] text-muted-foreground font-mono opacity-0 group-hover:opacity-100 transition-opacity shrink-0">Ctrl+Shift+O</span>
+                            <div className="flex items-center gap-3">
+                                <Edit3 size={18} />
+                                <span className="text-sm font-bold tracking-tight">New Mission</span>
+                            </div>
+                            <div className="text-[10px] font-black opacity-40 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                                <span className="px-1 border border-current rounded">Ctrl</span>
+                                <span className="px-1 border border-current rounded">K</span>
+                            </div>
                         </button>
                     </div>
 
-                    <div className="mb-6 px-1">
-                        <nav className="space-y-0.5">
-                            <button
-                                onClick={() => setIsSearchModalOpen(true)}
-                                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg cursor-pointer transition-all duration-300 group hover:bg-accent/50 text-muted-foreground hover:text-foreground"
-                            >
-                                <Search size={16} className="group-hover:text-foreground transition-colors duration-300" />
-                                <span className="font-medium text-[13px] tracking-tight">Search chats</span>
-                            </button>
-                            <SidebarItem icon={FolderPlus} label="Projects" href="/projects" />
-                            <SidebarItem icon={Image} label="Images" href="/images" />
-                        </nav>
+                    {/* Navigation */}
+                    <div className="mb-8 px-1 space-y-1">
+                        <SidebarItem
+                            icon={Github}
+                            label="GitHub Integration"
+                            href="#"
+                            onClick={() => setIsGithubModalOpen(true)}
+                            badge={isGithubConnected ? (
+                                <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
+                            ) : null}
+                        />
+                        <SidebarItem icon={FolderPlus} label="My Projects" href="/projects" active={pathname === '/projects'} />
+                        <SidebarItem icon={Image} label="Generated Images" href="/images" active={pathname === '/images'} />
                     </div>
 
-                    <div className="flex-1 overflow-y-auto space-y-4 px-1">
-                        <div>
-                            <h3 className="px-3 text-[10px] font-semibold text-neutral-500 mb-1.5 uppercase tracking-widest text-[#9b9b9b]">Your chats</h3>
-                            <nav className="space-y-0.5">
-                                {chats
-                                    .filter(chat => !chat.is_archived)
-                                    .sort((a, b) => {
-                                        if (a.is_pinned && !b.is_pinned) return -1;
-                                        if (!a.is_pinned && b.is_pinned) return 1;
-                                        return 0;
-                                    })
-                                    .map((chat) => (
-                                        <div key={chat.id} className="relative group/chat">
-                                            <Link
-                                                href={`/c/${chat.id}`}
-                                                className={`flex items-center gap-2.5 px-3 py-1.5 text-[13px] rounded-lg transition-all pr-8 ${pathname === `/c/${chat.id}`
-                                                    ? 'text-foreground bg-accent'
-                                                    : 'text-muted-foreground hover:text-foreground hover:bg-accent/30'
-                                                    }`}
-                                            >
-                                                <div className="flex items-center gap-2 min-w-0">
-                                                    {chat.is_pinned && <Pin size={10} className="text-primary fill-primary shrink-0" />}
-                                                    <MessageSquare size={14} className={pathname === `/c/${chat.id}` ? 'text-primary' : 'text-muted-foreground group-hover/chat:text-foreground'} />
-                                                    <span className="truncate font-medium">{chat.title}</span>
-                                                </div>
-                                            </Link>
+                    {/* Chat History */}
+                    <SidebarChatList
+                        chats={chats}
+                        pathname={pathname}
+                        onDelete={handleDeleteChat}
+                        onTogglePin={handleTogglePin}
+                        onToggleArchive={handleToggleArchive}
+                        onRename={(chat) => { setSelectedChat(chat); setIsRenameModalOpen(true); }}
+                        onShare={(chat) => { setSelectedChat(chat); setIsShareModalOpen(true); }}
+                        onGroupChat={(chat) => { setSelectedChat(chat); setIsGroupModalOpen(true); }}
+                    />
 
-                                            <button
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    e.stopPropagation();
-                                                    setActiveMenu(activeMenu === chat.id ? null : chat.id);
-                                                }}
-                                                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-muted opacity-0 group-hover/chat:opacity-100 transition-opacity"
-                                            >
-                                                <MoreHorizontal size={14} />
-                                            </button>
+                    {/* Footer / Profile */}
+                    <SidebarProfile user={user} supabase={supabase} />
+                </div>
+            </aside>
 
-                                            {/* Context Menu */}
-                                            <AnimatePresence>
-                                                {activeMenu === chat.id && (
-                                                    <>
-                                                        {/* Invisible backdrop to close menu */}
-                                                        <div
-                                                            className="fixed inset-0 z-[90]"
-                                                            onClick={() => setActiveMenu(null)}
-                                                        />
-                                                        <motion.div
-                                                            initial={{ opacity: 0, scale: 0.95, x: 10 }}
-                                                            animate={{ opacity: 1, scale: 1, x: 0 }}
-                                                            exit={{ opacity: 0, scale: 0.95, x: 10 }}
-                                                            className="absolute right-8 top-0 w-48 bg-card border border-border rounded-xl shadow-xl z-[100] p-1.5 overflow-hidden"
-                                                        >
-                                                            <div className="space-y-0.5">
-                                                                <button
-                                                                    onClick={(e) => handleShare(chat, e)}
-                                                                    className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-accent text-sm text-foreground transition-colors"
-                                                                >
-                                                                    <Share2 size={14} /> Share
-                                                                </button>
-                                                                <button
-                                                                    onClick={(e) => {
-                                                                        e.preventDefault();
-                                                                        e.stopPropagation();
-                                                                        setIsGroupModalOpen(true);
-                                                                        setActiveMenu(null);
-                                                                    }}
-                                                                    className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-accent text-sm text-foreground transition-colors"
-                                                                >
-                                                                    <Users size={14} /> Start a group chat
-                                                                </button>
-                                                                <button
-                                                                    onClick={(e) => {
-                                                                        e.preventDefault();
-                                                                        e.stopPropagation();
-                                                                        setChatToRename(chat);
-                                                                        setIsRenameModalOpen(true);
-                                                                        setActiveMenu(null);
-                                                                    }}
-                                                                    className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-accent text-sm text-foreground transition-colors"
-                                                                >
-                                                                    <Edit3 size={14} /> Rename
-                                                                </button>
-                                                                <div className="h-px bg-border my-1" />
-                                                                <button
-                                                                    onClick={(e) => handleTogglePin(chat, e)}
-                                                                    className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-accent text-sm text-foreground transition-colors"
-                                                                >
-                                                                    <Pin size={14} className={chat.is_pinned ? 'fill-foreground' : ''} />
-                                                                    {chat.is_pinned ? 'Unpin chat' : 'Pin chat'}
-                                                                </button>
-                                                                <button
-                                                                    onClick={(e) => handleToggleArchive(chat, e)}
-                                                                    className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-accent text-sm text-foreground transition-colors"
-                                                                >
-                                                                    <Archive size={14} /> {chat.is_archived ? 'Unarchive' : 'Archive'}
-                                                                </button>
-                                                                <button
-                                                                    onClick={(e) => handleDeleteChat(chat.id, e)}
-                                                                    className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-red-500/10 text-sm text-red-500 transition-colors"
-                                                                >
-                                                                    <Trash2 size={14} /> Delete
-                                                                </button>
-                                                            </div>
-                                                        </motion.div>
-                                                    </>
-                                                )}
-                                            </AnimatePresence>
-                                        </div>
-                                    ))}
-                                {chats.length === 0 && (
-                                    <div className="px-4 py-2 text-sm text-neutral-600 italic">
-                                        {user ? 'No chats yet' : 'Sign in to see history'}
-                                    </div>
-                                )}
-                            </nav>
-                        </div>
-                    </div>
-
-                    <div className="mt-auto border-t border-border pt-4 relative" ref={profileRef}>
-                        {user ? (
-                            <>
-                                <AnimatePresence>
-                                    {isProfileMenuOpen && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                            className="absolute bottom-full left-0 w-full mb-2 bg-card border border-border rounded-xl shadow-2xl z-[110] p-1.5 overflow-hidden"
-                                        >
-                                            <div className="space-y-0.5">
-                                                <Link href="/strategy" className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-accent text-sm text-foreground transition-colors">
-                                                    <Sparkles size={16} className="text-primary" /> Strategic Guide
-                                                </Link>
-                                                <Link href="/settings" className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-accent text-sm text-foreground transition-colors">
-                                                    <Settings size={16} /> Settings
-                                                </Link>
-                                                <Link href="/strategy#help" className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-accent text-sm text-foreground transition-colors">
-                                                    <ListTodo size={16} /> Help & FAQ
-                                                </Link>
-                                                <div className="h-px bg-border my-1" />
-                                                <button
-                                                    onClick={() => supabase.auth.signOut().then(() => router.push('/login'))}
-                                                    className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-500/10 text-sm text-red-500 transition-colors"
-                                                >
-                                                    <LogOut size={16} /> Sign Out
-                                                </button>
-                                            </div>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-
-                                <div
-                                    onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                                    className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-accent/20 hover:bg-accent/40 transition-colors cursor-pointer group"
-                                >
-                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-red-500 to-orange-600 flex items-center justify-center text-[10px] font-bold text-white shadow-lg shrink-0 capitalize">
-                                        {user.user_metadata?.full_name
-                                            ? user.user_metadata.full_name.split(' ').map((n: any) => n[0]).join('').substring(0, 2)
-                                            : user.email?.[0]}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="text-[13px] font-semibold text-foreground truncate tracking-tight">
-                                            {user.user_metadata?.full_name || (user.email?.includes('kiranjinkakumar') ? 'Kiran Jinka' : 'User')}
-                                        </div>
-                                    </div>
-                                    <ChevronDown size={12} className={`text-muted-foreground transition-transform duration-300 ${isProfileMenuOpen ? 'rotate-180' : ''}`} />
-                                </div>
-                            </>
-                        ) : (
-                            <Link href="/login" className="flex items-center gap-3 px-3 py-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent transition-colors text-sm font-medium group">
-                                <LogOut size={18} className="group-hover:translate-x-1 transition-transform" />
-                                <span>Sign In</span>
-                            </Link>
-                        )}
-                    </div>
-                </div >
-            </aside >
-
-            <SearchChatsModal
-                isOpen={isSearchModalOpen}
-                onClose={() => setIsSearchModalOpen(false)}
-                chats={chats}
-            />
-
+            {/* Modals */}
+            <GithubIntegrationModal isOpen={isGithubModalOpen} onClose={() => setIsGithubModalOpen(false)} />
             <RenameModal
                 isOpen={isRenameModalOpen}
                 onClose={() => setIsRenameModalOpen(false)}
-                onRename={handleRename}
-                initialTitle={chatToRename?.title || ''}
+                onRename={async (title) => {
+                    if (selectedChat) {
+                        const success = await chatService.updateChatTitle(selectedChat.id, title);
+                        if (success) { fetchChats(); toast.success('Renamed'); }
+                    }
+                }}
+                initialTitle={selectedChat?.title || ''}
             />
-
-            {
-                chatToShare && (
-                    <ShareModal
-                        isOpen={isShareModalOpen}
-                        onClose={() => setIsShareModalOpen(false)}
-                        chat={chatToShare}
-                    />
-                )
-            }
-
+            {selectedChat && (
+                <ShareModal isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} chat={selectedChat} />
+            )}
             <GroupChatModal
                 isOpen={isGroupModalOpen}
                 onClose={() => setIsGroupModalOpen(false)}
                 onCreateGroup={async (name, members) => {
-                    // Create a pseudo-group chat
-                    const { chat, error } = await chatService.createChat(name);
+                    const { chat } = await chatService.createChat(name);
                     if (chat) {
-                        // In a real app, we'd add members to a relation table here
-                        // For now, we just create the chat
-                        await chatService.addMessage(chat.id, `Group created with members: ${members.join(', ')}`, 'assistant');
-                        setChats(prev => [chat, ...prev]);
-                        toast.success('Group chat created');
-                        router.push(`/c/${chat.id}`);
+                        await chatService.addMessage(chat.id, `Group created: ${members.join(', ')}`, 'assistant');
+                        fetchChats(); router.push(`/c/${chat.id}`);
                     }
                 }}
             />

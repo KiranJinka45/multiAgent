@@ -1,8 +1,11 @@
-'use client';
-
+import { useState, memo } from 'react';
+import dynamic from 'next/dynamic';
 import { Check, Copy } from 'lucide-react';
-import { useState } from 'react';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+
+const SyntaxHighlighter = dynamic(
+    () => import('react-syntax-highlighter').then(mod => mod.Prism),
+    { ssr: false, loading: () => <pre className="p-6 text-sm font-mono text-neutral-400">Loading editor...</pre> }
+);
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 interface CodeBlockProps {
@@ -11,7 +14,8 @@ interface CodeBlockProps {
     isStreaming?: boolean;
 }
 
-export default function CodeBlock({ language, value, isStreaming }: CodeBlockProps) {
+function CodeBlockComponent({ language, value, isStreaming }: CodeBlockProps) {
+    // ... existing content (lines 15-72)
     const [isCopied, setIsCopied] = useState(false);
 
     const copyToClipboard = async () => {
@@ -73,3 +77,5 @@ export default function CodeBlock({ language, value, isStreaming }: CodeBlockPro
         </div>
     );
 }
+
+export default memo(CodeBlockComponent);

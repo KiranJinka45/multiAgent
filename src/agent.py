@@ -9,6 +9,7 @@ from tools.filesystem import write_file, read_file, list_directory, replace_in_f
 from tools.terminal import run_terminal_command
 from tools.captcha import solve_captcha
 from tools.architect import create_design_document
+from tools.devops import generate_docker_config, generate_cicd_pipeline, generate_iac_config, generate_monitoring_config
 from scavenger.llm_registry import start_registry as llm_registry
 
 # Load environment variables
@@ -101,14 +102,15 @@ class AntiGravityAgent:
         if not api_key:
              print("⚠️ GROQ_API_KEY not found. Fallback to Gemini.")
              from langchain_google_genai import ChatGoogleGenerativeAI
-             self.llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", temperature=0)
+             self.llm = ChatGoogleGenerativeAI(model="gemini-3.1-pro-preview", temperature=0)
         else:
              self.llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0, api_key=api_key)
         self.tools = [
             navigate_web, click_element, fill_form, read_page_content,
             execute_shell, write_to_disk, edit_file, read_from_disk, list_files,
             solve_website_captcha, check_llm_health, get_llm_snippet,
-            create_design_document
+            create_design_document, generate_docker_config, generate_cicd_pipeline,
+            generate_iac_config, generate_monitoring_config
         ]
         self.llm_with_tools = self.llm.bind_tools(self.tools)
         self.system_prompt = load_system_prompt()

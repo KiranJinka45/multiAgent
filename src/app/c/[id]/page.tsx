@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { toast } from 'sonner';
 import { chatService } from '@/lib/chat-service';
+import { projectService } from '@/lib/project-service';
 import { Message } from '@/types/chat';
 import Sidebar from '@/components/Sidebar';
 import MobileMenu from '@/components/MobileMenu';
@@ -181,9 +182,37 @@ export default function ChatPage({ params }: { params: { id: string } }) {
         }
     };
 
-    const addMessage = useCallback((content: string, model: string = 'Fast', tool?: string) => {
+    const addMessage = useCallback(async (content: string, model: string = 'Fast', tool?: string) => {
+        if (tool === 'project') {
+            const toastId = toast.loading("Creating project...");
+            try {
+                const { data: project, error } = await projectService.createProject(
+                    content.split('\n')[0].substring(0, 30) || "New AI Project",
+                    content,
+                    "application"
+                );
+
+                if (project) {
+                    toast.success("Project workspace ready!", { id: toastId });
+                    router.push(`/projects/${project.id}`);
+                } else {
+                    const errorMsg = (error && typeof error === 'object' && 'message' in error)
+                        ? (error as any).message
+                        : (typeof error === 'string' ? error : "Unknown error");
+
+                    toast.error(`Failed to initialize project: ${errorMsg}`, {
+                        id: toastId,
+                        description: "Check if projects table exists in Supabase."
+                    });
+                    console.error("Project creation failed:", error);
+                }
+            } catch (err) {
+                toast.error("Error creating project", { id: toastId });
+            }
+            return;
+        }
         handleAiGeneration(content, model, tool);
-    }, [params.id]);
+    }, [params.id, router]);
 
     const handleRegenerate = async (messageId: string) => {
         const index = messages.findIndex(m => m.id === messageId);

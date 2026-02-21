@@ -1,129 +1,50 @@
 'use client';
 
-import { Plus, Sparkles, Mic, Send, ChevronDown, Image, FileText, HardDrive, Notebook, Palette, Layout, BookOpen, Search } from 'lucide-react';
-import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
+import {
+    Send, Mic, MicOff, Paperclip, Globe, Image as ImageIcon, Sparkles,
+    ChevronDown, Plus, Cpu, Zap, Brain, Wand2, FileText, Github,
+    MoreHorizontal, X, Music, Video, Code, Table, ArrowUp
+} from 'lucide-react';
+import { useSidebar } from '@/context/SidebarContext';
 import { toast } from 'sonner';
+import { motion, AnimatePresence } from 'framer-motion';
 
-// Add type support for SpeechRecognition
-declare global {
-    interface Window {
-        SpeechRecognition: any;
-        webkitSpeechRecognition: any;
-    }
-}
-
-type TaskInputProps = {
-    onAddTask: (title: string, model: ModelType, tool?: string) => void;
+interface TaskInputProps {
+    onAddTask: (title: string, tool?: string, model?: string) => void;
+    placeholder?: string;
     centered?: boolean;
-};
-
-type ModelType = 'Fast' | 'Thinking' | 'Pro';
+}
 
 export interface TaskInputHandle {
-    setInput: (value: string) => void;
     focus: () => void;
+    clear: () => void;
+    setInput: (value: string) => void;
 }
 
-const TaskInput = forwardRef<TaskInputHandle, TaskInputProps>(({ onAddTask, centered = false }, ref) => {
+const TaskInput = forwardRef<TaskInputHandle, TaskInputProps>(({ onAddTask, placeholder = "How can MultiAgent help you today?", centered = false }, ref) => {
+    const { setIsGithubModalOpen } = useSidebar();
     const [title, setTitle] = useState('');
     const [isRecording, setIsRecording] = useState(false);
-    const inputRef = useRef<HTMLInputElement>(null);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isModelMenuOpen, setIsModelMenuOpen] = useState(false);
+    const [selectedModel, setSelectedModel] = useState('Pro');
+    const [isFocused, setIsFocused] = useState(false);
 
-    // Menus state
-    const [showPlusMenu, setShowPlusMenu] = useState(false);
-    const [showToolsMenu, setShowToolsMenu] = useState(false);
-    const [showModelMenu, setShowModelMenu] = useState(false);
-    const [selectedModel, setSelectedModel] = useState<ModelType>('Fast');
-    const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
-
-    const recognitionRef = useRef<SpeechRecognition | null>(null);
-    const fileInputRef = useRef<HTMLInputElement>(null);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const menuRef = useRef<HTMLDivElement>(null);
 
     useImperativeHandle(ref, () => ({
-        setInput: (value: string) => setTitle(value),
-        focus: () => inputRef.current?.focus()
+        focus: () => textareaRef.current?.focus(),
+        clear: () => setTitle(''),
+        setInput: (value: string) => setTitle(value)
     }));
 
-    useEffect(() => {
-        if (typeof window !== 'undefined' && (window.SpeechRecognition || window.webkitSpeechRecognition)) {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            recognitionRef.current = new SpeechRecognition();
-            recognitionRef.current.continuous = true;
-            recognitionRef.current.interimResults = true;
-
-            recognitionRef.current.onresult = (event: any) => {
-                const transcript = Array.from(event.results)
-                    .map((result: any) => result[0].transcript)
-                    .join('');
-                setTitle(transcript);
-            };
-
-            recognitionRef.current.onerror = (event: any) => {
-                console.error('Speech recognition error', event.error);
-                setIsRecording(false);
-                toast.error("Microphone error");
-            };
-
-            recognitionRef.current.onend = () => {
-                setIsRecording(false);
-            };
-        }
-    }, []);
-
-    const toggleRecording = () => {
-        if (!recognitionRef.current) {
-            toast.error("Speech recognition not supported in this browser");
-            return;
-        }
-
-        if (isRecording) {
-            recognitionRef.current.stop();
-            setIsRecording(false);
-        } else {
-            recognitionRef.current.start();
-            setIsRecording(true);
-            toast.info("Listening...");
-        }
-    };
-
-    const handleFeatureClick = (feature: string) => {
-        if (feature === 'Create images') {
-            setTitle('Generate an image: ');
-            setTimeout(() => inputRef.current?.focus(), 50);
-        } else if (feature === 'Deep Research') {
-            setTitle('Research topic: ');
-            setTimeout(() => inputRef.current?.focus(), 50);
-        } else if (feature === 'Guided Learning') {
-            setTitle('Teach me about: ');
-            setTimeout(() => inputRef.current?.focus(), 50);
-        } else if (feature === 'Upload files') {
-            fileInputRef.current?.click();
-        } else {
-            toast.info(`Selected: ${feature}`, {
-                description: "This feature is currently a UI mock."
-            });
-        }
-        setShowPlusMenu(false);
-        setShowToolsMenu(false);
-    };
-
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            setAttachedFiles(prev => [...prev, ...Array.from(e.target.files!)]);
-            toast.success(`${e.target.files.length} file(s) attached`);
-        }
-    };
-
-    const removeFile = (index: number) => {
-        setAttachedFiles(prev => prev.filter((_, i) => i !== index));
-    };
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (title.trim() || attachedFiles.length > 0) {
-            let tool = undefined;
-            let prompt = title;
+    const handleSubmit = (e?: React.FormEvent) => {
+        e?.preventDefault();
+        if (title.trim()) {
+            let tool = 'general';
+            let prompt = title.trim();
 
             if (title.startsWith('Generate an image: ')) {
                 tool = 'image';
@@ -131,242 +52,225 @@ const TaskInput = forwardRef<TaskInputHandle, TaskInputProps>(({ onAddTask, cent
             } else if (title.startsWith('Research topic: ')) {
                 tool = 'research';
                 prompt = title.replace('Research topic: ', '');
-            } else if (title.startsWith('Teach me about: ')) {
-                tool = 'learning';
-                prompt = title.replace('Teach me about: ', '');
+            } else if (title.startsWith('Deep Think: ')) {
+                tool = 'thinking';
+                prompt = title.replace('Deep Think: ', '');
             }
 
-            onAddTask(prompt, selectedModel, tool);
+            onAddTask(prompt, tool, selectedModel);
             setTitle('');
-            setAttachedFiles([]);
-            setShowPlusMenu(false);
-            setShowToolsMenu(false);
-            setShowModelMenu(false);
+            if (textareaRef.current) textareaRef.current.style.height = 'auto';
         }
     };
 
-    // Conditional classes based on 'centered' prop
-    const containerClasses = centered
-        ? "w-full max-w-3xl mx-auto relative z-40"
-        : "fixed bottom-0 left-0 md:left-64 right-0 p-6 pb-8 bg-gradient-to-t from-background via-background to-transparent z-40";
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSubmit();
+        }
+    };
 
-    const inputWrapperClasses = centered
-        ? "relative flex items-center bg-card border border-input rounded-[2rem] p-3 pr-4 shadow-2xl transition-all duration-300 focus-within:bg-accent/50 focus-within:border-ring focus-within:ring-1 focus-within:ring-ring w-full"
-        : "relative flex items-center bg-card border border-input rounded-[2rem] p-2 pr-4 shadow-2xl transition-all duration-300 focus-within:bg-accent/50 focus-within:border-ring w-full max-w-4xl mx-auto";
+    const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const target = e.target;
+        setTitle(target.value);
+        target.style.height = 'auto';
+        target.style.height = `${Math.min(target.scrollHeight, 200)}px`;
+    };
+
+    // Close menus on outside click
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+                setIsMenuOpen(false);
+                setIsModelMenuOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const models = [
+        { id: 'Pro', name: 'Pro', icon: Brain, desc: 'Most capable model for complex tasks', color: 'text-purple-400' },
+        { id: 'Fast', name: 'Fast', icon: Zap, desc: 'Optimized for speed and efficiency', color: 'text-yellow-400' },
+        { id: 'Thinking', name: 'Thinking', icon: Cpu, desc: 'Extended reasoning for deep insights', color: 'text-blue-400' },
+    ];
+
+    const currentModelData = models.find(m => m.id === selectedModel) || models[0];
 
     return (
-        <div className={containerClasses}>
-            {/* Menus Layer */}
-            <AnimatePresence>
-                {/* Plus Menu */}
-                {showPlusMenu && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        className={`absolute bg-popover border border-border rounded-2xl shadow-2xl p-2 min-w-[200px] z-50 flex flex-col gap-1 ${centered ? 'bottom-full mb-4 left-0' : 'bottom-24 left-8'}`}
-                    >
-                        <button onClick={() => handleFeatureClick('Upload files')} className="flex items-center gap-3 px-4 py-2.5 text-muted-foreground hover:bg-accent rounded-xl transition-colors text-sm font-medium text-left">
-                            <FileText size={18} className="text-red-400" />
-                            Upload files
-                        </button>
-                        <button onClick={() => handleFeatureClick('Add from Drive')} className="flex items-center gap-3 px-4 py-2.5 text-muted-foreground hover:bg-accent rounded-xl transition-colors text-sm font-medium text-left">
-                            <HardDrive size={18} className="text-blue-400" />
-                            Add from Drive
-                        </button>
-                        <button onClick={() => handleFeatureClick('Photos')} className="flex items-center gap-3 px-4 py-2.5 text-muted-foreground hover:bg-accent rounded-xl transition-colors text-sm font-medium text-left">
-                            <Image size={18} className="text-yellow-400" />
-                            Photos
-                        </button>
-                        <div className="h-px bg-border my-1" />
-                        <button onClick={() => handleFeatureClick('NotebookLM')} className="flex items-center gap-3 px-4 py-2.5 text-muted-foreground hover:bg-accent rounded-xl transition-colors text-sm font-medium text-left">
-                            <Notebook size={18} className="text-purple-400" />
-                            NotebookLM
-                        </button>
-                    </motion.div>
-                )}
-
-                {/* Tools Menu */}
-                {showToolsMenu && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        className={`absolute bg-popover border border-border rounded-2xl shadow-2xl p-2 min-w-[220px] z-50 flex flex-col gap-1 ${centered ? 'bottom-full mb-4 right-0' : 'bottom-24 right-8'}`}
-                    >
-                        <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Tools</div>
-                        <button onClick={() => handleFeatureClick('Deep Research')} className="flex items-center gap-3 px-4 py-2.5 text-muted-foreground hover:bg-accent rounded-xl transition-colors text-sm font-medium text-left">
-                            <Search size={18} className="text-blue-400" />
-                            Deep Research
-                        </button>
-                        <button onClick={() => handleFeatureClick('Create images')} className="flex items-center gap-3 px-4 py-2.5 text-muted-foreground hover:bg-accent rounded-xl transition-colors text-sm font-medium text-left">
-                            <Palette size={18} className="text-orange-400" />
-                            Create images
-                        </button>
-                        <button onClick={() => handleFeatureClick('Canvas')} className="flex items-center gap-3 px-4 py-2.5 text-muted-foreground hover:bg-accent rounded-xl transition-colors text-sm font-medium text-left">
-                            <Layout size={18} className="text-green-400" />
-                            Canvas
-                        </button>
-                        <button onClick={() => handleFeatureClick('Guided Learning')} className="flex items-center gap-3 px-4 py-2.5 text-muted-foreground hover:bg-accent rounded-xl transition-colors text-sm font-medium text-left">
-                            <BookOpen size={18} className="text-indigo-400" />
-                            Guided Learning
-                        </button>
-                    </motion.div>
-                )}
-
-                {/* Model Menu */}
-                {showModelMenu && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        className={`absolute bg-popover border border-border rounded-2xl shadow-2xl p-2 min-w-[180px] z-50 flex flex-col gap-1 ${centered ? 'bottom-full mb-4 right-16' : 'bottom-24 right-32'}`}
-                    >
-                        <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Gemini 3</div>
-                        <button onClick={() => { setSelectedModel('Fast'); setShowModelMenu(false); }} className={`flex items-center justify-between px-4 py-2.5 rounded-xl transition-colors text-sm font-medium text-left ${selectedModel === 'Fast' ? 'bg-accent text-foreground' : 'text-muted-foreground hover:bg-accent'}`}>
-                            <div>
-                                <div className="font-semibold">Fast</div>
-                                <div className="text-xs text-muted-foreground font-normal">Answers quickly</div>
-                            </div>
-                            {selectedModel === 'Fast' && <div className="w-2 h-2 rounded-full bg-primary" />}
-                        </button>
-                        <button onClick={() => { setSelectedModel('Thinking'); setShowModelMenu(false); }} className={`flex items-center justify-between px-4 py-2.5 rounded-xl transition-colors text-sm font-medium text-left ${selectedModel === 'Thinking' ? 'bg-accent text-foreground' : 'text-muted-foreground hover:bg-accent'}`}>
-                            <div>
-                                <div className="font-semibold">Thinking</div>
-                                <div className="text-xs text-muted-foreground font-normal">Solves complex problems</div>
-                            </div>
-                            {selectedModel === 'Thinking' && <div className="w-2 h-2 rounded-full bg-primary" />}
-                        </button>
-                        <button onClick={() => { setSelectedModel('Pro'); setShowModelMenu(false); }} className={`flex items-center justify-between px-4 py-2.5 rounded-xl transition-colors text-sm font-medium text-left ${selectedModel === 'Pro' ? 'bg-accent text-foreground' : 'text-muted-foreground hover:bg-accent'}`}>
-                            <div>
-                                <div className="font-semibold">Pro</div>
-                                <div className="text-xs text-muted-foreground font-normal">Advanced reasoning</div>
-                            </div>
-                            {selectedModel === 'Pro' && <div className="w-2 h-2 rounded-full bg-primary" />}
-                        </button>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
-            <form onSubmit={handleSubmit} className={`w-full relative ${centered ? '' : 'max-w-4xl mx-auto'}`}>
-                {/* Attached Files UI */}
-                <AnimatePresence>
-                    {attachedFiles.length > 0 && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 5 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: 5 }}
-                            className="flex flex-wrap gap-2 mb-3 px-2"
-                        >
-                            {attachedFiles.map((file, idx) => (
-                                <div key={`${file.name}-${idx}`} className="flex items-center gap-2 px-3 py-1.5 bg-accent/50 border border-border rounded-xl text-xs font-medium text-foreground">
-                                    <FileText size={14} className="text-blue-400" />
-                                    <span className="max-w-[120px] truncate">{file.name}</span>
-                                    <button
-                                        type="button"
-                                        onClick={() => removeFile(idx)}
-                                        className="ml-1 p-0.5 hover:bg-background rounded-full transition-colors"
-                                    >
-                                        <Plus size={14} className="rotate-45" />
-                                    </button>
-                                </div>
-                            ))}
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-
-                <div className={inputWrapperClasses}>
-                    {/* Left Actions */}
-                    <button
-                        type="button"
-                        onClick={() => {
-                            setShowPlusMenu(!showPlusMenu);
-                            setShowToolsMenu(false);
-                            setShowModelMenu(false);
-                        }}
-                        className={`p-3 rounded-full transition-colors ${showPlusMenu ? 'bg-accent text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-accent'}`}
-                    >
-                        <Plus size={20} className={`transition-transform duration-300 ${showPlusMenu ? 'rotate-45' : ''}`} />
-                    </button>
-
-                    {/* Input Field */}
-                    <input
-                        ref={inputRef}
-                        type="text"
+        <div className={`w-full transition-all duration-500 ${centered ? 'max-w-3xl mx-auto' : 'max-w-4xl mx-auto px-4 md:px-6'}`}>
+            <div
+                className={`relative transition-all duration-500 rounded-[2rem] border overflow-hidden ${isFocused
+                    ? 'glass-card ring-2 ring-primary/20 border-primary/30 shadow-[0_0_50px_-12px_rgba(var(--primary),0.2)]'
+                    : 'glass border-white/5 shadow-xl'
+                    }`}
+            >
+                {/* Input Area */}
+                <div className="flex flex-col p-2 pt-3">
+                    <textarea
+                        ref={textareaRef}
+                        rows={1}
                         value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        placeholder={isRecording ? "Listening..." : "Ask MultiAgent"}
-                        className="flex-1 bg-transparent border-none outline-none text-foreground placeholder-muted-foreground text-lg px-2 min-w-0"
-                        autoFocus={centered}
+                        onChange={handleInput}
+                        onKeyDown={handleKeyDown}
+                        onFocus={() => setIsFocused(true)}
+                        onBlur={() => setIsFocused(false)}
+                        placeholder={placeholder}
+                        className="w-full px-4 py-2 bg-transparent border-none focus:ring-0 text-foreground placeholder:text-muted-foreground/50 resize-none min-h-[44px] max-h-[200px] text-lg font-medium tracking-tight leading-relaxed custom-scrollbar scroll-smooth"
                     />
 
-                    {/* Right Actions */}
-                    <div className="flex items-center gap-2 shrink-0">
-                        {/* Tools / Features */}
-                        {!title && (
+                    {/* Bottom Toolbar */}
+                    <div className="flex items-center justify-between gap-2 px-2 pb-2 mt-2">
+                        <div className="flex items-center gap-1.5" ref={menuRef}>
+                            {/* Action Menu Toggle */}
+                            <div className="relative">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                                    className="p-2.5 rounded-full hover:bg-foreground/5 text-muted-foreground hover:text-foreground transition-all active:scale-90 bg-foreground/5"
+                                >
+                                    <Plus size={20} className={`transition-transform duration-300 ${isMenuOpen ? 'rotate-45' : ''}`} />
+                                </button>
+
+                                <AnimatePresence>
+                                    {isMenuOpen && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                            className="absolute bottom-full left-0 mb-4 w-72 glass-card rounded-[1.5rem] shadow-2xl p-2 z-[60]"
+                                        >
+                                            <div className="grid grid-cols-2 gap-1.5 font-bold">
+                                                {[
+                                                    { icon: FileText, label: 'Docs', desc: 'PDF, Word, TXT', color: 'text-blue-400' },
+                                                    { icon: ImageIcon, label: 'Images', desc: 'PNG, JPG, WebP', color: 'text-purple-400' },
+                                                    { icon: Github, label: 'GitHub', desc: 'Integrate repos', color: 'text-green-400' },
+                                                    { icon: Code, label: 'Code', desc: 'JS, PY, TS, C++', color: 'text-orange-400' },
+                                                ].map((item, i) => (
+                                                    <button
+                                                        key={i}
+                                                        onClick={() => item.label === 'GitHub' ? setIsGithubModalOpen(true) : null}
+                                                        className="flex flex-col items-center gap-1 p-3 rounded-2xl hover:bg-foreground/5 transition-all text-sm group"
+                                                    >
+                                                        <item.icon size={22} className={`${item.color} group-hover:scale-110 transition-transform`} />
+                                                        <span className="text-foreground">{item.label}</span>
+                                                        <span className="text-[10px] text-muted-foreground font-medium opacity-60 tracking-tight">{item.desc}</span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            <div className="h-px bg-white/5 my-2 mx-2" />
+                                            <div className="px-2 pb-1">
+                                                <button className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-foreground/5 text-sm font-semibold transition-all">
+                                                    <Brain size={18} className="text-primary" /> Create Custom Tool
+                                                </button>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+
+                            {/* Model Selector Trigger */}
+                            <div className="relative">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsModelMenuOpen(!isModelMenuOpen)}
+                                    className="flex items-center gap-2 px-3.5 py-2.5 rounded-full hover:bg-foreground/5 text-muted-foreground hover:text-foreground transition-all active:scale-95 text-xs font-black tracking-widest uppercase border border-white/5"
+                                >
+                                    <currentModelData.icon size={14} className={currentModelData.color} />
+                                    <span>{currentModelData.name}</span>
+                                    <ChevronDown size={12} className={`transition-transform duration-300 ${isModelMenuOpen ? 'rotate-180' : ''}`} />
+                                </button>
+
+                                <AnimatePresence>
+                                    {isModelMenuOpen && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                            className="absolute bottom-full left-0 mb-4 w-64 glass-card rounded-[1.5rem] shadow-2xl p-2 z-[60]"
+                                        >
+                                            <div className="space-y-1">
+                                                {models.map((model) => (
+                                                    <button
+                                                        key={model.id}
+                                                        onClick={() => { setSelectedModel(model.id); setIsModelMenuOpen(false); }}
+                                                        className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${selectedModel === model.id ? 'bg-primary/10' : 'hover:bg-foreground/5'
+                                                            }`}
+                                                    >
+                                                        <div className={`p-2 rounded-lg ${selectedModel === model.id ? 'bg-primary/20' : 'bg-foreground/5'}`}>
+                                                            <model.icon size={18} className={model.color} />
+                                                        </div>
+                                                        <div className="text-left">
+                                                            <div className={`text-sm font-bold ${selectedModel === model.id ? 'text-primary' : 'text-foreground'}`}>{model.name}</div>
+                                                            <div className="text-[10px] text-muted-foreground font-medium truncate w-32">{model.desc}</div>
+                                                        </div>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+
                             <button
                                 type="button"
-                                onClick={() => {
-                                    setShowToolsMenu(!showToolsMenu);
-                                    setShowPlusMenu(false);
-                                    setShowModelMenu(false);
-                                }}
-                                className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors text-sm font-medium ${showToolsMenu ? 'bg-accent text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-accent'}`}
+                                onClick={() => setIsGithubModalOpen(true)}
+                                className="p-2.5 rounded-full hover:bg-foreground/5 text-muted-foreground hover:text-foreground transition-all active:scale-90"
                             >
-                                <Sparkles size={16} />
-                                <span>Tools</span>
+                                <Github size={18} />
                             </button>
-                        )}
-
-                        {/* Pro Selector (Visual only) */}
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setShowModelMenu(!showModelMenu);
-                                setShowPlusMenu(false);
-                                setShowToolsMenu(false);
-                            }}
-                            className="hidden sm:flex items-center gap-1 pl-3 pr-2 py-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded-full transition-colors text-sm font-medium"
-                        >
-                            <span>{selectedModel}</span>
-                            <ChevronDown size={14} />
-                        </button>
-
-                        <div className="w-px h-6 bg-border mx-1 hidden sm:block" />
-
-                        {/* Submit / Mic */}
-                        {title.trim() ? (
-                            <button
-                                type="submit"
-                                className="p-2.5 bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-colors active:scale-95"
-                            >
-                                <Send size={20} className="ml-0.5" />
+                            <button type="button" className="p-2.5 rounded-full hover:bg-foreground/5 text-muted-foreground hover:text-foreground transition-all active:scale-90">
+                                <Globe size={18} />
                             </button>
-                        ) : (
+                        </div>
+
+                        {/* Submit Actions */}
+                        <div className="flex items-center gap-2">
                             <button
                                 type="button"
-                                onClick={toggleRecording}
-                                className={`p-3 rounded-full transition-all duration-300 ${isRecording ? 'bg-destructive text-destructive-foreground scale-110 animate-pulse' : 'text-foreground bg-accent hover:bg-accent/80'}`}
+                                onClick={() => setIsRecording(!isRecording)}
+                                className={`p-2.5 rounded-full transition-all active:scale-90 ${isRecording ? 'bg-red-500/10 text-red-500' : 'hover:bg-foreground/5 text-muted-foreground hover:text-foreground'
+                                    }`}
                             >
-                                <Mic size={20} />
+                                {isRecording ? <MicOff size={20} /> : <Mic size={20} />}
                             </button>
-                        )}
+
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => handleSubmit()}
+                                disabled={!title.trim()}
+                                className={`p-3 rounded-full transition-all flex items-center justify-center ${title.trim()
+                                    ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
+                                    : 'bg-muted text-muted-foreground opacity-50 cursor-not-allowed'
+                                    }`}
+                            >
+                                <ArrowUp size={22} className="stroke-[3]" />
+                            </motion.button>
+                        </div>
                     </div>
                 </div>
-                {!centered && (
-                    <p className="text-center text-xs text-muted-foreground mt-3 font-medium">
-                        MultiAgent can make mistakes. Check important info.
-                    </p>
-                )}
-            </form>
 
-            <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                className="hidden"
-                onChange={handleFileChange}
-            />
+                {/* Focus indicator animation */}
+                <AnimatePresence>
+                    {isFocused && (
+                        <motion.div
+                            layoutId="glow"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 pointer-events-none rounded-[2rem] border border-primary/50"
+                        />
+                    )}
+                </AnimatePresence>
+            </div>
+
+            {/* Disclaimer */}
+            {centered && (
+                <p className="text-center mt-6 text-[11px] font-bold text-muted-foreground/40 uppercase tracking-[0.2em]">
+                    MultiAgent can make mistakes. Verify important info.
+                </p>
+            )}
         </div>
     );
 });

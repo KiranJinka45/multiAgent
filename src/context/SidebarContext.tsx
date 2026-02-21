@@ -1,12 +1,17 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { githubService } from '@/lib/github-service';
 
 type SidebarContextType = {
     isCollapsed: boolean;
     setIsCollapsed: (collapsed: boolean) => void;
     width: number;
     setWidth: (width: number) => void;
+    isGithubModalOpen: boolean;
+    setIsGithubModalOpen: (open: boolean) => void;
+    isGithubConnected: boolean;
+    setIsGithubConnected: (connected: boolean) => void;
 };
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
@@ -37,8 +42,29 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
         }
     }, [width, isCollapsed]);
 
+    const [isGithubModalOpen, setIsGithubModalOpen] = useState(false);
+    const [isGithubConnected, setIsGithubConnected] = useState(false);
+
+    // Initial GitHub connection check
+    useEffect(() => {
+        const checkConnection = async () => {
+            try {
+                const connected = await githubService.isConnected();
+                setIsGithubConnected(connected);
+            } catch (err) {
+                console.error('Error checking github connection:', err);
+            }
+        };
+        checkConnection();
+    }, []);
+
     return (
-        <SidebarContext.Provider value={{ isCollapsed, setIsCollapsed, width, setWidth }}>
+        <SidebarContext.Provider value={{
+            isCollapsed, setIsCollapsed,
+            width, setWidth,
+            isGithubModalOpen, setIsGithubModalOpen,
+            isGithubConnected, setIsGithubConnected
+        }}>
             {children}
         </SidebarContext.Provider>
     );

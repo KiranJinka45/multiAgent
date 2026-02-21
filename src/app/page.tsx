@@ -227,53 +227,50 @@ export default function Dashboard() {
                 <div className="flex-1 overflow-y-auto w-full scroll-smooth">
                     <div className="max-w-4xl mx-auto w-full px-4 md:px-6 pt-20 pb-40">
                         {messages.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center min-h-[70vh] text-center space-y-4 relative">
-                                {/* Custom MultiAgent Doodle */}
-                                <div className="mb-4 relative py-6 px-4 group">
-                                    <h1 className="text-4xl md:text-5xl font-black tracking-tighter flex items-center justify-center select-none">
-                                        {/* Stylized M */}
-                                        <span className="text-blue-500 animate-in slide-in-from-left-8 duration-700">M</span>
-                                        {/* Stylized u with pulse */}
-                                        <span className="text-red-400 relative">u
-                                            <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-400 rounded-full animate-ping opacity-75"></span>
-                                        </span>
-                                        {/* Animated lti */}
-                                        <span className="text-yellow-400 bg-gradient-to-b from-yellow-400 to-orange-500 bg-clip-text">lti</span>
-                                        {/* Agent with dynamic underline */}
-                                        <span className="relative text-green-400 bg-gradient-to-r from-green-400 via-blue-400 to-indigo-500 bg-clip-text text-transparent">
-                                            Agent
-                                            <span className="absolute -bottom-2 left-0 w-0 h-1.5 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full transition-all duration-700 group-hover:w-full" />
-                                        </span>
-                                    </h1>
-
-                                    {/* Ornamental elements mimicking doodle style */}
-                                    <div className="absolute -top-2 -right-8 w-24 h-24 bg-blue-500/10 blur-3xl rounded-full" />
-                                    <div className="absolute -bottom-4 -left-12 w-32 h-32 bg-purple-500/10 blur-3xl rounded-full" />
-
-                                    <div className="mt-3 text-lg md:text-xl font-semibold text-muted-foreground/80 tracking-tight animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300">
-                                        Where should we start?
+                            <div className="flex flex-col items-center justify-center min-h-[70vh] text-center space-y-12 relative">
+                                {/* Premium Logo & Greeting */}
+                                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+                                    <div className="relative inline-block">
+                                        <div className="absolute -inset-4 bg-gradient-to-r from-primary/20 via-purple-500/20 to-blue-500/20 blur-2xl rounded-full opacity-50 group-hover:opacity-100 transition-opacity" />
+                                        <h1 className="text-6xl md:text-7xl font-bold tracking-tight bg-gradient-to-br from-foreground via-foreground/90 to-muted-foreground bg-clip-text text-transparent select-none">
+                                            MultiAgent
+                                        </h1>
                                     </div>
+                                    <p className="text-xl md:text-2xl font-medium text-muted-foreground max-w-lg mx-auto leading-tight">
+                                        The autonomous text-to-app architect.
+                                        <span className="block text-primary/80">Where should we build today?</span>
+                                    </p>
                                 </div>
-                                {/* Centered Input */}
-                                <div className="w-full max-w-3xl">
+
+                                {/* Centered Input with Glassmorphism */}
+                                <div className="w-full max-w-2xl relative z-40 animate-in fade-in zoom-in-95 duration-1000 delay-200">
                                     <TaskInput ref={taskInputRef} onAddTask={addMessage} centered={true} />
                                 </div>
 
-                                {/* Recommendation Chips */}
-                                <div className="flex flex-wrap items-center justify-center gap-3 max-w-2xl px-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
-                                    <button onClick={() => addMessage("Create an image of a futuristic city")} className="px-4 py-2 bg-card hover:bg-accent border border-border hover:border-input rounded-full text-sm text-muted-foreground hover:text-foreground transition-all text-left flex items-center gap-2">
-                                        <span>🎨</span> Create image
-                                    </button>
-                                    <button onClick={() => addMessage("Explain quantum computing concepts")} className="px-4 py-2 bg-card hover:bg-accent border border-border hover:border-input rounded-full text-sm text-muted-foreground hover:text-foreground transition-all text-left flex items-center gap-2">
-                                        <span>🎓</span> Help me learn
-                                    </button>
-                                    <button onClick={() => addMessage("Write a python script to parse CSV")} className="px-4 py-2 bg-card hover:bg-accent border border-border hover:border-input rounded-full text-sm text-muted-foreground hover:text-foreground transition-all text-left flex items-center gap-2">
-                                        <span>💻</span> Write code
-                                    </button>
-                                    <button onClick={() => addMessage("Analyze the latest tech trends")} className="px-4 py-2 bg-card hover:bg-accent border border-border hover:border-input rounded-full text-sm text-muted-foreground hover:text-foreground transition-all text-left flex items-center gap-2">
-                                        <span>📊</span> Analyze data
-                                    </button>
+                                {/* Refined Recommendation Chips */}
+                                <div className="flex flex-wrap items-center justify-center gap-3 max-w-3xl px-4 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-500">
+                                    {[
+                                        { icon: "🚀", label: "Build a landing page", prompt: "Build a professional landing page for a creative agency" },
+                                        { icon: "🎨", label: "Generate an image", prompt: "Create a photorealistic image of a futuristic floating garden" },
+                                        { icon: "🎓", label: "Teach me concepts", prompt: "Explain quantum computing using a simple analogy" },
+                                        { icon: "💻", label: "Write a script", prompt: "Write a python script to automate daily weather notifications" },
+                                        { icon: "📊", label: "Analyze data", prompt: "Show me the top tech trends for 2026" },
+                                        { icon: "🐳", label: "Dockerize app", prompt: "Generate a Dockerfile for a React and FastAPI application" }
+                                    ].map((item, i) => (
+                                        <button
+                                            key={i}
+                                            onClick={() => addMessage(item.prompt)}
+                                            className="group flex items-center gap-2.5 px-5 py-2.5 glass rounded-full text-sm font-medium text-muted-foreground hover:text-foreground hover:border-primary/50 hover:bg-primary/5 transition-all active:scale-95"
+                                        >
+                                            <span className="group-hover:scale-110 transition-transform">{item.icon}</span>
+                                            {item.label}
+                                        </button>
+                                    ))}
                                 </div>
+
+                                {/* Background Decorative Elements */}
+                                <div className="absolute top-1/4 -left-20 w-64 h-64 bg-primary/5 blur-[100px] rounded-full animate-float" />
+                                <div className="absolute bottom-1/4 -right-20 w-80 h-80 bg-blue-500/5 blur-[120px] rounded-full animate-float" style={{ animationDelay: '-3s' }} />
                             </div>
                         ) : (
                             <div className="space-y-8 animate-in fade-in duration-500">
@@ -289,7 +286,7 @@ export default function Dashboard() {
                 </div>
 
                 {messages.length > 0 && <TaskInput ref={taskInputRef} onAddTask={addMessage} />}
-            </main>
+            </main >
 
             <Canvas
                 isOpen={isCanvasOpen}
@@ -297,6 +294,6 @@ export default function Dashboard() {
                 isGenerating={isGenerating}
                 {...canvasData}
             />
-        </div>
+        </div >
     );
 }

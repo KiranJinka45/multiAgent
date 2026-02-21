@@ -10,6 +10,8 @@ const getGroqClient = () => {
     return new Groq({ apiKey });
 };
 
+export const runtime = 'edge';
+
 export async function POST(req: Request) {
     try {
         const body = await req.json().catch(() => ({}));
@@ -25,14 +27,27 @@ export async function POST(req: Request) {
             'Pro': 'llama-3.3-70b-versatile'
         };
 
-        const selectedModel = modelMap[model as string] || 'llama-3.3-70b-versatile';
+        const selectedModel = modelMap[model as string] || 'llama-3.1-8b-instant';
 
-        let systemPrompt = 'You are MultiAgent, a helpful and intelligent AI assistant. You provide concise, accurate, and well-formatted responses. Use markdown for code and structured data.';
+        let systemPrompt = `You are MultiAgent, a world-class system architect and software engineer inspired by platforms like Lovable, Bolt, and Replit.
+Your primary goal is to help users build end-to-end projects, websites, and applications in minutes.
+
+RULES:
+1. **No-Code/High-Speed Mindset**: Proactively suggest and use rapid development tools (Tailwind CSS, Framer Motion, Lucide React).
+2. **Rapid Backend**: For logic and data, always favor Supabase, Edge Functions, or serverless patterns that integrate instantly.
+3. **Professional Grade**: Build functional, high-fidelity code over long explanations.
+4. **Architectural Excellence**: When a user wants to build something, think about the full structure first, then implement. Use professional boilerplates.
+5. **Aesthetics Matter**: Always use modern, premium UI/UX patterns (glassmorphism, vibrant gradients, smooth animations).
+
+You are the Project Creator and Lead Architect. Build it right, build it fast.
+
+SPECIAL DIRECTIVE:
+If the user's message indicates they want to BUILD a website, landing page, or application, append the hidden tag [SITE_BUILD_REQUEST] at the very END of your response. This will trigger our specialized builder UI.`;
 
         if (model === 'Thinking') {
-            systemPrompt += ' Please provide a detailed, step-by-step analysis. Think through the problem thoroughly before giving the final answer.';
+            systemPrompt += ' Please provide a deep architectural analysis and step-by-step implementation plan. Think through edge cases and deployment strategies thoroughly.';
         } else if (model === 'Pro') {
-            systemPrompt += ' You are in Pro mode. Provide advanced reasoning, comprehensive answers, and expert-level insights.';
+            systemPrompt += ' You are in Pro mode. Provide advanced full-stack reasoning, enterprise-grade architecture patterns, and expert-level optimization insights.';
         }
 
         const groq = getGroqClient();

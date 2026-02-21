@@ -45,7 +45,7 @@ export default function RenameModal({ isOpen, onClose, onRename, initialTitle }:
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="w-full max-w-md bg-card border border-border rounded-2xl shadow-2xl p-6 relative z-10"
+                        className="w-full max-w-md glass-card rounded-[2rem] shadow-2xl p-8 relative z-10 overflow-hidden"
                     >
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-2 text-foreground font-semibold">
