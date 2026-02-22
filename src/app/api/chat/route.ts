@@ -93,14 +93,23 @@ If the user's message indicates they want to BUILD a website, landing page, or a
                 'Connection': 'keep-alive',
             },
         });
-    } catch (error: any) {
+    } catch (error) {
         console.error('Chat API Error:', error);
-        const errorMessage = error?.message || error?.toString() || 'Unknown error';
+
+        let errorMessage = 'Unknown error';
+        let errorStatus = 500;
+
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        } else if (typeof error === 'object' && error !== null) {
+            errorMessage = (error as { message?: string }).message || error.toString();
+            errorStatus = (error as { status?: number }).status || 500;
+        }
 
         // Return a clean JSON error for non-streaming failures
         return NextResponse.json(
             { error: `MultiAgent Error: ${errorMessage}` },
-            { status: error?.status || 500 }
+            { status: errorStatus }
         );
     }
 }

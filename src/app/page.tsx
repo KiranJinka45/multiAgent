@@ -10,13 +10,19 @@ import TaskInput, { TaskInputHandle } from '@/components/TaskInput';
 import ChatList from '@/components/ChatList';
 import TopNav from '@/components/TopNav';
 import Canvas from '@/components/Canvas';
+import AionGeneratorView from '@/components/AionGeneratorView'; // Added import
 import { chatService } from '@/lib/chat-service';
 import { Message } from '@/types/chat';
+import { motion } from 'framer-motion';
 
 export default function Dashboard() {
     const [messages, setMessages] = useState<Message[]>([]);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
+
+    // Aion Generator State
+    const [isAionGeneratorOpen, setIsAionGeneratorOpen] = useState(false);
+    const [aionPrompt, setAionPrompt] = useState('');
 
     // Canvas State
     const [isCanvasOpen, setIsCanvasOpen] = useState(false);
@@ -60,6 +66,13 @@ export default function Dashboard() {
     const handleAiGeneration = async (prompt: string, model: string = 'Fast', tool?: string) => {
         setIsGenerating(true);
         try {
+            // New Aion Generator Intercept
+            if (prompt.toLowerCase().includes('generate app') || prompt.toLowerCase().includes('build a') || prompt.toLowerCase().includes('create a web app')) {
+                setAionPrompt(prompt);
+                setIsAionGeneratorOpen(true);
+                return;
+            }
+
             // 1. Create a new chat
             const title = tool === 'image' ? `Image: ${prompt}` : (prompt.length > 40 ? prompt.substring(0, 40) + '...' : prompt);
             const { chat: newChat, error: chatError } = await chatService.createChat(title);
@@ -226,7 +239,11 @@ export default function Dashboard() {
 
                 <div className="flex-1 overflow-y-auto w-full scroll-smooth">
                     <div className="max-w-4xl mx-auto w-full px-4 md:px-6 pt-20 pb-40">
-                        {messages.length === 0 ? (
+                        {isAionGeneratorOpen ? (
+                            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+                                <AionGeneratorView prompt={aionPrompt} onComplete={() => setIsAionGeneratorOpen(false)} />
+                            </motion.div>
+                        ) : messages.length === 0 ? (
                             <div className="flex flex-col items-center justify-center min-h-[70vh] text-center space-y-12 relative">
                                 {/* Premium Logo & Greeting */}
                                 <div className="space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-1000">
@@ -252,8 +269,6 @@ export default function Dashboard() {
                                     {[
                                         { icon: "🚀", label: "Build a landing page", prompt: "Build a professional landing page for a creative agency" },
                                         { icon: "🎨", label: "Generate an image", prompt: "Create a photorealistic image of a futuristic floating garden" },
-                                        { icon: "🎓", label: "Teach me concepts", prompt: "Explain quantum computing using a simple analogy" },
-                                        { icon: "💻", label: "Write a script", prompt: "Write a python script to automate daily weather notifications" },
                                         { icon: "📊", label: "Analyze data", prompt: "Show me the top tech trends for 2026" },
                                         { icon: "🐳", label: "Dockerize app", prompt: "Generate a Dockerfile for a React and FastAPI application" }
                                     ].map((item, i) => (

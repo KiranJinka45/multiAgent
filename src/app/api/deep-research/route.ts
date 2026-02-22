@@ -32,7 +32,7 @@ The landscape for "${message}" is rapidly evolving. Key players are increasingly
 *This report was generated using MultiAgent's Deep Research capability, analyzing thousands of data points across the theoretical landscape.*`;
 
         return NextResponse.json({ response });
-    } catch (error: any) {
+    } catch (error) {
         console.error('Deep Research Error:', error);
         return NextResponse.json({ error: 'Failed to conduct research' }, { status: 500 });
     }

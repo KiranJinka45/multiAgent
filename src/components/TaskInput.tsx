@@ -2,9 +2,9 @@
 
 import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import {
-    Send, Mic, MicOff, Paperclip, Globe, Image as ImageIcon, Sparkles,
-    ChevronDown, Plus, Cpu, Zap, Brain, Wand2, FileText, Github,
-    MoreHorizontal, X, Music, Video, Code, Table, ArrowUp
+    Mic, MicOff, Image as ImageIcon,
+    ChevronDown, Plus, Cpu, Zap, Brain, Wand2, FileText,
+    Camera, Files, Library, ArrowUp
 } from 'lucide-react';
 import { useSidebar } from '@/context/SidebarContext';
 import { toast } from 'sonner';
@@ -98,176 +98,196 @@ const TaskInput = forwardRef<TaskInputHandle, TaskInputProps>(({ onAddTask, plac
     const currentModelData = models.find(m => m.id === selectedModel) || models[0];
 
     return (
-        <div className={`w-full transition-all duration-500 ${centered ? 'max-w-3xl mx-auto' : 'max-w-4xl mx-auto px-4 md:px-6'}`}>
+        <div className={`w-full transition-all duration-300 ${centered ? 'max-w-3xl mx-auto' : 'max-w-4xl mx-auto px-4 md:px-6'}`}>
             <div
-                className={`relative transition-all duration-500 rounded-[2rem] border overflow-hidden ${isFocused
-                    ? 'glass-card ring-2 ring-primary/20 border-primary/30 shadow-[0_0_50px_-12px_rgba(var(--primary),0.2)]'
-                    : 'glass border-white/5 shadow-xl'
+                className={`relative transition-all duration-300 rounded-[2rem] bg-foreground/[0.03] border border-white/10 ${isFocused ? 'ring-2 ring-primary/30 shadow-lg' : 'shadow-md'
                     }`}
             >
-                {/* Input Area */}
-                <div className="flex flex-col p-2 pt-3">
-                    <textarea
-                        ref={textareaRef}
-                        rows={1}
-                        value={title}
-                        onChange={handleInput}
-                        onKeyDown={handleKeyDown}
-                        onFocus={() => setIsFocused(true)}
-                        onBlur={() => setIsFocused(false)}
-                        placeholder={placeholder}
-                        className="w-full px-4 py-2 bg-transparent border-none focus:ring-0 text-foreground placeholder:text-muted-foreground/50 resize-none min-h-[44px] max-h-[200px] text-lg font-medium tracking-tight leading-relaxed custom-scrollbar scroll-smooth"
-                    />
-
-                    {/* Bottom Toolbar */}
-                    <div className="flex items-center justify-between gap-2 px-2 pb-2 mt-2">
-                        <div className="flex items-center gap-1.5" ref={menuRef}>
-                            {/* Action Menu Toggle */}
-                            <div className="relative">
-                                <button
-                                    type="button"
-                                    onClick={() => setIsMenuOpen(!isMenuOpen)}
-                                    className="p-2.5 rounded-full hover:bg-foreground/5 text-muted-foreground hover:text-foreground transition-all active:scale-90 bg-foreground/5"
-                                >
-                                    <Plus size={20} className={`transition-transform duration-300 ${isMenuOpen ? 'rotate-45' : ''}`} />
-                                </button>
-
-                                <AnimatePresence>
-                                    {isMenuOpen && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                            className="absolute bottom-full left-0 mb-4 w-72 glass-card rounded-[1.5rem] shadow-2xl p-2 z-[60]"
-                                        >
-                                            <div className="grid grid-cols-2 gap-1.5 font-bold">
-                                                {[
-                                                    { icon: FileText, label: 'Docs', desc: 'PDF, Word, TXT', color: 'text-blue-400' },
-                                                    { icon: ImageIcon, label: 'Images', desc: 'PNG, JPG, WebP', color: 'text-purple-400' },
-                                                    { icon: Github, label: 'GitHub', desc: 'Integrate repos', color: 'text-green-400' },
-                                                    { icon: Code, label: 'Code', desc: 'JS, PY, TS, C++', color: 'text-orange-400' },
-                                                ].map((item, i) => (
-                                                    <button
-                                                        key={i}
-                                                        onClick={() => item.label === 'GitHub' ? setIsGithubModalOpen(true) : null}
-                                                        className="flex flex-col items-center gap-1 p-3 rounded-2xl hover:bg-foreground/5 transition-all text-sm group"
-                                                    >
-                                                        <item.icon size={22} className={`${item.color} group-hover:scale-110 transition-transform`} />
-                                                        <span className="text-foreground">{item.label}</span>
-                                                        <span className="text-[10px] text-muted-foreground font-medium opacity-60 tracking-tight">{item.desc}</span>
-                                                    </button>
-                                                ))}
-                                            </div>
-                                            <div className="h-px bg-white/5 my-2 mx-2" />
-                                            <div className="px-2 pb-1">
-                                                <button className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-foreground/5 text-sm font-semibold transition-all">
-                                                    <Brain size={18} className="text-primary" /> Create Custom Tool
-                                                </button>
-                                            </div>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
-
-                            {/* Model Selector Trigger */}
-                            <div className="relative">
-                                <button
-                                    type="button"
-                                    onClick={() => setIsModelMenuOpen(!isModelMenuOpen)}
-                                    className="flex items-center gap-2 px-3.5 py-2.5 rounded-full hover:bg-foreground/5 text-muted-foreground hover:text-foreground transition-all active:scale-95 text-xs font-black tracking-widest uppercase border border-white/5"
-                                >
-                                    <currentModelData.icon size={14} className={currentModelData.color} />
-                                    <span>{currentModelData.name}</span>
-                                    <ChevronDown size={12} className={`transition-transform duration-300 ${isModelMenuOpen ? 'rotate-180' : ''}`} />
-                                </button>
-
-                                <AnimatePresence>
-                                    {isModelMenuOpen && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                            className="absolute bottom-full left-0 mb-4 w-64 glass-card rounded-[1.5rem] shadow-2xl p-2 z-[60]"
-                                        >
-                                            <div className="space-y-1">
-                                                {models.map((model) => (
-                                                    <button
-                                                        key={model.id}
-                                                        onClick={() => { setSelectedModel(model.id); setIsModelMenuOpen(false); }}
-                                                        className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${selectedModel === model.id ? 'bg-primary/10' : 'hover:bg-foreground/5'
-                                                            }`}
-                                                    >
-                                                        <div className={`p-2 rounded-lg ${selectedModel === model.id ? 'bg-primary/20' : 'bg-foreground/5'}`}>
-                                                            <model.icon size={18} className={model.color} />
-                                                        </div>
-                                                        <div className="text-left">
-                                                            <div className={`text-sm font-bold ${selectedModel === model.id ? 'text-primary' : 'text-foreground'}`}>{model.name}</div>
-                                                            <div className="text-[10px] text-muted-foreground font-medium truncate w-32">{model.desc}</div>
-                                                        </div>
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
-
+                {/* Unified Input Bar Area */}
+                <div className="flex flex-col p-2">
+                    {/* Top Row: Add Button & Input & Mic/Submit */}
+                    <div className="flex items-center gap-2">
+                        {/* Action Menu (Plus Button) */}
+                        <div className="relative" ref={menuRef}>
                             <button
                                 type="button"
-                                onClick={() => setIsGithubModalOpen(true)}
-                                className="p-2.5 rounded-full hover:bg-foreground/5 text-muted-foreground hover:text-foreground transition-all active:scale-90"
+                                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                                className="p-2.5 rounded-full bg-foreground/5 hover:bg-foreground/10 text-muted-foreground hover:text-foreground transition-all active:scale-95 flex-shrink-0"
                             >
-                                <Github size={18} />
+                                <Plus size={20} className={`transition-transform duration-300 ${isMenuOpen ? 'rotate-45' : ''}`} />
                             </button>
-                            <button type="button" className="p-2.5 rounded-full hover:bg-foreground/5 text-muted-foreground hover:text-foreground transition-all active:scale-90">
-                                <Globe size={18} />
-                            </button>
+
+                            <AnimatePresence>
+                                {isMenuOpen && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                        className="absolute bottom-full left-0 mb-3 w-64 glass-card rounded-[1.5rem] shadow-2xl p-2 z-[70] border border-white/10"
+                                    >
+                                        <div className="space-y-1">
+                                            {[
+                                                { icon: Camera, label: 'Camera', color: 'text-foreground/80' },
+                                                { icon: ImageIcon, label: 'Photos', color: 'text-foreground/80' },
+                                                { icon: Files, label: 'Files', color: 'text-foreground/80' },
+                                                { icon: Library, label: 'NotebookLLM', color: 'text-foreground/80' },
+                                            ].map((item, i) => (
+                                                <button
+                                                    key={i}
+                                                    onClick={() => {
+                                                        setIsMenuOpen(false);
+                                                        toast.info(`Selected ${item.label}`);
+                                                    }}
+                                                    className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-foreground/5 transition-all text-sm font-medium"
+                                                >
+                                                    <item.icon size={18} className={item.color} />
+                                                    <span className="text-foreground">{item.label}</span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </div>
 
-                        {/* Submit Actions */}
-                        <div className="flex items-center gap-2">
+                        {/* Text Area */}
+                        <textarea
+                            ref={textareaRef}
+                            rows={1}
+                            value={title}
+                            onChange={handleInput}
+                            onKeyDown={handleKeyDown}
+                            onFocus={() => setIsFocused(true)}
+                            onBlur={() => setIsFocused(false)}
+                            placeholder={placeholder}
+                            className="flex-1 bg-transparent border-none focus:ring-0 text-foreground placeholder:text-muted-foreground/60 resize-none min-h-[44px] max-h-[200px] text-[15px] font-normal tracking-normal leading-relaxed custom-scrollbar scroll-smooth py-2.5 px-2"
+                        />
+
+                        {/* Mic & Submit Buttons */}
+                        <div className="flex items-center gap-1.5 pr-1">
+                            {/* Microphone Button */}
                             <button
                                 type="button"
-                                onClick={() => setIsRecording(!isRecording)}
-                                className={`p-2.5 rounded-full transition-all active:scale-90 ${isRecording ? 'bg-red-500/10 text-red-500' : 'hover:bg-foreground/5 text-muted-foreground hover:text-foreground'
+                                onClick={() => {
+                                    if (isRecording) {
+                                        setIsRecording(false);
+                                    } else {
+                                        try {
+                                            const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+                                            if (SpeechRecognition) {
+                                                const recognition = new SpeechRecognition();
+                                                recognition.continuous = false;
+                                                // Using final results instead of interim to avoid the rapid "Please try again" errors
+                                                recognition.interimResults = false;
+
+                                                recognition.onstart = () => setIsRecording(true);
+
+                                                recognition.onresult = (event: any) => {
+                                                    const transcript = Array.from(event.results)
+                                                        .map((result: any) => result[0].transcript)
+                                                        .join('');
+                                                    setTitle(prev => prev ? prev + ' ' + transcript : transcript);
+                                                    if (textareaRef.current) {
+                                                        textareaRef.current.style.height = 'auto';
+                                                        textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`;
+                                                    }
+                                                };
+
+                                                recognition.onerror = (event: any) => {
+                                                    console.error("Speech recognition error", event.error);
+                                                    setIsRecording(false);
+                                                    if (event.error === 'not-allowed') {
+                                                        toast.error("Microphone access denied. Please allow it in your browser settings.");
+                                                    } else if (event.error !== 'no-speech') {
+                                                        toast.error(`Microphone error: ${event.error}`);
+                                                    }
+                                                };
+
+                                                recognition.onend = () => setIsRecording(false);
+
+                                                recognition.start();
+                                            } else {
+                                                toast.error("Speech recognition is not supported in this browser.");
+                                            }
+                                        } catch (error) {
+                                            console.error("Error initializing mic:", error);
+                                            toast.error("Microphone initialization failed.");
+                                            setIsRecording(false);
+                                        }
+                                    }
+                                }}
+                                className={`p-2.5 rounded-full transition-all active:scale-90 flex-shrink-0 ${isRecording ? 'bg-red-500/20 text-red-500 animate-pulse' : 'text-foreground/70 hover:bg-foreground/5 hover:text-foreground'
                                     }`}
                             >
                                 {isRecording ? <MicOff size={20} /> : <Mic size={20} />}
                             </button>
 
+                            {/* Submit Arrow Button */}
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={() => handleSubmit()}
                                 disabled={!title.trim()}
-                                className={`p-3 rounded-full transition-all flex items-center justify-center ${title.trim()
-                                    ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
-                                    : 'bg-muted text-muted-foreground opacity-50 cursor-not-allowed'
+                                className={`p-2.5 rounded-full transition-all flex items-center justify-center flex-shrink-0 ${title.trim()
+                                    ? 'bg-primary text-primary-foreground shadow-sm hover:opacity-90'
+                                    : 'bg-foreground/10 text-foreground/30 hover:bg-foreground/10 cursor-not-allowed'
                                     }`}
                             >
-                                <ArrowUp size={22} className="stroke-[3]" />
+                                <ArrowUp size={20} strokeWidth={2.5} />
                             </motion.button>
                         </div>
                     </div>
-                </div>
 
-                {/* Focus indicator animation */}
-                <AnimatePresence>
-                    {isFocused && (
-                        <motion.div
-                            layoutId="glow"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="absolute inset-0 pointer-events-none rounded-[2rem] border border-primary/50"
-                        />
-                    )}
-                </AnimatePresence>
+                    {/* Bottom Row (Underneath Input): Model Selector */}
+                    <div className="flex items-center gap-2 pl-12 pb-1 mt-1">
+                        <div className="relative z-[60]">
+                            <button
+                                type="button"
+                                onClick={() => setIsModelMenuOpen(!isModelMenuOpen)}
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-foreground/5 text-muted-foreground hover:text-foreground transition-all active:scale-95 text-[13px] font-medium border border-transparent hover:border-white/5"
+                            >
+                                <currentModelData.icon size={14} className={currentModelData.color} />
+                                <span>{currentModelData.name}</span>
+                                <ChevronDown size={14} className={`opacity-50 transition-transform duration-300 ${isModelMenuOpen ? 'rotate-180' : ''}`} />
+                            </button>
+
+                            <AnimatePresence>
+                                {isModelMenuOpen && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                        className="absolute bottom-full left-0 mb-3 w-64 glass-card rounded-[1.5rem] shadow-xl p-2 z-[60] border border-white/10"
+                                    >
+                                        <div className="space-y-1">
+                                            {models.map((model) => (
+                                                <button
+                                                    key={model.id}
+                                                    onClick={() => { setSelectedModel(model.id); setIsModelMenuOpen(false); }}
+                                                    className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${selectedModel === model.id ? 'bg-primary/10' : 'hover:bg-foreground/5'
+                                                        }`}
+                                                >
+                                                    <div className={`p-2 rounded-lg ${selectedModel === model.id ? 'bg-primary/20' : 'bg-foreground/5'}`}>
+                                                        <model.icon size={18} className={model.color} />
+                                                    </div>
+                                                    <div className="text-left">
+                                                        <div className={`text-sm font-semibold ${selectedModel === model.id ? 'text-primary' : 'text-foreground'}`}>{model.name}</div>
+                                                        <div className="text-[11px] text-muted-foreground font-medium truncate w-32">{model.desc}</div>
+                                                    </div>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {/* Disclaimer */}
             {centered && (
-                <p className="text-center mt-6 text-[11px] font-bold text-muted-foreground/40 uppercase tracking-[0.2em]">
+                <p className="text-center mt-3 text-[12px] text-muted-foreground/60">
                     MultiAgent can make mistakes. Verify important info.
                 </p>
             )}
