@@ -2,7 +2,7 @@
 
 import { Github, X, ExternalLink, GitBranch, GitPullRequest, Code2, CheckCircle2, Lock, RotateCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { githubService, GithubRepo } from '@/lib/github-service';
 import { useSidebar } from '@/context/SidebarContext';
 import { toast } from 'sonner';
@@ -18,16 +18,7 @@ export default function GithubIntegrationModal({ isOpen, onClose }: GithubIntegr
     const [repos, setRepos] = useState<GithubRepo[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        if (isOpen) {
-            checkConnection();
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = 'auto';
-        }
-    }, [isOpen]);
-
-    const checkConnection = async () => {
+    const checkConnection = useCallback(async () => {
         setIsLoading(true);
         try {
             const connected = await githubService.isConnected();
@@ -42,13 +33,22 @@ export default function GithubIntegrationModal({ isOpen, onClose }: GithubIntegr
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [setIsGithubConnected]);
+
+    useEffect(() => {
+        if (isOpen) {
+            checkConnection();
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'auto';
+        }
+    }, [isOpen, checkConnection]);
 
     const handleConnect = async () => {
         try {
             await githubService.connect();
             // Redirect happens
-        } catch (error) {
+        } catch {
             toast.error("Failed to connect GitHub");
         }
     };

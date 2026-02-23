@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { toast } from 'sonner';
 import { chatService } from '@/lib/chat-service';
 import { projectService } from '@/lib/project-service';
@@ -31,7 +30,6 @@ export default function ChatPage({ params }: { params: { id: string } }) {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const taskInputRef = useRef<TaskInputHandle>(null); // Add ref
     const router = useRouter();
-    const supabase = createClientComponentClient();
 
     useEffect(() => {
         const loadMessages = async () => {
@@ -49,7 +47,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
         scrollToBottom();
     }, [messages]);
 
-    const handleAiGeneration = async (prompt: string, model: string = 'Fast', tool?: string) => {
+    const handleAiGeneration = useCallback(async (prompt: string, model: string = 'Fast', tool?: string) => {
         setIsGenerating(true);
         try {
             // Optimistic update for user message
@@ -180,7 +178,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
         } finally {
             setIsGenerating(false);
         }
-    };
+    }, [params.id]);
 
     const addMessage = useCallback(async (content: string, model: string = 'Fast', tool?: string) => {
         if (tool === 'project') {
@@ -197,7 +195,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
                     router.push(`/projects/${project.id}`);
                 } else {
                     const errorMsg = (error && typeof error === 'object' && 'message' in error)
-                        ? (error as any).message
+                        ? (error as { message: string }).message
                         : (typeof error === 'string' ? error : "Unknown error");
 
                     toast.error(`Failed to initialize project: ${errorMsg}`, {
@@ -206,13 +204,13 @@ export default function ChatPage({ params }: { params: { id: string } }) {
                     });
                     console.error("Project creation failed:", error);
                 }
-            } catch (err) {
+            } catch {
                 toast.error("Error creating project", { id: toastId });
             }
             return;
         }
         handleAiGeneration(content, model, tool);
-    }, [params.id, router]);
+    }, [router, handleAiGeneration]);
 
     const handleRegenerate = async (messageId: string) => {
         const index = messages.findIndex(m => m.id === messageId);

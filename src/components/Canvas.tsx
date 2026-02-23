@@ -1,8 +1,8 @@
 'use client';
 
-import { X, Maximize2, Minimize2, Copy, Check, Download, Edit3, Code2, Eye } from 'lucide-react';
+import { X, Maximize2, Minimize2, Copy, Check, Edit3, Code2, Eye, FileText } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import CodeBlock from './CodeBlock';
 import { toast } from 'sonner';
@@ -19,7 +19,6 @@ type CanvasProps = {
 
 export default function Canvas({ isOpen, onClose, title, content, contentType, isGenerating, language }: CanvasProps) {
     const [isMaximized, setIsMaximized] = useState(false);
-    const [isEditing, setIsEditing] = useState(false);
     const [editableContent, setEditableContent] = useState(content);
     const [copied, setCopied] = useState(false);
     const [viewMode, setViewMode] = useState<'preview' | 'code'>(contentType === 'code' ? 'code' : 'preview');
@@ -107,7 +106,7 @@ export default function Canvas({ isOpen, onClose, title, content, contentType, i
                         <div className="prose dark:prose-invert max-w-none animate-in fade-in slide-in-from-bottom-2 duration-500">
                             <ReactMarkdown
                                 components={{
-                                    code({ node, inline, className, children, ...props }: any) {
+                                    code({ inline, className, children, ...props }: { inline?: boolean; className?: string; children?: React.ReactNode }) {
                                         const match = /language-(\w+)/.exec(className || '');
                                         return !inline && match ? (
                                             <CodeBlock
@@ -154,5 +153,4 @@ export default function Canvas({ isOpen, onClose, title, content, contentType, i
     );
 }
 
-// Missing import fix
-import { FileText } from 'lucide-react';
+

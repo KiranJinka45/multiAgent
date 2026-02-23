@@ -3,15 +3,15 @@
 import { useRef, useEffect, useState, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
+import Image from 'next/image';
 import {
     Sparkles, User, Copy, ThumbsUp, ThumbsDown, RefreshCw, PenSquare,
-    Check, MoreHorizontal, MessageSquarePlus, Volume2, GitFork,
-    Upload, RotateCw, Brain, ChevronDown, Zap
+    MoreHorizontal, Volume2, GitFork,
+    Upload, RotateCw, Brain, Zap
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Message } from '@/types/chat';
 import CodeBlock from './CodeBlock';
-import { chatService } from '@/lib/chat-service';
 import { projectService } from '@/lib/project-service';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
@@ -113,7 +113,7 @@ const MessageItem = memo(({
 
                                 <ReactMarkdown
                                     components={{
-                                        code({ node, inline, className, children, ...props }: any) {
+                                        code({ inline, className, children, ...props }: { inline?: boolean; className?: string; children?: React.ReactNode }) {
                                             const match = /language-(\w+)/.exec(className || '');
                                             return !inline && match ? (
                                                 <CodeBlock
@@ -127,13 +127,16 @@ const MessageItem = memo(({
                                                 </code>
                                             );
                                         },
-                                        img({ node, ...props }: any) {
+                                        img({ src, alt }: { src?: string; alt?: string }) {
                                             return (
                                                 <div className="my-6 overflow-hidden rounded-[2rem] border border-white/10 bg-black/20 shadow-2xl group/img">
-                                                    <img
-                                                        {...props}
+                                                    <Image
+                                                        src={src || ''}
+                                                        alt={alt || 'Generated interface'}
+                                                        width={1200}
+                                                        height={700}
+                                                        unoptimized
                                                         className="w-full h-auto object-cover max-h-[700px] transition-transform duration-700 group-hover/img:scale-[1.03] cursor-zoom-in"
-                                                        loading="lazy"
                                                     />
                                                 </div>
                                             );
@@ -187,7 +190,7 @@ const MessageItem = memo(({
                                                             toast.success("Build environment ready", { id: toastId });
                                                             router.push(`/projects/${project.id}`);
                                                         }
-                                                    } catch (e) {
+                                                    } catch {
                                                         toast.error("Build engine failure", { id: toastId });
                                                     }
                                                 }}
@@ -226,8 +229,7 @@ const MessageItem = memo(({
 
                             <div className="relative">
                                 <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
+                                    onClick={() => {
                                         setActiveMenu(activeMenu === msg.id ? null : msg.id);
                                     }}
                                     className={`p-2 rounded-xl transition-all border border-transparent ${activeMenu === msg.id ? 'glass text-foreground border-white/10' : 'text-muted-foreground hover:text-foreground hover:glass'
@@ -346,7 +348,7 @@ export default function ChatList({ messages, onEdit, onRegenerate }: ChatListPro
         setShareModalOpen(true);
     };
 
-    const handleBranch = async (messageId: string) => {
+    const handleBranch = async () => {
         toast.info("Branching mission...");
         setActiveMenu(null);
     };

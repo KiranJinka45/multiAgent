@@ -17,7 +17,7 @@ export async function POST(req: Request) {
             response: `![Generated Image for: ${prompt}](${imageUrl})\n\nI've generated this image based on your request: "${prompt}"`,
             imageUrl: imageUrl
         });
-    } catch (error: any) {
+    } catch (error) {
         console.error('Image Generation Error:', error);
         return NextResponse.json({ error: 'Failed to generate image' }, { status: 500 });
     }

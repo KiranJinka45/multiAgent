@@ -34,9 +34,9 @@ def update_env_file(file_path, key, value):
 def main():
     print("--- Starting Supabase Scavenger (Automated) ---")
     
-    # Credentials from user
-    EMAIL = "kiranjinkakumar@gmail.com"
-    PASSWORD = "multiAgent@000"
+    # Credentials from user (using env if available)
+    EMAIL = os.getenv("SCAVENGER_EMAIL", "kiranjinkakumar@gmail.com")
+    PASSWORD = os.getenv("SCAVENGER_PASSWORD", "Kiran@4518")
     PROJECT_ID = "shvwmatbjvjspijslawl"
 
     with sync_playwright() as p:

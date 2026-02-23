@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
     FileCode,
-    Play,
     Save,
     RefreshCcw,
     ChevronRight,
@@ -16,7 +15,6 @@ import {
     Globe,
     Download,
     Sparkles,
-    MessageSquare,
     ExternalLink,
     Share2,
     ShieldCheck
@@ -48,6 +46,9 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
     const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isGenerating, setIsGenerating] = useState(false);
+    const [userReply, setUserReply] = useState<string | null>(null);
+    const [replyText, setReplyText] = useState("");
+    const [hasStartedGenerating, setHasStartedGenerating] = useState(false);
     const [viewMode, setViewMode] = useState<'editor' | 'preview' | 'split'>('split');
     const [editContent, setEditContent] = useState('');
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -89,11 +90,85 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
         [files, selectedFileId]
     );
 
+    const handleGenerate = useCallback(async () => {
+        if (isGenerating) return;
+        setIsGenerating(true);
+
+        try {
+            const res = await fetch('/api/generate-project', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    projectId: params.id,
+                    prompt: project?.description || "A modern web application"
+                })
+            });
+
+            if (!res.ok) {
+                const errorData = await res.json();
+                const detailedError = typeof errorData.error === 'object'
+                    ? JSON.stringify(errorData.error)
+                    : (errorData.error || res.statusText);
+                toast.error(`Generation failed: ${detailedError}`);
+                setIsGenerating(false);
+            }
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+            toast.error(`An error occurred: ${errorMessage}`);
+            setIsGenerating(false);
+        }
+    }, [params.id, isGenerating, project?.description]);
+
+    const loadFiles = useCallback(async () => {
+        const f = await projectService.getProjectFiles(params.id);
+        const filesData = f || [];
+        setFiles(filesData);
+
+        if (filesData.length > 0 && !selectedFileId) {
+            setSelectedFileId(filesData[0].id);
+            setEditContent(filesData[0].content || '');
+        }
+    }, [params.id, selectedFileId]);
+
+    const submitClarification = () => {
+        if (!replyText.trim()) return;
+        setUserReply(replyText);
+        setHasStartedGenerating(true);
+        projectService.updateProject(params.id, { description: project?.description + '\n\nPreferences: ' + replyText }).then(() => {
+            handleGenerate();
+        });
+    };
+
+    const loadProjectData = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const p = await projectService.getProject(params.id);
+            if (!p) {
+                toast.error("Project not found");
+                router.push('/projects');
+                return;
+            }
+            setProject(p);
+
+            // Sync generation state with project status
+            const currentIsGenerating = p.status.startsWith('generating') || p.status === 'brainstorming';
+            setIsGenerating(currentIsGenerating);
+
+            await loadFiles();
+
+            if (p.status === 'draft') {
+                // handleGenerate(); // Disabled for clarification phase
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    }, [params.id, router, loadFiles, handleGenerate]);
+
     useEffect(() => {
         loadProjectData();
 
         // Listen for real-time status updates
-        const supabase = projectService.getSupabaseClient();
+        const supabase = projectService.getSupabase();
 
         // Channel for project status
         const statusChannel = supabase
@@ -163,73 +238,7 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
             supabase.removeChannel(statusChannel);
             supabase.removeChannel(filesChannel);
         };
-    }, [params.id]);
-
-    const loadProjectData = async () => {
-        setIsLoading(true);
-        try {
-            const p = await projectService.getProject(params.id);
-            if (!p) {
-                toast.error("Project not found");
-                router.push('/projects');
-                return;
-            }
-            setProject(p);
-
-            // Sync generation state with project status
-            const currentIsGenerating = p.status.startsWith('generating') || p.status === 'brainstorming';
-            setIsGenerating(currentIsGenerating);
-
-            await loadFiles();
-
-            if (p.status === 'draft') {
-                handleGenerate();
-            }
-        } catch (error) {
-            console.error("Error loading project:", error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const loadFiles = async () => {
-        const f = await projectService.getProjectFiles(params.id);
-        const filesData = f || [];
-        setFiles(filesData);
-
-        if (filesData.length > 0 && !selectedFileId) {
-            setSelectedFileId(filesData[0].id);
-            setEditContent(filesData[0].content || '');
-        }
-    };
-
-    const handleGenerate = async () => {
-        if (isGenerating) return;
-        setIsGenerating(true);
-
-        try {
-            const res = await fetch('/api/generate-project', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    projectId: params.id,
-                    prompt: project?.description || "A modern web application"
-                })
-            });
-
-            if (!res.ok) {
-                const errorData = await res.json();
-                const detailedError = typeof errorData.error === 'object'
-                    ? JSON.stringify(errorData.error)
-                    : (errorData.error || res.statusText);
-                toast.error(`Generation failed: ${detailedError}`);
-                setIsGenerating(false);
-            }
-        } catch (error: any) {
-            toast.error(`An error occurred: ${error.message}`);
-            setIsGenerating(false);
-        }
-    };
+    }, [params.id, loadProjectData, selectedFileId]);
 
     const [showRefineChat, setShowRefineChat] = useState(false);
     const [refinementPrompt, setRefinementPrompt] = useState('');
@@ -271,8 +280,9 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
             toast.success("File refined successfully!", { id: toastId });
             setShowRefineChat(false);
             setRefinementPrompt('');
-        } catch (error: any) {
-            toast.error(`Error: ${error.message}`, { id: toastId });
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : "Refinement failed";
+            toast.error(`Error: ${errorMessage}`, { id: toastId });
         } finally {
             setIsRefining(false);
         }
@@ -305,8 +315,9 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
             const { updatedFile } = await res.json();
             setAuditResults(updatedFile.content);
             toast.success("Audit complete!", { id: toastId });
-        } catch (error: any) {
-            toast.error(`Audit failed: ${error.message}`, { id: toastId });
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : "Audit failed";
+            toast.error(`Audit failed: ${errorMessage}`, { id: toastId });
             setShowAudit(false);
         } finally {
             setIsRefining(false);
@@ -344,7 +355,7 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
                 id: toastId,
                 description: "Your site is now accessible via the share link."
             });
-        } catch (error) {
+        } catch {
             toast.error("Deployment failed", { id: toastId });
         }
     };
@@ -379,7 +390,7 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
             document.body.removeChild(a);
 
             toast.success("Project downloaded!", { id: toastId });
-        } catch (error) {
+        } catch {
             toast.error("Failed to package project", { id: toastId });
         }
     };
@@ -449,6 +460,10 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
                         <ShieldCheck size={14} className={isRefining && showAudit ? 'animate-pulse' : ''} />
                         Audit
                     </button>
+                    <button onClick={handleDownload} className="flex items-center gap-2 px-3 py-1.5 bg-white/5 hover:bg-white/10 text-xs font-medium rounded-lg transition-all">
+                        <Download size={14} />
+                        Download
+                    </button>
                     <button onClick={handleGenerate} disabled={isGenerating} className="flex items-center gap-2 px-3 py-1.5 bg-white/5 hover:bg-white/10 text-xs font-medium rounded-lg transition-all">
                         <RefreshCcw size={14} className={isGenerating ? 'animate-spin' : ''} />
                         Rebuild
@@ -482,63 +497,144 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
                     )}
                 </AnimatePresence>
 
-                <main className="flex-1 flex overflow-hidden relative">
-                    <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-[#1a1a1a] border border-white/10 p-1 rounded-r-lg hover:bg-primary/20 hover:text-primary transition-all shadow-xl">
-                        {isSidebarOpen ? <ChevronLeft size={12} /> : <ChevronRight size={12} />}
-                    </button>
+                <main className="flex-1 flex overflow-hidden relative bg-[#0a0a0a]">
+                    {(files.length === 0 && (!hasStartedGenerating || project?.status === 'draft' || project?.status.startsWith('generating') || project?.status === 'brainstorming')) ? (
+                        <div className="flex-1 flex w-full">
+                            {/* Left Panel: Chat Phase */}
+                            <div className="w-1/2 border-r border-white/5 bg-[#0d0d0d] flex flex-col pt-10 px-8 relative">
+                                <div className="flex items-center gap-2 mb-8 text-primary font-bold text-lg"><Globe size={20} /> MultiAgent</div>
+                                <div className="flex-1 overflow-y-auto space-y-6 pb-24 custom-scrollbar pr-4">
+                                    {/* User Original Prompt */}
+                                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-[#1a1a1a] rounded-2xl p-5 border border-white/5 text-sm text-gray-300 shadow-xl">
+                                        {project?.description?.split('\n\nPreferences:')[0]}
+                                    </motion.div>
+                                    
+                                    {/* AI Clarification Questions */}
+                                    {project?.status === 'draft' && (
+                                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-primary/5 rounded-2xl p-6 border border-primary/20 text-sm text-gray-300 space-y-5 shadow-lg relative overflow-hidden">
+                                            <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
+                                            <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest">
+                                                <Sparkles size={14} className="animate-pulse" />
+                                                Agent is asking a question
+                                            </div>
+                                            <div className="text-gray-200 font-medium">
+                                                Before I start building, I need to clarify a few key aspects of your platform:
+                                            </div>
+                                            <div className="space-y-3 pl-2 text-gray-400">
+                                                <p><strong className="text-gray-200">1. Frontend Framework</strong> - a. React (Next.js) b. Vue c. Vanilla JS</p>
+                                                <p><strong className="text-gray-200">2. Backend & Database</strong> - a. Supabase (PostgreSQL) b. Firebase c. Node/Mongo</p>
+                                                <p><strong className="text-gray-200">3. Styling Preference</strong> - a. Tailwind CSS b. Custom CSS c. Material UI</p>
+                                            </div>
+                                        </motion.div>
+                                    )}
 
-                    <AnimatePresence>
-                        {isGenerating && (
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                                animate={{ opacity: 1, scale: 1, y: 0 }}
-                                exit={{ opacity: 0, scale: 0.9, y: 10 }}
-                                className="absolute right-6 top-20 z-[100] w-80 bg-[#1a1a1a]/90 backdrop-blur-xl border border-primary/20 rounded-3xl p-6 shadow-2xl space-y-6 overflow-hidden"
-                            >
-                                <div className="flex flex-col gap-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className="relative">
-                                            <Loader2 size={18} className="text-primary animate-spin" />
-                                            <div className="absolute inset-0 rounded-full border-t-2 border-primary animate-pulse" />
-                                        </div>
-                                        <div className="space-y-0.5">
-                                            <h3 className="text-sm font-bold tracking-tight text-white">MultiAgent is Building</h3>
-                                            <p className="text-[10px] text-neutral-400">Crafting your professional vision...</p>
-                                        </div>
-                                    </div>
+                                    {/* User Reply */}
+                                    {userReply && (
+                                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-[#1a1a1a] rounded-2xl p-5 border border-white/5 text-sm text-gray-300 shadow-xl self-end mt-6 ml-auto max-w-[80%] border-primary/30 text-right">
+                                            {userReply}
+                                        </motion.div>
+                                    )}
 
-                                    <div className="bg-black/60 rounded-xl p-3 border border-white/5 space-y-2 shadow-inner">
-                                        <div className="text-[9px] font-bold text-primary uppercase tracking-[0.2em] flex justify-between">
-                                            <span>Construction</span>
-                                            <span className="animate-pulse">Processing</span>
-                                        </div>
-                                        <div className="text-[10px] font-medium text-neutral-200 font-mono truncate uppercase">
-                                            {project?.status === 'generating files'
-                                                ? `⚡ Building ${files.length} Files...`
-                                                : (project?.status === 'brainstorming' ? '🧠 Architecture Design...' : '⚡ Initializing Engine...')}
-                                        </div>
-                                        <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
-                                            <motion.div
-                                                className="h-full bg-primary"
-                                                initial={{ width: "10%" }}
-                                                animate={{ width: "100%" }}
-                                                transition={{ duration: 15, ease: "linear" }}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="flex justify-center">
-                                        <span className="text-[8px] text-neutral-500 font-bold uppercase tracking-widest bg-white/5 px-2 py-0.5 rounded-full">
-                                            Lightning Fast: Pro Build
-                                        </span>
-                                    </div>
+                                    {/* Generating State */}
+                                    {isGenerating && (
+                                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-primary/5 rounded-2xl p-6 border border-primary/20 text-sm text-gray-300 shadow-lg relative overflow-hidden mt-6 flex flex-col gap-4">
+                                            <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
+                                            <div className="flex items-center gap-3">
+                                                <Loader2 size={16} className="text-primary animate-spin" />
+                                                <span className="text-primary font-bold text-xs uppercase tracking-widest">Building Infrastructure</span>
+                                            </div>
+                                            <p className="text-gray-400">I'll set up your core structure now and we'll iterate from there. Let's build.</p>
+                                            <div className="h-1.5 w-full bg-black/40 rounded-full overflow-hidden">
+                                                <motion.div 
+                                                    className="h-full bg-primary" 
+                                                    initial={{ width: "10%" }} 
+                                                    animate={{ width: "100%" }} 
+                                                    transition={{ duration: 15, ease: "linear" }}
+                                                />
+                                            </div>
+                                        </motion.div>
+                                    )}
                                 </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
+                                
+                                {/* Input Box */}
+                                {!userReply && project?.status === 'draft' && (
+                                    <div className="absolute bottom-6 flex-1 w-[calc(100%-4rem)]">
+                                        <div className="bg-[#141414] border border-white/10 rounded-2xl p-2 flex items-center shadow-2xl focus-within:border-primary/50 transition-colors">
+                                            <textarea 
+                                                placeholder="Message Agent (e.g., 1a, 2a, 3a)..." 
+                                                className="flex-1 bg-transparent resize-none outline-none text-sm text-gray-200 p-3 min-h-[44px] max-h-32"
+                                                value={replyText}
+                                                onChange={e => setReplyText(e.target.value)}
+                                                onKeyDown={e => {
+                                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                                        e.preventDefault();
+                                                        submitClarification();
+                                                    }
+                                                }}
+                                            />
+                                            <button onClick={submitClarification} disabled={!replyText.trim() || isGenerating} className="p-3 bg-primary rounded-xl text-primary-foreground hover:opacity-90 transition-opacity disabled:opacity-50">
+                                                <ChevronRight size={18} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
 
-                    <div className="flex-1 flex overflow-hidden">
-                        {(viewMode === 'editor' || viewMode === 'split') && (
+                            {/* Right Panel: Placeholder Preview */}
+                            <div className="w-1/2 bg-[#050505] flex items-center justify-center p-12 relative overflow-hidden">
+                                {/* Grid background */}
+                                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+                                
+                                <div className="relative z-10 text-center space-y-8 w-full max-w-md">
+                                    <Sparkles size={32} className="text-gray-500 mx-auto" />
+                                    <div className="space-y-2">
+                                        <h2 className="text-2xl font-bold tracking-tight text-white drop-shadow-lg">Deploy Your Application</h2>
+                                        <p className="text-sm text-gray-400">Make your app publicly available with managed infrastructure.</p>
+                                    </div>
+                                    
+                                    <div className="bg-[#0f0f0f] border border-white/10 rounded-2xl p-6 shadow-2xl relative overflow-hidden transform hover:scale-[1.02] transition-transform">
+                                        <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-4">
+                                            <div className="flex items-center gap-2 text-xs font-bold text-gray-300">
+                                                <Globe size={14} className="text-gray-500" /> Deployments
+                                            </div>
+                                        </div>
+                                        <div className="bg-[#1a1a1a] rounded-xl p-4 border border-white/5 flex items-center justify-between group">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-2.5 h-2.5 bg-green-500/80 rounded-full animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
+                                                <div className="text-sm text-gray-300 font-medium tracking-tight">Live <span className="text-gray-500 font-mono ml-2 text-xs">multiagent.app</span></div>
+                                            </div>
+                                            <button className="px-4 py-1.5 bg-white text-black text-xs font-bold rounded-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors">Visit ↗</button>
+                                        </div>
+                                    </div>
+                                    
+                                    {isGenerating && (
+                                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-center mt-12 gap-2">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-white/20 animate-bounce" />
+                                            <div className="w-1.5 h-1.5 rounded-full bg-white/20 animate-bounce delay-100" />
+                                            <div className="w-1.5 h-1.5 rounded-full bg-white/20 animate-bounce delay-200" />
+                                        </motion.div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <>
+                            <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-[#1a1a1a] border border-white/10 p-1 rounded-r-lg hover:bg-primary/20 hover:text-primary transition-all shadow-xl">
+                                {isSidebarOpen ? <ChevronLeft size={12} /> : <ChevronRight size={12} />}
+                            </button>
+                            
+                            {/* Re-generating sleek banner */}
+                            <AnimatePresence>
+                                {isGenerating && files.length > 0 && (
+                                    <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-[#1a1a1a]/90 backdrop-blur-md px-4 py-2 rounded-full border border-primary/30 shadow-2xl flex items-center gap-3">
+                                        <Loader2 size={14} className="text-primary animate-spin" />
+                                        <span className="text-xs font-bold text-gray-200 uppercase tracking-widest">Rebuilding Core Engine...</span>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+
+                            <div className="flex-1 flex overflow-hidden">
+                                {(viewMode === 'editor' || viewMode === 'split') && (
                             <div className="flex-1 flex flex-col bg-[#1e1e1e] overflow-hidden">
                                 <div className="h-10 border-b border-white/5 flex items-center justify-between px-4 bg-[#1c1c1c]">
                                     <span className="text-[10px] text-gray-400 uppercase tracking-widest flex items-center gap-2">
@@ -694,6 +790,8 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
                             </div>
                         )}
                     </div>
+                </>
+                    )}
                 </main>
             </div>
 

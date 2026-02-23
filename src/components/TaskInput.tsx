@@ -3,10 +3,9 @@
 import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import {
     Mic, MicOff, Image as ImageIcon,
-    ChevronDown, Plus, Cpu, Zap, Brain, Wand2, FileText,
+    ChevronDown, Plus, Cpu, Zap, Brain,
     Camera, Files, Library, ArrowUp
 } from 'lucide-react';
-import { useSidebar } from '@/context/SidebarContext';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -22,8 +21,8 @@ export interface TaskInputHandle {
     setInput: (value: string) => void;
 }
 
-const TaskInput = forwardRef<TaskInputHandle, TaskInputProps>(({ onAddTask, placeholder = "How can MultiAgent help you today?", centered = false }, ref) => {
-    const { setIsGithubModalOpen } = useSidebar();
+const TaskInput = forwardRef<TaskInputHandle, TaskInputProps>(({ onAddTask, placeholder = "How can I help you today?", centered = false }, ref) => {
+    // Sidebar context (unused)
     const [title, setTitle] = useState('');
     const [isRecording, setIsRecording] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -160,7 +159,7 @@ const TaskInput = forwardRef<TaskInputHandle, TaskInputProps>(({ onAddTask, plac
                             onFocus={() => setIsFocused(true)}
                             onBlur={() => setIsFocused(false)}
                             placeholder={placeholder}
-                            className="flex-1 bg-transparent border-none focus:ring-0 text-foreground placeholder:text-muted-foreground/60 resize-none min-h-[44px] max-h-[200px] text-[15px] font-normal tracking-normal leading-relaxed custom-scrollbar scroll-smooth py-2.5 px-2"
+                            className="flex-1 bg-transparent border-none focus:ring-0 outline-none appearance-none shadow-none text-foreground placeholder:text-muted-foreground/60 resize-none min-h-[44px] max-h-[200px] text-[15px] font-normal tracking-normal leading-relaxed custom-scrollbar scroll-smooth py-2.5 px-2"
                         />
 
                         {/* Mic & Submit Buttons */}
@@ -173,6 +172,7 @@ const TaskInput = forwardRef<TaskInputHandle, TaskInputProps>(({ onAddTask, plac
                                         setIsRecording(false);
                                     } else {
                                         try {
+                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                             const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
                                             if (SpeechRecognition) {
                                                 const recognition = new SpeechRecognition();
@@ -182,8 +182,10 @@ const TaskInput = forwardRef<TaskInputHandle, TaskInputProps>(({ onAddTask, plac
 
                                                 recognition.onstart = () => setIsRecording(true);
 
+                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                 recognition.onresult = (event: any) => {
                                                     const transcript = Array.from(event.results)
+                                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                         .map((result: any) => result[0].transcript)
                                                         .join('');
                                                     setTitle(prev => prev ? prev + ' ' + transcript : transcript);
@@ -193,6 +195,7 @@ const TaskInput = forwardRef<TaskInputHandle, TaskInputProps>(({ onAddTask, plac
                                                     }
                                                 };
 
+                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                 recognition.onerror = (event: any) => {
                                                     console.error("Speech recognition error", event.error);
                                                     setIsRecording(false);

@@ -1,11 +1,11 @@
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createClientComponentClient, type SupabaseClient } from '@supabase/auth-helpers-nextjs';
 import { Project, ProjectFile } from '@/types/project';
 
 export const projectService = {
-    getSupabaseClient: () => createClientComponentClient(),
+    getSupabase: (supabaseServer?: SupabaseClient) => supabaseServer || createClientComponentClient(),
 
-    async getProjects(supabaseServer?: any) {
-        const supabase = supabaseServer || createClientComponentClient();
+    async getProjects(supabaseServer?: SupabaseClient) {
+        const supabase = this.getSupabase(supabaseServer);
         const { data, error } = await supabase
             .from('projects')
             .select('*')
@@ -18,8 +18,8 @@ export const projectService = {
         return data as Project[];
     },
 
-    async getProject(id: string, supabaseServer?: any) {
-        const supabase = supabaseServer || createClientComponentClient();
+    async getProject(id: string, supabaseServer?: SupabaseClient) {
+        const supabase = this.getSupabase(supabaseServer);
         const { data, error } = await supabase
             .from('projects')
             .select('*')
@@ -33,8 +33,8 @@ export const projectService = {
         return data as Project;
     },
 
-    async createProject(name: string, description?: string, type?: string) {
-        const supabase = createClientComponentClient();
+    async createProject(name: string, description?: string, type?: string, supabaseServer?: SupabaseClient) {
+        const supabase = this.getSupabase(supabaseServer);
         const { data: { user } } = await supabase.auth.getUser();
 
         if (!user) return { data: null, error: 'User not authenticated' };
@@ -57,8 +57,8 @@ export const projectService = {
         return { data: data as Project, error };
     },
 
-    async getProjectFiles(projectId: string) {
-        const supabase = createClientComponentClient();
+    async getProjectFiles(projectId: string, supabaseServer?: SupabaseClient) {
+        const supabase = this.getSupabase(supabaseServer);
         const { data, error } = await supabase
             .from('project_files')
             .select('*')
@@ -72,8 +72,8 @@ export const projectService = {
         return data as ProjectFile[];
     },
 
-    async updateFile(id: string, content: string) {
-        const supabase = createClientComponentClient();
+    async updateFile(id: string, content: string, supabaseServer?: SupabaseClient) {
+        const supabase = this.getSupabase(supabaseServer);
         const { data, error } = await supabase
             .from('project_files')
             .update({ content, updated_at: new Date().toISOString() })
@@ -88,8 +88,8 @@ export const projectService = {
         return data as ProjectFile;
     },
 
-    async updateProject(id: string, project: Partial<Project>) {
-        const supabase = createClientComponentClient();
+    async updateProject(id: string, project: Partial<Project>, supabaseServer?: SupabaseClient) {
+        const supabase = this.getSupabase(supabaseServer);
         const { data, error } = await supabase
             .from('projects')
             .update(project)
@@ -100,8 +100,8 @@ export const projectService = {
         return { data: data as Project, error };
     },
 
-    async deleteProject(id: string) {
-        const supabase = createClientComponentClient();
+    async deleteProject(id: string, supabaseServer?: SupabaseClient) {
+        const supabase = this.getSupabase(supabaseServer);
         const { error } = await supabase
             .from('projects')
             .delete()

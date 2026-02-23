@@ -2,7 +2,6 @@
 
 import { MessageSquare, Pin, MoreHorizontal, Share2, Users, Edit3, Archive, Trash2 } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Chat } from '@/types/chat';
@@ -50,8 +49,8 @@ export const SidebarChatList = ({
                             <Link
                                 href={`/c/${chat.id}`}
                                 className={`flex items-center gap-2.5 px-3 py-2 text-[13px] rounded-xl transition-all pr-8 border border-transparent ${pathname === `/c/${chat.id}`
-                                        ? 'text-foreground bg-primary/5 border-primary/10'
-                                        : 'text-muted-foreground hover:text-foreground hover:bg-accent/30'
+                                    ? 'text-foreground bg-primary/5 border-primary/10'
+                                    : 'text-muted-foreground hover:text-foreground hover:bg-accent/30'
                                     }`}
                             >
                                 <div className="flex items-center gap-2 min-w-0 flex-1">

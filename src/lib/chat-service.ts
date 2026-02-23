@@ -1,11 +1,13 @@
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createClientComponentClient, type SupabaseClient } from '@supabase/auth-helpers-nextjs';
+import { type PostgrestError } from '@supabase/supabase-js';
 import { Chat, Message } from '@/types/chat';
 
-const supabase = createClientComponentClient();
-
 export const chatService = {
+    getSupabase: (supabaseServer?: SupabaseClient) => supabaseServer || createClientComponentClient(),
+
     // Create a new chat
-    async createChat(title: string): Promise<{ chat: Chat | null, error: any }> {
+    async createChat(title: string, supabaseServer?: SupabaseClient): Promise<{ chat: Chat | null, error: PostgrestError | string | null }> {
+        const supabase = this.getSupabase(supabaseServer);
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
             return { chat: null, error: 'User not authenticated' };
@@ -25,7 +27,8 @@ export const chatService = {
     },
 
     // Get all chats for the current user, ordered by most recent update
-    async getChats(): Promise<Chat[]> {
+    async getChats(supabaseServer?: SupabaseClient): Promise<Chat[]> {
+        const supabase = this.getSupabase(supabaseServer);
         const { data, error } = await supabase
             .from('chats')
             .select('*')
@@ -35,11 +38,12 @@ export const chatService = {
             console.error('Error fetching chats:', error);
             return [];
         }
-        return data;
+        return data as Chat[];
     },
 
     // Get details of a specific chat
-    async getChat(chatId: string): Promise<Chat | null> {
+    async getChat(chatId: string, supabaseServer?: SupabaseClient): Promise<Chat | null> {
+        const supabase = this.getSupabase(supabaseServer);
         const { data, error } = await supabase
             .from('chats')
             .select('*')
@@ -47,11 +51,12 @@ export const chatService = {
             .single();
 
         if (error) return null;
-        return data;
+        return data as Chat;
     },
 
     // Get messages for a specific chat
-    async getMessages(chatId: string): Promise<Message[]> {
+    async getMessages(chatId: string, supabaseServer?: SupabaseClient): Promise<Message[]> {
+        const supabase = this.getSupabase(supabaseServer);
         const { data, error } = await supabase
             .from('messages')
             .select('*')
@@ -62,11 +67,12 @@ export const chatService = {
             console.error('Error fetching messages:', error);
             return [];
         }
-        return data;
+        return data as Message[];
     },
 
     // Add a message to a chat
-    async addMessage(chatId: string, content: string, role: 'user' | 'assistant'): Promise<Message | null> {
+    async addMessage(chatId: string, content: string, role: 'user' | 'assistant', supabaseServer?: SupabaseClient): Promise<Message | null> {
+        const supabase = this.getSupabase(supabaseServer);
         const { data, error } = await supabase
             .from('messages')
             .insert({ chat_id: chatId, content, role })
@@ -84,11 +90,12 @@ export const chatService = {
             .update({ updated_at: new Date().toISOString() })
             .eq('id', chatId);
 
-        return data;
+        return data as Message;
     },
 
     // Delete a chat and all its messages (cascade handled by DB)
-    async deleteChat(chatId: string): Promise<boolean> {
+    async deleteChat(chatId: string, supabaseServer?: SupabaseClient): Promise<boolean> {
+        const supabase = this.getSupabase(supabaseServer);
         const { error } = await supabase
             .from('chats')
             .delete()
@@ -102,7 +109,8 @@ export const chatService = {
     },
 
     // Update chat title
-    async updateChatTitle(chatId: string, title: string): Promise<boolean> {
+    async updateChatTitle(chatId: string, title: string, supabaseServer?: SupabaseClient): Promise<boolean> {
+        const supabase = this.getSupabase(supabaseServer);
         const { error } = await supabase
             .from('chats')
             .update({ title })
@@ -116,7 +124,8 @@ export const chatService = {
     },
 
     // Toggle pin status
-    async togglePinned(chatId: string, isPinned: boolean): Promise<boolean> {
+    async togglePinned(chatId: string, isPinned: boolean, supabaseServer?: SupabaseClient): Promise<boolean> {
+        const supabase = this.getSupabase(supabaseServer);
         const { error } = await supabase
             .from('chats')
             .update({ is_pinned: isPinned })
@@ -130,7 +139,8 @@ export const chatService = {
     },
 
     // Toggle archive status
-    async toggleArchived(chatId: string, isArchived: boolean): Promise<boolean> {
+    async toggleArchived(chatId: string, isArchived: boolean, supabaseServer?: SupabaseClient): Promise<boolean> {
+        const supabase = this.getSupabase(supabaseServer);
         const { error } = await supabase
             .from('chats')
             .update({ is_archived: isArchived })
@@ -144,7 +154,8 @@ export const chatService = {
     },
 
     // Toggle public status (Sharing)
-    async togglePublic(chatId: string, isPublic: boolean): Promise<boolean> {
+    async togglePublic(chatId: string, isPublic: boolean, supabaseServer?: SupabaseClient): Promise<boolean> {
+        const supabase = this.getSupabase(supabaseServer);
         const { error } = await supabase
             .from('chats')
             .update({ is_public: isPublic })
@@ -158,7 +169,8 @@ export const chatService = {
     },
 
     // Delete a single message
-    async deleteMessage(messageId: string): Promise<boolean> {
+    async deleteMessage(messageId: string, supabaseServer?: SupabaseClient): Promise<boolean> {
+        const supabase = this.getSupabase(supabaseServer);
         const { error } = await supabase
             .from('messages')
             .delete()

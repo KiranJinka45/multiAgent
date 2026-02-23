@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { FolderPlus, Plus, Search, MoreHorizontal, Calendar, Loader2, Palette, Layout, Code, Terminal, Sparkles } from 'lucide-react';
+import { useState } from 'react';
+import { FolderPlus, Plus, Search, MoreHorizontal, Calendar, Palette, Layout, Code, Terminal, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { projectService } from '@/lib/project-service';
@@ -22,7 +22,6 @@ export default function ProjectGallery({ initialProjects }: ProjectGalleryProps)
         if (!name) return;
 
         // Optimistic UI: Open editor immediately
-        const tempId = crypto.randomUUID();
         toast.success("Initializing engine... Opening editor instantly.", { icon: '⚡' });
 
         // We push to the route immediately - the page will handle the 'draft' or 'not found' state
@@ -30,7 +29,7 @@ export default function ProjectGallery({ initialProjects }: ProjectGalleryProps)
         // To be truly optimistic and instant, we'd need a way to pass the name/prompt to the editor
         // Let's stick to rapid creation for now.
 
-        const { data: project, error } = await projectService.createProject(name, "Initiated by MultiAgent AI", "application");
+        const { data: project } = await projectService.createProject(name, "Initiated by MultiAgent AI", "application");
         if (project) {
             setProjects(prev => [project, ...prev]);
             router.push(`/projects/${project.id}`);

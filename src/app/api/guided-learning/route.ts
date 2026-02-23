@@ -31,7 +31,7 @@ We'll wrap up by building a robust project together to solidify your knowledge. 
 *This learning path is dynamically generated based on your goals and optimized for the MultiAgent learning framework.*`;
 
         return NextResponse.json({ response });
-    } catch (error: any) {
+    } catch (error) {
         console.error('Guided Learning Error:', error);
         return NextResponse.json({ error: 'Failed to generate learning path' }, { status: 500 });
     }

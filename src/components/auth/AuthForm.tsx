@@ -24,7 +24,13 @@ export function AuthForm() {
     const [supabase] = useState(() => {
         const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
         const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-        if (!url || !key || url.includes("YOUR_SUPABASE_URL")) {
+
+        const isUrlPlaceholder = !url || url.includes("YOUR_SUPABASE_URL") || url === "";
+        const isStripeKey = key?.startsWith('sb_publishable_') || key?.startsWith('pk_');
+        const isKeyPlaceholder = !key || key === "" || (!key.startsWith('eyJ') && !key.includes('.'));
+
+        if (isUrlPlaceholder || isKeyPlaceholder || isStripeKey) {
+            console.warn("Supabase configuration missing or invalid. Key format check failed.", { isStripeKey });
             return null;
         }
         return createClientComponentClient();
@@ -95,7 +101,7 @@ export function AuthForm() {
             });
             router.refresh();
             router.push("/");
-        } catch (error: any) {
+        } catch (error) {
             console.error("Login error:", error);
             toast.error("An unexpected error occurred.");
         } finally {
@@ -139,7 +145,7 @@ export function AuthForm() {
 
             // Redirect to login page with email pre-filled
             router.push(`/login?email=${encodeURIComponent(data.email)}`);
-        } catch (error: any) {
+        } catch (error) {
             console.error("Register error:", error);
             toast.error("An unexpected error occurred.");
         } finally {
@@ -200,8 +206,16 @@ export function AuthForm() {
                 </div>
 
                 {!supabase && (
-                    <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-200 text-sm text-center">
-                        Auth is not configured. Missing Supabase keys.
+                    <div className="mb-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-200 text-sm leading-relaxed">
+                        <p className="font-bold flex items-center gap-2 mb-1">
+                            <span className="w-2 h-2 rounded-full bg-red-500" />
+                            Configuration Error
+                        </p>
+                        {process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.startsWith('sb_publishable_') ? (
+                            <span>You have pasted a <b>Stripe Key</b> into your Supabase settings by mistake. Please use your Supabase <b>Anon (Public) Key</b> instead.</span>
+                        ) : (
+                            <span>Auth is not configured. Missing or invalid Supabase keys in .env.local</span>
+                        )}
                     </div>
                 )}
 

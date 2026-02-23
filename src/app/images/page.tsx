@@ -1,6 +1,6 @@
 'use client';
 
-import { Image as ImageIcon, Download, Share2, MoreHorizontal, Filter, Sparkles } from 'lucide-react';
+import { Image as ImageIcon, Download, Share2, Filter, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Sidebar from '@/components/Sidebar';
 

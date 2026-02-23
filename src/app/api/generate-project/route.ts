@@ -57,7 +57,7 @@ export async function POST(req: Request) {
             stream: true,
         });
 
-        const fileGenerationPromises: Promise<any>[] = [];
+        const fileGenerationPromises: Promise<void>[] = [];
         const processedFiles = new Set<string>();
         let accumulatedJson = '';
 
@@ -135,11 +135,12 @@ export async function POST(req: Request) {
         console.log(`[Generate API] Success! Cascading build complete for ${projectId}.`);
         return NextResponse.json({ success: true, filesCount: processedFiles.size });
 
-    } catch (error: any) {
+    } catch (error) {
         console.error('[Generate API] Fatal Error:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         return NextResponse.json({
-            error: error.message || 'Unknown error',
-            details: error.response?.data || error.stack || null,
+            error: errorMessage,
+            details: error instanceof Error ? error.stack : null,
             fullError: JSON.stringify(error)
         }, { status: 500 });
     }

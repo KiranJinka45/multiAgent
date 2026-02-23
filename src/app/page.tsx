@@ -9,7 +9,6 @@ import MobileMenu from '@/components/MobileMenu';
 import TaskInput, { TaskInputHandle } from '@/components/TaskInput';
 import ChatList from '@/components/ChatList';
 import TopNav from '@/components/TopNav';
-import Canvas from '@/components/Canvas';
 import AionGeneratorView from '@/components/AionGeneratorView'; // Added import
 import { chatService } from '@/lib/chat-service';
 import { Message } from '@/types/chat';
@@ -18,20 +17,9 @@ import { motion } from 'framer-motion';
 export default function Dashboard() {
     const [messages, setMessages] = useState<Message[]>([]);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [isGenerating, setIsGenerating] = useState(false);
 
-    // Aion Generator State
     const [isAionGeneratorOpen, setIsAionGeneratorOpen] = useState(false);
     const [aionPrompt, setAionPrompt] = useState('');
-
-    // Canvas State
-    const [isCanvasOpen, setIsCanvasOpen] = useState(false);
-    const [canvasData, setCanvasData] = useState<{
-        title: string;
-        content: string;
-        contentType: 'code' | 'markdown';
-        language?: string;
-    }>({ title: '', content: '', contentType: 'markdown' });
 
     const router = useRouter();
     const supabase = createClientComponentClient();
@@ -63,144 +51,61 @@ export default function Dashboard() {
         scrollToBottom();
     }, [messages]);
 
-    const handleAiGeneration = async (prompt: string, model: string = 'Fast', tool?: string) => {
-        setIsGenerating(true);
+    const handleAiGeneration = useCallback(async (prompt: string, tool?: string) => {
         try {
             // New Aion Generator Intercept
-            if (prompt.toLowerCase().includes('generate app') || prompt.toLowerCase().includes('build a') || prompt.toLowerCase().includes('create a web app')) {
+            if (tool === 'project' || prompt.toLowerCase().includes('generate app') || prompt.toLowerCase().includes('build a') || prompt.toLowerCase().includes('create a web app')) {
                 setAionPrompt(prompt);
                 setIsAionGeneratorOpen(true);
                 return;
             }
 
-            // 1. Create a new chat
-            const title = tool === 'image' ? `Image: ${prompt}` : (prompt.length > 40 ? prompt.substring(0, 40) + '...' : prompt);
-            const { chat: newChat, error: chatError } = await chatService.createChat(title);
+            // Image generation handling
+            if (tool === 'image') {
+                const response = await fetch('/api/generate-image', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt }),
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    const { chat } = await chatService.createChat(`Image: ${prompt.substring(0, 30)}`);
+                    if (chat) {
+                        await chatService.addMessage(chat.id, prompt, 'user');
+                        await chatService.addMessage(chat.id, data.response, 'assistant');
+                        router.push(`/c/${chat.id}`);
+                        return;
+                    }
+                }
+            }
 
-            if (!newChat) {
+            // Standard Chat/Research -> Create chat and redirect
+            const title = prompt.length > 40 ? prompt.substring(0, 40) + '...' : prompt;
+            const { chat, error } = await chatService.createChat(title);
+
+            if (chat) {
+                await chatService.addMessage(chat.id, prompt, 'user');
+                router.push(`/c/${chat.id}`);
+            } else {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) {
                     toast.error("Please login to start a chat", {
                         action: { label: "Login", onClick: () => router.push("/login") }
                     });
                 } else {
-                    toast.error(`Start chat failed: ${chatError?.message || "Unknown error"}`);
-                }
-                return;
-            }
-
-            // 2. Add user message to DB & State
-            await chatService.addMessage(newChat.id, prompt, 'user');
-            const userMsg: Message = { id: crypto.randomUUID(), chat_id: newChat.id, content: prompt, role: 'user', created_at: new Date().toISOString() };
-            setMessages([userMsg]);
-
-            // 3. Add placeholder assistant msg
-            const aiMsgId = crypto.randomUUID();
-            const aiMsg: Message = { id: aiMsgId, chat_id: newChat.id, content: '', role: 'assistant', created_at: new Date().toISOString() };
-            setMessages(prev => [...prev, aiMsg]);
-
-            // 4. Trigger tool-specific or standard AI response
-            let endpoint = '/api/chat';
-            if (tool === 'image') endpoint = '/api/generate-image';
-            else if (tool === 'research') endpoint = '/api/deep-research';
-            else if (tool === 'learning') endpoint = '/api/guided-learning';
-
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: prompt, prompt, model }),
-            });
-
-            if (!response.ok) throw new Error('Failed to fetch response');
-
-            if (tool === 'image') {
-                const data = await response.json();
-                if (data.response) {
-                    setMessages(prev =>
-                        prev.map(msg => msg.id === aiMsgId ? { ...msg, content: data.response } : msg)
-                    );
-                    await chatService.addMessage(newChat.id, data.response, 'assistant');
-                    setTimeout(() => router.push(`/c/${newChat.id}`), 1000);
-                }
-            } else {
-                const reader = response.body?.getReader();
-                if (!reader) throw new Error('No reader available');
-                const textDecoder = new TextDecoder();
-                let fullResponse = '';
-                let isCanvasDetected = false;
-
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-                    const chunk = textDecoder.decode(value, { stream: true });
-                    fullResponse += chunk;
-
-                    // Early Canvas detection
-                    if (!isCanvasDetected && fullResponse.includes('```')) {
-                        isCanvasDetected = true;
-                        setIsCanvasOpen(true);
-                    }
-
-                    // Strict redundancy fix: Strip ALL code blocks for chat display
-                    let chatDisplayContent = fullResponse;
-                    if (isCanvasDetected) {
-                        chatDisplayContent = fullResponse.replace(/```[\s\S]*$/, '\n\n> **[View Code in Canvas]**');
-
-                        const codeMatch = fullResponse.match(/```(\w+)?\n([\s\S]*?)(?:```|$)/);
-                        if (codeMatch) {
-                            setCanvasData(prev => ({
-                                ...prev,
-                                title: "Generated Code",
-                                content: codeMatch[2],
-                                contentType: 'code',
-                                language: codeMatch[1] || 'typescript'
-                            }));
-                        }
-                    }
-
-                    setMessages(prev =>
-                        prev.map(msg => msg.id === aiMsgId ? { ...msg, content: chatDisplayContent } : msg)
-                    );
-                }
-
-                if (fullResponse) {
-                    await chatService.addMessage(newChat.id, fullResponse, 'assistant');
-
-                    // Sync Canvas one last time
-                    if (fullResponse.includes('```')) {
-                        const codeBlockMatch = fullResponse.match(/```(\w+)?\n([\s\S]*?)```/);
-                        if (codeBlockMatch) {
-                            setCanvasData({
-                                title: "Generated Code",
-                                content: codeBlockMatch[2],
-                                contentType: 'code',
-                                language: codeBlockMatch[1] || 'typescript'
-                            });
-                            setIsCanvasOpen(true);
-                        }
-                    } else if (fullResponse.length > 800) {
-                        setCanvasData({
-                            title: "Document",
-                            content: fullResponse,
-                            contentType: 'markdown'
-                        });
-                        setIsCanvasOpen(true);
-                    }
-
-                    setTimeout(() => router.push(`/c/${newChat.id}`), 500);
+                    toast.error("Failed to start chat session");
+                    console.error("Chat creation error:", error);
                 }
             }
         } catch (error) {
             console.error("AI Generation error:", error);
             toast.error("Something went wrong");
-        } finally {
-            setIsGenerating(false);
         }
-    };
+    }, [router, supabase, setIsAionGeneratorOpen, setAionPrompt]);
 
-    const addMessage = useCallback((content: string, model: string = 'Fast', tool?: string) => {
-        handleAiGeneration(content, model, tool);
-    }, [router]);
+    const addMessage = useCallback((content: string, tool?: string) => {
+        handleAiGeneration(content, tool);
+    }, [handleAiGeneration]);
 
     const handleRegenerate = async (messageId: string) => {
         // Find the assistant message
@@ -231,7 +136,7 @@ export default function Dashboard() {
 
             <main
                 style={{ marginLeft: 'var(--sidebar-width, 260px)' }}
-                className={`flex-1 flex flex-col h-full relative transition-[margin] duration-300 ease-in-out ${isCanvasOpen ? 'md:mr-[30%] xl:mr-[30%]' : ''}`}
+                className="flex-1 flex flex-col h-full relative transition-[margin] duration-300 ease-in-out"
             >
                 <TopNav onOpenMobileMenu={() => setIsMobileMenuOpen(true)} />
                 {/* Top decorative gradient */}
@@ -249,12 +154,11 @@ export default function Dashboard() {
                                 <div className="space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-1000">
                                     <div className="relative inline-block">
                                         <div className="absolute -inset-4 bg-gradient-to-r from-primary/20 via-purple-500/20 to-blue-500/20 blur-2xl rounded-full opacity-50 group-hover:opacity-100 transition-opacity" />
-                                        <h1 className="text-6xl md:text-7xl font-bold tracking-tight bg-gradient-to-br from-foreground via-foreground/90 to-muted-foreground bg-clip-text text-transparent select-none">
+                                        <h1 className="text-5xl md:text-6xl font-bold tracking-tight bg-gradient-to-br from-foreground via-foreground/90 to-muted-foreground bg-clip-text text-transparent select-none">
                                             MultiAgent
                                         </h1>
                                     </div>
                                     <p className="text-xl md:text-2xl font-medium text-muted-foreground max-w-lg mx-auto leading-tight">
-                                        The autonomous text-to-app architect.
                                         <span className="block text-primary/80">Where should we build today?</span>
                                     </p>
                                 </div>
@@ -302,13 +206,6 @@ export default function Dashboard() {
 
                 {messages.length > 0 && <TaskInput ref={taskInputRef} onAddTask={addMessage} />}
             </main >
-
-            <Canvas
-                isOpen={isCanvasOpen}
-                onClose={() => setIsCanvasOpen(false)}
-                isGenerating={isGenerating}
-                {...canvasData}
-            />
         </div >
     );
 }

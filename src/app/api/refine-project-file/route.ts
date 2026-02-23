@@ -18,7 +18,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
         }
 
-        const { fileId, projectId, currentContent, prompt, filePath } = await req.json();
+        const { fileId, currentContent, prompt, filePath } = await req.json();
 
         if (!fileId || !prompt || !currentContent) {
             return NextResponse.json({ error: 'File ID, content, and prompt are required' }, { status: 400 });
@@ -75,11 +75,12 @@ export async function POST(req: Request) {
         console.log(`[Refine API] Success! File ${filePath} updated.`);
         return NextResponse.json({ success: true, updatedFile: data });
 
-    } catch (error: any) {
+    } catch (error) {
         console.error('[Refine API] Fatal Error:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         return NextResponse.json({
-            error: error.message || 'Unknown error',
-            details: error.stack || null
+            error: errorMessage,
+            details: error instanceof Error ? error.stack : null
         }, { status: 500 });
     }
 }

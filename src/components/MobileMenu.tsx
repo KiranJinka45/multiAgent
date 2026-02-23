@@ -6,8 +6,8 @@ import { useSidebar } from '@/context/SidebarContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, useEffect } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useState, useEffect, useCallback } from 'react';
+import { createClientComponentClient, type User } from '@supabase/auth-helpers-nextjs';
 import { chatService } from '@/lib/chat-service';
 
 type MobileMenuProps = {
@@ -25,34 +25,36 @@ type MenuItemProps = {
 };
 
 const MenuItem = ({ icon: Icon, label, href, active, onClick }: MenuItemProps) => (
-    <Link
-        href={href}
-        onClick={onClick}
-        className={`w-full flex items-center gap-4 px-4 py-4 rounded-xl transition-all ${active
-            ? 'bg-blue-600/10 text-blue-500'
-            : 'text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200'
-            }`}
-    >
-        <Icon size={24} strokeWidth={1.5} />
-        <span className="font-medium text-lg">{label}</span>
-        {active && (
-            <div className="ml-auto w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]"></div>
-        )}
-    </Link>
+    <div className="w-full">
+        <Link
+            href={href}
+            onClick={onClick}
+            className={`w-full flex items-center gap-4 px-4 py-4 rounded-xl transition-all ${active
+                ? 'bg-blue-600/10 text-blue-500'
+                : 'text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200'
+                }`}
+        >
+            <Icon size={24} strokeWidth={1.5} />
+            <span className="font-medium text-lg">{label}</span>
+            {active && (
+                <div className="ml-auto w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]"></div>
+            )}
+        </Link>
+    </div>
 );
 
 export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     const pathname = usePathname();
     const { setIsGithubModalOpen } = useSidebar();
     const [chats, setChats] = useState<Chat[]>([]);
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<User | null>(null);
     const supabase = createClientComponentClient();
 
-    const fetchChats = async () => {
+    const fetchChats = useCallback(async () => {
         if (!user) return;
         const data = await chatService.getChats();
         setChats(data);
-    };
+    }, [user]);
 
     useEffect(() => {
         const getUser = async () => {
@@ -60,6 +62,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             setUser(user);
         };
         getUser();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
@@ -78,7 +81,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 supabase.removeChannel(channel);
             };
         }
-    }, [user, supabase]);
+    }, [user, supabase, fetchChats]);
 
     return (
         <AnimatePresence>

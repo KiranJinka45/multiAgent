@@ -3,7 +3,7 @@
 import { Sparkles, PanelLeft, Edit3, FolderPlus, Image, Github } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createClientComponentClient, type User } from '@supabase/auth-helpers-nextjs';
 import { chatService } from '@/lib/chat-service';
 import { Chat } from '@/types/chat';
 import { useSidebar } from '@/context/SidebarContext';
@@ -24,7 +24,7 @@ export default function Sidebar() {
     const pathname = usePathname();
     const router = useRouter();
     const [chats, setChats] = useState<Chat[]>([]);
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<User | null>(null);
     const { isCollapsed, setIsCollapsed, width, setWidth, isGithubModalOpen, setIsGithubModalOpen, isGithubConnected } = useSidebar();
     const [isResizing, setIsResizing] = useState(false);
 
@@ -39,9 +39,9 @@ export default function Sidebar() {
 
     const fetchChats = useCallback(async () => {
         if (!user) return;
-        const data = await chatService.getChats();
+        const data = await chatService.getChats(supabase);
         setChats(data);
-    }, [user]);
+    }, [user, supabase]);
 
     // Resizing logic
     const startResizing = useCallback((e: React.MouseEvent) => {
@@ -91,7 +91,7 @@ export default function Sidebar() {
     const handleDeleteChat = async (id: string, e: React.MouseEvent) => {
         e.preventDefault(); e.stopPropagation();
         if (confirm('Delete this chat permanently?')) {
-            const success = await chatService.deleteChat(id);
+            const success = await chatService.deleteChat(id, supabase);
             if (success) {
                 setChats(prev => prev.filter(c => c.id !== id));
                 if (pathname === `/c/${id}`) router.push('/');
@@ -102,7 +102,7 @@ export default function Sidebar() {
 
     const handleTogglePin = async (chat: Chat, e: React.MouseEvent) => {
         e.preventDefault(); e.stopPropagation();
-        const success = await chatService.togglePinned(chat.id, !chat.is_pinned);
+        const success = await chatService.togglePinned(chat.id, !chat.is_pinned, supabase);
         if (success) {
             fetchChats();
             toast.success(chat.is_pinned ? 'Unpinned' : 'Pinned');
@@ -111,7 +111,7 @@ export default function Sidebar() {
 
     const handleToggleArchive = async (chat: Chat, e: React.MouseEvent) => {
         e.preventDefault(); e.stopPropagation();
-        const success = await chatService.toggleArchived(chat.id, !chat.is_archived);
+        const success = await chatService.toggleArchived(chat.id, !chat.is_archived, supabase);
         if (success) {
             fetchChats();
             toast.success(chat.is_archived ? 'Restored' : 'Archived');

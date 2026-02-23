@@ -171,7 +171,7 @@ export default function StrategyGuide() {
                         <h3 className="font-bold text-foreground flex items-center gap-2 text-[13px]">
                             <Layers size={14} className="text-blue-500" /> Tool Integration
                         </h3>
-                        <p className="text-xs text-muted-foreground">Use the input bar's 'Tools' menu to trigger Deep Research or Canvas modes. These utilize specialized LLM architectures for high-quality outputs.</p>
+                        <p className="text-xs text-muted-foreground">Use the input bar&apos;s &quot;Tools&quot; menu to trigger Deep Research or Canvas modes. These utilize specialized LLM architectures for high-quality outputs.</p>
                     </div>
                     <div className="space-y-3">
                         <h3 className="font-bold text-foreground flex items-center gap-2 text-[13px]">
@@ -187,7 +187,7 @@ export default function StrategyGuide() {
                 <h3 className="text-lg font-bold">Chat Ready?</h3>
                 <p className="text-muted-foreground text-sm max-w-xl mx-auto">
                     These strategies ensure your agents are secure, scalable, and cost-effective.
-                    Close this window or select 'New chat' to begin your next orbit.
+                    Close this window or select &apos;New chat&apos; to begin your next orbit.
                 </p>
             </div>
         </div>

@@ -6,11 +6,13 @@ import { LogOut, Settings, Sparkles, ListTodo, ChevronDown, Github } from 'lucid
 import { useSidebar } from '@/context/SidebarContext';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+// Auth helpers import (unused)
+
+import { type SupabaseClient, type User } from '@supabase/auth-helpers-nextjs';
 
 type SidebarProfileProps = {
-    user: any;
-    supabase: any;
+    user: User | null;
+    supabase: SupabaseClient;
 };
 
 export const SidebarProfile = ({ user, supabase }: SidebarProfileProps) => {
@@ -40,9 +42,9 @@ export const SidebarProfile = ({ user, supabase }: SidebarProfileProps) => {
         );
     }
 
-    const initials = user.user_metadata?.full_name
-        ? user.user_metadata.full_name.split(' ').map((n: any) => n[0]).join('').substring(0, 2)
-        : user.email?.[0];
+    const initials = user?.user_metadata?.full_name
+        ? user.user_metadata.full_name.split(' ').map((n: string) => n[0]).join('').substring(0, 2)
+        : user?.email?.[0] || 'U';
 
     const displayName = user.user_metadata?.full_name || (user.email?.includes('kiranjinkakumar') ? 'Kiran Jinka' : 'User');
 
@@ -89,10 +91,16 @@ export const SidebarProfile = ({ user, supabase }: SidebarProfileProps) => {
                     <div className="text-sm font-bold text-foreground truncate tracking-tight">
                         {displayName}
                     </div>
-                    <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground truncate uppercase tracking-widest font-black opacity-60">
-                        {isGithubConnected && <Github size={10} className="text-primary" />}
-                        Pro Member
-                    </div>
+                    {process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.startsWith('sb_publishable_') ? (
+                        <div className="text-[10px] text-red-400 truncate uppercase tracking-widest font-black opacity-80 animate-pulse">
+                            STRIPE KEY ERROR
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground truncate uppercase tracking-widest font-black opacity-60">
+                            {isGithubConnected && <Github size={10} className="text-primary" />}
+                            Pro Member
+                        </div>
+                    )}
                 </div>
                 <ChevronDown size={14} className={`text-muted-foreground transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
             </div>

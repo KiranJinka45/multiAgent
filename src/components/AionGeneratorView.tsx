@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Circle, Loader2, PlayCircle, Code2, Server, Globe2, Wrench, RefreshCw, Rocket } from 'lucide-react';
+import { CheckCircle2, Loader2, PlayCircle, Code2, Server, Wrench, RefreshCw, Rocket } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface AionGeneratorProps {
@@ -60,9 +60,9 @@ export default function AionGeneratorView({ prompt, onComplete }: AionGeneratorP
 
                     if (data.status === 'completed') {
                         clearInterval(poll);
-                        // In a real app we'd fetch the manifest and urls cleanly here
+                        setManifest(data.manifest);
+                        setUrls(data.deployment_urls);
                         toast.success("Project generated and deployed!");
-                        if (onComplete) onComplete();
                     }
                 }
             } catch (err) {
@@ -77,17 +77,24 @@ export default function AionGeneratorView({ prompt, onComplete }: AionGeneratorP
     const activeIndex = steps.findIndex(s => s.id === status);
     // Auto-fixing happens inside the sandbox step visually
     const isAutoFixing = status.includes('auto_fixing');
-    const displayIndex = status === 'completed' ? steps.length : (activeIndex === -1 ? (isAutoFixing ? 4 : 0) : activeIndex);
+    const displayIndex = status === 'completed' ? steps.length : (activeIndex === -1 ? (isAutoFixing ? 3 : 0) : activeIndex);
+
+    const [showManifest, setShowManifest] = useState(false);
 
     return (
         <div className="w-full max-w-4xl mx-auto p-6 mt-8 space-y-8">
-            <div className="text-center space-y-2">
+            <div className="text-center space-y-2 relative">
                 <h2 className="text-2xl font-bold tracking-tight">Project Aion Builder</h2>
                 <p className="text-muted-foreground text-sm">
                     {status === 'completed'
                         ? 'Your application is ready to use!'
                         : `Generating app based on: "${prompt}"`}
                 </p>
+                {status === 'completed' && onComplete && (
+                    <button onClick={onComplete} className="absolute right-0 top-0 text-sm text-muted-foreground hover:text-foreground">
+                        Close
+                    </button>
+                )}
             </div>
 
             <div className="glass-card rounded-3xl p-8 border border-white/5 relative overflow-hidden">
@@ -96,7 +103,6 @@ export default function AionGeneratorView({ prompt, onComplete }: AionGeneratorP
                     {steps.map((step, idx) => {
                         const isCompleted = idx < displayIndex;
                         const isActive = idx === displayIndex;
-                        const isPending = idx > displayIndex;
 
                         return (
                             <div key={step.id} className="flex flex-col gap-1 relative z-10">
@@ -146,13 +152,23 @@ export default function AionGeneratorView({ prompt, onComplete }: AionGeneratorP
                     <p className="text-sm text-muted-foreground">Your infrastructure has been provisioned and deployed via Vercel/Fly.io.</p>
 
                     <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
-                        <button className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-medium hover:opacity-90 transition-opacity">
-                            Open Frontend
-                        </button>
-                        <button className="px-6 py-2.5 rounded-xl bg-foreground/10 text-foreground font-medium hover:bg-foreground/15 transition-colors">
-                            View Architecture Manifest
-                        </button>
+                        {urls?.frontend && (
+                            <a href={urls.frontend} target="_blank" rel="noopener noreferrer" className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-medium hover:opacity-90 transition-opacity">
+                                Open Frontend
+                            </a>
+                        )}
+                        {manifest && (
+                            <button onClick={() => setShowManifest(!showManifest)} className="px-6 py-2.5 rounded-xl bg-foreground/10 text-foreground font-medium hover:bg-foreground/15 transition-colors">
+                                {showManifest ? 'Hide' : 'View'} Architecture Manifest
+                            </button>
+                        )}
                     </div>
+
+                    {showManifest && manifest && (
+                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-4 p-4 bg-background border border-white/5 rounded-xl text-left overflow-x-auto overflow-y-auto max-h-80 text-xs font-mono text-muted-foreground">
+                            <pre>{JSON.stringify(manifest, null, 2)}</pre>
+                        </motion.div>
+                    )}
                 </motion.div>
             )}
 

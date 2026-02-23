@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Copy, Share2, Linkedin, Instagram, MessageCircle } from 'lucide-react';
+import { X, Copy, Linkedin, Instagram, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface ShareDialogProps {

@@ -3,7 +3,7 @@
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { User, LogOut, Monitor, Shield, Bell, Moon, Sun, Smartphone, Download, Trash2, Check, ChevronRight, Lock } from 'lucide-react';
+import { User, LogOut, Monitor, Shield, Bell, Moon, Sun, Smartphone, Trash2, Check, ChevronRight } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import Sidebar from '@/components/Sidebar';
 import MobileMenu from '@/components/MobileMenu';
@@ -12,18 +12,19 @@ import { toast } from 'sonner';
 import { chatService } from '@/lib/chat-service';
 import { Archive, RotateCcw } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { User as SupabaseUser } from '@supabase/supabase-js';
+import { Chat } from '@/types/chat';
 
 type SettingsTab = 'profile' | 'appearance' | 'security' | 'notifications' | 'archive';
 
 export default function SettingsPage() {
     const supabase = createClientComponentClient();
     const router = useRouter();
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<SupabaseUser | null>(null);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const { theme, setTheme } = useTheme();
     const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
-    const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-    const [archivedChats, setArchivedChats] = useState<any[]>([]);
+    const [archivedChats, setArchivedChats] = useState<Chat[]>([]);
 
     useEffect(() => {
         const getUser = async () => {
@@ -42,12 +43,12 @@ export default function SettingsPage() {
             const fetchArchived = async () => {
                 // We'll fetch all and filter client-side for now as getChats returns all sorted
                 // A better approach would be a specific query but getChats is cached usually
-                const allChats = await chatService.getChats();
+                const allChats = await chatService.getChats(supabase);
                 setArchivedChats(allChats.filter(chat => chat.is_archived));
             };
             fetchArchived();
         }
-    }, [activeTab]);
+    }, [activeTab, supabase]);
 
     const handleSignOut = async () => {
         await supabase.auth.signOut();
@@ -150,7 +151,7 @@ export default function SettingsPage() {
                                         <div className="font-medium text-foreground">Export Data</div>
                                         <div className="text-sm text-muted-foreground">Download all your chat history</div>
                                     </div>
-                                    <button onClick={() => toast.success("Data export started")} className="px-4 py-2 bg-background border border-border rounded-lg hover:bg-accent transition-colors text-sm font-medium text-foreground">
+                                    <button onClick={handleExportData} className="px-4 py-2 bg-background border border-border rounded-lg hover:bg-accent transition-colors text-sm font-medium text-foreground">
                                         Export JSON
                                     </button>
                                 </div>
@@ -159,7 +160,7 @@ export default function SettingsPage() {
                                         <div className="font-medium text-destructive">Delete Account</div>
                                         <div className="text-sm text-destructive/80">Permanently remove all data</div>
                                     </div>
-                                    <button className="px-4 py-2 bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive/90 transition-colors text-sm font-medium">
+                                    <button onClick={handleDeleteAccount} className="px-4 py-2 bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive/90 transition-colors text-sm font-medium">
                                         Delete
                                     </button>
                                 </div>
@@ -221,7 +222,7 @@ export default function SettingsPage() {
                                             <div className="flex gap-2">
                                                 <button
                                                     onClick={async () => {
-                                                        const success = await chatService.toggleArchived(chat.id, false);
+                                                        const success = await chatService.toggleArchived(chat.id, false, supabase);
                                                         if (success) {
                                                             setArchivedChats(prev => prev.filter(c => c.id !== chat.id));
                                                             toast.success('Chat unarchived');
@@ -235,7 +236,7 @@ export default function SettingsPage() {
                                                 <button
                                                     onClick={async () => {
                                                         if (confirm('Permanently delete this chat?')) {
-                                                            const success = await chatService.deleteChat(chat.id);
+                                                            const success = await chatService.deleteChat(chat.id, supabase);
                                                             if (success) {
                                                                 setArchivedChats(prev => prev.filter(c => c.id !== chat.id));
                                                                 toast.success('Chat deleted');
@@ -263,7 +264,10 @@ export default function SettingsPage() {
             <Sidebar />
             <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
 
-            <main className="flex-1 flex flex-col h-full relative md:ml-64 bg-[#050505]">
+            <main
+                className="flex-1 flex flex-col h-full relative bg-[#050505] transition-[margin] duration-300 ease-in-out"
+                style={{ marginLeft: 'var(--sidebar-width, 260px)' }}
+            >
                 <TopNav onOpenMobileMenu={() => setIsMobileMenuOpen(true)} />
 
                 <div className="flex-1 overflow-y-auto w-full">

@@ -2,12 +2,19 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Command, LayoutGrid, MessageSquare, Plus, Sparkles, Moon, Sun, Settings, Compass, Box } from 'lucide-react';
+import { Search, LayoutGrid, MessageSquare, Plus, Sparkles, Settings, Box, type LucideIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { projectService } from '@/lib/project-service';
 import { chatService } from '@/lib/chat-service';
 import { Project } from '@/types/project';
 import { Chat } from '@/types/chat';
+
+interface ResultItem {
+    icon: LucideIcon;
+    label: string;
+    action: () => void;
+    type: string;
+}
 
 export default function CommandPalette() {
     const [isOpen, setIsOpen] = useState(false);
@@ -74,7 +81,7 @@ export default function CommandPalette() {
         ...filteredChats.map(c => ({ icon: Sparkles, label: c.title, action: () => router.push(`/c/${c.id}`), type: 'chat' }))
     ];
 
-    const handleSelect = (item: any) => {
+    const handleSelect = (item: ResultItem) => {
         item.action();
         setIsOpen(false);
     };
@@ -152,7 +159,7 @@ export default function CommandPalette() {
                                 </div>
                             ) : (
                                 <div className="py-12 text-center text-muted-foreground text-sm">
-                                    No results found for "{query}"
+                                    No results found for &quot;{query}&quot;
                                 </div>
                             )}
                         </div>

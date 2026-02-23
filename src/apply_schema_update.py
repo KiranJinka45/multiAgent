@@ -11,9 +11,17 @@ def main():
     PROJECT_ID = "shvwmatbjvjspijslawl"
     
     SQL_COMMAND = """
-    alter table chats add column if not exists is_pinned boolean default false;
-    alter table chats add column if not exists is_archived boolean default false;
-    alter table chats add column if not exists is_public boolean default false;
+    CREATE TABLE IF NOT EXISTS agents_execution (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), project_id UUID REFERENCES projects(id) ON DELETE CASCADE, agent_name TEXT, input_json JSONB, output_json JSONB, status TEXT);
+    CREATE TABLE IF NOT EXISTS build_logs (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), project_id UUID REFERENCES projects(id) ON DELETE CASCADE, phase TEXT, log_output TEXT, success BOOLEAN);
+    CREATE TABLE IF NOT EXISTS error_memory (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), error_hash TEXT, resolution_patch JSONB);
+    CREATE TABLE IF NOT EXISTS deployments (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), project_id UUID REFERENCES projects(id) ON DELETE CASCADE, vercel_url TEXT, render_url TEXT, status TEXT);
+    CREATE TABLE IF NOT EXISTS usage_tracking (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), project_id UUID REFERENCES projects(id) ON DELETE CASCADE, tokens_used INT, feature TEXT);
+
+    ALTER TABLE projects ADD COLUMN IF NOT EXISTS generating BOOLEAN DEFAULT FALSE;
+    ALTER TABLE projects ADD COLUMN IF NOT EXISTS building BOOLEAN DEFAULT FALSE;
+    ALTER TABLE projects ADD COLUMN IF NOT EXISTS debugging BOOLEAN DEFAULT FALSE;
+    ALTER TABLE projects ADD COLUMN IF NOT EXISTS deployed BOOLEAN DEFAULT FALSE;
+    ALTER TABLE projects ADD COLUMN IF NOT EXISTS failed BOOLEAN DEFAULT FALSE;
     """
 
     with sync_playwright() as p:

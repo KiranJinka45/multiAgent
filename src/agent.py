@@ -95,62 +95,62 @@ def load_system_prompt() -> str:
     except FileNotFoundError:
         return "You are AntiGravity. System prompt file not found."
 
-class AntiGravityAgent:
-    def __init__(self):
-        # Switch to Groq for speed and rate limits
+class BaseAgent:
+    def __init__(self, name: str, system_prompt: str, model_name: str = "llama-3.3-70b-versatile"):
+        self.name = name
         api_key = os.getenv("GROQ_API_KEY")
         if not api_key:
-             print("⚠️ GROQ_API_KEY not found. Fallback to Gemini.")
              from langchain_google_genai import ChatGoogleGenerativeAI
              self.llm = ChatGoogleGenerativeAI(model="gemini-3.1-pro-preview", temperature=0)
         else:
-             self.llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0, api_key=api_key)
-        self.tools = [
-            navigate_web, click_element, fill_form, read_page_content,
-            execute_shell, write_to_disk, edit_file, read_from_disk, list_files,
-            solve_website_captcha, check_llm_health, get_llm_snippet,
-            create_design_document, generate_docker_config, generate_cicd_pipeline,
-            generate_iac_config, generate_monitoring_config
-        ]
-        self.llm_with_tools = self.llm.bind_tools(self.tools)
-        self.system_prompt = load_system_prompt()
+             self.llm = ChatGroq(model=model_name, temperature=0, api_key=api_key)
+        self.system_prompt = system_prompt
         self.messages = [SystemMessage(content=self.system_prompt)]
 
+    def run(self, input_data: str) -> str:
+        self.messages.append(HumanMessage(content=input_data))
+        response = self.llm.invoke(self.messages)
+        self.messages.append(response)
+        return response.content
+
+class Orchestrator:
+    def __init__(self):
+        self.architect = BaseAgent("Architect Agent", "You are the Architect. Output strict JSON architecture spec. No explanations.")
+        self.backend = BaseAgent("Backend Agent", "You are the Backend Agent. Inject Spring Boot WebFlux entities/controllers. strict JSON.")
+        self.frontend = BaseAgent("Frontend Agent", "You are the Frontend Agent. Inject Angular 18 standalone components. strict JSON.")
+        self.devops = BaseAgent("DevOps Agent", "You are the DevOps Agent. Setup Docker, render.yaml, vercel.json. strict JSON.")
+        self.debug = BaseAgent("Debug Agent", "You are the Debug Agent. PATCH ONLY. Input: file_path, error_log. Output JSON diff: {file_path, updated_content}.", model_name="llama-3.3-70b-versatile")
+        self.devsecops = BaseAgent("DevSecOps Agent", "You are the DevSecOps Agent. Audit code for security before deployment.")
+
+    def run_pipeline(self, user_requirements: str) -> dict:
+        print(f"--- Starting Orchestration Pipeline ---")
+        print(f"1. Architect Phase")
+        architecture_spec = self.architect.run(user_requirements)
+        
+        print(f"2. Backend Phase")
+        backend_spec = self.backend.run(architecture_spec)
+        
+        print(f"3. Frontend Phase")
+        frontend_spec = self.frontend.run(architecture_spec)
+        
+        print(f"4. DevOps Phase")
+        infrastructure_spec = self.devops.run(architecture_spec)
+        
+        print(f"5. DevSecOps Audit")
+        audit_result = self.devsecops.run(backend_spec + frontend_spec)
+        
+        print("--- Pipeline Complete ---")
+        return {
+            "status": "success",
+            "architecture": architecture_spec,
+            "backend_code": backend_spec,
+            "frontend_code": frontend_spec,
+            "infrastructure": infrastructure_spec,
+            "audit": audit_result
+        }
+
+class AntiGravityAgent(Orchestrator):
     def run(self, user_input: str):
-        print(f"User: {user_input}")
-        self.messages.append(HumanMessage(content=user_input))
-        
-        # Simple loop for demonstration. In a real agent, use LangGraph or AgentExecutor.
-        # This loop manually handles tool calls.
-        MAX_STEPS = 15
-        for _ in range(MAX_STEPS):
-            response = self.llm_with_tools.invoke(self.messages)
-            self.messages.append(response)
-            
-            if response.tool_calls:
-                print(f"Agent chose tools: {len(response.tool_calls)}")
-                for tool_call in response.tool_calls:
-                    tool_name = tool_call["name"]
-                    tool_args = tool_call["args"]
-                    print(f"Executing {tool_name} with {tool_args}")
-                    
-                    # Execute tool
-                    tool_result = "Unknown tool"
-                    selected_tool = next((t for t in self.tools if t.name == tool_name), None)
-                    if selected_tool:
-                        try:
-                            tool_result = selected_tool.invoke(tool_args)
-                        except Exception as e:
-                            tool_result = f"Error: {e}"
-                    
-                    print(f"Result: {str(tool_result)[:100]}...") # Truncate log
-                    
-                    # Append tool result to messages
-                    from langchain_core.messages import ToolMessage
-                    self.messages.append(ToolMessage(tool_call_id=tool_call["id"], content=str(tool_result)))
-            else:
-                # Iterate until no more tool calls or max steps
-                print(f"Agent Response: {response.content}")
-                break
-        
-        return self.messages[-1].content
+        # Compatibility wrapper for existing UI
+        result = self.run_pipeline(user_input)
+        return str(result)
