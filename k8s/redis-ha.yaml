@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-sentinel
+  namespace: multi-agent
+  labels:
+    app: redis-sentinel
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: redis-sentinel
+  template:
+    metadata:
+      labels:
+        app: redis-sentinel
+    spec:
+      containers:
+      - name: redis
+        image: bitnami/redis:7.2
+        env:
+        - name: REDIS_MASTER_HOST
+          value: "redis-master-0.redis-headless.multi-agent.svc.cluster.local" # Initial master
+        - name: ALLOW_EMPTY_PASSWORD
+          value: "yes"
+        - name: REDIS_REPLICATION_MODE
+          value: "master"
+        ports:
+        - containerPort: 6379
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: object-sentinel
+  namespace: multi-agent
+  labels:
+    app: object-sentinel
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: object-sentinel
+  template:
+    metadata:
+      labels:
+        app: object-sentinel
+    spec:
+      containers:
+      - name: sentinel
+        image: bitnami/redis-sentinel:7.2
+        env:
+        - name: REDIS_MASTER_HOST
+          value: "redis-master-0.redis-headless.multi-agent.svc.cluster.local"
+        - name: REDIS_MASTER_SET
+          value: "multi-agent-master"
+        - name: REDIS_SENTINEL_DOWN_AFTER_MILLISECONDS
+          value: "5000"
+        - name: REDIS_SENTINEL_FAILOVER_TIMEOUT
+          value: "10000"
+        ports:
+        - containerPort: 26379
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-sentinel-svc
+  namespace: multi-agent
+spec:
+  ports:
+  - port: 26379
+    targetPort: 26379
+    name: sentinel
+  selector:
+    app: object-sentinel

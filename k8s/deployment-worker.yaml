@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: multiagent-worker
+spec:
+  replicas: 5 # Higher concurrency scale for background jobs
+  selector:
+    matchLabels:
+      app: multiagent-worker
+  template:
+    metadata:
+      labels:
+        app: multiagent-worker
+    spec:
+      containers:
+      - name: worker
+        image: multiagent:latest
+        command: ["node", "dist/worker.js"]
+        envFrom:
+        - secretRef:
+            name: multiagent-secrets
+        - configMapRef:
+            name: multiagent-config
+        resources:
+          requests:
+            cpu: 1000m
+            memory: 1Gi
+          limits:
+            cpu: 2000m
+            memory: 2Gi

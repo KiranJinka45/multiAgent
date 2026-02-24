@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: multiagent-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: multiagent-api
+  template:
+    metadata:
+      labels:
+        app: multiagent-api
+    spec:
+      containers:
+      - name: api
+        image: multiagent:latest
+        ports:
+        - containerPort: 3000
+        envFrom:
+        - secretRef:
+            name: multiagent-secrets
+        - configMapRef:
+            name: multiagent-config
+        readinessProbe:
+          httpGet:
+            path: /api/metrics # Simple check, could be a dedicated /health endpoint
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          requests:
+            cpu: 500m
+            memory: 512Mi
+          limits:
+            cpu: 1000m
+            memory: 1Gi

@@ -9,8 +9,8 @@ import MobileMenu from '@/components/MobileMenu';
 import TaskInput, { TaskInputHandle } from '@/components/TaskInput';
 import ChatList from '@/components/ChatList';
 import TopNav from '@/components/TopNav';
-import AionGeneratorView from '@/components/AionGeneratorView'; // Added import
 import { chatService } from '@/lib/chat-service';
+import { projectService } from '@/lib/project-service';
 import { Message } from '@/types/chat';
 import { motion } from 'framer-motion';
 
@@ -18,8 +18,6 @@ export default function Dashboard() {
     const [messages, setMessages] = useState<Message[]>([]);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-    const [isAionGeneratorOpen, setIsAionGeneratorOpen] = useState(false);
-    const [aionPrompt, setAionPrompt] = useState('');
 
     const router = useRouter();
     const supabase = createClientComponentClient();
@@ -53,10 +51,24 @@ export default function Dashboard() {
 
     const handleAiGeneration = useCallback(async (prompt: string, tool?: string) => {
         try {
-            // New Aion Generator Intercept
-            if (tool === 'project' || prompt.toLowerCase().includes('generate app') || prompt.toLowerCase().includes('build a') || prompt.toLowerCase().includes('create a web app')) {
-                setAionPrompt(prompt);
-                setIsAionGeneratorOpen(true);
+            // Redirect to Project Editor Workflow for all build/generate requests
+            if (tool === 'project' || prompt.toLowerCase().includes('generate app') || prompt.toLowerCase().includes('build a') || prompt.toLowerCase().includes('create a web app') || prompt.toLowerCase().includes('coffee cafe')) {
+                const toastId = toast.loading("Initializing MultiAgent Build Environment...");
+
+                const { data: project, error } = await projectService.createProject(
+                    prompt.substring(0, 30) + (prompt.length > 30 ? "..." : ""),
+                    prompt,
+                    'web_app'
+                );
+
+                if (error || !project) {
+                    toast.error("Failed to initialize project room", { id: toastId });
+                    console.error("Project creation error:", error);
+                    return;
+                }
+
+                toast.success("Project Room Ready", { id: toastId });
+                router.push(`/projects/${project.id}`);
                 return;
             }
 
@@ -101,7 +113,7 @@ export default function Dashboard() {
             console.error("AI Generation error:", error);
             toast.error("Something went wrong");
         }
-    }, [router, supabase, setIsAionGeneratorOpen, setAionPrompt]);
+    }, [router, supabase]);
 
     const addMessage = useCallback((content: string, tool?: string) => {
         handleAiGeneration(content, tool);
@@ -144,11 +156,7 @@ export default function Dashboard() {
 
                 <div className="flex-1 overflow-y-auto w-full scroll-smooth">
                     <div className="max-w-4xl mx-auto w-full px-4 md:px-6 pt-20 pb-40">
-                        {isAionGeneratorOpen ? (
-                            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-                                <AionGeneratorView prompt={aionPrompt} onComplete={() => setIsAionGeneratorOpen(false)} />
-                            </motion.div>
-                        ) : messages.length === 0 ? (
+                        {messages.length === 0 ? (
                             <div className="flex flex-col items-center justify-center min-h-[70vh] text-center space-y-12 relative">
                                 {/* Premium Logo & Greeting */}
                                 <div className="space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-1000">
