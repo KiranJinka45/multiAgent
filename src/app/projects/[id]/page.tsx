@@ -98,9 +98,12 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
         [files, selectedFileId]
     );
 
+    const [error, setError] = useState<string | null>(null);
+
     const handleGenerate = useCallback(async () => {
         if (isGenerating) return;
         setIsGenerating(true);
+        setError(null);
 
         try {
             const res = await fetch('/api/generate-project', {
@@ -117,13 +120,16 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
                 const detailedError = typeof errorData.error === 'object'
                     ? JSON.stringify(errorData.error)
                     : (errorData.error || res.statusText);
-                toast.error(`Generation failed: ${detailedError}`);
-                setIsGenerating(false);
+
+                setError(detailedError);
+                toast.error(`Generation engine unavailable: ${detailedError}`);
+                // We keep isGenerating=true if we want to show the "Retrying" UI, 
+                // but for now let's allow it to stay true so the overlay doesn't flicker away.
             }
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
-            toast.error(`An error occurred: ${errorMessage}`);
-            setIsGenerating(false);
+            setError(errorMessage);
+            toast.error(`Network error: ${errorMessage}`);
         }
     }, [params.id, isGenerating, project?.description]);
 
@@ -167,8 +173,8 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
 
             await loadFiles();
 
-            if (p.status === 'draft') {
-                // handleGenerate(); // Disabled for clarification phase
+            if (p.status === 'draft' && p.description?.includes('Preferences:')) {
+                handleGenerate();
             }
         } finally {
             setIsLoading(false);
@@ -621,41 +627,84 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
                                 )}
                             </div>
 
-                            {/* Right Panel: Placeholder Preview */}
+                            {/* Right Panel: Placeholder Preview / Build Overlay */}
                             <div className="w-1/2 bg-[#050505] flex items-center justify-center p-12 relative overflow-hidden">
                                 {/* Grid background */}
                                 <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
 
-                                <div className="relative z-10 text-center space-y-8 w-full max-w-md">
-                                    <Sparkles size={32} className="text-gray-500 mx-auto" />
-                                    <div className="space-y-2">
-                                        <h2 className="text-2xl font-bold tracking-tight text-white drop-shadow-lg">Deploy Your Application</h2>
-                                        <p className="text-sm text-gray-400">Make your app publicly available with managed infrastructure.</p>
-                                    </div>
+                                <AnimatePresence>
+                                    {isGenerating ? (
+                                        <motion.div
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                            className="absolute inset-0 z-50 bg-[#0a0a0a] flex items-center justify-center p-8"
+                                        >
+                                            <div className="max-w-md w-full text-center space-y-8">
+                                                <div className="relative inline-block">
+                                                    <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full animate-pulse" />
+                                                    <div className="relative bg-[#1a1a1a] p-6 rounded-3xl border border-primary/30 shadow-2xl">
+                                                        <Loader2 size={40} className="text-primary animate-spin" />
+                                                    </div>
+                                                </div>
 
-                                    <div className="bg-[#0f0f0f] border border-white/10 rounded-2xl p-6 shadow-2xl relative overflow-hidden transform hover:scale-[1.02] transition-transform">
-                                        <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-4">
-                                            <div className="flex items-center gap-2 text-xs font-bold text-gray-300">
-                                                <Globe size={14} className="text-gray-500" /> Deployments
-                                            </div>
-                                        </div>
-                                        <div className="bg-[#1a1a1a] rounded-xl p-4 border border-white/5 flex items-center justify-between group">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-2.5 h-2.5 bg-green-500/80 rounded-full animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
-                                                <div className="text-sm text-gray-300 font-medium tracking-tight">Live <span className="text-gray-500 font-mono ml-2 text-xs">multiagent.app</span></div>
-                                            </div>
-                                            <button className="px-4 py-1.5 bg-white text-black text-xs font-bold rounded-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors">Visit ↗</button>
-                                        </div>
-                                    </div>
+                                                <div className="space-y-3">
+                                                    <h2 className="text-2xl font-bold tracking-tight text-white uppercase tracking-widest">
+                                                        Engineering Your Project
+                                                    </h2>
+                                                    <p className="text-sm text-gray-400 italic">
+                                                        "MultiAgent AI Core is blueprinting, coding, and validating your full-stack application."
+                                                    </p>
+                                                </div>
 
-                                    {isGenerating && (
-                                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-center mt-12 gap-2">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-white/20 animate-bounce" />
-                                            <div className="w-1.5 h-1.5 rounded-full bg-white/20 animate-bounce delay-100" />
-                                            <div className="w-1.5 h-1.5 rounded-full bg-white/20 animate-bounce delay-200" />
+                                                <div className="space-y-4">
+                                                    <div className="flex justify-between text-[10px] font-bold text-primary uppercase tracking-widest px-1">
+                                                        <span>Architecting</span>
+                                                        <span>95%</span>
+                                                    </div>
+                                                    <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
+                                                        <motion.div
+                                                            className="h-full bg-gradient-to-r from-primary to-blue-500 shadow-[0_0_15px_rgba(var(--primary),0.5)]"
+                                                            initial={{ width: "5%" }}
+                                                            animate={{ width: "95%" }}
+                                                            transition={{ duration: 45, ease: "easeInOut" }}
+                                                        />
+                                                    </div>
+                                                    <div className="flex justify-center gap-1.5 pt-2">
+                                                        {['SCANNING', 'CODING', 'VALIDATING', 'OPTIMIZING'].map((step, idx) => (
+                                                            <div key={idx} className="px-2 py-1 rounded-md bg-white/[0.02] border border-white/5 text-[8px] font-bold text-gray-500">
+                                                                {step}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </motion.div>
+                                    ) : (
+                                        <div className="relative z-10 text-center space-y-8 w-full max-w-md">
+                                            <Sparkles size={32} className="text-gray-500 mx-auto" />
+                                            <div className="space-y-2">
+                                                <h2 className="text-2xl font-bold tracking-tight text-white drop-shadow-lg">Deploy Your Application</h2>
+                                                <p className="text-sm text-gray-400">Make your app publicly available with managed infrastructure.</p>
+                                            </div>
+
+                                            <div className="bg-[#0f0f0f] border border-white/10 rounded-2xl p-6 shadow-2xl relative overflow-hidden transform hover:scale-[1.02] transition-transform">
+                                                <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-4">
+                                                    <div className="flex items-center gap-2 text-xs font-bold text-gray-300">
+                                                        <Globe size={14} className="text-gray-500" /> Deployments
+                                                    </div>
+                                                </div>
+                                                <div className="bg-[#1a1a1a] rounded-xl p-4 border border-white/5 flex items-center justify-between group">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-2.5 h-2.5 bg-green-500/80 rounded-full animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
+                                                        <div className="text-sm text-gray-300 font-medium tracking-tight">Live <span className="text-gray-500 font-mono ml-2 text-xs">multiagent.app</span></div>
+                                                    </div>
+                                                    <button className="px-4 py-1.5 bg-white text-black text-xs font-bold rounded-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors">Visit ↗</button>
+                                                </div>
+                                            </div>
+                                        </div>
                                     )}
-                                </div>
+                                </AnimatePresence>
                             </div>
                         </div>
                     ) : (
@@ -838,7 +887,34 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
                                                 transition={{ type: "spring", damping: 20, stiffness: 100 }}
                                                 className="h-full bg-white shadow-2xl border border-gray-200 rounded-lg overflow-hidden relative"
                                             >
-                                                <iframe srcDoc={previewDoc} className="w-full h-full border-none" title="Preview" sandbox="allow-scripts" />
+                                                {isGenerating && files.length < 5 && (
+                                                    <div className="absolute inset-0 z-50 bg-[#0d0d0d] flex items-center justify-center p-6 text-center">
+                                                        <div className="space-y-6 max-w-xs">
+                                                            <div className="relative inline-block">
+                                                                <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full animate-pulse" />
+                                                                <Loader2 size={32} className="text-primary animate-spin relative" />
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <h3 className="text-sm font-bold text-white uppercase tracking-[0.2em]">Engineering Build</h3>
+                                                                <p className="text-[10px] text-gray-500 font-medium">MultiAgent is synthesizing your world-class codebase from the core blueprints.</p>
+                                                            </div>
+                                                            {error && (
+                                                                <div className="space-y-3">
+                                                                    <div className="p-2 rounded bg-red-500/10 border border-red-500/20 text-[9px] text-red-400">
+                                                                        {error}
+                                                                    </div>
+                                                                    <button
+                                                                        onClick={handleGenerate}
+                                                                        className="px-4 py-2 bg-primary text-primary-foreground text-[10px] font-bold rounded-lg hover:opacity-90 transition-all w-full shadow-lg"
+                                                                    >
+                                                                        Retry Engine Connection
+                                                                    </button>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                <iframe srcDoc={previewDoc} className="w-full h-full border-none" title="Preview" sandbox="allow-scripts" key={files.length} />
                                             </motion.div>
                                         </div>
                                     </div>

@@ -107,9 +107,18 @@ export async function POST(req: Request) {
         });
 
     } catch (error) {
-        logger.error({ error: error instanceof Error ? error.message : String(error) }, 'Fatal queuing error');
+        const errorMsg = error instanceof Error ? error.message : String(error);
+        logger.error({ error: errorMsg }, 'Fatal queuing error');
+
+        if (errorMsg.includes('Connection is closed') || errorMsg.includes('ECONNREFUSED') || errorMsg.includes('Redis')) {
+            return NextResponse.json({
+                error: 'Database connection error. Please ensure Redis is running.',
+                details: 'The project generation queue is currently unavailable.'
+            }, { status: 503 });
+        }
+
         return NextResponse.json({
-            error: error instanceof Error ? error.message : 'Internal server error'
+            error: errorMsg
         }, { status: 500 });
     }
 }

@@ -14,8 +14,12 @@ class RedisClient {
                 connectTimeout: 5000,       // Fail fast on boot
                 retryStrategy: (times: number) => {
                     if (this.instance.status === 'connecting' && times > 5) {
-                        logger.fatal('Redis connection failed on boot. Failing fast.');
-                        process.exit(1);
+                        logger.error('Redis connection failed on boot. Continuing in fail-soft mode (In-memory fallback not available, APIs will return service unavailable).');
+                        // In production, we might still want to exit, but for dev/beta, we allow boot to show errors.
+                        if (process.env.NODE_ENV === 'production') {
+                            process.exit(1);
+                        }
+                        return null; // Stop retrying
                     }
                     const delay = Math.min(times * 50, 2000);
                     return delay;

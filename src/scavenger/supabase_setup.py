@@ -58,18 +58,29 @@ def main():
             page.click('button:has-text("Sign In")')
             
             # Wait for dashboard
-            print("Waiting for dashboard redirect...")
+            print("Waiting for dashboard redirect or success toast...")
+            success_element = None
             try:
-                page.wait_for_url("**/projects**", timeout=30000)
+                # Try to detect either a redirect or a success message
+                success_element = page.wait_for_selector("text=Signed in successfully!", timeout=15000)
+                if success_element:
+                    print("✅ Detected 'Signed in successfully!' toast.")
+                else:
+                    page.wait_for_url("**/projects**", timeout=20000)
                 print("✅ Logged in successfully!")
             except Exception as e:
-                print(f"Login timeout. Current URL: {page.url}")
+                print(f"Login timeout/failure. Current URL: {page.url}")
                 page.screenshot(path="login_failed.png")
-                # Try to check if we are still on login page or captcha
-                if "sign-in" in page.url:
+                # Continue anyway if we see the toast or if we are just slow
+                if (success_element is not None) or ("sign-in" not in page.url):
+                    print("Attempting to proceed anyway...")
+                else:
                     print("Still on sign-in page. Please solve captcha if present.")
-                    # Wait for user manual intervention
-                    page.wait_for_url("**/projects**", timeout=60000)
+                    # Wait for user manual intervention shorter
+                    try:
+                        page.wait_for_url("**/projects**", timeout=30000)
+                    except:
+                        pass
             
             # Navigate to API settings directly
             api_settings_url = f"https://supabase.com/dashboard/project/{PROJECT_ID}/settings/api"
