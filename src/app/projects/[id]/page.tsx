@@ -138,11 +138,15 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
         const filesData = f || [];
         setFiles(filesData);
 
-        if (filesData.length > 0 && !selectedFileId) {
-            setSelectedFileId(filesData[0].id);
-            setEditContent(filesData[0].content || '');
-        }
-    }, [params.id, selectedFileId]);
+        setFiles(prev => {
+            if (prev.length > 0 && !selectedFileId) {
+                const firstId = prev[0].id;
+                setSelectedFileId(firstId);
+                setEditContent(prev[0].content || '');
+            }
+            return prev;
+        });
+    }, [params.id]); // Removed selectedFileId to stabilize
 
     const submitClarification = () => {
         if (!replyText.trim()) return;
@@ -156,13 +160,15 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
         });
     };
 
-    const loadProjectData = useCallback(async () => {
-        setIsLoading(true);
+    const loadProjectData = useCallback(async (isInitial = false) => {
+        if (isInitial) setIsLoading(true);
         try {
             const p = await projectService.getProject(params.id);
             if (!p) {
-                toast.error("Project not found");
-                router.push('/projects');
+                if (isInitial) {
+                    toast.error("Project not found");
+                    router.push('/projects');
+                }
                 return;
             }
             setProject(p);
@@ -171,25 +177,31 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
             const currentIsGenerating = p.status.startsWith('generating') || p.status === 'brainstorming';
             setIsGenerating(currentIsGenerating);
 
-            await loadFiles();
+            // Load files in parallel or sequence, but don't block initial UI
+            loadFiles();
 
             if (p.status === 'draft' && p.description?.includes('Preferences:')) {
+                // We use a separate check to avoid calling handleGenerate too multiple times
+                // handleGenerate has its own isGenerating check
                 handleGenerate();
             }
         } finally {
-            setIsLoading(false);
+            if (isInitial) setIsLoading(false);
         }
-    }, [params.id, router, loadFiles, handleGenerate]);
+    }, [params.id]); // Highly stable: only depends on ID. router, loadFiles, handleGenerate are essentially stable.
 
+    // Initial Mount Effect
     useEffect(() => {
-        loadProjectData();
+        loadProjectData(true);
+    }, [params.id]); // Run only once when the ID changes
 
-        // Listen for real-time status updates
+    // Real-time Subscriptions Effect
+    useEffect(() => {
         const supabase = projectService.getSupabase();
 
         // Channel for project status
         const statusChannel = supabase
-            .channel('project-status')
+            .channel(`project-status-${params.id}`)
             .on(
                 'postgres_changes',
                 { event: 'UPDATE', schema: 'public', table: 'projects', filter: `id=eq.${params.id}` },
@@ -208,36 +220,27 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
 
         // Channel for real-time file streaming
         const filesChannel = supabase
-            .channel('project-files-stream')
+            .channel(`project-files-stream-${params.id}`)
             .on(
                 'postgres_changes',
                 { event: '*', schema: 'public', table: 'project_files', filter: `project_id=eq.${params.id}` },
                 (payload) => {
                     const newOrUpdatedFile = payload.new as ProjectFile;
 
+                    if (payload.eventType === 'DELETE') {
+                        setFiles(prev => prev.filter(f => f.id !== payload.old.id));
+                        return;
+                    }
+
                     setFiles(prev => {
                         const exists = prev.some(f => f.id === newOrUpdatedFile.id);
                         let updated;
 
                         if (exists) {
-                            // Update existing file in the tree
                             updated = prev.map(f => f.id === newOrUpdatedFile.id ? newOrUpdatedFile : f);
                         } else {
-                            // Add new file
                             updated = [...prev, newOrUpdatedFile].sort((a, b) => a.path.localeCompare(b.path));
-
-                            // Auto-select if it's the first file and nothing is selected
-                            if (updated.length === 1) {
-                                setSelectedFileId(newOrUpdatedFile.id);
-                                setEditContent(newOrUpdatedFile.content || '');
-                            }
                         }
-
-                        // If the currently selected file was updated, update the editor content
-                        if (selectedFileId === newOrUpdatedFile.id) {
-                            setEditContent(newOrUpdatedFile.content || '');
-                        }
-
                         return updated;
                     });
 
@@ -255,7 +258,14 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
             supabase.removeChannel(statusChannel);
             supabase.removeChannel(filesChannel);
         };
-    }, [params.id, loadProjectData, selectedFileId]);
+    }, [params.id]); // Only depend on ID for subscriptions
+
+    // Content Sync Effect: Keep editor in sync with selected file
+    useEffect(() => {
+        if (selectedFile) {
+            setEditContent(selectedFile.content || '');
+        }
+    }, [selectedFileId, selectedFile]);
 
     const [showRefineChat, setShowRefineChat] = useState(false);
     const [refinementPrompt, setRefinementPrompt] = useState('');
