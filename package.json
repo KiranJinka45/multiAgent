@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "worker": "dotenv -e .env.local -- tsx src/worker.ts",
-    "dev:all": "concurrently \"npm run dev\" \"npm run worker\"",
+    "dev:all": "concurrently --shell cmd.exe \"npm run dev\" \"npm run worker\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
