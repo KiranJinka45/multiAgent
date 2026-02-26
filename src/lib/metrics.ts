@@ -55,6 +55,18 @@ export const queueWaitTimeSeconds = new Histogram({
     registers: [registry],
 });
 
+export const lockExtensionTotal = new Counter({
+    name: 'lock_extension_total',
+    help: 'Total number of BullMQ lock extensions',
+    registers: [registry],
+});
+
+export const lockExpiredTotal = new Counter({
+    name: 'lock_expired_total',
+    help: 'Total number of BullMQ lock expirations detected',
+    registers: [registry],
+});
+
 // --- Business/Integration Metrics ---
 
 export const stripeWebhookEventsTotal = new Counter({

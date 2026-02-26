@@ -1,38 +1,80 @@
 import { NextResponse } from 'next/server';
+import redis from '@/lib/redis';
 import logger from '@/lib/logger';
-import { createClient } from '@supabase/supabase-js';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
 
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
-    const health = {
-        status: 'ok',
-        timestamp: new Date().toISOString(),
-        services: {
-            database: 'unknown',
-            llm: 'unknown',
-        }
-    };
+    const supabase = createRouteHandlerClient({ cookies });
 
     try {
-        // Check database
-        const { error } = await supabase.from('projects').select('count', { count: 'exact', head: true });
-        health.services.database = error ? 'error' : 'ok';
-    } catch (e) {
-        health.services.database = 'error';
+        const checks: any = {
+            redis: 'healthy',
+            worker: 'unknown',
+            database: 'healthy',
+            recommendation: 'live'
+        };
+
+        // 1. Check Redis
+        try {
+            await redis.ping();
+        } catch (err) {
+            checks.redis = 'unavailable';
+            checks.recommendation = 'offline';
+        }
+
+        // 2. Check Worker Heartbeat
+        try {
+            const heartbeat = await redis.get('system:health:worker');
+            if (heartbeat) {
+                const data = JSON.parse(heartbeat);
+                const age = (Date.now() - data.lastSeen) / 1000;
+                if (age < 15) {
+                    checks.worker = 'healthy';
+                } else {
+                    checks.worker = 'stale';
+                    if (checks.recommendation !== 'offline') checks.recommendation = 'polling';
+                }
+            } else {
+                checks.worker = 'offline';
+                if (checks.recommendation !== 'offline') checks.recommendation = 'polling';
+            }
+        } catch (err) {
+            checks.worker = 'error';
+        }
+
+        // 3. Check Database (Supabase)
+        try {
+            const { error } = await supabase.from('projects').select('id', { count: 'exact', head: true }).limit(1);
+            if (error) {
+                checks.database = 'unreachable';
+                checks.recommendation = 'offline';
+            } else {
+                checks.database = 'healthy';
+            }
+        } catch (err) {
+            checks.database = 'error';
+        }
+
+        // 4. Check Governance Reconciliation
+        try {
+            const reconStatus = await redis.get('system:reconciliation:status');
+            if (reconStatus) {
+                checks.governance = JSON.parse(reconStatus);
+            } else {
+                checks.governance = { status: 'pending', lastRun: null };
+            }
+        } catch (err) {
+            checks.governance = { status: 'error' };
+        }
+
+        const status = checks.recommendation === 'offline' ? 503 : 200;
+        return NextResponse.json(checks, { status });
+
+    } catch (error: any) {
+        logger.error({ error }, 'Global health check failed');
+        return NextResponse.json({ status: 'error', message: error.message }, { status: 500 });
     }
-
-    // LLM check could be a simple model list call
-    // but for now we'll mark it as OK if env key exists
-    health.services.llm = process.env.GROQ_API_KEY ? 'ok' : 'missing_key';
-
-    if (health.services.database !== 'ok') {
-        health.status = 'degraded';
-        logger.warn(health, 'Health check degraded');
-    }
-
-    return NextResponse.json(health, { status: health.status === 'ok' ? 200 : 503 });
 }

@@ -17,7 +17,8 @@ import {
     Sparkles,
     ExternalLink,
     Share2,
-    ShieldCheck
+    ShieldCheck,
+    Clock
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -28,6 +29,10 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import JSZip from 'jszip';
 import { memo } from 'react';
+import { BuildUpdate } from '@/types/build';
+import { BuildTimeline } from '@/components/BuildTimeline';
+import { BuildSummary } from '@/components/BuildSummary';
+
 
 const FileItem = memo(({ file, isSelected, onClick }: { file: ProjectFile, isSelected: boolean, onClick: () => void }) => {
     const fileName = file.path.split('/').pop() || file.path;
@@ -56,8 +61,17 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
     const [editContent, setEditContent] = useState('');
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [previewSize, setPreviewSize] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
+    const [buildProgress, setBuildProgress] = useState<BuildUpdate | null>(null);
+    const [showSummary, setShowSummary] = useState(false);
+    const [currentExecutionId, setCurrentExecutionId] = useState<string | null>(null);
+    const [connectionMode, setConnectionMode] = useState<'live' | 'polling' | 'failover'>('live');
+    const [errorCount, setErrorCount] = useState(0);
+    const [isBackendOffline, setIsBackendOffline] = useState(false);
+    const [stableHealthSeconds, setStableHealthSeconds] = useState(0);
+    const [userRole, setUserRole] = useState<string>('user');
 
     const previewWidths = {
+
         desktop: '100%',
         tablet: '768px',
         mobile: '375px'
@@ -123,8 +137,10 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
 
                 setError(detailedError);
                 toast.error(`Generation engine unavailable: ${detailedError}`);
-                // We keep isGenerating=true if we want to show the "Retrying" UI, 
-                // but for now let's allow it to stay true so the overlay doesn't flicker away.
+            } else {
+                const data = await res.json();
+                setCurrentExecutionId(data.executionId);
+                setShowSummary(false);
             }
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
@@ -132,6 +148,62 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
             toast.error(`Network error: ${errorMessage}`);
         }
     }, [params.id, isGenerating, project?.description]);
+
+    // SSE Effect for Real-time Progress
+    useEffect(() => {
+        if (!currentExecutionId || !isGenerating) return;
+
+        let eventSource: EventSource | null = null;
+        let retryCount = 0;
+        const maxRetries = 2; // Aggressive failover for Distributed Resilience
+
+        const connect = () => {
+            if (eventSource) eventSource.close();
+
+            eventSource = new EventSource(`/api/projects/${params.id}/build-progress?executionId=${currentExecutionId}`);
+
+            eventSource.onmessage = (event) => {
+                try {
+                    const data: BuildUpdate = JSON.parse(event.data);
+                    setBuildProgress(data);
+                    retryCount = 0; // Reset on successful message
+
+                    if (data.status === 'completed') {
+                        eventSource?.close();
+                        setTimeout(() => {
+                            setShowSummary(true);
+                            setIsGenerating(false);
+                        }, 1000);
+                    } else if (data.status === 'failed') {
+                        eventSource?.close();
+                        setIsGenerating(false);
+                    }
+                } catch (e) {
+                    console.error("Failed to parse SSE data", e);
+                }
+            };
+
+            eventSource.onerror = () => {
+                eventSource?.close();
+                setErrorCount(prev => prev + 1);
+
+                if (retryCount < maxRetries) {
+                    retryCount++;
+                    const delay = Math.min(1000 * Math.pow(2, retryCount), 10000);
+                    setTimeout(connect, delay);
+                } else if (connectionMode !== 'failover') {
+                    setConnectionMode('failover');
+                    toast.warning("Live stream interrupted. Switching to Global Failover Mode (Polling).");
+                }
+            };
+        };
+
+        if (connectionMode === 'live') {
+            connect();
+        }
+        return () => eventSource?.close();
+    }, [currentExecutionId, isGenerating, params.id, connectionMode]); // Re-connect if mode changes back to live
+
 
     const loadFiles = useCallback(async () => {
         const f = await projectService.getProjectFiles(params.id);
@@ -146,7 +218,7 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
             }
             return prev;
         });
-    }, [params.id]); // Removed selectedFileId to stabilize
+    }, [params.id, selectedFileId]);
 
     const submitClarification = () => {
         if (!replyText.trim()) return;
@@ -173,92 +245,281 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
             }
             setProject(p);
 
+            if (isInitial) {
+                const supabase = projectService.getSupabase();
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session) {
+                    const { data: profile } = await supabase.from('user_profiles').select('role').eq('id', session.user.id).single();
+                    if (profile) {
+                        setUserRole(profile.role || 'user');
+                    }
+                }
+            }
+
             // Sync generation state with project status
             const currentIsGenerating = p.status.startsWith('generating') || p.status === 'brainstorming';
-            setIsGenerating(currentIsGenerating);
+
+            if (currentIsGenerating && p.last_execution_id) {
+                setCurrentExecutionId(p.last_execution_id);
+                setIsGenerating(true);
+
+                // FALLBACK: Directly fetch build state if we are in generating mode and don't have progress yet or in failover
+                if (!buildProgress || connectionMode === 'failover') {
+                    fetch(`/api/projects/${params.id}/build-state?executionId=${p.last_execution_id}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (!data.error) setBuildProgress(data);
+                        })
+                        .catch(err => {
+                            console.error("Manual sync failed:", err);
+                            setErrorCount(prev => prev + 1);
+                        });
+                }
+            }
 
             // Load files in parallel or sequence, but don't block initial UI
             loadFiles();
 
             if (p.status === 'draft' && p.description?.includes('Preferences:')) {
-                // We use a separate check to avoid calling handleGenerate too multiple times
-                // handleGenerate has its own isGenerating check
                 handleGenerate();
             }
         } finally {
             if (isInitial) setIsLoading(false);
         }
-    }, [params.id]); // Highly stable: only depends on ID. router, loadFiles, handleGenerate are essentially stable.
+    }, [params.id, loadFiles, handleGenerate, router, buildProgress]);
+
+    const forceSync = useCallback(() => {
+        toast.promise(loadProjectData(false), {
+            loading: 'Syncing engineering core...',
+            success: 'Synchronized.',
+            error: 'Sync failed.'
+        });
+    }, [loadProjectData]);
 
     // Initial Mount Effect
     useEffect(() => {
         loadProjectData(true);
-    }, [params.id]); // Run only once when the ID changes
+    }, [params.id, loadProjectData]);
+
+    // Fallback / Polling Effect
+    useEffect(() => {
+        // If not generating and we have live websockets, no polling needed
+        if (!isGenerating && connectionMode === 'live') return;
+
+        // Determine polling speed
+        let delay = 10000;
+        if (connectionMode === 'polling' || connectionMode === 'failover') {
+            delay = isGenerating ? 3000 : 15000;
+        }
+
+        const interval = setInterval(() => {
+            loadProjectData(false);
+        }, delay);
+
+        return () => clearInterval(interval);
+    }, [isGenerating, loadProjectData, connectionMode]);
 
     // Real-time Subscriptions Effect
     useEffect(() => {
+        let isMounted = true;
+        let reconnectTimeout: NodeJS.Timeout | null = null;
+        let retryCount = 0;
+        let isPollingCooldown = false;
+        let statusChannel: ReturnType<ReturnType<typeof projectService.getSupabase>['channel']> | null = null;
+        let filesChannel: ReturnType<ReturnType<typeof projectService.getSupabase>['channel']> | null = null;
+
         const supabase = projectService.getSupabase();
 
-        // Channel for project status
-        const statusChannel = supabase
-            .channel(`project-status-${params.id}`)
-            .on(
-                'postgres_changes',
-                { event: 'UPDATE', schema: 'public', table: 'projects', filter: `id=eq.${params.id}` },
-                (payload) => {
-                    const updatedProject = payload.new as Project;
-                    setProject(updatedProject);
+        const cleanUpChannels = async () => {
+            if (statusChannel) {
+                await supabase.removeChannel(statusChannel);
+                statusChannel = null;
+            }
+            if (filesChannel) {
+                await supabase.removeChannel(filesChannel);
+                filesChannel = null;
+            }
+            // Dedup: clear any orphaned channels for this project to prevent multiple instances
+            const allChannels = supabase.getChannels();
+            const orphaned = allChannels.filter(c =>
+                c.topic === `realtime:project-status-${params.id}` ||
+                c.topic === `realtime:project-files-stream-${params.id}`
+            );
+            for (const c of orphaned) {
+                await supabase.removeChannel(c);
+            }
+        };
 
-                    if (updatedProject.status === 'completed') {
-                        setIsGenerating(false);
-                    } else if (updatedProject.status.startsWith('generating')) {
-                        setIsGenerating(true);
-                    }
-                }
-            )
-            .subscribe();
+        const connectRealtime = async () => {
+            if (!isMounted || isPollingCooldown) return;
 
-        // Channel for real-time file streaming
-        const filesChannel = supabase
-            .channel(`project-files-stream-${params.id}`)
-            .on(
-                'postgres_changes',
-                { event: '*', schema: 'public', table: 'project_files', filter: `project_id=eq.${params.id}` },
-                (payload) => {
-                    const newOrUpdatedFile = payload.new as ProjectFile;
+            await cleanUpChannels();
 
-                    if (payload.eventType === 'DELETE') {
-                        setFiles(prev => prev.filter(f => f.id !== payload.old.id));
-                        return;
-                    }
+            statusChannel = supabase
+                .channel(`project-status-${params.id}`)
+                .on(
+                    'postgres_changes',
+                    { event: 'UPDATE', schema: 'public', table: 'projects', filter: `id=eq.${params.id}` },
+                    (payload) => {
+                        const updatedProject = payload.new as Project;
+                        setProject(updatedProject);
 
-                    setFiles(prev => {
-                        const exists = prev.some(f => f.id === newOrUpdatedFile.id);
-                        let updated;
-
-                        if (exists) {
-                            updated = prev.map(f => f.id === newOrUpdatedFile.id ? newOrUpdatedFile : f);
-                        } else {
-                            updated = [...prev, newOrUpdatedFile].sort((a, b) => a.path.localeCompare(b.path));
+                        if (updatedProject.status === 'completed') {
+                            setIsGenerating(false);
+                        } else if (updatedProject.status.startsWith('generating')) {
+                            setIsGenerating(true);
                         }
-                        return updated;
-                    });
-
-                    if (payload.eventType === 'INSERT') {
-                        toast.success(`Generated: ${newOrUpdatedFile.path}`, {
-                            icon: '📄',
-                            duration: 2000
-                        });
                     }
+                );
+
+            filesChannel = supabase
+                .channel(`project-files-stream-${params.id}`)
+                .on(
+                    'postgres_changes',
+                    { event: '*', schema: 'public', table: 'project_files', filter: `project_id=eq.${params.id}` },
+                    (payload) => {
+                        const newOrUpdatedFile = payload.new as ProjectFile;
+
+                        if (payload.eventType === 'DELETE') {
+                            setFiles(prev => prev.filter(f => f.id !== payload.old.id));
+                            return;
+                        }
+
+                        setFiles(prev => {
+                            const exists = prev.some(f => f.id === newOrUpdatedFile.id);
+                            if (exists) {
+                                return prev.map(f => f.id === newOrUpdatedFile.id ? newOrUpdatedFile : f);
+                            }
+                            return [...prev, newOrUpdatedFile].sort((a, b) => a.path.localeCompare(b.path));
+                        });
+
+                        if (payload.eventType === 'INSERT') {
+                            toast.success(`Generated: ${newOrUpdatedFile.path}`, {
+                                icon: '📄',
+                                duration: 2000
+                            });
+                        }
+                    }
+                );
+
+            let channelsSubscribed = 0;
+
+            const handleSubscribe = (status: string) => {
+                if (!isMounted) return;
+
+                if (status === 'SUBSCRIBED') {
+                    channelsSubscribed++;
+                    if (channelsSubscribed === 2) {
+                        retryCount = 0;
+                        setConnectionMode('live');
+                        // Successfully connected quietly (prevents console spam)
+                    }
+                } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+                    handleConnectionFailure(status);
                 }
-            )
-            .subscribe();
+            };
+
+            statusChannel.subscribe(handleSubscribe);
+            filesChannel.subscribe(handleSubscribe);
+        };
+
+        const handleConnectionFailure = (status: string) => {
+            if (!isMounted || isPollingCooldown) return;
+
+            retryCount++;
+
+            if (retryCount >= 5) {
+                // Limit retries to 5 and switch to POLLING
+                console.warn(`Realtime failed 5 times (${status}). Switching to POLLING mode for 3 minutes.`);
+                setConnectionMode('polling');
+                isPollingCooldown = true;
+                cleanUpChannels();
+
+                if (reconnectTimeout) clearTimeout(reconnectTimeout);
+                reconnectTimeout = setTimeout(() => {
+                    if (!isMounted) return;
+                    console.log('Attempting to recover Realtime connection after 3m cooldown.');
+                    isPollingCooldown = false;
+                    retryCount = 0;
+                    connectRealtime();
+                }, 180000); // 3 minutes cooling down
+            } else {
+                // Exponential backoff strategy with jitter
+                const backoffTiers = [2000, 5000, 10000, 30000];
+                const baseDelay = backoffTiers[Math.min(retryCount - 1, backoffTiers.length - 1)] || 30000;
+                const jitter = Math.floor(Math.random() * 1000);
+                const reconnectDelay = baseDelay + jitter;
+
+                if (retryCount === 1) {
+                    console.warn(`Supabase realtime connection unstable. Retrying in ${Math.round(reconnectDelay / 1000)}s...`);
+                }
+
+                if (reconnectTimeout) clearTimeout(reconnectTimeout);
+                reconnectTimeout = setTimeout(() => {
+                    connectRealtime();
+                }, reconnectDelay);
+            }
+        };
+
+        connectRealtime();
 
         return () => {
-            supabase.removeChannel(statusChannel);
-            supabase.removeChannel(filesChannel);
+            isMounted = false;
+            if (reconnectTimeout) clearTimeout(reconnectTimeout);
+            cleanUpChannels();
         };
-    }, [params.id]); // Only depend on ID for subscriptions
+    }, [params.id]); // Excluded mutable states (like loadProjectData or errorCount) to prevent re-trigger loop
+
+    // Backend Health Check Polling
+    useEffect(() => {
+        if (!isGenerating) return;
+
+        const checkHealth = async () => {
+            try {
+                const res = await fetch('/api/health');
+                const data = await res.json();
+
+                if (data.recommendation === 'offline') {
+                    setIsBackendOffline(true);
+                    setStableHealthSeconds(0);
+                    if (connectionMode !== 'failover') setConnectionMode('failover');
+                } else if (data.recommendation === 'polling') {
+                    setIsBackendOffline(false);
+                    setStableHealthSeconds(0);
+                    if (connectionMode === 'live') {
+                        setConnectionMode('failover');
+                        toast.warning("Worker heartbeat stale. Switching to safe polling mode.");
+                    }
+                } else {
+                    setIsBackendOffline(false);
+                    // System is healthy, track stability if in failover
+                    if (connectionMode === 'failover') {
+                        setStableHealthSeconds(prev => {
+                            const next = prev + 10; // Polling interval is 10s
+                            if (next >= 180) {
+                                console.log('✅ System stable for 180s. Recovering to LIVE mode.');
+                                toast.success("System stability restored. Recovering live stream.");
+                                setConnectionMode('live');
+                                setErrorCount(0);
+                                return 0;
+                            }
+                            return next;
+                        });
+                    } else {
+                        setStableHealthSeconds(0);
+                    }
+                }
+            } catch (err) {
+                console.error("Health check failed:", err);
+                setIsBackendOffline(true);
+                setStableHealthSeconds(0);
+            }
+        };
+
+        checkHealth();
+        const interval = setInterval(checkHealth, 10000); // 10s health polling
+        return () => clearInterval(interval);
+    }, [isGenerating, connectionMode]); // Only depend on ID for subscriptions
 
     // Content Sync Effect: Keep editor in sync with selected file
     useEffect(() => {
@@ -506,455 +767,280 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
             </header>
 
             <div className="flex-1 flex overflow-hidden">
-                <AnimatePresence>
-                    {isSidebarOpen && (
-                        <motion.aside initial={{ width: 0, opacity: 0 }} animate={{ width: 260, opacity: 1 }} exit={{ width: 0, opacity: 0 }} className="border-r border-white/5 bg-[#141414] flex flex-col">
-                            <div className="p-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center justify-between">Explorer<FileCode size={12} /></div>
-                            <div className="flex-1 overflow-y-auto px-2 space-y-4">
-                                {files.length === 0 && isGenerating && (
-                                    <div className="p-4 space-y-3">
-                                        {[1, 2, 3].map(i => (
-                                            <div key={i} className="flex items-center gap-2 animate-pulse">
-                                                <div className="w-4 h-4 bg-white/5 rounded" />
-                                                <div className="h-3 bg-white/5 rounded w-full" />
-                                            </div>
-                                        ))}
-                                        <div className="text-[10px] text-primary/50 font-bold uppercase tracking-widest pt-2">Blueprinting Full-Stack...</div>
-                                    </div>
-                                )}
-
-                                {Object.entries(files.reduce((acc: Record<string, ProjectFile[]>, file) => {
-                                    const parts = file.path.split('/');
-                                    const folder = parts.length > 1 ? parts[0] : 'root';
-                                    if (!acc[folder]) acc[folder] = [];
-                                    acc[folder].push(file);
-                                    return acc;
-                                }, {})).map(([folder, folderFiles]) => (
-                                    <div key={folder} className="space-y-1">
-                                        <div className="px-3 py-1 text-[10px] font-bold text-gray-600 uppercase tracking-widest flex items-center gap-2 cursor-default bg-white/[0.02] rounded-md">
-                                            <ChevronRight size={10} className={folder !== 'root' ? 'text-gray-500' : 'opacity-0'} />
-                                            {folder}
-                                        </div>
-                                        <div className={folder !== 'root' ? 'pl-2 border-l border-white/5 ml-4 pr-1' : ''}>
-                                            {folderFiles.map(file => (
-                                                <FileItem
-                                                    key={file.id}
-                                                    file={file}
-                                                    isSelected={selectedFileId === file.id}
-                                                    onClick={() => { setSelectedFileId(file.id); setEditContent(file.content || ''); }}
-                                                />
-                                            ))}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </motion.aside>
-                    )}
-                </AnimatePresence>
-
                 <main className="flex-1 flex overflow-hidden relative bg-[#0a0a0a]">
-                    {(project?.status === 'draft' && !hasStartedGenerating) ? (
-                        <div className="flex-1 flex w-full">
-                            {/* Left Panel: Chat Phase */}
-                            <div className="w-1/2 border-r border-white/5 bg-[#0d0d0d] flex flex-col pt-10 px-8 relative">
-                                <div className="flex items-center gap-2 mb-8 text-primary font-bold text-lg"><Globe size={20} /> MultiAgent</div>
-                                <div className="flex-1 overflow-y-auto space-y-6 pb-24 custom-scrollbar pr-4">
-                                    {/* User Original Prompt */}
-                                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-[#1a1a1a] rounded-2xl p-5 border border-white/5 text-sm text-gray-300 shadow-xl">
-                                        {project?.description?.split('\n\nPreferences:')[0]}
-                                    </motion.div>
+                    <AnimatePresence mode="wait">
+                        {/* 1. DRAFT MODE (Initial Configuration) */}
+                        {(project?.status === 'draft' && !hasStartedGenerating && !isGenerating && !error) && (
+                            <motion.div
+                                key="draft-view"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="flex-1 flex w-full"
+                            >
+                                {/* Left Panel: Chat Phase */}
+                                <div className="w-1/2 border-r border-white/5 bg-[#0d0d0d] flex flex-col pt-10 px-8 relative">
+                                    <div className="flex items-center gap-2 mb-8 text-primary font-bold text-lg"><Globe size={20} /> MultiAgent</div>
+                                    <div className="flex-1 overflow-y-auto space-y-6 pb-24 custom-scrollbar pr-4">
+                                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-[#1a1a1a] rounded-2xl p-5 border border-white/5 text-sm text-gray-300 shadow-xl">
+                                            {project?.description?.split('\n\nPreferences:')[0]}
+                                        </motion.div>
 
-                                    {/* AI Clarification Questions */}
-                                    {project?.status === 'draft' && (
                                         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-primary/5 rounded-2xl p-6 border border-primary/20 text-sm text-gray-300 space-y-5 shadow-lg relative overflow-hidden">
                                             <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
                                             <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest">
                                                 <Sparkles size={14} className="animate-pulse" />
                                                 Agent is asking 5 key questions
                                             </div>
-                                            <div className="text-gray-200 font-medium">
-                                                To build your world-class product, I need to clarify these essential details:
-                                            </div>
+                                            <div className="text-gray-200 font-medium">To build your world-class product, I need to clarify these essential details:</div>
                                             <div className="space-y-3 pl-2 text-gray-400">
-                                                <p><strong className="text-gray-200">1. Frontend Framework</strong> - e.g., Next.js, React, or Vue?</p>
-                                                <p><strong className="text-gray-200">2. Backend & Database</strong> - e.g., Supabase (Postgres), Firebase, or Custom?</p>
-                                                <p><strong className="text-gray-200">3. UI Styling</strong> - e.g., Tailwind CSS, Sleek Dark Mode, or Minimalist?</p>
-                                                <p><strong className="text-gray-200">4. Authentication</strong> - Do you need Social Login, Email/Pass, or none?</p>
-                                                <p><strong className="text-gray-200">5. Core Features</strong> - What are the 3 must-have features for users?</p>
+                                                <p><strong className="text-gray-200">1. Framework</strong> - e.g., Next.js or React?</p>
+                                                <p><strong className="text-gray-200">2. Backend</strong> - e.g., Supabase or Custom?</p>
+                                                <p><strong className="text-gray-200">3. UI Styling</strong> - Tailwind or Sleek Dark Mode?</p>
+                                                <p><strong className="text-gray-200">4. Auth</strong> - Social Login or Email?</p>
+                                                <p><strong className="text-gray-200">5. Features</strong> - Top 3 must-have features?</p>
                                             </div>
                                         </motion.div>
-                                    )}
-
-                                    {/* User Reply */}
-                                    {userReply && (
-                                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-[#1a1a1a] rounded-2xl p-5 border border-white/5 text-sm text-gray-300 shadow-xl self-end mt-6 ml-auto max-w-[80%] border-primary/30 text-right">
-                                            {userReply}
-                                        </motion.div>
-                                    )}
-
-                                    {/* Generating State */}
-                                    {isGenerating && (
-                                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-primary/5 rounded-2xl p-6 border border-primary/20 text-sm text-gray-300 shadow-lg relative overflow-hidden mt-6 flex flex-col gap-4">
-                                            <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
-                                            <div className="flex items-center gap-3">
-                                                <Loader2 size={16} className="text-primary animate-spin" />
-                                                <span className="text-primary font-bold text-xs uppercase tracking-widest">MultiAgent is Building Your Product</span>
-                                            </div>
-                                            <p className="text-gray-400 italic">"Engineering your world-class application. This will be ready in minutes."</p>
-                                            <div className="h-1.5 w-full bg-black/40 rounded-full overflow-hidden">
-                                                <motion.div
-                                                    className="h-full bg-primary"
-                                                    initial={{ width: "5%" }}
-                                                    animate={{ width: "95%" }}
-                                                    transition={{ duration: 60, ease: "linear" }}
-                                                />
-                                            </div>
-                                        </motion.div>
-                                    )}
-                                </div>
-
-                                {/* Input Box */}
-                                {!userReply && project?.status === 'draft' && (
-                                    <div className="absolute bottom-6 flex-1 w-[calc(100%-4rem)]">
+                                    </div>
+                                    <div className="absolute bottom-6 w-[calc(100%-4rem)]">
                                         <div className="bg-[#141414] border border-white/10 rounded-2xl p-2 flex items-center shadow-2xl focus-within:border-primary/50 transition-colors">
                                             <textarea
                                                 placeholder="Message Agent (e.g., 1a, 2a, 3a)..."
                                                 className="flex-1 bg-transparent resize-none outline-none text-sm text-gray-200 p-3 min-h-[44px] max-h-32"
                                                 value={replyText}
                                                 onChange={e => setReplyText(e.target.value)}
-                                                onKeyDown={e => {
-                                                    if (e.key === 'Enter' && !e.shiftKey) {
-                                                        e.preventDefault();
-                                                        submitClarification();
-                                                    }
-                                                }}
+                                                onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submitClarification(); } }}
                                             />
-                                            <button onClick={submitClarification} disabled={!replyText.trim() || isGenerating} className="p-3 bg-primary rounded-xl text-primary-foreground hover:opacity-90 transition-opacity disabled:opacity-50">
+                                            <button onClick={submitClarification} disabled={!replyText.trim() || isGenerating} className="p-3 bg-primary rounded-xl text-primary-foreground hover:opacity-90 disabled:opacity-50 transition-all">
                                                 <ChevronRight size={18} />
                                             </button>
                                         </div>
                                     </div>
-                                )}
-                            </div>
+                                </div>
+                                {/* Right Panel: Dashboard Placeholder */}
+                                <div className="w-1/2 bg-[#050505] flex items-center justify-center p-12 relative overflow-hidden">
+                                    <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+                                    <div className="text-center space-y-8 w-full max-w-md">
+                                        <Sparkles size={32} className="text-gray-500 mx-auto" />
+                                        <div className="space-y-2">
+                                            <h2 className="text-2xl font-bold text-white tracking-tight">Deterministic Engineering</h2>
+                                            <p className="text-sm text-gray-400 font-medium">Configure your requirements to begin the high-speed build process.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
 
-                            {/* Right Panel: Placeholder Preview / Build Overlay */}
-                            <div className="w-1/2 bg-[#050505] flex items-center justify-center p-12 relative overflow-hidden">
-                                {/* Grid background */}
-                                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+                        {/* 2. DETERMINISTIC BUILD MODE */}
+                        {isGenerating && (
+                            <motion.div
+                                key="build-view"
+                                initial={{ opacity: 0, scale: 0.98 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="absolute inset-0 z-[60] bg-[#0a0a0a] flex flex-col items-center justify-center p-4 overflow-hidden"
+                            >
+                                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 blur-[120px] -z-10" />
+                                <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/5 blur-[120px] -z-10" />
+                                <div className="w-full max-w-2xl space-y-6">
+                                    <div className="text-center space-y-2">
+                                        <div className="inline-flex p-3 bg-primary/10 rounded-2xl border border-primary/20 mb-1">
+                                            <Loader2 size={24} className="text-primary animate-spin" />
+                                        </div>
+                                        <h1 className="text-2xl font-black text-white tracking-tighter uppercase leading-tight">
+                                            🚀 Building Your Application
+                                        </h1>
+                                        <p className="text-gray-400 text-sm max-w-lg mx-auto font-medium">
+                                            MultiAgent is architecting and generating your system.
+                                        </p>
+                                    </div>
+                                    <div className="bg-[#111] border border-white/5 rounded-[2rem] p-4 shadow-2xl relative overflow-hidden">
+                                        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+                                        <BuildTimeline data={buildProgress} onSync={forceSync} />
+                                    </div>
+                                    <div className="flex justify-center gap-4 text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">
+                                        <span>Engineering Mode Active</span>
+                                        <span className="text-primary animate-pulse">•</span>
+                                        {userRole === 'owner' ? (
+                                            <span className="text-red-500 animate-pulse">OWNER MODE ACTIVE – GOVERNANCE DISABLED</span>
+                                        ) : (
+                                            <span>User Input Locked</span>
+                                        )}
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
 
-                                <AnimatePresence>
-                                    {isGenerating ? (
-                                        <motion.div
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0 }}
-                                            className="absolute inset-0 z-50 bg-[#0a0a0a] flex items-center justify-center p-8"
-                                        >
-                                            <div className="max-w-md w-full text-center space-y-8">
-                                                <div className="relative inline-block">
-                                                    <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full animate-pulse" />
-                                                    <div className="relative bg-[#1a1a1a] p-6 rounded-3xl border border-primary/30 shadow-2xl">
-                                                        <Loader2 size={40} className="text-primary animate-spin" />
-                                                    </div>
+                        {/* 3. SUCCESS SUMMARY MODE */}
+                        {showSummary && buildProgress && !isGenerating && (
+                            <motion.div
+                                key="summary-view"
+                                initial={{ opacity: 0 }}
+                                exit={{ opacity: 0 }}
+                                className="absolute inset-0 z-[70] bg-[#0a0a0a] flex items-center justify-center p-4 overflow-hidden"
+                            >
+                                <BuildSummary data={buildProgress} onViewProject={() => setShowSummary(false)} />
+                            </motion.div>
+                        )}
+
+                        {/* 4. ERROR / FAILURE MODE */}
+                        {error && !isGenerating && (
+                            <motion.div
+                                key="error-view"
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="absolute inset-0 z-[60] bg-[#0a0a0a] flex items-center justify-center p-8"
+                            >
+                                <div className="w-full max-w-lg bg-[#111] border border-red-500/20 rounded-[2.5rem] p-10 text-center space-y-8 shadow-2xl">
+                                    <div className="inline-flex p-4 bg-red-500/10 rounded-3xl border border-red-500/20">
+                                        <XCircle size={32} className="text-red-500" />
+                                    </div>
+                                    <div className="space-y-4">
+                                        <h1 className="text-3xl font-black text-white tracking-tight">Build Interrupted</h1>
+                                        <div className="p-4 bg-black/40 rounded-2xl border border-white/5 text-sm text-red-400/80 font-mono text-left max-h-32 overflow-y-auto custom-scrollbar">
+                                            {error}
+                                        </div>
+                                        <p className="text-gray-500 text-sm">An unexpected error occurred during the build. Your configuration has been preserved.</p>
+                                    </div>
+                                    <button
+                                        onClick={handleGenerate}
+                                        className="w-full py-4 bg-white text-black font-black rounded-2xl hover:bg-gray-200 transition-all shadow-xl flex items-center justify-center gap-2 uppercase tracking-widest text-xs"
+                                    >
+                                        <RefreshCcw size={18} /> RETRY DETERMINISTIC BUILD
+                                    </button>
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {/* 5. EDITOR / PREVIEW MODE (Post-Generation) */}
+                        {(!isGenerating && !showSummary && !error && hasStartedGenerating) && (
+                            <motion.div key="editor-view" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 flex overflow-hidden">
+                                {/* Left Side: Sidebar Toggle + Content */}
+                                <div className="flex-1 flex flex-col relative">
+                                    <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-[#1a1a1a] border border-white/10 p-1 rounded-r-lg hover:bg-primary/20 hover:text-primary transition-all shadow-xl">
+                                        {isSidebarOpen ? <ChevronLeft size={12} /> : <ChevronRight size={12} />}
+                                    </button>
+
+                                    <div className="flex-1 flex overflow-hidden">
+                                        {(viewMode === 'editor' || viewMode === 'split') && (
+                                            <div className="flex-1 flex flex-col bg-[#1e1e1e] overflow-hidden border-r border-white/5">
+                                                <div className="h-10 border-b border-white/5 flex items-center justify-between px-4 bg-[#1c1c1c]">
+                                                    <span className="text-[10px] text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                                                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                                                        {selectedFile?.path || 'No file selected'}
+                                                    </span>
+                                                    <button onClick={handleSaveFile} className="flex items-center gap-1.5 text-[10px] font-bold text-primary hover:text-white transition-colors">
+                                                        <Save size={12} /> SAVE
+                                                    </button>
                                                 </div>
-
-                                                <div className="space-y-3">
-                                                    <h2 className="text-2xl font-bold tracking-tight text-white uppercase tracking-widest">
-                                                        Engineering Your Project
-                                                    </h2>
-                                                    <p className="text-sm text-gray-400 italic">
-                                                        "MultiAgent AI Core is blueprinting, coding, and validating your full-stack application."
-                                                    </p>
+                                                <div className="flex-1 relative overflow-auto custom-scrollbar">
+                                                    <textarea
+                                                        value={editContent}
+                                                        onChange={(e) => setEditContent(e.target.value)}
+                                                        className="absolute inset-0 w-full h-full bg-transparent text-gray-300 p-6 font-mono text-sm leading-relaxed outline-none resize-none z-10 opacity-30 focus:opacity-100 transition-opacity"
+                                                        spellCheck={false}
+                                                    />
+                                                    {editContent ? (
+                                                        <SyntaxHighlighter
+                                                            language={selectedFile?.language || 'typescript'}
+                                                            style={vscDarkPlus}
+                                                            customStyle={{ margin: 0, padding: '24px', backgroundColor: 'transparent', fontSize: '14px', lineHeight: '1.6', fontFamily: 'JetBrains Mono, Menlo, monospace', pointerEvents: 'none' }}
+                                                        >
+                                                            {editContent}
+                                                        </SyntaxHighlighter>
+                                                    ) : (
+                                                        <div className="flex-1 flex items-center justify-center h-full">
+                                                            <p className="text-xs text-gray-600">Select a file to view code</p>
+                                                        </div>
+                                                    )}
                                                 </div>
+                                            </div>
+                                        )}
 
-                                                <div className="space-y-4">
-                                                    <div className="flex justify-between text-[10px] font-bold text-primary uppercase tracking-widest px-1">
-                                                        <span>Architecting</span>
-                                                        <span>95%</span>
+                                        {(viewMode === 'preview' || viewMode === 'split') && (
+                                            <div className="flex-1 flex flex-col bg-[#f5f5f5] overflow-hidden">
+                                                <div className="h-10 border-b border-gray-200 flex items-center justify-between px-4 bg-gray-50 z-10">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="flex gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-red-400" /><div className="w-2.5 h-2.5 rounded-full bg-yellow-400" /><div className="w-2.5 h-2.5 rounded-full bg-green-400" /></div>
+                                                        <span className="text-[10px] font-bold text-gray-400 uppercase ml-4">localhost:3000</span>
                                                     </div>
-                                                    <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
-                                                        <motion.div
-                                                            className="h-full bg-gradient-to-r from-primary to-blue-500 shadow-[0_0_15px_rgba(var(--primary),0.5)]"
-                                                            initial={{ width: "5%" }}
-                                                            animate={{ width: "95%" }}
-                                                            transition={{ duration: 45, ease: "easeInOut" }}
-                                                        />
-                                                    </div>
-                                                    <div className="flex justify-center gap-1.5 pt-2">
-                                                        {['SCANNING', 'CODING', 'VALIDATING', 'OPTIMIZING'].map((step, idx) => (
-                                                            <div key={idx} className="px-2 py-1 rounded-md bg-white/[0.02] border border-white/5 text-[8px] font-bold text-gray-500">
-                                                                {step}
-                                                            </div>
+                                                    <div className="flex items-center gap-1 bg-gray-200/50 p-0.5 rounded-lg border border-gray-300/50">
+                                                        {['mobile', 'tablet', 'desktop'].map((s) => (
+                                                            <button
+                                                                key={s}
+                                                                onClick={() => setPreviewSize(s as any)}
+                                                                className={`p-1 rounded-md transition-all ${previewSize === s ? 'bg-white text-primary shadow-sm' : 'text-gray-400'}`}
+                                                            >
+                                                                {s === 'mobile' ? <Monitor size={12} className="-rotate-90 scale-75" /> : s === 'tablet' ? <Layout size={12} /> : <Monitor size={12} />}
+                                                            </button>
                                                         ))}
                                                     </div>
+                                                    <button onClick={() => { }} className="text-gray-400 hover:text-gray-600"><RefreshCcw size={12} /></button>
+                                                </div>
+                                                <div className="flex-1 overflow-auto flex justify-center p-8 bg-[#f0f0f0] custom-scrollbar">
+                                                    <motion.div
+                                                        animate={{ width: previewWidths[previewSize] }}
+                                                        transition={{ type: "spring", damping: 20, stiffness: 100 }}
+                                                        className="h-full bg-white shadow-2xl border border-gray-200 rounded-lg overflow-hidden relative"
+                                                    >
+                                                        <iframe srcDoc={previewDoc} className="w-full h-full border-none" title="Preview" sandbox="allow-scripts" key={files.length} />
+                                                    </motion.div>
                                                 </div>
                                             </div>
-                                        </motion.div>
-                                    ) : (
-                                        <div className="relative z-10 text-center space-y-8 w-full max-w-md">
-                                            <Sparkles size={32} className="text-gray-500 mx-auto" />
-                                            <div className="space-y-2">
-                                                <h2 className="text-2xl font-bold tracking-tight text-white drop-shadow-lg">Deploy Your Application</h2>
-                                                <p className="text-sm text-gray-400">Make your app publicly available with managed infrastructure.</p>
-                                            </div>
-
-                                            <div className="bg-[#0f0f0f] border border-white/10 rounded-2xl p-6 shadow-2xl relative overflow-hidden transform hover:scale-[1.02] transition-transform">
-                                                <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-4">
-                                                    <div className="flex items-center gap-2 text-xs font-bold text-gray-300">
-                                                        <Globe size={14} className="text-gray-500" /> Deployments
-                                                    </div>
-                                                </div>
-                                                <div className="bg-[#1a1a1a] rounded-xl p-4 border border-white/5 flex items-center justify-between group">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-2.5 h-2.5 bg-green-500/80 rounded-full animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
-                                                        <div className="text-sm text-gray-300 font-medium tracking-tight">Live <span className="text-gray-500 font-mono ml-2 text-xs">multiagent.app</span></div>
-                                                    </div>
-                                                    <button className="px-4 py-1.5 bg-white text-black text-xs font-bold rounded-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors">Visit ↗</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
-                        </div>
-                    ) : (
-                        <>
-                            <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-[#1a1a1a] border border-white/10 p-1 rounded-r-lg hover:bg-primary/20 hover:text-primary transition-all shadow-xl">
-                                {isSidebarOpen ? <ChevronLeft size={12} /> : <ChevronRight size={12} />}
-                            </button>
-
-                            {/* Re-generating sleek banner */}
-                            <AnimatePresence>
-                                {isGenerating && files.length > 0 && (
-                                    <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-[#1a1a1a]/90 backdrop-blur-md px-4 py-2 rounded-full border border-primary/30 shadow-2xl flex items-center gap-3">
-                                        <Loader2 size={14} className="text-primary animate-spin" />
-                                        <span className="text-xs font-bold text-gray-200 uppercase tracking-widest">Engineering World-Class Solution...</span>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-
-                            <div className="flex-1 flex overflow-hidden">
-                                {(viewMode === 'editor' || viewMode === 'split') && (
-                                    <div className="flex-1 flex flex-col bg-[#1e1e1e] overflow-hidden">
-                                        <div className="h-10 border-b border-white/5 flex items-center justify-between px-4 bg-[#1c1c1c]">
-                                            <span className="text-[10px] text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                                                {selectedFile?.path || 'No file selected'}
-                                            </span>
-                                            <button onClick={handleSaveFile} className="flex items-center gap-1.5 text-[10px] font-bold text-primary hover:text-white transition-colors">
-                                                <Save size={12} /> SAVE
-                                            </button>
-                                        </div>
-                                        <div className="flex-1 relative overflow-auto custom-scrollbar group">
-                                            <textarea value={editContent} onChange={(e) => setEditContent(e.target.value)} className="absolute inset-0 w-full h-full bg-transparent text-gray-300 p-6 font-mono text-sm leading-relaxed outline-none resize-none z-10 opacity-30 focus:opacity-100 transition-opacity" spellCheck={false} />
-                                            {editContent ? (
-                                                <SyntaxHighlighter language={selectedFile?.language || 'typescript'} style={vscDarkPlus} customStyle={{ margin: 0, padding: '24px', backgroundColor: 'transparent', fontSize: '14px', lineHeight: '1.6', fontFamily: 'JetBrains Mono, Menlo, monospace', pointerEvents: 'none' }}>
-                                                    {editContent}
-                                                </SyntaxHighlighter>
-                                            ) : isGenerating ? (
-                                                <div className="flex-1 flex items-center justify-center h-full">
-                                                    <div className="text-center space-y-4">
-                                                        <Loader2 size={32} className="text-primary animate-spin mx-auto opacity-20" />
-                                                        <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Generating Source Code...</p>
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <div className="flex-1 flex items-center justify-center h-full">
-                                                    <p className="text-xs text-gray-600">Select a file to view code</p>
-                                                </div>
-                                            )}
-
-                                            {/* AI Refinement Overlay */}
-                                            <div className="absolute right-6 bottom-6 z-20 flex flex-col items-end gap-3 text-white">
-                                                <AnimatePresence>
-                                                    {showRefineChat && (
-                                                        <motion.div
-                                                            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                                                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                                                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                                            className="w-80 bg-[#1a1a1a]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-4 space-y-3"
-                                                        >
-                                                            <div className="flex items-center gap-2 text-[10px] font-bold text-primary uppercase tracking-widest">
-                                                                <Sparkles size={10} />
-                                                                Refine with AI
-                                                            </div>
-                                                            <textarea
-                                                                autoFocus
-                                                                value={refinementPrompt}
-                                                                onChange={(e) => setRefinementPrompt(e.target.value)}
-                                                                placeholder="Example: Add a responsive navbar with a logo..."
-                                                                className="w-full bg-black/40 border border-white/5 rounded-xl p-3 text-xs text-neutral-200 outline-none focus:border-primary/50 transition-all min-h-[80px] resize-none"
-                                                                onKeyDown={(e) => {
-                                                                    if (e.key === 'Enter' && !e.shiftKey) {
-                                                                        e.preventDefault();
-                                                                        handleRefine();
-                                                                    }
-                                                                    if (e.key === 'Escape') setShowRefineChat(false);
-                                                                }}
-                                                            />
-                                                            <div className="flex justify-between items-center">
-                                                                <span className="text-[9px] text-neutral-500">Press Enter to Apply</span>
-                                                                <button
-                                                                    onClick={handleRefine}
-                                                                    disabled={isRefining || !refinementPrompt}
-                                                                    className="px-3 py-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-lg hover:opacity-90 transition-all flex items-center gap-1.5 disabled:opacity-50"
-                                                                >
-                                                                    {isRefining ? <Loader2 size={10} className="animate-spin" /> : <Sparkles size={10} />}
-                                                                    Apply Changes
-                                                                </button>
-                                                            </div>
-                                                        </motion.div>
-                                                    )}
-                                                </AnimatePresence>
-
-                                                {/* AI Audit Results Overlay */}
-                                                <AnimatePresence>
-                                                    {showAudit && auditResults && (
-                                                        <motion.div
-                                                            initial={{ opacity: 0, x: -20, scale: 0.95 }}
-                                                            animate={{ opacity: 1, x: 0, scale: 1 }}
-                                                            exit={{ opacity: 0, x: -10, scale: 0.95 }}
-                                                            className="absolute left-6 bottom-6 z-20 w-96 bg-[#1a1a1a]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
-                                                        >
-                                                            <div className="bg-primary/20 px-4 py-3 flex items-center justify-between border-b border-white/5">
-                                                                <div className="flex items-center gap-2 text-[10px] font-bold text-primary uppercase tracking-widest">
-                                                                    <ShieldCheck size={12} />
-                                                                    Professional Audit
-                                                                </div>
-                                                                <button onClick={() => setShowAudit(false)} className="text-gray-400 hover:text-white transition-colors">
-                                                                    <RefreshCcw size={12} className="rotate-45" />
-                                                                </button>
-                                                            </div>
-                                                            <div className="p-4 max-h-[400px] overflow-y-auto custom-scrollbar text-xs leading-relaxed text-gray-300 whitespace-pre-wrap font-sans">
-                                                                <div className="space-y-4">
-                                                                    {auditResults}
-                                                                </div>
-                                                            </div>
-                                                            <div className="p-3 bg-black/40 border-t border-white/5 flex justify-end">
-                                                                <button
-                                                                    onClick={() => { setShowRefineChat(true); setRefinementPrompt("Apply the SEO and accessibility fixes suggested in the audit."); setShowAudit(false); }}
-                                                                    className="px-3 py-1.5 bg-white hover:bg-neutral-200 text-black text-[10px] font-bold rounded-lg transition-all flex items-center gap-2"
-                                                                >
-                                                                    <Sparkles size={10} />
-                                                                    Apply All Fixes
-                                                                </button>
-                                                            </div>
-                                                        </motion.div>
-                                                    )}
-                                                </AnimatePresence>
-
-                                                <button
-                                                    onClick={() => setShowRefineChat(!showRefineChat)}
-                                                    className={`p-3 rounded-2xl shadow-xl transition-all border flex items-center gap-2 group/btn ${showRefineChat ? 'bg-white text-black border-white' : 'bg-primary text-primary-foreground border-primary/20 hover:scale-105'}`}
-                                                >
-                                                    <Sparkles size={18} className={isRefining ? 'animate-pulse' : ''} />
-                                                    <span className={`text-xs font-bold overflow-hidden transition-all duration-300 ${showRefineChat ? 'w-0 opacity-0' : 'w-16 opacity-100'}`}>Ask AI</span>
-                                                </button>
-                                            </div>
-                                        </div>
+                                        )}
                                     </div>
-                                )}
 
-                                {viewMode === 'split' && <div className="w-1 bg-black shadow-2xl z-10" />}
-
-                                {(viewMode === 'preview' || viewMode === 'split') && (
-                                    <div className="flex-1 flex flex-col bg-[#f5f5f5] overflow-hidden">
-                                        <div className="h-10 border-b border-gray-200 flex items-center justify-between px-4 bg-gray-50 z-10">
-                                            <div className="flex items-center gap-2">
-                                                <div className="flex gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-red-400" /><div className="w-2.5 h-2.5 rounded-full bg-yellow-400" /><div className="w-2.5 h-2.5 rounded-full bg-green-400" /></div>
-                                                <span className="text-[10px] font-bold text-gray-400 uppercase ml-4 flex items-center gap-1">localhost:3000</span>
-                                            </div>
-
-                                            <div className="flex items-center gap-1 bg-gray-200/50 p-0.5 rounded-lg border border-gray-300/50">
-                                                <button
-                                                    onClick={() => setPreviewSize('mobile')}
-                                                    className={`p-1 rounded-md transition-all ${previewSize === 'mobile' ? 'bg-white text-primary shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
-                                                    title="Mobile View"
-                                                >
-                                                    <Monitor size={12} className="rotate-0 scale-[0.8] origin-center -rotate-90" />
-                                                </button>
-                                                <button
-                                                    onClick={() => setPreviewSize('tablet')}
-                                                    className={`p-1 rounded-md transition-all ${previewSize === 'tablet' ? 'bg-white text-primary shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
-                                                    title="Tablet View"
-                                                >
-                                                    <Layout size={12} />
-                                                </button>
-                                                <button
-                                                    onClick={() => setPreviewSize('desktop')}
-                                                    className={`p-1 rounded-md transition-all ${previewSize === 'desktop' ? 'bg-white text-primary shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
-                                                    title="Desktop View"
-                                                >
-                                                    <Monitor size={12} />
-                                                </button>
-                                            </div>
-
-                                            <button onClick={() => { /* re-trigger useMemo */ }} className="text-gray-400 hover:text-gray-600"><RefreshCcw size={12} /></button>
-                                        </div>
-                                        <div className="flex-1 overflow-auto flex justify-center p-8 bg-[#f0f0f0] custom-scrollbar">
-                                            <motion.div
-                                                animate={{ width: previewWidths[previewSize] }}
-                                                transition={{ type: "spring", damping: 20, stiffness: 100 }}
-                                                className="h-full bg-white shadow-2xl border border-gray-200 rounded-lg overflow-hidden relative"
-                                            >
-                                                {isGenerating && files.length < 5 && (
-                                                    <div className="absolute inset-0 z-50 bg-[#0d0d0d] flex items-center justify-center p-6 text-center">
-                                                        <div className="space-y-6 max-w-xs">
-                                                            <div className="relative inline-block">
-                                                                <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full animate-pulse" />
-                                                                <Loader2 size={32} className="text-primary animate-spin relative" />
-                                                            </div>
-                                                            <div className="space-y-2">
-                                                                <h3 className="text-sm font-bold text-white uppercase tracking-[0.2em]">Engineering Build</h3>
-                                                                <p className="text-[10px] text-gray-500 font-medium">MultiAgent is synthesizing your world-class codebase from the core blueprints.</p>
-                                                            </div>
-                                                            {error && (
-                                                                <div className="space-y-3">
-                                                                    <div className="p-2 rounded bg-red-500/10 border border-red-500/20 text-[9px] text-red-400">
-                                                                        {error}
-                                                                    </div>
-                                                                    <button
-                                                                        onClick={handleGenerate}
-                                                                        className="px-4 py-2 bg-primary text-primary-foreground text-[10px] font-bold rounded-lg hover:opacity-90 transition-all w-full shadow-lg"
-                                                                    >
-                                                                        Retry Engine Connection
-                                                                    </button>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                )}
-                                                <iframe srcDoc={previewDoc} className="w-full h-full border-none" title="Preview" sandbox="allow-scripts" key={files.length} />
-                                            </motion.div>
-                                        </div>
+                                    {/* AI Refinement Overlay Buttons */}
+                                    <div className="absolute right-6 bottom-6 z-20 flex flex-col items-end gap-3">
+                                        <button
+                                            onClick={() => setShowRefineChat(!showRefineChat)}
+                                            className="p-3 bg-primary text-primary-foreground rounded-2xl shadow-xl hover:scale-105 transition-all border border-primary/20 flex items-center gap-2 group"
+                                        >
+                                            <Sparkles size={18} />
+                                            <span className="text-xs font-bold px-1">Ask Agent</span>
+                                        </button>
                                     </div>
-                                )}
-                            </div>
-                        </>
-                    )}
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </main>
             </div>
 
-            {/* Status Bar */}
-            <footer className="h-6 border-t border-white/5 bg-[#141414] px-4 flex items-center justify-between text-[10px] text-gray-500 font-medium">
+            <footer className="h-6 border-t border-white/5 bg-[#141414] px-4 flex items-center justify-between text-[10px] text-gray-500 font-medium z-[100]">
                 <div className="flex items-center gap-4">
                     <span className="flex items-center gap-1.5">
-                        <Loader2 size={10} className={isGenerating ? 'animate-spin text-primary' : 'hidden'} />
-                        {isGenerating ? 'Generating code...' : 'Ready'}
+                        <div className={`w-1.5 h-1.5 rounded-full ${isGenerating ? (isBackendOffline ? 'bg-red-500 animate-pulse' : (connectionMode === 'failover' ? 'bg-orange-500 animate-pulse' : 'bg-primary animate-pulse')) : 'bg-green-500'}`} />
+                        {isGenerating
+                            ? (isBackendOffline ? 'OFFLINE (No Backend)' : (connectionMode === 'failover' ? 'Failover Mode (Polling)' : 'Engineering Mode Active'))
+                            : 'System Ready'}
                     </span>
-                    <span>UTF-8</span>
+                    <span className="text-white/20">|</span>
+                    <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold ${isBackendOffline ? 'bg-red-500/10 text-red-500 border border-red-500/20' : (connectionMode === 'failover' ? 'bg-orange-500/10 text-orange-500 border border-orange-500/20' : 'bg-green-500/10 text-green-500')}`}>
+                        {(isBackendOffline ? 'OFFLINE' : connectionMode).toUpperCase()}
+                    </span>
+                    <span className="text-white/20">|</span>
+                    <span>{project?.id.split('-')[0]}</span>
                 </div>
                 <div className="flex items-center gap-4">
-                    <span>{selectedFile?.language?.toUpperCase()}</span>
-                    <span className="text-primary/60">MultiAgent AI Core v1.0</span>
+                    <span className="text-primary/60 font-bold tracking-widest">MULTIAGENT CORE v2.0-DETERMINISTIC</span>
+                    <span className="text-white/20">|</span>
+                    <span className="flex items-center gap-1"><Clock size={10} /> {new Date().toLocaleTimeString()}</span>
                 </div>
             </footer>
 
             <style jsx global>{`
-                .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+                .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
                 .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.05); border-radius: 10px; }
                 .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.1); }
+                .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
             `}</style>
         </div>
     );
 }
+
+const XCircle = ({ size, className }: { size: number, className: string }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        <circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" />
+    </svg>
+);

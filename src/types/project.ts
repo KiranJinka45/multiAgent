@@ -6,6 +6,7 @@ export interface Project {
     status: string; // 'draft' | 'brainstorming' | 'generating' | 'completed' | 'failed' | etc.
     project_type: string | null;
     deployment_url: string | null;
+    last_execution_id?: string | null;
     created_at: string;
     updated_at: string;
 }
