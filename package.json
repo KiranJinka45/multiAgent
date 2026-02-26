@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "worker": "tsx src/worker.ts",
+    "worker": "dotenv -e .env.local -- tsx src/worker.ts",
     "dev:all": "concurrently \"npm run dev\" \"npm run worker\"",
     "build": "next build",
     "start": "next start",
