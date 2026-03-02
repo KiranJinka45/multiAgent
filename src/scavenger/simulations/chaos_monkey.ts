@@ -1,5 +1,4 @@
 import { execSync } from 'child_process';
-import logger from '../../lib/logger';
 import redis from '../../lib/redis';
 
 /**

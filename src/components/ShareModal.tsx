@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Copy, Check, Linkedin, Instagram, MessageCircle } from 'lucide-react'; // Using Lucide icons
 import { useState, useEffect } from 'react';
 import { Chat } from '@/types/chat';
+import { formatDate } from '@/lib/date';
 
 type ShareModalProps = {
     isOpen: boolean;
@@ -80,7 +81,7 @@ export default function ShareModal({ isOpen, onClose, chat }: ShareModalProps) {
                         <div className="text-center space-y-2">
                             <h3 className="text-lg font-semibold">{chat.title}</h3>
                             <p className="text-sm text-muted-foreground">Shared via MultiAgent</p>
-                            <div className="text-xs text-muted-foreground/50 mt-4 font-mono">{new Date(chat.created_at).toLocaleDateString()}</div>
+                            <div className="text-xs text-muted-foreground/50 mt-4 font-mono">{formatDate(chat.created_at)}</div>
                         </div>
                     </div>
 
@@ -124,8 +125,8 @@ function ShareButton({ icon, label, onClick, active }: { icon: React.ReactNode, 
             <button
                 onClick={onClick}
                 className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 ${active
-                        ? 'bg-green-500 text-white shadow-lg scale-110'
-                        : 'bg-accent hover:bg-foreground hover:text-background text-foreground'
+                    ? 'bg-green-500 text-white shadow-lg scale-110'
+                    : 'bg-accent hover:bg-foreground hover:text-background text-foreground'
                     }`}
             >
                 {active ? <Check size={20} /> : icon}

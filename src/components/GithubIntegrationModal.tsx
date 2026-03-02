@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { githubService, GithubRepo } from '@/lib/github-service';
 import { useSidebar } from '@/context/SidebarContext';
 import { toast } from 'sonner';
+import { formatDate } from '@/lib/date';
 
 type GithubIntegrationModalProps = {
     isOpen: boolean;
@@ -188,7 +189,7 @@ export default function GithubIntegrationModal({ isOpen, onClose }: GithubIntegr
                                             </div>
                                             <div className="flex items-center gap-2 md:gap-4 shrink-0">
                                                 <div className="text-[9px] md:text-[11px] font-bold text-muted-foreground hidden lg:block">
-                                                    Synced {new Date(repo.updated_at).toLocaleDateString()}
+                                                    Synced {formatDate(repo.updated_at)}
                                                 </div>
                                                 <a href={repo.html_url} target="_blank" className="p-2 rounded-lg hover:bg-white/10 text-muted-foreground transition-all">
                                                     <ExternalLink size={14} />

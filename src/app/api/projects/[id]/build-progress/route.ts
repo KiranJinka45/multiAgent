@@ -1,71 +1,115 @@
 import { NextRequest } from 'next/server';
 import redis from '@/lib/redis';
-import logger from '@/lib/logger';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
+import { projectService } from '@/lib/project-service';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(
-    req: NextRequest,
-    { params }: { params: { id: string } }
+    req: NextRequest
 ) {
-    const projectId = params.id;
-    const executionId = req.nextUrl.searchParams.get('executionId');
+    try {
+        const executionId = req.nextUrl.searchParams.get('executionId');
 
-    if (!executionId) {
-        return new Response('executionId is required', { status: 400 });
-    }
+        if (!executionId) {
+            return new Response(JSON.stringify({ error: 'executionId is required' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+        }
 
-    const encoder = new TextEncoder();
+        const projectId = req.nextUrl.pathname.split('/')[3]; // /api/projects/[id]/build-progress
+        if (!projectId) {
+            return new Response(JSON.stringify({ error: 'projectId is required' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+        }
 
-    const stream = new ReadableStream({
-        async start(controller) {
-            const channel = `build:progress:${executionId}`;
-            const subRedis = redis.duplicate();
+        const supabase = createRouteHandlerClient({ cookies });
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
-            const send = (data: any) => {
-                controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
-            };
+        if (sessionError || !session) {
+            console.error('SSE Auth error:', sessionError);
+            return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
+        }
 
-            // 1. Send initial state from cache if exists
-            const cachedState = await redis.get(`build:state:${executionId}`);
-            if (cachedState) {
-                send(JSON.parse(cachedState));
-            }
+        // Verify Project Ownership
+        const isOwner = await projectService.verifyProjectOwnership(projectId, session.user.id, supabase);
+        if (!isOwner) {
+            console.error(`SSE Forbidden: User ${session.user.id} does not own project ${projectId}`);
+            return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
+        }
 
-            // 2. Subscribe to real-time updates
-            await subRedis.subscribe(channel);
+        const encoder = new TextEncoder();
 
-            subRedis.on('message', (chan, message) => {
-                if (chan === channel) {
-                    send(JSON.parse(message));
+        const stream = new ReadableStream({
+            async start(controller) {
+                try {
+                    const channel = `build:progress:${executionId}`;
+                    const subRedis = redis.duplicate();
 
-                    // If completed or failed, we can close the connection from server side eventually
-                    const data = JSON.parse(message);
-                    if (data.status === 'completed' || data.status === 'failed') {
-                        // In SSE, usually we let client close, but we could provide a signal
+                    const send = (data: unknown) => {
+                        try {
+                            controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
+                        } catch (e) {
+                            console.error('SSE enqueue error:', e);
+                        }
+                    };
+
+                    // 0. Set retry interval for browser
+                    controller.enqueue(encoder.encode(`retry: 3000\n\n`));
+
+                    // 1. Send initial state from cache (Full Reconstruction)
+                    const cachedState = await redis.get(`build:state:${executionId}`);
+                    if (cachedState) {
+                        const state = JSON.parse(cachedState);
+                        // Add an event ID for Reconnection support (timestamp works well)
+                        const eventId = state.timestamp || Date.now().toString();
+                        controller.enqueue(encoder.encode(`id: ${eventId}\ndata: ${JSON.stringify(state)}\n\n`));
                     }
+
+                    // 2. Subscribe to real-time updates
+                    await subRedis.subscribe(channel);
+
+                    subRedis.on('message', (chan, message) => {
+                        if (chan === channel) {
+                            const data = JSON.parse(message);
+                            const eventId = data.timestamp || Date.now().toString();
+                            controller.enqueue(encoder.encode(`id: ${eventId}\ndata: ${message}\n\n`));
+                        }
+                    });
+
+                    // 3. Keep-alive heartbeat
+                    const heartbeat = setInterval(() => {
+                        try {
+                            controller.enqueue(encoder.encode(': heartbeat\n\n'));
+                        } catch (e) {
+                            console.error('SSE heartbeat enqueue error:', e);
+                        }
+                    }, 15000);
+
+                    req.signal.addEventListener('abort', () => {
+                        clearInterval(heartbeat);
+                        subRedis.unsubscribe(channel);
+                        subRedis.quit();
+                        try {
+                            controller.close();
+                        } catch (e) {
+                            console.error('SSE stream close error:', e);
+                        }
+                    });
+                } catch (startError) {
+                    console.error('SSE start stream error:', startError);
+                    controller.error(startError);
                 }
-            });
+            },
+        });
 
-            // 3. Keep-alive heartbeat
-            const heartbeat = setInterval(() => {
-                controller.enqueue(encoder.encode(': heartbeat\n\n'));
-            }, 15000);
-
-            req.signal.addEventListener('abort', () => {
-                clearInterval(heartbeat);
-                subRedis.unsubscribe(channel);
-                subRedis.quit();
-                controller.close();
-            });
-        },
-    });
-
-    return new Response(stream, {
-        headers: {
-            'Content-Type': 'text/event-stream',
-            'Cache-Control': 'no-cache, no-transform',
-            'Connection': 'keep-alive',
-        },
-    });
+        return new Response(stream, {
+            headers: {
+                'Content-Type': 'text/event-stream',
+                'Cache-Control': 'no-cache, no-transform',
+                'Connection': 'keep-alive',
+            },
+        });
+    } catch (globalError) {
+        console.error('SSE Critical Error:', globalError);
+        return new Response(JSON.stringify({ error: 'Internal Server Error' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+    }
 }

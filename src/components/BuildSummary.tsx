@@ -4,7 +4,6 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import {
     Rocket,
-    CheckCircle2,
     ShieldCheck,
     Globe,
     Zap,
@@ -30,7 +29,7 @@ export const BuildSummary: React.FC<BuildSummaryProps> = ({ data, onViewProject 
 
     const stats = [
         { label: 'Build Time', value: `${(data.durationMs ? (data.durationMs / 1000).toFixed(1) : '45.2')}s`, icon: <Clock size={12} /> },
-        { label: 'AI Tokens', value: (data.tokensUsed || 12450).toLocaleString(), icon: <Cpu size={12} /> },
+        { label: 'AI Tokens', value: (data.tokensUsed || 12450).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), icon: <Cpu size={12} /> },
         { label: 'ID', value: data.executionId.split('-')[0], icon: <Terminal size={12} /> },
     ];
 

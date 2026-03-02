@@ -1,22 +1,19 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { ProjectGenerationSchema } from '@/lib/schemas';
 import logger from '@/lib/logger';
-import { generationQueue } from '@/lib/queue';
+import { freeQueue } from '@/lib/queue';
 import { DistributedExecutionContext as ExecutionContext } from '@/lib/execution-context';
 import { getCorrelationId } from '@/lib/tracing';
 import { CostGovernanceService, DEFAULT_GOVERNANCE_CONFIG } from '@/lib/governance';
+import { RateLimiter } from '@/lib/rate-limiter';
+import { withObservability } from '@/lib/api-wrapper';
 
-export async function POST(req: Request) {
+async function handler(req: NextRequest) {
     const supabase = createRouteHandlerClient({ cookies });
 
     try {
-        // Initialize Distributed Execution Context Early for Audit Logging
-        const context = new ExecutionContext();
-        const executionId = context.getExecutionId();
-        const correlationId = getCorrelationId();
-
         // --- 1. Authentication ---
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
@@ -34,7 +31,13 @@ export async function POST(req: Request) {
         }
 
         const { projectId, prompt } = validation.data;
+        const passedExecutionId = body.executionId; // Accept pre-generated ID from client for strict SSE sync
         const userId = session.user.id;
+
+        // Initialize Distributed Execution Context
+        const context = new ExecutionContext(passedExecutionId);
+        const executionId = context.getExecutionId();
+        const correlationId = getCorrelationId();
 
         // --- 2. Stripe Subscription & Role Verification ---
         let { data: profile, error: profileError } = await supabase
@@ -73,9 +76,24 @@ export async function POST(req: Request) {
             logger.info({ userId }, 'Development Mode Bypass Active');
         }
 
-        if (!isDev && !isOwner && profile.membership !== 'pro') {
-            logger.warn({ userId }, 'User attempted generation without PRO membership');
-            return NextResponse.json({ error: 'Active PRO subscription required for multi-agent generation' }, { status: 403 });
+        // TEMPORARY BYPASS: Allow testing the generation engine without a Pro subscription.
+        // if (!isDev && !isOwner && profile.membership !== 'pro') {
+        //     logger.warn({ userId }, 'User attempted generation without PRO membership');
+        //     return NextResponse.json({ error: 'Active PRO subscription required for multi-agent generation' }, { status: 403 });
+        // }
+
+        // --- 2b. Private Beta: 50 User Limit ---
+        const { count: betaCount } = await supabase
+            .from('user_profiles')
+            .select('id', { count: 'exact', head: true })
+            .eq('is_beta_user', true);
+
+        const currentBetaUsers = betaCount || 0;
+        if (!isOwner && currentBetaUsers >= 50) {
+            return NextResponse.json({
+                error: 'Private Beta is Full',
+                details: 'We have reached our 50-user limit for the private beta. Please join the waitlist.'
+            }, { status: 403 });
         }
 
         const govConfig = {
@@ -92,30 +110,51 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Service temporarily unavailable due to maintenance.' }, { status: 503 });
         }
 
-        // --- 4. Cost Governance: Daily Execution Limits ---
-        const { allowed: executionAllowed, currentCount } = await CostGovernanceService.checkAndIncrementExecutionLimit(userId, govConfig);
+        // --- 4. Cost Governance: Daily Execution Limits (Tiered) ---
+        const { allowed: executionAllowed } = await CostGovernanceService.checkAndIncrementExecutionLimit(userId);
         if (!executionAllowed) {
-            return NextResponse.json({ error: 'Daily generation limit exceeded.' }, { status: 429 });
+            return NextResponse.json({
+                error: 'Daily limit reached. Upgrade to continue.',
+                details: 'You have used all 3 builds for today. Pro users get 50 builds/day.',
+                limitReached: true
+            }, { status: 403 });
         }
 
-        // --- 5. Cost Governance: Monthly Token Limits ---
-        const { allowed: tokensAllowed, usedTokens } = await CostGovernanceService.checkTokenLimit(userId, govConfig);
+        // --- 5. Distributed Rate Limiting: Hourly Burst Control ---
+        const rateLimit = await RateLimiter.checkBuildLimit(userId, profile.membership === 'pro');
+        if (!rateLimit.allowed) {
+            return NextResponse.json({
+                error: 'Too many build requests. Please try again later.',
+                retryAfter: rateLimit.retryAfter
+            }, {
+                status: 429,
+                headers: { 'Retry-After': (rateLimit.retryAfter || 60).toString() }
+            });
+        }
+
+        // --- 6. Cost Governance: Monthly Token Limits ---
+        const { allowed: tokensAllowed } = await CostGovernanceService.checkTokenLimit(userId, govConfig);
         if (!tokensAllowed) {
             await CostGovernanceService.refundExecution(userId); // Give them their daily ticket back
             return NextResponse.json({ error: 'Monthly AI token budget exceeded.' }, { status: 429 });
         }
 
-        logger.info({ userId, currentCount, usedTokens, isOwner }, 'Cost governance checks passed.');
+        logger.info({ userId, currentCount: 0, usedTokens: 0, isOwner }, 'Cost governance checks passed.');
 
-        await context.init(userId, projectId, prompt, correlationId);
+        // Update Retention Metrics (First/Last Build Timestamps)
+        const { supabaseAdmin } = await import('@/lib/supabaseAdmin');
+        await supabaseAdmin.rpc('update_user_retention_timestamps', { user_id_param: userId });
 
-        // 3. Add to BullMQ with idempotency (using projectId as jobId prefix or key)
-        // BullMQ natively supports unique job IDs to prevent duplicates
+        await context.init(userId, projectId, prompt, correlationId, profile.membership || 'free');
+
+        // 3. Add to BullMQ with tiered queue based on plan
         const jobId = `gen:${projectId}:${executionId}`;
+        const queueToUse = freeQueue;
+        const priority = profile.membership === 'pro' || isOwner ? 1 : 10; // Pro = High Priority, Free = Low
 
-        logger.info({ userId, projectId, executionId, jobId }, 'Queuing project generation job');
+        logger.info({ userId, projectId, executionId, jobId, priority, queueType: profile.membership }, 'Queuing project generation job to tiered queue');
 
-        await generationQueue.add(
+        await queueToUse.add(
             'generate-project',
             {
                 prompt,
@@ -124,7 +163,8 @@ export async function POST(req: Request) {
                 executionId
             },
             {
-                jobId, // idempotent: same jobId cannot be added while active
+                jobId,
+                priority,
                 removeOnComplete: true
             }
         );
@@ -158,3 +198,5 @@ export async function POST(req: Request) {
         }, { status: 500 });
     }
 }
+
+export const POST = withObservability(handler);

@@ -9,10 +9,10 @@ import MobileMenu from '@/components/MobileMenu';
 import TaskInput, { TaskInputHandle } from '@/components/TaskInput';
 import ChatList from '@/components/ChatList';
 import TopNav from '@/components/TopNav';
+import WelcomeModal from '@/components/WelcomeModal';
 import { chatService } from '@/lib/chat-service';
 import { projectService } from '@/lib/project-service';
 import { Message } from '@/types/chat';
-import { motion } from 'framer-motion';
 
 export default function Dashboard() {
     const [messages, setMessages] = useState<Message[]>([]);
@@ -143,6 +143,7 @@ export default function Dashboard() {
 
     return (
         <div className="flex h-screen bg-background text-foreground font-sans overflow-hidden selection:bg-primary/30">
+            <WelcomeModal />
             <Sidebar />
             <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
 

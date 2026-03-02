@@ -53,21 +53,16 @@ describe('Redlock TTL Expiry and Auto-Extension Audit', () => {
         const lock = await redlock.acquire([resource], 3000);
 
         // SIMULATE NODE.JS EVENT LOOP STALL (e.g., Heavy synchronous JSON payload parsing)
-        // We do a busy wait to block the main thread for 4000ms.
-        // During this time, standard async extend/heartbeat timers CANNOT fire.
         const start = Date.now();
         while (Date.now() - start < 4000) {
-            // Blocking the CPU explicitly! Node.js event loop is completely frozen here.
+            // Blocking the CPU explicitly!
         }
 
         // By the time the event loop unfreezes, the 3000ms TTL has naturally expired in Redis.
-
-        // Worker 2 (Orchestrator Retry) comes in and successfully "steals" the lock because it's genuinely expired.
         const lock2 = await redlock.acquire([resource], 5000);
         expect(lock2).toBeDefined();
 
         // Worker 1 finally unfreezes from its GC stall and tries to release or update state thinking it still owns it.
-        // It SHOULD throw an error because it lost the lock, preventing unsafe overrides!
         let releaseFailedSafely = false;
         try {
             await lock.release();
@@ -78,9 +73,8 @@ describe('Redlock TTL Expiry and Auto-Extension Audit', () => {
             }
         }
 
-        expect(releaseFailedSafely).toBe(true); // Worker 1 was safely blocked from catastrophic data corruption.
-
-        await lock2.release(); // Clean up
+        expect(releaseFailedSafely).toBe(true);
+        await lock2.release();
     }, 10000);
 
 });

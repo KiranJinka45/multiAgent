@@ -28,8 +28,9 @@ async function validateIdempotency() {
         } else {
             console.warn('⚠️ Idempotency Warning: Second submission returned new executionId.');
         }
-    } catch (err: any) {
-        console.error('❌ Idempotency Test Failed:', err.message);
+    } catch (err) {
+        const msg = axios.isAxiosError(err) ? err.message : String(err);
+        console.error('❌ Idempotency Test Failed:', msg);
     }
 }
 

@@ -3,6 +3,8 @@
 import React from 'react';
 import { useStore } from '@/store/useStore';
 import { CheckCircle2, Clock, XCircle, PlayCircle } from 'lucide-react';
+import { formatTime } from '@/lib/date';
+import { AgentResult } from '@/lib/execution-context';
 
 export const ExecutionTimeline = () => {
     const { executionContext, logs } = useStore();
@@ -22,7 +24,7 @@ export const ExecutionTimeline = () => {
         <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Agent Status Cards */}
-                {agents.map((agent) => (
+                {(agents as AgentResult[]).map((agent) => (
                     <div key={agent.agentName} className="p-4 rounded-xl border border-gray-700/50 bg-gray-800/40 backdrop-blur-md">
                         <div className="flex items-center justify-between mb-2">
                             <span className="font-semibold text-gray-200">{agent.agentName}</span>
@@ -36,7 +38,7 @@ export const ExecutionTimeline = () => {
                         </div>
                         {agent.endTime && (
                             <div className="text-[10px] text-gray-500 mt-1">
-                                Finished at {new Date(agent.endTime).toLocaleTimeString()}
+                                Finished at {formatTime(agent.endTime)}
                             </div>
                         )}
                     </div>

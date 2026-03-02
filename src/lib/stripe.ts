@@ -5,54 +5,24 @@ if (!process.env.STRIPE_SECRET_KEY) {
 }
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: '2024-06-20', // Using a stable version
+    apiVersion: '2026-02-25.clover', // Use latest stable or compatible version
     appInfo: {
-        name: 'MultiAgent',
-        version: '0.1.0',
+        name: 'MultiAgent Platform',
+        version: '1.0.0',
     },
 });
 
-export const stripeService = {
-    async createCheckoutSession(userId: string, email: string) {
-        try {
-            const session = await stripe.checkout.sessions.create({
-                payment_method_types: ['card'],
-                line_items: [
-                    {
-                        price_data: {
-                            currency: 'inr',
-                            product_data: {
-                                name: 'MultiAgent Pro Build',
-                                description: 'High-speed autonomous project engineering',
-                            },
-                            unit_amount: 50000, // ₹500.00
-                        },
-                        quantity: 1,
-                    },
-                ],
-                mode: 'payment',
-                success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
-                cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing`,
-                customer_email: email,
-                client_reference_id: userId,
-                metadata: {
-                    userId,
-                },
-            });
-            return session;
-        } catch (error) {
-            console.error('[Stripe Service] Error creating checkout session:', error);
-            throw error;
-        }
+export const STRIPE_CONFIG = {
+    plans: {
+        pro: process.env.STRIPE_PRO_PLAN_ID || (process.env.NODE_ENV === 'production' ? '' : 'price_pro_default'),
+        scale: process.env.STRIPE_SCALE_PLAN_ID || (process.env.NODE_ENV === 'production' ? '' : 'price_scale_default'),
     },
-
-    async verifySession(sessionId: string) {
-        try {
-            const session = await stripe.checkout.sessions.retrieve(sessionId);
-            return session.payment_status === 'paid';
-        } catch (error) {
-            console.error('[Stripe Service] Error verifying session:', error);
-            return false;
-        }
-    }
+    webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
 };
+
+export async function createPortalSession(customerId: string, returnUrl: string) {
+    return await stripe.billingPortal.sessions.create({
+        customer: customerId,
+        return_url: returnUrl,
+    });
+}

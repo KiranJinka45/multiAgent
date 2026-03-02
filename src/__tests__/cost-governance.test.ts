@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import redis from '../lib/redis';
-import { CostGovernanceService, DEFAULT_GOVERNANCE_CONFIG } from '../lib/governance';
+import { CostGovernanceService } from '../lib/governance';
 import { v4 as uuidv4 } from 'uuid';
 
 describe('Cost Governance Layer Integration Tests', () => {
@@ -34,22 +34,22 @@ describe('Cost Governance Layer Integration Tests', () => {
         const limits = { maxDailyGenerations: 3, maxMonthlyTokens: 1000 };
 
         // 1st request
-        let res = await CostGovernanceService.checkAndIncrementExecutionLimit(userId, limits);
+        let res = await CostGovernanceService.checkAndIncrementExecutionLimit(userId);
         expect(res.allowed).toBe(true);
         expect(res.currentCount).toBe(1);
 
         // 2nd request
-        res = await CostGovernanceService.checkAndIncrementExecutionLimit(userId, limits);
+        res = await CostGovernanceService.checkAndIncrementExecutionLimit(userId);
         expect(res.allowed).toBe(true);
         expect(res.currentCount).toBe(2);
 
         // 3rd request (Final allowed)
-        res = await CostGovernanceService.checkAndIncrementExecutionLimit(userId, limits);
+        res = await CostGovernanceService.checkAndIncrementExecutionLimit(userId);
         expect(res.allowed).toBe(true);
         expect(res.currentCount).toBe(3);
 
         // 4th request (Should be BLOCKED)
-        res = await CostGovernanceService.checkAndIncrementExecutionLimit(userId, limits);
+        res = await CostGovernanceService.checkAndIncrementExecutionLimit(userId);
         expect(res.allowed).toBe(false);
         expect(res.currentCount).toBe(3); // Count stops at the limit exactly
 
@@ -57,7 +57,7 @@ describe('Cost Governance Layer Integration Tests', () => {
         await CostGovernanceService.refundExecution(userId);
 
         // 4th request retry (Should be ALLOWED again because we refunded)
-        res = await CostGovernanceService.checkAndIncrementExecutionLimit(userId, limits);
+        res = await CostGovernanceService.checkAndIncrementExecutionLimit(userId);
         expect(res.allowed).toBe(true);
         expect(res.currentCount).toBe(3);
     });
@@ -72,21 +72,21 @@ describe('Cost Governance Layer Integration Tests', () => {
         expect(tokenCheck.usedTokens).toBe(0);
 
         // Orchestrator simulates successful run and records 40,000 tokens
-        await CostGovernanceService.recordTokenUsage(userId, 40000);
+        await CostGovernanceService.recordTokenUsage(userId, 40000, 'test-exec-id');
 
         tokenCheck = await CostGovernanceService.checkTokenLimit(userId, limits);
         expect(tokenCheck.allowed).toBe(true);
         expect(tokenCheck.usedTokens).toBe(40000);
 
         // Orchestrator records another 50,000 tokens (Total: 90,000)
-        await CostGovernanceService.recordTokenUsage(userId, 50000);
+        await CostGovernanceService.recordTokenUsage(userId, 50000, 'test-exec-id');
 
         tokenCheck = await CostGovernanceService.checkTokenLimit(userId, limits);
         expect(tokenCheck.allowed).toBe(true);
         expect(tokenCheck.usedTokens).toBe(90000);
 
         // Orchestrator records 15,000 tokens (Total: 105,000) - Over Budget!
-        await CostGovernanceService.recordTokenUsage(userId, 15000);
+        await CostGovernanceService.recordTokenUsage(userId, 15000, 'test-exec-id');
 
         // User tries a new job, should be blocked!
         tokenCheck = await CostGovernanceService.checkTokenLimit(userId, limits);

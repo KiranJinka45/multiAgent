@@ -1,8 +1,8 @@
 import { Groq } from 'groq-sdk';
 import logger from '../lib/logger';
+import { AgentContext } from '../types/agent-context';
 import { breakers } from '../lib/circuit-breaker';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface AgentResponse<T = any> {
     success: boolean;
     data: T;
@@ -10,6 +10,8 @@ export interface AgentResponse<T = any> {
     error?: string;
     confidence?: number;
     tokens?: number;
+    promptTokens?: number;
+    completionTokens?: number;
 }
 
 export abstract class BaseAgent {
@@ -22,7 +24,6 @@ export abstract class BaseAgent {
         this.groq = new Groq({ apiKey });
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     protected log(message: string, meta: Record<string, any> = {}) {
         const timestamp = new Date().toISOString();
         this.logs.push(`[${this.getName()}] [${timestamp}] ${message}`);
@@ -30,10 +31,10 @@ export abstract class BaseAgent {
     }
 
     abstract getName(): string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    abstract execute(input: any, context?: any): Promise<AgentResponse>;
 
-    protected async promptLLM(system: string, user: string, model: string = 'llama-3.3-70b-versatile') {
+    abstract execute(input: any, context: AgentContext, signal?: AbortSignal): Promise<AgentResponse>;
+
+    protected async promptLLM(system: string, user: string, model: string = 'llama-3.3-70b-versatile', signal?: AbortSignal) {
         this.log(`Invoking LLM (${model})`);
         try {
             return await breakers.llm.execute(async () => {
@@ -44,7 +45,7 @@ export abstract class BaseAgent {
                     ],
                     model,
                     response_format: { type: 'json_object' }
-                });
+                }, { signal });
 
                 const content = response.choices[0].message.content;
                 const tokensUsed = response.usage?.total_tokens || 0;
@@ -53,7 +54,9 @@ export abstract class BaseAgent {
 
                 return {
                     result: JSON.parse(content),
-                    tokens: tokensUsed
+                    tokens: tokensUsed,
+                    promptTokens: response.usage?.prompt_tokens || 0,
+                    completionTokens: response.usage?.completion_tokens || 0
                 };
             });
         } catch (error) {

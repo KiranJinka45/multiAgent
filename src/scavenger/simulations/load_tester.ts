@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { v4 as uuidv4 } from 'uuid';
 
 /**
  * MultiAgent Load Tester
@@ -20,8 +19,14 @@ async function submitJob() {
         const duration = Date.now() - start;
         console.log(`✅ Job Submitted: ${response.data.executionId} (${duration}ms)`);
         return true;
-    } catch (err: any) {
-        console.error(`❌ Submission Failed: ${err.response?.data?.error || err.message}`);
+    } catch (err) {
+        let errMsg = 'Unknown error';
+        if (axios.isAxiosError(err)) {
+            errMsg = err.response?.data?.error || err.message;
+        } else if (err instanceof Error) {
+            errMsg = err.message;
+        }
+        console.error(`❌ Submission Failed: ${errMsg}`);
         return false;
     }
 }

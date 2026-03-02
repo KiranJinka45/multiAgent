@@ -9,7 +9,12 @@ import logger from './lib/logger';
 
 export async function reconcileBilling() {
     logger.info('🚀 Starting Governance Reconciliation...');
-    const result: any = {
+    const result: {
+        timestamp: string;
+        checks: number;
+        discrepancies: number;
+        errors: string[];
+    } = {
         timestamp: new Date().toISOString(),
         checks: 0,
         discrepancies: 0,

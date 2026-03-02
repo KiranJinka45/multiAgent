@@ -31,7 +31,7 @@ export default function AionGeneratorView({ prompt, onComplete }: AionGeneratorP
                 const response = await fetch('http://localhost:8000/api/generate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt, project_name: 'aion-app-' + Math.floor(Math.random() * 1000) }),
+                    body: JSON.stringify({ prompt, project_name: 'aion-app-' + Date.now() }),
                 });
 
                 if (!response.ok) throw new Error('Failed to start generation');

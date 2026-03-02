@@ -25,7 +25,7 @@ export async function POST(req: Request) {
 
         switch (event.type) {
             case 'checkout.session.completed':
-                const session = event.data.object as any;
+                const session = event.data.object as { id: string, client_reference_id: string | null };
                 const userId = session.client_reference_id;
 
                 if (userId) {

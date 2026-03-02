@@ -1,19 +1,18 @@
 import { create } from 'zustand';
 import { ExecutionContextType } from '@/lib/execution-context';
+import { ProjectFile } from '@/types/project';
 
 interface AppState {
     currentProjectId: string | null;
     isGenerating: boolean;
     executionContext: ExecutionContextType | null;
     logs: string[];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    generatedFiles: any[];
+    generatedFiles: ProjectFile[];
 
     // Actions
     setProject: (projectId: string) => void;
     startGeneration: () => void;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    finishGeneration: (context: ExecutionContextType, files: any[]) => void;
+    finishGeneration: (context: ExecutionContextType, files: ProjectFile[]) => void;
     failGeneration: (error: string) => void;
     addLog: (log: string) => void;
     reset: () => void;
@@ -33,17 +32,17 @@ export const useStore = create<AppState>((set) => ({
         logs: ['[System] Initializing generation engine...']
     }),
 
-    finishGeneration: (context, files) => set({
+    finishGeneration: (context, files) => set((state) => ({
         isGenerating: false,
         executionContext: context,
         generatedFiles: files,
-        logs: (prev) => [...prev, '[System] Build completed successfully.']
-    }),
+        logs: [...state.logs, '[System] Build completed successfully.']
+    })),
 
-    failGeneration: (error) => set({
+    failGeneration: (error) => set((state) => ({
         isGenerating: false,
-        logs: (prev) => [...prev, `[Error] ${error}`]
-    }),
+        logs: [...state.logs, `[Error] ${error}`]
+    })),
 
     addLog: (log) => set((state) => ({ logs: [...state.logs, log] })),
 

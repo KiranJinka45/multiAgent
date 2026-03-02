@@ -1,0 +1,9 @@
+﻿src/agents/orchestrator.ts(85,96): error TS2339: Property 'schema' does not exist on type 'unknown'.
+src/agents/orchestrator.ts(90,96): error TS2339: Property 'schema' does not exist on type 'unknown'.
+src/agents/orchestrator.ts(102,81): error TS2339: Property 'files' does not exist on type 'unknown'.
+src/agents/orchestrator.ts(103,82): error TS2339: Property 'files' does not exist on type 'unknown'.
+src/agents/orchestrator.ts(118,84): error TS2339: Property 'files' does not exist on type 'unknown'.
+src/agents/orchestrator.ts(131,80): error TS2339: Property 'files' does not exist on type 'unknown'.
+src/agents/orchestrator.ts(211,52): error TS2554: Expected 2 arguments, but got 1.
+src/lib/opentelemetry.ts(13,19): error TS2693: 'Resource' only refers to a type, but is being used as a value here.
+src/lib/stripe.ts(8,5): error TS2322: Type '"2024-06-20"' is not assignable to type '"2026-02-25.clover"'.

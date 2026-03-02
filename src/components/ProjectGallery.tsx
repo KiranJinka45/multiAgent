@@ -1,12 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { FolderPlus, Plus, Search, MoreHorizontal, Calendar, Palette, Layout, Code, Terminal, Sparkles } from 'lucide-react';
+import { FolderPlus, Plus, Search, Calendar, Palette, Layout, Code, Terminal, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { projectService } from '@/lib/project-service';
 import { Project } from '@/types/project';
 import { toast } from 'sonner';
+import { formatDate } from '@/lib/date';
 
 interface ProjectGalleryProps {
     initialProjects: Project[];
@@ -35,6 +36,33 @@ export default function ProjectGallery({ initialProjects }: ProjectGalleryProps)
             router.push(`/projects/${project.id}`);
         } else {
             toast.error("Failed to create project");
+        }
+    };
+
+    const handleDelete = async (e: React.MouseEvent, id: string) => {
+        e.stopPropagation();
+        if (window.confirm('Are you sure you want to delete this project?')) {
+            const success = await projectService.deleteProject(id);
+            if (success) {
+                setProjects(prev => prev.filter(p => p.id !== id));
+                toast.success('Project deleted');
+            } else {
+                toast.error('Failed to delete project');
+            }
+        }
+    };
+
+    const handleRename = async (e: React.MouseEvent, id: string, currentName: string) => {
+        e.stopPropagation();
+        const newName = window.prompt('Enter new project name:', currentName);
+        if (newName && newName !== currentName) {
+            const { data } = await projectService.updateProject(id, { name: newName });
+            if (data) {
+                setProjects(prev => prev.map(p => p.id === id ? { ...p, name: newName } : p));
+                toast.success('Project renamed');
+            } else {
+                toast.error('Failed to rename project');
+            }
         }
     };
 
@@ -108,8 +136,17 @@ export default function ProjectGallery({ initialProjects }: ProjectGalleryProps)
                                 {getProjectIcon(project.project_type, project.name)}
                             </div>
                             <div className="flex items-center gap-1 opacity-10 group-hover:opacity-100 transition-opacity">
-                                <button className="p-2 hover:bg-accent rounded-xl text-muted-foreground transition-colors">
-                                    <MoreHorizontal size={18} />
+                                <button
+                                    onClick={(e) => handleRename(e, project.id, project.name)}
+                                    className="px-2 py-1 hover:bg-accent rounded-xl text-xs font-bold uppercase text-muted-foreground transition-colors"
+                                >
+                                    Rename
+                                </button>
+                                <button
+                                    onClick={(e) => handleDelete(e, project.id)}
+                                    className="px-2 py-1 hover:bg-red-500/20 rounded-xl text-xs font-bold uppercase text-red-500 transition-colors"
+                                >
+                                    Delete
                                 </button>
                             </div>
                         </div>
@@ -129,7 +166,7 @@ export default function ProjectGallery({ initialProjects }: ProjectGalleryProps)
                             </div>
                             <div className="flex items-center gap-1.5 ml-auto">
                                 <Calendar size={12} className="opacity-50" />
-                                <span>{new Date(project.created_at).toLocaleDateString()}</span>
+                                <span>{formatDate(project.created_at)}</span>
                             </div>
                         </div>
                     </motion.div>

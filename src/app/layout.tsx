@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 import { Toaster } from 'sonner';
 import { SidebarProvider } from '@/context/SidebarContext';
 import CommandPalette from '@/components/CommandPalette';
+import FeedbackButton from '@/components/FeedbackButton';
 
 export default function RootLayout({
   children,
@@ -32,6 +33,7 @@ export default function RootLayout({
           >
             {children}
             <CommandPalette />
+            <FeedbackButton />
             <Toaster position="top-center" richColors theme="dark" />
           </ThemeProvider>
         </SidebarProvider>

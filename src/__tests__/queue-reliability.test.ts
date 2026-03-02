@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
-import { Queue, Worker, QueueEvents, Job } from 'bullmq';
+import { Queue, Worker, QueueEvents } from 'bullmq';
 import redis from '../lib/redis';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -46,7 +46,7 @@ describe('BullMQ Queue Reliability Integration Tests', () => {
         const jobId = `idempotent-test-${uuidv4()}`;
 
         let processCount = 0;
-        const worker = new Worker(TEST_QUEUE_NAME, async (job) => {
+        const worker = new Worker(TEST_QUEUE_NAME, async () => {
             processCount++;
             return 'done';
         }, { connection: redis });
@@ -72,7 +72,7 @@ describe('BullMQ Queue Reliability Integration Tests', () => {
         const numJobs = 200;
         let processed = 0;
 
-        const worker = new Worker(TEST_QUEUE_NAME, async (job) => {
+        const worker = new Worker(TEST_QUEUE_NAME, async () => {
             processed++;
             return 'done';
         }, { connection: redis, concurrency: 20 });
@@ -101,7 +101,7 @@ describe('BullMQ Queue Reliability Integration Tests', () => {
     it('should validate exponential backoff and dead-letter queue (DLQ) routing', async () => {
         let attemptsObserved = 0;
 
-        const worker = new Worker(TEST_QUEUE_NAME, async (job) => {
+        const worker = new Worker(TEST_QUEUE_NAME, async () => {
             attemptsObserved++;
             throw new Error('Simulated persistent failure');
         }, { connection: redis });
@@ -111,8 +111,8 @@ describe('BullMQ Queue Reliability Integration Tests', () => {
 
         // Wait for it to fail its final attempt (3 attempts total based on defaultOptions)
         await new Promise<void>((resolve) => {
-            queueEvents.on('failed', ({ jobId }) => {
-                if (jobId === job.id) resolve();
+            queueEvents.on('failed', ({ jobId: _jobId }) => {
+                if (_jobId === job.id) resolve();
             });
         });
 
@@ -138,14 +138,14 @@ describe('BullMQ Queue Reliability Integration Tests', () => {
         let jobStarted = false;
 
         // Worker 1: Starts the job, then "crashes" (closes abruptly)
-        const worker1 = new Worker('stall-test-queue', async (job) => {
+        const worker1 = new Worker('stall-test-queue', async () => {
             jobStarted = true;
             // Simulate crash by hanging and closing the worker from the outside
             await new Promise(resolve => setTimeout(resolve, 10000));
             return 'done';
-        }, { connection: redis, lockDuration: 1000, stallInterval: 1000 }); // Fast lock expiry
+        }, { connection: redis, lockDuration: 1000, stalledInterval: 1000 }); // Fast lock expiry
 
-        const job = await fastStallQueue.add('stall-test', { crash: true });
+        await fastStallQueue.add('stall-test', { crash: true });
 
         // Wait for worker 1 to pick it up
         await new Promise<void>((resolve) => {
@@ -162,10 +162,10 @@ describe('BullMQ Queue Reliability Integration Tests', () => {
 
         let recovered = false;
         // Worker 2: The recovery worker that picks up the stalled job
-        const worker2 = new Worker('stall-test-queue', async (job) => {
+        const worker2 = new Worker('stall-test-queue', async () => {
             recovered = true;
             return 'recovered';
-        }, { connection: redis, stallInterval: 1000 });
+        }, { connection: redis, stalledInterval: 1000 });
         workers.push(worker2);
 
         // Wait for stall checker to detect the dead lock and move it back to wait, where worker 2 picks it up

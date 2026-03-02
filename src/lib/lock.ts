@@ -27,10 +27,13 @@ const redlock = new Redlock(
     }
 );
 
-redlock.on('error', (error: any) => {
+redlock.on('error', (error: unknown) => {
     // Ignore cases where a resource is already locked.
-    if (error && (error.name === 'ExecutionError' || error.message?.includes('locked'))) {
-        return;
+    if (error && typeof error === 'object' && ('name' in error || 'message' in error)) {
+        const err = error as { name?: string; message?: string };
+        if (err.name === 'ExecutionError' || err.message?.includes('locked')) {
+            return;
+        }
     }
     logger.error({ error }, 'Redlock error');
 });

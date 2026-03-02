@@ -25,8 +25,8 @@ describe('Prometheus Metrics Validation', () => {
         const orchestrator = new Orchestrator();
 
         // 1. Mock Agents to be super fast
-        vi.spyOn(orchestrator['dbAgent'], 'execute').mockResolvedValue({ success: true, data: { schema: 'schema' } });
-        vi.spyOn(orchestrator['valAgent'], 'execute').mockResolvedValue({ success: true, data: { confidenceScore: 0.95 } });
+        vi.spyOn(orchestrator['dbAgent'], 'execute').mockResolvedValue({ success: true, data: { schema: 'schema' }, logs: [], error: undefined });
+        vi.spyOn(orchestrator['valAgent'], 'execute').mockResolvedValue({ success: true, data: { confidenceScore: 0.95 }, logs: [], error: undefined });
 
         let runCount = 0;
         vi.spyOn(orchestrator['beAgent'], 'execute').mockImplementation(async () => {
@@ -35,12 +35,12 @@ describe('Prometheus Metrics Validation', () => {
             if (runCount <= 5) {
                 throw new Error('SIMULATED_METRIC_FAILURE : Backend crashed');
             }
-            return { success: true, data: { files: [] } };
+            return { success: true, data: { files: [] }, logs: [], error: undefined };
         });
 
-        vi.spyOn(orchestrator['feAgent'], 'execute').mockResolvedValue({ success: true, data: { files: [] } });
-        vi.spyOn(orchestrator['dpAgent'], 'execute').mockResolvedValue({ success: true, data: { files: [] } });
-        vi.spyOn(orchestrator['teAgent'], 'execute').mockResolvedValue({ success: true, data: { files: [] } });
+        vi.spyOn(orchestrator['feAgent'], 'execute').mockResolvedValue({ success: true, data: { files: [] }, logs: [], error: undefined });
+        vi.spyOn(orchestrator['dpAgent'], 'execute').mockResolvedValue({ success: true, data: { files: [] }, logs: [], error: undefined });
+        vi.spyOn(orchestrator['teAgent'], 'execute').mockResolvedValue({ success: true, data: { files: [] }, logs: [], error: undefined });
 
         // 2. Execute 15 absolute runs (5 failed due to Backend, 10 successful after Backend stops throwing)
         const runs = [];

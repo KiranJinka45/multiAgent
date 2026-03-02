@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React from 'react';
+import { motion } from 'framer-motion';
 import {
     CheckCircle2,
     Loader2,
@@ -116,7 +116,7 @@ export const BuildTimeline: React.FC<BuildTimelineProps> = ({ data, onSync }) =>
 
                 {data.message && (
                     <p className="text-[10px] text-gray-400 italic text-center animate-pulse leading-none">
-                        "{data.message}"
+                        &quot;{data.message}&quot;
                     </p>
                 )}
             </div>

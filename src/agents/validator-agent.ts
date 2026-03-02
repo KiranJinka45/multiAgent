@@ -1,11 +1,12 @@
 import { BaseAgent, AgentResponse } from './base-agent';
+import { AgentContext } from '../types/agent-context';
 import logger from '../lib/logger';
 
 export class ValidatorAgent extends BaseAgent {
     getName() { return 'ValidatorAgent'; }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
-    async execute(input: { agentName: string, output: any, spec: string }, _context?: any): Promise<AgentResponse> {
+    async execute(input: { agentName: string, output: unknown, spec: string }, _context: AgentContext, signal?: AbortSignal): Promise<AgentResponse> {
+        void _context;
         this.log(`Validating output for ${input.agentName}...`);
 
         try {
@@ -17,7 +18,7 @@ export class ValidatorAgent extends BaseAgent {
 
             const userPrompt = `Agent: ${input.agentName}\nSpec: ${input.spec}\nOutput: ${JSON.stringify(input.output)}`;
 
-            const { result, tokens } = await this.promptLLM(system, userPrompt, 'llama-3.1-8b-instant');
+            const { result, tokens } = await this.promptLLM(system, userPrompt, 'llama-3.1-8b-instant', signal);
 
             logger.info({
                 agentValidated: input.agentName,

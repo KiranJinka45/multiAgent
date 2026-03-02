@@ -9,9 +9,9 @@ import Sidebar from '@/components/Sidebar';
 import MobileMenu from '@/components/MobileMenu';
 import TopNav from '@/components/TopNav';
 import { toast } from 'sonner';
-import { chatService } from '@/lib/chat-service';
 import { Archive, RotateCcw } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { chatService } from '@/lib/chat-service';
+import { formatRelative } from '@/lib/date';
 import { User as SupabaseUser } from '@supabase/supabase-js';
 import { Chat } from '@/types/chat';
 
@@ -25,6 +25,11 @@ export default function SettingsPage() {
     const { theme, setTheme } = useTheme();
     const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
     const [archivedChats, setArchivedChats] = useState<Chat[]>([]);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     useEffect(() => {
         const getUser = async () => {
@@ -216,7 +221,7 @@ export default function SettingsPage() {
                                             <div>
                                                 <div className="font-medium text-foreground text-sm">{chat.title}</div>
                                                 <div className="text-xs text-muted-foreground mt-1">
-                                                    Archived {formatDistanceToNow(new Date(chat.updated_at), { addSuffix: true })}
+                                                    Archived {mounted ? formatRelative(chat.updated_at) : '...'}
                                                 </div>
                                             </div>
                                             <div className="flex gap-2">

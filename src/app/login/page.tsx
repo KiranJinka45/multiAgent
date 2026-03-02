@@ -1,37 +1,91 @@
-import { Suspense } from "react";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
-import { AuthForm } from "@/components/auth/AuthForm";
+'use client';
+
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Github } from 'lucide-react';
 
 export default function LoginPage() {
+    const supabase = createClientComponentClient();
+    const router = useRouter();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    const handleLogin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (!error) router.push('/projects');
+        else alert(error.message);
+    };
+
+    const handleSignUp = async () => {
+        const { error } = await supabase.auth.signUp({ email, password });
+        if (!error) alert("Check your email for confirmation link!");
+        else alert(error.message);
+    };
+
+    const handleGithubLogin = async () => {
+        await supabase.auth.signInWithOAuth({
+            provider: 'github',
+            options: {
+                scopes: 'repo', // Required to create and push to repositories
+                redirectTo: `${window.location.origin}/auth/callback`
+            }
+        });
+    };
+
     return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-[#050505] relative overflow-hidden">
-            {/* ... (background elements remain the same, but for brevity in replacement I will keep them if I can match larger block or just wrap the specific part) */}
-            {/* Background Elements */}
-            <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-[100px] animate-pulse" />
-            <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-[120px]" />
-
-            {/* Grid Pattern */}
-            <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
-
-            <div className="absolute top-8 left-8 z-50">
-                <Link
-                    href="/"
-                    className="flex items-center gap-2 text-neutral-400 hover:text-white transition-colors text-sm font-medium group"
-                >
-                    <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-                    Back to Home
-                </Link>
-            </div>
-
-            <main className="w-full px-4 relative z-10">
-                <div className="mb-8 text-center">
-                    <h2 className="text-xl font-semibold tracking-tight text-white/90">MultiAgent</h2>
+        <div className="min-h-screen bg-[#050505] text-white flex items-center justify-center p-8">
+            <div className="w-full max-w-sm space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+                <div className="text-center">
+                    <h1 className="text-3xl font-black uppercase tracking-tighter">Secure Access</h1>
+                    <p className="text-[10px] text-white/40 font-bold uppercase tracking-[0.3em] mt-2">DETERMINISTIC CI AUTH</p>
                 </div>
-                <Suspense fallback={<div>Loading...</div>}>
-                    <AuthForm />
-                </Suspense>
-            </main>
+
+                <form onSubmit={handleLogin} className="space-y-4">
+                    <input
+                        type="email"
+                        placeholder="Registry Email"
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all"
+                    />
+                    <input
+                        type="password"
+                        placeholder="Security Key"
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all"
+                    />
+                    <div className="flex gap-4">
+                        <button
+                            type="submit"
+                            className="w-1/2 py-4 bg-white text-black font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-white/90 transition-all shadow-xl"
+                        >
+                            Sign In
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleSignUp}
+                            className="w-1/2 py-4 bg-transparent border border-white/20 text-white font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-white/10 transition-all"
+                        >
+                            Sign Up
+                        </button>
+                    </div>
+                </form>
+
+                <div className="flex items-center gap-4 text-white/20">
+                    <div className="h-px bg-white/10 flex-1" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest">or authenticate via</span>
+                    <div className="h-px bg-white/10 flex-1" />
+                </div>
+
+                <button
+                    onClick={handleGithubLogin}
+                    className="w-full py-4 bg-[#24292e] hover:bg-[#2f363d] text-white flex items-center justify-center gap-3 font-black uppercase text-xs tracking-widest rounded-2xl transition-all shadow-xl"
+                >
+                    <Github size={18} />
+                    GitHub
+                </button>
+            </div>
         </div>
     );
 }

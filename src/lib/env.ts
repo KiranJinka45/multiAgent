@@ -9,10 +9,12 @@ const envSchema = z.object({
     NEXT_PUBLIC_SUPABASE_URL: z.string().url('Supabase URL is required'),
     NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1, 'Supabase Anon Key is required'),
     SUPABASE_SERVICE_ROLE_KEY: z.string().min(1, 'Supabase Service Role is required'),
-    STRIPE_SECRET_KEY: z.string().min(1, 'Stripe Secret Key is required'),
-    STRIPE_WEBHOOK_SECRET: z.string().min(1, 'Stripe Webhook Secret is required'),
+    STRIPE_SECRET_KEY: z.string().min(1, 'Stripe Secret Key is required').optional(),
+    STRIPE_WEBHOOK_SECRET: z.string().min(1, 'Stripe Webhook Secret is required').optional(),
     WORKER_CONCURRENCY: z.coerce.number().default(5),
     METRICS_TOKEN: z.string().min(1, 'Metrics Authorization Token is required').default('generate-a-secure-token-here'),
+    GITHUB_CLIENT_ID: z.string().min(1, 'GitHub Client ID is required for push integration').optional(),
+    GITHUB_CLIENT_SECRET: z.string().min(1, 'GitHub Client Secret is required for push integration').optional(),
 });
 
 type EnvVars = z.infer<typeof envSchema>;
@@ -23,9 +25,8 @@ try {
     _env = envSchema.parse(process.env);
 } catch (err) {
     if (err instanceof z.ZodError) {
-        const zodError = err as z.ZodError<any>;
         logger.fatal(
-            { errors: zodError.errors },
+            { issues: err.issues },
             'Environment validation failed. Missing or invalid required variables.'
         );
         process.exit(1);

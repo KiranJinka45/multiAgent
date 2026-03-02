@@ -112,5 +112,20 @@ export const projectService = {
             return false;
         }
         return true;
+    },
+
+    async verifyProjectOwnership(projectId: string, userId: string, supabaseServer?: SupabaseClient) {
+        const supabase = this.getSupabase(supabaseServer);
+        const { data, error } = await supabase
+            .from('projects')
+            .select('user_id')
+            .eq('id', projectId)
+            .single();
+
+        if (error || !data) {
+            return false;
+        }
+
+        return data.user_id === userId;
     }
 };

@@ -25,20 +25,20 @@ describe('Fault Tolerance - Orchestrator Crash Simulation & Resume', () => {
         const orchestrator = new Orchestrator();
 
         // 1. Mock Agents
-        const dbSpy = vi.spyOn(orchestrator['dbAgent'], 'execute').mockResolvedValue({ success: true, data: { schema: 'mocked db schema' } });
+        const dbSpy = vi.spyOn(orchestrator['dbAgent'], 'execute').mockResolvedValue({ success: true, data: { schema: 'mocked db schema' }, logs: [], error: undefined });
 
         let backendCrashing = true;
         const beSpy = vi.spyOn(orchestrator['beAgent'], 'execute').mockImplementation(async () => {
             if (backendCrashing) {
                 throw new Error('SIMULATED_FATAL_CRASH: Worker process died unexpectedly during BackendGeneration');
             }
-            return { success: true, data: { files: [] } };
+            return { success: true, data: { files: [] }, logs: [], error: undefined };
         });
 
-        const feSpy = vi.spyOn(orchestrator['feAgent'], 'execute').mockResolvedValue({ success: true, data: { files: [] } });
-        const dpSpy = vi.spyOn(orchestrator['dpAgent'], 'execute').mockResolvedValue({ success: true, data: { files: [] } });
-        const teSpy = vi.spyOn(orchestrator['teAgent'], 'execute').mockResolvedValue({ success: true, data: { files: [] } });
-        const valSpy = vi.spyOn(orchestrator['valAgent'], 'execute').mockResolvedValue({ success: true, data: { confidenceScore: 0.95 } });
+        vi.spyOn(orchestrator['feAgent'], 'execute').mockResolvedValue({ success: true, data: { files: [] }, logs: [], error: undefined });
+        const dpSpy = vi.spyOn(orchestrator['dpAgent'], 'execute').mockResolvedValue({ success: true, data: { files: [] }, logs: [], error: undefined });
+        vi.spyOn(orchestrator['teAgent'], 'execute').mockResolvedValue({ success: true, data: { files: [] }, logs: [], error: undefined });
+        vi.spyOn(orchestrator['valAgent'], 'execute').mockResolvedValue({ success: true, data: { confidenceScore: 0.95 }, logs: [], error: undefined });
 
         // Mock Stripe Billing verification (Simulating API Route boundary wrapper)
         let stripeCharges = 0;

@@ -45,12 +45,29 @@ class RedisClient {
                     ...commonOptions
                 });
             } else {
-                // Standard Single Node or Load Balancer
-                this.instance = new Redis(REDIS_URLS[0], commonOptions);
+                // Standard Single Node or Load Balancer (e.g. Upstash)
+                const redisUrl = REDIS_URLS[0];
+
+                // Upstash or secure managed Redis requires TLS
+                const isSecure = redisUrl.startsWith('rediss://') || process.env.REDIS_TLS === 'true';
+
+                const connectionOptions: Record<string, unknown> = {
+                    ...commonOptions,
+                };
+
+                // Critical for Upstash/Managed Redis TLS
+                if (isSecure) {
+                    connectionOptions.tls = { rejectUnauthorized: false };
+                }
+
+                logger.info({ isSecure, urlPrefix: redisUrl.substring(0, 8) }, 'Initializing Redis Connection');
+
+                this.instance = new Redis(redisUrl, connectionOptions);
             }
 
-            this.instance.on('connect', () => logger.info('Redis connected'));
-            this.instance.on('error', (err) => logger.error({ err }, 'Redis error'));
+            this.instance.on('connect', () => logger.info('Redis connected successfully'));
+            this.instance.on('ready', () => logger.info('Redis ready to receive commands'));
+            this.instance.on('error', (err) => logger.error({ err: err.message || err }, 'Redis connection error'));
         }
         return this.instance;
     }

@@ -8,7 +8,11 @@ const logger = pino({
         service: 'multi-agent-platform',
     },
     mixin() {
-        return { correlationId: getCorrelationId() };
+        return {
+            correlationId: getCorrelationId(),
+            // executionId is often passed in specific log calls, 
+            // but we can also pull from AsyncLocalStorage if we add it there later
+        };
     },
     formatters: {
         level: (label) => {
@@ -17,5 +21,12 @@ const logger = pino({
     },
     timestamp: pino.stdTimeFunctions.isoTime,
 });
+
+/**
+ * Creates a child logger with a fixed executionId for a specific build job.
+ */
+export function getExecutionLogger(executionId: string) {
+    return logger.child({ executionId });
+}
 
 export default logger;

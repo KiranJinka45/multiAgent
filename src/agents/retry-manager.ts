@@ -1,6 +1,5 @@
 import logger from '../lib/logger';
 import { retryCountTotal } from '../lib/metrics';
-import { ExecutionContextType } from '../lib/execution-context';
 
 export class RetryManager {
     private maxRetries: number;
@@ -14,21 +13,20 @@ export class RetryManager {
     async executeWithRetry<T>(
         operation: () => Promise<T>,
         agentName: string,
-        _context: any // Using any here to avoid cyclic dependency if needed, or if we want to be less strict with the wrapper
+        _context: any
     ): Promise<T> {
         let lastError: unknown;
-        const timeoutMs = 60000; // 60 second timeout per agent execution
+        const timeoutMs = 60000;
 
         for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
             try {
                 if (attempt > 1) {
-                    const delay = this.baseDelayMs * Math.pow(2, attempt - 2);
+                    const delay = this.baseDelayMs * Math.pow(2, (attempt - 2));
                     logger.warn({ agentName, attempt, delay }, 'Retrying agent execution...');
                     retryCountTotal.inc({ agent_name: agentName });
                     await new Promise(resolve => setTimeout(resolve, delay));
                 }
 
-                // Execute with timeout
                 return await Promise.race([
                     operation(),
                     new Promise<T>((_, reject) => setTimeout(() => reject(new Error(`Agent execution timed out after ${timeoutMs}ms`)), timeoutMs))
@@ -42,7 +40,7 @@ export class RetryManager {
                     error: errorMessage
                 }, 'Agent execution failed');
 
-                if (error && typeof error === 'object' && 'isFatal' in error && error.isFatal) {
+                if (error && typeof error === 'object' && 'isFatal' in error && (error as any).isFatal) {
                     logger.error({ agentName }, 'Fatal error detected. Aborting retries.');
                     break;
                 }
