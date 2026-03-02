@@ -170,6 +170,48 @@ const shutdown = async () => {
     process.exit(0);
 };
 
+
+// Phase 3 & 4: Cluster Listeners (Schedule Assignments & Rolling Restarts)
+(async () => {
+    try {
+        const nodeId = await NodeRegistry.register();
+        logger.info({ nodeId }, 'Node registered in cluster');
+        FailoverManager.start();
+
+        // 1. Listen for cluster events
+        const sub = redis.duplicate();
+        await sub.connect();
+
+        await sub.subscribe('cluster:schedule:assign', 'cluster:node:restart');
+
+        sub.on('message', async (channel: string, message: string) => {
+            try {
+                const data = JSON.parse(message);
+                if (channel === 'cluster:schedule:assign') {
+                    if (data.targetNodeId === nodeId) {
+                        logger.info({ projectId: data.request.projectId }, '[Worker] Picking up assigned runtime');
+                        PreviewOrchestrator.start(
+                            data.request.projectId,
+                            data.request.userId,
+                            data.request.executionId
+                        ).catch((err: any) => logger.error({ err, projectId: data.request.projectId } as any, 'Failed to start assigned runtime'));
+                    }
+                } else if (channel === 'cluster:node:restart') {
+                    if (data.nodeId === nodeId) {
+                        logger.warn({ reason: data.reason }, '[Worker] Received restart signal. Shutting down gracefully...');
+                        await shutdown();
+                    }
+                }
+            } catch (err: any) {
+                logger.error({ err } as any, `[Worker] Error processing message on channel ${channel}`);
+            }
+        });
+
+    } catch (err: any) {
+        logger.error({ err } as any, 'Failed to register node in cluster (non-fatal, running in standalone mode)');
+    }
+})();
+
 process.on('SIGTERM', shutdown);
 process.on('SIGINT', shutdown);
 
