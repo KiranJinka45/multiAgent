@@ -1,11 +1,12 @@
 import logger from '../lib/logger';
 import { retryCountTotal } from '../lib/metrics';
+import { ExecutionContextType } from '../lib/execution-context';
 
 export class RetryManager {
     private maxRetries: number;
     private baseDelayMs: number;
 
-    constructor(maxRetries: number = 3, baseDelayMs: number = 2000) {
+    constructor(maxRetries: number = 2, baseDelayMs: number = 2000) {
         this.maxRetries = maxRetries;
         this.baseDelayMs = baseDelayMs;
     }
@@ -13,9 +14,9 @@ export class RetryManager {
     async executeWithRetry<T>(
         operation: () => Promise<T>,
         agentName: string,
-        context: any
+        _context: any // Using any here to avoid cyclic dependency if needed, or if we want to be less strict with the wrapper
     ): Promise<T> {
-        let lastError: any;
+        let lastError: unknown;
         const timeoutMs = 60000; // 60 second timeout per agent execution
 
         for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
@@ -32,18 +33,25 @@ export class RetryManager {
                     operation(),
                     new Promise<T>((_, reject) => setTimeout(() => reject(new Error(`Agent execution timed out after ${timeoutMs}ms`)), timeoutMs))
                 ]);
-            } catch (error) {
+            } catch (error: unknown) {
                 lastError = error;
+                const errorMessage = error instanceof Error ? error.message : String(error);
                 logger.error({
                     agentName,
                     attempt,
-                    error: error instanceof Error ? error.message : String(error)
+                    error: errorMessage
                 }, 'Agent execution failed');
+
+                if (error && typeof error === 'object' && 'isFatal' in error && error.isFatal) {
+                    logger.error({ agentName }, 'Fatal error detected. Aborting retries.');
+                    break;
+                }
 
                 if (attempt === this.maxRetries) break;
             }
         }
 
-        throw new Error(`Max retries reached for ${agentName}: ${lastError.message}`);
+        const finalErrorMessage = lastError instanceof Error ? lastError.message : String(lastError);
+        throw new Error(`Max retries reached for ${agentName}: ${finalErrorMessage}`);
     }
 }

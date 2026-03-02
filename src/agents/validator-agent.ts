@@ -1,11 +1,11 @@
 import { BaseAgent, AgentResponse } from './base-agent';
-import { ExecutionContext } from '../lib/execution-context';
 import logger from '../lib/logger';
 
 export class ValidatorAgent extends BaseAgent {
     getName() { return 'ValidatorAgent'; }
 
-    async execute(input: { agentName: string, output: any, spec: string }): Promise<AgentResponse> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+    async execute(input: { agentName: string, output: any, spec: string }, _context?: any): Promise<AgentResponse> {
         this.log(`Validating output for ${input.agentName}...`);
 
         try {

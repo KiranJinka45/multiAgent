@@ -37,7 +37,7 @@ describe('Redlock TTL Expiry and Auto-Extension Audit', () => {
         try {
             await redlock.acquire([resource], 1000);
             stolen = true;
-        } catch (err) {
+        } catch (_err) {
             // Expected ResourceLockedError because our extension held strong.
         }
 
@@ -71,9 +71,9 @@ describe('Redlock TTL Expiry and Auto-Extension Audit', () => {
         let releaseFailedSafely = false;
         try {
             await lock.release();
-        } catch (err: any) {
+        } catch (err: unknown) {
             // Redlock correctly detects that the UUID value in Redis doesn't match Worker 1's lock anymore.
-            if (err.name === 'ExecutionError' || err.message?.includes('locked')) {
+            if (err instanceof Error && (err.name === 'ExecutionError' || err.message?.includes('locked'))) {
                 releaseFailedSafely = true;
             }
         }

@@ -54,7 +54,6 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
     const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isGenerating, setIsGenerating] = useState(false);
-    const [userReply, setUserReply] = useState<string | null>(null);
     const [replyText, setReplyText] = useState("");
     const [hasStartedGenerating, setHasStartedGenerating] = useState(false);
     const [viewMode, setViewMode] = useState<'editor' | 'preview' | 'split'>('split');
@@ -65,7 +64,6 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
     const [showSummary, setShowSummary] = useState(false);
     const [currentExecutionId, setCurrentExecutionId] = useState<string | null>(null);
     const [connectionMode, setConnectionMode] = useState<'live' | 'polling' | 'failover'>('live');
-    const [errorCount, setErrorCount] = useState(0);
     const [isBackendOffline, setIsBackendOffline] = useState(false);
     const [stableHealthSeconds, setStableHealthSeconds] = useState(0);
     const [userRole, setUserRole] = useState<string>('user');
@@ -94,7 +92,6 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
                 <head>
                     <meta charset="utf-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1">
-                    <script src="https://cdn.tailwindcss.com"></script>
                     ${css}
                 </head>
                 <body>
@@ -185,7 +182,6 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
 
             eventSource.onerror = () => {
                 eventSource?.close();
-                setErrorCount(prev => prev + 1);
 
                 if (retryCount < maxRetries) {
                     retryCount++;
@@ -222,7 +218,6 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
 
     const submitClarification = () => {
         if (!replyText.trim()) return;
-        setUserReply(replyText);
         setHasStartedGenerating(true);
         toast.info("MultiAgent is building your world-class project...", {
             icon: <Sparkles className="text-primary animate-pulse" size={16} />
@@ -272,7 +267,6 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
                         })
                         .catch(err => {
                             console.error("Manual sync failed:", err);
-                            setErrorCount(prev => prev + 1);
                         });
                 }
             }
@@ -500,7 +494,6 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
                                 console.log('✅ System stable for 180s. Recovering to LIVE mode.');
                                 toast.success("System stability restored. Recovering live stream.");
                                 setConnectionMode('live');
-                                setErrorCount(0);
                                 return 0;
                             }
                             return next;

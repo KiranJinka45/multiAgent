@@ -6,11 +6,13 @@ interface AppState {
     isGenerating: boolean;
     executionContext: ExecutionContextType | null;
     logs: string[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     generatedFiles: any[];
 
     // Actions
     setProject: (projectId: string) => void;
     startGeneration: () => void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     finishGeneration: (context: ExecutionContextType, files: any[]) => void;
     failGeneration: (error: string) => void;
     addLog: (log: string) => void;

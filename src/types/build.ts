@@ -19,17 +19,44 @@ export interface BuildUpdate {
     tokensUsed?: number;
     durationMs?: number;
     message?: string;
+    timestamp: string;
 }
 
 export const BUILD_STAGES_CONFIG: Omit<BuildStage, 'status' | 'message' | 'progressPercent' | 'timestamp'>[] = [
-    { id: 'initializing', name: 'Initializing Project', weight: 0.05 },
-    { id: 'database', name: 'Designing Database Schema', weight: 0.15 },
-    { id: 'auth', name: 'Configuring Authentication', weight: 0.10 },
-    { id: 'security', name: 'Applying Security Policies (RLS)', weight: 0.05 },
-    { id: 'backend', name: 'Generating Backend API', weight: 0.20 },
-    { id: 'frontend_layout', name: 'Generating Frontend Layout', weight: 0.10 },
-    { id: 'landing_page', name: 'Building Landing Page', weight: 0.10 },
-    { id: 'auth_pages', name: 'Building Auth Pages', weight: 0.05 },
-    { id: 'dashboard', name: 'Building Dashboards', weight: 0.10 },
-    { id: 'finalizing', name: 'Finalizing Build', weight: 0.10 },
+    { id: 'initializing', name: 'Initializing', weight: 0.05 },
+    { id: 'database', name: 'Database Schema', weight: 0.10 },
+    { id: 'backend', name: 'Backend API', weight: 0.20 },
+    { id: 'frontend', name: 'Frontend App', weight: 0.20 },
+    { id: 'security', name: 'Security Policies', weight: 0.05 },
+    { id: 'testing', name: 'Testing', weight: 0.15 },
+    { id: 'dockerization', name: 'Dockerization', weight: 0.05 },
+    { id: 'cicd', name: 'CI/CD Setup', weight: 0.05 },
+    { id: 'deployment', name: 'Deployment', weight: 0.10 },
+    { id: 'finalization', name: 'Finalization', weight: 0.05 },
+];
+
+export const STAGE_PROGRESS: Record<string, number> = {
+    initializing: 5,
+    database: 15,
+    backend: 35,
+    frontend: 55,
+    security: 60,
+    testing: 75,
+    dockerization: 80,
+    cicd: 85,
+    deployment: 95,
+    finalization: 100
+};
+
+export const STAGE_ORDER = [
+    'initializing',
+    'database',
+    'backend',
+    'frontend',
+    'security',
+    'testing',
+    'dockerization',
+    'cicd',
+    'deployment',
+    'finalization'
 ];

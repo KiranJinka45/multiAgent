@@ -1,10 +1,10 @@
 import { BaseAgent, AgentResponse } from './base-agent';
-import { ExecutionContext } from '../lib/execution-context';
 
 export class FrontendAgent extends BaseAgent {
     getName() { return 'FrontendAgent'; }
 
-    async execute(input: { prompt: string, backendFiles: any[] }, context?: ExecutionContext): Promise<AgentResponse> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+    async execute(input: { prompt: string, backendFiles: any[] }, _context?: any): Promise<AgentResponse> {
         this.log(`Generating Frontend UI based on backend integration...`);
         try {
             const system = `You are a Senior Frontend Architect. 

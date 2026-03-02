@@ -33,6 +33,8 @@ export interface ExecutionContextType {
     metrics: ExecutionMetrics;
     metadata: Record<string, any>;
     correlationId: string;
+    finalFiles?: any[];
+    locked?: boolean;
 }
 
 export class DistributedExecutionContext {
@@ -110,6 +112,7 @@ export class DistributedExecutionContext {
     async finalize(status: 'completed' | 'failed'): Promise<void> {
         await this.atomicUpdate((ctx) => {
             ctx.status = status;
+            ctx.locked = true;
             ctx.metrics.endTime = new Date().toISOString();
             ctx.metrics.totalDurationMs =
                 new Date().getTime() - new Date(ctx.metrics.startTime).getTime();
@@ -119,7 +122,7 @@ export class DistributedExecutionContext {
     /**
      * Atomic update using Redis WATCH/MULTI/EXEC for safe concurrency
      */
-    private async atomicUpdate(updater: (ctx: ExecutionContextType) => void): Promise<void> {
+    public async atomicUpdate(updater: (ctx: ExecutionContextType) => void): Promise<void> {
         for (let i = 0; i < 5; i++) { // Max retries for optimistic locking
             try {
                 await redis.watch(this.key);
@@ -127,6 +130,10 @@ export class DistributedExecutionContext {
                 if (!data) throw new Error(`Execution context ${this.executionId} not found`);
 
                 const context = JSON.parse(data) as ExecutionContextType;
+                if (context.locked) {
+                    await redis.unwatch();
+                    return; // Fail-safe: No updates allowed on locked context
+                }
                 updater(context);
 
                 const result = await redis.multi()

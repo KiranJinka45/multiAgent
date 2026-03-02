@@ -1,8 +1,8 @@
 import { Groq } from 'groq-sdk';
 import logger from '../lib/logger';
-import { ExecutionContext } from '../lib/execution-context';
 import { breakers } from '../lib/circuit-breaker';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface AgentResponse<T = any> {
     success: boolean;
     data: T;
@@ -22,6 +22,7 @@ export abstract class BaseAgent {
         this.groq = new Groq({ apiKey });
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     protected log(message: string, meta: Record<string, any> = {}) {
         const timestamp = new Date().toISOString();
         this.logs.push(`[${this.getName()}] [${timestamp}] ${message}`);
@@ -29,7 +30,8 @@ export abstract class BaseAgent {
     }
 
     abstract getName(): string;
-    abstract execute(input: any, context?: ExecutionContext): Promise<AgentResponse>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    abstract execute(input: any, context?: any): Promise<AgentResponse>;
 
     protected async promptLLM(system: string, user: string, model: string = 'llama-3.3-70b-versatile') {
         this.log(`Invoking LLM (${model})`);

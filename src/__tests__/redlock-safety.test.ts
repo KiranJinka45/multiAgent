@@ -65,7 +65,7 @@ describe('Redlock Safety & Distributed Locking Integration Tests', () => {
         try {
             await redlock.acquire([resource], 1000);
             stolen = true;
-        } catch (error) {
+        } catch (_error) {
             // We expect a ResourceLockedError because Worker 1 successfully extended it
         }
 

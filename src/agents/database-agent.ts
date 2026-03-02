@@ -1,10 +1,11 @@
 import { BaseAgent, AgentResponse } from './base-agent';
-import { ExecutionContext } from '../lib/execution-context';
 
 export class DatabaseAgent extends BaseAgent {
     getName() { return 'DatabaseAgent'; }
 
-    async execute(prompt: string, context?: ExecutionContext): Promise<AgentResponse> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    async execute(prompt: string, _context?: any): Promise<AgentResponse> {
         this.log(`Designing schema for: ${prompt}`);
         try {
             const system = `You are a Senior Database Architect. 

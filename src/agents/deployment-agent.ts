@@ -1,15 +1,18 @@
 import { BaseAgent, AgentResponse } from './base-agent';
-import { ExecutionContext } from '../lib/execution-context';
 
 export class DeploymentAgent extends BaseAgent {
     getName() { return 'DeploymentAgent'; }
 
-    async execute(input: { prompt: string, allFiles: any[] }, context?: ExecutionContext): Promise<AgentResponse> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+    async execute(input: { prompt: string, allFiles: any[] }, _context?: any): Promise<AgentResponse> {
         this.log(`Generating Deployment configuration (Docker, hosting)...`);
         try {
             const system = `You are a DevOps Architect. 
             Create Dockerfiles and deployment scripts.
-            Output JSON with "files" (array of {path: string, content: string}) for DevOps.`;
+            Output JSON with:
+            1. "files" (array of {path: string, content: string}) for DevOps configuration.
+            2. "previewUrl": a string representing the simulated local deployment URL (e.g. "http://localhost:3000").
+            Ensure your output is strictly valid JSON matching this schema.`;
 
             const { result, tokens } = await this.promptLLM(system, `Prompt: ${input.prompt}\nFiles: ${JSON.stringify(input.allFiles)}`);
 
