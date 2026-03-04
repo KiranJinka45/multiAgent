@@ -13,15 +13,17 @@ class RedisClient {
                 maxRetriesPerRequest: null, // Critical for BullMQ
                 connectTimeout: 5000,       // Fail fast on boot
                 retryStrategy: (times: number) => {
-                    if (this.instance.status === 'connecting' && times > 5) {
-                        logger.error('Redis connection failed on boot. Continuing in fail-soft mode (In-memory fallback not available, APIs will return service unavailable).');
-                        // In production, we might still want to exit, but for dev/beta, we allow boot to show errors.
-                        if (process.env.NODE_ENV === 'production') {
-                            process.exit(1);
-                        }
-                        return null; // Stop retrying
+                    const isDev = process.env.NODE_ENV !== 'production';
+                    // Permanent fix: In dev, retry forever to handle Docker start/stop.
+                    // In prod, give up after 20 tries (approx 40s) to allow orchestrator failover.
+                    if (!isDev && times > 20) {
+                        logger.error('Redis connection failed permanently. Halting.');
+                        return null;
                     }
-                    const delay = Math.min(times * 50, 2000);
+                    const delay = Math.min(times * 100, 3000);
+                    if (times % 5 === 0) {
+                        logger.warn({ times, nextRetryIn: delay }, 'Redis unreachable. Retrying...');
+                    }
                     return delay;
                 },
                 reconnectOnError: (err) => {

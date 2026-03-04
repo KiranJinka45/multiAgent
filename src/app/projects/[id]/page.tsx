@@ -271,21 +271,28 @@ Database: ${stack.database}`;
         let reconnectTimeout: NodeJS.Timeout | null = null;
         let retryCount = 0;
         let isPollingCooldown = false;
-        let statusChannel: any = null;
-        let filesChannel: any = null;
         const supabase = projectService.getSupabase();
+
+        const statusChannel = supabase.channel(`project-status-${params.id}`);
+        const filesChannel = supabase.channel(`project-files-stream-${params.id}`);
 
         const connectRealtime = async () => {
             if (!isMounted || isPollingCooldown) return;
-            statusChannel = supabase.channel(`project-status-${params.id}`)
+
+            statusChannel
                 .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'projects', filter: `id=eq.${params.id}` }, (payload) => {
                     const updatedProject = payload.new as Project;
                     setProject(updatedProject);
                     if (updatedProject.status === 'completed') setIsGenerating(false);
                     else if (updatedProject.status.startsWith('generating')) setIsGenerating(true);
-                }).subscribe();
+                }).subscribe((status) => {
+                    if (status === 'CHANNEL_ERROR') {
+                        console.warn("[Realtime] Status channel error. Polling fallback engaged.");
+                        setConnectionMode('polling');
+                    }
+                });
 
-            filesChannel = supabase.channel(`project-files-stream-${params.id}`)
+            filesChannel
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'project_files', filter: `project_id=eq.${params.id}` }, (payload) => {
                     const newOrUpdatedFile = payload.new as ProjectFile;
                     if (payload.eventType === 'DELETE') {
@@ -304,8 +311,9 @@ Database: ${stack.database}`;
         return () => {
             isMounted = false;
             if (reconnectTimeout) clearTimeout(reconnectTimeout);
-            if (statusChannel) supabase.removeChannel(statusChannel);
-            if (filesChannel) supabase.removeChannel(filesChannel);
+            // Synchronous cleanup for permanent stability
+            supabase.removeChannel(statusChannel);
+            supabase.removeChannel(filesChannel);
         };
     }, [params.id]);
 
