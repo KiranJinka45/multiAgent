@@ -1,4 +1,6 @@
-console.log("Checking GROQ_API_KEY...");
+import dotenv from 'dotenv';
+dotenv.config({ path: '.env.local' });
+console.log("Checking GROQ_API_KEY with .env.local via dotenv.config()...");
 const apiKey = process.env.GROQ_API_KEY;
 if (apiKey) {
     console.log("✅ GROQ_API_KEY found:", apiKey.substring(0, 8) + "...");

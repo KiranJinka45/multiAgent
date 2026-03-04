@@ -21,7 +21,6 @@
     "@opentelemetry/semantic-conventions": "^1.40.0",
     "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/supabase-js": "^2.45.4",
-    "@tailwindcss/postcss": "^4.2.1",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.2.1",
     "@types/ioredis": "^4.28.10",
@@ -58,6 +57,7 @@
     "zustand": "^5.0.11"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.2.1",
     "@types/dom-speech-recognition": "^0.0.7",
     "@types/jszip": "^3.4.0",
     "@types/node": "^20",

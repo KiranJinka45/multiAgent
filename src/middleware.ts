@@ -57,11 +57,9 @@ export async function middleware(req: NextRequest) {
             console.error("Middleware profile error:", profileError);
         }
 
-        // TEMPORARY BYPASS: Since the `is_beta_user` column does not exist in the DB right now, 
-        // this error fails silently and blocks the user. We allow access if the profile errors or exists.
-        // Also allow if the user is an 'owner' or in development.
+        // Check beta access permissions
         const isDev = process.env.NODE_ENV === 'development';
-        const isBeta = profile?.is_beta_user || profile?.role === 'owner' || !!profileError || isDev;
+        const isBeta = profile?.is_beta_user || profile?.role === 'owner' || isDev;
 
         // Check if route is waitlist
         const isWaitlistRoute = req.nextUrl.pathname === '/waitlist';
