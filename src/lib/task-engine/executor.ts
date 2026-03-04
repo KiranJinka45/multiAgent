@@ -2,6 +2,7 @@ import { TaskGraph, BaseTask } from './task-graph';
 import { agentRegistry } from './agent-registry';
 import { AgentMetrics } from '../agent-intelligence/agent-metrics';
 import { StrategyEngine } from '../agent-intelligence/strategy-engine';
+import { SwarmOrchestrator } from './swarm-orchestrator';
 import logger from '../logger';
 
 export class TaskExecutor {
@@ -62,7 +63,7 @@ export class TaskExecutor {
             } else {
                 // ── 1. Evolution: Strategy Optimization ─────────────────
                 const strategy = await StrategyEngine.getOptimalStrategy(task.type, task.title);
-                // In a more advanced implementation, we would apply strategy.temperature etc. to the agent call
+                SwarmOrchestrator.broadcast(task.type, `Starting task: ${task.title} with strategy: ${strategy.strategy}`);
 
                 const res = await agentRegistry.runTaskDirectly(task.type, task.payload, globalContext);
 
