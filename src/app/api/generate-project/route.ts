@@ -3,7 +3,8 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { ProjectGenerationSchema } from '@/lib/schemas';
 import logger from '@/lib/logger';
-import { freeQueue } from '@/lib/queue';
+import { freeQueue, proQueue } from '@/lib/queue';
+import { TenantService } from '@/lib/tenant-service';
 import { DistributedExecutionContext as ExecutionContext } from '@/lib/execution-context';
 import { getCorrelationId } from '@/lib/tracing';
 import { CostGovernanceService, DEFAULT_GOVERNANCE_CONFIG } from '@/lib/governance';
@@ -145,14 +146,18 @@ async function handler(req: NextRequest) {
         const { supabaseAdmin } = await import('@/lib/supabaseAdmin');
         await supabaseAdmin.rpc('update_user_retention_timestamps', { user_id_param: userId });
 
-        await context.init(userId, projectId, prompt, correlationId, profile.membership || 'free');
+        // --- 7. Multi-Tenant: Fetch Tenant & Routing ---
+        const tenant = await TenantService.getTenantForUser(userId);
+        const plan = tenant?.plan || 'free';
+
+        await context.init(userId, projectId, prompt, correlationId, plan);
 
         // 3. Add to BullMQ with tiered queue based on plan
         const jobId = `gen:${projectId}:${executionId}`;
-        const queueToUse = freeQueue;
-        const priority = profile.membership === 'pro' || isOwner ? 1 : 10; // Pro = High Priority, Free = Low
+        const queueToUse = plan === 'pro' || plan === 'enterprise' ? proQueue : freeQueue;
+        const priority = plan === 'pro' || plan === 'enterprise' || isOwner ? 1 : 10; // Pro = High Priority, Free = Low
 
-        logger.info({ userId, projectId, executionId, jobId, priority, queueType: profile.membership }, 'Queuing project generation job to tiered queue');
+        logger.info({ userId, projectId, executionId, jobId, priority, queueType: plan }, 'Queuing project generation job to tiered queue');
 
         await queueToUse.add(
             'generate-project',
@@ -170,10 +175,21 @@ async function handler(req: NextRequest) {
         );
 
         // 4. Update project status
-        await supabase.from('projects').update({
-            status: 'generating',
-            last_execution_id: executionId
-        }).eq('id', projectId);
+        try {
+            const { error: updateError } = await supabase.from('projects').update({
+                status: 'generating',
+                last_execution_id: executionId
+            }).eq('id', projectId);
+
+            if (updateError) {
+                logger.warn({ projectId, error: updateError }, 'Initial project update failed, retrying without last_execution_id');
+                await supabase.from('projects').update({
+                    status: 'generating'
+                }).eq('id', projectId);
+            }
+        } catch (err) {
+            logger.error({ projectId, err }, 'Failed to update project status');
+        }
 
         // 5. Return executionId immediately
         return NextResponse.json({

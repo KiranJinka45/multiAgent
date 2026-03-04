@@ -227,7 +227,9 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({ buildProgress, onRedeploy }
                                         title="Project Preview"
                                         onLoad={() => setIframeStatus('loaded')}
                                         onError={() => setIframeStatus('error')}
-                                        sandbox="allow-scripts allow-same-origin allow-forms"
+                                        sandbox="allow-scripts allow-same-origin allow-modals allow-popups allow-forms"
+                                        referrerPolicy="no-referrer"
+                                        loading="lazy"
                                     />
                                 ) : (
                                     <iframe

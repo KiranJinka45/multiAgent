@@ -7,7 +7,10 @@ import {
     Layout,
     Download,
     Rocket,
-    Github
+    Github,
+    MessageSquare,
+    Wand2,
+    Eye
 } from 'lucide-react';
 import { BuildUpdate } from '@/types/build';
 import FileExplorer from '@/components/FileExplorer';
@@ -15,6 +18,8 @@ import FileViewer from '@/components/FileViewer';
 import BuildConsole from '@/components/BuildConsole';
 import PreviewPanel from '@/components/PreviewPanel';
 import BuildLogs from '@/components/BuildLogs';
+import ChatEditPanel from '@/components/ChatEditPanel';
+import { DiffViewer } from '@/components/DiffViewer';
 import { formatTime, formatYear } from '@/lib/date';
 
 interface DevOpsDashboardProps {
@@ -25,6 +30,7 @@ interface DevOpsDashboardProps {
     onPushToGithub?: () => void;
     onRedeploy?: () => void;
     projectTitle: string;
+    projectId?: string;
 }
 
 const DevOpsDashboard: React.FC<DevOpsDashboardProps> = ({
@@ -34,11 +40,14 @@ const DevOpsDashboard: React.FC<DevOpsDashboardProps> = ({
     onDeploy,
     onPushToGithub,
     onRedeploy,
-    projectTitle
+    projectTitle,
+    projectId = ''
 }) => {
     const [activeTab, setActiveTab] = useState<'preview' | 'explorer' | 'logs'>('preview');
     const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null);
     const [mounted, setMounted] = useState(false);
+    const [chatOpen, setChatOpen] = useState(false);
+    const [diffOpen, setDiffOpen] = useState(false);
 
     useEffect(() => {
         setMounted(true);
@@ -114,6 +123,14 @@ const DevOpsDashboard: React.FC<DevOpsDashboardProps> = ({
                             animate={{ opacity: 1, x: 0 }}
                             className="flex items-center gap-2 flex-wrap"
                         >
+                            {buildProgress?.metadata?.diffs && buildProgress.metadata.diffs.length > 0 && (
+                                <button
+                                    onClick={() => setDiffOpen(true)}
+                                    className="flex items-center gap-1.5 px-3 sm:px-5 py-2 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 text-blue-400 rounded-xl text-[10px] font-black tracking-widest uppercase transition-all"
+                                >
+                                    <Eye size={13} /> <span>Review Changes</span>
+                                </button>
+                            )}
                             <button
                                 onClick={onDownload}
                                 className="flex items-center gap-1.5 px-3 sm:px-5 py-2 bg-white/[0.03] hover:bg-white/10 border border-white/10 rounded-xl text-[10px] font-black tracking-widest uppercase transition-all hover:active-border-glow"
@@ -152,6 +169,24 @@ const DevOpsDashboard: React.FC<DevOpsDashboardProps> = ({
                             </button>
                         ))}
                     </div>
+
+                    {/* Chat Edit toggle button */}
+                    {isCompleted && (
+                        <button
+                            onClick={() => setChatOpen(prev => !prev)}
+                            className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-black tracking-widest uppercase transition-all ${chatOpen
+                                ? 'bg-violet-500/20 text-violet-300 border border-violet-500/30 shadow-[0_0_20px_rgba(139,92,246,0.15)]'
+                                : 'bg-white/[0.03] text-white/40 border border-white/[0.06] hover:text-white hover:bg-white/[0.06]'
+                                }`}
+                        >
+                            <Wand2 size={12} />
+                            <span className="hidden sm:inline">AI Edit</span>
+                            {/* Pulsing badge */}
+                            {!chatOpen && (
+                                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-violet-500 shadow-[0_0_8px_rgba(139,92,246,0.9)] animate-pulse" />
+                            )}
+                        </button>
+                    )}
                 </div>
             </header>
 
@@ -173,37 +208,77 @@ const DevOpsDashboard: React.FC<DevOpsDashboardProps> = ({
                 {/* Post-Completion 3-Tab View */}
                 {isCompleted && (
                     <main className="flex-1 flex w-full relative z-20 overflow-hidden bg-[#050505]">
-                        <AnimatePresence mode="wait">
-                            <motion.div
-                                key={activeTab}
-                                initial={{ opacity: 0, scale: 0.98 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 1.02 }}
-                                transition={{ duration: 0.2 }}
-                                className="absolute inset-0 flex flex-col w-full h-full"
-                            >
-                                {activeTab === 'preview' && (
-                                    <PreviewPanel buildProgress={buildProgress} files={files} onRedeploy={handleRedeploy} />
-                                )}
-                                {activeTab === 'explorer' && (
-                                    <div className="flex h-full w-full">
-                                        <div className="w-[320px] border-r border-white/5 bg-[#030303] shrink-0">
-                                            <FileExplorer
-                                                files={files}
-                                                currentStage={currentStage}
-                                                onFileSelect={setSelectedFilePath}
-                                                activeFile={selectedFilePath}
-                                            />
+                        {/* Main content area */}
+                        <div className={`flex flex-col transition-all duration-300 ${chatOpen ? 'flex-1 min-w-0' : 'flex-1'}`}>
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={activeTab}
+                                    initial={{ opacity: 0, scale: 0.98 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 1.02 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="absolute inset-0 flex flex-col w-full h-full"
+                                    style={chatOpen ? { position: 'relative', flex: 1, inset: 'unset' } : {}}
+                                >
+                                    {activeTab === 'preview' && (
+                                        <PreviewPanel buildProgress={buildProgress} files={files} onRedeploy={handleRedeploy} />
+                                    )}
+                                    {activeTab === 'explorer' && (
+                                        <div className="flex h-full w-full">
+                                            <div className="w-[320px] border-r border-white/5 bg-[#030303] shrink-0">
+                                                <FileExplorer
+                                                    files={files}
+                                                    currentStage={currentStage}
+                                                    onFileSelect={setSelectedFilePath}
+                                                    activeFile={selectedFilePath}
+                                                />
+                                            </div>
+                                            <div className="flex-1 bg-[#0a0a0a]">
+                                                <FileViewer file={selectedFile} />
+                                            </div>
                                         </div>
-                                        <div className="flex-1 bg-[#0a0a0a]">
-                                            <FileViewer file={selectedFile} />
-                                        </div>
+                                    )}
+                                    {activeTab === 'logs' && (
+                                        <BuildLogs logs={buildLogs} isGenerating={status !== 'completed' && status !== 'failed'} />
+                                    )}
+                                </motion.div>
+                            </AnimatePresence>
+                        </div>
+
+                        {/* Chat Edit Panel — side pane */}
+                        <AnimatePresence>
+                            {chatOpen && (
+                                <motion.div
+                                    key="chat-pane"
+                                    initial={{ width: 0, opacity: 0 }}
+                                    animate={{ width: 380, opacity: 1 }}
+                                    exit={{ width: 0, opacity: 0 }}
+                                    transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+                                    className="shrink-0 overflow-hidden border-l border-white/[0.06]"
+                                    style={{ minWidth: 0 }}
+                                >
+                                    <div className="w-[380px] h-full">
+                                        <ChatEditPanel
+                                            projectId={projectId}
+                                            isOpen={chatOpen}
+                                            onClose={() => setChatOpen(false)}
+                                            onFilesUpdated={(patches) => {
+                                                // Supabase realtime will sync file list automatically.
+                                                // If a file was created, select it in explorer.
+                                                const firstCreated = patches?.find(p => p.action === 'create' || p.type === 'create');
+                                                if (firstCreated) setSelectedFilePath(firstCreated.path);
+                                            }}
+                                            onNavigateToFile={(filePath) => {
+                                                setSelectedFilePath(filePath);
+                                                setActiveTab('explorer');
+                                            }}
+                                            onPreviewReload={() => {
+                                                setActiveTab('preview');
+                                            }}
+                                        />
                                     </div>
-                                )}
-                                {activeTab === 'logs' && (
-                                    <BuildLogs logs={buildLogs} isGenerating={status !== 'completed' && status !== 'failed'} />
-                                )}
-                            </motion.div>
+                                </motion.div>
+                            )}
                         </AnimatePresence>
                     </main>
                 )}
@@ -233,6 +308,14 @@ const DevOpsDashboard: React.FC<DevOpsDashboardProps> = ({
                     <span>PLATFORM-OS-{formatYear(new Date())}</span>
                 </div>
             </footer>
+
+            {/* Diff Viewer Modal */}
+            {diffOpen && buildProgress?.metadata?.diffs && (
+                <DiffViewer
+                    diffs={buildProgress.metadata.diffs}
+                    onClose={() => setDiffOpen(false)}
+                />
+            )}
         </div>
     );
 };

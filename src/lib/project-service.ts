@@ -127,5 +127,53 @@ export const projectService = {
         }
 
         return data.user_id === userId;
+    },
+
+    async saveProjectFiles(projectId: string, files: { path: string, content: string, language?: string }[], supabaseServer?: SupabaseClient) {
+        const supabase = this.getSupabase(supabaseServer);
+
+        // 1. Deduplicate files by path (keep the last one)
+        // Normalize paths to always start with a slash and have consistent slashes
+        const uniqueFilesMap = new Map<string, any>();
+        files.forEach(f => {
+            if (f.path) {
+                // Ensure starts with a single slash and uses forward slashes
+                let normPath = f.path.replace(/\\/g, '/');
+                if (!normPath.startsWith('/')) {
+                    normPath = '/' + normPath;
+                }
+
+                uniqueFilesMap.set(normPath, {
+                    ...f,
+                    path: normPath,
+                });
+            }
+        });
+        const uniqueFiles = Array.from(uniqueFilesMap.values());
+
+        // 2. Delete existing files
+        const { error: deleteError } = await supabase.from('project_files').delete().eq('project_id', projectId);
+        if (deleteError) {
+            console.error('Error deleting existing project files:', deleteError);
+            throw deleteError;
+        }
+
+        // 3. Insert new files in batches to avoid payload limits
+        const batchSize = 50;
+        for (let i = 0; i < uniqueFiles.length; i += batchSize) {
+            const batch = uniqueFiles.slice(i, i + batchSize).map(f => ({
+                project_id: projectId,
+                path: f.path,
+                content: f.content,
+                language: f.language || f.path.split('.').pop()
+            }));
+
+            const { error } = await supabase.from('project_files').insert(batch);
+            if (error) {
+                console.error(`Error saving batch ${i / batchSize}:`, error);
+                throw error;
+            }
+        }
+        return true;
     }
 };

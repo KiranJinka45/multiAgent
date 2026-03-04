@@ -20,26 +20,26 @@ interface TechStackSelectorProps {
 
 const OPTIONS = {
     frontend: [
-        { id: 'nextjs', name: 'Next.js App Router', desc: 'React framework for production', recommendedFor: ['seo', 'ecommerce', 'fullstack'] },
+        { id: 'nextjs', name: 'Next.js App Router', desc: 'React framework for production', recommendedFor: ['seo', 'ecommerce', 'fullstack', 'default'] },
         { id: 'react', name: 'React (Vite)', desc: 'Fast client-side SPA', recommendedFor: ['dashboard', 'admin', 'interactive'] },
         { id: 'angular', name: 'Angular', desc: 'Enterprise application framework', recommendedFor: ['enterprise', 'complex'] },
         { id: 'html', name: 'Static HTML/JS', desc: 'Vanilla web standard', recommendedFor: ['landing', 'simple', 'static'] },
     ],
     styling: [
-        { id: 'tailwind', name: 'Tailwind V4', desc: 'Performance-first utility classes', recommendedFor: ['modern', 'fast', 'custom'] },
-        { id: 'css-modules', name: 'CSS Modules', desc: 'Scoped traditional CSS', recommendedFor: ['legacy', 'strict'] },
-        { id: 'scss', name: 'SCSS / SASS', desc: 'Advanced CSS preprocessor', recommendedFor: ['complex styling'] },
+        { id: 'tailwind', name: 'Tailwind CSS', desc: 'Performance-first utility classes', recommendedFor: ['modern', 'fast', 'custom', 'default'] },
+        { id: 'shadcn', name: 'Shadcn UI', desc: 'Beautifully designed components', recommendedFor: ['ui', 'components'] },
+        { id: 'framer', name: 'Framer Motion', desc: 'Production-ready animations', recommendedFor: ['animation', 'interactive'] },
     ],
     backend: [
-        { id: 'none', name: 'None (Client Only)', desc: 'No backend required' },
-        { id: 'express', name: 'Node / Express', desc: 'Standard JS ecosystem', recommendedFor: ['api', 'custom backend'] },
-        { id: 'nestjs', name: 'NestJS', desc: 'Structured enterprise APIs', recommendedFor: ['enterprise', 'microservices'] },
+        { id: 'api-routes', name: 'Next.js API Routes', desc: 'Serverless backend logic', recommendedFor: ['api', 'default'] },
+        { id: 'auth', name: 'Authentication (Auth.js)', desc: 'Secure user management', recommendedFor: ['auth', 'users'] },
+        { id: 'database', name: 'Database (Supabase)', desc: 'Postgres & Realtime data', recommendedFor: ['db', 'data'] },
     ],
     database: [
+        { id: 'supabase', name: 'Supabase', desc: 'Instant Postgres with Auth', recommendedFor: ['realtime', 'auth', 'fast delivery', 'default'] },
         { id: 'none', name: 'None', desc: 'No persistent storage' },
         { id: 'postgres', name: 'PostgreSQL', desc: 'Relational data', recommendedFor: ['relational', 'complex queries', 'financial'] },
         { id: 'mongodb', name: 'MongoDB', desc: 'NoSQL document storage', recommendedFor: ['dynamic schemas', 'nosql', 'fast iteration'] },
-        { id: 'supabase', name: 'Supabase', desc: 'Instant Postgres with Auth', recommendedFor: ['realtime', 'auth', 'fast delivery'] },
     ],
 };
 

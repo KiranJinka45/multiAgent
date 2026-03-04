@@ -5,7 +5,7 @@ import { Worker, Job } from 'bullmq';
 import { QUEUE_FREE, QUEUE_PRO } from './lib/queue';
 import redis from './lib/redis';
 import logger from './lib/logger';
-import { Orchestrator } from './agents/orchestrator';
+import { TaskOrchestrator } from './agents/task-orchestrator';
 import { runWithTracing } from './lib/tracing';
 import { queueWaitTimeSeconds, stuckBuildsTotal } from './lib/metrics';
 import { NodeRegistry } from './runtime/cluster/nodeRegistry';
@@ -15,8 +15,7 @@ import { PreviewOrchestrator } from './runtime/previewOrchestrator';
 import { RuntimeCleanup } from './runtime/runtimeCleanup';
 import { env } from './config/env';
 
-// ✅ Global singleton orchestrator
-const orchestrator = new Orchestrator();
+const orchestrator = new TaskOrchestrator();
 
 /**
  * CRASH RECOVERY: Scans Redis for executions that are stuck in 'executing' status
@@ -200,7 +199,6 @@ process.on('SIGINT', shutdown);
         FailoverManager.start();
 
         const sub = redis.duplicate();
-        await sub.connect();
         await sub.subscribe('cluster:schedule:assign', 'cluster:node:restart');
 
         sub.on('message', async (channel: string, message: string) => {

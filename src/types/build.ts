@@ -26,6 +26,9 @@ export interface BuildUpdate {
     timestamp?: string;
     previewUrl?: string; // Populated on build completion
     previewPort?: number; // Internal port the sandbox is running on
+    metadata?: {
+        diffs?: any[];
+    };
 }
 
 export const BUILD_STAGES_CONFIG: Omit<BuildStage, 'status' | 'message' | 'progressPercent' | 'timestamp' | 'startedAt' | 'completedAt'>[] = [

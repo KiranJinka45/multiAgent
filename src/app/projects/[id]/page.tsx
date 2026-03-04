@@ -205,13 +205,20 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
 
     const handleStartBuildExplicit = (stack: TechStack) => {
         setIsReviewing(false);
-        const stackContext = `\n\n[Architecture Requirements]
+        const stackHeader = '[Architecture Requirements]';
+        const stackContext = `\n\n${stackHeader}
 Frontend: ${stack.frontend}
 Styling: ${stack.styling}
 Backend: ${stack.backend}
 Database: ${stack.database}`;
 
-        const fullPrompt = (project?.description || '') + stackContext;
+        let currentDescription = project?.description || '';
+        // If requirements already exist, we should replace them instead of appending
+        if (currentDescription.includes(stackHeader)) {
+            currentDescription = currentDescription.split(stackHeader)[0].trim();
+        }
+
+        const fullPrompt = currentDescription + stackContext;
         projectService.updateProject(params.id, { description: fullPrompt }).then(() => {
             setProject(prev => prev ? { ...prev, description: fullPrompt } : null);
             handleGenerate();
@@ -238,6 +245,8 @@ Database: ${stack.database}`;
                         .then(res => res.json())
                         .then(data => { if (!data.error) setBuildProgress(data); });
                 }
+            } else if (p.status === 'completed') {
+                setBuildProgress({ status: 'completed', currentStage: 'deployment', stages: [], totalProgress: 100 } as any);
             }
             loadFiles();
         } finally {
@@ -247,7 +256,8 @@ Database: ${stack.database}`;
 
     useEffect(() => {
         loadProjectData(true);
-    }, [params.id, loadProjectData]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [params.id]);
 
     useEffect(() => {
         if (!isGenerating && connectionMode === 'live') return;
@@ -418,18 +428,23 @@ Database: ${stack.database}`;
                                         </motion.div>
                                     </div>
                                     <div className="absolute bottom-8 left-10 right-10">
-                                        <div className="bg-[#121212] border border-white/10 rounded-[1.5rem] p-2.5 flex items-center shadow-[0_30px_60px_rgba(0,0,0,0.8)] focus-within:border-primary/40 transition-all">
-                                            <textarea
-                                                placeholder="Inject tactical requirements (e.g. 1: Next.js, 2: Tailwind, 3: Supabase)..."
-                                                className="flex-1 bg-transparent resize-none outline-none text-sm text-gray-200 p-4 min-h-[56px] max-h-40 font-medium"
-                                                value={replyText}
-                                                onChange={(e) => setReplyText(e.target.value)}
-                                                onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submitClarification(); } }}
-                                            />
-                                            <button onClick={() => setIsReviewing(true)} className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center text-primary-foreground hover:scale-105 active:scale-95 transition-all shadow-[0_10px_20px_rgba(59,130,246,0.3)]">
+                                        <button
+                                            onClick={() => setIsReviewing(true)}
+                                            className="w-full bg-[#121212] border border-white/10 rounded-[1.5rem] p-4 flex items-center justify-between shadow-[0_30px_60px_rgba(0,0,0,0.8)] hover:border-primary/40 transition-all group"
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-white/40 group-hover:text-primary transition-colors">
+                                                    <Sparkles size={20} />
+                                                </div>
+                                                <div className="text-left py-2">
+                                                    <div className="text-sm font-bold text-white mb-1">Select Architecture Stack</div>
+                                                    <div className="text-xs text-white/40 font-medium">Click to configure frameworks & infrastructure</div>
+                                                </div>
+                                            </div>
+                                            <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all shadow-lg">
                                                 <ChevronRight size={24} />
-                                            </button>
-                                        </div>
+                                            </div>
+                                        </button>
                                     </div>
                                 </div>
                                 <div className={`w-1/2 bg-[#020202] py-12 px-6 relative overflow-hidden flex flex-col transition-all duration-500 ${isReviewing ? 'opacity-100 translate-x-0' : 'opacity-30 translate-x-8'}`}>
@@ -437,17 +452,17 @@ Database: ${stack.database}`;
                                         {isReviewing ? (
                                             <TechStackSelector
                                                 prompt={project?.description || ''}
-                                                onStartBuild={handle StartBuildExplicit}
-                                        isGenerating={isGenerating}
+                                                onStartBuild={handleStartBuildExplicit}
+                                                isGenerating={isGenerating}
                                             />
                                         ) : (
-                                        <div className="flex flex-col items-center justify-center h-full text-center space-y-10 w-full max-w-sm mx-auto">
-                                            <Globe size={64} className="text-white/10 mx-auto" />
-                                            <div className="space-y-4">
-                                                <h2 className="text-2xl font-black text-white tracking-widest uppercase italic">Deterministic Grid</h2>
-                                                <p className="text-xs text-white/30 font-bold uppercase tracking-[0.3em] leading-relaxed">The high-speed generative engine is oscillating at idle. Inject parameters to initialize synchronization.</p>
+                                            <div className="flex flex-col items-center justify-center h-full text-center space-y-10 w-full max-w-sm mx-auto">
+                                                <Globe size={64} className="text-white/10 mx-auto" />
+                                                <div className="space-y-4">
+                                                    <h2 className="text-2xl font-black text-white tracking-widest uppercase italic">Deterministic Grid</h2>
+                                                    <p className="text-xs text-white/30 font-bold uppercase tracking-[0.3em] leading-relaxed">The high-speed generative engine is oscillating at idle. Inject parameters to initialize synchronization.</p>
+                                                </div>
                                             </div>
-                                        </div>
                                         )}
                                     </div>
                                 </div>
@@ -458,6 +473,7 @@ Database: ${stack.database}`;
                                 <DevOpsDashboard
                                     buildProgress={buildProgress}
                                     files={displayFiles}
+                                    projectId={params.id}
                                     onDownload={() => { window.location.href = `/api/projects/${params.id}/export`; }}
                                     onDeploy={() => { }}
                                     onPushToGithub={() => setIsGithubModalOpen(true)}
