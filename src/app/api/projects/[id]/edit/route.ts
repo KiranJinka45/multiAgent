@@ -125,7 +125,7 @@ export async function POST(
         const richContext = buildRichContext(memory, allFiles, installedPackages);
 
         // ── 3. Identify targeted files ───────────────────────────────
-        const affectedPaths = projectMemory.getAffectedFiles(memory, message);
+        const affectedPaths = await projectMemory.getAffectedFiles(memory, message);
 
         let relevantFiles = allFiles
             .filter(f => affectedPaths.includes(f.path) || affectedPaths.length === 0)
@@ -181,7 +181,7 @@ export async function POST(
         const dirtyFiles = vfs.getDirtyFiles().map(f => ({ path: f.path, content: f.content }));
 
         if (sandboxAvailable && dirtyFiles.length > 0) {
-            verifyResult = await patchVerifier.verify(sandboxDir, dirtyFiles);
+            verifyResult = await patchVerifier.verify(sandboxDir, vfs);
         }
 
         // ── 7. Sync final files from sandbox → Supabase ─────────────
@@ -243,9 +243,22 @@ export async function POST(
             }
         }
 
+        // ── 9. Trigger Preview Refresh ───────────────────────────────
+        let previewUrl = null;
+        if (sandboxAvailable) {
+            try {
+                const { startPreview } = require('@/lib/preview-runtime');
+                const latestFiles = await projectService.getProjectFiles(projectId, supabaseAdmin);
+                previewUrl = await startPreview(projectId, latestFiles);
+                console.log(`[ChatEdit] Preview refreshed at ${previewUrl}`);
+            } catch (e) {
+                console.warn('[ChatEdit] Preview refresh failed', e);
+            }
+        }
+
         const elapsed = Date.now() - t0;
 
-        // ── 9. Rich response ─────────────────────────────────────────
+        // ── 10. Rich response ─────────────────────────────────────────
         return NextResponse.json({
             success: true,
             message: agentResult.data.explanation,
@@ -264,6 +277,7 @@ export async function POST(
             healAttempts: verifyResult.healAttempts,
             healed: verifyResult.healed,
             previewReloaded: sandboxAvailable,
+            previewUrl: previewUrl,
             newFeatures: agentResult.data.newFeatures,
             tokensUsed: agentResult.tokens,
             elapsedMs: elapsed

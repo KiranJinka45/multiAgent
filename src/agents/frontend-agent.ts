@@ -4,7 +4,14 @@ import { AgentContext } from '../types/agent-context';
 export class FrontendAgent extends BaseAgent {
     getName() { return 'FrontendAgent'; }
 
-    async execute(input: { prompt: string, backendFiles: unknown[] }, _context: AgentContext, signal?: AbortSignal): Promise<AgentResponse> {
+    async execute(input: { prompt: string, backendFiles: unknown[], isIncremental?: boolean, affectedFiles?: string[] }, _context: AgentContext, signal?: AbortSignal): Promise<AgentResponse> {
+        if (input.isIncremental) {
+            const frontendFiles = input.affectedFiles?.filter(f => f.includes('page') || f.includes('layout') || f.includes('component') || f.includes('tailwind') || f.endsWith('.css'));
+            if (!frontendFiles || frontendFiles.length === 0) {
+                this.log(`Skipping Frontend generation (no frontend files affected in incremental build)`);
+                return { success: true, data: { files: [] }, tokens: 0, logs: this.logs };
+            }
+        }
         void _context;
         this.log(`Generating Frontend UI based on backend integration...`);
         try {

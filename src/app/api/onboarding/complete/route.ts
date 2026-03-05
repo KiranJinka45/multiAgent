@@ -1,10 +1,11 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import logger from '@/lib/logger';
 import { withObservability } from '@/lib/api-wrapper';
 
-async function handler() {
+// handler must accept (req: NextRequest) because withObservability passes NextRequest as the first arg
+async function handler(req: NextRequest) {
     const supabase = createRouteHandlerClient({ cookies });
 
     try {

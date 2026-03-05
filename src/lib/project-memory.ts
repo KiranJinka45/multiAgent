@@ -3,6 +3,8 @@ import logger from './logger';
 import { CodeChunker } from './memory/code-chunker';
 import { EmbeddingsEngine } from './memory/embeddings-engine';
 import { VectorStore } from './memory/vector-store';
+import redis from './redis';
+import { createHash } from 'crypto';
 
 export interface ProjectMemory {
     projectId: string;
@@ -187,6 +189,22 @@ class ProjectMemoryService {
         memory.lastUpdated = new Date().toISOString();
         await this.persistMemory(memory);
         this.memoryCache.set(projectId, memory);
+
+        // Invalidate semantic search cache entries for this project
+        // using SCAN to avoid blocking KEYS * on large Redis instances
+        try {
+            let cursor = '0';
+            do {
+                const [nextCursor, keys] = await redis.scan(cursor, 'MATCH', 'mem:search:*', 'COUNT', 100);
+                cursor = nextCursor;
+                if (keys.length > 0) {
+                    await redis.del(...keys);
+                    logger.debug({ count: keys.length }, '[ProjectMemory] Invalidated search cache entries');
+                }
+            } while (cursor !== '0');
+        } catch (e) {
+            logger.warn({ error: e }, '[ProjectMemory] Search cache invalidation failed (non-fatal)');
+        }
     }
 
     async addFeature(projectId: string, feature: string): Promise<void> {
@@ -202,11 +220,36 @@ class ProjectMemoryService {
 
     /**
      * Performs a semantic search across the global code memory.
+     * Results are cached in Redis for 5 minutes (TTL = 300s).
      */
     async searchSimilarCode(query: string, techStack?: string, limit = 5) {
+        const cacheKey = `mem:search:${createHash('sha256').update(`${query}:${techStack || ''}`).digest('hex').slice(0, 24)}`;
+        const CACHE_TTL = 300; // 5 minutes
+
+        // --- Cache read ---
+        try {
+            const cached = await redis.get(cacheKey);
+            if (cached) {
+                logger.debug({ cacheKey }, '[ProjectMemory] Cache HIT for semantic search');
+                return JSON.parse(cached);
+            }
+        } catch (cacheErr) {
+            logger.warn({ cacheErr }, '[ProjectMemory] Redis cache read failed, falling through');
+        }
+
+        // --- Cache miss: run embedding + vector search ---
         const embedding = await EmbeddingsEngine.generate(query);
         if (!embedding) return [];
-        return await VectorStore.searchSimilarCode(embedding, techStack, limit);
+        const results = await VectorStore.searchSimilarCode(embedding, techStack, limit);
+
+        // --- Cache write ---
+        try {
+            await redis.set(cacheKey, JSON.stringify(results), 'EX', CACHE_TTL);
+        } catch (cacheErr) {
+            logger.warn({ cacheErr }, '[ProjectMemory] Redis cache write failed');
+        }
+
+        return results;
     }
 
     /**

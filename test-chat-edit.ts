@@ -79,12 +79,12 @@ async function main() {
     memory.fileManifest.forEach(f => info(`  ${f.path} -> [${f.purpose}] created by ${f.agent}`));
 
     // Affected file detection - dark mode
-    const darkMode = projectMemory.getAffectedFiles(memory, 'add dark mode toggle');
+    const darkMode = await projectMemory.getAffectedFiles(memory, 'add dark mode toggle');
     pass(`getAffectedFiles("dark mode") matched ${darkMode.length} files`);
     darkMode.forEach(f => info(`  ${f}`));
 
     // Affected file detection - dashboard
-    const dashboard = projectMemory.getAffectedFiles(memory, 'add a dashboard chart');
+    const dashboard = await projectMemory.getAffectedFiles(memory, 'add a dashboard chart');
     pass(`getAffectedFiles("dashboard chart") matched ${dashboard.length} files`);
     dashboard.forEach(f => info(`  ${f}`));
 

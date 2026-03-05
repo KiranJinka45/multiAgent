@@ -82,16 +82,33 @@ export class TaskExecutor {
                         tokens: 2500 // Mock token usage
                     });
                 } else {
-                    executingTask.status = 'failed';
-                    logger.error({ taskId: task.id, error: res.error }, `Agent failed its task execution!`);
+                    // ── 3. Autonomous Self-Healing: DebugAgent retry ────────
+                    logger.warn({ taskId: task.id, error: res.error }, `Agent failed. Attempting DebugAgent self-heal...`);
 
-                    await AgentMetrics.record({
-                        agentName: task.type,
-                        taskType: task.title,
-                        success: false,
-                        durationMs: duration,
-                        tokens: 500
-                    });
+                    const healed = await this.attemptDebugFix(task, res, globalContext);
+                    if (healed) {
+                        executingTask.status = 'completed';
+                        logger.info({ taskId: task.id, duration: Date.now() - startTime }, `Task self-healed via DebugAgent.`);
+
+                        await AgentMetrics.record({
+                            agentName: task.type,
+                            taskType: task.title,
+                            success: true,
+                            durationMs: Date.now() - startTime,
+                            tokens: 3500 // Agent + debug attempt
+                        });
+                    } else {
+                        executingTask.status = 'failed';
+                        logger.error({ taskId: task.id, error: res.error }, `Agent failed its task execution and DebugAgent could not heal!`);
+
+                        await AgentMetrics.record({
+                            agentName: task.type,
+                            taskType: task.title,
+                            success: false,
+                            durationMs: Date.now() - startTime,
+                            tokens: 3500
+                        });
+                    }
                 }
             }
         } catch (e: any) {
@@ -110,6 +127,49 @@ export class TaskExecutor {
             this.concurrentTasks.delete(task.id);
         }
     }
+
+    /**
+     * Attempt to self-heal a failed task by invoking DebugAgent.
+     * Returns true if the fix was successful.
+     */
+    private async attemptDebugFix(task: BaseTask, failedResult: any, globalContext?: any): Promise<boolean> {
+        try {
+            const { DebugAgent } = require('../../agents/debug-agent');
+            const debugAgent = new DebugAgent();
+
+            const errorMsg = failedResult.error || 'Unknown agent failure';
+            const existingFiles = failedResult.data?.files || [];
+
+            const debugResult = await debugAgent.execute({
+                errors: errorMsg,
+                files: existingFiles.slice(0, 10),
+                userPrompt: task.payload?.prompt || task.description
+            }, {} as any);
+
+            if (debugResult.success && debugResult.data?.patches?.length > 0 && debugResult.data.confidence > 0.5) {
+                logger.info({
+                    taskId: task.id,
+                    patchCount: debugResult.data.patches.length,
+                    confidence: debugResult.data.confidence
+                }, 'DebugAgent produced a fix — injecting into context');
+
+                // Store the fixed files back into globalContext
+                if (globalContext?.setAgentResult) {
+                    globalContext.setAgentResult(task.type, {
+                        data: { files: debugResult.data.patches },
+                        success: true
+                    });
+                }
+                return true;
+            }
+
+            return false;
+        } catch (e) {
+            logger.warn({ taskId: task.id, error: e }, 'DebugAgent self-heal attempt failed');
+            return false;
+        }
+    }
 }
 
 export const taskExecutor = new TaskExecutor();
+

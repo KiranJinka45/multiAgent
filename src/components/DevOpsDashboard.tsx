@@ -2,16 +2,7 @@
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-    Terminal,
-    Layout,
-    Download,
-    Rocket,
-    Github,
-    MessageSquare,
-    Wand2,
-    Eye
-} from 'lucide-react';
+import { Terminal, Layout, Download, Rocket, Github, Wand2, Eye, BarChart2, Activity } from 'lucide-react';
 import { BuildUpdate } from '@/types/build';
 import FileExplorer from '@/components/FileExplorer';
 import FileViewer from '@/components/FileViewer';
@@ -19,7 +10,9 @@ import BuildConsole from '@/components/BuildConsole';
 import PreviewPanel from '@/components/PreviewPanel';
 import BuildLogs from '@/components/BuildLogs';
 import ChatEditPanel from '@/components/ChatEditPanel';
-import { DiffViewer } from '@/components/DiffViewer';
+import { DiffViewer, FileDiff } from '@/components/DiffViewer';
+import ResourceGraph from '@/components/ResourceGraph';
+import AgentTimeline from '@/components/AgentTimeline';
 import { formatTime, formatYear } from '@/lib/date';
 
 interface DevOpsDashboardProps {
@@ -43,11 +36,14 @@ const DevOpsDashboard: React.FC<DevOpsDashboardProps> = ({
     projectTitle,
     projectId = ''
 }) => {
-    const [activeTab, setActiveTab] = useState<'preview' | 'explorer' | 'logs'>('preview');
+    const [activeTab, setActiveTab] = useState<'preview' | 'explorer' | 'logs' | 'metrics' | 'timeline'>('preview');
     const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null);
     const [mounted, setMounted] = useState(false);
     const [chatOpen, setChatOpen] = useState(false);
     const [diffOpen, setDiffOpen] = useState(false);
+
+    // Pull executionId from buildProgress metadata for the Timeline
+    const executionId = (buildProgress as any)?.executionId || (buildProgress as any)?.metadata?.executionId || '';
 
     useEffect(() => {
         setMounted(true);
@@ -84,6 +80,23 @@ const DevOpsDashboard: React.FC<DevOpsDashboardProps> = ({
             window.location.reload();
         }
     }, [onRedeploy]);
+
+    // Apply a single diff patch via the API
+    const handleApplyDiff = useCallback(async (diff: FileDiff) => {
+        const res = await fetch(`/api/projects/${projectId}/apply-patch`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                path: diff.path,
+                content: diff.newContent,
+                action: diff.type,
+            }),
+        });
+        if (!res.ok) {
+            const body = await res.json().catch(() => ({}));
+            throw new Error(body?.error || `Apply failed (${res.status})`);
+        }
+    }, [projectId]);
 
     return (
         <div className="flex-1 flex flex-col h-full bg-[#030303] text-gray-300 font-sans overflow-hidden selection:bg-primary/30">
@@ -168,6 +181,23 @@ const DevOpsDashboard: React.FC<DevOpsDashboardProps> = ({
                                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
                             </button>
                         ))}
+                        {/* Timeline — always visible once build starts */}
+                        <button
+                            onClick={() => setActiveTab('timeline')}
+                            className={`flex items-center gap-1 px-2.5 sm:px-4 py-1.5 rounded-lg transition-all text-[10px] font-black tracking-widest uppercase ${activeTab === 'timeline' ? 'bg-amber-500/20 text-amber-300 shadow-inner border border-amber-500/20' : 'text-white/40 hover:text-white'}`}
+                        >
+                            <Activity size={10} className="hidden sm:block" />
+                            Timeline
+                        </button>
+                        {isCompleted && (
+                            <button
+                                onClick={() => setActiveTab('metrics')}
+                                className={`flex items-center gap-1 px-2.5 sm:px-4 py-1.5 rounded-lg transition-all text-[10px] font-black tracking-widest uppercase ${activeTab === 'metrics' ? 'bg-violet-500/20 text-violet-300 shadow-inner border border-violet-500/20' : 'text-white/40 hover:text-white'}`}
+                            >
+                                <BarChart2 size={10} className="hidden sm:block" />
+                                Metrics
+                            </button>
+                        )}
                     </div>
 
                     {/* Chat Edit toggle button */}
@@ -240,6 +270,12 @@ const DevOpsDashboard: React.FC<DevOpsDashboardProps> = ({
                                     )}
                                     {activeTab === 'logs' && (
                                         <BuildLogs logs={buildLogs} isGenerating={status !== 'completed' && status !== 'failed'} />
+                                    )}
+                                    {activeTab === 'timeline' && (
+                                        <AgentTimeline executionId={executionId} isCompleted={isCompleted} />
+                                    )}
+                                    {activeTab === 'metrics' && (
+                                        <ResourceGraph projectId={projectId} />
                                     )}
                                 </motion.div>
                             </AnimatePresence>
@@ -314,6 +350,7 @@ const DevOpsDashboard: React.FC<DevOpsDashboardProps> = ({
                 <DiffViewer
                     diffs={buildProgress.metadata.diffs}
                     onClose={() => setDiffOpen(false)}
+                    onApply={handleApplyDiff}
                 />
             )}
         </div>

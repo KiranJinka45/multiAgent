@@ -42,7 +42,9 @@ export async function middleware(req: NextRequest) {
             // Redirect unauthenticated users to login page
             return NextResponse.redirect(new URL("/login", req.url));
         }
-        if (req.nextUrl.pathname.startsWith("/api/") && !req.nextUrl.pathname.startsWith("/api/webhooks")) {
+        if (req.nextUrl.pathname.startsWith("/api/") &&
+            !req.nextUrl.pathname.startsWith("/api/webhooks") &&
+            !req.nextUrl.pathname.startsWith("/api/build/events")) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
     } else {

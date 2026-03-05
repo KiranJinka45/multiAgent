@@ -4,7 +4,14 @@ import { AgentContext } from '../types/agent-context';
 export class BackendAgent extends BaseAgent {
     getName() { return 'BackendAgent'; }
 
-    async execute(input: { prompt: string, schema: string }, _context: AgentContext, signal?: AbortSignal): Promise<AgentResponse> {
+    async execute(input: { prompt: string, schema: string, isIncremental?: boolean, affectedFiles?: string[] }, _context: AgentContext, signal?: AbortSignal): Promise<AgentResponse> {
+        if (input.isIncremental) {
+            const backendFiles = input.affectedFiles?.filter(f => f.includes('api/') || f.includes('middleware') || f.includes('lib/'));
+            if (!backendFiles || backendFiles.length === 0) {
+                this.log(`Skipping Backend generation (no backend files affected in incremental build)`);
+                return { success: true, data: { files: [] }, tokens: 0, logs: this.logs };
+            }
+        }
         void _context;
         this.log(`Generating Backend APIs based on schema...`);
         try {

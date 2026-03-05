@@ -1,3 +1,6 @@
+import * as dotenv from "dotenv";
+dotenv.config({ path: ".env.local" });
+
 // Apply project_memory migration via Supabase SQL API (direct fetch)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -19,6 +22,9 @@ CREATE TABLE IF NOT EXISTS project_memory (
     UNIQUE(project_id)
 );
 CREATE INDEX IF NOT EXISTS idx_project_memory_project_id ON project_memory(project_id);
+
+-- Force PostgREST to reload schema cache
+NOTIFY pgrst, 'reload schema';
 `;
 
 async function run() {

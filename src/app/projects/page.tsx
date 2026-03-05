@@ -5,8 +5,14 @@ import ProjectGallery from '@/components/ProjectGallery';
 import { projectService } from '@/lib/project-service';
 
 export default async function ProjectsPage() {
-    const supabase = createServerComponentClient({ cookies });
-    const projects = await projectService.getProjects(supabase);
+    let projects = null;
+    try {
+        const supabase = createServerComponentClient({ cookies });
+        projects = await projectService.getProjects(supabase);
+    } catch (err) {
+        // Supabase unreachable (network issue / env not configured) — render empty gallery
+        console.error('[ProjectsPage] Failed to fetch projects:', err);
+    }
 
     return (
         <div className="flex h-screen bg-background text-foreground overflow-hidden">

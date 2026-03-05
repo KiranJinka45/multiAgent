@@ -18,7 +18,10 @@ import {
     ShieldCheck,
     Wrench,
     RefreshCw,
-    Info
+    Info,
+    Zap,
+    Brain,
+    ChevronRight
 } from 'lucide-react';
 
 // ── Types ─────────────────────────────────────────────────────────────
@@ -188,8 +191,8 @@ const MessageBubble: React.FC<{
         >
             {/* Avatar */}
             <div className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${isUser
-                    ? 'bg-primary/20 border border-primary/30'
-                    : 'bg-gradient-to-br from-violet-500 to-blue-600 shadow-[0_0_15px_rgba(139,92,246,0.3)]'
+                ? 'bg-primary/20 border border-primary/30'
+                : 'bg-gradient-to-br from-violet-500 to-blue-600 shadow-[0_0_15px_rgba(139,92,246,0.3)]'
                 }`}>
                 {isUser
                     ? <User size={13} className="text-primary" />
@@ -201,8 +204,8 @@ const MessageBubble: React.FC<{
             <div className={`flex flex-col gap-2 max-w-[85%] ${isUser ? 'items-end' : 'items-start'}`}>
                 {/* Bubble */}
                 <div className={`relative px-3.5 py-2.5 rounded-2xl text-[13px] leading-relaxed ${isUser
-                        ? 'bg-primary/15 border border-primary/25 text-white rounded-tr-sm'
-                        : 'bg-white/[0.04] border border-white/8 text-gray-200 rounded-tl-sm'
+                    ? 'bg-primary/15 border border-primary/25 text-white rounded-tr-sm'
+                    : 'bg-white/[0.04] border border-white/8 text-gray-200 rounded-tl-sm'
                     }`}>
                     {message.isLoading ? (
                         <span className="flex items-center gap-2 text-gray-400">
@@ -268,6 +271,96 @@ const MessageBubble: React.FC<{
     );
 };
 
+// ── Autonomous Thought Stream ───────────────────────────────────────
+
+interface AgentThought {
+    agent: string;
+    timestamp: string;
+    action: string;
+    reasoning: string;
+}
+
+const AgentThoughtStream: React.FC<{
+    projectId: string;
+    enabled: boolean;
+}> = ({ projectId, enabled }) => {
+    const [thoughts, setThoughts] = useState<AgentThought[]>([]);
+    const [expanded, setExpanded] = useState(true);
+    const thoughtsEndRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (!enabled) { setThoughts([]); return; }
+
+        // Poll for agent thoughts (connected to the SSE build events stream)
+        const interval = setInterval(async () => {
+            try {
+                const res = await fetch(`/api/projects/${projectId}/agent-thoughts`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.thoughts?.length) setThoughts(data.thoughts.slice(-20));
+                }
+            } catch { } // Non-critical
+        }, 3000);
+
+        return () => clearInterval(interval);
+    }, [projectId, enabled]);
+
+    useEffect(() => {
+        thoughtsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [thoughts]);
+
+    if (!enabled || thoughts.length === 0) return null;
+
+    const agentColors: Record<string, string> = {
+        PlannerAgent: 'text-blue-400',
+        CoderAgent: 'text-green-400',
+        DebugAgent: 'text-amber-400',
+        SelfEvaluator: 'text-violet-400',
+        System: 'text-gray-400',
+    };
+
+    return (
+        <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="relative z-10 border-b border-white/[0.04] bg-black/30"
+        >
+            <button
+                onClick={() => setExpanded(v => !v)}
+                className="w-full flex items-center gap-2 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-violet-400/70 hover:text-violet-400 transition-colors"
+            >
+                <Brain size={10} />
+                Agent Thought Stream ({thoughts.length})
+                <ChevronRight size={9} className={`ml-auto transition-transform ${expanded ? 'rotate-90' : ''}`} />
+            </button>
+            <AnimatePresence>
+                {expanded && (
+                    <motion.div
+                        initial={{ height: 0 }}
+                        animate={{ height: 'auto' }}
+                        exit={{ height: 0 }}
+                        className="overflow-hidden"
+                    >
+                        <div className="max-h-32 overflow-y-auto px-4 pb-2 space-y-1.5 custom-scrollbar">
+                            {thoughts.map((t, i) => (
+                                <div key={i} className="flex gap-2 text-[10px] leading-relaxed">
+                                    <span className={`font-bold shrink-0 ${agentColors[t.agent] || 'text-gray-400'}`}>
+                                        {t.agent}
+                                    </span>
+                                    <span className="text-white/40">{t.action}:</span>
+                                    <span className="text-white/60 truncate">{t.reasoning}</span>
+                                </div>
+                            ))}
+                            <div ref={thoughtsEndRef} />
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </motion.div>
+    );
+};
+
 // ── Main ChatEditPanel ──────────────────────────────────────────────
 
 const ChatEditPanel: React.FC<ChatEditPanelProps> = ({
@@ -287,6 +380,7 @@ const ChatEditPanel: React.FC<ChatEditPanelProps> = ({
     const [inputValue, setInputValue] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showScrollBtn, setShowScrollBtn] = useState(false);
+    const [autonomousMode, setAutonomousMode] = useState(false);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -420,6 +514,18 @@ const ChatEditPanel: React.FC<ChatEditPanelProps> = ({
                             </div>
                         </div>
                         <div className="flex items-center gap-1">
+                            {/* Autonomous Mode Toggle */}
+                            <button
+                                onClick={() => setAutonomousMode(v => !v)}
+                                title={autonomousMode ? 'Disable Autonomous Mode' : 'Enable Autonomous Mode'}
+                                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border ${autonomousMode
+                                        ? 'bg-violet-500/15 border-violet-500/30 text-violet-400 shadow-[0_0_12px_rgba(139,92,246,0.15)]'
+                                        : 'bg-white/[0.03] border-white/[0.08] text-white/30 hover:text-white/60 hover:border-white/15'
+                                    }`}
+                            >
+                                <Zap size={10} className={autonomousMode ? 'text-violet-400' : ''} />
+                                Auto
+                            </button>
                             <button onClick={clearHistory} title="Clear history" className="p-2 rounded-lg text-white/30 hover:text-white/70 hover:bg-white/5 transition-all">
                                 <RotateCcw size={13} />
                             </button>
@@ -441,6 +547,13 @@ const ChatEditPanel: React.FC<ChatEditPanelProps> = ({
                             </div>
                         ))}
                     </div>
+
+                    {/* ── Agent Thought Stream (Autonomous Mode) ── */}
+                    <AnimatePresence>
+                        {autonomousMode && (
+                            <AgentThoughtStream projectId={projectId} enabled={autonomousMode} />
+                        )}
+                    </AnimatePresence>
 
                     {/* ── Messages ── */}
                     <div
@@ -498,8 +611,8 @@ const ChatEditPanel: React.FC<ChatEditPanelProps> = ({
                     {/* ── Input ── */}
                     <div className="relative z-10 px-4 pb-4 pt-3 border-t border-white/[0.05] bg-[#080810]/60 backdrop-blur-xl shrink-0">
                         <div className={`flex gap-2.5 p-3 bg-white/[0.04] rounded-2xl border transition-all ${isSubmitting
-                                ? 'border-violet-500/30 shadow-[0_0_20px_rgba(139,92,246,0.08)]'
-                                : 'border-white/[0.07] hover:border-white/[0.12] focus-within:border-primary/40 focus-within:shadow-[0_0_25px_rgba(59,130,246,0.06)]'
+                            ? 'border-violet-500/30 shadow-[0_0_20px_rgba(139,92,246,0.08)]'
+                            : 'border-white/[0.07] hover:border-white/[0.12] focus-within:border-primary/40 focus-within:shadow-[0_0_25px_rgba(59,130,246,0.06)]'
                             }`}>
                             <Sparkles
                                 size={15}
@@ -524,17 +637,19 @@ const ChatEditPanel: React.FC<ChatEditPanelProps> = ({
                                 onClick={() => sendMessage(inputValue)}
                                 disabled={isSubmitting || !inputValue.trim()}
                                 className={`self-end p-2 rounded-xl transition-all ${inputValue.trim() && !isSubmitting
-                                        ? 'bg-primary text-white shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:brightness-110'
-                                        : 'bg-white/5 text-white/20 cursor-not-allowed'
+                                    ? 'bg-primary text-white shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:brightness-110'
+                                    : 'bg-white/5 text-white/20 cursor-not-allowed'
                                     }`}
                             >
                                 {isSubmitting ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
                             </button>
                         </div>
                         <p className="text-[10px] text-white/15 text-center mt-2 font-medium">
-                            Patches are type-checked & auto-healed before applying
-                        </p>
-                    </div>
+                            {autonomousMode
+                                ? '🤖 Autonomous Mode — AI will plan, code, debug & self-evaluate'
+                                : 'Patches are type-checked & auto-healed before applying'
+                            }
+                        </p>    </div>
                 </motion.div>
             )}
         </AnimatePresence>

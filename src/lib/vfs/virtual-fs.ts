@@ -33,15 +33,24 @@ export class VirtualFileSystem {
 
     /**
      * Set or overwrite file content in the VFS.
+     * Only marks as dirty if the content hash actually changes.
      */
-    setFile(path: string, content: string, isDirty: boolean = true, agentId?: string) {
+    setFile(path: string, content: string, forceDirty: boolean = true, agentId?: string) {
         const normalized = path.replace(/^\//, '');
+        const existing = this.tree.get(normalized);
+        const newHash = this.generateHash(content);
+
+        let isDirty = forceDirty;
+        if (existing && existing.hash === newHash) {
+            isDirty = false; // The content hasn't changed, don't mark as dirty
+        }
+
         this.tree.set(normalized, {
             path: normalized,
             content,
-            hash: this.generateHash(content),
-            isDirty,
-            agentId,
+            hash: newHash,
+            isDirty: isDirty || (existing ? existing.isDirty : false),
+            agentId: agentId || (existing ? existing.agentId : undefined),
             lastModified: new Date().toISOString()
         });
     }

@@ -37,7 +37,7 @@ const resumeOrphanedExecutions = async () => {
 
                     const { userId, projectId, message } = state;
 
-                    orchestrator.run(message || 'Resuming build...', userId || 'unknown', projectId || 'unknown', state.executionId)
+                    orchestrator.run(message || 'Resuming build...', userId || 'unknown', projectId || 'unknown', state.executionId, AbortSignal.timeout(30 * 60 * 1000))
                         .catch(err => logger.error({ err, executionId: state.executionId }, 'Failed to resume orphaned execution'));
                 }
             } catch (err) {
@@ -118,8 +118,8 @@ const processJob = async (job: Job, tier: 'free' | 'pro') => {
                 controller.signal
             );
 
-            if (result && !result.success) {
-                throw new Error(result.error);
+            if (result && !(result as any).success) {
+                throw new Error((result as any).error || 'Build failed');
             }
 
             return result;
