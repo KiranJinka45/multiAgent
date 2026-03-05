@@ -1,11 +1,9 @@
-﻿src/agents/task-orchestrator.ts(20,26): error TS2307: Cannot find module '../lib/event-bus' or its corresponding type declarations.
-src/app/api/projects/[id]/edit/route.ts(131,40): error TS2339: Property 'includes' does not exist on type 'Promise<string[]>'.
-src/app/api/projects/[id]/edit/route.ts(131,74): error TS2339: Property 'length' does not exist on type 'Promise<string[]>'.
-src/app/api/projects/[id]/edit/route.ts(184,67): error TS2345: Argument of type '{ path: string; content: string; }[]' is not assignable to parameter of type 'VirtualFileSystem'.
-  Type '{ path: string; content: string; }[]' is missing the following properties from type 'VirtualFileSystem': tree, loadFromDiskState, getFile, setFile, and 6 more.
-src/lib/task-engine/swarm-orchestrator.ts(11,27): error TS2304: Cannot find name 'TaskGraph'.
-src/lib/task-engine/swarm-orchestrator.ts(13,28): error TS2304: Cannot find name 'TaskGraph'.
-src/lib/vfs/rollback-manager.ts(13,38): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Map<string, any>'.
-src/lib/vfs/rollback-manager.ts(31,33): error TS2345: Argument of type 'Map<string, any>' is not assignable to parameter of type 'string'.
-src/worker.ts(40,34): error TS2554: Expected 5 arguments, but got 4.
-src/worker.ts(122,40): error TS2339: Property 'error' does not exist on type '{ success: boolean; files: { path: string; content: string; }[]; previewUrl: string; }'.
+﻿src/agents/orchestrator.ts(85,96): error TS2339: Property 'schema' does not exist on type 'unknown'.
+src/agents/orchestrator.ts(90,96): error TS2339: Property 'schema' does not exist on type 'unknown'.
+src/agents/orchestrator.ts(102,81): error TS2339: Property 'files' does not exist on type 'unknown'.
+src/agents/orchestrator.ts(103,82): error TS2339: Property 'files' does not exist on type 'unknown'.
+src/agents/orchestrator.ts(118,84): error TS2339: Property 'files' does not exist on type 'unknown'.
+src/agents/orchestrator.ts(131,80): error TS2339: Property 'files' does not exist on type 'unknown'.
+src/agents/orchestrator.ts(211,52): error TS2554: Expected 2 arguments, but got 1.
+src/lib/opentelemetry.ts(13,19): error TS2693: 'Resource' only refers to a type, but is being used as a value here.
+src/lib/stripe.ts(8,5): error TS2322: Type '"2024-06-20"' is not assignable to type '"2026-02-25.clover"'.

@@ -14,12 +14,11 @@ async function trigger() {
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
     // 1. Find the project and user
-    const projectId = process.argv[2] || "d4f64aaa-d112-4c69-a181-6b29b2526c92";
+    const projectId = "f94a47d8-8dc9-4803-be92-2fd0ec791181";
     const { data: project, error: pErr } = await supabase.from('projects').select('*').eq('id', projectId).single();
     if (pErr) { console.error("Project not found:", pErr); return; }
 
-    // Use the real userId to test TenantService resolution
-    const userId = project.user_id || "027f27e9-b18d-472f-95da-b7038d4dd61d";
+    const userId = project.user_id;
     const prompt = project.description || "Build a simple Next.js landing page with Tailwind, a single API route, and deploy it.";
     const executionId = `exec_${Date.now()}`;
 
