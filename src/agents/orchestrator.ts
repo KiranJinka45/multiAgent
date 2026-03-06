@@ -1,15 +1,15 @@
-import { DatabaseAgent } from './database-agent';
-import { BackendAgent } from './backend-agent';
-import { FrontendAgent } from './frontend-agent';
-import { DeploymentAgent } from './deployment-agent';
-import { TestingAgent } from './testing-agent';
-import { ValidatorAgent } from './validator-agent';
-import { PlannerAgent, TaskPlan } from './planner-agent';
+import { DatabaseAgent } from '@services/database-agent';
+import { BackendAgent } from '@services/backend-agent';
+import { FrontendAgent } from '@services/frontend-agent';
+import { DeploymentAgent } from '@services/deployment-agent';
+import { TestingAgent } from '@services/testing-agent';
+import { ValidatorAgent } from '@services/validator-agent';
+import { PlannerAgent, TaskPlan } from '@services/planner-agent';
 import { RetryManager } from './retry-manager';
-import { BaseAgent, AgentResponse } from './base-agent';
-import { DistributedExecutionContext as ExecutionContext, ExecutionContextType } from '../lib/execution-context';
-import logger, { getExecutionLogger } from '../lib/logger';
-import { runWithTracing } from '../lib/tracing';
+import { BaseAgent, AgentResponse } from '@services/base-agent';
+import { DistributedExecutionContext as ExecutionContext, ExecutionContextType } from './execution-context';
+import logger, { getExecutionLogger } from '@configs/logger';
+import { runWithTracing } from '@configs/tracing';
 import {
     agentExecutionDuration,
     agentFailuresTotal,
@@ -19,12 +19,12 @@ import {
 } from '../lib/metrics';
 import { CostGovernanceService } from '../lib/governance';
 import { BuildStage, BuildUpdate, BUILD_STAGES_CONFIG, STAGE_ORDER, STAGE_PROGRESS } from '../types/build';
-import redis from '../lib/redis';
+import redis from '@queue/redis-client';
 import { sendBuildSuccessEmail } from '../lib/email';
 import { OrchestratorLock } from '../lib/orchestrator-lock';
-import { supabaseAdmin } from '../lib/supabaseAdmin';
-import { projectService } from '../lib/project-service';
-import { projectMemory } from '../lib/project-memory';
+import { supabaseAdmin } from '@queue/supabase-admin';
+import { projectService } from './project-service';
+import { projectMemory } from './project-memory';
 
 export class Orchestrator {
     private isFrozen = false;

@@ -1,6 +1,6 @@
-import redis from './lib/redis';
-import { supabaseAdmin } from './lib/supabaseAdmin';
-import logger from './lib/logger';
+import redis from '@queue/redis-client';
+import { supabaseAdmin } from '@queue/supabase-admin';
+import logger from '@configs/logger';
 
 /**
  * Reconciliation Job for MultiAgent Governance

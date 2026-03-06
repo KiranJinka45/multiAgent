@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { Queue, Worker, QueueEvents } from 'bullmq';
-import redis from '../lib/redis';
+import redis from '@queue/redis-client';
 import { v4 as uuidv4 } from 'uuid';
 
 const TEST_QUEUE_NAME = 'test-reliability-queue';

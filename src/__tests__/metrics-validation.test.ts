@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll, vi, beforeEach } from 'vitest';
 import { Orchestrator } from '../agents/orchestrator';
-import { registry } from '../lib/metrics';
-import redis from '../lib/redis';
+import { registry } from '@configs/metrics';
+import redis from '@queue/redis-client';
 import { v4 as uuidv4 } from 'uuid';
 
 describe('Prometheus Metrics Validation', () => {

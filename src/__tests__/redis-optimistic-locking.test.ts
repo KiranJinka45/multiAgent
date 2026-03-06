@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { DistributedExecutionContext } from '../lib/execution-context';
-import redis from '../lib/redis';
+import { DistributedExecutionContext } from './execution-context';
+import redis from '@queue/redis-client';
 import { v4 as uuidv4 } from 'uuid';
 
 describe('DistributedExecutionContext - Redis Optimistic Locking Stress Test', () => {

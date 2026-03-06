@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll, vi, beforeEach } from 'vitest';
 import { Orchestrator } from '../agents/orchestrator';
-import { DistributedExecutionContext } from '../lib/execution-context';
-import redis from '../lib/redis';
+import { DistributedExecutionContext } from './execution-context';
+import redis from '@queue/redis-client';
 import { v4 as uuidv4 } from 'uuid';
 
 describe('Fault Tolerance - Orchestrator Crash Simulation & Resume', () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
-import redis from '../lib/redis';
+import redis from '@queue/redis-client';
 import { CostGovernanceService } from '../lib/governance';
 import { v4 as uuidv4 } from 'uuid';
 

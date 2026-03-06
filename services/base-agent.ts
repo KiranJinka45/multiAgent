@@ -1,5 +1,5 @@
 import { Groq } from 'groq-sdk';
-import logger from '../lib/logger';
+import logger from '@configs/logger';
 import { AgentContext } from '../types/agent-context';
 import { breakers } from '../lib/circuit-breaker';
 

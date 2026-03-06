@@ -25,6 +25,24 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "@services/*": [
+        "./services/*"
+      ],
+      "@workers/*": [
+        "./workers/*"
+      ],
+      "@queue/*": [
+        "./queue/*"
+      ],
+      "@realtime/*": [
+        "./realtime/*"
+      ],
+      "@configs/*": [
+        "./configs/*"
+      ],
+      "@templates/*": [
+        "./templates/*"
       ]
     },
     "target": "ES2017"

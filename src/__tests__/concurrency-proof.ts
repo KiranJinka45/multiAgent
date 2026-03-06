@@ -1,6 +1,6 @@
-import redis from '../lib/redis';
+import redis from '@queue/redis-client';
 import { Orchestrator } from '../agents/orchestrator';
-import logger from '../lib/logger';
+import logger from '@configs/logger';
 
 async function testDuplicateJobPrevention() {
     const executionId = `test-concurrent-${Date.now()}`;

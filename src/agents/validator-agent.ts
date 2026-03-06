@@ -1,6 +1,6 @@
-import { BaseAgent, AgentResponse } from './base-agent';
+import { BaseAgent, AgentResponse } from '@services/base-agent';
 import { AgentContext } from '../types/agent-context';
-import logger from '../lib/logger';
+import logger from '@configs/logger';
 
 export class ValidatorAgent extends BaseAgent {
     getName() { return 'ValidatorAgent'; }

@@ -2,18 +2,18 @@ import dotenv from 'dotenv';
 dotenv.config({ path: '.env.local' });
 
 import { Worker, Job } from 'bullmq';
-import { QUEUE_FREE, QUEUE_PRO } from './lib/queue';
-import redis from './lib/redis';
-import logger from './lib/logger';
+import { QUEUE_FREE, QUEUE_PRO } from '@queue/build-queue';
+import redis from '@queue/redis-client';
+import logger from '@configs/logger';
 import { TaskOrchestrator } from './agents/task-orchestrator';
-import { runWithTracing } from './lib/tracing';
-import { queueWaitTimeSeconds, stuckBuildsTotal } from './lib/metrics';
+import { runWithTracing } from '@configs/tracing';
+import { queueWaitTimeSeconds, stuckBuildsTotal } from '@configs/metrics';
 import { NodeRegistry } from './runtime/cluster/nodeRegistry';
 import { FailoverManager } from './runtime/cluster/failoverManager';
 import { RedisRecovery } from './runtime/cluster/redisRecovery';
 import { PreviewOrchestrator } from './runtime/previewOrchestrator';
 import { RuntimeCleanup } from './runtime/runtimeCleanup';
-import { env } from './config/env';
+import { env } from '@configs/env';
 
 const orchestrator = new TaskOrchestrator();
 

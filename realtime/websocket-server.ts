@@ -3,8 +3,8 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import Redis from 'ioredis';
 import { Queue } from 'bullmq';
-import { QUEUE_FREE, QUEUE_PRO } from './lib/queue';
-import redis from './lib/redis';
+import { QUEUE_FREE, QUEUE_PRO } from '@queue/build-queue';
+import redis from '@queue/redis-client';
 import dotenv from 'dotenv';
 import cors from 'cors';
 

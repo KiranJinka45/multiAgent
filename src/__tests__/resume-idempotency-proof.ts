@@ -1,6 +1,6 @@
 import { Orchestrator } from '../agents/orchestrator';
-import { DistributedExecutionContext as ExecutionContext } from '../lib/execution-context';
-import redis from '../lib/redis';
+import { DistributedExecutionContext as ExecutionContext } from './execution-context';
+import redis from '@queue/redis-client';
 
 async function testResumeIdempotency() {
     const executionId = `test-resume-${Date.now()}`;

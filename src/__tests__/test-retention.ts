@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '../lib/supabaseAdmin';
+import { supabaseAdmin } from '@queue/supabase-admin';
 
 async function testRetentionLogic() {
     console.log('--- Testing Retention Logic ---');

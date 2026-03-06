@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { withLock } from '../lib/lock';
 import redlock from '../lib/lock';
-import redis from '../lib/redis';
+import redis from '@queue/redis-client';
 import { v4 as uuidv4 } from 'uuid';
 
 describe('Redlock Safety & Distributed Locking Integration Tests', () => {

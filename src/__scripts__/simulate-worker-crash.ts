@@ -6,7 +6,7 @@
  */
 
 import { Worker, Queue } from 'bullmq';
-import redis from '../lib/redis';
+import redis from '@queue/redis-client';
 
 const QUEUE_NAME = 'project-generation-v1';
 const queue = new Queue(QUEUE_NAME, { connection: redis });

@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "worker": "dotenv -e .env.local -- tsx src/worker.ts",
-    "realtime": "dotenv -e .env.local -- tsx src/realtime.ts",
+    "worker": "dotenv -e .env.local -- tsx workers/build-worker.ts",
+    "realtime": "dotenv -e .env.local -- tsx realtime/websocket-server.ts",
     "dev:all": "concurrently --shell cmd.exe \"npm run dev\" \"npm run worker\" \"npm run realtime\"",
     "build": "next build",
     "start": "next start",
