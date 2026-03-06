@@ -103,7 +103,7 @@ export class TaskOrchestrator {
             // Setup SSE tracking (legacy stages for UI compatibility)
             const uiStages = ['database', 'backend', 'frontend', 'testing', 'deployment'];
             for (const stage of uiStages) {
-                await this.updateLegacyUiStage(executionId, stage, 'pending', 'Waiting for dependencies...');
+                await this.updateLegacyUiStage(projectId, executionId, stage, 'pending', 'Waiting for dependencies...');
             }
 
             // ═══════════════════════════════════════════════════════════════
@@ -142,7 +142,7 @@ export class TaskOrchestrator {
                     getExecutionId: () => executionId,
                     get: () => context.get(),
                     setAgentResult: (n: string, r: any) => context.setAgentResult(n, r),
-                    updateUiStage: (stage: string, status: string, msg: string) => this.updateLegacyUiStage(executionId, stage, status, msg)
+                    updateUiStage: (stage: string, status: string, msg: string) => this.updateLegacyUiStage(projectId, executionId, stage, status, msg)
                 });
 
                 // Collect files from all agents
@@ -322,7 +322,7 @@ export class TaskOrchestrator {
 
             await eventBus.stage(executionId, 'cicd', 'in_progress', 'Configuring CI/CD pipelines...', 85);
             const cicdTimer = await eventBus.startTimer(executionId, 'CICDAgent', 'pipeline_setup', 'Injecting GitHub Actions workflow files...');
-            await this.updateLegacyUiStage(executionId, 'deployment', 'completed', 'Project ready!', 100);
+            await this.updateLegacyUiStage(projectId, executionId, 'deployment', 'completed', 'Project ready!', 100);
 
             // ── 9. Autonomous AI DevOps Phase ────────────────────────────
             elog.info('Initiating Autonomous DevOps pipeline...');
@@ -373,11 +373,13 @@ export class TaskOrchestrator {
         }
     }
 
-    private async updateLegacyUiStage(executionId: string, stageId: string, status: string, message: string, progress = 0) {
+    private async updateLegacyUiStage(projectId: string, executionId: string, stageId: string, status: string, message: string, progress = 0) {
         // Bridge: publishes to the Redis Streams Event Bus (replaces old broken pusher)
         try {
             const redis = require('../lib/redis').default;
             const state = JSON.parse(await redis.get(`build:state:${executionId}`) || '{}');
+            state.projectId = projectId; // Ensure projectId is in the state snapshot
+            state.executionId = executionId;
             state._stagesMap = state._stagesMap || {};
             state._stagesMap[stageId] = { id: stageId, status, message, progressPercent: progress };
             const STAGE_ORDER = ['initializing', 'database', 'backend', 'frontend', 'testing', 'dockerization', 'cicd', 'deployment'];
@@ -400,9 +402,8 @@ export class TaskOrchestrator {
             await redis.setex(`build:state:${executionId}`, 86400, stateString);
 
             // Publish directly to Socket.IO Redis Sub
-            const [projectId] = executionId.split('-'); // Simple extraction or get from context if available
             await redis.publish('build-events', JSON.stringify({
-                projectId: state.projectId || projectId, // Need project scope for socket.io rooms
+                projectId,
                 executionId,
                 ...state
             }));

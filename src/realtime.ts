@@ -26,10 +26,27 @@ const PORT = 3005;
 io.on('connection', (socket) => {
     console.log(`[Socket.IO] Client connected: ${socket.id}`);
 
-    socket.on('join-project', (projectId: string) => {
+    socket.on('join-project', async (projectId: string) => {
         const room = `project:${projectId}`;
         socket.join(room);
         console.log(`[Socket.IO] Client ${socket.id} joined room: ${room}`);
+
+        // Catch-up logic: Fetch latest build state from Redis and send to the joining client
+        try {
+            // We use the same key pattern as event-bus.ts: build:state:{executionId}
+            // However, the client joins by projectId. We might need a mapping or check for multiple executions.
+            // For now, let's look for keys pattern build:state:* and find one matching the project if possible,
+            // or rely on the fact that the orchestrator publishes to 'build-events' which we already listen to.
+
+            // Optimization: If the orchestrator stores the 'latest' state in a predictable key:
+            const latestState = await redisSub.get(`project:state:${projectId}`);
+            if (latestState) {
+                socket.emit('build-update', JSON.parse(latestState));
+                console.log(`[Socket.IO] Sent catch-up state to ${socket.id} for project ${projectId}`);
+            }
+        } catch (error) {
+            console.error('[Socket.IO] Catch-up error:', error);
+        }
     });
 
     socket.on('disconnect', () => {
@@ -49,9 +66,12 @@ redisSub.on('message', (channel, message) => {
     if (channel === 'build-events') {
         try {
             const payload = JSON.parse(message);
-            const { projectId } = payload;
+            const { projectId, executionId } = payload;
 
             if (projectId) {
+                // Cache the latest state for this project to enable instant catch-up for new listeners
+                redisSub.setex(`project:state:${projectId}`, 3600, message); // TTL 1 hour
+
                 io.to(`project:${projectId}`).emit('build-update', payload);
                 console.log(`[Socket.IO] Broadcasted build-update to project:${projectId}`);
             } else {

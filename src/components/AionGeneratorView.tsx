@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle2, Loader2, PlayCircle, Code2, Server, Wrench, RefreshCw, Rocket } from 'lucide-react';
 import { toast } from 'sonner';
+import { useSocket } from '@/hooks/use-socket';
+import { BuildUpdate } from '@/types/build';
 
 interface AionGeneratorProps {
     prompt: string;
@@ -23,6 +25,23 @@ export default function AionGeneratorView({ prompt, onComplete }: AionGeneratorP
     const [status, setStatus] = useState<string>('initializing');
     const [manifest, setManifest] = useState<Record<string, unknown> | null>(null);
     const [urls, setUrls] = useState<{ frontend?: string; backend?: string } | null>(null);
+    const [projectId, setProjectId] = useState<string | null>(null);
+
+    // ── 1. Unified Socket.IO Realtime ───────────────────────────────────────
+    useSocket({
+        projectId: projectId || '',
+        onUpdate: (update) => {
+            console.log('[AionGenerator] Socket Update:', update.status);
+            setStatus(update.status);
+
+            if (update.status === 'completed') {
+                setManifest((update.metadata as any)?.manifest || null);
+                setUrls((update.metadata as any)?.deployment_urls || { frontend: (update.metadata as any)?.previewUrl } || null);
+                toast.success("Project generated and deployed!");
+                if (onComplete) onComplete();
+            }
+        }
+    });
 
     useEffect(() => {
         // 1. Trigger the Generation Job
@@ -37,6 +56,7 @@ export default function AionGeneratorView({ prompt, onComplete }: AionGeneratorP
                 if (!response.ok) throw new Error('Failed to start generation');
                 const data = await response.json();
                 setJobId(data.job_id);
+                setProjectId(data.projectId || data.project_id || data.job_id); // Ensure we have a projectId for room joining
             } catch (error) {
                 console.error("Start error:", error);
                 toast.error("Failed to connect to Aion Orchestrator (is it running on port 8000?)");
@@ -47,31 +67,7 @@ export default function AionGeneratorView({ prompt, onComplete }: AionGeneratorP
         startJob();
     }, [prompt]);
 
-    useEffect(() => {
-        // 2. Poll the status every 2 seconds
-        if (!jobId || status === 'completed' || status.startsWith('failed')) return;
-
-        const poll = setInterval(async () => {
-            try {
-                const res = await fetch(`http://localhost:8000/api/status/${jobId}`);
-                if (res.ok) {
-                    const data = await res.json();
-                    setStatus(data.status);
-
-                    if (data.status === 'completed') {
-                        clearInterval(poll);
-                        setManifest(data.manifest);
-                        setUrls(data.deployment_urls);
-                        toast.success("Project generated and deployed!");
-                    }
-                }
-            } catch (err) {
-                console.error("Poll error:", err);
-            }
-        }, 2000);
-
-        return () => clearInterval(poll);
-    }, [jobId, status, onComplete]);
+    // Unified Socket.IO replaces legacy polling logic
 
     // Determine active step index
     const activeIndex = steps.findIndex(s => s.id === status);

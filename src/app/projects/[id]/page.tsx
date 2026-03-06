@@ -21,6 +21,7 @@ import DevOpsDashboard from '@/components/DevOpsDashboard';
 import { formatTime } from '@/lib/date';
 import TechStackSelector, { TechStack } from '@/components/TechStackSelector';
 import PushToGithubModal from '@/components/PushToGithubModal';
+import { useSocket } from '@/hooks/use-socket';
 
 const FileItem = memo(({ file, isSelected, onClick }: { file: ProjectFile, isSelected: boolean, onClick: () => void }) => {
     const fileName = file.path.split('/').pop() || file.path;
@@ -55,6 +56,21 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
     const [replyText, setReplyText] = useState("");
 
     const router = useRouter();
+
+    // ── 1. Unified Socket.IO Realtime ───────────────────────────────────────
+    const { isConnected: isSocketConnected } = useSocket({
+        projectId: params.id,
+        onUpdate: (update) => {
+            console.log('[Realtime] Build update received via Socket.IO:', update.currentStage);
+            setBuildProgress(update);
+            if (update.status === 'completed') {
+                setIsGenerating(false);
+                loadFiles();
+            } else if (update.status === 'executing' || update.status === 'failed') {
+                setIsGenerating(update.status === 'executing');
+            }
+        }
+    });
 
     useEffect(() => {
         setMounted(true);
@@ -220,6 +236,10 @@ Database: ${stack.database}`;
 
     useEffect(() => {
         if (!isGenerating && connectionMode === 'live') return;
+        // Only poll for project metadata/files when NOT in active generation
+        // Active build progress is now handled by Socket.IO
+        if (isGenerating) return;
+
         let delay = (connectionMode === 'polling' || connectionMode === 'failover') ? (isGenerating ? 3000 : 15000) : 10000;
         const interval = setInterval(() => loadProjectData(false), delay);
         return () => clearInterval(interval);
@@ -278,8 +298,9 @@ Database: ${stack.database}`;
                     .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'projects', filter: `id=eq.${params.id}` }, (payload) => {
                         const updatedProject = payload.new as Project;
                         setProject(updatedProject);
-                        if (updatedProject.status === 'completed') setIsGenerating(false);
-                        else if (updatedProject.status.startsWith('generating')) setIsGenerating(true);
+                        // Build status is now handled by Socket.IO
+                        // if (updatedProject.status === 'completed') setIsGenerating(false);
+                        // else if (updatedProject.status.startsWith('generating')) setIsGenerating(true);
                     });
                 setupChannel(newStatusChannel, 'status', initStatusChannel);
             };
