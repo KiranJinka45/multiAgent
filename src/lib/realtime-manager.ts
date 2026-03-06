@@ -60,8 +60,14 @@ class RealtimeManager {
         container.isSubscribed = true;
 
         const attemptSubscribe = () => {
+            // If the channel is already in a joining or joined state, don't re-subscribe
+            // This prevents "WebSocket is closed before the connection is established" errors
+            if (container.channel.state === 'joining' || container.channel.state === 'joined') {
+                return;
+            }
+
             container.subscribePromise = new Promise((resolve) => {
-                container.channel.subscribe((status) => {
+                container.channel.subscribe((status, err) => {
                     if (status === 'SUBSCRIBED') {
                         container.retryCount = 0;
                         if (onStatus) onStatus(status);

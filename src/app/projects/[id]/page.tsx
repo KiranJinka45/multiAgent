@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback, useRef, memo } from 'react';
+import { useState, useEffect, useMemo, useCallback, memo } from 'react';
 import {
     FileCode,
     ChevronRight,
@@ -21,7 +21,6 @@ import DevOpsDashboard from '@/components/DevOpsDashboard';
 import { formatTime } from '@/lib/date';
 import TechStackSelector, { TechStack } from '@/components/TechStackSelector';
 import PushToGithubModal from '@/components/PushToGithubModal';
-import { realtimeManager } from '@/lib/realtime-manager';
 
 const FileItem = memo(({ file, isSelected, onClick }: { file: ProjectFile, isSelected: boolean, onClick: () => void }) => {
     const fileName = file.path.split('/').pop() || file.path;
@@ -54,17 +53,6 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
     const [userRole, setUserRole] = useState<string>('user');
     const [error, setError] = useState<string | null>(null);
     const [replyText, setReplyText] = useState("");
-
-    // === STABILITY REFS ===
-    const eventSourceRef = useRef<EventSource | null>(null);
-    const buildTriggeredRef = useRef(false);
-    const realtimeInitRef = useRef(false);
-    const connectionModeRef = useRef(connectionMode);
-    const buildProgressRef = useRef(buildProgress);
-
-    // Keep refs in sync with state without triggering re-renders
-    useEffect(() => { connectionModeRef.current = connectionMode; }, [connectionMode]);
-    useEffect(() => { buildProgressRef.current = buildProgress; }, [buildProgress]);
 
     const router = useRouter();
 
@@ -112,133 +100,48 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
     }, [files, buildProgress]);
 
     const handleGenerate = useCallback(async () => {
-        // === BUILD DEBOUNCE: prevent duplicate triggers ===
-        if (buildTriggeredRef.current || isGenerating) return;
-        buildTriggeredRef.current = true;
-
+        if (isGenerating) return;
         setIsGenerating(true);
         setError(null);
         setHasStartedGenerating(true);
-        toast.info("Initializing Secure Connection Grid...");
+        toast.info('Initializing Secure Connection Grid...');
 
         const tempExecutionId = Array.from(crypto.getRandomValues(new Uint8Array(16)))
             .map(b => b.toString(16).padStart(2, '0')).join('');
 
-        let retryCount = 0;
-        const maxRetries = 2;
-
-        const startStreaming = () => {
-            return new Promise<void>((resolve, reject) => {
-                // === SSE REF LIFECYCLE: close any existing stream ===
-                if (eventSourceRef.current) {
-                    eventSourceRef.current.close();
-                    eventSourceRef.current = null;
-                }
-
-                const es = new EventSource(`/api/projects/${params.id}/build-progress?executionId=${tempExecutionId}`);
-                eventSourceRef.current = es;
-
-                es.onopen = () => {
-                    console.log("[SSE] Connected reliably. Triggering build API.");
-                    resolve();
-                };
-
-                es.onmessage = (event) => {
-                    try {
-                        const data: BuildUpdate = JSON.parse(event.data);
-
-                        // Monotonic progress update: only allow progress to increase
-                        setBuildProgress(prev => {
-                            if (!prev) return data;
-                            const nextProgress = Math.max(prev.totalProgress || 0, data.totalProgress || 0);
-                            return { ...data, totalProgress: nextProgress };
-                        });
-
-                        retryCount = 0;
-                        lastDataTime = Date.now(); // Track last real data event
-                        if (data.status === 'completed') {
-                            clearInterval(sseTimeoutCheck); // Clear timeout monitor
-                            es.close();
-                            eventSourceRef.current = null;
-                            buildTriggeredRef.current = false;
-                            setTimeout(() => setIsGenerating(false), 1000);
-                        } else if (data.status === 'failed') {
-                            clearInterval(sseTimeoutCheck);
-                            es.close();
-                            eventSourceRef.current = null;
-                            buildTriggeredRef.current = false;
-                            setIsGenerating(false);
-                        }
-                    } catch (e) {
-                        console.error("Failed to parse SSE data", e);
-                    }
-                };
-
-                // === SSE 30s TIMEOUT PROTECTION ===
-                let lastDataTime = Date.now();
-                const sseTimeoutCheck = setInterval(async () => {
-                    if (Date.now() - lastDataTime > 30000) {
-                        console.debug("[SSE] No data for 30s. Polling build state fallback...");
-                        try {
-                            const res = await fetch(`/api/build-state/${params.id}?executionId=${tempExecutionId}`);
-                            const data = await res.json();
-                            if (data && !data.error) {
-                                setBuildProgress(data);
-                                lastDataTime = Date.now();
-                            }
-                        } catch (err) {
-                            console.debug("[SSE] Fallback poll failed:", err);
-                        }
-                    }
-                }, 10000);
-
-                es.onerror = () => {
-                    if (es.readyState === EventSource.CLOSED) return;
-                    if (retryCount < maxRetries) {
-                        retryCount++;
-                    } else if (connectionModeRef.current !== 'failover') {
-                        es.close();
-                        eventSourceRef.current = null;
-                        setConnectionMode('failover');
-                        toast.warning("Live stream interrupted. Switching to Global Failover Mode (Polling).");
-                        reject(new Error("SSE failed"));
-                    }
-                };
-            });
-        };
-
         try {
-            await startStreaming();
-            toast.success("Connection Secured. Initiating Orchestrator.", { icon: <Terminal size={16} /> });
+            // Wait briefly so we display the grid before triggering build
+            await new Promise<void>((resolve) => setTimeout(resolve, 500));
 
+            toast.success('Connection Secured. Initiating Orchestrator.', { icon: <Terminal size={16} /> });
+
+            // ── 2. Trigger the build ──────────────────────────────────────────────
             const res = await fetch('/api/generate-project', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     projectId: params.id,
                     executionId: tempExecutionId,
-                    prompt: project?.description || "A modern web application"
+                    prompt: project?.description || 'A modern web application'
                 })
             });
 
             if (!res.ok) {
-                const errorData = await res.json();
-                const detailedError = errorData.error || res.statusText;
+                const errorData = await res.json().catch(() => ({}));
+                const detailedError = (errorData as any).error || res.statusText;
                 toast.error(`Generation engine unavailable: ${detailedError}`);
                 setError(detailedError);
-                if (eventSourceRef.current) { eventSourceRef.current.close(); eventSourceRef.current = null; }
-                buildTriggeredRef.current = false;
                 setIsGenerating(false);
             }
+
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+            const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
             setError(errorMessage);
             toast.error(`Network error: ${errorMessage}`);
-            if (eventSourceRef.current) { eventSourceRef.current.close(); eventSourceRef.current = null; }
-            buildTriggeredRef.current = false;
             setIsGenerating(false);
         }
-    }, [params.id, isGenerating, project?.description]);
+    }, [params.id, isGenerating, project?.description, router]);
+
 
     const loadFiles = useCallback(async () => {
         const f = await projectService.getProjectFiles(params.id);
@@ -248,6 +151,7 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
             setSelectedFileId(filesData[0].id);
         }
     }, [params.id, selectedFileId]);
+
 
     const submitClarification = () => {
         if (!replyText.trim()) return;
@@ -295,20 +199,10 @@ Database: ${stack.database}`;
             const currentIsGenerating = p.status.startsWith('generating') || p.status === 'brainstorming';
             if (currentIsGenerating && p.last_execution_id) {
                 setIsGenerating(true);
-                // Use ref to avoid stale closure — no re-render dependency needed
-                if (!buildProgressRef.current || connectionModeRef.current === 'failover') {
+                if (!buildProgress || connectionMode === 'failover') {
                     fetch(`/api/build-state/${params.id}?executionId=${p.last_execution_id}`)
                         .then(res => res.json())
-                        .then(data => {
-                            if (!data.error) {
-                                // Monotonic fallback: don't overwrite higher progress from SSE
-                                setBuildProgress(prev => {
-                                    if (!prev) return data;
-                                    if (data.totalProgress < prev.totalProgress) return prev;
-                                    return data;
-                                });
-                            }
-                        });
+                        .then(data => { if (!data.error) setBuildProgress(data); });
                 }
             } else if (p.status === 'completed') {
                 setBuildProgress({ status: 'completed', currentStage: 'deployment', stages: [], totalProgress: 100 } as any);
@@ -317,67 +211,108 @@ Database: ${stack.database}`;
         } finally {
             if (isInitial) setIsLoading(false);
         }
-        // Stable deps — no buildProgress / connectionMode in array to prevent infinite re-creation
-    }, [params.id, loadFiles, router]);
+    }, [params.id, loadFiles, router, buildProgress, connectionMode]);
 
     useEffect(() => {
         loadProjectData(true);
-    }, [params.id, loadProjectData]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [params.id]);
 
     useEffect(() => {
         if (!isGenerating && connectionMode === 'live') return;
-        const delay = (connectionMode === 'polling' || connectionMode === 'failover') ? (isGenerating ? 3000 : 15000) : 10000;
+        let delay = (connectionMode === 'polling' || connectionMode === 'failover') ? (isGenerating ? 3000 : 15000) : 10000;
         const interval = setInterval(() => loadProjectData(false), delay);
         return () => clearInterval(interval);
     }, [isGenerating, loadProjectData, connectionMode]);
 
-    // === STABLE REALTIME SUBSCRIPTIONS (ref-guarded, single-init) ===
     useEffect(() => {
-        if (realtimeInitRef.current) return;
-        realtimeInitRef.current = true;
+        let isMounted = true;
+        let reconnectTimeout: NodeJS.Timeout | null = null;
+        let retryCount = 0;
+        let isPollingCooldown = false;
+        const supabase = projectService.getSupabase();
 
-        const statusChannelName = `project-status-${params.id}`;
-        const filesChannelName = `project-files-stream-${params.id}`;
+        const statusChannel = supabase.channel(`project-status-${params.id}`);
+        const filesChannel = supabase.channel(`project-files-stream-${params.id}`);
 
-        const statusChannel = realtimeManager.getChannel(statusChannelName);
-        const filesChannel = realtimeManager.getChannel(filesChannelName);
+        const connectRealtime = async () => {
+            if (!isMounted || isPollingCooldown) return;
 
-        statusChannel
-            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'projects', filter: `id=eq.${params.id}` }, (payload) => {
-                const updatedProject = payload.new as Project;
-                setProject(updatedProject);
-                if (updatedProject.status === 'completed') setIsGenerating(false);
-                else if (updatedProject.status.startsWith('generating')) setIsGenerating(true);
-            });
+            const setupChannel = (channel: ReturnType<typeof supabase.channel>, name: string, callback: () => void) => {
+                let attempts = 0;
+                const maxDelay = 10000;
 
-        filesChannel
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'project_files', filter: `project_id=eq.${params.id}` }, (payload) => {
-                const newOrUpdatedFile = payload.new as ProjectFile;
-                if (payload.eventType === 'DELETE') {
-                    setFiles(prev => prev.filter(f => f.id !== payload.old.id));
-                } else {
-                    setFiles(prev => {
-                        const exists = prev.some(f => f.id === newOrUpdatedFile.id);
-                        if (exists) return prev.map(f => f.id === newOrUpdatedFile.id ? newOrUpdatedFile : f);
-                        return [...prev, newOrUpdatedFile].sort((a, b) => a.path.localeCompare(b.path));
+                const subscribe = () => {
+                    channel.subscribe((status) => {
+                        if (status === 'SUBSCRIBED') {
+                            console.log(`[Realtime] ${name} connected successfully.`);
+                            attempts = 0;
+                            if (name === 'status') setConnectionMode('live');
+                        } else if (status === 'CHANNEL_ERROR') {
+                            console.warn(`[Realtime] ${name} channel error. Reconnecting...`);
+                            if (name === 'status') setConnectionMode('polling');
+
+                            // Exponential backoff
+                            const delay = Math.min(1000 * Math.pow(2, attempts), maxDelay);
+                            attempts++;
+
+                            if (reconnectTimeout) clearTimeout(reconnectTimeout);
+                            reconnectTimeout = setTimeout(() => {
+                                console.log(`[Realtime] Retrying ${name} connection (attempt ${attempts})...`);
+                                supabase.removeChannel(channel).then(() => {
+                                    if (isMounted) {
+                                        callback();
+                                    }
+                                });
+                            }, delay);
+                        }
                     });
-                }
-            });
+                };
 
-        realtimeManager.subscribe(statusChannelName, (status) => {
-            if (status === 'CHANNEL_ERROR') {
-                // RealtimeManager already retried 5 times with backoff before reaching here.
-                // Silently fall back to polling — no console.warn to avoid user-facing noise.
-                console.debug("[Realtime] Channel exhausted retries. Falling back to polling.");
-                setConnectionMode('polling');
-            }
-        });
-        realtimeManager.subscribe(filesChannelName);
+                subscribe();
+            };
 
+            const initStatusChannel = () => {
+                const newStatusChannel = supabase.channel(`project-status-${params.id}`);
+                newStatusChannel
+                    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'projects', filter: `id=eq.${params.id}` }, (payload) => {
+                        const updatedProject = payload.new as Project;
+                        setProject(updatedProject);
+                        if (updatedProject.status === 'completed') setIsGenerating(false);
+                        else if (updatedProject.status.startsWith('generating')) setIsGenerating(true);
+                    });
+                setupChannel(newStatusChannel, 'status', initStatusChannel);
+            };
+
+            const initFilesChannel = () => {
+                const newFilesChannel = supabase.channel(`project-files-stream-${params.id}`);
+                newFilesChannel
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'project_files', filter: `project_id=eq.${params.id}` }, (payload) => {
+                        const newOrUpdatedFile = payload.new as ProjectFile;
+                        if (payload.eventType === 'DELETE') {
+                            setFiles(prev => prev.filter(f => f.id !== payload.old.id));
+                        } else {
+                            setFiles(prev => {
+                                const exists = prev.some(f => f.id === newOrUpdatedFile.id);
+                                if (exists) return prev.map(f => f.id === newOrUpdatedFile.id ? newOrUpdatedFile : f);
+                                return [...prev, newOrUpdatedFile].sort((a, b) => a.path.localeCompare(b.path));
+                            });
+                        }
+                    });
+                setupChannel(newFilesChannel, 'files', initFilesChannel);
+            };
+
+            initStatusChannel();
+            initFilesChannel();
+        };
+
+        connectRealtime();
         return () => {
-            realtimeInitRef.current = false;
-            realtimeManager.safeUnsubscribe(statusChannelName);
-            realtimeManager.safeUnsubscribe(filesChannelName);
+            isMounted = false;
+            if (reconnectTimeout) clearTimeout(reconnectTimeout);
+            // Synchronous cleanup for permanent stability
+            supabase.removeChannel(statusChannel);
+            supabase.removeChannel(filesChannel);
         };
     }, [params.id]);
 

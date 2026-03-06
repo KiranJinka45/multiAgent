@@ -2,7 +2,15 @@ import { createClientComponentClient, type SupabaseClient } from '@supabase/auth
 import { Project, ProjectFile } from '@/types/project';
 
 export const projectService = {
-    getSupabase: (supabaseServer?: SupabaseClient) => supabaseServer || createClientComponentClient(),
+    getSupabase: (supabaseServer?: SupabaseClient) => supabaseServer || createClientComponentClient({
+        options: {
+            realtime: {
+                params: {
+                    eventsPerSecond: 10
+                }
+            }
+        }
+    }),
 
     async getProjects(supabaseServer?: SupabaseClient) {
         const supabase = this.getSupabase(supabaseServer);

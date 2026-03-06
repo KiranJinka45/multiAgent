@@ -9,6 +9,9 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'MultiAgent | System Online',
   description: 'MultiAgent Application',
+  icons: {
+    icon: "/favicon.ico"
+  }
 };
 
 import { Toaster } from 'sonner';

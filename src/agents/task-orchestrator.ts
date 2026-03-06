@@ -23,6 +23,7 @@ import logger, { getExecutionLogger } from '../lib/logger';
 import { eventBus } from '../lib/event-bus';
 import { ImpactAnalyzer } from '../lib/impact-analyzer';
 import { DependencyGraph } from '../lib/dependency-graph';
+import { DockerDeployer } from './docker-deployer';
 import path from 'path';
 
 // Pre-register agents for the Execution Engine
@@ -40,6 +41,7 @@ export class TaskOrchestrator {
     private selfEvaluator = new SelfEvaluator();
     private taskExecutor = new TaskExecutor();
     private rollbackManager = new RollbackManager();
+    private dockerDeployer = new DockerDeployer();
 
     async run(prompt: string, userId: string, projectId: string, executionId: string, signal: AbortSignal) {
         const context = new DistributedExecutionContext(executionId);
@@ -281,17 +283,23 @@ export class TaskOrchestrator {
                 }));
             });
 
-            // ── 7. Preview Container Isolation ───────────────────────────
+            // ── 7. Preview Container Isolation (Docker Agent) ───────────────────────────
             elog.info('Containerizing output for preview router...');
-            await eventBus.stage(executionId, 'dockerization', 'in_progress', 'Containerizing preview environment...', 75);
-            const previewTimer = await eventBus.startTimer(executionId, 'Dockerizer', 'container_setup', 'Launching preview container and routing traffic...');
-            let previewUrl = 'http://localhost:3001';
+            await eventBus.stage(executionId, 'dockerization', 'in_progress', 'Containerizing environment via local Docker engine...', 75);
+            const previewTimer = await eventBus.startTimer(executionId, 'DockerAgent', 'container_setup', 'Building image & routing traffic...');
+            let previewUrl = 'http://localhost:3000';
             try {
-                const manager = require('../lib/preview-manager');
+                // Determine true file set (either written ones or all)
                 const flushedFiles = await projectService.getProjectFiles(projectId, supabaseAdmin);
-                previewUrl = await manager.previewManager.launchPreview(projectId, flushedFiles || allFiles);
+                const targetFiles = (flushedFiles && flushedFiles.length > 0) ? flushedFiles : allFiles;
+
+                // Orchestrate Docker Deployment
+                previewUrl = await this.dockerDeployer.deploy(projectId, targetFiles, sandboxDir);
+
+                await memory.recordThought('DockerAgent', 'deploy', `Successfully built and deployed container to ${previewUrl}`);
             } catch (e) {
-                elog.warn('Preview manager sandbox failed fallback isolation route.');
+                elog.warn({ error: e }, 'Docker deployment failed. Ensure Docker Desktop is running.');
+                await memory.recordThought('DockerAgent', 'error', 'Local Docker engine unavailable or build failed. Bypassing container isolation.');
             }
             await previewTimer(`Preview available at ${previewUrl}`);
 
@@ -387,7 +395,17 @@ export class TaskOrchestrator {
             state.currentStage = stageId;
             state.status = status === 'completed' && stageId === 'deployment' ? 'completed' : 'executing';
             state.message = message;
-            await redis.setex(`build:state:${executionId}`, 86400, JSON.stringify(state));
+
+            const stateString = JSON.stringify(state);
+            await redis.setex(`build:state:${executionId}`, 86400, stateString);
+
+            // Publish directly to Socket.IO Redis Sub
+            const [projectId] = executionId.split('-'); // Simple extraction or get from context if available
+            await redis.publish('build-events', JSON.stringify({
+                projectId: state.projectId || projectId, // Need project scope for socket.io rooms
+                executionId,
+                ...state
+            }));
 
             // Push to event bus (this is what eventually reaches the UI via SSE)
             await eventBus.stage(executionId, stageId, status, message, BUILD_STAGE_PROGRESS[stageId] || progress);
