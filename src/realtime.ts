@@ -2,6 +2,9 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import Redis from 'ioredis';
+import { Queue } from 'bullmq';
+import { QUEUE_FREE, QUEUE_PRO } from './lib/queue';
+import redis from './lib/redis';
 import dotenv from 'dotenv';
 import cors from 'cors';
 
@@ -22,6 +25,35 @@ const REDIS_URLS = process.env.REDIS_URLS ? process.env.REDIS_URLS.split(',') : 
 const redisSub = new Redis(REDIS_URLS[0]);
 
 const PORT = 3005;
+
+// Health & Metrics Endpoint
+app.get('/health', async (req, res) => {
+    try {
+        const workerHealth = await redis.get('system:health:worker');
+        const freeQueue = new Queue(QUEUE_FREE, { connection: redis });
+        const proQueue = new Queue(QUEUE_PRO, { connection: redis });
+
+        const [waitingFree, activeFree, waitingPro, activePro] = await Promise.all([
+            freeQueue.getWaitingCount(),
+            freeQueue.getActiveCount(),
+            proQueue.getWaitingCount(),
+            proQueue.getActiveCount()
+        ]);
+
+        res.json({
+            status: 'ok',
+            uptime: process.uptime(),
+            worker: workerHealth ? JSON.parse(workerHealth) : { status: 'offline' },
+            queues: {
+                free: { waiting: waitingFree, active: activeFree },
+                pro: { waiting: waitingPro, active: activePro }
+            },
+            redis: redis.status
+        });
+    } catch (error) {
+        res.status(500).json({ status: 'error', error: String(error) });
+    }
+});
 
 io.on('connection', (socket) => {
     console.log(`[Socket.IO] Client connected: ${socket.id}`);
