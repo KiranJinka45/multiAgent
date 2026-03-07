@@ -1,9 +1,9 @@
-import { supabaseAdmin } from './supabaseAdmin';
-import logger from './logger';
-import { CodeChunker } from './memory/code-chunker';
-import { EmbeddingsEngine } from './memory/embeddings-engine';
-import { VectorStore } from './memory/vector-store';
-import redis from './redis';
+import { supabaseAdmin } from '@queue/supabase-admin';
+import logger from '@configs/logger';
+import { CodeChunker } from '@services/memory/code-chunker';
+import { EmbeddingsEngine } from '@services/memory/embeddings-engine';
+import { VectorStore } from '@services/memory/vector-store';
+import redis from '@queue/redis-client';
 import { createHash } from 'crypto';
 
 export interface ProjectMemory {

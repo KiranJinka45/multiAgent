@@ -1,16 +1,18 @@
 import fs from 'fs-extra';
 import path from 'path';
-import logger from './logger';
+import logger from '@configs/logger';
 
 export class TemplateEngine {
-    private static TEMPLATES_DIR = path.join(process.cwd(), 'src/templates');
+    private static TEMPLATES_DIR = path.join(process.cwd(), 'templates');
 
     /**
      * Copies a template to a target directory.
      * This is designed to be extremely fast.
      */
     static async copyTemplate(templateId: string, targetDir: string): Promise<string[]> {
-        const sourceDir = path.join(this.TEMPLATES_DIR, templateId);
+        // Map the default ID back to the root of the 'templates' directory
+        const mappedId = templateId === 'nextjs-tailwind-basic' ? '.' : templateId;
+        const sourceDir = path.join(this.TEMPLATES_DIR, mappedId);
 
         if (!await fs.pathExists(sourceDir)) {
             throw new Error(`Template [${templateId}] not found in ${sourceDir}`);

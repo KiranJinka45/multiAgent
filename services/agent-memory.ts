@@ -1,5 +1,5 @@
-import redis from './redis';
-import logger from './logger';
+import redis from '@queue/redis-client';
+import logger from '@configs/logger';
 
 export interface CycleRecord {
     cycle: number;

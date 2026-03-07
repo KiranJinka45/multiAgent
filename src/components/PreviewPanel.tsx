@@ -15,7 +15,7 @@ import {
     Copy,
     Check
 } from 'lucide-react';
-import { BuildUpdate } from '../types/build';
+import { BuildUpdate } from '@shared-types/build';
 
 interface PreviewPanelProps {
     buildProgress: BuildUpdate | null;

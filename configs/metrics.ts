@@ -1,6 +1,6 @@
-import logger from './logger';
+import logger from '@configs/logger';
 import { Registry, Histogram, Counter } from 'prom-client';
-import redis from './redis';
+import redis from '@queue/redis-client';
 
 export const registry = new Registry();
 

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import redis from '@queue/redis-client';
-import { CostGovernanceService } from '../lib/governance';
+import { CostGovernanceService } from '@configs/governance';
 import { v4 as uuidv4 } from 'uuid';
 
 describe('Cost Governance Layer Integration Tests', () => {

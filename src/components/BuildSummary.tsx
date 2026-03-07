@@ -12,7 +12,7 @@ import {
     Clock,
     Cpu
 } from 'lucide-react';
-import { BuildUpdate } from '@/types/build';
+import { BuildUpdate } from '@shared-types/build';
 
 interface BuildSummaryProps {
     data: BuildUpdate;

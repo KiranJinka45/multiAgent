@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { DistributedExecutionContext } from './execution-context';
+import { DistributedExecutionContext } from '@services/execution-context';
 import redis from '@queue/redis-client';
 import { v4 as uuidv4 } from 'uuid';
 

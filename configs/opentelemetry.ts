@@ -3,7 +3,7 @@ import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentation
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import logger from './logger';
+import logger from '@configs/logger';
 
 const traceExporter = new OTLPTraceExporter({
     url: process.env.OTLP_RECEIVER_URL || 'http://localhost:4318/v1/traces',

@@ -1,5 +1,5 @@
 import Redis from 'ioredis';
-import logger from './logger';
+import logger from '@configs/logger';
 
 const REDIS_URLS = process.env.REDIS_URLS ? process.env.REDIS_URLS.split(',') : [process.env.REDIS_URL || 'redis://localhost:6379'];
 const SENTINEL_NAME = process.env.REDIS_SENTINEL_NAME || null;

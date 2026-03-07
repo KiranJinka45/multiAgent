@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabaseAdmin';
-import { projectMemory } from '@/lib/project-memory';
+import { supabaseAdmin } from '@queue/supabase-admin';
+import { projectMemory } from '@services/project-memory';
 
 export const dynamic = 'force-dynamic';
 

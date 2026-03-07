@@ -1,11 +1,11 @@
 'use client';
 
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { getSupabaseClient } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
 export default function WaitlistPage() {
-    const supabase = createClientComponentClient();
+    const supabase = getSupabaseClient();
     const router = useRouter();
     const [email, setEmail] = useState('');
 

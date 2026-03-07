@@ -6,10 +6,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, Github, Chrome } from "lucide-react";
-import { userAuthSchema, userRegisterSchema, type UserAuthSchema, type UserRegisterSchema } from "@/lib/validations/auth";
-import { cn } from "@/lib/utils";
+import { userAuthSchema, userRegisterSchema, type UserAuthSchema, type UserRegisterSchema } from '@/lib/validations/auth';
+import { cn } from "@configs/utils";
 import { toast } from "sonner";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { getSupabaseClient } from '@/lib/supabaseClient';
 import { useSearchParams, useRouter } from "next/navigation";
 
 type AuthMode = "login" | "register";
@@ -33,7 +33,7 @@ export function AuthForm() {
             console.warn("Supabase configuration missing or invalid. Key format check failed.", { isStripeKey });
             return null;
         }
-        return createClientComponentClient();
+        return getSupabaseClient();
     });
 
     // Login Form

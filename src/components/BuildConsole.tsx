@@ -14,8 +14,8 @@ import {
     Box,
     Rocket
 } from 'lucide-react';
-import { BuildUpdate } from '../types/build';
-import { formatTime } from '@/lib/date';
+import { BuildUpdate } from '@shared-types/build';
+import { formatTime } from '@configs/date';
 
 interface BuildConsoleProps {
     buildProgress: BuildUpdate | null;

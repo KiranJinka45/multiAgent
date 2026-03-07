@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Orchestrator } from '../../../agents/orchestrator';
-import { DistributedExecutionContext as ExecutionContext } from '../../../lib/execution-context';
-import redis from '../../../lib/redis';
-import logger from '../../../lib/logger';
+import { Orchestrator } from '@services/orchestrator';
+import { DistributedExecutionContext as ExecutionContext } from '@services/execution-context';
+import redis from '@queue/redis-client';
+import logger from '@configs/logger';
 
 export async function POST(
     req: NextRequest,

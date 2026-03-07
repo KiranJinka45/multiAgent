@@ -1,16 +1,9 @@
-import { createClientComponentClient, type SupabaseClient } from '@supabase/auth-helpers-nextjs';
-import { Project, ProjectFile } from '@/types/project';
+import { getSupabaseClient } from '@/lib/supabaseClient';
+import type { SupabaseClient } from '@supabase/auth-helpers-nextjs';
+import { Project, ProjectFile } from '@shared-types/project';
 
 export const projectService = {
-    getSupabase: (supabaseServer?: SupabaseClient) => supabaseServer || createClientComponentClient({
-        options: {
-            realtime: {
-                params: {
-                    eventsPerSecond: 10
-                }
-            }
-        }
-    }),
+    getSupabase: (supabaseServer?: SupabaseClient) => supabaseServer || getSupabaseClient(),
 
     async getProjects(supabaseServer?: SupabaseClient) {
         const supabase = this.getSupabase(supabaseServer);

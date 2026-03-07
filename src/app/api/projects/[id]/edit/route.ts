@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ChatEditAgent } from '@/agents/chat-edit-agent';
-import { projectMemory } from '@/lib/project-memory';
-import { projectService } from '@/lib/project-service';
-import { sandbox } from '@/lib/sandbox';
-import { patchVerifier } from '@/lib/patch-verifier';
-import { supabaseAdmin } from '@/lib/supabaseAdmin';
-import { VirtualFileSystem, PatchEngine, CommitManager } from '@/lib/vfs';
+import { ChatEditAgent } from '@services/chat-edit-agent';
+import { projectMemory } from '@services/project-memory';
+import { projectService } from '@services/project-service';
+import { sandbox } from '@runtime/sandbox';
+import { patchVerifier } from '@services/patch-verifier';
+import { supabaseAdmin } from '@queue/supabase-admin';
+import { VirtualFileSystem, PatchEngine, CommitManager } from '@services/vfs';
 import path from 'path';
 import fs from 'fs';
 

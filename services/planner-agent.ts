@@ -1,5 +1,5 @@
 import { BaseAgent, AgentResponse } from '@services/base-agent';
-import { AgentContext } from '../types/agent-context';
+import { AgentContext } from '@shared-types/agent-context';
 
 export interface TaskStep {
     id: number;

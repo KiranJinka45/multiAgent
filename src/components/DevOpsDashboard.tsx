@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Terminal, Layout, Download, Rocket, Github, Wand2, Eye, BarChart2, Activity } from 'lucide-react';
-import { BuildUpdate } from '@/types/build';
+import { BuildUpdate } from '@shared-types/build';
 import FileExplorer from '@/components/FileExplorer';
 import FileViewer from '@/components/FileViewer';
 import BuildConsole from '@/components/BuildConsole';
@@ -13,7 +13,7 @@ import ChatEditPanel from '@/components/ChatEditPanel';
 import { DiffViewer, FileDiff } from '@/components/DiffViewer';
 import ResourceGraph from '@/components/ResourceGraph';
 import AgentTimeline from '@/components/AgentTimeline';
-import { formatTime, formatYear } from '@/lib/date';
+import { formatTime, formatYear } from '@configs/date';
 
 interface DevOpsDashboardProps {
     buildProgress: BuildUpdate | null;

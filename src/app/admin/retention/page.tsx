@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { getSupabaseClient } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
 
 interface RetentionMetrics {
@@ -13,7 +13,7 @@ interface RetentionMetrics {
 }
 
 export default function RetentionDashboard() {
-    const supabase = createClientComponentClient();
+    const supabase = getSupabaseClient();
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [metrics, setMetrics] = useState<RetentionMetrics | null>(null);

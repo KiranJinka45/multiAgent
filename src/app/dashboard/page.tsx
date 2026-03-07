@@ -1,9 +1,9 @@
 'use client';
 
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { getSupabaseClient } from '@/lib/supabaseClient';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { formatDate } from '@/lib/date';
+import { formatDate } from '@configs/date';
 
 interface Task {
     id: string;
@@ -13,7 +13,7 @@ interface Task {
 }
 
 export default function DashboardPage() {
-    const supabase = createClientComponentClient();
+    const supabase = getSupabaseClient();
     const router = useRouter();
     const [tasks, setTasks] = useState<Task[]>([]);
     const [title, setTitle] = useState('');

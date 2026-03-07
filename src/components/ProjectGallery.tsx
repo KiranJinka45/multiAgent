@@ -4,10 +4,10 @@ import { useState } from 'react';
 import { FolderPlus, Plus, Search, Calendar, Palette, Layout, Code, Terminal, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { projectService } from '@/lib/project-service';
-import { Project } from '@/types/project';
+import { projectService } from '@services/project-service';
+import { Project } from '@shared-types/project';
 import { toast } from 'sonner';
-import { formatDate } from '@/lib/date';
+import { formatDate } from '@configs/date';
 
 interface ProjectGalleryProps {
     initialProjects: Project[];

@@ -1,5 +1,5 @@
 import { BaseAgent, AgentResponse } from '@services/base-agent';
-import { AgentContext } from '../types/agent-context';
+import { AgentContext } from '@shared-types/agent-context';
 
 export interface IntentResult {
     templateId: 'nextjs-tailwind-basic' | 'fullstack-app';
@@ -31,7 +31,7 @@ Available Templates:
 
 Output strictly valid JSON:
 {
-  "templateId": "nextjs-tailwind-basic" | "fullstack-app",
+  "templateId": "nextjs-tailwind-basic",
   "projectName": "string",
   "description": "Short project summary",
   "features": ["string"],

@@ -1,11 +1,14 @@
-import { AgentResponse } from '../../agents/base-agent';
-import logger from '../logger';
-import { DatabaseAgent } from '../../agents/database-agent';
-import { BackendAgent } from '../../agents/backend-agent';
-import { FrontendAgent } from '../../agents/frontend-agent';
-import { DeploymentAgent } from '../../agents/deployment-agent';
-import { TestingAgent } from '../../agents/testing-agent';
-import { ValidatorAgent } from '../../agents/validator-agent';
+import { AgentResponse } from '@services/base-agent';
+import logger from '@configs/logger';
+import { DatabaseAgent } from '@services/database-agent';
+import { BackendAgent } from '@services/backend-agent';
+import { FrontendAgent } from '@services/frontend-agent';
+import { DeploymentAgent } from '@services/deployment-agent';
+import { TestingAgent } from '@services/testing-agent';
+import { ValidatorAgent } from '@services/validator-agent';
+import { PlannerAgent } from '@services/planner-agent';
+import { DebugAgent } from '@services/debug-agent';
+import { CoderAgent } from '@services/coder-agent';
 
 export interface TaskAgent {
     execute(payload: any, context?: any): Promise<AgentResponse<any>>;

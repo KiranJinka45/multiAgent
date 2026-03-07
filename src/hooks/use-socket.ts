@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from 'react';
-import io from 'socket.io-client';
-import type { Socket } from 'socket.io-client';
-import { BuildUpdate } from '@/types/build';
+import { useEffect, useState } from 'react';
+import { BuildUpdate } from '@shared-types/build';
+import { socketManager } from '@/lib/socketManager';
 
 export interface UseSocketOptions {
     projectId: string;
@@ -12,59 +11,59 @@ export interface UseSocketOptions {
 }
 
 export function useSocket({ projectId, onUpdate, serverUrl = 'http://localhost:3005' }: UseSocketOptions) {
-    const socketRef = useRef<Socket | null>(null);
     const [isConnected, setIsConnected] = useState(false);
     const [lastUpdate, setLastUpdate] = useState<BuildUpdate | null>(null);
 
-    const connect = useCallback(() => {
-        if (socketRef.current) {
-            socketRef.current.disconnect();
-        }
-
-        console.log(`[Socket.IO] Connecting to ${serverUrl} for project ${projectId}`);
-        const socket = io(serverUrl, {
-            reconnectionAttempts: 10,
-            reconnectionDelay: 2000,
-        });
-
-        socketRef.current = socket;
-
-        socket.on('connect', () => {
-            console.log('[Socket.IO] Connected to server');
-            setIsConnected(true);
-            socket.emit('join-project', projectId);
-        });
-
-        socket.on('disconnect', () => {
-            console.log('[Socket.IO] Disconnected');
-            setIsConnected(false);
-        });
-
-        socket.on('build-update', (data: BuildUpdate) => {
-            setLastUpdate(data);
-            if (onUpdate) onUpdate(data);
-        });
-
-        socket.on('connect_error', (error) => {
-            console.warn('[Socket.IO] Connection error:', error);
-        });
-
-        return socket;
-    }, [projectId, serverUrl, onUpdate]);
-
     useEffect(() => {
-        const socket = connect();
+        let isMounted = true;
+
+        // 1. Connect or retrieve singleton socket
+        const initializeSocket = async () => {
+            const socket = await socketManager.connect({ serverUrl });
+
+            if (isMounted) {
+                // Determine current connection state
+                setIsConnected(!!socket && socket.connected);
+
+                if (socket && socket.connected) {
+                    socketManager.emit('join-project', projectId);
+                }
+            }
+        };
+
+        initializeSocket();
+
+        // 2. Listen to connection state changes
+        const unmountConnectionListener = socketManager.addConnectionListener((connected) => {
+            if (isMounted) {
+                setIsConnected(connected);
+                if (connected) {
+                    // Re-join room on reconnect
+                    socketManager.emit('join-project', projectId);
+                }
+            }
+        });
+
+        // 3. Listen to build updates
+        const unmountUpdateListener = socketManager.addUpdateListener('build-update', (data: BuildUpdate) => {
+            if (isMounted) {
+                setLastUpdate(data);
+                if (onUpdate) onUpdate(data);
+            }
+        });
 
         return () => {
-            console.log('[Socket.IO] Component unmounting, disconnecting...');
-            socket.disconnect();
+            isMounted = false;
+            // Unsubscribe listeners but DO NOT disconnect the singleton socket
+            unmountConnectionListener();
+            unmountUpdateListener();
         };
-    }, [connect]);
+    }, [projectId, serverUrl, onUpdate]);
 
     return {
         isConnected,
         lastUpdate,
-        socket: socketRef.current,
-        reconnect: connect
+        // Optional manual reconnect trigger if desired
+        reconnect: () => socketManager.connect({ serverUrl })
     };
 }

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PreviewOrchestrator } from '@/runtime/previewOrchestrator';
-import { RuntimeMetrics } from '@/runtime/runtimeMetrics';
-import { ProcessManager } from '@/runtime/processManager';
-import logger from '@/lib/logger';
+import { PreviewOrchestrator } from '@runtime/previewOrchestrator';
+import { RuntimeMetrics } from '@runtime/runtimeMetrics';
+import { ProcessManager } from '@runtime/processManager';
+import logger from '@configs/logger';
 
 export const dynamic = 'force-dynamic';
 

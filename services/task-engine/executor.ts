@@ -1,9 +1,9 @@
 import { TaskGraph, BaseTask } from './task-graph';
 import { agentRegistry } from './agent-registry';
-import { AgentMetrics } from '../agent-intelligence/agent-metrics';
-import { StrategyEngine } from '../agent-intelligence/strategy-engine';
+import { AgentMetrics } from '@services/agent-intelligence/agent-metrics';
+import { StrategyEngine } from '@services/agent-intelligence/strategy-engine';
 import { SwarmOrchestrator } from './swarm-orchestrator';
-import logger from '../logger';
+import logger from '@configs/logger';
 
 export class TaskExecutor {
     private isRunning = false;
@@ -134,7 +134,7 @@ export class TaskExecutor {
      */
     private async attemptDebugFix(task: BaseTask, failedResult: any, globalContext?: any): Promise<boolean> {
         try {
-            const { DebugAgent } = require('../../agents/debug-agent');
+            const { DebugAgent } = require('@services/debug-agent');
             const debugAgent = new DebugAgent();
 
             const errorMsg = failedResult.error || 'Unknown agent failure';

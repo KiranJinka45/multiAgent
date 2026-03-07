@@ -1,14 +1,16 @@
 'use client';
 
 import { LucideIcon, LayoutDashboard, ListTodo, CheckSquare, Settings, X, Github, MessageSquare, Pin } from 'lucide-react';
-import { Chat } from '@/types/chat';
-import { useSidebar } from '@/context/SidebarContext';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Chat } from '@shared-types/chat';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect, useCallback } from 'react';
-import { createClientComponentClient, type User } from '@supabase/auth-helpers-nextjs';
-import { chatService } from '@/lib/chat-service';
+import { useSidebar } from '@/context/SidebarContext';
+import { motion, AnimatePresence } from 'framer-motion';
+import { getSupabaseClient } from '@/lib/supabaseClient';
+import { useRealtimeSubscription } from '@/hooks/useRealtimeSubscription';
+import { chatService } from '@services/chat-service';
+import type { User } from '@supabase/auth-helpers-nextjs';
 
 type MobileMenuProps = {
     isOpen: boolean;
@@ -48,7 +50,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     const { setIsGithubModalOpen } = useSidebar();
     const [chats, setChats] = useState<Chat[]>([]);
     const [user, setUser] = useState<User | null>(null);
-    const supabase = createClientComponentClient();
+    const supabase = getSupabaseClient();
 
     const fetchChats = useCallback(async () => {
         if (!user) return;
@@ -68,20 +70,16 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     useEffect(() => {
         if (user) {
             fetchChats();
-            const channel = supabase
-                .channel('mobile-menu-changes')
-                .on(
-                    'postgres_changes',
-                    { event: '*', schema: 'public', table: 'chats' },
-                    () => fetchChats()
-                )
-                .subscribe();
-
-            return () => {
-                supabase.removeChannel(channel);
-            };
         }
-    }, [user, supabase, fetchChats]);
+    }, [user, fetchChats]);
+
+    useRealtimeSubscription('mobile-menu-changes', {
+        event: '*',
+        schema: 'public',
+        table: 'chats'
+    }, () => {
+        if (user) fetchChats();
+    });
 
     return (
         <AnimatePresence>

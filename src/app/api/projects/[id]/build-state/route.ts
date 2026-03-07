@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import redis from '@/lib/redis';
-import logger from '@/lib/logger';
+import redis from '@queue/redis-client';
+import logger from '@configs/logger';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
-import { projectService } from '@/lib/project-service';
+import { projectService } from '@services/project-service';
 
 export const dynamic = 'force-dynamic';
 

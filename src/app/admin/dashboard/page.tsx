@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { getSupabaseClient } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
 
 export default function AdminDashboard() {
-    const supabase = createClientComponentClient();
+    const supabase = getSupabaseClient();
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({

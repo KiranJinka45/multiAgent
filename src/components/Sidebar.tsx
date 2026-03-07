@@ -3,9 +3,11 @@
 import { Sparkles, PanelLeft, Edit3, FolderPlus, Image, Github } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { createClientComponentClient, type User } from '@supabase/auth-helpers-nextjs';
-import { chatService } from '@/lib/chat-service';
-import { Chat } from '@/types/chat';
+import { getSupabaseClient } from '@/lib/supabaseClient';
+import { useRealtimeSubscription } from '@/hooks/useRealtimeSubscription';
+import type { User } from '@supabase/auth-helpers-nextjs';
+import { chatService } from '@services/chat-service';
+import { Chat } from '@shared-types/chat';
 import { useSidebar } from '@/context/SidebarContext';
 import { toast } from 'sonner';
 
@@ -35,7 +37,7 @@ export default function Sidebar() {
     const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
 
     const sidebarRef = useRef<HTMLDivElement>(null);
-    const supabase = createClientComponentClient();
+    const supabase = getSupabaseClient();
 
     const fetchChats = useCallback(async () => {
         if (!user) return;
@@ -78,14 +80,15 @@ export default function Sidebar() {
     useEffect(() => {
         if (!user) return;
         fetchChats();
+    }, [user, fetchChats]);
 
-        const channel = supabase
-            .channel('sidebar-sync')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'chats' }, () => fetchChats())
-            .subscribe();
-
-        return () => { supabase.removeChannel(channel); };
-    }, [user, fetchChats, supabase]);
+    useRealtimeSubscription('sidebar-sync', {
+        event: '*',
+        schema: 'public',
+        table: 'chats'
+    }, () => {
+        if (user) fetchChats();
+    });
 
     // Handlers
     const handleDeleteChat = async (id: string, e: React.MouseEvent) => {

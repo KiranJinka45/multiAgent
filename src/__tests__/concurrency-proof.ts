@@ -1,5 +1,5 @@
 import redis from '@queue/redis-client';
-import { Orchestrator } from '../agents/orchestrator';
+import { Orchestrator } from '@services/orchestrator';
 import logger from '@configs/logger';
 
 async function testDuplicateJobPrevention() {

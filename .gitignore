@@ -33,3 +33,10 @@ next-env.d.ts
 
 # scavenger artifacts
 *.png
+
+# custom execution ignored files
+/tmp/
+*.log
+validate_*.txt
+tsc_*.log
+Redis/*.pid

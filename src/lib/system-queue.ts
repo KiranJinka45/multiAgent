@@ -1,6 +1,6 @@
 import { Queue, Worker } from 'bullmq';
-import redis from './redis';
-import logger from './logger';
+import redis from '@queue/redis-client';
+import logger from '@configs/logger';
 import { reconcileBilling } from '../reconciler';
 
 export const SYSTEM_QUEUE_NAME = 'system-maintenance-v1';

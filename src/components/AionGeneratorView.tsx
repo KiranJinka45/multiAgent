@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { CheckCircle2, Loader2, PlayCircle, Code2, Server, Wrench, RefreshCw, Rocket } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSocket } from '@/hooks/use-socket';
-import { BuildUpdate } from '@/types/build';
+import { BuildUpdate } from '@shared-types/build';
 
 interface AionGeneratorProps {
     prompt: string;

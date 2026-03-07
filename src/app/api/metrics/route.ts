@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
-import redis from '@/lib/redis';
-import { withObservability } from '@/lib/api-wrapper';
+import redis from '@queue/redis-client';
+import { withObservability } from '@configs/api-wrapper';
 
 async function handler() {
     const supabase = createRouteHandlerClient({ cookies });

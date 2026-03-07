@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
-import redis from '@/lib/redis';
-import { getLatestBuildState } from '@/lib/event-bus';
+import redis from '@queue/redis-client';
+import { getLatestBuildState } from '@configs/event-bus';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
-import { ProjectGenerationSchema } from '@/lib/schemas';
-import logger from '@/lib/logger';
-import { freeQueue, proQueue } from '@/lib/queue';
-import { TenantService } from '@/lib/tenant-service';
-import { DistributedExecutionContext as ExecutionContext } from '@/lib/execution-context';
-import { getCorrelationId } from '@/lib/tracing';
-import { CostGovernanceService, DEFAULT_GOVERNANCE_CONFIG } from '@/lib/governance';
-import { RateLimiter } from '@/lib/rate-limiter';
-import { withObservability } from '@/lib/api-wrapper';
+import { ProjectGenerationSchema } from '@configs/schemas';
+import logger from '@configs/logger';
+import { freeQueue, proQueue } from '@queue/build-queue';
+import { TenantService } from '@services/tenant-service';
+import { DistributedExecutionContext as ExecutionContext } from '@services/execution-context';
+import { getCorrelationId } from '@configs/tracing';
+import { CostGovernanceService, DEFAULT_GOVERNANCE_CONFIG } from '@configs/governance';
+import { RateLimiter } from '@configs/rate-limiter';
+import { withObservability } from '@configs/api-wrapper';
 
 async function handler(req: NextRequest) {
     const supabase = createRouteHandlerClient({ cookies });
@@ -49,7 +49,7 @@ async function handler(req: NextRequest) {
 
         if (profileError?.code === 'PGRST116' || !profile) {
             // Profile not found - auto-create a basic free profile for the user using Admin client to bypass RLS
-            const { supabaseAdmin } = await import('@/lib/supabaseAdmin');
+            const { supabaseAdmin } = await import('@queue/supabase-admin');
             const { data: newProfile, error: insertError } = await supabaseAdmin
                 .from('user_profiles')
                 .insert([{ id: userId, role: 'user', membership: 'free' }])
@@ -123,7 +123,7 @@ async function handler(req: NextRequest) {
 
         // --- 5. Distributed Rate Limiting: Hourly Burst Control ---
         const rateLimit = await RateLimiter.checkBuildLimit(userId, profile.membership === 'pro');
-        if (!rateLimit.allowed) {
+        if (!rateLimit.allowed && !isDev) {
             return NextResponse.json({
                 error: 'Too many build requests. Please try again later.',
                 retryAfter: rateLimit.retryAfter
@@ -143,7 +143,7 @@ async function handler(req: NextRequest) {
         logger.info({ userId, currentCount: 0, usedTokens: 0, isOwner }, 'Cost governance checks passed.');
 
         // Update Retention Metrics (First/Last Build Timestamps)
-        const { supabaseAdmin } = await import('@/lib/supabaseAdmin');
+        const { supabaseAdmin } = await import('@queue/supabase-admin');
         await supabaseAdmin.rpc('update_user_retention_timestamps', { user_id_param: userId });
 
         // --- 7. Multi-Tenant: Fetch Tenant & Routing ---

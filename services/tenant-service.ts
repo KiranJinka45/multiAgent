@@ -1,5 +1,5 @@
-import { supabaseAdmin } from './supabaseAdmin';
-import logger from './logger';
+import { supabaseAdmin } from '@queue/supabase-admin';
+import logger from '@configs/logger';
 
 export interface Tenant {
     id: string;

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { withLock } from '../lib/lock';
-import redlock from '../lib/lock';
+import { withLock } from '@configs/lock';
+import redlock from '@configs/lock';
 import redis from '@queue/redis-client';
 import { v4 as uuidv4 } from 'uuid';
 

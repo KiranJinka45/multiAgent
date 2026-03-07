@@ -1,5 +1,5 @@
 import { VirtualFileSystem } from './virtual-fs';
-import logger from '../logger';
+import logger from '@configs/logger';
 
 export class RollbackManager {
     private snapshots: Map<string, string> = new Map();

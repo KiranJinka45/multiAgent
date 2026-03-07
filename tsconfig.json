@@ -43,6 +43,21 @@
       ],
       "@templates/*": [
         "./templates/*"
+      ],
+      "@shared-types/*": [
+        "./types/*"
+      ],
+      "@runtime/*": [
+        "./services/runtime/*"
+      ],
+      "@services/engines/*": [
+        "./services/engines/*"
+      ],
+      "@services/agent-intelligence/*": [
+        "./services/agent-intelligence/*"
+      ],
+      "@services/learning/*": [
+        "./services/learning/*"
       ]
     },
     "target": "ES2017"

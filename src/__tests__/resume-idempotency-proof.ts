@@ -1,5 +1,5 @@
-import { Orchestrator } from '../agents/orchestrator';
-import { DistributedExecutionContext as ExecutionContext } from './execution-context';
+import { Orchestrator } from '@services/orchestrator';
+import { DistributedExecutionContext as ExecutionContext } from '@services/execution-context';
 import redis from '@queue/redis-client';
 
 async function testResumeIdempotency() {

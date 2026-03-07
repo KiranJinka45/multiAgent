@@ -1,7 +1,7 @@
 import { Groq } from 'groq-sdk';
 import logger from '@configs/logger';
-import { AgentContext } from '../types/agent-context';
-import { breakers } from '../lib/circuit-breaker';
+import { AgentContext } from '@shared-types/agent-context';
+import { breakers } from '@configs/circuit-breaker';
 
 export interface AgentResponse<T = any> {
     success: boolean;

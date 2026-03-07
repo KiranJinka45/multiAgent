@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import redis from '@/lib/redis';
-import logger from '@/lib/logger';
+import redis from '@queue/redis-client';
+import logger from '@configs/logger';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
-import { QUEUE_FREE, QUEUE_PRO } from '@/lib/queue';
+import { QUEUE_FREE, QUEUE_PRO } from '@queue/build-queue';
 import { Queue } from 'bullmq';
 
 export const dynamic = 'force-dynamic';

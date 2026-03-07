@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll, vi, beforeEach } from 'vitest';
-import { Orchestrator } from '../agents/orchestrator';
-import { DistributedExecutionContext } from './execution-context';
+import { Orchestrator } from '@services/orchestrator';
+import { DistributedExecutionContext } from '@services/execution-context';
 import redis from '@queue/redis-client';
 import { v4 as uuidv4 } from 'uuid';
 

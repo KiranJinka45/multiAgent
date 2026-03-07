@@ -1,12 +1,12 @@
 'use client';
 
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { getSupabaseClient } from '@/lib/supabaseClient';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Github } from 'lucide-react';
 
 export default function LoginPage() {
-    const supabase = createClientComponentClient();
+    const supabase = getSupabaseClient();
     const router = useRouter();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');

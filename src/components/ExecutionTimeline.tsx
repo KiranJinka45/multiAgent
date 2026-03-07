@@ -3,8 +3,8 @@
 import React from 'react';
 import { useStore } from '@/store/useStore';
 import { CheckCircle2, Clock, XCircle, PlayCircle } from 'lucide-react';
-import { formatTime } from '@/lib/date';
-import { AgentResult } from '@/lib/execution-context';
+import { formatTime } from '@configs/date';
+import { DistributedExecutionContext as ExecutionContext, type AgentResult } from '@services/execution-context';
 
 export const ExecutionTimeline = () => {
     const { executionContext, logs } = useStore();

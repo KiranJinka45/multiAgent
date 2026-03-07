@@ -11,7 +11,7 @@ import {
     Timer,
     RefreshCcw
 } from 'lucide-react';
-import { BuildUpdate, BuildStage } from '@/types/build';
+import { BuildUpdate, BuildStage } from '@shared-types/build';
 
 interface BuildTimelineProps {
     data: BuildUpdate | null;

@@ -13,15 +13,16 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { projectService } from '@/lib/project-service';
-import { Project, ProjectFile } from '@/types/project';
+import { projectService } from '@services/project-service';
+import { Project, ProjectFile } from '@shared-types/project';
 import { toast } from 'sonner';
-import { BuildUpdate } from '@/types/build';
+import { BuildUpdate } from '@shared-types/build';
 import DevOpsDashboard from '@/components/DevOpsDashboard';
-import { formatTime } from '@/lib/date';
+import { formatTime } from '@configs/date';
 import TechStackSelector, { TechStack } from '@/components/TechStackSelector';
 import PushToGithubModal from '@/components/PushToGithubModal';
 import { useSocket } from '@/hooks/use-socket';
+import { useRealtimeSubscription } from '@/hooks/useRealtimeSubscription';
 
 const FileItem = memo(({ file, isSelected, onClick }: { file: ProjectFile, isSelected: boolean, onClick: () => void }) => {
     const fileName = file.path.split('/').pop() || file.path;
@@ -245,97 +246,33 @@ Database: ${stack.database}`;
         return () => clearInterval(interval);
     }, [isGenerating, loadProjectData, connectionMode]);
 
-    useEffect(() => {
-        let isMounted = true;
-        let reconnectTimeout: NodeJS.Timeout | null = null;
-        let retryCount = 0;
-        let isPollingCooldown = false;
-        const supabase = projectService.getSupabase();
+    useRealtimeSubscription(`project-status-${params.id}`, {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'projects',
+        filter: `id=eq.${params.id}`
+    }, (payload) => {
+        const updatedProject = payload.new as Project;
+        setProject(updatedProject);
+    });
 
-        const statusChannel = supabase.channel(`project-status-${params.id}`);
-        const filesChannel = supabase.channel(`project-files-stream-${params.id}`);
-
-        const connectRealtime = async () => {
-            if (!isMounted || isPollingCooldown) return;
-
-            const setupChannel = (channel: ReturnType<typeof supabase.channel>, name: string, callback: () => void) => {
-                let attempts = 0;
-                const maxDelay = 10000;
-
-                const subscribe = () => {
-                    channel.subscribe((status) => {
-                        if (status === 'SUBSCRIBED') {
-                            console.log(`[Realtime] ${name} connected successfully.`);
-                            attempts = 0;
-                            if (name === 'status') setConnectionMode('live');
-                        } else if (status === 'CHANNEL_ERROR') {
-                            console.warn(`[Realtime] ${name} channel error. Reconnecting...`);
-                            if (name === 'status') setConnectionMode('polling');
-
-                            // Exponential backoff
-                            const delay = Math.min(1000 * Math.pow(2, attempts), maxDelay);
-                            attempts++;
-
-                            if (reconnectTimeout) clearTimeout(reconnectTimeout);
-                            reconnectTimeout = setTimeout(() => {
-                                console.log(`[Realtime] Retrying ${name} connection (attempt ${attempts})...`);
-                                supabase.removeChannel(channel).then(() => {
-                                    if (isMounted) {
-                                        callback();
-                                    }
-                                });
-                            }, delay);
-                        }
-                    });
-                };
-
-                subscribe();
-            };
-
-            const initStatusChannel = () => {
-                const newStatusChannel = supabase.channel(`project-status-${params.id}`);
-                newStatusChannel
-                    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'projects', filter: `id=eq.${params.id}` }, (payload) => {
-                        const updatedProject = payload.new as Project;
-                        setProject(updatedProject);
-                        // Build status is now handled by Socket.IO
-                        // if (updatedProject.status === 'completed') setIsGenerating(false);
-                        // else if (updatedProject.status.startsWith('generating')) setIsGenerating(true);
-                    });
-                setupChannel(newStatusChannel, 'status', initStatusChannel);
-            };
-
-            const initFilesChannel = () => {
-                const newFilesChannel = supabase.channel(`project-files-stream-${params.id}`);
-                newFilesChannel
-                    .on('postgres_changes', { event: '*', schema: 'public', table: 'project_files', filter: `project_id=eq.${params.id}` }, (payload) => {
-                        const newOrUpdatedFile = payload.new as ProjectFile;
-                        if (payload.eventType === 'DELETE') {
-                            setFiles(prev => prev.filter(f => f.id !== payload.old.id));
-                        } else {
-                            setFiles(prev => {
-                                const exists = prev.some(f => f.id === newOrUpdatedFile.id);
-                                if (exists) return prev.map(f => f.id === newOrUpdatedFile.id ? newOrUpdatedFile : f);
-                                return [...prev, newOrUpdatedFile].sort((a, b) => a.path.localeCompare(b.path));
-                            });
-                        }
-                    });
-                setupChannel(newFilesChannel, 'files', initFilesChannel);
-            };
-
-            initStatusChannel();
-            initFilesChannel();
-        };
-
-        connectRealtime();
-        return () => {
-            isMounted = false;
-            if (reconnectTimeout) clearTimeout(reconnectTimeout);
-            // Synchronous cleanup for permanent stability
-            supabase.removeChannel(statusChannel);
-            supabase.removeChannel(filesChannel);
-        };
-    }, [params.id]);
+    useRealtimeSubscription(`project-files-stream-${params.id}`, {
+        event: '*',
+        schema: 'public',
+        table: 'project_files',
+        filter: `project_id=eq.${params.id}`
+    }, (payload) => {
+        const newOrUpdatedFile = payload.new as ProjectFile;
+        if (payload.eventType === 'DELETE') {
+            setFiles(prev => prev.filter(f => f.id !== payload.old.id));
+        } else {
+            setFiles(prev => {
+                const exists = prev.some(f => f.id === newOrUpdatedFile.id);
+                if (exists) return prev.map(f => f.id === newOrUpdatedFile.id ? newOrUpdatedFile : f);
+                return [...prev, newOrUpdatedFile].sort((a, b) => a.path.localeCompare(b.path));
+            });
+        }
+    });
 
     useEffect(() => {
         if (!isGenerating) return;

@@ -1,9 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
 import * as crypto from 'crypto';
-import redis from './redis';
-import logger from './logger';
-import { AgentContext } from '../types/agent-context';
-import { OrchestratorLock } from './orchestrator-lock';
+import redis from '@queue/redis-client';
+import logger from '@configs/logger';
+import { AgentContext } from '@shared-types/agent-context';
+import { OrchestratorLock } from '@configs/orchestrator-lock';
 
 export interface ExecutionMetrics {
     startTime: string;

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ContainerManager } from '@/runtime/containerManager';
-import { PreviewRegistry } from '@/runtime/previewRegistry';
-import logger from '@/lib/logger';
+import { ContainerManager } from '@runtime/containerManager';
+import { PreviewRegistry } from '@runtime/previewRegistry';
+import logger from '@configs/logger';
 
 export const dynamic = 'force-dynamic';
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { getSupabaseClient } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { User, LogOut, Monitor, Shield, Bell, Moon, Sun, Smartphone, Trash2, Check, ChevronRight } from 'lucide-react';
@@ -10,15 +10,15 @@ import MobileMenu from '@/components/MobileMenu';
 import TopNav from '@/components/TopNav';
 import { toast } from 'sonner';
 import { Archive, RotateCcw } from 'lucide-react';
-import { chatService } from '@/lib/chat-service';
-import { formatRelative } from '@/lib/date';
+import { chatService } from '@services/chat-service';
+import { formatRelative } from '@configs/date';
 import { User as SupabaseUser } from '@supabase/supabase-js';
-import { Chat } from '@/types/chat';
+import { Chat } from '@shared-types/chat';
 
 type SettingsTab = 'profile' | 'appearance' | 'security' | 'notifications' | 'archive';
 
 export default function SettingsPage() {
-    const supabase = createClientComponentClient();
+    const supabase = getSupabaseClient();
     const router = useRouter();
     const [user, setUser] = useState<SupabaseUser | null>(null);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

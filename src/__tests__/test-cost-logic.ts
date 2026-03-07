@@ -1,4 +1,4 @@
-import { CostGovernanceService, PLAN_LIMITS } from '../lib/governance';
+import { CostGovernanceService, PLAN_LIMITS } from '@configs/governance';
 
 async function testCostSafeguard() {
     console.log('--- Testing Cost Safeguard ---');

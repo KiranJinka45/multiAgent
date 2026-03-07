@@ -1,6 +1,6 @@
 import { Queue, QueueEvents } from 'bullmq';
-import redis from './redis';
-import logger from './logger';
+import redis from './redis-client';
+import logger from '@configs/logger';
 
 export const QUEUE_FREE = 'project-generation-free-v1';
 export const QUEUE_PRO = 'project-generation-pro-v1';

@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import { stripe } from '@/lib/stripe';
-import { supabaseAdmin } from '@/lib/supabaseAdmin';
-import logger from '@/lib/logger';
-import { stripeWebhookEventsTotal } from '@/lib/metrics';
+import { stripe } from '@configs/billing';
+import { supabaseAdmin } from '@queue/supabase-admin';
+import logger from '@configs/logger';
+import { stripeWebhookEventsTotal } from '@configs/metrics';
 
 export async function POST(req: Request) {
     const body = await req.text();

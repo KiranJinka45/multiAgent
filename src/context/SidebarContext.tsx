@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { githubService } from '@/lib/github-service';
+import { githubService, type GithubRepo } from '@services/github-service';
 
 type SidebarContextType = {
     isCollapsed: boolean;

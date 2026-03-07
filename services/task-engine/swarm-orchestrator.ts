@@ -1,4 +1,4 @@
-import logger from '../logger';
+import logger from '@configs/logger';
 
 export interface SwarmMessage {
     from: string;

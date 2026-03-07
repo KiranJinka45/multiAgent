@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { getSupabaseClient } from '@/lib/supabaseClient';
 import { toast } from 'sonner';
 
 export default function WelcomeModal() {
-    const supabase = createClientComponentClient();
+    const supabase = getSupabaseClient();
     const [isOpen, setIsOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 

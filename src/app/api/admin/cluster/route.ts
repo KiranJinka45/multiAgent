@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { NodeRegistry } from '@/runtime/cluster/nodeRegistry';
-import { RuntimeScheduler } from '@/runtime/cluster/runtimeScheduler';
-import { FailoverManager } from '@/runtime/cluster/failoverManager';
-import { RollingRestart } from '@/runtime/cluster/rollingRestart';
-import { StaleEvictor } from '@/runtime/cluster/staleEvictor';
-import { RedisRecovery } from '@/runtime/cluster/redisRecovery';
-import logger from '@/lib/logger';
+import { NodeRegistry } from '@runtime/cluster/nodeRegistry';
+import { RuntimeScheduler } from '@runtime/cluster/runtimeScheduler';
+import { FailoverManager } from '@runtime/cluster/failoverManager';
+import { RollingRestart } from '@runtime/cluster/rollingRestart';
+import { StaleEvictor } from '@runtime/cluster/staleEvictor';
+import { RedisRecovery } from '@runtime/cluster/redisRecovery';
+import logger from '@configs/logger';
 
 export const dynamic = 'force-dynamic';
 

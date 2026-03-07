@@ -5,14 +5,14 @@ import { Worker, Job } from 'bullmq';
 import { QUEUE_FREE, QUEUE_PRO } from '@queue/build-queue';
 import redis from '@queue/redis-client';
 import logger from '@configs/logger';
-import { TaskOrchestrator } from './agents/task-orchestrator';
+import { TaskOrchestrator } from '@services/task-orchestrator';
 import { runWithTracing } from '@configs/tracing';
 import { queueWaitTimeSeconds, stuckBuildsTotal } from '@configs/metrics';
-import { NodeRegistry } from './runtime/cluster/nodeRegistry';
-import { FailoverManager } from './runtime/cluster/failoverManager';
-import { RedisRecovery } from './runtime/cluster/redisRecovery';
-import { PreviewOrchestrator } from './runtime/previewOrchestrator';
-import { RuntimeCleanup } from './runtime/runtimeCleanup';
+import { NodeRegistry } from '@services/runtime/cluster/nodeRegistry';
+import { FailoverManager } from '@services/runtime/cluster/failoverManager';
+import { RedisRecovery } from '@services/runtime/cluster/redisRecovery';
+import { PreviewOrchestrator } from '@services/runtime/previewOrchestrator';
+import { RuntimeCleanup } from '@services/runtime/runtimeCleanup';
 import { env } from '@configs/env';
 
 const orchestrator = new TaskOrchestrator();
@@ -84,7 +84,7 @@ const processJob = async (job: Job, tier: 'free' | 'pro') => {
                     throw new Error('Failed to extend Redis lock (Heartbeat Violation)');
                 }
 
-                const { lockExtensionTotal } = await import('./lib/metrics');
+                const { lockExtensionTotal } = await import('@configs/metrics');
                 lockExtensionTotal.inc();
                 logger.debug(
                     { jobId: job.id, executionId, tier },
@@ -93,7 +93,7 @@ const processJob = async (job: Job, tier: 'free' | 'pro') => {
             }
         } catch (err: unknown) {
             const errorMessage = err instanceof Error ? err.message : String(err);
-            const { ...metrics } = await import('./lib/metrics');
+            const { ...metrics } = await import('@configs/metrics');
             metrics.lockExpiredTotal.inc();
             logger.error(
                 { jobId: job.id, executionId, error: errorMessage, tier },

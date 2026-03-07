@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Menu, PanelLeft, ChevronDown, Sparkles } from 'lucide-react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { getSupabaseClient } from '@/lib/supabaseClient';
 import { useEffect, useState } from 'react';
 import { useSidebar } from '@/context/SidebarContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -14,7 +14,7 @@ type TopNavProps = {
 export default function TopNav({ onOpenMobileMenu }: TopNavProps) {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const { isCollapsed, setIsCollapsed } = useSidebar();
-    const supabase = createClientComponentClient();
+    const supabase = getSupabaseClient();
 
     useEffect(() => {
         const checkUser = async () => {
