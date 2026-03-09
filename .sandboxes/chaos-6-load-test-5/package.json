@@ -1,0 +1,12 @@
+{
+  "name": "chaos-6-app-5",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "echo 'build ok'"
+  },
+  "dependencies": {
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest"
+  }
+}

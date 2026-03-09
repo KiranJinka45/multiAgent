@@ -30,20 +30,38 @@ export class TemplateEngine {
         });
 
         // Get list of copied files for VFS tracking
-        const files = await this.getFilesRecursive(targetDir);
+        const files = await this.getFilesRecursive(targetDir, targetDir);
         logger.info(`Template [${templateId}] applied. ${files.length} files initialized.`);
 
         return files;
     }
 
-    private static async getFilesRecursive(dir: string, baseDir: string = dir): Promise<string[]> {
+    private static async getFilesRecursive(dir: string, baseDir: string): Promise<string[]> {
         const entries = await fs.readdir(dir, { withFileTypes: true });
-        const files = await Promise.all(entries.map((entry) => {
-            const res = path.resolve(dir, entry.name);
-            return entry.isDirectory() ? this.getFilesRecursive(res, baseDir) : res;
+        const files = await Promise.all(entries.map(async (entry) => {
+            const res = path.join(dir, entry.name);
+            return entry.isDirectory() ? this.getFilesRecursive(res, baseDir) : [res];
         }));
 
-        return Array.prototype.concat(...files).map(f => path.relative(baseDir, f));
+        const flattened = files.flat();
+
+        // ONLY apply relative mapping at the entry point of recursion
+        if (dir === baseDir) {
+            return flattened.map(f => {
+                let rel = path.relative(baseDir, f);
+                if (path.isAbsolute(rel)) {
+                    // Fallback for Windows drive casing issues
+                    const normalizedBase = baseDir.replace(/\\/g, '/').toLowerCase();
+                    const normalizedF = f.replace(/\\/g, '/').toLowerCase();
+                    if (normalizedF.startsWith(normalizedBase)) {
+                        rel = f.substring(baseDir.length).replace(/^[\\\/]+/, '');
+                    }
+                }
+                return rel.replace(/\\/g, '/');
+            });
+        }
+
+        return flattened;
     }
 
     /**
@@ -51,7 +69,7 @@ export class TemplateEngine {
      * Use this for branding, project names, and feature descriptions.
      */
     static async customizeFiles(targetDir: string, replacements: Record<string, string>) {
-        const files = await this.getFilesRecursive(targetDir);
+        const files = await this.getFilesRecursive(targetDir, targetDir);
 
         for (const file of files) {
             const filePath = path.join(targetDir, file);

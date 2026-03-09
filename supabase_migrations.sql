@@ -179,3 +179,6 @@ CREATE TABLE IF NOT EXISTS internal_abuse_logs (
     system_response TEXT,
     recorded_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
+- -   A d d   m i s s i n g   o w n e r _ i d   t o   t e n a n t s  
+ A L T E R   T A B L E   t e n a n t s   A D D   C O L U M N   I F   N O T   E X I S T S   o w n e r _ i d   U U I D   R E F E R E N C E S   a u t h . u s e r s ( i d )   O N   D E L E T E   C A S C A D E ;  
+ 

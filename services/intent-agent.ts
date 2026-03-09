@@ -16,7 +16,7 @@ export class IntentDetectionAgent extends BaseAgent {
     getName() { return 'IntentDetectionAgent'; }
 
     async execute(
-        input: { prompt: string },
+        input: { prompt: string; techStack?: Record<string, string> },
         _context: AgentContext,
         signal?: AbortSignal
     ): Promise<AgentResponse<IntentResult>> {
@@ -24,6 +24,9 @@ export class IntentDetectionAgent extends BaseAgent {
 
         const system = `You are a High-Speed Intent Classifier.
 Your goal is to map a user's prompt to a prebuilt project template and extract key branding/feature requirements.
+
+User-selected or recommended Tech Stack: ${input.techStack ? JSON.stringify(input.techStack) : 'None'}
+If a tech stack is provided, prioritize selecting templates or features that align with it.
 
 Available Templates:
 - nextjs-tailwind-basic: Best for landing pages, simple portfolios, and marketing sites using Next.js and Tailwind.

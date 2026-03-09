@@ -116,10 +116,9 @@ export class PatchVerifier {
             logger.warn({ attempt, remaining: this.maxHealAttempts - attempt }, 'Still failing after heal — retrying...');
         }
 
-        // After max retries: allow through with warnings rather than blocking the user
-        // This matches the same philosophy as the full orchestrator — never block the user
-        logger.warn({ errorCount: result.errors.length }, 'Max heal attempts reached — allowing through with warnings');
-        result.passed = true; // Soft-pass: dev server may still show the changes
+        // After max retries: FAIL. Do not allow through with errors for chaos test.
+        logger.warn({ errorCount: result.errors.length }, 'Max heal attempts reached — verification FAILED');
+        result.passed = false;
         return result;
     }
 
@@ -130,7 +129,7 @@ export class PatchVerifier {
         try {
             const { stdout, stderr } = await execAsync(
                 'npx tsc --noEmit --pretty false 2>&1 || true',
-                { cwd: dir, timeout: this.tscTimeout, shell: 'cmd.exe' }
+                { cwd: dir, timeout: this.tscTimeout, shell: process.env.ComSpec || 'cmd.exe' }
             );
 
             const output = (stdout + stderr).trim();
@@ -166,14 +165,26 @@ export class PatchVerifier {
         vfs: VirtualFileSystem
     ): Promise<boolean> {
         try {
-            const { RepairAgent } = require('../agents/repair-agent');
+            const { RepairAgent } = require('./repair-agent');
             const repairAgent = new RepairAgent();
 
-            const patchedFiles = vfs.getDirtyFiles();
+            let filesToRepair = vfs.getDirtyFiles();
+            if (filesToRepair.length === 0) {
+                filesToRepair = vfs.getAllFiles();
+            }
+
             const response = await repairAgent.execute(
-                { error: stderr, stdout: '', files: patchedFiles.slice(0, 10) },
+                { error: stderr, stdout: '', files: filesToRepair.slice(0, 15) },
                 {} as any
             );
+
+            console.log(`[PatchVerifier] RepairAgent response success: ${response.success}`);
+            if (response.success && response.data) {
+                console.log(`[PatchVerifier] RepairAgent Explanation: ${response.data.explanation}`);
+                console.log(`[PatchVerifier] RepairAgent Patches: ${response.data.patches?.length || 0}`);
+            } else {
+                console.log(`[PatchVerifier] RepairAgent Error: ${response.error}`);
+            }
 
             if (response.success && response.data?.patches?.length > 0) {
                 // Apply patches BACK TO VFS, not disk directly

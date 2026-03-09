@@ -1,0 +1,1 @@
+export default function Page() { return <div>Memory Test 10</div>; }

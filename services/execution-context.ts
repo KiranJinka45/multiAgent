@@ -245,7 +245,12 @@ export class DistributedExecutionContext implements ExecutionContextType, AgentC
         };
 
         await redis.setex(this.key, DistributedExecutionContext.TTL, JSON.stringify(context));
+        await redis.sadd('active:executions', this.executionId);
         return context;
+    }
+
+    public static async getActiveExecutions(): Promise<string[]> {
+        return await redis.smembers('active:executions');
     }
 
     async get(): Promise<ExecutionContextType | null> {
@@ -410,6 +415,7 @@ export class DistributedExecutionContext implements ExecutionContextType, AgentC
                 new Date().getTime() - new Date(ctx.metrics.startTime).getTime();
             ctx.version += 1;
         });
+        await redis.srem('active:executions', this.executionId);
     }
 
     /**
@@ -429,6 +435,7 @@ export class DistributedExecutionContext implements ExecutionContextType, AgentC
         const dlqKey = `dlq:execution:${this.executionId}`;
         await redis.setex(dlqKey, 604800, JSON.stringify(dlqEntry)); // 7 days retention
         await redis.sadd('dlq:executions', this.executionId);
+        await redis.srem('active:executions', this.executionId);
 
         logger.error({ executionId: this.executionId, reason }, 'Execution moved to Dead Letter Queue');
     }

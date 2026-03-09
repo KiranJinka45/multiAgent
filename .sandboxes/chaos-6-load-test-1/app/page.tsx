@@ -1,0 +1,1 @@
+export default function Page() { return <div>Load Test 1</div>; }

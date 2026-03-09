@@ -1,0 +1,7 @@
+{
+  "name": "chaos-13-app",
+  "version": "1.0.0",
+  "dependencies": {
+    "react": "latest"
+  }
+}

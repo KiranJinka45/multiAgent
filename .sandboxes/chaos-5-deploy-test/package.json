@@ -1,0 +1,13 @@
+{
+  "name": "chaos-5-app",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "echo 'Dummy build success'",
+    "start": "echo 'Dummy start success'"
+  },
+  "dependencies": {
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest"
+  }
+}
