@@ -11,6 +11,10 @@ export interface VirtualFile {
 
 export class VirtualFileSystem {
     private tree: Map<string, VirtualFile> = new Map();
+    
+    isEmpty(): boolean {
+        return this.tree.size === 0;
+    }
 
     /**
      * Initializes the VFS from an array of existing files.

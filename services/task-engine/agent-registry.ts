@@ -1,17 +1,16 @@
-import { AgentResponse } from '@services/base-agent';
-import logger from '@configs/logger';
-import { DatabaseAgent } from '@services/database-agent';
-import { BackendAgent } from '@services/backend-agent';
-import { FrontendAgent } from '@services/frontend-agent';
-import { DeploymentAgent } from '@services/deployment-agent';
-import { TestingAgent } from '@services/testing-agent';
-import { ValidatorAgent } from '@services/validator-agent';
-import { PlannerAgent } from '@services/planner-agent';
-import { DebugAgent } from '@services/debug-agent';
-import { CoderAgent } from '@services/coder-agent';
+import { AgentResponse } from '../../agents/base-agent';
+import logger from '../../config/logger';
+import { DatabaseAgent } from '../../agents/database-agent';
+import { BackendAgent } from '../../agents/backend-agent';
+import { FrontendAgent } from '../../agents/frontend-agent';
+import { DeploymentAgent } from '../../agents/deploy-agent';
+import { TestingAgent } from '../../agents/testing-agent';
+import { ValidatorAgent } from '../../agents/validator-agent';
+
+import { StrategyConfig } from '../agent-intelligence/strategy-engine';
 
 export interface TaskAgent {
-    execute(payload: any, context?: any): Promise<AgentResponse<any>>;
+    execute(payload: any, context?: any, signal?: AbortSignal, strategy?: StrategyConfig): Promise<AgentResponse<any>>;
 }
 
 export class AgentRegistry {
@@ -32,20 +31,19 @@ export class AgentRegistry {
         return this.agents.has(taskType);
     }
 
-    async runTaskDirectly(taskType: string, payload: any, context?: any): Promise<AgentResponse<any>> {
+    async runTaskDirectly(taskType: string, payload: any, context?: any, signal?: AbortSignal, strategy?: StrategyConfig): Promise<AgentResponse<any>> {
         const agent = this.getAgent(taskType);
         if (!agent) {
             return {
                 success: false,
                 data: null,
-                logs: [],
                 error: `No agent registered in AgentRegistry for task type: ${taskType}`
             };
         }
 
         try {
-            logger.info({ taskType }, 'System dispatching to specialized Agent');
-            return await agent.execute(payload, context);
+            logger.info({ taskType, strategy: strategy?.strategy }, 'System dispatching to specialized Agent with strategy');
+            return await agent.execute(payload, context, signal, strategy);
         } catch (error) {
             logger.error({ error, taskType }, 'Specialized agent crashed during execution');
             return {

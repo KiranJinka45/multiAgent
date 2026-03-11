@@ -1,6 +1,6 @@
 import './pre-init';
 import { Queue } from 'bullmq';
-import { QUEUE_ARCHITECTURE } from '../src/lib/queue/agent-queues';
+import { QUEUE_ARCHITECTURE } from '../lib/queue/agent-queues';
 import redis from '../queue/redis-client';
 import { DistributedExecutionContext } from '../services/execution-context';
 import path from 'path';

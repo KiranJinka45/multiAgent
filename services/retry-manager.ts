@@ -1,5 +1,5 @@
-import logger from '@configs/logger';
-import { retryCountTotal } from '@configs/metrics';
+import logger from '@config/logger';
+import { retryCountTotal } from '@config/metrics';
 
 export class RetryManager {
     private maxRetries: number;
@@ -31,8 +31,18 @@ export class RetryManager {
                     operation(),
                     new Promise<T>((_, reject) => setTimeout(() => reject(new Error(`Agent execution timed out after ${timeoutMs}ms`)), timeoutMs))
                 ]);
-            } catch (error: unknown) {
+            } catch (error: any) {
                 lastError = error;
+                const status = error?.status;
+                const isRateLimit = status === 429 || error?.message?.includes('rate_limit_exceeded');
+
+                if (isRateLimit) {
+                    const delay = this.baseDelayMs * Math.pow(3, (attempt - 1)); // Aggressive backoff for rate limits
+                    logger.warn({ agentName, attempt, delay }, 'Rate limit exceeded. Backing off...');
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    continue; // Immediately retry after backoff
+                }
+
                 const errorMessage = error instanceof Error ? error.message : String(error);
                 logger.error({
                     agentName,

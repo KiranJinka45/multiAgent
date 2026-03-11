@@ -1,12 +1,13 @@
 import '../scripts/pre-init';
 
 import { Worker, Job } from 'bullmq';
-import { QUEUE_DOCKER, deployQueue } from '../src/lib/queue/agent-queues';
-import redis from '@queue/redis-client';
-import logger from '@configs/logger';
-import { DockerDeployer } from '@services/docker-deployer';
-import { eventBus } from '@configs/event-bus';
-import { DistributedExecutionContext } from '@services/execution-context';
+import { QUEUE_DOCKER, deployQueue } from '../lib/queue/agent-queues';
+import redis from '../services/queue/redis-client';
+import logger from '../config/logger';
+import { DockerDeployer } from '../services/docker-deployer';
+import { eventBus } from '../services/event-bus';
+import { DistributedExecutionContext } from '../services/execution-context';
+import { IS_PRODUCTION } from '../config/build-mode';
 import path from 'path';
 import fs from 'fs';
 
@@ -31,10 +32,16 @@ const dockerWorker = new Worker(QUEUE_DOCKER, async (job: Job) => {
         const data = await context.get();
         const targetFiles = data?.finalFiles || [];
 
-        // 1. Build & Deploy Preview (Docker bypass for local testing)
-        // const previewUrl = await dockerDeployer.deploy(projectId, targetFiles, sandboxDir);
-        const previewUrl = `http://localhost:8080/preview-${projectId}`;
-        await new Promise(r => setTimeout(r, 1000));
+        // 1. Build & Deploy Preview
+        let previewUrl = `http://localhost:8080/preview-${projectId}`;
+        
+        if (IS_PRODUCTION) {
+            log('[Docker Worker] Production Build: Initiating Docker deployment');
+            previewUrl = await dockerDeployer.deploy(projectId, targetFiles, sandboxDir);
+        } else {
+            log('[Docker Worker] Dev Mode: Bypassing Docker deployment');
+            await new Promise(r => setTimeout(r, 1000));
+        }
 
         // 2. Update Context
         await context.atomicUpdate(ctx => {
@@ -66,7 +73,7 @@ const dockerWorker = new Worker(QUEUE_DOCKER, async (job: Job) => {
         throw error;
     }
 }, {
-    connection: redis,
+    connection: redis as any,
     concurrency: 2 // Docker builds are resource intensive
 });
 

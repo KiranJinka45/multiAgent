@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
-import logger from '@configs/logger';
+import logger from '@config/logger';
 
 export class CICDManager {
     /**

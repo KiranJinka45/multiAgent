@@ -1,5 +1,5 @@
 import { supabaseAdmin } from '@queue/supabase-admin';
-import logger from '@configs/logger';
+import logger from '@config/logger';
 
 export interface CodeChunkMetadata {
     purpose: string;

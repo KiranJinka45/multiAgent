@@ -1,54 +1,54 @@
 import { TaskGraph, BaseTask } from './task-graph';
 import { agentRegistry } from './agent-registry';
-import { AgentMetrics } from '@services/agent-intelligence/agent-metrics';
-import { StrategyEngine } from '@services/agent-intelligence/strategy-engine';
+import { AgentMetrics } from '../agent-intelligence/agent-metrics';
+import { StrategyEngine } from '../agent-intelligence/strategy-engine';
 import { SwarmOrchestrator } from './swarm-orchestrator';
-import logger from '@configs/logger';
+import logger from '../../config/logger';
+import { eventBus } from '../../services/event-bus';
 
 export class TaskExecutor {
-    private isRunning = false;
-    private concurrentTasks = new Set<string>();
-
     /**
      * Traverses the TaskGraph, executing tasks whose dependencies are met.
      * Starts execution of independent nodes in parallel automatically.
      */
     async evaluateGraph(graph: TaskGraph, globalContext?: any) {
-        if (this.isRunning) return;
-        this.isRunning = true;
+        const concurrentTasks = new Set<string>();
+        let isRunning = true;
 
         logger.info('Starting Multi-Agent Task Graph execution');
         let remainingTasks = graph.getAllTasks().filter(t => t.status !== 'completed' && t.status !== 'failed');
 
-        while (remainingTasks.length > 0 && this.isRunning) {
-            const runnableTasks = graph.getReadyTasks();
+        try {
+            while (remainingTasks.length > 0 && isRunning) {
+                const runnableTasks = graph.getReadyTasks();
 
-            if (runnableTasks.length === 0) {
-                // If there are remaining tasks, but none runnable, it implies a cycle or failed dependencies preventing progression.
-                const executing = this.concurrentTasks.size > 0;
-                if (!executing) {
-                    logger.error('Task engine detected a deadlock or failed dependency graph! Halting execution.');
-                    return;
+                if (runnableTasks.length === 0) {
+                    // If there are remaining tasks, but none runnable, it implies a cycle or failed dependencies preventing progression.
+                    const executing = concurrentTasks.size > 0;
+                    if (!executing) {
+                        logger.error('Task engine detected a deadlock or failed dependency graph! Halting execution.');
+                        return;
+                    }
+                    // Yield to event loop to allow concurrent promises to advance the graph status
+                    await new Promise(r => setTimeout(r, 100));
+                } else {
+                    // Spawn parallel executions for all currently runnable nodes
+                    const runPromises = runnableTasks.map(task => this.executeTask(task, graph, globalContext, concurrentTasks));
+                    await Promise.all(runPromises);
                 }
-                // Yield to event loop to allow concurrent promises to advance the graph status
-                await new Promise(r => setTimeout(r, 100));
-            } else {
-                // Spawn parallel executions for all currently runnable nodes
-                const runPromises = runnableTasks.map(task => this.executeTask(task, graph, globalContext));
-                await Promise.all(runPromises);
+
+                remainingTasks = graph.getAllTasks().filter(t => t.status !== 'completed' && t.status !== 'failed');
             }
-
-            remainingTasks = graph.getAllTasks().filter(t => t.status !== 'completed' && t.status !== 'failed');
+        } finally {
+            logger.info('Task Graph execution finished.');
+            isRunning = false;
         }
-
-        logger.info('Task Graph execution finished.');
-        this.isRunning = false;
     }
 
-    private async executeTask(task: BaseTask, graph: TaskGraph, globalContext?: any) {
-        if (this.concurrentTasks.has(task.id)) return;
+    private async executeTask(task: BaseTask, graph: TaskGraph, globalContext: any, concurrentTasks: Set<string>) {
+        if (concurrentTasks.has(task.id)) return;
 
-        this.concurrentTasks.add(task.id);
+        concurrentTasks.add(task.id);
         const executingTask = graph.getTask(task.id)!;
         executingTask.status = 'running';
 
@@ -65,7 +65,14 @@ export class TaskExecutor {
                 const strategy = await StrategyEngine.getOptimalStrategy(task.type, task.title);
                 SwarmOrchestrator.broadcast(task.type, `Starting task: ${task.title} with strategy: ${strategy.strategy}`);
 
-                const res = await agentRegistry.runTaskDirectly(task.type, task.payload, globalContext);
+                const executionId = globalContext?.executionId || 'unknown';
+                const agentTimer = await eventBus.startTimer(executionId, task.type, 'task_execution', `Processing: ${task.title}`);
+
+                const res = await agentRegistry.runTaskDirectly(task.type, task.payload, globalContext, undefined, strategy);
+                
+                await agentTimer(res.success ? 'Success' : `Failed: ${res.error}`);
+                
+                console.log(`[DEBUG] Agent ${task.type} resolved task ${task.id}. Success: ${res.success}, Files: ${res.data?.fileCount || res.data?.files?.length || 0}`);
 
                 const duration = Date.now() - startTime;
 
@@ -124,7 +131,7 @@ export class TaskExecutor {
                 tokens: 500
             });
         } finally {
-            this.concurrentTasks.delete(task.id);
+            concurrentTasks.delete(task.id);
         }
     }
 
@@ -134,7 +141,7 @@ export class TaskExecutor {
      */
     private async attemptDebugFix(task: BaseTask, failedResult: any, globalContext?: any): Promise<boolean> {
         try {
-            const { DebugAgent } = require('@services/debug-agent');
+            const { DebugAgent } = require('../../agents/debug-agent');
             const debugAgent = new DebugAgent();
 
             const errorMsg = failedResult.error || 'Unknown agent failure';

@@ -1,5 +1,5 @@
 import { supabaseAdmin } from '@queue/supabase-admin';
-import logger from '@configs/logger';
+import logger from '@config/logger';
 import { CodeChunker } from '@services/memory/code-chunker';
 import { EmbeddingsEngine } from '@services/memory/embeddings-engine';
 import { VectorStore } from '@services/memory/vector-store';

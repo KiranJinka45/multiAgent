@@ -1,13 +1,12 @@
-import dotenv from 'dotenv';
-dotenv.config({ path: '.env.local' });
+import 'dotenv/config';
 
 import { Worker, Job } from 'bullmq';
-import { QUEUE_PLANNER, architectureQueue } from '../src/lib/queue/agent-queues';
-import redis from '@queue/redis-client';
-import logger from '@configs/logger';
-import { IntentDetectionAgent } from '@services/intent-agent';
-import { eventBus } from '@configs/event-bus';
-import { DistributedExecutionContext } from '@services/execution-context';
+import { QUEUE_PLANNER, architectureQueue } from '../lib/queue/agent-queues';
+import redis from '../services/queue/redis-client';
+import logger from '../config/logger';
+import { IntentDetectionAgent } from '../agents/intent-agent';
+import { eventBus } from '../services/event-bus';
+import { DistributedExecutionContext } from '../services/execution-context';
 
 const intentAgent = new IntentDetectionAgent();
 
@@ -60,8 +59,9 @@ const plannerWorker = new Worker(QUEUE_PLANNER, async (job: Job) => {
         throw error;
     }
 }, {
-    connection: redis,
+    connection: redis as any,
     concurrency: 5
 });
 
 logger.info('Planner Worker online');
+

@@ -1,15 +1,16 @@
 import '../scripts/pre-init';
 
 import { Worker, Job } from 'bullmq';
-import { QUEUE_DEPLOY } from '../src/lib/queue/agent-queues';
-import redis from '@queue/redis-client';
-import logger from '@configs/logger';
-import { projectMemory } from '@services/project-memory';
-import { InfraProvisioner } from '@services/devops/infra-provisioner';
-import { CICDManager } from '@services/devops/cicd-manager';
-import { TenantService } from '@services/tenant-service';
-import { eventBus } from '@configs/event-bus';
-import { DistributedExecutionContext } from '@services/execution-context';
+import { QUEUE_DEPLOY } from '../lib/queue/agent-queues';
+import redis from '../services/queue/redis-client';
+import logger from '../config/logger';
+import { projectMemory } from '../services/project-memory';
+import { InfraProvisioner } from '../services/devops/infra-provisioner';
+import { CICDManager } from '../services/devops/cicd-manager';
+import { TenantService } from '../services/tenant-service';
+import { eventBus } from '../services/event-bus';
+import { DistributedExecutionContext } from '../services/execution-context';
+import { IS_PRODUCTION } from '../config/build-mode';
 import path from 'path';
 import fs from 'fs';
 
@@ -42,7 +43,8 @@ const deployWorker = new Worker(QUEUE_DEPLOY, async (job: Job) => {
 
         // 2. Provision Infrastructure (Production)
         const tenant = await TenantService.getTenantForUser(data?.userId || 'unknown');
-        if (tenant) {
+        if (tenant && IS_PRODUCTION) {
+            log('[Deploy Worker] Production Mode: Provisioning resources...');
             const infra = await InfraProvisioner.provisionResources(projectId, tenant.plan);
             await CICDManager.setupPipeline(projectId, sandboxDir, intent?.templateId || 'nextjs');
 
@@ -50,6 +52,8 @@ const deployWorker = new Worker(QUEUE_DEPLOY, async (job: Job) => {
                 ctx.metadata.infra = infra;
                 ctx.metadata.deploymentStatus = 'deployed';
             });
+        } else {
+            log('[Deploy Worker] Dev Mode: Skipping infrastructure provisioning');
         }
 
         // 3. Finalize Status
@@ -91,7 +95,7 @@ const deployWorker = new Worker(QUEUE_DEPLOY, async (job: Job) => {
         throw error;
     }
 }, {
-    connection: redis,
+    connection: redis as any,
     concurrency: 5
 });
 

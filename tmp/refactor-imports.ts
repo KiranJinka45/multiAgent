@@ -7,8 +7,8 @@ const replacements = [
     // Top-level aliases for common infrastructure
     { from: /import .* from ['"]\.\.?\/\.\.?\/lib\/redis['"]/g, to: (m: string) => m.replace(/['"]\.\.?\/\.\.?\/lib\/redis['"]/, "'@queue/redis-client'") },
     { from: /import .* from ['"]\.\.?\/\.\.?\/lib\/queue['"]/g, to: (m: string) => m.replace(/['"]\.\.?\/\.\.?\/lib\/queue['"]/, "'@queue/build-queue'") },
-    { from: /import .* from ['"]\.\.?\/\.\.?\/lib\/logger['"]/g, to: (m: string) => m.replace(/['"]\.\.?\/\.\.?\/lib\/logger['"]/, "'@configs/logger'") },
-    { from: /import .* from ['"]\.\.?\/\.\.?\/config\/env['"]/g, to: (m: string) => m.replace(/['"]\.\.?\/\.\.?\/config\/env['"]/, "'@configs/env'") },
+    { from: /import .* from ['"]\.\.?\/\.\.?\/lib\/logger['"]/g, to: (m: string) => m.replace(/['"]\.\.?\/\.\.?\/lib\/logger['"]/, "'@config/logger'") },
+    { from: /import .* from ['"]\.\.?\/\.\.?\/config\/env['"]/g, to: (m: string) => m.replace(/['"]\.\.?\/\.\.?\/config\/env['"]/, "'@config/env'") },
     { from: /import .* from ['"]\.\.?\/\.\.?\/lib\/event-bus['"]/g, to: (m: string) => m.replace(/['"]\.\.?\/\.\.?\/lib\/event-bus['"]/, "'@realtime/event-bus'") },
 
     // Service-internal relative fixes (now that they are in the same folder)
@@ -19,9 +19,9 @@ const replacements = [
 
     // Catch-all for remaining lib references
     { from: /import .* from ['"]\.\.?\/lib\/supabaseAdmin['"]/g, to: (m: string) => m.replace(/['"]\.\.?\/lib\/supabaseAdmin['"]/, "'@queue/supabase-admin'") },
-    { from: /import .* from ['"]\.\.?\/lib\/metrics['"]/g, to: (m: string) => m.replace(/['"]\.\.?\/lib\/metrics['"]/, "'@configs/metrics'") },
-    { from: /import .* from ['"]\.\.?\/lib\/tracing['"]/g, to: (m: string) => m.replace(/['"]\.\.?\/lib\/tracing['"]/, "'@configs/tracing'") },
-    { from: /import .* from ['"]\.\.?\/lib\/opentelemetry['"]/g, to: (m: string) => m.replace(/['"]\.\.?\/lib\/opentelemetry['"]/, "'@configs/opentelemetry'") },
+    { from: /import .* from ['"]\.\.?\/lib\/metrics['"]/g, to: (m: string) => m.replace(/['"]\.\.?\/lib\/metrics['"]/, "'@config/metrics'") },
+    { from: /import .* from ['"]\.\.?\/lib\/tracing['"]/g, to: (m: string) => m.replace(/['"]\.\.?\/lib\/tracing['"]/, "'@config/tracing'") },
+    { from: /import .* from ['"]\.\.?\/lib\/opentelemetry['"]/g, to: (m: string) => m.replace(/['"]\.\.?\/lib\/opentelemetry['"]/, "'@config/opentelemetry'") },
 
     // Fix agent-to-agent relative imports (now at root of services/)
     { from: /from ['"]\.\/.*-agent['"]/g, to: (m: string) => m.replace(/['"]\.\//, "'@services/") },

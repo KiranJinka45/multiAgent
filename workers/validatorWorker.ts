@@ -1,14 +1,14 @@
 import '../scripts/pre-init';
 import { Worker, Job } from 'bullmq';
-import { QUEUE_VALIDATOR, dockerQueue, repairQueue } from '../src/lib/queue/agent-queues';
-import redis from '@queue/redis-client';
-import logger from '@configs/logger';
-import { patchVerifier } from '@services/patch-verifier';
-import { DebugAgent } from '@services/debug-agent';
-import { VirtualFileSystem, CommitManager, PatchEngine } from '@services/vfs';
-import { AgentMemory } from '@services/agent-memory';
-import { eventBus } from '@configs/event-bus';
-import { DistributedExecutionContext } from '@services/execution-context';
+import { QUEUE_VALIDATOR, dockerQueue, repairQueue } from '../lib/queue/agent-queues';
+import redis from '../services/queue/redis-client';
+import logger from '../config/logger';
+import { patchVerifier } from '../services/patch-verifier';
+import { DebugAgent } from '../agents/debug-agent';
+import { VirtualFileSystem, CommitManager, PatchEngine } from '../services/vfs';
+import { AgentMemory } from '../services/agent-memory';
+import { eventBus } from '../services/event-bus';
+import { DistributedExecutionContext } from '../services/execution-context';
 import path from 'path';
 import fs from 'fs';
 
@@ -88,7 +88,7 @@ const validatorWorker = new Worker(QUEUE_VALIDATOR, async (job: Job) => {
         throw error;
     }
 }, {
-    connection: redis,
+    connection: redis as any,
     concurrency: 5
 });
 

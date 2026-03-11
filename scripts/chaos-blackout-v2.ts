@@ -1,6 +1,6 @@
 import './pre-init';
 import { Queue } from 'bullmq';
-import { QUEUE_VALIDATOR } from '../src/lib/queue/agent-queues';
+import { QUEUE_VALIDATOR } from '../lib/queue/agent-queues';
 import ioredis from 'ioredis';
 import { DistributedExecutionContext } from '../services/execution-context';
 import path from 'path';

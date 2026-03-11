@@ -1,17 +1,16 @@
-import dotenv from 'dotenv';
-dotenv.config({ path: '.env.local' });
+import 'dotenv/config';
 
 import { Worker, Job } from 'bullmq';
-import { QUEUE_ARCHITECTURE, generatorQueue } from '../src/lib/queue/agent-queues';
-import redis from '@queue/redis-client';
-import logger from '@configs/logger';
-import { TemplateEngine } from '@services/template-engine';
-import { CustomizerAgent } from '@services/customizer-agent';
-import { VirtualFileSystem, CommitManager } from '@services/vfs';
-import { eventBus } from '@configs/event-bus';
-import { DistributedExecutionContext } from '@services/execution-context';
+import { QUEUE_ARCHITECTURE, generatorQueue } from '../lib/queue/agent-queues';
+import redis from '../services/queue/redis-client';
+import logger from '../config/logger';
+import { TemplateEngine } from '../services/template-engine';
+import { CustomizerAgent } from '../agents/customizer-agent';
+import { VirtualFileSystem, CommitManager } from '../services/vfs';
+import { eventBus } from '../services/event-bus';
+import { DistributedExecutionContext } from '../services/execution-context';
 import path from 'path';
-import fs from 'fs-extra';
+import * as fs from 'fs-extra';
 
 const customizerAgent = new CustomizerAgent();
 
@@ -100,7 +99,7 @@ const architectureWorker = new Worker(QUEUE_ARCHITECTURE, async (job: Job) => {
         throw error;
     }
 }, {
-    connection: redis,
+    connection: redis as any,
     concurrency: 5
 });
 
@@ -114,3 +113,4 @@ setInterval(() => {
 }, 30000);
 
 new Promise(() => { });
+

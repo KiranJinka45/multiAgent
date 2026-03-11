@@ -1,5 +1,5 @@
 import { AgentMetrics } from './agent-metrics';
-import logger from '@configs/logger';
+import logger from '@config/logger';
 
 export type AgentStrategy = 'direct_generation' | 'memory_augmented' | 'template_driven' | 'multi_pass_review';
 
@@ -7,6 +7,7 @@ export interface StrategyConfig {
     strategy: AgentStrategy;
     temperature: number;
     contextWindow: number;
+    model: string;
 }
 
 export class StrategyEngine {
@@ -38,7 +39,8 @@ export class StrategyEngine {
         return {
             strategy,
             temperature,
-            contextWindow: 4000
+            contextWindow: 4000,
+            model: strategy === 'memory_augmented' ? 'llama-3.3-70b-versatile' : 'llama-3.1-8b-instant'
         };
     }
 

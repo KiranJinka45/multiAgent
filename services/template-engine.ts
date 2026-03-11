@@ -1,6 +1,6 @@
-import fs from 'fs-extra';
+import * as fs from 'fs-extra';
 import path from 'path';
-import logger from '@configs/logger';
+import logger from '@config/logger';
 
 export class TemplateEngine {
     private static TEMPLATES_DIR = path.join(process.cwd(), 'templates');

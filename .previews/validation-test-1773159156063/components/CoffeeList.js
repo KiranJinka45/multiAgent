@@ -1,0 +1,1 @@
+// Coffee list component

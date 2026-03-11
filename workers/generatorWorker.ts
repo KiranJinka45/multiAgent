@@ -1,19 +1,18 @@
-import dotenv from 'dotenv';
-dotenv.config({ path: '.env.local' });
+import 'dotenv/config';
 
 import { Worker, Job } from 'bullmq';
-import { QUEUE_GENERATOR, validatorQueue } from '../src/lib/queue/agent-queues';
-import redis from '@queue/redis-client';
-import logger from '@configs/logger';
-import { PlannerAgent } from '@services/planner-agent';
-import { TaskGraph, TaskExecutor } from '@services/task-engine';
-import { agentRegistry } from '@services/task-engine/agent-registry';
-import { DatabaseAgent } from '@services/database-agent';
-import { BackendAgent } from '@services/backend-agent';
-import { FrontendAgent } from '@services/frontend-agent';
-import { VirtualFileSystem, CommitManager } from '@services/vfs';
-import { eventBus } from '@configs/event-bus';
-import { DistributedExecutionContext } from '@services/execution-context';
+import { QUEUE_GENERATOR, validatorQueue } from '../lib/queue/agent-queues';
+import redis from '../services/queue/redis-client';
+import logger from '../config/logger';
+import { PlannerAgent } from '../agents/planner-agent';
+import { TaskGraph, TaskExecutor } from '../services/task-engine';
+import { agentRegistry } from '../services/task-engine/agent-registry';
+import { DatabaseAgent } from '../agents/database-agent';
+import { BackendAgent } from '../agents/backend-agent';
+import { FrontendAgent } from '../agents/frontend-agent';
+import { VirtualFileSystem, CommitManager } from '../services/vfs';
+import { eventBus } from '../services/event-bus';
+import { DistributedExecutionContext } from '../services/execution-context';
 import path from 'path';
 import fs from 'fs';
 
@@ -113,7 +112,7 @@ const generatorWorker = new Worker(QUEUE_GENERATOR, async (job: Job) => {
         throw error;
     }
 }, {
-    connection: redis,
+    connection: redis as any,
     concurrency: 5
 });
 
@@ -127,3 +126,4 @@ setInterval(() => {
 }, 30000);
 
 new Promise(() => { });
+

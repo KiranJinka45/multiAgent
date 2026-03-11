@@ -2,13 +2,13 @@ import '../scripts/pre-init';
 import path from 'path';
 
 import { Worker, Job } from 'bullmq';
-import { QUEUE_REPAIR, validatorQueue } from '../src/lib/queue/agent-queues';
-import redis from '@queue/redis-client';
-import logger from '@configs/logger';
-import { RepairAgent } from '../services/repair-agent';
+import { QUEUE_REPAIR, validatorQueue } from '../lib/queue/agent-queues';
+import redis from '../services/queue/redis-client';
+import logger from '../config/logger';
+import { RepairAgent } from '../agents/repair-agent';
 import { DistributedExecutionContext } from '../services/execution-context';
 import { VirtualFileSystem, CommitManager } from '../services/vfs';
-import { eventBus } from '@configs/event-bus';
+import { eventBus } from '../services/event-bus';
 
 import fs from 'fs';
 const logPath = path.join(process.cwd(), 'repair_direct.log');
@@ -86,7 +86,7 @@ const repairWorker = new Worker(QUEUE_REPAIR, async (job: Job) => {
         throw err;
     }
 }, {
-    connection: redis,
+    connection: redis as any,
     concurrency: 2
 });
 

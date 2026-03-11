@@ -13,6 +13,13 @@ export interface BuildStage {
     completedAt?: string;
 }
 
+export interface FileDiff {
+    path: string;
+    oldContent: string;
+    newContent: string;
+    type: 'create' | 'modify' | 'delete';
+}
+
 export interface BuildUpdate {
     executionId: string;
     totalProgress: number; // Aggregate weighted progress (0-100)
@@ -26,43 +33,44 @@ export interface BuildUpdate {
     timestamp?: string;
     previewUrl?: string; // Populated on build completion
     previewPort?: number; // Internal port the sandbox is running on
+    isPreviewReady?: boolean; // Flag for early preview access
+    isBackgroundBuilding?: boolean; // Flag for background deployment
     metadata?: {
-        diffs?: any[];
+        diffs?: FileDiff[];
+        executionId?: string;
+        previewUrl?: string;
+        taskCount?: number;
+        autonomousCycles?: number;
+        fastPath?: boolean;
     };
 }
 
 export const BUILD_STAGES_CONFIG: Omit<BuildStage, 'status' | 'message' | 'progressPercent' | 'timestamp' | 'startedAt' | 'completedAt'>[] = [
-    { id: 'initializing', stageIndex: 0, name: 'Initializing Project Core', weight: 0.05 },
-    { id: 'database', stageIndex: 1, name: 'Architecting Database Schema', weight: 0.15 },
-    { id: 'backend', stageIndex: 2, name: 'Generating Backend API layer', weight: 0.15 },
-    { id: 'frontend', stageIndex: 3, name: 'Building Frontend UI & Layout', weight: 0.20 },
-    { id: 'testing', stageIndex: 4, name: 'Executing Unit & Integration Tests', weight: 0.10 },
-    { id: 'dockerization', stageIndex: 5, name: 'Dockerizing Application Environment', weight: 0.10 },
-    { id: 'cicd', stageIndex: 6, name: 'Configuring CI/CD Pipelines', weight: 0.10 },
-    { id: 'deployment', stageIndex: 7, name: 'Deploying to Staging Sandbox', weight: 0.10 },
-    { id: 'finalization', stageIndex: 8, name: 'Finalizing Deployment', weight: 0.05 },
+    { id: 'meta', stageIndex: 0, name: 'Meta-Agent Analysis', weight: 0.10 },
+    { id: 'planner', stageIndex: 1, name: 'AI Architecture Planning', weight: 0.15 },
+    { id: 'database', stageIndex: 2, name: 'Database Schema Generation', weight: 0.15 },
+    { id: 'backend', stageIndex: 3, name: 'Backend API Generation', weight: 0.15 },
+    { id: 'frontend', stageIndex: 4, name: 'Frontend UI Construction', weight: 0.20 },
+    { id: 'docker', stageIndex: 5, name: 'Docker Environment Setup', weight: 0.10 },
+    { id: 'deployment', stageIndex: 6, name: 'Live Deployment', weight: 0.15 },
 ];
 
 export const STAGE_PROGRESS: Record<string, number> = {
-    initializing: 5,
-    database: 15,
-    backend: 35,
-    frontend: 55,
-    testing: 75,
-    dockerization: 80,
-    cicd: 85,
-    deployment: 95,
-    finalization: 100
+    meta: 10,
+    planner: 25,
+    database: 40,
+    backend: 55,
+    frontend: 75,
+    docker: 85,
+    deployment: 100,
 };
 
 export const STAGE_ORDER = [
-    'initializing',
+    'meta',
+    'planner',
     'database',
     'backend',
     'frontend',
-    'testing',
-    'dockerization',
-    'cicd',
-    'deployment',
-    'finalization'
+    'docker',
+    'deployment'
 ];

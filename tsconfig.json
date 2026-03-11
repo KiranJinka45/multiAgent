@@ -3,7 +3,10 @@
     "lib": [
       "dom",
       "dom.iterable",
-      "esnext"
+      "esnext",
+      "es2020",
+      "es2021",
+      "es2022"
     ],
     "allowJs": true,
     "skipLibCheck": true,
@@ -24,7 +27,16 @@
     "baseUrl": ".",
     "paths": {
       "@/*": [
-        "./src/*"
+        "./*"
+      ],
+      "@app/*": [
+        "./app/*"
+      ],
+      "@components/*": [
+        "./components/*"
+      ],
+      "@agents/*": [
+        "./agents/*"
       ],
       "@services/*": [
         "./services/*"
@@ -32,14 +44,26 @@
       "@workers/*": [
         "./workers/*"
       ],
+      "@queue": [
+        "./services/queue/index.ts"
+      ],
       "@queue/*": [
-        "./queue/*"
+        "./services/queue/*"
       ],
-      "@realtime/*": [
-        "./realtime/*"
+      "@services/orchestrator": [
+        "./services/orchestrator.ts"
       ],
-      "@configs/*": [
-        "./configs/*"
+      "@services/event-bus": [
+        "./services/event-bus.ts"
+      ],
+      "@services/build-state": [
+        "./services/build-state.ts"
+      ],
+      "@lib/*": [
+        "./lib/*"
+      ],
+      "@config/*": [
+        "./config/*"
       ],
       "@templates/*": [
         "./templates/*"
@@ -48,7 +72,7 @@
         "./types/*"
       ],
       "@runtime/*": [
-        "./services/runtime/*"
+        "./runtime/*"
       ],
       "@services/engines/*": [
         "./services/engines/*"
@@ -64,12 +88,15 @@
   },
   "include": [
     "next-env.d.ts",
-    ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/dev/types/**/*.ts"
+    ".next/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "templates",
+    "tmp",
+    ".next",
+    "scripts"
   ]
 }

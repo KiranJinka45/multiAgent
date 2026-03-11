@@ -1,4 +1,4 @@
-import { BaseAgent, AgentResponse } from '@services/base-agent';
+import { BaseAgent, AgentResponse } from '@agents/base-agent';
 import { AgentContext } from '@shared-types/agent-context';
 
 export interface DimensionScore {

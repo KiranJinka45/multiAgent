@@ -1,9 +1,9 @@
 import '../scripts/pre-init';
 
 import { Worker, Job } from 'bullmq';
-import { QUEUE_SUPERVISOR, supervisorQueue } from '../src/lib/queue/agent-queues';
-import redis from '@queue/redis-client';
-import logger from '@configs/logger';
+import { QUEUE_SUPERVISOR, supervisorQueue } from '../lib/queue/agent-queues';
+import redis from '../services/queue/redis-client';
+import logger from '../config/logger';
 import { supervisorService } from '../services/supervisor';
 import { DistributedExecutionContext } from '../services/execution-context';
 
@@ -24,7 +24,7 @@ const supervisorWorker = new Worker(QUEUE_SUPERVISOR, async (job: Job) => {
         }
     }
 }, {
-    connection: redis,
+    connection: redis as any,
     concurrency: 1
 });
 

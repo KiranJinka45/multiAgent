@@ -1,13 +1,12 @@
-import dotenv from 'dotenv';
-dotenv.config({ path: '.env.local' });
+import 'dotenv/config';
 
 import { Worker, Job } from 'bullmq';
-import { QUEUE_META, plannerQueue } from '../src/lib/queue/agent-queues';
-import redis from '@queue/redis-client';
-import logger from '@configs/logger';
-import { MetaAgent } from '../services/meta-agent';
+import { QUEUE_META, plannerQueue } from '../lib/queue/agent-queues';
+import redis from '../services/queue/redis-client';
+import logger from '../config/logger';
+import { MetaAgent } from '../agents/meta-agent';
 import { DistributedExecutionContext } from '../services/execution-context';
-import { eventBus } from '@configs/event-bus';
+import { eventBus } from '../services/event-bus';
 
 const metaAgent = new MetaAgent();
 
@@ -57,8 +56,9 @@ const metaWorker = new Worker(QUEUE_META, async (job: Job) => {
         throw err;
     }
 }, {
-    connection: redis,
+    connection: redis as any,
     concurrency: 5
 });
 
 logger.info('Meta-Agent Worker online');
+

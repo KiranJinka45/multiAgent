@@ -1,9 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
 import * as crypto from 'crypto';
 import redis from '@queue/redis-client';
-import logger from '@configs/logger';
+import logger from '@config/logger';
 import { AgentContext } from '@shared-types/agent-context';
-import { OrchestratorLock } from '@configs/orchestrator-lock';
+import { OrchestratorLock } from '@config/orchestrator-lock';
+import { VirtualFileSystem } from '@services/vfs';
 
 export interface ExecutionMetrics {
     startTime: string;
@@ -78,18 +79,20 @@ export interface ExecutionContextType {
     finalFiles?: any[];
     locked?: boolean;
     lastCommitHash: string;
+    vfsSnapshot?: string;
 }
 
 export class DistributedExecutionContext implements ExecutionContextType, AgentContext {
     public executionId: string;
     private key: string;
+    private vfs: VirtualFileSystem = new VirtualFileSystem();
     private static TTL = 86400; // 24 hours
 
     // Properties from ExecutionContextType
     public userId: string = '';
     public projectId: string = '';
     public prompt: string = '';
-    public status: 'initializing' | 'executing' | 'completed' | 'failed' = 'initializing';
+    public status: 'initializing' | 'executing' | 'validating' | 'completed' | 'failed' = 'initializing';
     public currentStageIndex: number = 0;
     public currentStage: string = '';
     public version: number = 0;
@@ -198,6 +201,10 @@ export class DistributedExecutionContext implements ExecutionContextType, AgentC
         this.key = `execution:${this.executionId}`;
     }
 
+    getVFS() {
+        return this.vfs;
+    }
+
     getExecutionId() {
         return this.executionId;
     }
@@ -241,7 +248,8 @@ export class DistributedExecutionContext implements ExecutionContextType, AgentC
                 tokensTotal: 0
             },
             metadata: { planType },
-            lastCommitHash: '0'.repeat(64)
+            lastCommitHash: '0'.repeat(64),
+            vfsSnapshot: this.vfs.createSnapshot()
         };
 
         await redis.setex(this.key, DistributedExecutionContext.TTL, JSON.stringify(context));
@@ -256,6 +264,29 @@ export class DistributedExecutionContext implements ExecutionContextType, AgentC
     async get(): Promise<ExecutionContextType | null> {
         const data = await redis.get(this.key);
         return data ? JSON.parse(data) : null;
+    }
+
+    /**
+     * Pulls the latest state from Redis and hydrates the local VFS.
+     */
+    async sync(): Promise<ExecutionContextType | null> {
+        const data = await this.get();
+        if (data) {
+            // Hydrate properties (ignoring private ones)
+            if (data.userId) this.userId = data.userId;
+            if (data.projectId) this.projectId = data.projectId;
+            if (data.prompt) this.prompt = data.prompt;
+            if (data.status) this.status = data.status;
+            if (data.currentStageIndex) this.currentStageIndex = data.currentStageIndex;
+            if (data.currentStage) this.currentStage = data.currentStage;
+            if (data.version) this.version = data.version;
+            if (data.agentResults) this.agentResults = data.agentResults;
+            if (data.metadata) this.metadata = data.metadata;
+            if (data.vfsSnapshot) {
+                this.vfs.restoreSnapshot(data.vfsSnapshot);
+            }
+        }
+        return data;
     }
 
     async update(updates: Partial<ExecutionContextType>): Promise<void> {
@@ -455,7 +486,14 @@ export class DistributedExecutionContext implements ExecutionContextType, AgentC
                     await redis.unwatch();
                     return; // Fail-safe: No updates allowed on locked context
                 }
+                if (context.vfsSnapshot && this.vfs.isEmpty()) {
+                    this.vfs.restoreSnapshot(context.vfsSnapshot);
+                }
+                
                 updater(context);
+                
+                // Keep snapshot in sync after updater runs
+                context.vfsSnapshot = this.vfs.createSnapshot();
 
                 const result = await redis.multi()
                     .setex(this.key, DistributedExecutionContext.TTL, JSON.stringify(context))
