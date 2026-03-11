@@ -1,5 +1,5 @@
 import express from 'express';
-import { createServer } from 'http';
+import { createServer, request as httpRequest } from 'http';
 import { Server } from 'socket.io';
 import Redis from 'ioredis';
 import { Queue } from 'bullmq';
@@ -11,6 +11,73 @@ dotenv.config({ path: '.env.local' });
 
 const app = express();
 app.use(cors());
+
+// Global Debug Logger
+app.use((req, res, next) => {
+    if (req.url.startsWith('/preview') || req.url === '/health') {
+        console.log(`[SocketServer] ${req.method} ${req.url}`);
+    }
+    next();
+});
+
+// --- Preview Proxy ---
+// Routes http://localhost:3005/preview/{projectId}/* -> http://localhost:{port}/*
+app.use('/preview', (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const parts = req.url.split('/').filter(Boolean);
+    const projectId = parts[0];
+    
+    if (!projectId) {
+        return next();
+    }
+
+    console.log(`[PreviewProxy] [${req.method}] ${req.url} -> Project: ${projectId}`);
+    
+    redis.get(`preview:port:${projectId}`).then(port => {
+        if (!port) {
+            console.warn(`[PreviewProxy] 404 - No port found for ${projectId}`);
+            return res.status(404).json({ error: 'Preview not found or expired', projectId });
+        }
+
+        // Track last access time for idle shutdown
+        redis.set(`preview:last_access:${projectId}`, Date.now().toString(), 'EX', 86400); // 1 day TTL
+        
+        const targetPort = parseInt(port);
+        // Stripping project ID from path for internal routing
+        const internalPath = req.url.replace(`/${projectId}`, '') || '/';
+
+        console.log(`[PreviewProxy] Forwarding to http://127.0.0.1:${targetPort}${internalPath}`);
+
+        const options = {
+            hostname: '127.0.0.1', // Use explicit IPv4 for Windows stability
+            port: targetPort,
+            path: internalPath,
+            method: req.method,
+            headers: {
+                ...req.headers,
+                host: `127.0.0.1:${targetPort}`
+            }
+        };
+
+        const proxyReq = httpRequest(options, (proxyRes) => {
+            console.log(`[PreviewProxy] Target Response: ${proxyRes.statusCode}`);
+            res.writeHead(proxyRes.statusCode || 200, proxyRes.headers);
+            proxyRes.pipe(res);
+        });
+
+        proxyReq.on('error', (err) => {
+            console.error(`[PreviewProxy] Connection failure to ${projectId}:`, err.message);
+            if (!res.headersSent) {
+                res.status(502).send('Gateway Error: Isolated preview server unreachable');
+            }
+        });
+
+        req.pipe(proxyReq);
+    }).catch(err => {
+        console.error('[PreviewProxy] Redis Lookup Error:', err);
+        if (!res.headersSent) res.status(500).send('Proxy State Error');
+    });
+});
+
 
 const server = createServer(app);
 const io = new Server(server, {
@@ -118,4 +185,13 @@ redisSub.on('message', (channel, message) => {
 
 server.listen(PORT, () => {
     console.log(`[Socket.IO] Realtime server running on http://localhost:${PORT}`);
+    
+    // Periodically update health status in Redis
+    setInterval(() => {
+        redis.set('system:health:socket', JSON.stringify({
+            status: 'online',
+            timestamp: Date.now(),
+            clients: io.engine.clientsCount
+        }), 'EX', 30);
+    }, 10000);
 });

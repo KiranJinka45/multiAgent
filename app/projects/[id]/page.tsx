@@ -64,18 +64,18 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
     // ── 1. Unified Socket.IO Realtime ───────────────────────────────────────
     useSocket({
         projectId: params.id,
-        onUpdate: (update) => {
-            console.log('[Realtime] Build update received via Socket.IO:', update.currentStage, update.status);
+        onUpdate: (update: BuildUpdate) => {
+            console.log(`[Realtime] Build update (${update.type}): ${update.message || update.currentStage || 'tick'}`);
             setBuildProgress(update);
-            if (update.status === 'completed') {
+            
+            if (update.status === 'completed' || update.status === 'failed') {
                 setIsGenerating(false);
                 loadFiles();
             } else if (update.status === 'queued') {
-                // Keep isGenerating true so UI doesn't let the user retrigger
                 setIsGenerating(true);
                 setHasStartedGenerating(true);
-            } else if (update.status === 'executing' || update.status === 'failed') {
-                setIsGenerating(update.status === 'executing');
+            } else if (update.status === 'executing') {
+                setIsGenerating(true);
             }
         }
     });

@@ -26,7 +26,10 @@ export interface BuildUpdate {
     currentStageIndex: number; // Strict mapping index for UI mapping
     currentStage: string;
     stages: BuildStage[];
-    status: "executing" | "completed" | "failed";
+    status: "queued" | "executing" | "completed" | "failed";
+    type?: string; // Realtime event classification
+    files?: { path: string; content?: string }[]; // Optional snapshot of project files
+    queuePosition?: number;
     tokensUsed?: number;
     durationMs?: number;
     message?: string;
