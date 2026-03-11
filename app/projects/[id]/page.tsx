@@ -65,45 +65,25 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
     useSocket({
         projectId: params.id,
         onUpdate: (update) => {
-            console.log('[Realtime] Build update received via Socket.IO:', update.currentStage);
+            console.log('[Realtime] Build update received via Socket.IO:', update.currentStage, update.status);
             setBuildProgress(update);
             if (update.status === 'completed') {
                 setIsGenerating(false);
                 loadFiles();
+            } else if (update.status === 'queued') {
+                // Keep isGenerating true so UI doesn't let the user retrigger
+                setIsGenerating(true);
+                setHasStartedGenerating(true);
             } else if (update.status === 'executing' || update.status === 'failed') {
                 setIsGenerating(update.status === 'executing');
             }
         }
     });
 
-    const previewDoc = useMemo(() => {
-        const htmlFile = files.find(f => f.path === 'index.html' || f.path === 'frontend/index.html' || f.path.endsWith('/index.html'));
-        const html = htmlFile?.content || '';
 
-        const css = files.filter(f => f.path.endsWith('.css')).map(f => `<style>${f.content}</style>`).join('\n');
-        const js = files.filter(f => f.path.endsWith('.js') || f.path.endsWith('.ts')).map(f => `<script>${f.content}</script>`).join('\n');
-
-        if (!html && files.length > 0 && !isGenerating) return 'No HTML file found for preview. Please ensure index.html exists.';
-        if (!html && isGenerating) return '';
-
-        return `
-            <!DOCTYPE html>
-            <html>
-                <head>
-                    <meta charset="utf-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1">
-                    ${css}
-                </head>
-                <body>
-                    ${html}
-                    ${js}
-                </body>
-            </html>
-        `;
-    }, [files, isGenerating]);
 
     const displayFiles = useMemo(() => {
-        const bp = buildProgress as any;
+        const bp = buildProgress as BuildUpdate | null;
         if (bp?.files && bp.files.length > 0) {
             return bp.files;
         }
@@ -139,7 +119,7 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
 
             if (!res.ok) {
                 const errorData = await res.json().catch(() => ({}));
-                const detailedError = (errorData as any).error || res.statusText;
+                const detailedError = (errorData as { error?: string }).error || res.statusText;
                 toast.error(`Generation engine unavailable: ${detailedError}`);
                 setError(detailedError);
                 setIsGenerating(false);
@@ -195,7 +175,7 @@ Database: ${stack.database}`;
                         .then(data => { if (!data.error) setBuildProgress(data); });
                 }
             } else if (p.status === 'completed') {
-                setBuildProgress({ status: 'completed', currentStage: 'deployment', stages: [], totalProgress: 100 } as any);
+                setBuildProgress({ status: 'completed', currentStage: 'deployment', stages: [], totalProgress: 100 } as BuildUpdate);
             }
             loadFiles();
         } finally {
@@ -313,7 +293,20 @@ Database: ${stack.database}`;
             <div className="flex-1 flex overflow-hidden">
                 <main className="flex-1 flex overflow-hidden relative bg-[#050505]">
                     <AnimatePresence mode="wait">
-                        {((project?.status === 'draft' || !project?.status) && !hasStartedGenerating && !isGenerating && !error) && (
+                        {isDevOpsMode ? (
+                            <motion.div key="devops-view" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1 flex overflow-hidden w-full h-full">
+                                <DevOpsDashboard
+                                    buildProgress={buildProgress}
+                                    files={displayFiles}
+                                    projectId={params.id}
+                                    onDownload={() => { window.location.href = `/api/build/${params.id}/export`; }}
+                                    onDeploy={() => { }}
+                                    onPushToGithub={() => setIsGithubModalOpen(true)}
+                                    onRedeploy={handleGenerate}
+                                    projectTitle={project?.name || 'Tactical Project'}
+                                />
+                            </motion.div>
+                        ) : ((project?.status === 'draft' || !project?.status) && !hasStartedGenerating && !isGenerating && !error) ? (
                             <motion.div key="draft-view" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1 flex w-full">
                                 <div className="w-1/2 border-r border-white/5 bg-[#080808] flex flex-col pt-12 px-10 relative">
                                     <div className="flex items-center gap-3 mb-10 group">
@@ -326,51 +319,62 @@ Database: ${stack.database}`;
                                         </div>
                                     </div>
                                     <div className="flex-1 overflow-y-auto space-y-8 pb-32 custom-scrollbar pr-4">
-                                        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="bg-white/[0.02] rounded-3xl p-6 border border-white/5 text-[13px] text-white/60 leading-relaxed shadow-2xl backdrop-blur-sm">
+                                        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="bg-white/[0.02] rounded-3xl p-6 border border-white/5 text-[13px] text-white/60 leading-relaxed shadow-2xl backdrop-blur-sm whitespace-pre-wrap">
                                             {project?.description?.split('\n\nPreferences:')[0]}
                                         </motion.div>
-                                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-primary/[0.03] rounded-[2rem] p-8 border border-primary/20 text-sm text-gray-300 space-y-6 shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden active-border-glow">
-                                            <div className="absolute top-0 left-0 w-1.5 h-full bg-primary" />
-                                            <div className="flex items-center gap-3 text-primary font-black text-[11px] uppercase tracking-[0.2em]">
-                                                <Sparkles size={16} className="animate-pulse" />
-                                                System Initialization Protocol
-                                            </div>
-                                            <div className="text-white font-bold text-base leading-tight">I&apos;m ready to architect your {project?.name}. Please specify your technical infrastructure preferences:</div>
-                                            <div className="grid grid-cols-1 gap-4 text-white/40 font-medium italic">
-                                                <div className="flex items-center gap-3 px-4 py-3 bg-white/[0.02] rounded-2xl border border-white/5 group hover:border-primary/40 transition-all">
-                                                    <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center group-hover:text-primary transition-colors">1</div>
-                                                    <span>Framework preference (e.g. Next.js, Vite, React)</span>
+                                        {!project?.description?.includes('[Architecture Requirements]') && (
+                                            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-primary/[0.03] rounded-[2rem] p-8 border border-primary/20 text-sm text-gray-300 space-y-6 shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden active-border-glow">
+                                                <div className="absolute top-0 left-0 w-1.5 h-full bg-primary" />
+                                                <div className="flex items-center gap-3 text-primary font-black text-[11px] uppercase tracking-[0.2em]">
+                                                    <Sparkles size={16} className="animate-pulse" />
+                                                    System Initialization Protocol
                                                 </div>
-                                                <div className="flex items-center gap-3 px-4 py-3 bg-white/[0.02] rounded-2xl border border-white/5 group hover:border-primary/40 transition-all">
-                                                    <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center group-hover:text-primary transition-colors">2</div>
-                                                    <span>UI & Styling System (e.g. Tailwind, Framer Motion)</span>
+                                                <div className="text-white font-bold text-base leading-tight">I&apos;m ready to architect your {project?.name}. Please specify your technical infrastructure preferences:</div>
+                                                <div className="grid grid-cols-1 gap-4 text-white/40 font-medium italic">
+                                                    <div className="flex items-center gap-3 px-4 py-3 bg-white/[0.02] rounded-2xl border border-white/5 group hover:border-primary/40 transition-all">
+                                                        <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center group-hover:text-primary transition-colors">1</div>
+                                                        <span>Framework preference (e.g. Next.js, Vite, React)</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-3 px-4 py-3 bg-white/[0.02] rounded-2xl border border-white/5 group hover:border-primary/40 transition-all">
+                                                        <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center group-hover:text-primary transition-colors">2</div>
+                                                        <span>UI & Styling System (e.g. Tailwind, Framer Motion)</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-3 px-4 py-3 bg-white/[0.02] rounded-2xl border border-white/5 group hover:border-primary/40 transition-all">
+                                                        <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center group-hover:text-primary transition-colors">3</div>
+                                                        <span>Backend requirements (e.g. DB, Auth, API)</span>
+                                                    </div>
                                                 </div>
-                                                <div className="flex items-center gap-3 px-4 py-3 bg-white/[0.02] rounded-2xl border border-white/5 group hover:border-primary/40 transition-all">
-                                                    <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center group-hover:text-primary transition-colors">3</div>
-                                                    <span>Backend requirements (e.g. DB, Auth, API)</span>
-                                                </div>
-                                            </div>
-                                        </motion.div>
+                                            </motion.div>
+                                        )}
                                     </div>
-                                    <div className="absolute bottom-8 left-10 right-10">
-                                        <button
-                                            onClick={() => setIsReviewing(true)}
-                                            className="w-full bg-[#121212] border border-white/10 rounded-[1.5rem] p-4 flex items-center justify-between shadow-[0_30px_60px_rgba(0,0,0,0.8)] hover:border-primary/40 transition-all group"
-                                        >
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-white/40 group-hover:text-primary transition-colors">
-                                                    <Sparkles size={20} />
-                                                </div>
-                                                <div className="text-left py-2">
-                                                    <div className="text-sm font-bold text-white mb-1">Select Architecture Stack</div>
-                                                    <div className="text-xs text-white/40 font-medium">Click to configure frameworks & infrastructure</div>
-                                                </div>
-                                            </div>
-                                            <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all shadow-lg">
-                                                <ChevronRight size={24} />
-                                            </div>
-                                        </button>
-                                    </div>
+                                    <AnimatePresence>
+                                        {!isReviewing && !project?.description?.includes('[Architecture Requirements]') && (
+                                            <motion.div 
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: 20 }}
+                                                className="absolute bottom-8 left-10 right-10"
+                                            >
+                                                <button
+                                                    onClick={() => setIsReviewing(true)}
+                                                    className="w-full bg-[#121212] border border-white/10 rounded-[1.5rem] p-4 flex items-center justify-between shadow-[0_30px_60px_rgba(0,0,0,0.8)] hover:border-primary/40 transition-all group"
+                                                >
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-white/40 group-hover:text-primary transition-colors">
+                                                            <Sparkles size={20} />
+                                                        </div>
+                                                        <div className="text-left py-2">
+                                                            <div className="text-sm font-bold text-white mb-1">Select Architecture Stack</div>
+                                                            <div className="text-xs text-white/40 font-medium">Click to configure frameworks & infrastructure</div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all shadow-lg">
+                                                        <ChevronRight size={24} />
+                                                    </div>
+                                                </button>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
                                 </div>
                                 <div className={`w-1/2 bg-[#020202] py-12 px-6 relative overflow-hidden flex flex-col transition-all duration-500 ${isReviewing ? 'opacity-100 translate-x-0' : 'opacity-30 translate-x-8'}`}>
                                     <div className="relative z-10 w-full h-full">
@@ -392,21 +396,7 @@ Database: ${stack.database}`;
                                     </div>
                                 </div>
                             </motion.div>
-                        )}
-                        {isDevOpsMode && (
-                            <motion.div key="devops-view" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 flex overflow-hidden w-full h-full">
-                                <DevOpsDashboard
-                                    buildProgress={buildProgress}
-                                    files={displayFiles}
-                                    projectId={params.id}
-                                    onDownload={() => { window.location.href = `/api/projects/${params.id}/export`; }}
-                                    onDeploy={() => { }}
-                                    onPushToGithub={() => setIsGithubModalOpen(true)}
-                                    onRedeploy={handleGenerate}
-                                    projectTitle={project?.name || 'Tactical Project'}
-                                />
-                            </motion.div>
-                        )}
+                        ) : null}
                     </AnimatePresence>
                 </main>
             </div>

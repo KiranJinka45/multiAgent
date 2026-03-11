@@ -1,18 +1,10 @@
 "use client";
 
-import React, { useMemo, useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
     Terminal,
-    Loader2,
-    CheckCircle2,
-    Clock,
-    Info,
-    Layout,
-    Database,
-    Server,
-    Box,
-    Rocket
+    Loader2
 } from 'lucide-react';
 import BuildDebugPanel from './BuildDebugPanel';
 import { formatTime } from '@config/date';
@@ -104,22 +96,7 @@ const BuildConsole: React.FC<BuildConsoleProps> = ({ buildProgress }) => {
         processQueue();
     }, [buildProgress, visualProgress?.currentStageIndex]);
 
-    const stages = useMemo(() => visualProgress?.stages || [], [visualProgress?.stages]);
 
-    const getStageIcon = (id: string, status: string) => {
-        if (status === 'in_progress') return <Loader2 size={16} className="text-primary animate-spin" />;
-        if (status === 'completed') return <CheckCircle2 size={16} className="text-green-500 shadow-[0_0_10px_rgba(34,197,94,0.4)]" />;
-
-        const i = id.toLowerCase();
-        if (i.includes('database')) return <Database size={16} />;
-        if (i.includes('backend')) return <Server size={16} />;
-        if (i.includes('frontend')) return <Layout size={16} />;
-        if (i.includes('docker')) return <Box size={16} />;
-        if (i.includes('cicd')) return <Clock size={16} />;
-        if (i.includes('deployment')) return <Rocket size={16} />;
-
-        return <Info size={16} />;
-    };
 
     return (
         <div className="flex-1 flex flex-col min-w-0 p-8 space-y-8 h-full overflow-hidden">
@@ -203,6 +180,16 @@ const BuildConsole: React.FC<BuildConsoleProps> = ({ buildProgress }) => {
                                 </span>
                             </motion.div>
                         ))}
+
+                        {buildProgress?.status === 'queued' && (
+                            <div className="flex gap-4 items-center pt-2">
+                                <span className="text-white/10 w-16">···</span>
+                                <div className="w-2 h-4 bg-yellow-500/40 animate-pulse" />
+                                <span className="text-[9px] font-black text-yellow-500/80 uppercase tracking-widest">
+                                    Awaiting Available Worker... {buildProgress.queuePosition ? `(Position: ${buildProgress.queuePosition})` : ''}
+                                </span>
+                            </div>
+                        )}
 
                         {buildProgress?.status === 'executing' && (
                             <div className="flex gap-4 items-center pt-2">

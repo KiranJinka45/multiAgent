@@ -1,5 +1,6 @@
-import { BaseAgent, AgentResponse } from '@/agents/base-agent';
-import { AgentContext } from '@/types/agent-context';
+import { BaseAgent, AgentResponse } from './base-agent';
+import { AgentContext } from '../types/agent-context';
+import { StrategyConfig } from '../services/agent-intelligence/strategy-engine';
 
 export interface TaskStep {
     id: number;
@@ -33,7 +34,7 @@ export class PlannerAgent extends BaseAgent {
         input: { prompt: string; techStack?: Record<string, string> },
         _context: AgentContext,
         signal?: AbortSignal,
-        strategy?: any
+        strategy?: StrategyConfig
     ): Promise<AgentResponse<TaskPlan>> {
         void _context;
         this.log('Generating structured task plan from user prompt...');
@@ -50,12 +51,15 @@ Each task must be assigned to exactly one agent:
 - TestingAgent: Unit tests, integration tests, E2E specs
 
 Rules:
-1. Tasks must have correct dependency ordering (a page can't be built before its API route).
-2. Each task should target specific files it will create or modify.
-3. Prioritize critical infrastructure first (database → backend → frontend → testing → deployment).
-4. For complex apps, break frontend into multiple tasks (layout, individual pages, shared components).
-5. Include auth setup if the prompt mentions users, login, accounts, or dashboard.
-6. Include payment setup if the prompt mentions pricing, subscription, or checkout.
+1. Surgical Patching: Prioritize modifying specific sections of template files using markers (e.g., @section: NAME) instead of full-file rewrites.
+2. Guardrails: NEVER plan modifications to core config files (package.json, tsconfig.json, tailwind.config.ts) unless adding specific dependencies via provided tools.
+3. Tech Stack Consistency: Always respect the chosen template's built-in layouts and structure.
+4. Tasks must have correct dependency ordering (a page can't be built before its API route).
+5. Each task should target specific files it will create or modify.
+6. Prioritize critical infrastructure first (database → backend → frontend → testing → deployment).
+7. For complex apps, break frontend into multiple tasks (layout, individual pages, shared components).
+8. Include auth setup if the prompt mentions users, login, accounts, or dashboard.
+9. Include payment setup if the prompt mentions pricing, subscription, or checkout.
 
 Output strictly valid JSON matching this schema:
 {
