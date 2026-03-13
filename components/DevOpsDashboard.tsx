@@ -2,8 +2,9 @@
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Terminal, Layout, Download, Rocket, Github, Wand2, Eye, BarChart2, Activity, Brain } from 'lucide-react';
+import { Terminal, Layout, Download, Rocket, Github, Wand2, Eye, BarChart2, Activity, Brain, Share } from 'lucide-react';
 import { BuildUpdate } from '@shared-types/build';
+import { toast } from 'sonner';
 import FileExplorer from '@/components/FileExplorer';
 import FileViewer from '@/components/FileViewer';
 import BuildConsole from '@/components/BuildConsole';
@@ -83,6 +84,12 @@ const DevOpsDashboard: React.FC<DevOpsDashboardProps> = ({
         }
     }, [onRedeploy]);
 
+    const handleShare = useCallback(() => {
+        const previewUrl = buildProgress?.metadata?.previewUrl || buildProgress?.previewUrl || `http://localhost:3005/preview/${projectId}/`;
+        navigator.clipboard.writeText(previewUrl);
+        toast.success('Preview link copied to clipboard!');
+    }, [buildProgress, projectId]);
+
     // Apply a single diff patch via the API
     const handleApplyDiff = useCallback(async (diff: FileDiff) => {
         const res = await fetch(`/api/projects/${projectId}/apply-patch`, {
@@ -123,9 +130,23 @@ const DevOpsDashboard: React.FC<DevOpsDashboardProps> = ({
                     <div className="hidden sm:block h-6 w-[1px] bg-white/10" />
 
                     <div className="hidden sm:flex items-center gap-5">
-                        <div className="flex items-center gap-2.5 px-3 py-1.5 bg-primary/5 rounded-full border border-primary/20">
-                            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
-                            <span className="text-[9px] font-black text-primary uppercase tracking-[0.1em]">{currentStage.replace(/-/g, ' ')}</span>
+                        <div className={`flex items-center gap-2.5 px-3 py-1.5 rounded-full border ${
+                            status === 'queued'
+                                ? 'bg-yellow-500/5 border-yellow-500/20'
+                                : 'bg-primary/5 border-primary/20'
+                        }`}>
+                            <div className={`w-1.5 h-1.5 rounded-full animate-pulse ${
+                                status === 'queued'
+                                    ? 'bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.8)]'
+                                    : 'bg-primary shadow-[0_0_10px_rgba(59,130,246,0.8)]'
+                            }`} />
+                            <span className={`text-[9px] font-black uppercase tracking-[0.1em] ${
+                                status === 'queued' ? 'text-yellow-500' : 'text-primary'
+                            }`}>
+                                {status === 'queued'
+                                    ? `Queued${buildProgress?.queuePosition ? ` (#${buildProgress.queuePosition})` : ''}`
+                                    : currentStage.replace(/-/g, ' ')}
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -160,6 +181,12 @@ const DevOpsDashboard: React.FC<DevOpsDashboardProps> = ({
                                     <Github size={13} /> <span className="hidden sm:inline">GitHub</span>
                                 </button>
                             )}
+                            <button
+                                onClick={handleShare}
+                                className="flex items-center gap-1.5 px-3 sm:px-5 py-2 bg-white/[0.03] hover:bg-white/10 border border-white/10 rounded-xl text-[10px] font-black tracking-widest uppercase transition-all hover:active-border-glow"
+                            >
+                                <Share size={13} /> <span className="hidden sm:inline">Share</span>
+                            </button>
                             <button
                                 onClick={onDeploy}
                                 className="flex items-center gap-1.5 px-3 sm:px-6 py-2 bg-primary text-white rounded-xl text-[10px] font-black tracking-widest uppercase shadow-[0_15px_35px_-10px_rgba(59,130,246,0.6)] hover:brightness-110 transition-all active-border-glow"

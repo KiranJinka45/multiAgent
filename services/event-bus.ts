@@ -19,6 +19,7 @@ const STREAM_TTL_SECONDS = 4 * 60 * 60; // 4 hours
 export interface BuildEvent {
     type: 'progress' | 'stage' | 'thought' | 'complete' | 'error' | 'heartbeat' | 'agent';
     executionId: string;
+    projectId?: string; // Optional context for global event routing
     timestamp: number;
     // Progress fields
     progress?: number;
@@ -63,6 +64,11 @@ export async function publishBuildEvent(event: BuildEvent): Promise<void> {
 
         // 3. Legacy pub/sub compat (non-blocking, best-effort)
         pipeline.publish(pubChannel, payload);
+
+        // 4. Global broadcast for Socket.IO project routing
+        if (event.projectId) {
+            pipeline.publish('build-events', payload);
+        }
 
         await pipeline.exec();
     } catch (err) {
@@ -134,10 +140,11 @@ export async function getLatestBuildState(executionId: string): Promise<BuildEve
  */
 export const eventBus = {
     /** Emit a progress event */
-    progress(executionId: string, progress: number, message: string, stage?: string, status = 'executing') {
+    progress(executionId: string, progress: number, message: string, stage?: string, status = 'executing', projectId?: string) {
         return publishBuildEvent({
             type: 'progress',
             executionId,
+            projectId,
             timestamp: Date.now(),
             progress,
             totalProgress: progress,
@@ -148,10 +155,11 @@ export const eventBus = {
     },
 
     /** Emit a stage transition event */
-    stage(executionId: string, stageId: string, stageStatus: string, message: string, progress: number) {
+    stage(executionId: string, stageId: string, stageStatus: string, message: string, progress: number, projectId?: string) {
         return publishBuildEvent({
             type: 'stage',
             executionId,
+            projectId,
             timestamp: Date.now(),
             currentStage: stageId,
             status: stageStatus,
@@ -162,10 +170,11 @@ export const eventBus = {
     },
 
     /** Emit an AI agent thought / log line */
-    thought(executionId: string, agent: string, thought: string) {
+    thought(executionId: string, agent: string, thought: string, projectId?: string) {
         return publishBuildEvent({
             type: 'thought',
             executionId,
+            projectId,
             timestamp: Date.now(),
             message: thought,
             metadata: { agent },
@@ -173,10 +182,11 @@ export const eventBus = {
     },
 
     /** Emit final completion event and schedule stream cleanup */
-    async complete(executionId: string, previewUrl?: string, metadata?: Record<string, unknown>) {
+    async complete(executionId: string, previewUrl?: string, metadata?: Record<string, unknown>, projectId?: string) {
         await publishBuildEvent({
             type: 'complete',
             executionId,
+            projectId,
             timestamp: Date.now(),
             status: 'completed',
             progress: 100,
@@ -193,10 +203,11 @@ export const eventBus = {
     },
 
     /** Emit an agent activity event (appears in the Timeline tab) */
-    agent(executionId: string, agentName: string, action: string, message: string) {
+    agent(executionId: string, agentName: string, action: string, message: string, projectId?: string) {
         return publishBuildEvent({
             type: 'agent',
             executionId,
+            projectId,
             timestamp: Date.now(),
             agent: agentName,
             action,
@@ -214,11 +225,12 @@ export const eventBus = {
      *   // ... do work ...
      *   await done('Schema complete');
      */
-    async startTimer(executionId: string, agentName: string, action: string, message: string) {
+    async startTimer(executionId: string, agentName: string, action: string, message: string, projectId?: string) {
         const startedAt = Date.now();
         await publishBuildEvent({
             type: 'agent',
             executionId,
+            projectId,
             timestamp: startedAt,
             agent: agentName,
             action: `${action}:started`,
@@ -229,6 +241,7 @@ export const eventBus = {
             await publishBuildEvent({
                 type: 'agent',
                 executionId,
+                projectId,
                 timestamp: Date.now(),
                 agent: agentName,
                 action: `${action}:finished`,
@@ -239,10 +252,11 @@ export const eventBus = {
     },
 
     /** Emit a build failure event */
-    error(executionId: string, message: string) {
+    error(executionId: string, message: string, projectId?: string) {
         return publishBuildEvent({
             type: 'error',
             executionId,
+            projectId,
             timestamp: Date.now(),
             status: 'failed',
             message,

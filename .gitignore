@@ -1,5 +1,7 @@
 # dependencies
 /node_modules
+templates/**/node_modules
+generated-projects/**/node_modules
 /.pnp
 .pnp.js
 

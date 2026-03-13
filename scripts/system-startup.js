@@ -160,8 +160,36 @@ async function main() {
 
     // 3. Spawning Managed Processes
     const activeProcesses = new Set();
+    const systemLog = fs.createWriteStream(path.join(process.cwd(), 'system.log'), { flags: 'a' });
+
     function startManagedProcess(name, command, args) {
-        let child = spawn(command, args, { stdio: 'inherit', shell: true });
+        console.log(`🚀 Starting ${name}...`);
+        let child = spawn(command, args, { shell: true });
+        
+        child.stdout.on('data', (data) => {
+            const lines = data.toString().split('\n');
+            lines.forEach(line => {
+                if (line.trim()) {
+                    const entry = `[${name}] ${line.trim()}\n`;
+                    systemLog.write(entry);
+                    if (line.includes('[DEBUG]') || line.includes('error') || line.includes('failed')) {
+                        console.log(entry.trim());
+                    }
+                }
+            });
+        });
+
+        child.stderr.on('data', (data) => {
+            const lines = data.toString().split('\n');
+            lines.forEach(line => {
+                if (line.trim()) {
+                    const entry = `[${name} ERROR] ${line.trim()}\n`;
+                    systemLog.write(entry);
+                    console.error(entry.trim());
+                }
+            });
+        });
+
         activeProcesses.add(child);
 
         child.on('exit', (code) => {

@@ -1,6 +1,6 @@
 import { Queue, QueueEvents, DefaultJobOptions } from 'bullmq';
-import redis from '@queue/redis-client';
-import logger from '@config/logger';
+import redis from '../../services/queue/redis-client';
+import logger from '../../config/logger';
 
 export const QUEUE_PLANNER = 'planner-queue';
 export const QUEUE_ARCHITECTURE = 'architecture-queue';

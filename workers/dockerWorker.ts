@@ -4,7 +4,7 @@ import { Worker, Job } from 'bullmq';
 import { QUEUE_DOCKER, deployQueue } from '../lib/queue/agent-queues';
 import redis from '../services/queue/redis-client';
 import logger from '../config/logger';
-import { DockerDeployer } from '../services/docker-deployer';
+import { DockerDeployer } from '../services/devops/docker-deployer';
 import { eventBus } from '../services/event-bus';
 import { DistributedExecutionContext } from '../services/execution-context';
 import { IS_PRODUCTION } from '../config/build-mode';

@@ -66,7 +66,8 @@ export class TaskExecutor {
                 SwarmOrchestrator.broadcast(task.type, `Starting task: ${task.title} with strategy: ${strategy.strategy}`);
 
                 const executionId = globalContext?.executionId || 'unknown';
-                const agentTimer = await eventBus.startTimer(executionId, task.type, 'task_execution', `Processing: ${task.title}`);
+                const projectId = globalContext?.projectId;
+                const agentTimer = await eventBus.startTimer(executionId, task.type, 'task_execution', `Processing: ${task.title}`, projectId);
 
                 const res = await agentRegistry.runTaskDirectly(task.type, task.payload, globalContext, undefined, strategy);
                 

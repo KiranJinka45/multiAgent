@@ -1,4 +1,4 @@
-import { Queue, QueueEvents } from 'bullmq';
+import { Queue } from 'bullmq';
 import redis from './redis-client';
 import logger from '@/config/logger';
 
@@ -30,9 +30,5 @@ export const proQueue = new Queue(QUEUE_PRO, {
     connection,
     defaultJobOptions: defaultOptions,
 });
-
-// 2. Initialize Queue Events
-export const freeQueueEvents = new QueueEvents(QUEUE_FREE, { connection });
-export const proQueueEvents = new QueueEvents(QUEUE_PRO, { connection });
 
 logger.info(`BullMQ Tiered Queues "${QUEUE_FREE}" and "${QUEUE_PRO}" initialized`);

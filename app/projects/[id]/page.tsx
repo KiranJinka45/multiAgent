@@ -97,8 +97,7 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
         setHasStartedGenerating(true);
         toast.info('Initializing Secure Connection Grid...');
 
-        const tempExecutionId = Array.from(crypto.getRandomValues(new Uint8Array(16)))
-            .map(b => b.toString(16).padStart(2, '0')).join('');
+        const tempExecutionId = crypto.randomUUID();
 
         try {
             // Wait briefly so we display the grid before triggering build
@@ -117,12 +116,15 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
                 })
             });
 
-            if (!res.ok) {
-                const errorData = await res.json().catch(() => ({}));
-                const detailedError = (errorData as { error?: string }).error || res.statusText;
-                toast.error(`Generation engine unavailable: ${detailedError}`);
+            const data = await res.json().catch(() => ({}));
+
+            if (!res.ok || !data.success) {
+                const detailedError = data.error || data.details?._errors?.join(', ') || res.statusText;
+                toast.error(`Build Initiation Failed: ${detailedError}`);
                 setError(detailedError);
                 setIsGenerating(false);
+            } else {
+                toast.success('Mission successfully enqueued on Grid.');
             }
 
         } catch (error) {

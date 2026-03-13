@@ -1,9 +1,10 @@
-import { freeQueue, proQueue } from './queue';
+import { freeQueue } from './queue/build-queue';
 import { Mission } from '../types/mission';
 import crypto from 'crypto';
 import logger from '../config/logger';
 import { missionController } from './mission-controller';
 import { Queue } from 'bullmq';
+import { eventBus } from './event-bus';
 
 export const commandGateway = {
     async submitMission(userId: string, projectId: string, prompt: string, options: { isFastPreview?: boolean, missionId?: string, queue?: Queue } = {}) {
@@ -45,6 +46,17 @@ export const commandGateway = {
                 jobId: `gen:${projectId}:${missionId}`,
                 removeOnComplete: true
             });
+
+            // 3. Immediately broadcast initial queued state to UI via unified event bus
+            const waitingCount = await queueToUse.getWaitingCount();
+            await eventBus.progress(
+                missionId, 
+                0, 
+                'Mission successfully enqueued', 
+                'queued', 
+                'queued', 
+                projectId
+            );
 
             elog.info({ queue: queueToUse.name }, 'Gateway: Mission successfully enqueued');
 

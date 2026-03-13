@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { BuildUpdate } from '@/types/build';
 import { socketManager } from '@/lib/socketManager';
 
@@ -13,6 +13,12 @@ export interface UseSocketOptions {
 export function useSocket({ projectId, onUpdate, serverUrl = 'http://localhost:3005' }: UseSocketOptions) {
     const [isConnected, setIsConnected] = useState(false);
     const [lastUpdate, setLastUpdate] = useState<BuildUpdate | null>(null);
+
+    // Use a ref for the callback so changing it doesn't trigger the effect
+    const onUpdateRef = useRef(onUpdate);
+    useEffect(() => {
+        onUpdateRef.current = onUpdate;
+    }, [onUpdate]);
 
     useEffect(() => {
         let isMounted = true;
@@ -48,7 +54,7 @@ export function useSocket({ projectId, onUpdate, serverUrl = 'http://localhost:3
         const unmountUpdateListener = socketManager.addUpdateListener('build-update', (data: BuildUpdate) => {
             if (isMounted) {
                 setLastUpdate(data);
-                if (onUpdate) onUpdate(data);
+                if (onUpdateRef.current) onUpdateRef.current(data);
             }
         });
 
@@ -58,7 +64,7 @@ export function useSocket({ projectId, onUpdate, serverUrl = 'http://localhost:3
             unmountConnectionListener();
             unmountUpdateListener();
         };
-    }, [projectId, serverUrl, onUpdate]);
+    }, [projectId, serverUrl]);
 
     return {
         isConnected,

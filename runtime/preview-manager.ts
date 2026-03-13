@@ -38,9 +38,37 @@ class PortAllocator {
     }
 }
 
+import { redis } from '../services/queue';
+
 export class PreviewServerManager {
     private portAllocator = new PortAllocator();
     private activePreviews = new Map<string, { port: number, process: ChildProcess }>();
+
+    constructor() {
+        this.startCleanupInterval();
+    }
+
+    private startCleanupInterval() {
+        setInterval(async () => {
+            const now = Date.now();
+            const IDLE_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+
+            for (const [projectId, info] of this.activePreviews.entries()) {
+                try {
+                    const lastAccessStr = await redis.get(`preview:last_access:${projectId}`);
+                    const lastAccess = lastAccessStr ? parseInt(lastAccessStr) : 0;
+
+                    if (lastAccess && (now - lastAccess > IDLE_TIMEOUT)) {
+                        console.log(`[PreviewManager] Shutting down idle preview for ${projectId}`);
+                        await this.stopPreview(projectId);
+                        await redis.del(`preview:last_access:${projectId}`);
+                    }
+                } catch (err) {
+                    console.error(`[PreviewManager] Idle cleanup error for ${projectId}:`, err);
+                }
+            }
+        }, 60000); // Check every minute
+    }
 
     async launchPreview(projectId: string, files: any[]): Promise<string> {
         // Stop existing process if any
@@ -70,8 +98,6 @@ export class PreviewServerManager {
         return new Promise((resolve, reject) => {
             try {
                 // Determine start command (simplified simulation, assumes Next.js structure for now)
-                const startCmd = `npx next dev -p ${port}`;
-
                 const child = SandboxRunner.spawnLongRunning('npx', ['next', 'dev', '-p', port.toString()], {
                     cwd: previewDir,
                     executionId: projectId, // Using projectId as executionId for simplicity here
@@ -82,7 +108,11 @@ export class PreviewServerManager {
                 this.activePreviews.set(projectId, { port, process: child });
 
                 // Allow some time for server to bind port
-                setTimeout(() => {
+                setTimeout(async () => {
+                    // Store port in Redis for Proxy discovery
+                    await redis.set(`preview:port:${projectId}`, port.toString(), 'EX', 3600); // 1 hour TTL
+                    // Initialize last access time
+                    await redis.set(`preview:last_access:${projectId}`, Date.now().toString(), 'EX', 86400);
                     resolve(`http://localhost:${port}`);
                 }, 5000);
 
@@ -91,7 +121,8 @@ export class PreviewServerManager {
                     // auto-recovery or log could be handled here
                 });
 
-                child.on('exit', () => {
+                child.on('exit', async () => {
+                    await redis.del(`preview:port:${projectId}`);
                     this.portAllocator.release(port);
                     this.activePreviews.delete(projectId);
                 });
@@ -107,6 +138,7 @@ export class PreviewServerManager {
         const preview = this.activePreviews.get(projectId);
         if (preview) {
             preview.process.kill('SIGKILL');
+            await redis.del(`preview:port:${projectId}`);
             this.portAllocator.release(preview.port);
             this.activePreviews.delete(projectId);
         }

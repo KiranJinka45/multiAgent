@@ -75,13 +75,21 @@ export class Orchestrator {
                 isFastPreview: options.isFastPreview ?? true 
             };
 
+            // NEW: Explicitly create mission if it doesn't exist
+            await missionController.createMission({
+                id: executionId,
+                projectId,
+                userId,
+                prompt,
+                status: 'draft',
+                createdAt: Date.now(),
+                updatedAt: Date.now(),
+                metadata: { isFastPreview: options.isFastPreview ?? true }
+            });
+
             await freeQueue.add('build-init', jobData);
 
-            // ⚡ Instant Trigger: Notify workers immediately via Redis Pub/Sub
-            // Skip for stress testing or standard builds to prioritize queue reliability
-            // await redis.publish('build:init:trigger', JSON.stringify(jobData));
-
-            elog.info({ projectId, executionId }, 'Successfully enqueued job and issued Instant Trigger.');
+            elog.info({ projectId, executionId }, 'Successfully created mission and enqueued job.');
 
             return {
                 success: true,
@@ -104,6 +112,7 @@ export class Orchestrator {
     }
 
     async execute(prompt: string, userId: string, projectId: string, executionId: string, signal: AbortSignal, options: { isFastPreview?: boolean } = {}) {
+        console.log(`[DEBUG] Orchestrator.execute started for ${executionId}`);
         const context = new DistributedExecutionContext(executionId);
         const elog = getExecutionLogger(executionId);
         const sandboxDir = path.join(process.cwd(), '.sandboxes', projectId);
@@ -198,7 +207,8 @@ export class Orchestrator {
                     });
                     
                     // NEW: Emit architecture findings
-                    await eventBus.agent(executionId, 'ArchitectureAgent', 'blueprint', JSON.stringify(archResult.data), projectId);
+                    const formattedBlueprint = `Framework: ${archResult.data.stack?.framework || 'React'}\nDatabase: ${archResult.data.stack?.database || 'PostgreSQL'}\nStrategy: ${archResult.data.justification || 'Scaling optimized'}`;
+                    await eventBus.agent(executionId, 'ArchitectureAgent', 'blueprint', formattedBlueprint, projectId);
                     
                     // Inject template based on architecture findings (or default)
                     const templateName = 'nextjs-saas-premium'; // Could be dynamic based on archResult.data.stack.framework
@@ -210,7 +220,7 @@ export class Orchestrator {
                 }
                 
                 // NEW: Emit strategy metadata
-                await eventBus.agent(executionId, 'SupervisorAgent', 'strategy_selection', `Strategy: ${strategy.strategy} | Model: ${strategy.model} | Temperature: ${strategy.temperature}`, projectId);
+                await eventBus.agent(executionId, 'SupervisorAgent', 'strategy_selection', `Strategy: ${strategy?.strategy || 'fast_path_bypass'} | Model: ${strategy?.model || 'llama-3.3-70b'} | Temperature: ${strategy?.temperature || 0.7}`, projectId);
 
                 await missionController.updateMission(executionId, { status: 'planning' });
                 const planResult = await this.plannerAgent.execute({ prompt: augmentedPrompt }, context, signal);
