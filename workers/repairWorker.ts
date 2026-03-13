@@ -29,7 +29,19 @@ const repairWorker = new Worker(QUEUE_REPAIR, async (job: Job) => {
         const data = await context.get();
         if (!data) return;
 
-        await eventBus.stage(executionId, 'testing', 'in_progress', 'Supervisor: Engaging Repair Agent to fix build errors...', 80);
+        // --- REPAIR LIMIT GUARD (Fix 5) ---
+        const repairAttempts = await redis.hincrby(`mission:stats:${executionId}`, 'repair_attempts', 1);
+        
+        if (repairAttempts > 3) {
+            log(`[Repair] Limit exceeded (${repairAttempts}). Failing mission.`);
+            await eventBus.error(executionId, 'Build failed autonomously after 3 repair attempts. Manual intervention required.');
+            // Strictly speaking we should transition state to 'failed' in mission-controller too
+            // But eventBus.error usually handles the UI broadcast.
+            return;
+        }
+        // ----------------------------------
+
+        await eventBus.stage(executionId, 'testing', 'in_progress', `Supervisor: Engaging Repair Agent to fix build errors (Attempt ${repairAttempts}/3)...`, 80);
 
         // 1. Get failed agent information
         const failedAgent = Object.values(data.agentResults).find(r => r.status === 'failed');
@@ -39,7 +51,7 @@ const repairWorker = new Worker(QUEUE_REPAIR, async (job: Job) => {
         const allFiles = data.finalFiles || [];
 
         // 3. Invoke RepairAgent
-        const repairResult = await repairAgent.execute({
+        const repairResult = await (repairAgent as any).execute({
             error,
             stdout: '', // We could pipe stdout here if available
             files: allFiles.slice(0, 20) // Top files for context

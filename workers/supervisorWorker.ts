@@ -6,8 +6,12 @@ import redis from '../services/queue/redis-client';
 import logger from '../config/logger';
 import { supervisorService } from '../services/supervisor';
 import { DistributedExecutionContext } from '../services/execution-context';
+import { PreviewWatchdog } from '../runtime/watchdog';
 
-const supervisorWorker = new Worker(QUEUE_SUPERVISOR, async (job: Job) => {
+const watchdog = new PreviewWatchdog();
+watchdog.start();
+
+new Worker(QUEUE_SUPERVISOR, async (job: Job) => {
     if (job.name === 'health-check-loop') {
         const activeIds = await DistributedExecutionContext.getActiveExecutions();
         logger.info({ count: activeIds.length }, '[Supervisor Worker] Running global health check');

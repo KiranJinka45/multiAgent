@@ -20,9 +20,12 @@ export const dynamic = 'force-dynamic';
  *
  * In production: replace with nginx/Caddy upstream or Cloudflare Tunnel.
  */
-export async function GET(
+/**
+ * Reverse-proxies requests to the locally running dev server for this project.
+ */
+async function handleProxy(
     req: NextRequest,
-    { params }: { params: { projectId: string; path?: string[] } }
+    params: { projectId: string; path?: string[] }
 ) {
     const { projectId } = params;
     const subPath = params.path ? `/${params.path.join('/')}` : '/';
@@ -50,7 +53,7 @@ export async function GET(
 
         const upstreamUrl = `${target.url}${subPath}${req.nextUrl.search}`;
         try {
-            // In Phase 5, SSRF guard needs to allow internal cluster hostnames
+            // SSRF guard
             RuntimeGuard.validateProxyTarget(upstreamUrl, target.port, true);
         } catch (guardErr) {
             logger.error({ projectId, upstreamUrl, guardErr }, '[PreviewProxy] SSRF guard blocked request');
@@ -66,10 +69,14 @@ export async function GET(
             }
         });
 
+        // Forward body for non-GET/HEAD methods
+        const hasBody = !['GET', 'HEAD'].includes(req.method);
+        const body = hasBody ? await req.arrayBuffer() : undefined;
+
         const upstreamRes = await fetch(upstreamUrl, {
             method: req.method,
             headers: forwardHeaders,
-            // Don't forward body for GET
+            body
         });
 
         // Record user activity for inactivity TTL
@@ -86,8 +93,8 @@ export async function GET(
         });
         responseHeaders.set('x-proxied-by', 'multiagent-preview');
 
-        const body = await upstreamRes.arrayBuffer();
-        return new NextResponse(body, {
+        const resBody = await upstreamRes.arrayBuffer();
+        return new NextResponse(resBody, {
             status: upstreamRes.status,
             headers: responseHeaders,
         });
@@ -98,6 +105,13 @@ export async function GET(
         return _errorResponse('The sandbox server is not responding');
     }
 }
+
+export const GET = (req: NextRequest, { params }: { params: { projectId: string; path?: string[] } }) => handleProxy(req, params);
+export const POST = (req: NextRequest, { params }: { params: { projectId: string; path?: string[] } }) => handleProxy(req, params);
+export const PUT = (req: NextRequest, { params }: { params: { projectId: string; path?: string[] } }) => handleProxy(req, params);
+export const DELETE = (req: NextRequest, { params }: { params: { projectId: string; path?: string[] } }) => handleProxy(req, params);
+export const PATCH = (req: NextRequest, { params }: { params: { projectId: string; path?: string[] } }) => handleProxy(req, params);
+export const HEAD = (req: NextRequest, { params }: { params: { projectId: string; path?: string[] } }) => handleProxy(req, params);
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 

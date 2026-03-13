@@ -18,9 +18,12 @@ export class TemplateService {
             const files: Record<string, string> = {};
             await this.readTemplateFiles(templatePath, templatePath, files);
 
-            await context.atomicUpdate(ctx => {
-                ctx.files = { ...ctx.files, ...files };
-            });
+            const vfs = context.getVFS();
+            for (const [filePath, content] of Object.entries(files)) {
+                vfs.setFile(filePath, content);
+            }
+
+            await context.atomicUpdate(() => {});
 
             logger.info({ templateName, fileCount: Object.keys(files).length }, '[TemplateService] Template injected into VFS');
             return true;
@@ -32,12 +35,16 @@ export class TemplateService {
 
     private async readTemplateFiles(basePath: string, currentPath: string, files: Record<string, string>) {
         const entries = await fs.readdir(currentPath, { withFileTypes: true });
+        const EXCLUDED_DIRS = ['node_modules', '.next', '.git', 'dist', '.turbo'];
 
         for (const entry of entries) {
             const fullPath = path.join(currentPath, entry.name);
             const relativePath = path.relative(basePath, fullPath).replace(/\\/g, '/');
 
             if (entry.isDirectory()) {
+                if (EXCLUDED_DIRS.includes(entry.name)) {
+                    continue;
+                }
                 await this.readTemplateFiles(basePath, fullPath, files);
             } else {
                 const content = await fs.readFile(fullPath, 'utf8');

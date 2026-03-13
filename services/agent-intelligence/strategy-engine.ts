@@ -40,7 +40,7 @@ export class StrategyEngine {
             strategy,
             temperature,
             contextWindow: 4000,
-            model: strategy === 'memory_augmented' ? 'llama-3.3-70b-versatile' : 'llama-3.1-8b-instant'
+            model: 'llama-3.1-8b-instant'
         };
     }
 

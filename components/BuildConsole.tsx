@@ -12,6 +12,7 @@ import { BuildUpdate } from '@shared-types/build';
 
 interface BuildConsoleProps {
     buildProgress: BuildUpdate | null;
+    executionId?: string;
 }
 
 const BuildConsole: React.FC<BuildConsoleProps> = ({ buildProgress }) => {
@@ -22,25 +23,37 @@ const BuildConsole: React.FC<BuildConsoleProps> = ({ buildProgress }) => {
 
     // Ingest logs with append-only strategy and throttling
     useEffect(() => {
-        if (buildProgress?.message && buildProgress.message !== lastMsgRef.current) {
-            lastMsgRef.current = buildProgress.message;
+        const update = buildProgress;
+        if (!update) return;
 
-            const newLog: { id: string, text: string, type: 'info' | 'success', timestamp: string } = {
-                id: `log-${Date.now()}-${prevLogsCount.current++}`,
-                text: buildProgress.message!,
-                type: buildProgress.status === 'completed' ? 'success' : 'info',
-                timestamp: formatTime(new Date())
-            };
-
-            React.startTransition(() => {
-                setLogs(prev => {
-                    // Avoid duplicate messages if they happen rapidly
-                    if (prev.length > 0 && prev[prev.length - 1].text === newLog.text) return prev;
-                    return [...prev, newLog].slice(-200); // Increased buffer to 200 logs
-                });
-            });
+        // 1. Process main status message
+        if (update.message && update.message !== lastMsgRef.current) {
+            lastMsgRef.current = update.message;
+            addLog(update.message, update.status === 'completed' ? 'success' : 'info');
         }
-    }, [buildProgress?.message, buildProgress?.status]);
+
+        // 2. Process granular agent events (Layer 3 & 11)
+        if (update.type === 'agent' && update.agent && update.action) {
+            const agentMsg = `[${update.agent}] ${update.action.toUpperCase()}: ${update.message || ''}`;
+            addLog(agentMsg, 'info');
+        }
+    }, [buildProgress]);
+
+    const addLog = (text: string, type: 'info' | 'success') => {
+        const newLog: { id: string, text: string, type: 'info' | 'success', timestamp: string } = {
+            id: `log-${Date.now()}-${prevLogsCount.current++}`,
+            text,
+            type,
+            timestamp: formatTime(new Date())
+        };
+
+        React.startTransition(() => {
+            setLogs(prev => {
+                if (prev.length > 0 && prev[prev.length - 1].text === newLog.text) return prev;
+                return [...prev, newLog].slice(-200);
+            });
+        });
+    };
 
     // Auto-scroll with debouncing
     useEffect(() => {
@@ -94,51 +107,41 @@ const BuildConsole: React.FC<BuildConsoleProps> = ({ buildProgress }) => {
         };
 
         processQueue();
-    }, [buildProgress, visualProgress?.currentStageIndex]);
+    }, [buildProgress, visualProgress]);
 
 
 
     return (
-        <div className="flex-1 flex flex-col min-w-0 p-8 space-y-8 h-full overflow-hidden">
-            {/* Build Status Card */}
-            <div className="flex items-center justify-between bg-white/[0.02] p-6 rounded-3xl border border-white/5 panel-depth">
-                <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                        <span className="px-2 py-0.5 bg-primary/20 text-primary text-[8px] font-black uppercase tracking-widest rounded-md border border-primary/20">Active Node</span>
-                        <h2 className="text-xl font-black tracking-tight text-white flex items-center gap-2">
-                            <Terminal size={22} className="text-primary" />
-                            Build Control Plane
-                        </h2>
-                    </div>
-                    <p className="text-xs text-white/30 font-medium ml-8">Orchestrating multi-agent workforce clusters...</p>
+        <div className="flex-1 flex flex-col min-w-0 p-4 space-y-4 h-full overflow-hidden">
+            {/* COMPACT Build Status Header */}
+            <div className="flex items-center justify-between bg-white/[0.02] p-3 px-4 rounded-xl border border-white/5">
+                <div className="flex items-center gap-3">
+                    <Terminal size={14} className="text-primary" />
+                    <span className="text-[10px] font-black tracking-widest uppercase text-white/60">Live Grid Engine</span>
                 </div>
-                <div className="flex items-center gap-8">
-                    <div className="text-right">
-                        <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.2em]">Deployment Health</p>
-                        <p className="text-2xl font-black text-primary tabular-nums">
-                            {visualProgress?.status === 'completed' ? 100 : (visualProgress?.totalProgress || 0)}%
-                        </p>
-                    </div>
-                    <div className="w-48 h-2 bg-white/5 rounded-full overflow-hidden border border-white/5 relative">
+                <div className="flex items-center gap-4">
+                    <div className="w-24 h-1 bg-white/5 rounded-full overflow-hidden relative">
                         <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${visualProgress?.status === 'completed' ? 100 : (visualProgress?.totalProgress || 0)}%` }}
-                            className="h-full bg-primary shadow-[0_0_20px_rgba(59,130,246,0.6)] relative z-10"
+                            className="h-full bg-primary"
                         />
-                        <div className="absolute inset-0 shimmer opacity-20" />
                     </div>
+                    <span className="text-[10px] font-black text-primary tabular-nums">
+                        {visualProgress?.status === 'completed' ? 100 : (visualProgress?.totalProgress || 0)}%
+                    </span>
                 </div>
             </div>
 
-            {/* Main Grid: Timeline + Console */}
-            <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 min-h-0 overflow-hidden">
-                {/* Timeline Panel - replaced with BuildDebugPanel */}
-                <div className="lg:col-span-4 flex flex-col min-h-0 overflow-hidden">
+            {/* Side-by-Side: Timeline(Small) + Console */}
+            <div className="flex-1 flex flex-col gap-4 min-h-0 overflow-hidden">
+                {/* Visual Timeline (Compact) */}
+                <div className="h-40 shrink-0 border-b border-white/5 pb-4">
                     <BuildDebugPanel buildProgress={visualProgress} />
                 </div>
 
-                {/* Console Panel */}
-                <div className="lg:col-span-8 glass-panel rounded-3xl flex flex-col overflow-hidden relative active-border-glow">
+                {/* Console Panel (Mainly filling the rest) */}
+                <div className="flex-1 glass-panel rounded-2xl flex flex-col overflow-hidden relative active-border-glow">
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full agent-glow pointer-events-none opacity-40" />
 
                     <div className="p-5 border-b border-white/5 flex items-center justify-between bg-black/60 relative z-20">
@@ -161,7 +164,7 @@ const BuildConsole: React.FC<BuildConsoleProps> = ({ buildProgress }) => {
 
                     <div
                         ref={scrollRef}
-                        className="flex-1 overflow-y-auto p-8 font-mono-tight space-y-2.5 text-[11px] leading-relaxed custom-scrollbar relative z-10"
+                        className="flex-1 overflow-y-auto p-4 font-mono-tight space-y-2 text-[10px] leading-relaxed custom-scrollbar relative z-10"
                     >
                         {logs.map((log) => (
                             <motion.div

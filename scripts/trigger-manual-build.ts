@@ -14,7 +14,7 @@ async function trigger() {
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
     // 1. Find the project and user
-    const projectId = "f94a47d8-8dc9-4803-be92-2fd0ec791181";
+    const projectId = "e0409937-2f76-415a-9b7d-4a71282022c9";
     const { data: project, error: pErr } = await supabase.from('projects').select('*').eq('id', projectId).single();
     if (pErr) { console.error("Project not found:", pErr); return; }
 

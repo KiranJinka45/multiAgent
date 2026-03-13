@@ -11,7 +11,7 @@ async function diagnose() {
     
     console.log('Triggering proxy request...');
     try {
-        await axios.get(`http://localhost:3005/preview/${projectId}/`, { timeout: 3000 });
+        await axios.get(`http://localhost:3010/preview/${projectId}/`, { timeout: 3000 });
     } catch (e) {
         console.log('Proxy request finished (expected error).');
     }

@@ -14,6 +14,7 @@ export default function Home() {
           <span>Autonomous Build Active</span>
         </div>
 
+        {/* @section: HERO */}
         <h1 className="text-6xl md:text-8xl font-black text-white tracking-tighter uppercase italic">
           MultiAgent <br />
           <span className="text-primary-500">Premium SaaS</span>
@@ -23,7 +24,9 @@ export default function Home() {
           Your autonomous mission has successfully initialized this senior-tier foundation. 
           Ready for advanced feature generation and deployment.
         </p>
+        {/* @endsection: HERO */}
 
+        {/* @section: FEATURES */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-12">
           {[
             { icon: Rocket, title: "Edge Ready", desc: "Optimized for global performance." },
@@ -37,6 +40,11 @@ export default function Home() {
             </div>
           ))}
         </div>
+        {/* @endsection: FEATURES */}
+
+        {/* @section: CTA */}
+        {/* Add Call to Action here */}
+        {/* @endsection: CTA */}
       </motion.div>
     </main>
   );

@@ -1,43 +1,73 @@
-import 'dotenv/config';
-import { freeQueue, proQueue } from '@queue/build-queue';
-import logger from '@config/logger';
-import redis from '@queue/redis-client';
+import { previewManager } from './preview-manager';
+import { previewRegistry } from './preview-registry';
+import logger from '@/config/logger';
 
-const WATCHDOG_INTERVAL = 10000;
+export class PreviewWatchdog {
+    private static interval: NodeJS.Timeout | null = null;
+    private static CHECK_INTERVAL = 30000; // 30 seconds
+    private static IDLE_TIMEOUT = 1800000; // 30 minutes
 
-logger.info("Initializing BullMQ Queue Watchdog (Interval: 10s)...");
+    static start() {
+        if (this.interval) return;
+        
+        logger.info('[Watchdog] Starting Preview Watchdog service...');
+        this.interval = setInterval(() => this.check(), this.CHECK_INTERVAL);
+    }
 
-setInterval(async () => {
-    try {
-        const freeStalled = await (freeQueue as any).getStalledJobs?.() || [];
-        const proStalled = await (proQueue as any).getStalledJobs?.() || [];
+    private static async check() {
+        try {
+            const allPreviews = await previewRegistry.getAll();
+            const now = Date.now();
 
-        if (freeStalled.length > 0) {
-            logger.warn({ count: freeStalled.length, stalledIds: freeStalled }, "Restarting stalled FREE builds from watchdog");
-        }
+            for (const reg of allPreviews) {
+                // 1. Idle Shutdown (Service 10)
+                const lastAccess = reg.lastAccessedAt || reg.createdAt;
+                if (reg.status === 'running' && (now - lastAccess > this.IDLE_TIMEOUT)) {
+                    logger.info({ projectId: reg.projectId }, '[Watchdog] Idle timeout reached. Suspending sandbox...');
+                    await previewManager.stopPreview(reg.projectId);
+                    await previewRegistry.updateStatus(reg.previewId, 'sleeping');
+                    continue;
+                }
 
-        if (proStalled.length > 0) {
-            logger.warn({ count: proStalled.length, stalledIds: proStalled }, "Restarting stalled PRO builds from watchdog");
-        }
+                // 2. Active Health Check (Phase 5 Hardening)
+                if (reg.status === 'running') {
+                    const portOpen = await previewManager.isPortOpen(reg.containerPort);
+                    const httpReady = portOpen ? await previewManager.isHttpReady(reg.containerPort) : false;
+                    
+                    if (!httpReady) {
+                        logger.warn({ 
+                            projectId: reg.projectId, 
+                            port: reg.containerPort,
+                            portOpen 
+                        }, '[Watchdog] Sandbox HTTP non-responsive. Triggering recovery...');
+                        await previewRegistry.updateStatus(reg.previewId, 'error');
+                    }
+                }
 
-        // --- NEW: Waiting Job & Heartbeat Check ---
-        const freeJobs = await freeQueue.getJobCounts();
-        if (freeJobs.waiting > 0) {
-            const heartbeat = await redis.get('system:health:worker');
-            if (!heartbeat) {
-                logger.error({ waitingJobs: freeJobs.waiting }, "CRITICAL: Jobs waiting but Worker is OFFLINE. Triggering group restart...");
-                // Exit with error to trigger parent system-startup.js restart
-                process.exit(1);
-            } else {
-                const health = JSON.parse(heartbeat);
-                const age = Date.now() - health.lastSeen;
-                if (age > 30000) { // 30s threshold
-                    logger.error({ age, waitingJobs: freeJobs.waiting }, "CRITICAL: Worker heartbeat is STALE. Worker may be frozen. Triggering group restart...");
-                    process.exit(1);
+                // 2. Crash Recovery (Service 7/Watchdog)
+                // We could implement an active port check here if needed, 
+                // but for now we rely on explicit status tracking.
+                if (reg.status === 'error') {
+                    const jitter = Math.floor(Math.random() * 10000);
+                    logger.warn({ projectId: reg.projectId, jitter }, '[Watchdog] Sandbox in error state. Scheduling auto-recovery with jitter...');
+                    setTimeout(async () => {
+                        try {
+                            await previewManager.restartPreview(reg.projectId);
+                        } catch (err) {
+                            logger.error({ projectId: reg.projectId, err }, '[Watchdog] Jittered recovery failed');
+                        }
+                    }, jitter);
                 }
             }
+        } catch (error) {
+            logger.error({ error }, '[Watchdog] Check loop error');
         }
-    } catch (err: any) {
-        logger.error({ err: err.message }, "Watchdog failed to check stalled jobs");
     }
-}, WATCHDOG_INTERVAL);
+
+    static stop() {
+        if (this.interval) {
+            clearInterval(this.interval);
+            this.interval = null;
+        }
+    }
+}

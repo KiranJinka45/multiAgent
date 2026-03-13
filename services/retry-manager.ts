@@ -16,7 +16,7 @@ export class RetryManager {
         _context: any
     ): Promise<T> {
         let lastError: unknown;
-        const timeoutMs = 60000;
+        const timeoutMs = 90000;
 
         for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
             try {
@@ -37,7 +37,7 @@ export class RetryManager {
                 const isRateLimit = status === 429 || error?.message?.includes('rate_limit_exceeded');
 
                 if (isRateLimit) {
-                    const delay = this.baseDelayMs * Math.pow(3, (attempt - 1)); // Aggressive backoff for rate limits
+                    const delay = this.baseDelayMs * Math.pow(2, (attempt - 1)); // Moderated backoff for rate limits
                     logger.warn({ agentName, attempt, delay }, 'Rate limit exceeded. Backing off...');
                     await new Promise(resolve => setTimeout(resolve, delay));
                     continue; // Immediately retry after backoff

@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Zap, Clock, DollarSign, TrendingUp, BarChart2 } from 'lucide-react';
+import { BuildUpdate } from '@shared-types/build';
 
 interface BuildMetric {
     id: string;
@@ -15,11 +16,9 @@ interface BuildMetric {
 
 interface ResourceGraphProps {
     projectId: string;
+    liveBuildProgress?: BuildUpdate | null;
 }
 
-function lerp(a: number, b: number, t: number) {
-    return a + (b - a) * t;
-}
 
 function formatDuration(ms: number) {
     const s = Math.round(ms / 1000);
@@ -135,7 +134,7 @@ const StatCard: React.FC<{
     </div>
 );
 
-const ResourceGraph: React.FC<ResourceGraphProps> = ({ projectId }) => {
+const ResourceGraph: React.FC<ResourceGraphProps> = ({ projectId, liveBuildProgress }) => {
     const [metrics, setMetrics] = useState<BuildMetric[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -189,6 +188,18 @@ const ResourceGraph: React.FC<ResourceGraphProps> = ({ projectId }) => {
     const totalCost = costData.reduce((a, b) => a + b, 0);
     const successRate = metrics.filter(m => m.status === 'completed').length / metrics.length * 100;
 
+    // Merge live metrics if available
+    const liveTokens = liveBuildProgress?.tokensUsed || 0;
+    const liveDuration = liveBuildProgress?.durationMs || 0;
+    const liveCost = liveBuildProgress?.costUsd || 0;
+
+    const displayTokens = liveTokens > 0 ? [...tokenData, liveTokens] : tokenData;
+    const displayDuration = liveDuration > 0 ? [...durationData, liveDuration] : durationData;
+    const displayCost = liveCost > 0 ? [...costData, liveCost] : costData;
+
+    const currentTotalTokens = totalTokens + liveTokens;
+    const currentTotalCost = totalCost + liveCost;
+
     return (
         <div className="flex-1 overflow-y-auto bg-[#050505] p-6">
             <div className="max-w-4xl mx-auto space-y-6">
@@ -199,7 +210,9 @@ const ResourceGraph: React.FC<ResourceGraphProps> = ({ projectId }) => {
                     </div>
                     <div>
                         <h2 className="text-sm font-bold text-white">Resource Consumption</h2>
-                        <p className="text-[10px] text-gray-600">Last {metrics.length} build{metrics.length !== 1 ? 's' : ''}</p>
+                        <p className="text-[10px] text-gray-600">
+                            {liveTokens > 0 ? 'Live Build Active' : `Last ${metrics.length} build${metrics.length !== 1 ? 's' : ''}`}
+                        </p>
                     </div>
                 </div>
 
@@ -208,8 +221,8 @@ const ResourceGraph: React.FC<ResourceGraphProps> = ({ projectId }) => {
                     <StatCard
                         icon={<Zap className="w-3.5 h-3.5" />}
                         label="Total Tokens"
-                        value={formatK(totalTokens)}
-                        sub="across all builds"
+                        value={formatK(currentTotalTokens)}
+                        sub={liveTokens > 0 ? `+${formatK(liveTokens)} live` : "across all builds"}
                         color="#a78bfa"
                     />
                     <StatCard
@@ -222,8 +235,8 @@ const ResourceGraph: React.FC<ResourceGraphProps> = ({ projectId }) => {
                     <StatCard
                         icon={<DollarSign className="w-3.5 h-3.5" />}
                         label="Total Cost"
-                        value={formatCost(totalCost)}
-                        sub="USD estimated"
+                        value={formatCost(currentTotalCost)}
+                        sub={liveCost > 0 ? `+$${liveCost.toFixed(3)} live` : "USD estimated"}
                         color="#34d399"
                     />
                     <StatCard
@@ -239,7 +252,7 @@ const ResourceGraph: React.FC<ResourceGraphProps> = ({ projectId }) => {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="p-4 rounded-xl border border-white/[0.07] bg-white/[0.02]">
                         <MiniChart
-                            data={tokenData}
+                            data={displayTokens}
                             color="#a78bfa"
                             label="Tokens per Build"
                             formatValue={v => formatK(v) + ' tok'}
@@ -247,7 +260,7 @@ const ResourceGraph: React.FC<ResourceGraphProps> = ({ projectId }) => {
                     </div>
                     <div className="p-4 rounded-xl border border-white/[0.07] bg-white/[0.02]">
                         <MiniChart
-                            data={durationData.map(d => d / 1000)}
+                            data={displayDuration.map(d => d / 1000)}
                             color="#38bdf8"
                             label="Duration (s) per Build"
                             formatValue={v => `${v.toFixed(0)}s`}
@@ -255,7 +268,7 @@ const ResourceGraph: React.FC<ResourceGraphProps> = ({ projectId }) => {
                     </div>
                     <div className="p-4 rounded-xl border border-white/[0.07] bg-white/[0.02]">
                         <MiniChart
-                            data={costData}
+                            data={displayCost}
                             color="#34d399"
                             label="Cost (USD) per Build"
                             formatValue={formatCost}

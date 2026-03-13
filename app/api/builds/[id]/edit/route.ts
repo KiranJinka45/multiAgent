@@ -8,6 +8,8 @@ import { supabaseAdmin } from '@queue/supabase-admin';
 import { VirtualFileSystem, PatchEngine, CommitManager } from '@services/vfs';
 import path from 'path';
 import fs from 'fs';
+import { previewManager } from '@/runtime/preview-manager';
+import logger from '@/config/logger';
 
 /**
  * POST /api/projects/[id]/edit
@@ -42,14 +44,14 @@ function readInstalledPackages(sandboxDir: string): string[] {
 }
 
 function buildRichContext(
-    memory: any,
+    memory: { framework: string; styling: string; backend: string; database: string; auth?: string; editHistory?: { action: string; filePath: string; reason: string }[]; features?: string[] },
     allFiles: { path: string; content?: string }[],
     installedPackages: string[]
 ): string {
     const fileTree = allFiles.map(f => f.path).join('\n  ');
     const recentEdits = (memory.editHistory || [])
         .slice(-8)
-        .map((e: any) => `${e.action} ${e.filePath} — ${e.reason}`)
+        .map((e: { action: string; filePath: string; reason: string }) => `${e.action} ${e.filePath} — ${e.reason}`)
         .join('\n  ');
     const features = (memory.features || []).join(', ') || 'none yet';
     const deps = installedPackages.slice(0, 30).join(', ');
@@ -149,12 +151,20 @@ export async function POST(
             projectContext: richContext,
             currentFiles: relevantFiles,
             techStack: {
-                framework: memory.framework,
-                styling: memory.styling,
-                backend: memory.backend,
-                database: memory.database
+                framework: memory.framework as any,
+                styling: memory.styling as any,
+                backend: memory.backend as any,
+                database: memory.database as any
             }
-        }, {} as any);
+        }, {
+            getVFS: () => vfs,
+            getExecutionId: () => '',
+            getProjectId: () => projectId,
+            get: () => undefined,
+            set: () => {},
+            log: () => {},
+            error: () => {}
+        } as any);
 
         if (!agentResult.success || !agentResult.data?.patches?.length) {
             return NextResponse.json({
@@ -171,7 +181,7 @@ export async function POST(
 
         PatchEngine.applyPatches(vfs, patches);
 
-        let sandboxAvailable = sandbox.exists(projectId);
+        const sandboxAvailable = sandbox.exists(projectId);
         if (sandboxAvailable) {
             await CommitManager.commit(vfs, sandboxDir);
         }
@@ -236,6 +246,19 @@ export async function POST(
             );
         }
 
+        // ── 9. Sync to Preview Sandbox (Hot Reload) ─────────────────
+        try {
+            const finalFiles = finalPatches
+                .filter(p => p.action !== 'delete')
+                .map(p => ({ path: p.path, content: p.content }));
+            
+            if (finalFiles.length > 0) {
+                await previewManager.updatePreviewFiles(projectId, finalFiles);
+            }
+        } catch (err) {
+            logger.warn({ projectId, err }, '[EditAgent] Sandbox sync failed');
+        }
+
         // Record new features
         if (agentResult.data.newFeatures?.length) {
             for (const feature of agentResult.data.newFeatures) {
@@ -250,7 +273,7 @@ export async function POST(
             success: true,
             message: agentResult.data.explanation,
             explanation: agentResult.data.explanation,
-            patches: finalPatches.map((p: any) => ({
+            patches: finalPatches.map((p: { path: string; action: string; reason?: string }) => ({
                 path: p.path,
                 action: p.action,
                 type: p.action,       // alias for UI

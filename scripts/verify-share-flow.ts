@@ -6,7 +6,7 @@ async function verifyShareFlow() {
 
     const projectId = 'share-test-' + Date.now();
     const mockPort = 9999;
-    const proxyUrl = `http://localhost:3005/preview/${projectId}/`;
+    const proxyUrl = `http://localhost:3010/preview/${projectId}/`;
 
     try {
         // 1. Setup Mock Preview Port in Redis
@@ -34,11 +34,11 @@ async function verifyShareFlow() {
         }
 
         // 5. Verify Public URL Structure
-        const PREVIEW_BASE_DOMAIN = process.env.PREVIEW_BASE_DOMAIN || 'http://localhost:3005';
+        const PREVIEW_BASE_DOMAIN = process.env.PREVIEW_BASE_DOMAIN || 'http://localhost:3010';
         const expectedUrl = `${PREVIEW_BASE_DOMAIN}/preview/${projectId}/`;
         console.log('🔗 Public Shareable URL:', expectedUrl);
 
-        if (expectedUrl === proxyUrl || PREVIEW_BASE_DOMAIN !== 'http://localhost:3005') {
+        if (expectedUrl === proxyUrl || PREVIEW_BASE_DOMAIN !== 'http://localhost:3010') {
             console.log('✅ URL standardization verified.');
         }
 

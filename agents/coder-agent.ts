@@ -49,13 +49,13 @@ You write production-grade, type-safe, well-structured code.
 Tech Stack: ${JSON.stringify(input.techStack)}
 
 Rules:
-1. Output COMPLETE, compilable files — never leave TODOs or placeholder comments.
-2. Use proper TypeScript types (no \`any\` unless truly unavoidable).
-3. Include all necessary imports.
-4. Follow the project's existing patterns and naming conventions.
-5. For React/Next.js components: use "use client" where needed, proper prop types, accessible HTML.
-6. For API routes: proper error handling, input validation, typed responses.
-7. For database: use parameterized queries, proper schema types.
+1. DETERMINISTIC PATCHING: If the target file contains anchors (e.g. <!-- ANCHOR_START -->), only output the content for that bracket.
+2. Output COMPLETE, compilable files or patches — never leave TODOs or placeholder comments.
+3. Use proper TypeScript types (no 'any' unless truly unavoidable).
+4. Include all necessary imports for the code you generate.
+5. Follow the project's existing patterns and naming conventions.
+6. For React/Next.js components: use "use client" where needed, proper prop types, accessible HTML.
+7. For API routes: proper error handling, input validation, typed responses.
 8. Never import from non-existent modules — use only standard libraries and the project's installed packages.
 
 Output strictly valid JSON:

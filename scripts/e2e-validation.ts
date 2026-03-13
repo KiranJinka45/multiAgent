@@ -11,7 +11,7 @@ import Redis from 'ioredis';
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 const NEXT_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-const SOCKET_URL = 'http://localhost:3005';
+const SOCKET_URL = 'http://localhost:3010';
 
 interface TestResult {
     name: string;

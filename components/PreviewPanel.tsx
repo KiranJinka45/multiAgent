@@ -186,11 +186,11 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({ buildProgress, onRedeploy }
                         </div>
 
                         {/* Iframe Area */}
-                        <div className="flex-1 bg-[#020202] p-4 sm:p-8 flex justify-center items-start overflow-y-auto custom-scrollbar">
+                        <div className="flex-1 bg-[#020202] p-2 sm:p-4 flex justify-center items-start overflow-y-auto custom-scrollbar">
                             <motion.div
                                 animate={{ width: widths[previewSize] }}
                                 transition={{ type: 'spring', damping: 25, stiffness: 120 }}
-                                className="bg-[#0a0a0a] rounded-2xl sm:rounded-[2.5rem] shadow-2xl overflow-hidden h-[500px] sm:h-[600px] border border-white/10 relative panel-depth group w-full max-w-full"
+                                className="bg-[#0a0a0a] rounded-xl sm:rounded-[1.5rem] shadow-2xl overflow-hidden h-[450px] sm:h-[550px] border border-white/10 relative panel-depth group w-full max-w-full"
                             >
                                 <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-1000 z-10" />
 

@@ -1,4 +1,4 @@
-export type MissionStatus = 'queued' | 'starting' | 'planning' | 'generating' | 'previewing' | 'completed' | 'failed';
+export type MissionStatus = 'queued' | 'planning' | 'generating' | 'patching' | 'building' | 'repairing' | 'previewing' | 'completed' | 'failed';
 
 export interface Mission {
     id: string; // This corresponds to the executionId

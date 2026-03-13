@@ -15,7 +15,6 @@
 
 import crypto from 'crypto';
 import path from 'path';
-import redis from '@queue/redis-client';
 import logger from '@config/logger';
 
 // ─── Config ────────────────────────────────────────────────────────────────
@@ -25,7 +24,7 @@ const SIGNED_URL_TTL_SECONDS = 3600; // 1 hour
 const INACTIVITY_SHUTDOWN_MS = 30 * 60 * 1000; // 30 minutes
 const ALLOWED_PREVIEW_HOSTS = ['localhost', '127.0.0.1'];
 const PROJECTS_ROOT = process.env.GENERATED_PROJECTS_ROOT
-    || path.join(process.cwd(), '.generated-projects');
+    || path.join(process.cwd(), '.sandboxes');
 
 // ─── Guard ─────────────────────────────────────────────────────────────────
 
@@ -39,8 +38,8 @@ export const RuntimeGuard = {
      * Throws if the resolved path escapes PROJECTS_ROOT.
      */
     resolveProjectPath(projectId: string): string {
-        // Only allow alphanumeric + hyphen project IDs (UUID format)
-        if (!/^[a-f0-9-]{36}$/.test(projectId)) {
+        // Allow alphanumeric + hyphen/underscore project IDs
+        if (!/^[a-zA-Z0-9-_]+$/.test(projectId)) {
             throw new Error(`[RuntimeGuard] Invalid projectId format: "${projectId}"`);
         }
 

@@ -1,5 +1,6 @@
 import { VectorStore } from './memory/vector-store';
 import { EmbeddingsEngine } from './memory/embeddings-engine';
+import { memoryPlane } from './memory-plane';
 import logger from '@config/logger';
 
 export interface KnowledgeContext {
@@ -42,17 +43,30 @@ export class KnowledgeService {
     }
 
     /**
-     * Augments a prompt with retrieved context.
+     * Augments a prompt with retrieved context from MemoryPlane (Layer 11).
      */
-    static async augmentPrompt(basePrompt: string, techStack?: string): Promise<string> {
-        const context = await this.getContext(basePrompt, techStack);
-        
-        if (context.length === 0) return basePrompt;
+    static async augmentPrompt(basePrompt: string, projectId?: string): Promise<string> {
+        if (!projectId) {
+            const context = await this.getContext(basePrompt);
+            if (context.length === 0) return basePrompt;
+            const contextString = context
+                .map(c => `[Context: ${c.metadata.purpose}]\n${c.content}`)
+                .join('\n\n---\n\n');
+            return `System Context:\n\n${contextString}\n\nMission: ${basePrompt}`;
+        }
 
-        const contextString = context
-            .map(c => `[Context: ${c.metadata.purpose}]\n${c.content}`)
-            .join('\n\n---\n\n');
+        try {
+            const multiDimContext = await memoryPlane.getRelevantContext(projectId, basePrompt);
+            return `
+MISSION RECALL & ARCHITECTURAL GUIDANCE:
+${multiDimContext}
 
-        return `The following context from previous successful builds may be relevant to this mission:\n\n${contextString}\n\nBased on this context, proceed with the original mission:\n${basePrompt}`;
+BASED ON THE ABOVE MEMORY, PROCEED WITH THE MISSION:
+${basePrompt}
+            `.trim();
+        } catch (error) {
+            logger.error({ error }, '[KnowledgeService] Failed to augment prompt with MemoryPlane');
+            return basePrompt;
+        }
     }
 }

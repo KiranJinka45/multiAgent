@@ -8,9 +8,10 @@ import { TestingAgent } from '../../agents/testing-agent';
 import { ValidatorAgent } from '../../agents/validator-agent';
 
 import { StrategyConfig } from '../agent-intelligence/strategy-engine';
+import { AgentContext } from '../../types/agent-context';
 
 export interface TaskAgent {
-    execute(payload: any, context?: any, signal?: AbortSignal, strategy?: StrategyConfig): Promise<AgentResponse<any>>;
+    execute(payload: any, context?: AgentContext, signal?: AbortSignal, strategy?: StrategyConfig): Promise<AgentResponse<any>>;
 }
 
 export class AgentRegistry {
@@ -31,7 +32,7 @@ export class AgentRegistry {
         return this.agents.has(taskType);
     }
 
-    async runTaskDirectly(taskType: string, payload: any, context?: any, signal?: AbortSignal, strategy?: StrategyConfig): Promise<AgentResponse<any>> {
+    async runTaskDirectly(taskType: string, payload: any, context?: AgentContext, signal?: AbortSignal, strategy?: StrategyConfig): Promise<AgentResponse<any>> {
         const agent = this.getAgent(taskType);
         if (!agent) {
             return {

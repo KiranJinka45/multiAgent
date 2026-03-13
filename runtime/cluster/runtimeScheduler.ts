@@ -28,7 +28,7 @@ import logger from '@config/logger';
 const SCHEDULE_CHANNEL = 'cluster:schedule:assign';
 const PENDING_QUEUE = 'cluster:schedule:pending';
 const ASSIGNMENT_PREFIX = 'cluster:assignment:';
-const ASSIGNMENT_TTL = 300;   // 5 min TTL on assignments
+const ASSIGNMENT_TTL = 86400; // 24 hours (matched to Registry TTL)
 
 // Scoring weights (sum to 1.0)
 const WEIGHT_CAPACITY = 0.40;

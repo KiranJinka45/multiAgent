@@ -34,78 +34,43 @@ async function handler(req: NextRequest) {
         const validation = ProjectGenerationSchema.safeParse(body);
 
         if (!validation.success) {
+            logger.warn({ details: validation.error.format() }, 'Invalid build request');
             return NextResponse.json({
+                success: false,
                 error: 'Invalid request data',
                 details: validation.error.format()
             }, { status: 400 });
         }
 
-        const { projectId, prompt } = validation.data;
-        const passedExecutionId = body.executionId; // Accept pre-generated ID from client for strict SSE sync
+        const { projectId, prompt, template: requestedTemplate } = validation.data;
+        const passedExecutionId = body.executionId || crypto.randomUUID();
         const userId = isChaosTest ? '00000000-0000-0000-0000-000000000000' : session.user.id;
+
+        // --- 1b. Template Detection ---
+        const template = requestedTemplate || (prompt.toLowerCase().includes('admin') ? 'nextjs-admin-v1' : 'nextjs-landing-v1');
 
         // Initialize Distributed Execution Context
         const context = new ExecutionContext(passedExecutionId);
         const executionId = context.getExecutionId();
         const correlationId = getCorrelationId();
 
-        // --- 2. Stripe Subscription & Role Verification ---
-        let { data: profile, error: profileError } = await supabase
-            .from('user_profiles')
-            .select('membership, role')
-            .eq('id', userId)
-            .single();
+        // --- 2. Profile & Role Verification (Simplified for Launch Stability) ---
+        let profile = isChaosTest ? { role: 'admin', membership: 'pro' } : null;
 
-        if (profileError?.code === 'PGRST116' || !profile) {
-            // Profile not found - auto-create a basic free profile for the user using Admin client to bypass RLS
-        const { supabaseAdmin } = await import('@services/supabase-admin');
-            const { data: newProfile, error: insertError } = await supabaseAdmin
+        if (!isChaosTest) {
+            const { data } = await supabase
                 .from('user_profiles')
-                .insert([{ id: userId, role: 'user', membership: 'free' }])
                 .select('membership, role')
+                .eq('id', userId)
                 .single();
-
-            if (insertError) {
-                logger.error({ userId, error: insertError }, 'Failed to auto-create user profile via admin');
-                return NextResponse.json({ error: 'Failed to access or create user profile' }, { status: 500 });
-            }
-            profile = newProfile;
-            profileError = null;
-        }
-
-        if (profileError || !profile) {
-            logger.warn({ userId, error: profileError }, 'User profile lookup failed');
-            return NextResponse.json({ error: 'User profile not found' }, { status: 403 });
+            profile = data || { role: 'user', membership: 'free' };
         }
 
         const isDev = process.env.NODE_ENV === 'development';
-        const isOwner = profile.role === 'owner';
-        const governanceBypass = isOwner || isDev;
+        const isOwner = profile?.role === 'owner' || profile?.role === 'admin';
+        const governanceBypass = isOwner || isDev || isChaosTest;
 
-        if (isDev) {
-            logger.info({ userId }, 'Development Mode Bypass Active');
-        }
-
-        // TEMPORARY BYPASS: Allow testing the generation engine without a Pro subscription.
-        // if (!isDev && !isOwner && profile.membership !== 'pro') {
-        //     logger.warn({ userId }, 'User attempted generation without PRO membership');
-        //     return NextResponse.json({ error: 'Active PRO subscription required for multi-agent generation' }, { status: 403 });
-        // }
-
-        // --- 2b. Private Beta: 50 User Limit ---
-        const { count: betaCount } = await supabase
-            .from('user_profiles')
-            .select('id', { count: 'exact', head: true })
-            .eq('is_beta_user', true);
-
-        const currentBetaUsers = betaCount || 0;
-        if (!isOwner && currentBetaUsers >= 50) {
-            return NextResponse.json({
-                error: 'Private Beta is Full',
-                details: 'We have reached our 50-user limit for the private beta. Please join the waitlist.'
-            }, { status: 403 });
-        }
-
+        // --- 3-6. Governance & Rate Limiting ---
         const govConfig = {
             governanceBypass,
             userId,
@@ -113,81 +78,58 @@ async function handler(req: NextRequest) {
             ...DEFAULT_GOVERNANCE_CONFIG
         };
 
-        // --- 3. Global Governance: Kill Switch ---
         const isKilled = await CostGovernanceService.isKillSwitchActive(govConfig);
         if (isKilled) {
-            logger.fatal('Attempted generation while GLOBAL KILL SWITCH is active. Rejecting request.');
-            return NextResponse.json({ error: 'Service temporarily unavailable due to maintenance.' }, { status: 503 });
+            return NextResponse.json({ success: false, error: 'Maintenance in progress' }, { status: 503 });
         }
 
-        // --- 4. Cost Governance: Daily Execution Limits (Tiered) ---
-        const { allowed: executionAllowed } = await CostGovernanceService.checkAndIncrementExecutionLimit(userId);
-        if (!executionAllowed) {
-            return NextResponse.json({
-                error: 'Daily limit reached. Upgrade to continue.',
-                details: 'You have used all 3 builds for today. Pro users get 50 builds/day.',
-                limitReached: true
-            }, { status: 403 });
+        if (!governanceBypass) {
+            const { allowed: executionAllowed } = await CostGovernanceService.checkAndIncrementExecutionLimit(userId);
+            if (!executionAllowed) {
+                return NextResponse.json({ success: false, error: 'Daily build limit reached' }, { status: 403 });
+            }
+
+            const rateLimit = await RateLimiter.checkBuildLimit(userId, profile.membership === 'pro');
+            if (!rateLimit.allowed) {
+                return NextResponse.json({ success: false, error: 'Too many requests' }, { status: 429 });
+            }
         }
 
-        // --- 5. Distributed Rate Limiting: Hourly Burst Control ---
-        const rateLimit = await RateLimiter.checkBuildLimit(userId, profile.membership === 'pro');
-        if (!rateLimit.allowed && !isDev) {
-            return NextResponse.json({
-                error: 'Too many build requests. Please try again later.',
-                retryAfter: rateLimit.retryAfter
-            }, {
-                status: 429,
-                headers: { 'Retry-After': (rateLimit.retryAfter || 60).toString() }
-            });
-        }
-
-        // --- 6. Cost Governance: Monthly Token Limits ---
-        const { allowed: tokensAllowed } = await CostGovernanceService.checkTokenLimit(userId, govConfig);
-        if (!tokensAllowed) {
-            await CostGovernanceService.refundExecution(userId); // Give them their daily ticket back
-            return NextResponse.json({ error: 'Monthly AI token budget exceeded.' }, { status: 429 });
-        }
-
-        logger.info({ userId, currentCount: 0, usedTokens: 0, isOwner }, 'Cost governance checks passed.');
-
-        // Update Retention Metrics (First/Last Build Timestamps)
-        const { supabaseAdmin } = await import('@/services/queue/supabase-admin');
-        await supabaseAdmin.rpc('update_user_retention_timestamps', { user_id_param: userId });
-
-        // --- 7. Multi-Tenant: Fetch Tenant & Routing ---
+        // --- 7. Multi-Tenant Initiation ---
         const tenant = await TenantService.getTenantForUser(userId);
-        const plan = tenant?.plan || 'free';
+        const plan = tenant?.plan || profile?.membership || 'free';
 
         await context.init(userId, projectId, prompt, correlationId, plan);
 
-        // 3. Submit Mission via Command Gateway
+        // Submit Mission
         const queueToUse = plan === 'pro' || plan === 'enterprise' ? proQueue : freeQueue;
         
         const missionResult = await commandGateway.submitMission(userId, projectId, prompt, {
             missionId: executionId,
             queue: queueToUse,
-            isFastPreview: true // Default behavior for this route
+            template,
+            isFastPreview: true
         });
 
         if (!missionResult.success) {
-            return NextResponse.json({ error: missionResult.error }, { status: 500 });
+            logger.error({ error: missionResult.error }, 'Mission submission failed');
+            return NextResponse.json({ success: false, error: missionResult.error }, { status: 500 });
         }
 
-        // 4. Update project status
-        try {
-            await supabase.from('projects').update({
-                status: 'generating',
-                last_execution_id: executionId
-            }).eq('id', projectId);
-        } catch (err) {
-            logger.error({ projectId, err }, 'Failed to update project status');
-        }
+        // Async Status Update
+        supabase.from('projects').update({
+            status: 'generating',
+            last_execution_id: executionId
+        }).eq('id', projectId).then(({ error }) => {
+            if (error) logger.error({ projectId, error }, 'Failed to update project status');
+        });
 
         return NextResponse.json({
             success: true,
             executionId,
-            message: 'Project generation mission initiated'
+            missionId: executionId,
+            status: 'QUEUED',
+            message: 'Pipeline initiated successfully'
         });
 
     } catch (error) {

@@ -23,7 +23,7 @@ async function platformPulse() {
     // 2. Poll for results
     let completed = false;
     let attempts = 0;
-    while (!completed && attempts < 60) {
+    while (!completed && attempts < 180) { // 6 minutes total
         const stateRaw = await redis.get(`build:state:${executionId}`);
         if (stateRaw) {
             const state = JSON.parse(stateRaw);
@@ -42,7 +42,7 @@ async function platformPulse() {
     }
 
     if (!completed) {
-        console.log('\n❌ Pulse timed out after 2 minutes.');
+        console.log('\n❌ Pulse timed out after 6 minutes.');
         process.exit(1);
     }
 

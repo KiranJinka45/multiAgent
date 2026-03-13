@@ -17,7 +17,6 @@
  *   await PreviewOrchestrator.start(projectId, executionId, userId);
  */
 
-import path from 'path';
 import { ProcessManager } from './processManager';
 import { ContainerManager } from './containerManager';
 import { PortManager } from './portManager';
@@ -31,9 +30,6 @@ import redis from '@queue/redis-client';
 import logger from '@config/logger';
 
 // ─── Configuration ────────────────────────────────────────────────────────────
-
-const PROJECTS_ROOT = process.env.GENERATED_PROJECTS_ROOT
-    || path.join(process.cwd(), '.generated-projects');
 
 const HEALTH_CHECK_INTERVAL = 30_000;
 
@@ -127,8 +123,23 @@ export const PreviewOrchestrator = {
             // 5. Resolve the public URL
             const previewUrl = this.buildUrl(projectId, port);
 
+            // 5.5. VERIFICATION LOOP (Reliability Upgrade)
+            logger.info({ projectId, port, previewUrl }, '[PreviewOrchestrator] Verifying runtime health...');
+            const healthOk = await this.verifyHealth(projectId, port);
+            if (!healthOk) {
+                throw new Error('Runtime started but failed health check (timeout after 30s)');
+            }
+
             // 6. Mark as RUNNING in registry
             await PreviewRegistry.markRunning(projectId, previewUrl, port, pid);
+            
+            // 6.5. Double-write for Proxy compatibility (Fix for "Preview not found")
+            await redis.set(`preview:${projectId}`, JSON.stringify({
+                port,
+                status: 'running',
+                previewUrl,
+                updatedAt: Date.now()
+            }), 'EX', 3600); // 1 hour TTL
 
             // 7. Persist to Redis build state for SSE delivery
             await this.patchBuildState(executionId, previewUrl);
@@ -237,10 +248,30 @@ export const PreviewOrchestrator = {
 
     // ─── Internal Helpers ───────────────────────────────────────────────────
 
+    async verifyHealth(projectId: string, port: number): Promise<boolean> {
+        const url = `http://localhost:${port}`;
+        const MAX_RETRIES = 30; // 30 seconds
+        for (let i = 0; i < MAX_RETRIES; i++) {
+            try {
+                const res = await fetch(url);
+                if (res.ok) {
+                    logger.info({ projectId, port, attempt: i + 1 }, '[PreviewOrchestrator] Health check PASSED');
+                    return true;
+                }
+            } catch {
+                // Ignore connection errors during boot
+            }
+            await new Promise(r => setTimeout(r, 1000));
+        }
+        logger.error({ projectId, port }, '[PreviewOrchestrator] Health check FAILED after 30s');
+        return false;
+    },
+
     buildUrl(projectId: string, port: number): string {
         if (URL_MODE === 'proxy') {
             const base = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-            return `${base}/api/preview-proxy/${projectId}`;
+            const cleanBase = base.endsWith('/') ? base.slice(0, -1) : base;
+            return `${cleanBase}/api/preview-proxy/${projectId}`;
         }
         return `http://localhost:${port}`;
     },
@@ -280,7 +311,7 @@ export const PreviewOrchestrator = {
                 } else {
                     throw new Error(`HTTP ${res.status}`);
                 }
-            } catch (err) {
+            } catch {
                 consecutiveFailures++;
                 await RuntimeMetrics.recordHealthCheck(projectId, false);
                 logger.warn({ projectId, consecutiveFailures, previewUrl }, '[HealthMonitor] Check failed');

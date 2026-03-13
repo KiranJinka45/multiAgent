@@ -10,7 +10,7 @@ export interface UseSocketOptions {
     serverUrl?: string;
 }
 
-export function useSocket({ projectId, onUpdate, serverUrl = 'http://localhost:3005' }: UseSocketOptions) {
+export function useSocket({ projectId, onUpdate, serverUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3010' }: UseSocketOptions) {
     const [isConnected, setIsConnected] = useState(false);
     const [lastUpdate, setLastUpdate] = useState<BuildUpdate | null>(null);
 

@@ -7,7 +7,7 @@ import { Queue } from 'bullmq';
 import { eventBus } from './event-bus';
 
 export const commandGateway = {
-    async submitMission(userId: string, projectId: string, prompt: string, options: { isFastPreview?: boolean, missionId?: string, queue?: Queue } = {}) {
+    async submitMission(userId: string, projectId: string, prompt: string, options: { isFastPreview?: boolean, missionId?: string, queue?: Queue, template?: string } = {}) {
         const missionId = options.missionId || crypto.randomUUID();
         const elog = logger.child({ missionId, projectId, userId });
 
@@ -27,7 +27,8 @@ export const commandGateway = {
                 createdAt: Date.now(),
                 updatedAt: Date.now(),
                 metadata: {
-                    fastPath: options.isFastPreview ?? true
+                    fastPath: options.isFastPreview ?? true,
+                    template: options.template
                 }
             };
 
@@ -41,6 +42,7 @@ export const commandGateway = {
                 executionId: missionId,
                 userId,
                 prompt,
+                template: options.template,
                 isFastPreview: options.isFastPreview ?? true
             }, {
                 jobId: `gen:${projectId}:${missionId}`,
@@ -48,7 +50,6 @@ export const commandGateway = {
             });
 
             // 3. Immediately broadcast initial queued state to UI via unified event bus
-            const waitingCount = await queueToUse.getWaitingCount();
             await eventBus.progress(
                 missionId, 
                 0, 

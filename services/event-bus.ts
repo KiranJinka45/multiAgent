@@ -13,8 +13,12 @@
 
 import { redis } from './queue';
 import logger from '@config/logger';
+import { PersistenceStore } from './persistence-store';
 
 const STREAM_TTL_SECONDS = 4 * 60 * 60; // 4 hours
+const THROTTLE_MS = 100; // 100ms throttle for progress/thought events
+
+const throttleMap = new Map<string, number>();
 
 export interface BuildEvent {
     type: 'progress' | 'stage' | 'thought' | 'complete' | 'error' | 'heartbeat' | 'agent';
@@ -32,6 +36,10 @@ export interface BuildEvent {
     agent?: string;
     action?: string;
     durationMs?: number;
+    tokensUsed?: number;
+    costUsd?: number;
+    // VFS Snapshot
+    files?: { path: string; content?: string }[];
     // Nested metadata
     metadata?: Record<string, unknown>;
 }
@@ -51,6 +59,17 @@ export async function publishBuildEvent(event: BuildEvent): Promise<void> {
     const payload = JSON.stringify(event);
 
     try {
+        // Throttle progress and thought events to prevent socket storms
+        if (event.type === 'progress' || event.type === 'thought') {
+            const throttleKey = `${event.executionId}:${event.type}`;
+            const now = Date.now();
+            const last = throttleMap.get(throttleKey) || 0;
+            if (now - last < THROTTLE_MS) {
+                return; // Silently drop high-frequency small updates
+            }
+            throttleMap.set(throttleKey, now);
+        }
+
         const pipeline = redis.pipeline();
 
         // 1. Append to stream with inline MAXLEN — atomic, no separate XTRIM needed
@@ -61,6 +80,18 @@ export async function publishBuildEvent(event: BuildEvent): Promise<void> {
 
         // 2. Update the snapshot state (for initial-state hydration on connect)
         pipeline.setex(stateKey, STREAM_TTL_SECONDS, payload);
+
+        // 2b. Authoritative Event Persistence (Layer 9)
+        if (event.type === 'stage' || event.type === 'agent' || event.type === 'error' || event.type === 'complete') {
+            PersistenceStore.logEvent({
+                execution_id: event.executionId,
+                type: event.type,
+                agent_name: event.agent || event.metadata?.agent as string,
+                action: event.action,
+                message: event.message,
+                data: event.metadata || {}
+            }).catch(() => {}); // Non-blocking persist
+        }
 
         // 3. Legacy pub/sub compat (non-blocking, best-effort)
         pipeline.publish(pubChannel, payload);
@@ -96,11 +127,11 @@ export async function readBuildEvents(
 
     try {
         // ioredis returns: [[streamKey, [[id, [field, value, ...]], ...]]] | null
-        const result = await (redis as any).xread(
+        const result = await (redis as unknown as { xread: (...args: unknown[]) => Promise<unknown[][]> }).xread(
             'BLOCK', blockMs,
             'COUNT', 50,
             'STREAMS', streamKey, lastId
-        );
+        ) as [string, [string, string[]][]][] | null;
 
         if (!result || !result[0]) return null;
 
@@ -109,7 +140,8 @@ export async function readBuildEvents(
             // fields is flat: ['data', '{json}']
             const dataIdx = fields.indexOf('data');
             const raw = dataIdx !== -1 ? fields[dataIdx + 1] : '{}';
-            return [id, JSON.parse(raw)] as [string, BuildEvent];
+            const event = JSON.parse(raw) as BuildEvent;
+            return [id, event] as [string, BuildEvent];
         });
     } catch (err: unknown) {
         // BLOCK timeout produces a null result, not an error — real errors need logging
@@ -140,7 +172,7 @@ export async function getLatestBuildState(executionId: string): Promise<BuildEve
  */
 export const eventBus = {
     /** Emit a progress event */
-    progress(executionId: string, progress: number, message: string, stage?: string, status = 'executing', projectId?: string) {
+    progress(executionId: string, progress: number, message: string, stage?: string, status = 'executing', projectId?: string, metrics?: { tokens?: number; duration?: number; cost?: number }) {
         return publishBuildEvent({
             type: 'progress',
             executionId,
@@ -151,11 +183,14 @@ export const eventBus = {
             message,
             currentStage: stage,
             status,
+            tokensUsed: metrics?.tokens,
+            durationMs: metrics?.duration,
+            costUsd: metrics?.cost
         });
     },
 
     /** Emit a stage transition event */
-    stage(executionId: string, stageId: string, stageStatus: string, message: string, progress: number, projectId?: string) {
+    stage(executionId: string, stageId: string, stageStatus: string, message: string, progress: number, projectId?: string, files?: { path: string; content?: string }[], metrics?: { tokens?: number; duration?: number; cost?: number }) {
         return publishBuildEvent({
             type: 'stage',
             executionId,
@@ -163,9 +198,13 @@ export const eventBus = {
             timestamp: Date.now(),
             currentStage: stageId,
             status: stageStatus,
-            message,
+            message: `[Stage] ${message}`,
             progress,
             totalProgress: progress,
+            files,
+            tokensUsed: metrics?.tokens,
+            durationMs: metrics?.duration,
+            costUsd: metrics?.cost
         });
     },
 
@@ -182,7 +221,11 @@ export const eventBus = {
     },
 
     /** Emit final completion event and schedule stream cleanup */
-    async complete(executionId: string, previewUrl?: string, metadata?: Record<string, unknown>, projectId?: string) {
+    async complete(executionId: string, previewUrl?: string, metadata?: Record<string, unknown>, projectId?: string, files?: { path: string; content?: string }[]) {
+        const tokens = Number(metadata?.tokensTotal || 0);
+        const duration = Number(metadata?.durationMs || 0);
+        const cost = (tokens / 1000) * 0.002;
+
         await publishBuildEvent({
             type: 'complete',
             executionId,
@@ -194,6 +237,10 @@ export const eventBus = {
             message: 'Build complete',
             currentStage: 'deployment',
             metadata: { previewUrl, ...metadata },
+            files,
+            tokensUsed: tokens,
+            durationMs: duration,
+            costUsd: cost
         });
         // Schedule stream cleanup — expire in 4 hours so replay is available for debugging
         try {
@@ -262,4 +309,7 @@ export const eventBus = {
             message,
         });
     },
+
+    /** Read new messages from the stream */
+    readBuildEvents
 } as const;

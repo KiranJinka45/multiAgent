@@ -6,8 +6,13 @@ export interface BaseTask {
     title: string;
     description?: string;
     dependsOn?: string[]; // IDs of tasks that must complete before this runs
-    payload?: any;
+    inputs?: string[];    // Expected input keys from the global context or parent tasks
+    outputs?: string[];   // Output keys this task will populate upon completion
+    payload?: Record<string, unknown>;
     status?: TaskStatus;
+    result?: Record<string, unknown>;         // Final artifact or data produced by the task
+    branchId?: string;                        // Optional identifier for speculative branches
+    isWinner?: boolean;                       // Flag for speculative result selection
 }
 
 export class TaskGraph {
@@ -63,5 +68,53 @@ export class TaskGraph {
      */
     getReadyTasks(): BaseTask[] {
         return this.getAllTasks().filter(t => t.status === 'pending' && this.areDependenciesMet(t.id));
+    }
+
+    /**
+     * Mark a task as completed and update its internal result.
+     */
+    completeTask(id: string, result: Record<string, unknown>) {
+        const task = this.getTask(id);
+        if (task) {
+            task.status = 'completed';
+            task.result = result;
+        }
+    }
+
+    /**
+     * Mark a task as failed.
+     */
+    failTask(id: string, error: string) {
+        const task = this.getTask(id);
+        if (task) {
+            task.status = 'failed';
+            task.payload = { ...task.payload, error };
+        }
+    }
+
+    /**
+     * Check if the entire graph is completed successfully.
+     */
+    isCompleted(): boolean {
+        return this.getAllTasks().every(t => t.status === 'completed');
+    }
+
+    /**
+     * Check if any task in the graph has failed.
+     */
+    hasFailed(): boolean {
+        return this.getAllTasks().some(t => t.status === 'failed');
+    }
+
+    /**
+     * Mark a specific task as the winner of a speculative competition.
+     * All other tasks in the same competitive set (parallel siblings) will be ignored.
+     */
+    setWinner(taskId: string) {
+        const task = this.getTask(taskId);
+        if (task) {
+            task.isWinner = true;
+            // Optionally mark siblings as 'skipped' or 'obsolete'
+        }
     }
 }

@@ -8,14 +8,19 @@ export interface TaskStep {
     description: string;
     agent: 'DatabaseAgent' | 'BackendAgent' | 'FrontendAgent' | 'DeploymentAgent' | 'TestingAgent';
     priority: 'critical' | 'high' | 'medium' | 'low';
-    dependencies: number[];  // IDs of steps that must complete first
+    dependencies: number[];
+    inputs?: string[];   // Specific keys needed from previous tasks (e.g., 'databaseSchema')
+    outputs?: string[];  // Keys this task will provide to the global context (e.g., 'apiEndpoints')
     estimatedComplexity: 'simple' | 'moderate' | 'complex';
-    fileTargets: string[];   // Files this step will create or modify
+    fileTargets: string[];
+    isPatch?: boolean;
+    section?: string; // e.g., 'HERO', 'FEATURES' (matches template markers)
 }
 
 export interface TaskPlan {
     projectName: string;
     summary: string;
+    templateId: 'nextjs-saas-premium' | 'nextjs-landing-v1';
     techStack: {
         framework: string;
         styling: string;
@@ -37,61 +42,54 @@ export class PlannerAgent extends BaseAgent {
         strategy?: StrategyConfig
     ): Promise<AgentResponse<TaskPlan>> {
         void _context;
-        this.log('Generating structured task plan from user prompt...');
+        this.log('Generating structured project blueprint and template mapping...');
 
         try {
-            const system = `You are a Senior AI Software Architect acting as a Project Planner.
-Given a user's application description, you must decompose it into a structured, ordered task plan.
+            const system = `You are the MultiAgent Lead Architect.
+Your goal is to decompose a user's request into a deterministic build plan using a TEMPLATE-FIRST approach.
 
-Each task must be assigned to exactly one agent:
-- DatabaseAgent: Schema design, migrations, seed data
-- BackendAgent: API routes, server logic, middleware, auth setup
-- FrontendAgent: UI components, pages, layouts, styling
-- DeploymentAgent: Docker, CI/CD, hosting config
-- TestingAgent: Unit tests, integration tests, E2E specs
+AVAILABLE TEMPLATES:
+1. nextjs-landing-v1: Perfect for clean, white-themed landing pages, portfolios, and agency sites.
+2. nextjs-saas-premium: Best for dark-themed SaaS apps, dashboards, and futuristic prototypes.
 
-Rules:
-1. Surgical Patching: Prioritize modifying specific sections of template files using markers (e.g., @section: NAME) instead of full-file rewrites.
-2. Guardrails: NEVER plan modifications to core config files (package.json, tsconfig.json, tailwind.config.ts) unless adding specific dependencies via provided tools.
-3. Tech Stack Consistency: Always respect the chosen template's built-in layouts and structure.
-4. Tasks must have correct dependency ordering (a page can't be built before its API route).
-5. Each task should target specific files it will create or modify.
-6. Prioritize critical infrastructure first (database → backend → frontend → testing → deployment).
-7. For complex apps, break frontend into multiple tasks (layout, individual pages, shared components).
-8. Include auth setup if the prompt mentions users, login, accounts, or dashboard.
-9. Include payment setup if the prompt mentions pricing, subscription, or checkout.
+MANDATORY RULES:
+1. SELECT ONE TEMPLATE: Based on the prompt's aesthetic (Dark/Sci-Fi -> saas-premium, Clean/Corporate -> landing-v1).
+2. STRUCTURED PATCHING: For FrontendAgent tasks, specify "isPatch": true and the "section" (HERO, FEATURES, TESTIMONIALS, CTA, NAVIGATION, FOOTER).
+3. AGENT COORDINATION: Define clear dependencies. Frontend tasks should "dependsOn" Backend tasks. Backend tasks should "dependsOn" Database tasks.
+4. STATE SHARING: Use "inputs" and "outputs" to pass state between agents.
+   - DatabaseAgent outputs: ["databaseSchema"]
+   - BackendAgent inputs: ["databaseSchema"] | outputs: ["apiEndpoints"]
+   - FrontendAgent inputs: ["apiEndpoints"]
+5. GUARDRAILS: Never plan changes to package.json or tsconfig.json.
 
-Output strictly valid JSON matching this schema:
+Output strictly valid JSON:
 {
   "projectName": "string",
   "summary": "one-line project summary",
-  "techStack": {
-    "framework": "nextjs|react-vite|angular|static-html",
-    "styling": "tailwind|shadcn|framer-motion|css-modules",
-    "backend": "api-routes|express|nestjs|none",
-    "database": "supabase|postgres|mongodb|none",
-    "auth": "nextauth|supabase-auth|clerk|none"
-  },
+  "templateId": "nextjs-landing-v1|nextjs-saas-premium",
+  "techStack": { "framework": "nextjs", "styling": "tailwind", "backend": "api-routes", "database": "supabase|none", "auth": "supabase|none" },
   "steps": [
     {
       "id": 1,
-      "title": "step title",
-      "description": "detailed description of what to build",
-      "agent": "AgentName",
-      "priority": "critical|high|medium|low",
+      "title": "Build Hero Section",
+      "description": "Generate a high-converting hero for a coffee shop...",
+      "agent": "FrontendAgent",
+      "priority": "critical",
       "dependencies": [],
-      "estimatedComplexity": "simple|moderate|complex",
-      "fileTargets": ["path/to/file.ts"]
+      "estimatedComplexity": "moderate",
+      "fileTargets": ["app/page.tsx"],
+      "isPatch": true,
+      "section": "HERO"
     }
   ],
-  "totalEstimatedFiles": 15
+  "totalEstimatedFiles": 10
 }`;
 
             const userPrompt = input.techStack
                 ? `Project Description: ${input.prompt}\n\nUser-selected Tech Stack: ${JSON.stringify(input.techStack)}`
                 : `Project Description: ${input.prompt}`;
 
-            const { result, tokens } = await this.promptLLM(system, userPrompt, 'llama-3.3-70b-versatile', signal, strategy);
+            const { result, tokens } = await this.promptLLM(system, userPrompt, 'llama-3.1-8b-instant', signal, strategy);
             this.log(`LLM raw response: ${JSON.stringify(result)}`);
 
             const plan = result as TaskPlan;

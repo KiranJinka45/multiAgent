@@ -54,7 +54,8 @@ export async function middleware(req: NextRequest) {
             !req.nextUrl.pathname.startsWith("/api/debug") &&
             !req.nextUrl.pathname.startsWith("/api/admin/containers") &&
             !req.nextUrl.pathname.startsWith("/api/generate-project") &&
-            !req.nextUrl.pathname.startsWith("/api/build/events")) {
+            !req.nextUrl.pathname.startsWith("/api/build/events") &&
+            !req.nextUrl.pathname.startsWith("/api/build")) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
     } else {

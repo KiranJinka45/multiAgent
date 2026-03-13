@@ -32,7 +32,7 @@ export async function GET() {
 
         // 3. Check Socket Server
         try {
-            const socketRes = await fetch('http://localhost:3005/health', { signal: AbortSignal.timeout(1000) });
+            const socketRes = await fetch('http://localhost:3010/health', { signal: AbortSignal.timeout(1000) });
             health.socket = socketRes.ok;
         } catch {
             health.socket = false;

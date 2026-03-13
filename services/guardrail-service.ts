@@ -30,17 +30,22 @@ export class GuardrailService {
             const isProtected = this.PROTECTED_FILES.includes(fileName);
 
             if (isProtected) {
-                // RULE 1: Prevent full overwrite of core config files
                 const original = originalFiles[file.path];
+                // For critical build files, we NEVER allow AI modification once initialized
+                const isCriticalConfig = ['next.config.js', 'next.config.mjs', 'tsconfig.json', 'tailwind.config.js', 'tailwind.config.ts'].includes(fileName);
+
+                if (isCriticalConfig && original && file.content !== original) {
+                    violations.push(`CRITICAL: Unauthorized modification of build infrastructure: ${file.path}. This file is locked for stability.`);
+                    logger.error({ path: file.path }, '[GuardrailService] BLOCK: AI attempted to modify locked config file');
+                    sanitizedFiles.push({ path: file.path, content: original });
+                    continue;
+                }
+
                 if (original && file.content !== original) {
-                    // Check if it's a "destructive" change (e.g., deleting scripts)
-                    if (this.isDestructive(original, file.content, fileName)) {
-                        violations.push(`Destructive modification of protected file: ${file.path}`);
-                        logger.warn({ path: file.path }, '[GuardrailService] Blocked destructive modification');
-                        // Sanitization: Revert to original or keep safe parts
-                        sanitizedFiles.push({ path: file.path, content: original });
-                        continue;
-                    }
+                    violations.push(`Unauthorized modification of critical file: ${file.path}. AI is not permitted to modify project infrastructure.`);
+                    logger.warn({ path: file.path }, '[GuardrailService] Guard: Reverted config modification');
+                    sanitizedFiles.push({ path: file.path, content: original });
+                    continue;
                 }
             }
 

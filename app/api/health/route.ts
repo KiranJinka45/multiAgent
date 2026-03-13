@@ -9,7 +9,7 @@ export async function GET() {
         // 2. Check Socket Server
         let isSocketUp = false;
         try {
-            const socketRes = await fetch('http://localhost:3005/health', { signal: AbortSignal.timeout(500) });
+            const socketRes = await fetch('http://localhost:3010/health', { signal: AbortSignal.timeout(500) });
             isSocketUp = socketRes.ok;
         } catch {}
 

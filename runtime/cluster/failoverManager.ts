@@ -20,12 +20,13 @@
  *  - Only one rebalance per cycle to avoid thrashing
  */
 
-import { NodeRegistry, NodeInfo } from './nodeRegistry';
+import { NodeRegistry } from './nodeRegistry';
 import { RuntimeScheduler, ScheduleRequest } from './runtimeScheduler';
 import { DistributedLock } from './distributedLock';
 import { PreviewRegistry } from '../previewRegistry';
-import redis from '@queue/redis-client';
-import logger from '@config/logger';
+import { redis } from '../../services/queue';
+import { missionController } from '../../services/mission-controller';
+import logger from '../../config/logger';
 
 // ─── Config ────────────────────────────────────────────────────────────────
 
@@ -91,13 +92,23 @@ export const FailoverManager = {
                 rescheduled += rescued;
             }
 
+            const deadWorkers = await this.detectDeadWorkers();
+            let recoveredMissions = 0;
+            for (const deadWorkerId of deadWorkers) {
+                logger.error({ deadWorkerId }, '[FailoverManager] Dead worker detected');
+                const recovered = await this.recoverMissionsFromDeadWorker(deadWorkerId);
+                recoveredMissions += recovered;
+            }
+
             // Rebalancing (max 1 migration per cycle)
             const rebalanced = await this.attemptRebalance();
 
-            if (deadNodes.length > 0 || rescheduled > 0 || rebalanced) {
+            if (deadNodes.length > 0 || rescheduled > 0 || deadWorkers.length > 0 || recoveredMissions > 0 || rebalanced) {
                 logger.info({
                     deadNodes: deadNodes.length,
                     rescheduled,
+                    deadWorkers: deadWorkers.length,
+                    recoveredMissions,
                     rebalanced,
                 }, '[FailoverManager] Cycle complete');
             }
@@ -171,6 +182,53 @@ export const FailoverManager = {
         }
 
         return rescheduled;
+    },
+
+    /**
+     * Find workers (build-workers) that have no heartbeat key (TTL expired).
+     */
+    async detectDeadWorkers(): Promise<string[]> {
+        const activeHeartbeatKeys = await redis.keys('worker:heartbeat:*');
+        const activeWorkerIds = new Set(activeHeartbeatKeys.map(k => k.split(':').pop()));
+        
+        const activeMissions = await missionController.listActiveMissions();
+        const deadWorkers = new Set<string>();
+
+        for (const mission of activeMissions) {
+            const missionWorkerId = mission.metadata?.workerId;
+            if (missionWorkerId && !activeWorkerIds.has(missionWorkerId)) {
+                deadWorkers.add(missionWorkerId);
+            }
+        }
+        
+        return Array.from(deadWorkers);
+    },
+
+    /**
+     * Requeue missions that were being processed by a dead worker.
+     */
+    async recoverMissionsFromDeadWorker(deadWorkerId: string): Promise<number> {
+        let recovered = 0;
+        const activeMissions = await missionController.listActiveMissions();
+
+        for (const mission of activeMissions) {
+            if (mission.metadata?.workerId === deadWorkerId) {
+                logger.warn({ missionId: mission.id, deadWorkerId }, '[FailoverManager] Recovering mission from dead worker');
+                
+                // Requeue by moving back to 'queued' or 'planning' and clearing workerId
+                await missionController.updateMission(mission.id, {
+                    status: 'queued',
+                    metadata: { 
+                        workerId: undefined,
+                        recoveryCount: (mission.metadata?.recoveryCount || 0) + 1,
+                        recoveredAt: new Date().toISOString()
+                    }
+                });
+                
+                recovered++;
+            }
+        }
+        return recovered;
     },
 
     /**

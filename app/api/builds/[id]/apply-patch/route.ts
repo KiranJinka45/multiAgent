@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@queue/supabase-admin';
 import { projectMemory } from '@services/project-memory';
+import { previewManager } from '@/runtime/preview-manager';
+import logger from '@/config/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -79,6 +81,15 @@ export async function POST(
                 content
             );
         } catch { /* non-fatal */ }
+
+        // Sync to Preview Sandbox (Hot Reload)
+        if (action !== 'delete') {
+            try {
+                await previewManager.updatePreviewFiles(projectId, [{ path, content }]);
+            } catch (err) {
+                logger.warn({ projectId, path, err }, '[ApplyPatch] Sandbox sync failed - sandbox might be offline');
+            }
+        }
 
         return NextResponse.json({ success: true, path });
     } catch (err: unknown) {

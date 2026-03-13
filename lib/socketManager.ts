@@ -9,7 +9,7 @@ export interface SocketManagerOptions {
 class SocketManager {
     private static instance: SocketManager;
     private socket: SocketIOClient.Socket | null = null;
-    private serverUrl: string = 'http://localhost:3005';
+    private serverUrl: string = typeof window !== 'undefined' ? (process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3010') : 'http://localhost:3010';
     private isConnected: boolean = false;
     private isConnecting: boolean = false;
     private serverAvailable: boolean | null = null;

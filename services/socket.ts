@@ -2,8 +2,7 @@ import express from 'express';
 import { createServer, request as httpRequest } from 'http';
 import { Server } from 'socket.io';
 import Redis from 'ioredis';
-import { Queue } from 'bullmq';
-import { QUEUE_FREE, QUEUE_PRO, redis } from '@queue';
+import { redis } from '@queue';
 import dotenv from 'dotenv';
 import cors from 'cors';
 
@@ -91,31 +90,17 @@ const io = new Server(server, {
 const REDIS_URLS = process.env.REDIS_URLS ? process.env.REDIS_URLS.split(',') : [process.env.REDIS_URL || 'redis://localhost:6379'];
 const redisSub = new Redis(REDIS_URLS[0]);
 
-const PORT = 3005;
+const PORT = parseInt(process.env.SOCKET_PORT || '3011');
 
 // Health & Metrics Endpoint
 app.get('/health', async (req, res) => {
     try {
-        const workerHealth = await redis.get('system:health:worker');
-        const freeQueue = new Queue(QUEUE_FREE, { connection: redis as any });
-        const proQueue = new Queue(QUEUE_PRO, { connection: redis as any });
-
-        const [waitingFree, activeFree, waitingPro, activePro] = await Promise.all([
-            freeQueue.getWaitingCount(),
-            freeQueue.getActiveCount(),
-            proQueue.getWaitingCount(),
-            proQueue.getActiveCount()
-        ]);
 
         res.json({
             status: 'ok',
             uptime: process.uptime(),
-            worker: workerHealth ? JSON.parse(workerHealth) : { status: 'offline' },
-            queues: {
-                free: { waiting: waitingFree, active: activeFree },
-                pro: { waiting: waitingPro, active: activePro }
-            },
-            redis: redis.status
+            redis: redis.status,
+            id: 'socket-server-v2'
         });
     } catch (error) {
         res.status(500).json({ status: 'error', error: String(error) });
@@ -165,7 +150,7 @@ redisSub.on('message', (channel, message) => {
     if (channel === 'build-events') {
         try {
             const payload = JSON.parse(message);
-            const { projectId, executionId } = payload;
+            const { projectId } = payload;
 
             if (projectId) {
                 // Cache the latest state for this project to enable instant catch-up for new listeners
@@ -183,7 +168,7 @@ redisSub.on('message', (channel, message) => {
     }
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
     console.log(`[Socket.IO] Realtime server running on http://localhost:${PORT}`);
     
     // Periodically update health status in Redis

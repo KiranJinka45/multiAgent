@@ -21,6 +21,7 @@ export interface AgentResponse<T = any> {
 
 export abstract class BaseAgent {
     protected groq: Groq;
+    protected logs: string[] = [];
 
     constructor() {
         const apiKey = process.env.GROQ_API_KEY;

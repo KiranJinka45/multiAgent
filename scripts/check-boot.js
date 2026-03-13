@@ -27,8 +27,8 @@ async function run() {
     const redisReady = await checkPort(6379);
     console.log(`Redis (6379): ${redisReady ? 'ONLINE' : 'OFFLINE'}`);
     
-    const socketReady = await checkPort(3005);
-    console.log(`Socket Server (3005): ${socketReady ? 'ONLINE' : 'OFFLINE'}`);
+    const socketReady = await checkPort(3010);
+    console.log(`Socket Server (3010): ${socketReady ? 'ONLINE' : 'OFFLINE'}`);
     
     const webReady = await checkPort(3000);
     console.log(`Web App (3000): ${webReady ? 'ONLINE' : 'OFFLINE'}`);

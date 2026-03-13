@@ -84,16 +84,16 @@ export class VirtualFileSystem {
     /**
      * Generates a snapshot of the current tree for rollback capability.
      */
-    createSnapshot(): string {
-        return JSON.stringify(Array.from(this.tree.entries()));
+    createSnapshot(): [string, VirtualFile][] {
+        return Array.from(this.tree.entries());
     }
 
     /**
      * Restores the tree from a previously created snapshot.
      */
-    restoreSnapshot(snapshot: string) {
-        const entries = JSON.parse(snapshot);
-        this.tree = new Map(entries);
+    restoreSnapshot(snapshot: [string, VirtualFile][]) {
+        if (!snapshot || !Array.isArray(snapshot)) return;
+        this.tree = new Map(snapshot);
     }
 
     /**

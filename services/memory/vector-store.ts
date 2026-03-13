@@ -58,4 +58,44 @@ export class VectorStore {
             return [];
         }
     }
+
+    /**
+     * Stores a global experience lesson.
+     */
+    static async upsertExperience(data: { content: string, embedding: number[], metadata: { outcome: string, projectId: string, type: string, context?: Record<string, unknown> } }) {
+        try {
+            const { error } = await supabaseAdmin
+                .from('global_experience_memory')
+                .upsert({
+                    content: data.content,
+                    embedding: data.embedding,
+                    outcome: data.metadata.outcome,
+                    metadata: data.metadata
+                });
+
+            if (error) throw error;
+            logger.info('[VectorStore] Successfully indexed experience lesson');
+        } catch (error) {
+            logger.error({ error }, '[VectorStore] Failed to index experience');
+        }
+    }
+
+    /**
+     * Performs a semantic search for similar experience lessons.
+     */
+    static async searchExperience(queryEmbedding: number[], limit = 5) {
+        try {
+            const { data, error } = await supabaseAdmin.rpc('match_experience', {
+                query_embedding: queryEmbedding,
+                match_threshold: 0.7,
+                match_count: limit
+            });
+
+            if (error) throw error;
+            return data || [];
+        } catch (error) {
+            logger.error({ error }, '[VectorStore] Experience search failed');
+            return [];
+        }
+    }
 }

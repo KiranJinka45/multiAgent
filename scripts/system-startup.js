@@ -39,6 +39,31 @@ async function isPortInUse(port) {
     });
 }
 
+async function waitForSocketHealth(url, timeoutMs = 30000) {
+    console.log(`⏳ Waiting for Socket Server health at ${url}...`);
+    const startTime = Date.now();
+    while (Date.now() - startTime < timeoutMs) {
+        try {
+            const http = require('http');
+            const ok = await new Promise((resolve) => {
+                const req = http.get(url, (res) => {
+                    resolve(res.statusCode === 200);
+                });
+                req.on('error', () => resolve(false));
+                req.end();
+            });
+            if (ok) {
+                console.log("✅ Socket Server is healthy!");
+                return true;
+            }
+        } catch (e) {}
+        process.stdout.write(".");
+        await new Promise(r => setTimeout(r, 1000));
+    }
+    console.warn("\n⚠️ Socket Server health check timed out. Proceeding anyway...");
+    return false;
+}
+
 function checkDockerRunning() {
     return new Promise((resolve) => {
         // Use 'docker version' to check the SERVER engine, which is more reliable than just 'docker ps'
@@ -195,8 +220,8 @@ async function main() {
         child.on('exit', (code) => {
             activeProcesses.delete(child);
             if (!child.manualKill) {
-                console.warn(`⚠️  ${name} exited with code ${code}. Restarting in 2s...`);
-                setTimeout(() => startManagedProcess(name, command, args), 2000);
+                console.warn(`⚠️  ${name} exited with code ${code}. Restarting in 5s...`);
+                setTimeout(() => startManagedProcess(name, command, args), 5000);
             }
         });
 
@@ -204,21 +229,21 @@ async function main() {
     }
 
     console.log("\n=== Launching Application Stack ===");
-    const socketProcess = startManagedProcess('Socket Server', npmCmd, ['run', 'dev:socket']);
+    const socketProcess = startManagedProcess('Socket Server (3011)', npmCmd, ['run', 'dev:socket']);
     const buildWorkerProcess = startManagedProcess('Build Worker', npmCmd, ['run', 'dev:worker']);
     const watchdogProcess = startManagedProcess('Watchdog', npmCmd, ['run', 'dev:watchdog']);
     
-    // Core Agents Pipeline
-    const metaWorker = startManagedProcess('Meta Agent', npmCmd, ['run', 'dev:meta']);
-    const plannerWorker = startManagedProcess('Planner Agent', npmCmd, ['run', 'dev:planner']);
-    const archWorker = startManagedProcess('Architecture Agent', npmCmd, ['run', 'dev:architecture']);
-    const genWorker = startManagedProcess('Generator Agent', npmCmd, ['run', 'dev:generator']);
-    const valWorker = startManagedProcess('Validator Agent', npmCmd, ['run', 'dev:validator']);
-    const repairWorker = startManagedProcess('Repair Agent', npmCmd, ['run', 'dev:repair']);
-    const dockerWorker = startManagedProcess('Docker Worker', npmCmd, ['run', 'dev:docker']);
+    // Core Agents Pipeline (Redundant: Orchestrator now handles these in-process)
+    // const metaWorker = startManagedProcess('Meta Agent', npmCmd, ['run', 'dev:meta']);
+    // const plannerWorker = startManagedProcess('Planner Agent', npmCmd, ['run', 'dev:planner']);
+    // const archWorker = startManagedProcess('Architecture Agent', npmCmd, ['run', 'dev:architecture']);
+    // const genWorker = startManagedProcess('Generator Agent', npmCmd, ['run', 'dev:generator']);
+    // const valWorker = startManagedProcess('Validator Agent', npmCmd, ['run', 'dev:validator']);
+    // const repairWorker = startManagedProcess('Repair Agent', npmCmd, ['run', 'dev:repair']);
+    // const dockerWorker = startManagedProcess('Docker Worker', npmCmd, ['run', 'dev:docker']);
 
-    // Wait briefly for socket API to initialize
-    await new Promise(r => setTimeout(r, 2000));
+    // Wait for Socket Server health check before continuing
+    await waitForSocketHealth('http://localhost:3011/health');
 
     const webProcess = spawn(npmCmd, ['run', 'dev-safe'], { stdio: 'inherit', shell: true });
     activeProcesses.add(webProcess);

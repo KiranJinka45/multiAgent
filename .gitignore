@@ -45,4 +45,6 @@ Redis/*.pid
 .sandboxes/
 .previews/
 system-startup.log
-scripts/boot-fleet.ps1
+/scripts/boot-fleet.ps1
+/.snapshots/
+/.microvms/

@@ -7,6 +7,7 @@ export interface ErrorSolution {
     missingDependencies: string[];
     patches: Array<{
         path: string;
+        anchor?: string;
         content: string;
     }>;
 }
@@ -18,11 +19,14 @@ export class ErrorKnowledgeBase {
      * Normalizes and hashes an error message for lookup.
      */
     private static hashError(error: string): string {
-        // Normalize: remove variable parts like line numbers, paths, or timestamps
+        // Normalize: remove variable parts like line numbers, paths, hashes, or timestamps
         const normalized = error
             .replace(/\/.*?\/MultiAgent\//g, 'PROJECT_ROOT/') // Strip private paths
             .replace(/:\d+:\d+/g, ':LINE:COL') // Strip line/col
-            .replace(/0x[0-9a-fA-F]+/g, 'HEX_VAL'); // Strip memory addresses
+            .replace(/0x[0-9a-fA-F]+/g, 'HEX_VAL') // Strip memory addresses
+            .replace(/[a-f0-9]{8,}/g, 'HASH_VAL') // Strip build hashes/UUIDs
+            .replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/g, 'TIMESTAMP') // Strip ISO timestamps
+            .trim();
         
         return crypto.createHash('md4').update(normalized).digest('hex');
     }

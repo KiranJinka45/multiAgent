@@ -26,7 +26,7 @@ export interface BuildUpdate {
     currentStageIndex: number; // Strict mapping index for UI mapping
     currentStage: string;
     stages: BuildStage[];
-    status: "queued" | "executing" | "completed" | "failed";
+    status: "queued" | "executing" | "completed" | "failed" | "repairing";
     type?: string; // Realtime event classification
     files?: { path: string; content?: string }[]; // Optional snapshot of project files
     queuePosition?: number;
@@ -38,6 +38,9 @@ export interface BuildUpdate {
     previewPort?: number; // Internal port the sandbox is running on
     isPreviewReady?: boolean; // Flag for early preview access
     isBackgroundBuilding?: boolean; // Flag for background deployment
+    agent?: string; // Granular agent identification
+    action?: string; // Granular action identification
+    costUsd?: number;
     metadata?: {
         diffs?: FileDiff[];
         executionId?: string;
@@ -49,31 +52,25 @@ export interface BuildUpdate {
 }
 
 export const BUILD_STAGES_CONFIG: Omit<BuildStage, 'status' | 'message' | 'progressPercent' | 'timestamp' | 'startedAt' | 'completedAt'>[] = [
-    { id: 'meta', stageIndex: 0, name: 'Meta-Agent Analysis', weight: 0.10 },
-    { id: 'planner', stageIndex: 1, name: 'AI Architecture Planning', weight: 0.15 },
-    { id: 'database', stageIndex: 2, name: 'Database Schema Generation', weight: 0.15 },
-    { id: 'backend', stageIndex: 3, name: 'Backend API Generation', weight: 0.15 },
-    { id: 'frontend', stageIndex: 4, name: 'Frontend UI Construction', weight: 0.20 },
-    { id: 'docker', stageIndex: 5, name: 'Docker Environment Setup', weight: 0.10 },
-    { id: 'deployment', stageIndex: 6, name: 'Live Deployment', weight: 0.15 },
+    { id: 'planning', stageIndex: 0, name: 'AI Architecting & Planning', weight: 0.15 },
+    { id: 'generating', stageIndex: 1, name: 'Code Generation', weight: 0.40 },
+    { id: 'patching', stageIndex: 2, name: 'Reliability Guardrails', weight: 0.20 },
+    { id: 'building', stageIndex: 3, name: 'Build & Compilation', weight: 0.20 },
+    { id: 'deployment', stageIndex: 4, name: 'Runtime Infrastructure', weight: 0.05 },
 ];
 
 export const STAGE_PROGRESS: Record<string, number> = {
-    meta: 10,
-    planner: 25,
-    database: 40,
-    backend: 55,
-    frontend: 75,
-    docker: 85,
-    deployment: 100,
+    planning: 15,
+    generating: 40,
+    patching: 60,
+    building: 80,
+    deployment: 95,
 };
 
 export const STAGE_ORDER = [
-    'meta',
-    'planner',
-    'database',
-    'backend',
-    'frontend',
-    'docker',
+    'planning',
+    'generating',
+    'patching',
+    'building',
     'deployment'
 ];

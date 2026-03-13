@@ -1,138 +1,185 @@
 import { TaskGraph, BaseTask } from './task-graph';
 import { agentRegistry } from './agent-registry';
+import { AgentContext } from '../../types/agent-context';
 import { AgentMetrics } from '../agent-intelligence/agent-metrics';
 import { StrategyEngine } from '../agent-intelligence/strategy-engine';
 import { SwarmOrchestrator } from './swarm-orchestrator';
 import logger from '../../config/logger';
-import { eventBus } from '../../services/event-bus';
+import { eventBus } from '../event-bus';
+import { DebugAgent } from '../../agents/debug-agent';
+import { AgentResponse } from '../../agents/base-agent';
+import { patchEngine } from '../patch-engine';
+import { BuildCache } from './build-cache';
+import { previewManager } from '../../runtime/preview-manager';
 
 export class TaskExecutor {
     /**
      * Traverses the TaskGraph, executing tasks whose dependencies are met.
      * Starts execution of independent nodes in parallel automatically.
      */
-    async evaluateGraph(graph: TaskGraph, globalContext?: any) {
+    /**
+     * Traverses the TaskGraph, executing tasks whose dependencies are met.
+     * Starts execution of independent nodes in parallel automatically.
+     */
+    async evaluateGraph(graph: TaskGraph, globalContext: AgentContext) {
         const concurrentTasks = new Set<string>();
         let isRunning = true;
 
-        logger.info('Starting Multi-Agent Task Graph execution');
-        let remainingTasks = graph.getAllTasks().filter(t => t.status !== 'completed' && t.status !== 'failed');
-
+        logger.info('Starting Agent Task Graph Engine execution');
+        
         try {
-            while (remainingTasks.length > 0 && isRunning) {
+            while (isRunning) {
                 const runnableTasks = graph.getReadyTasks();
+                const remainingPending = graph.getAllTasks().filter(t => t.status === 'pending');
 
                 if (runnableTasks.length === 0) {
-                    // If there are remaining tasks, but none runnable, it implies a cycle or failed dependencies preventing progression.
-                    const executing = concurrentTasks.size > 0;
-                    if (!executing) {
-                        logger.error('Task engine detected a deadlock or failed dependency graph! Halting execution.');
-                        return;
+                    if (remainingPending.length === 0) {
+                        // All tasks are either running, completed, or failed.
+                        const running = graph.getAllTasks().filter(t => t.status === 'running');
+                        if (running.length === 0) {
+                            isRunning = false;
+                            break;
+                        }
+                    } else {
+                        // Deadlock detection?
+                        const running = graph.getAllTasks().filter(t => t.status === 'running');
+                        if (running.length === 0) {
+                            logger.error('Task Engine Deadlock: Tasks remain pending but none are runnable.');
+                            isRunning = false;
+                            break;
+                        }
                     }
-                    // Yield to event loop to allow concurrent promises to advance the graph status
-                    await new Promise(r => setTimeout(r, 100));
+                    // Wait for concurrent tasks to complete
+                    await new Promise(r => setTimeout(r, 200));
                 } else {
-                    // Spawn parallel executions for all currently runnable nodes
-                    const runPromises = runnableTasks.map(task => this.executeTask(task, graph, globalContext, concurrentTasks));
-                    await Promise.all(runPromises);
+                    // Start all runnable tasks in parallel
+                    for (const task of runnableTasks) {
+                        // Fire and forget executeTask, it will update status inside
+                        this.executeTask(task, graph, globalContext, concurrentTasks).catch(err => {
+                            logger.error({ taskId: task.id, err }, 'Critical error in background task execution');
+                        });
+                    }
+                    // Briefly wait as we've spawned new work
+                    await new Promise(r => setTimeout(r, 100));
                 }
 
-                remainingTasks = graph.getAllTasks().filter(t => t.status !== 'completed' && t.status !== 'failed');
+                if (graph.hasFailed()) {
+                    logger.warn('Graph execution contains failures. Continuing other branches if possible.');
+                }
             }
         } finally {
-            logger.info('Task Graph execution finished.');
-            isRunning = false;
+            logger.info('Agent Task Graph Engine execution finished.');
         }
     }
 
-    private async executeTask(task: BaseTask, graph: TaskGraph, globalContext: any, concurrentTasks: Set<string>) {
+    private async executeTask(task: BaseTask, graph: TaskGraph, globalContext: AgentContext, concurrentTasks: Set<string>) {
         if (concurrentTasks.has(task.id)) return;
 
         concurrentTasks.add(task.id);
         const executingTask = graph.getTask(task.id)!;
         executingTask.status = 'running';
 
-        logger.info({ taskId: task.id, type: task.type }, `Spawning agent assigned to task '${task.title}'`);
+        logger.info({ taskId: task.id, type: task.type }, `[GraphEngine] Executing task: ${task.title}`);
 
         const startTime = Date.now();
         try {
-            // Check if registry handles this type. If not, default to standard generic prompt logic or skip.
-            if (!agentRegistry.hasAgent(task.type)) {
-                logger.warn({ type: task.type }, `No specialised agent found for task type. Skiping task resolution.`);
-                executingTask.status = 'completed'; // Soft-fail or dummy skip for now
-            } else {
-                // ── 1. Evolution: Strategy Optimization ─────────────────
-                const strategy = await StrategyEngine.getOptimalStrategy(task.type, task.title);
-                SwarmOrchestrator.broadcast(task.type, `Starting task: ${task.title} with strategy: ${strategy.strategy}`);
+            // ── 1. Context Preparation (Input Mapping) ──────────────────
+            const taskInputs: Record<string, unknown> = { ...task.payload };
+            if (task.inputs) {
+                for (const inputKey of task.inputs) {
+                    // Try to find input in the results of dependency tasks
+                    for (const depId of task.dependsOn || []) {
+                        const depTask = graph.getTask(depId);
+                        if (depTask?.result && depTask.result[inputKey] !== undefined) {
+                            taskInputs[inputKey] = depTask.result[inputKey];
+                        }
+                    }
+                }
+            }
 
-                const executionId = globalContext?.executionId || 'unknown';
-                const projectId = globalContext?.projectId;
+            if (!agentRegistry.hasAgent(task.type)) {
+                logger.warn({ type: task.type }, `No specialised agent for '${task.type}'. Skipping.`);
+                graph.completeTask(task.id, { skipped: true });
+            } else {
+                // ── 2. Build Cache Check (Performance Upgrade) ────────────────
+                const depResults = (task.dependsOn || []).map(id => graph.getTask(id)?.result || {});
+                const cacheKey = BuildCache.generateKey(task.type, taskInputs, depResults);
+                const cached = await BuildCache.get(cacheKey);
+
+                if (cached) {
+                    logger.info({ taskId: task.id, cacheKey }, '[GraphEngine] CACHE HIT: Reusing existing artifact');
+                    await eventBus.agent(globalContext.getExecutionId(), task.type, 'cache_hit', `Reused cached result for: ${task.title}`, globalContext.getProjectId());
+                    graph.completeTask(task.id, cached);
+                    return;
+                }
+
+                const strategy = await StrategyEngine.getOptimalStrategy(task.type, task.title);
+                SwarmOrchestrator.broadcast(task.type, `Task started: ${task.title}`);
+
+                const executionId = globalContext.getExecutionId();
+                const projectId = globalContext.getProjectId();
                 const agentTimer = await eventBus.startTimer(executionId, task.type, 'task_execution', `Processing: ${task.title}`, projectId);
 
-                const res = await agentRegistry.runTaskDirectly(task.type, task.payload, globalContext, undefined, strategy);
+                const res = await agentRegistry.runTaskDirectly(task.type, taskInputs, globalContext, undefined, strategy);
                 
                 await agentTimer(res.success ? 'Success' : `Failed: ${res.error}`);
                 
-                console.log(`[DEBUG] Agent ${task.type} resolved task ${task.id}. Success: ${res.success}, Files: ${res.data?.fileCount || res.data?.files?.length || 0}`);
-
                 const duration = Date.now() - startTime;
 
                 if (res.success) {
-                    executingTask.status = 'completed';
-                    logger.info({ taskId: task.id, duration }, `Agent successfully resolved task.`);
+                    // ── Surgical Patch / VFS Sync ──────────────────────────
+                    await this.syncTaskResults(res, globalContext);
+                    
+                    const resultData = (res.data as Record<string, unknown>) || {};
+                    await BuildCache.set(cacheKey, resultData);
+                    
+                    graph.completeTask(task.id, resultData);
+                    logger.info({ taskId: task.id, duration }, `Task completed successfully.`);
 
-                    // ── 2. Evolution: Record Performance ────────────────────
                     await AgentMetrics.record({
                         agentName: task.type,
                         taskType: task.title,
                         success: true,
                         durationMs: duration,
-                        tokens: 2500 // Mock token usage
+                        tokens: res.tokens || 1000
                     });
                 } else {
-                    // ── 3. Autonomous Self-Healing: DebugAgent retry ────────
-                    logger.warn({ taskId: task.id, error: res.error }, `Agent failed. Attempting DebugAgent self-heal...`);
-
+                    logger.warn({ taskId: task.id, error: res.error }, `Task failed. Attempting self-heal...`);
                     const healed = await this.attemptDebugFix(task, res, globalContext);
+                    
                     if (healed) {
-                        executingTask.status = 'completed';
-                        logger.info({ taskId: task.id, duration: Date.now() - startTime }, `Task self-healed via DebugAgent.`);
-
-                        await AgentMetrics.record({
-                            agentName: task.type,
-                            taskType: task.title,
-                            success: true,
-                            durationMs: Date.now() - startTime,
-                            tokens: 3500 // Agent + debug attempt
-                        });
+                        graph.completeTask(task.id, { healed: true });
+                        logger.info({ taskId: task.id }, `Task self-healed.`);
                     } else {
-                        executingTask.status = 'failed';
-                        logger.error({ taskId: task.id, error: res.error }, `Agent failed its task execution and DebugAgent could not heal!`);
-
-                        await AgentMetrics.record({
-                            agentName: task.type,
-                            taskType: task.title,
-                            success: false,
-                            durationMs: Date.now() - startTime,
-                            tokens: 3500
-                        });
+                        graph.failTask(task.id, res.error || 'Unknown error');
+                        logger.error({ taskId: task.id }, `Task failed after repair attempt.`);
                     }
                 }
             }
-        } catch (e: any) {
-            const duration = Date.now() - startTime;
-            executingTask.status = 'failed';
-            logger.error({ taskId: task.id, error: e.message }, `Agent threw exception.`);
-
-            await AgentMetrics.record({
-                agentName: task.type,
-                taskType: task.title,
-                success: false,
-                durationMs: duration,
-                tokens: 500
-            });
+        } catch (e: unknown) {
+            const error = e as Error;
+            logger.error({ taskId: task.id, error: error.message }, `Task execution threw exception.`);
+            graph.failTask(task.id, error.message);
         } finally {
             concurrentTasks.delete(task.id);
+        }
+    }
+
+    private async syncTaskResults(res: AgentResponse<unknown>, globalContext: AgentContext) {
+        if (!res.data || typeof res.data !== 'object') return;
+        
+        const files = (res.data as Record<string, any>).files;
+        if (Array.isArray(files)) {
+            const projectId = globalContext.getProjectId();
+            for (const file of files) {
+                if (file.path && file.content) {
+                    // 1. Surgical Patch Engine (Permanent)
+                    await patchEngine.applyPatch(projectId, file.path, file.content);
+                    
+                    // 2. Real-time VFS Stream (Transient Hot-Reload)
+                    await previewManager.streamFileUpdate(projectId, file.path, file.content);
+                }
+            }
         }
     }
 
@@ -140,19 +187,19 @@ export class TaskExecutor {
      * Attempt to self-heal a failed task by invoking DebugAgent.
      * Returns true if the fix was successful.
      */
-    private async attemptDebugFix(task: BaseTask, failedResult: any, globalContext?: any): Promise<boolean> {
+    private async attemptDebugFix(task: BaseTask, failedResult: AgentResponse<unknown>, globalContext: AgentContext): Promise<boolean> {
         try {
-            const { DebugAgent } = require('../../agents/debug-agent');
             const debugAgent = new DebugAgent();
 
-            const errorMsg = failedResult.error || 'Unknown agent failure';
-            const existingFiles = failedResult.data?.files || [];
+            const errorMsg = (typeof failedResult.error === 'string' ? failedResult.error : 'Unknown agent failure');
+            const data = failedResult.data as { files?: { path: string, content: string }[] } | undefined;
+            const existingFiles = data?.files || [];
 
             const debugResult = await debugAgent.execute({
                 errors: errorMsg,
                 files: existingFiles.slice(0, 10),
-                userPrompt: task.payload?.prompt || task.description
-            }, {} as any);
+                userPrompt: (task.payload?.prompt as string) || task.description || ''
+            }, globalContext);
 
             if (debugResult.success && debugResult.data?.patches?.length > 0 && debugResult.data.confidence > 0.5) {
                 logger.info({
@@ -165,7 +212,7 @@ export class TaskExecutor {
                 if (globalContext?.setAgentResult) {
                     globalContext.setAgentResult(task.type, {
                         data: { files: debugResult.data.patches },
-                        success: true
+                        status: 'completed'
                     });
                 }
                 return true;

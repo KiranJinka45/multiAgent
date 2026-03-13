@@ -50,7 +50,7 @@ export class FilePatchService {
         // /* @section: NAME */ ... /* @endsection: NAME */
         // <!-- @section: NAME --> ... <!-- @endsection: NAME -->
         const patterns = [
-            new RegExp(`(/\\*\\s*@section:\\s*${section}\\s*\\*/)([\\s\\S]*?)(/\\*\\s*@endsection:\\s*${section}\\s*\\*/)`, 'g'),
+            new RegExp(`(\\{?\\s*/\\*\\s*@section:\\s*${section}\\s*\\*/\\s*\\}?)([\\s\\S]*?)(\\{?\\s*/\\*\\s*@endsection:\\s*${section}\\s*\\*/\\s*\\}?)`, 'g'),
             new RegExp(`(<!--\\s*@section:\\s*${section}\\s*-->)([\\s\\S]*?)(<!--\\s*@endsection:\\s*${section}\\s*-->)`, 'g')
         ];
 

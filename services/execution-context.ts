@@ -2,9 +2,9 @@ import { v4 as uuidv4 } from 'uuid';
 import * as crypto from 'crypto';
 import redis from '@queue/redis-client';
 import logger from '@config/logger';
-import { AgentContext } from '@shared-types/agent-context';
-import { OrchestratorLock } from '@config/orchestrator-lock';
-import { VirtualFileSystem } from '@services/vfs';
+import { AgentContext } from '../types/agent-context';
+import { OrchestratorLock } from '../config/orchestrator-lock';
+import { VirtualFileSystem, VirtualFile } from './vfs/virtual-fs';
 
 export interface ExecutionMetrics {
     startTime: string;
@@ -76,10 +76,10 @@ export interface ExecutionContextType {
     metrics: ExecutionMetrics;
     metadata: Record<string, unknown>;
     correlationId: string;
-    finalFiles?: any[];
+    finalFiles?: VirtualFile[];
     locked?: boolean;
     lastCommitHash: string;
-    vfsSnapshot?: string;
+    vfsSnapshot?: [string, VirtualFile][];
 }
 
 export class DistributedExecutionContext implements ExecutionContextType, AgentContext {
@@ -105,7 +105,7 @@ export class DistributedExecutionContext implements ExecutionContextType, AgentC
     public correlationId: string = '';
     public lastCommitHash: string = '0'.repeat(64); // Seed hash
     public locked?: boolean;
-    public finalFiles?: any[];
+    public finalFiles?: VirtualFile[];
 
     private static LUA_TRANSITION_SCRIPT = `
         local contextKey = KEYS[1]
@@ -207,6 +207,10 @@ export class DistributedExecutionContext implements ExecutionContextType, AgentC
 
     getExecutionId() {
         return this.executionId;
+    }
+
+    getProjectId() {
+        return this.projectId;
     }
 
     async init(userId: string, projectId: string, prompt: string, correlationId: string, planType: string = 'free'): Promise<ExecutionContextType> {
@@ -392,17 +396,17 @@ export class DistributedExecutionContext implements ExecutionContextType, AgentC
         return logs.map(l => JSON.parse(l));
     }
 
-    public static computeHash(input: any): string {
+    public static computeHash(input: string | Record<string, unknown> | unknown[]): string {
         const str = typeof input === 'string' ? input : JSON.stringify(input);
         return crypto.createHash('sha256').update(str).digest('hex');
     }
 
-    public static computeChainedHash(previousHash: string, data: any): string {
+    public static computeChainedHash(previousHash: string, data: Record<string, unknown>): string {
         const dataStr = JSON.stringify(data);
         return crypto.createHash('sha256').update(previousHash + dataStr).digest('hex');
     }
 
-    async performOnce(key: string, fn: () => Promise<any>): Promise<any> {
+    async performOnce(key: string, fn: () => Promise<unknown>): Promise<unknown> {
         const lockKey = `once:${this.executionId}:${key}`;
         const acquired = await redis.set(lockKey, 'locked', 'EX', 3600, 'NX');
         if (acquired === 'OK') {
@@ -452,7 +456,7 @@ export class DistributedExecutionContext implements ExecutionContextType, AgentC
     /**
      * DEAD LETTER RECORDING
      */
-    async recordToDeadLetter(reason: string, metadata: any = {}): Promise<void> {
+    async recordToDeadLetter(reason: string, metadata: Record<string, unknown> = {}): Promise<void> {
         const ctx = await this.get();
         if (!ctx) return;
 
