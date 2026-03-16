@@ -3,7 +3,7 @@
 import { Image as ImageIcon, Download, Share2, Filter, Sparkles, Plus, Loader2, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
-import Sidebar from '@/components/Sidebar';
+import Sidebar from '@components/Sidebar';
 import { toast } from 'sonner';
 
 interface GeneratedImage {

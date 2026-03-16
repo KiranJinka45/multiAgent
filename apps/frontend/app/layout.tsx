@@ -2,7 +2,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { ThemeProvider } from "@/components/ThemeProvider";
+import { ThemeProvider } from "@components/ThemeProvider";
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -15,9 +15,9 @@ export const metadata: Metadata = {
 };
 
 import { Toaster } from 'sonner';
-import { SidebarProvider } from '@/context/SidebarContext';
-import CommandPalette from '@/components/CommandPalette';
-import FeedbackButton from '@/components/FeedbackButton';
+import { SidebarProvider } from '@context/SidebarContext';
+import CommandPalette from '@components/CommandPalette';
+import FeedbackButton from '@components/FeedbackButton';
 
 export default function RootLayout({
   children,

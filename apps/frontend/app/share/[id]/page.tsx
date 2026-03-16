@@ -1,7 +1,7 @@
 import { PreviewRegistry } from '@registry/previewRegistry';
 import { previewManager } from '@runtime/preview-manager';
 import { AnalyticsService } from '@services/analytics-service';
-import { ShareOverlay } from '@/components/ShareOverlay';
+import { ShareOverlay } from '@components/ShareOverlay';
 import { Loader2 } from 'lucide-react';
 import { headers } from 'next/headers';
 

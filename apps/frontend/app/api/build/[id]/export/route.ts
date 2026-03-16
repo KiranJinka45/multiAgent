@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import JSZip from 'jszip';
-import { projectService } from '@/services/project-service';
+import { projectService } from '@services/project-service';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { RateLimiter } from '@config/rate-limiter';

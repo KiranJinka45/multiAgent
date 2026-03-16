@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
-import { projectService } from '@/services/project-service';
+import { projectService } from '@services/project-service';
 import logger from '@config/logger';
 
 export async function GET(

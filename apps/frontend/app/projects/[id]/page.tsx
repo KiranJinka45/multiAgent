@@ -12,15 +12,15 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { projectService } from '@/services/project-service';
-import { Project, ProjectFile } from '@/types/project';
+import { projectService } from '@services/project-service';
+import { Project, ProjectFile } from '@shared-types/project';
 import { toast } from 'sonner';
-import { BuildUpdate } from '@/types/build';
-import DevOpsDashboard from '@/components/DevOpsDashboard';
-import TechStackSelector, { TechStack } from '@/components/TechStackSelector';
-import PushToGithubModal from '@/components/PushToGithubModal';
-import { useSocket } from '@/hooks/use-socket';
-import { useRealtimeSubscription } from '@/hooks/useRealtimeSubscription';
+import { BuildUpdate } from '@shared-types/build';
+import DevOpsDashboard from '@components/DevOpsDashboard';
+import TechStackSelector, { TechStack } from '@components/TechStackSelector';
+import PushToGithubModal from '@components/PushToGithubModal';
+import { useSocket } from '@hooks/use-socket';
+import { useRealtimeSubscription } from '@hooks/useRealtimeSubscription';
 
 const FileItem = memo(({ file, isSelected, onClick }: { file: ProjectFile, isSelected: boolean, onClick: () => void }) => {
     const fileName = file.path.split('/').pop() || file.path;

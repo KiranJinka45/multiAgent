@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
-import { BuildUpdate } from '@/types/build';
-import { socketManager } from '@/lib/socketManager';
+import { BuildUpdate } from '@shared-types/build';
+import { socketManager } from '@lib/socketManager';
 
 export interface UseSocketOptions {
     projectId: string;

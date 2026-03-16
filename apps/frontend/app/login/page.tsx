@@ -1,6 +1,6 @@
 'use client';
 
-import { getSupabaseClient } from '@/lib/supabaseClient';
+import { getSupabaseClient } from '@lib/supabaseClient';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Github } from 'lucide-react';

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { missionController } from '@/services/mission-controller';
+import { missionController } from '@services/mission-controller';
 import logger from '@config/logger';
 
 export async function GET(

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { previewRegistry } from '@/runtime/preview-registry';
 import { previewManager } from '@/runtime/preview-manager';
-import logger from '@/config/logger';
+import logger from '@config/logger';
 
 export async function GET(
     req: NextRequest,

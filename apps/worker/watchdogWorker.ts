@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config({ path: '.env.local' });
 import { PreviewWatchdog } from '../runtime/watchdog';
-import logger from '@/config/logger';
+import logger from '@config/logger';
 
 async function main() {
     logger.info('[WatchdogWorker] Starting background resource monitor...');

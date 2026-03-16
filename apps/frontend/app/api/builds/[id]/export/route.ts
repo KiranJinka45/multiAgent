@@ -66,7 +66,7 @@ export async function GET(
                 { path: 'package.json', content: '{\n  "name": "multiagent-project",\n  "version": "1.0.0",\n  "private": true,\n  "scripts": {\n    "dev": "next dev",\n    "build": "next build",\n    "start": "next start"\n  },\n  "dependencies": {\n    "next": "14.2.3",\n    "react": "18.3.1",\n    "react-dom": "18.3.1",\n    "tailwindcss": "3.4.3"\n  }\n}' },
                 { path: 'next.config.js', content: '/** @type {import("next").NextConfig} */\nconst nextConfig = {};\nmodule.exports = nextConfig;' },
                 { path: 'tailwind.config.js', content: '/** @type {import("tailwindcss").Config} */\nmodule.exports = { content: ["./pages/**/*.{js,ts,jsx,tsx,mdx}", "./components/**/*.{js,ts,jsx,tsx,mdx}", "./app/**/*.{js,ts,jsx,tsx,mdx}"], theme: {}, plugins: [] };' },
-                { path: 'app/page.tsx', content: 'import Header from "@/components/Header";\nexport default function Home() { return <main><Header /><div className="p-8">Auto-generated Fallback Project. Generating...</div></main>; }' },
+                { path: 'app/page.tsx', content: 'import Header from "@components/Header";\nexport default function Home() { return <main><Header /><div className="p-8">Auto-generated Fallback Project. Generating...</div></main>; }' },
                 { path: 'pages/api/health.ts', content: 'export default function handler(req: any, res: any) { res.status(200).json({ status: "healthy" }); }' },
                 { path: 'components/Header.tsx', content: 'export default function Header() { return <header className="p-4 bg-gray-100">MultiAgent System</header>; }' },
                 { path: 'styles/globals.css', content: '@tailwind base;\n@tailwind components;\n@tailwind utilities;' },

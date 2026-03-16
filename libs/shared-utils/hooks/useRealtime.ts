@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from 'react';
-import { realtimeManager, type PostgresBinding } from '@/lib/realtimeManager';
+import { realtimeManager, type PostgresBinding } from '@lib/realtimeManager';
 import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
 export function useRealtime(

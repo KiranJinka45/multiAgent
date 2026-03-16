@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getSupabaseClient } from '@/lib/supabaseClient';
+import { getSupabaseClient } from '@lib/supabaseClient';
 import { useRouter } from 'next/navigation';
 
 export default function BillingPage() {

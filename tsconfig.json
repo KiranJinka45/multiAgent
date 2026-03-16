@@ -93,6 +93,15 @@
       ],
       "@validator/*": [
         "./libs/validator/*"
+      ],
+      "@hooks/*": [
+        "./libs/shared-utils/hooks/*"
+      ],
+      "@lib/*": [
+        "./libs/shared-utils/lib/*"
+      ],
+      "@context/*": [
+        "./libs/context/*"
       ]
     },
     "target": "ES2017"

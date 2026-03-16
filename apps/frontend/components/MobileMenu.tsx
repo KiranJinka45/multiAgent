@@ -1,15 +1,15 @@
 'use client';
 
 import { LucideIcon, LayoutDashboard, ListTodo, CheckSquare, Settings, X, Github, MessageSquare, Pin } from 'lucide-react';
-import { Chat } from '@/types/chat';
+import { Chat } from '@shared-types/chat';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect, useCallback } from 'react';
-import { useSidebar } from '@/context/SidebarContext';
+import { useSidebar } from '@context/SidebarContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getSupabaseClient } from '@/lib/supabaseClient';
-import { useRealtimeSubscription } from '@/hooks/useRealtimeSubscription';
-import { chatService } from '@/services/chat-service';
+import { getSupabaseClient } from '@lib/supabaseClient';
+import { useRealtimeSubscription } from '@hooks/useRealtimeSubscription';
+import { chatService } from '@services/chat-service';
 import type { User } from '@supabase/auth-helpers-nextjs';
 
 type MobileMenuProps = {

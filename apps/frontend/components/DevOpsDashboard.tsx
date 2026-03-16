@@ -5,15 +5,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Terminal, Download, Github, Wand2, Share, ChevronDown } from 'lucide-react';
 import { BuildUpdate } from '@shared-types/build';
 import { toast } from 'sonner';
-import FileExplorer from '@/components/FileExplorer';
-import FileViewer from '@/components/FileViewer';
-import BuildConsole from '@/components/BuildConsole';
-import PreviewPanel from '@/components/PreviewPanel';
-import ChatEditPanel from '@/components/ChatEditPanel';
-import { DiffViewer, FileDiff } from '@/components/DiffViewer';
-import ResourceGraph from '@/components/ResourceGraph';
-import AgentTimeline from '@/components/AgentTimeline';
-import { ThoughtStream } from '@/components/devops/ThoughtStream';
+import FileExplorer from '@components/FileExplorer';
+import FileViewer from '@components/FileViewer';
+import BuildConsole from '@components/BuildConsole';
+import PreviewPanel from '@components/PreviewPanel';
+import ChatEditPanel from '@components/ChatEditPanel';
+import { DiffViewer, FileDiff } from '@components/DiffViewer';
+import ResourceGraph from '@components/ResourceGraph';
+import AgentTimeline from '@components/AgentTimeline';
+import { ThoughtStream } from '@components/devops/ThoughtStream';
 import { formatTime, formatYear } from '@config/date';
 
 interface DevOpsDashboardProps {

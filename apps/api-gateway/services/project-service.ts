@@ -1,4 +1,4 @@
-import { getSupabaseClient } from '@/lib/supabaseClient';
+import { getSupabaseClient } from '@lib/supabaseClient';
 import type { SupabaseClient } from '@supabase/auth-helpers-nextjs';
 import { Project, ProjectFile } from '@shared-types/project';
 

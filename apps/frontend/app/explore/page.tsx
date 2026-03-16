@@ -4,11 +4,11 @@ import { useState, useEffect } from 'react';
 import { Compass, Search, Sparkles, Layout, Globe, ArrowUpRight, Zap, RefreshCw } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import Sidebar from '@/components/Sidebar';
-import TopNav from '@/components/TopNav';
-import MobileMenu from '@/components/MobileMenu';
+import Sidebar from '@components/Sidebar';
+import TopNav from '@components/TopNav';
+import MobileMenu from '@components/MobileMenu';
 import { Project } from '@shared-types/project';
-import { formatDate } from '@/config/date';
+import { formatDate } from '@config/date';
 
 export default function ExplorePage() {
     const [projects, setProjects] = useState<Project[]>([]);

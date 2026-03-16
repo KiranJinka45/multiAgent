@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { PreviewRegistry } from '@registry/previewRegistry';
 import { previewManager } from '@runtime/preview-manager';
-import { AnalyticsService } from '@/services/analytics-service';
+import { AnalyticsService } from '@services/analytics-service';
 
 export async function GET(
     req: NextRequest,
