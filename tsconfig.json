@@ -27,61 +27,72 @@
     "baseUrl": ".",
     "paths": {
       "@/*": [
-        "./*"
+        "./apps/frontend/*"
+      ],
+      "@/services/*": [
+        "./apps/api-gateway/services/*",
+        "./libs/shared-services/*"
+      ],
+      "@/types/*": [
+        "./libs/shared-types/*"
       ],
       "@app/*": [
-        "./app/*"
+        "./apps/frontend/app/*"
       ],
       "@components/*": [
-        "./components/*"
+        "./apps/frontend/components/*"
       ],
       "@agents/*": [
-        "./agents/*"
-      ],
-      "@services/*": [
-        "./services/*"
+        "./libs/agents/*"
       ],
       "@workers/*": [
-        "./workers/*"
+        "./apps/worker/*"
       ],
       "@queue": [
-        "./services/queue/index.ts"
+        "./libs/shared-services/queue/index.ts"
       ],
       "@queue/*": [
-        "./services/queue/*"
+        "./libs/shared-services/queue/*"
+      ],
+      "@services/*": [
+        "./apps/api-gateway/services/*",
+        "./libs/shared-services/*"
+      ],
+      "@shared/*": [
+        "./libs/shared-utils/*"
+      ],
+      "@shared/services/*": [
+        "./libs/shared-services/*"
+      ],
+      "@shared/types/*": [
+        "./libs/shared-types/*"
       ],
       "@services/orchestrator": [
-        "./services/orchestrator.ts"
+        "./apps/api-gateway/services/orchestrator.ts"
       ],
-      "@services/event-bus": [
-        "./services/event-bus.ts"
-      ],
-      "@services/build-state": [
-        "./services/build-state.ts"
-      ],
-      "@lib/*": [
-        "./lib/*"
+      "@libs/*": [
+        "./libs/*"
       ],
       "@config/*": [
-        "./config/*"
+        "./libs/shared-utils/config/*"
       ],
       "@templates/*": [
-        "./templates/*"
+        "./libs/templates/*"
       ],
       "@shared-types/*": [
-        "./types/*"
+        "./libs/shared-types/*"
       ],
       "@runtime/*": [
-        "./runtime/*"
+        "./apps/preview-runtime/*"
       ],
-      "@services/engines/*": [
-        "./services/engines/*"
+      "@registry/*": [
+        "./libs/registry/*"
       ],
-      "@services/agent-intelligence/*": [
-        "./services/agent-intelligence/*"
+      "@build-engine/*": [
+        "./libs/build-engine/*"
       ],
-      "@services/learning/*": [
-        "./services/learning/*"
+      "@validator/*": [
+        "./libs/validator/*"
       ]
     },
     "target": "ES2017"
@@ -96,7 +107,6 @@
     "node_modules",
     "templates",
     "tmp",
-    ".next",
-    "scripts"
+    ".next"
   ]
 }

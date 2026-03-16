@@ -1,1 +1,0 @@
-export default function Page() { return <div>Memory Test 6</div>; }

@@ -2,7 +2,7 @@ const fs = require("fs")
 const path = require("path")
 const glob = require("glob")
 
-const files = glob.sync("src/**/*.{ts,tsx,js,jsx}")
+const files = glob.sync("{src,shared,workers,runtime,api-gateway}/**/*.{ts,tsx,js,jsx}")
 
 let broken = []
 

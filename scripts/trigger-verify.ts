@@ -37,12 +37,12 @@ async function triggerAndWatch() {
     const interval = setInterval(async () => {
         const stateStr = await redis.get(stateKey);
         if (stateStr) {
-            const state = JSON.parse(stateStr);
-            if (state.currentStage !== lastStage || state.totalProgress !== lastProgress) {
-                console.log(`[${state.status.toUpperCase()}] Stage: ${state.currentStage} (${state.totalProgress}%) - ${state.message}`);
-                lastStage = state.currentStage;
-                lastProgress = state.totalProgress;
-            }
+                const state = JSON.parse(stateStr);
+                if (state && state.status && (state.currentStage !== lastStage || state.totalProgress !== lastProgress)) {
+                    console.log(`[${state.status.toUpperCase()}] Stage: ${state.currentStage ?? 'unknown'} (${state.totalProgress ?? 0}%) - ${state.message ?? 'N/A'}`);
+                    lastStage = state.currentStage;
+                    lastProgress = state.totalProgress;
+                }
 
             if (state.status === "completed") {
                 console.log("\n✨ BUILD COMPLETED SUCCESSFULLY!");

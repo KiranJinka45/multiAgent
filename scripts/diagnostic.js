@@ -1,5 +1,5 @@
-const Redis = require('ioredis');
-const { execSync } = require('child_process');
+import Redis from 'ioredis';
+import { execSync } from 'child_process';
 
 async function checkDiagnostics() {
     console.log("=== Build Pipeline Diagnostic Report ===");
@@ -17,23 +17,20 @@ async function checkDiagnostics() {
         if (workerHealth) {
             const health = JSON.parse(workerHealth);
             const age = Math.round((Date.now() - health.lastSeen) / 1000);
-            console.log(`✅ Worker: Active (Last seen ${age}s ago)`);
-            console.log(`   Concurrency: Free=${health.freeConcurrency}, Pro=${health.proConcurrency}`);
+            const statusColor = age < 30 ? '✅' : '⚠️';
+            console.log(`${statusColor} Worker: Active (Last seen ${age}s ago)`);
+            console.log(`   Worker ID: ${health.workerId}`);
+            console.log(`   Memory: ${health.memory?.toFixed(2) || 'N/A'} MB`);
         } else {
             console.log("❌ Worker: OFFLINE (No heartbeat found in Redis)");
         }
 
         // 2. Check Job Counts
         const queues = [
-            'meta-agent-queue',
-            'planner-queue',
-            'architecture-queue',
-            'generator-queue',
-            'validator-queue',
-            'repair-queue',
-            'docker-queue',
-            'deploy-queue',
-            'supervisor-queue'
+            'project-generation-free-v1',
+            'project-generation-pro-v1',
+            'build-init',
+            'preview-schedule-v1'
         ];
 
         for (const q of queues) {
@@ -52,14 +49,22 @@ async function checkDiagnostics() {
         try {
             const isWin = process.platform === 'win32';
             const cmd = isWin 
-                ? 'powershell "Get-Process node -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Id"' 
+                ? 'tasklist /FI "IMAGENAME eq node.exe" /NH'
                 : 'pgrep node';
             
             const processes = execSync(cmd, { encoding: 'utf8' });
-            const nodeCount = (processes.trim().split('\n').filter(line => line.trim().length > 0) || []).length;
+            const lines = processes.trim().split('\n').filter(line => line.trim().length > 0);
+            
+            let nodeCount = 0;
+            if (isWin) {
+                nodeCount = lines.filter(line => line.toLowerCase().includes('node.exe')).length;
+            } else {
+                nodeCount = lines.length;
+            }
+            
             console.log(`Found ${nodeCount} Node.js processes running.`);
-        } catch (e) {
-            console.log("No Node.js processes found or unable to list.");
+        } catch {
+            console.error("Diagnostic error occurred while checking processes.");
         }
 
     } catch (e) {

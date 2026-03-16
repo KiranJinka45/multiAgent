@@ -33,7 +33,7 @@ async function run() {
     const executionId = context.getExecutionId();
 
     // 1. Setup sandbox
-    const sandboxDir = path.join(process.cwd(), '.sandboxes', projectId);
+    const sandboxDir = path.join(process.cwd(), '.generated-projects', projectId);
     fs.mkdirSync(path.join(sandboxDir, 'app'), { recursive: true });
     const pageContent = `export default function Page() { return <div>Restart Recovery Test</div>; }`;
     fs.writeFileSync(path.join(sandboxDir, 'app/page.tsx'), pageContent);

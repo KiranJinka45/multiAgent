@@ -19,7 +19,7 @@ async function run() {
     const executionId = context.getExecutionId();
 
     // 1. Setup sandbox
-    const sandboxDir = path.join(process.cwd(), '.sandboxes', projectId);
+    const sandboxDir = path.join(process.cwd(), '.generated-projects', projectId);
     if (!fs.existsSync(sandboxDir)) {
         fs.mkdirSync(path.join(sandboxDir, 'app'), { recursive: true });
         const pageContent = `export default function Page() { return <div>Blackout Recovery Test</div>; }`;

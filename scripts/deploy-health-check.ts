@@ -1,12 +1,12 @@
 import './pre-init';
 import { Queue } from 'bullmq';
 import { QUEUE_VALIDATOR } from '../lib/queue/agent-queues';
-import redis from '../queue/redis-client';
-import { DistributedExecutionContext } from '../services/execution-context';
+import redis from '../shared/services/queue/redis-client';
+import { DistributedExecutionContext } from '../api-gateway/services/execution-context';
 import path from 'path';
 import fs from 'fs';
 
-const validatorQueue = new Queue(QUEUE_VALIDATOR, { connection: redis });
+const validatorQueue = new Queue(QUEUE_VALIDATOR, { connection: redis as any });
 
 async function sleep(ms: number) { return new Promise(r => setTimeout(r, ms)); }
 
@@ -18,7 +18,7 @@ async function healthCheck(url: string, timeoutMs: number = 5000): Promise<{ sta
         const res = await fetch(url, { signal: controller.signal });
         clearTimeout(timer);
         return { status: res.status, ok: res.ok, responseTime: Date.now() - start };
-    } catch (err: any) {
+    } catch (_err) {
         return { status: 0, ok: false, responseTime: Date.now() - start };
     }
 }
@@ -35,7 +35,7 @@ async function run() {
         const executionId = context.getExecutionId();
 
         // Setup sandbox
-        const sandboxDir = path.join(process.cwd(), '.sandboxes', projectId);
+        const sandboxDir = path.join(process.cwd(), '.generated-projects', projectId);
         fs.mkdirSync(path.join(sandboxDir, 'app'), { recursive: true });
         const pageContent = `export default function Page() { return <div>Deploy Verify ${i}</div>; }`;
         fs.writeFileSync(path.join(sandboxDir, 'app/page.tsx'), pageContent);
@@ -51,7 +51,7 @@ async function run() {
             finalFiles: [
                 { path: 'app/page.tsx', content: pageContent }
             ], status: 'executing', currentStage: 'validator'
-        } as any);
+        } as Partial<DistributedExecutionContext>);
 
         // Enqueue
         await validatorQueue.add('validate', { executionId, projectId });

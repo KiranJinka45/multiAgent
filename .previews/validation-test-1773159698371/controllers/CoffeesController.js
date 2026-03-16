@@ -1,1 +1,0 @@
-Coffees controller methods

@@ -21,7 +21,7 @@ const stateKey = `execution:${executionId}`;
 async function run() {
     try {
         // 1. Prepare finalFiles from sandbox
-        const sandboxDir = path.join(process.cwd(), '.sandboxes', projectId);
+        const sandboxDir = path.join(process.cwd(), '.generated-projects', projectId);
         const files = ["app/page.tsx", "app/layout.tsx", "app/globals.css", "package.json", "tsconfig.json", "tailwind.config.js"];
         const finalFiles = [];
         for (const f of files) {

@@ -18,7 +18,7 @@ async function run() {
     const executionId = context.getExecutionId();
 
     // 1. Setup sandbox with a LOGICAL ERROR (Incorrect Import)
-    const sandboxDir = path.join(process.cwd(), '.sandboxes', projectId);
+    const sandboxDir = path.join(process.cwd(), '.generated-projects', projectId);
     fs.mkdirSync(path.join(sandboxDir, 'app'), { recursive: true });
 
     // Create a component with a non-existent import

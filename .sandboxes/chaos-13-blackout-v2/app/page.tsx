@@ -1,1 +1,0 @@
-export default function Page() { return <div>Recovery V2</div>; }

@@ -1,1 +1,0 @@
-export default function Page() { return <div>Blackout Recovery Test</div>; }

@@ -25,7 +25,7 @@ async function run() {
             await context.init('user-chaos', projectId, `Chaos Load Test Job ${i}`, `chaos-6-corr-${i}`);
 
             // 2. Setup Sandbox with files
-            const sandboxDir = path.join(process.cwd(), '.sandboxes', projectId);
+            const sandboxDir = path.join(process.cwd(), '.generated-projects', projectId);
             fs.mkdirSync(path.join(sandboxDir, 'app'), { recursive: true });
 
             let pageContent = `export default function Page() { return <div>Load Test ${i}</div>; }`;

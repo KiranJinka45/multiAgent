@@ -9,7 +9,7 @@ async function testSelfHealing() {
     
     const projectId = 'test-healing-' + Date.now();
     const executionId = 'exec-' + Date.now();
-    const sandboxDir = path.join(process.cwd(), '.sandboxes', projectId);
+    const sandboxDir = path.join(process.cwd(), '.generated-projects', projectId);
     
     await fs.ensureDir(sandboxDir);
     
