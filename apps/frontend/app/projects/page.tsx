@@ -1,7 +1,9 @@
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import Sidebar from '@components/Sidebar';
+import TopNav from '@components/TopNav';
 import ProjectGallery from '@components/ProjectGallery';
+import MobileMenu from '@components/MobileMenu';
 import { projectService } from '@services/project-service';
 
 export default async function ProjectsPage() {
@@ -10,7 +12,6 @@ export default async function ProjectsPage() {
         const supabase = createServerComponentClient({ cookies });
         projects = await projectService.getProjects(supabase);
     } catch (err) {
-        // Supabase unreachable (network issue / env not configured) — render empty gallery
         console.error('[ProjectsPage] Failed to fetch projects:', err);
     }
 
@@ -21,7 +22,10 @@ export default async function ProjectsPage() {
                 className="flex-1 flex flex-col h-full relative transition-[margin] duration-300 ease-in-out"
                 style={{ marginLeft: 'var(--sidebar-width, 260px)' }}
             >
-                <ProjectGallery initialProjects={projects || []} />
+                <TopNav />
+                <div className="flex-1 overflow-y-auto pt-16">
+                    <ProjectGallery initialProjects={projects || []} />
+                </div>
             </main>
         </div>
     );

@@ -126,25 +126,25 @@ export default function Sidebar() {
             <aside
                 ref={sidebarRef}
                 style={{ width: isCollapsed ? 0 : width }}
-                className={`fixed left-0 top-0 h-screen bg-background border-r border-border flex flex-col z-50 transition-[width] duration-300 ease-in-out ${isCollapsed ? '-translate-x-full overflow-hidden' : 'translate-x-0'}`}
+                className={`fixed left-0 top-0 h-screen glass border-r border-border/50 flex flex-col z-50 transition-[width] duration-300 ease-in-out ${isCollapsed ? '-translate-x-full overflow-hidden' : 'translate-x-0'}`}
             >
                 {/* Resize Handle */}
                 <div onMouseDown={startResizing} className="absolute right-0 top-0 h-full w-1 cursor-col-resize group z-50">
-                    <div className="absolute inset-y-0 right-0 w-[1px] bg-border group-hover:bg-primary transition-colors h-full" />
+                    <div className="absolute inset-y-0 right-0 w-[1px] bg-border/50 group-hover:bg-primary transition-colors h-full" />
                 </div>
 
-                <div className="p-4 h-full flex flex-col min-w-[260px] glass">
+                <div className="p-4 h-full flex flex-col min-w-[260px]">
                     {/* Header */}
-                    <div className="flex items-center justify-between mb-6 px-2">
-                        <div className="flex items-center gap-2 group cursor-pointer" onClick={() => router.push('/')}>
-                            <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20 rotate-3 group-hover:rotate-0 transition-transform duration-500">
-                                <Sparkles size={18} className="text-primary-foreground" />
+                    <div className="flex items-center justify-between mb-8 px-2">
+                        <div className="flex items-center gap-3 group cursor-pointer" onClick={() => router.push('/')}>
+                            <div className="w-10 h-10 rounded-2xl bg-primary flex items-center justify-center glow-primary rotate-3 group-hover:rotate-0 transition-all duration-500">
+                                <Sparkles size={22} className="text-primary-foreground" />
                             </div>
-                            <span className="font-black text-lg tracking-tighter">MultiAgent</span>
+                            <span className="font-black text-xl tracking-tighter bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-transparent">MultiAgent</span>
                         </div>
                         <button
                             onClick={() => setIsCollapsed(true)}
-                            className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent transition-all"
+                            className="p-2.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all"
                         >
                             <PanelLeft size={20} />
                         </button>

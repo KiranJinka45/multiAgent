@@ -89,32 +89,32 @@ export default function ProjectGallery({ initialProjects }: ProjectGalleryProps)
 
     return (
         <div className="flex-1 overflow-auto p-8">
-            <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-4">
-                    <div className="p-3 bg-primary/10 rounded-2xl text-primary">
-                        <FolderPlus size={24} />
+            <div className="flex items-center justify-between mb-12">
+                <div className="flex items-center gap-5">
+                    <div className="p-4 bg-primary/10 rounded-[2rem] text-primary glow-primary">
+                        <FolderPlus size={28} />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight text-foreground">Projects</h1>
-                        <p className="text-sm text-muted-foreground">Manage and organize your multi-step missions</p>
+                        <h1 className="text-4xl font-black tracking-tighter text-foreground">Missions</h1>
+                        <p className="text-sm text-muted-foreground font-medium">Manage and organize your autonomous builds</p>
                     </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
                     <div className="relative group">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                         <input
                             type="text"
-                            placeholder="Search projects..."
+                            placeholder="Find a mission..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-9 pr-4 py-2 bg-accent/50 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20 transition-all w-64 underline-none outline-none"
+                            className="pl-11 pr-4 py-3 bg-accent/30 border border-border/50 rounded-2xl text-sm focus:ring-4 focus:ring-primary/10 transition-all w-72 outline-none"
                         />
                     </div>
                     <button
                         onClick={handleCreateProject}
-                        className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-medium hover:opacity-90 transition-opacity shadow-lg shadow-primary/20"
+                        className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-2xl text-sm font-bold hover:opacity-90 transition-all shadow-xl shadow-primary/20 active:scale-95"
                     >
-                        <Plus size={16} /> New Project
+                        <Plus size={18} /> New Mission
                     </button>
                 </div>
             </div>
@@ -127,7 +127,7 @@ export default function ProjectGallery({ initialProjects }: ProjectGalleryProps)
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.02 }}
                         onClick={() => router.push(`/projects/${project.id}`)}
-                        className="group p-6 bg-card border border-border rounded-3xl hover:shadow-2xl hover:border-primary/30 transition-all cursor-pointer relative overflow-hidden flex flex-col h-full"
+                        className="group p-8 glass-card rounded-[2.5rem] hover:shadow-primary/10 hover:border-primary/50 transition-all cursor-pointer relative overflow-hidden flex flex-col h-full"
                     >
                         <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity" />
 

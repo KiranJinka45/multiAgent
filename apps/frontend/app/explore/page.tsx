@@ -50,7 +50,7 @@ export default function ExplorePage() {
             >
                 <TopNav onOpenMobileMenu={() => setIsMobileMenuOpen(true)} />
 
-                <div className="flex-1 overflow-y-auto px-6 py-12">
+                <div className="flex-1 overflow-y-auto px-6 pt-24 pb-12">
                     <div className="max-w-7xl mx-auto space-y-12">
                         {/* Header Section */}
                         <div className="space-y-4">

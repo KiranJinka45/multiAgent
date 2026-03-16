@@ -32,7 +32,7 @@ export default function TopNav({ onOpenMobileMenu }: TopNavProps) {
 
     return (
         <header
-            className="fixed top-0 right-0 h-14 bg-background/80 backdrop-blur-md z-[40] flex items-center px-4 transition-[left] duration-300 ease-in-out"
+            className="fixed top-0 right-0 h-16 glass border-b border-border/50 z-[40] flex items-center px-6 transition-[left] duration-300 ease-in-out"
             style={{ left: 'var(--sidebar-width, 260px)' }}
         >
             <div className="flex items-center gap-1">
