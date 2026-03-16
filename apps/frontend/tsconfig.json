@@ -35,7 +35,14 @@
       "@config/*": ["../../libs/shared-utils/config/*"],
       "@hooks/*": ["../../libs/shared-utils/hooks/*"],
       "@lib/*": ["../../libs/shared-utils/lib/*"],
-      "@queue": ["../../libs/shared-services/queue/index.ts"]
+      "@agents/*": ["../../libs/agents/*"],
+      "@workers/*": ["../../apps/worker/*"],
+      "@runtime/*": ["../../apps/preview-runtime/*"],
+      "@registry/*": ["../../libs/registry/*"],
+      "@build-engine/*": ["../../libs/build-engine/*"],
+      "@validator/*": ["../../libs/validator/*"],
+      "@queue": ["../../libs/shared-services/queue/index.ts"],
+      "@queue/*": ["../../libs/shared-services/queue/*"]
     }
   },
   "include": [

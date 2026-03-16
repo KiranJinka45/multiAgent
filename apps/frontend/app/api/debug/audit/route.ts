@@ -5,7 +5,7 @@ import {
     plannerQueue, architectureQueue, generatorQueue,
     validatorQueue, dockerQueue, deployQueue,
     supervisorQueue, repairQueue, metaQueue
-} from '../../../../lib/queue/agent-queues';
+} from '@lib/agent-queues';
 
 export async function GET() {
     const results: Record<string, unknown> = {

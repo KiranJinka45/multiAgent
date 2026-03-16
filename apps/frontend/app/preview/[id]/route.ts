@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { previewRegistry } from '@/runtime/preview-registry';
-import { previewManager } from '@/runtime/preview-manager';
+import { PreviewRegistry } from '@registry/previewRegistry';
+import { previewManager } from '@runtime/preview-manager';
 import logger from '@config/logger';
 
 export async function GET(
@@ -11,10 +11,10 @@ export async function GET(
 
     try {
         // 1. Resolve preview registration (try ID or ProjectId fallback)
-        let reg = await previewRegistry.lookup(previewId);
+        let reg = await PreviewRegistry.lookupByPreviewId(previewId);
         if (!reg) {
-            const resolvedId = await previewRegistry.getPreviewId(previewId);
-            if (resolvedId) reg = await previewRegistry.lookup(resolvedId);
+            // If they provided a ProjectId instead of a PreviewId, registry can get it
+            reg = await PreviewRegistry.get(previewId);
         }
 
         if (!reg) {
@@ -33,11 +33,11 @@ export async function GET(
 
         // 2. Handle Lifecycle States
         // Auto-wake if sleeping or if process is missing internally
-        if (reg.status === 'starting') {
+        if (reg.status === 'STARTING') {
             return buildLoadingResponse('Initializing Isolated Architecture...');
         }
 
-        if (reg.status === 'sleeping' || reg.status === 'error') {
+        if (reg.status === 'STOPPED' || reg.status === 'FAILED') {
             await previewManager.restartPreview(reg.projectId);
             return buildLoadingResponse('Re-activating Sandbox Container...');
         }
@@ -46,9 +46,9 @@ export async function GET(
         // Standard Next.js Route Handlers don't support streaming proxy well, 
         // so we use a robust fetch-forwarder.
         
-        await previewRegistry.heartbeat(previewId);
-        const targetHost = reg.containerHost === 'localhost' ? '127.0.0.1' : reg.containerHost;
-        const target = `http://${targetHost}:${reg.containerPort}`;
+        await PreviewRegistry.recordHealthCheck(reg.projectId);
+        const targetHost = '127.0.0.1';
+        const target = `http://${targetHost}:${reg.port}`;
         
         return await fetchProxy(req, target, previewId);
 

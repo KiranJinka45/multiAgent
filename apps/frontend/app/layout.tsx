@@ -26,7 +26,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} antialiased selection:bg-blue-500/30`}>
+      <body className={`${inter.className} antialiased selection:bg-primary/30`}>
         <SidebarProvider>
           <ThemeProvider
             attribute="class"
@@ -34,7 +34,9 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            {children}
+            <div className="flex min-h-screen bg-background">
+                {children}
+            </div>
             <CommandPalette />
             <FeedbackButton />
             <Toaster position="top-center" richColors theme="dark" />

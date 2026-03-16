@@ -168,7 +168,7 @@ export default function Sidebar() {
                     </div>
 
                     {/* Navigation */}
-                    <div className="mb-8 px-1 space-y-1">
+                    <div className="mb-8 px-1 space-y-1 glass p-4 rounded-3xl border-border/20 shadow-lg">
                         <SidebarItem
                             icon={Github}
                             label="GitHub Integration"
@@ -178,10 +178,10 @@ export default function Sidebar() {
                                 <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
                             ) : null}
                         />
-                        <SidebarItem icon={FolderPlus} label="My Projects" href="/projects" active={pathname === '/projects'} />
+                        <SidebarItem icon={FolderPlus} label="Missions" href="/projects" active={pathname === '/projects'} />
                         <SidebarItem icon={Compass} label="Showcase" href="/explore" active={pathname === '/explore'} />
                         <SidebarItem icon={Terminal} label="Control Plane" href="/dashboard" active={pathname === '/dashboard'} />
-                        <SidebarItem icon={Image} label="Generated Images" href="/images" active={pathname === '/images'} />
+                        <SidebarItem icon={Image} label="History" href="/images" active={pathname === '/images'} />
                     </div>
 
                     {/* Chat History */}

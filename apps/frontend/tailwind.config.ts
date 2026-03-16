@@ -7,6 +7,7 @@ const config: Config = {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./context/**/*.{js,ts,jsx,tsx,mdx}",
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/**/*.{js,ts,jsx,tsx,mdx}",
     "../../libs/**/*.{js,ts,jsx,tsx,mdx}",
     "../../libs/shared-utils/**/*.{js,ts,jsx,tsx,mdx}",
@@ -48,6 +49,10 @@ const config: Config = {
           foreground: "hsl(var(--card-foreground))",
         },
       },
+      borderRadius: {
+        xl: "1rem",
+        "2xl": "1.5rem",
+      },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
@@ -55,6 +60,12 @@ const config: Config = {
       },
     },
   },
+  safelist: [
+    "bg-background",
+    "text-foreground",
+    "border-border",
+    "bg-card"
+  ],
   plugins: [
     typography,
   ],

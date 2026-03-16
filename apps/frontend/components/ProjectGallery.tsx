@@ -217,6 +217,21 @@ export default function ProjectGallery({ initialProjects }: ProjectGalleryProps)
                     </motion.button>
                 </div>
             )}
+            {/* Premium Debug Overlay */}
+            <div className="fixed bottom-6 right-6 glass p-4 rounded-2xl text-[10px] font-mono border-border/50 shadow-2xl z-[100] flex flex-col gap-1 select-none pointer-events-none opacity-50 hover:opacity-100 transition-opacity">
+                <div className="flex justify-between gap-4">
+                    <span className="text-muted-foreground uppercase tracking-widest">Missions</span>
+                    <span className="text-primary font-bold">{projects.length}</span>
+                </div>
+                <div className="flex justify-between gap-4">
+                    <span className="text-muted-foreground uppercase tracking-widest">Filtered</span>
+                    <span className="text-foreground">{filteredProjects.length}</span>
+                </div>
+                <div className="flex justify-between gap-4">
+                    <span className="text-muted-foreground uppercase tracking-widest">System</span>
+                    <span className="text-green-500">Stable</span>
+                </div>
+            </div>
         </div>
     );
 }
