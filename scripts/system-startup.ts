@@ -211,7 +211,7 @@ async function startup() {
     
     await waitForSocketHealth('http://localhost:3011/health');
 
-    const webProcess = spawn(npmCmd, ['run', 'dev-safe', '--', '-p', '3004'], { stdio: 'inherit', shell: true });
+    const webProcess = spawn(npmCmd, ['run', 'dev-safe', '--', 'apps/frontend', '-p', '3004'], { stdio: 'inherit', shell: true });
     activeProcesses.add(webProcess);
 
     process.on('SIGINT', () => {

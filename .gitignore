@@ -1,23 +1,20 @@
 # dependencies
-/node_modules
-templates/**/node_modules
-generated-projects/**/node_modules
-/.pnp
-.pnp.js
-
-# testing
-/coverage
+node_modules/
+**/node_modules/
 
 # next.js
-/.next/
-/out/
+.next/
+**/.next/
+out/
 
 # production
-/build
+build/
 
 # misc
 .DS_Store
 *.pem
+dump.rdb
+appendonlydir/
 
 # debug
 npm-debug.log*
@@ -39,6 +36,7 @@ next-env.d.ts
 # custom execution ignored files
 /tmp/
 *.log
+system.log
 validate_*.txt
 tsc_*.log
 Redis/*.pid
@@ -48,3 +46,4 @@ system-startup.log
 /scripts/boot-fleet.ps1
 /.snapshots/
 /.microvms/
+file_list.txt
