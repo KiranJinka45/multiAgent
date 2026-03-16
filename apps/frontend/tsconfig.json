@@ -24,6 +24,12 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"],
+      "@/app/*": ["./app/*"],
+      "@/components/*": ["./components/*"],
+      "@/services/*": ["../../apps/api-gateway/services/*", "../../libs/shared-services/*"],
+      "@/context/*": ["../../libs/context/*"],
+      "@/types/*": ["../../libs/shared-types/*"],
+      "@/shared/*": ["../../libs/shared-utils/*"],
       "@app/*": ["./app/*"],
       "@components/*": ["./components/*"],
       "@services/*": ["../../apps/api-gateway/services/*", "../../libs/shared-services/*"],
