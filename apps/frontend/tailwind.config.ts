@@ -1,4 +1,4 @@
-// @ts-ignore
+import typography from '@tailwindcss/typography';
 import type { Config } from "tailwindcss";
 
 const config: Config = {
@@ -8,6 +8,8 @@ const config: Config = {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./context/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/**/*.{js,ts,jsx,tsx,mdx}",
+    "../../libs/**/*.{js,ts,jsx,tsx,mdx}",
+    "../../libs/shared-utils/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
@@ -54,7 +56,7 @@ const config: Config = {
     },
   },
   plugins: [
-    require('@tailwindcss/typography'),
+    typography,
   ],
 };
 export default config;
