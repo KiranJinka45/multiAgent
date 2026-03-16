@@ -24,20 +24,17 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"],
-      "@/app/*": ["./app/*"],
-      "@/components/*": ["./components/*"],
-      "@/services/*": ["../../apps/api-gateway/services/*", "../../libs/shared-services/*"],
-      "@/context/*": ["../../libs/context/*"],
-      "@/types/*": ["../../libs/shared-types/*"],
-      "@/shared/*": ["../../libs/shared-utils/*"],
       "@app/*": ["./app/*"],
       "@components/*": ["./components/*"],
       "@services/*": ["../../apps/api-gateway/services/*", "../../libs/shared-services/*"],
       "@types/*": ["../../libs/shared-types/*"],
+      "@context/*": ["../../libs/context/*"],
       "@shared/*": ["../../libs/shared-utils/*"],
       "@shared-types/*": ["../../libs/shared-types/*"],
       "@libs/*": ["../../libs/*"],
       "@config/*": ["../../libs/shared-utils/config/*"],
+      "@hooks/*": ["../../libs/shared-utils/hooks/*"],
+      "@lib/*": ["../../libs/shared-utils/lib/*"],
       "@queue": ["../../libs/shared-services/queue/index.ts"]
     }
   },
