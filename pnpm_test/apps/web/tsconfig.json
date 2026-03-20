@@ -1,0 +1,57 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "noEmit": true,
+    "incremental": true,
+    "module": "esnext",
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"],
+      "@app/*": ["./app/*"],
+      "@components/*": ["./components/*"],
+      "@services/*": ["../../apps/api/src/services/*", "../../packages/utils/src/services/*"],
+      "@types/*": ["../../packages/contracts/src/*"],
+      "@context/*": ["../../packages/context/src/*"],
+      "@shared/*": ["../../packages/utils/src/*"],
+      "@shared-types/*": ["../../packages/contracts/src/*"],
+      "@libs/*": ["../../packages/*/src"],
+      "@config/*": ["../../packages/utils/src/config/*"],
+      "@hooks/*": ["../../packages/utils/src/hooks/*"],
+      "@lib/*": ["../../packages/utils/src/lib/*"],
+      "@agents/*": ["../../packages/agents/src/*"],
+      "@workers/*": ["../../apps/worker/src/*"],
+      "@runtime/*": ["../../apps/sandbox-runtime/src/*"],
+      "@registry/*": ["../../packages/registry/src/*"],
+      "@build-engine/*": ["../../packages/build-engine/src/*"],
+      "@validator/*": ["../../packages/validator/src/*"],
+      "@queue": ["../../packages/utils/src/services/redis-client.ts"],
+      "@queue/*": ["../../packages/utils/src/services/queue/*"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    ".next/types/**/*.ts",
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

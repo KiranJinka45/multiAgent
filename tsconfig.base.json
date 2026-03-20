@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "baseUrl": ".",
+    "paths": {
+      "@config/*": ["packages/utils/src/config/*"],
+      "@utils/*": ["packages/utils/src/services/*"],
+      "@services/*": ["packages/utils/src/services/*"],
+      "@shared/*": ["packages/utils/src/*"],
+      "@shared-types/*": ["packages/contracts/*"]
+    }
+  }
+}

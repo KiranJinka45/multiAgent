@@ -1,24 +1,18 @@
 {
   "compilerOptions": {
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext",
-      "es2020",
-      "es2021",
-      "es2022"
-    ],
+    "target": "ESNext",
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": false,
+    "strict": true,
     "noEmit": true,
-    "incremental": true,
-    "module": "esnext",
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
+    "incremental": true,
     "plugins": [
       {
         "name": "next"
@@ -26,96 +20,15 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./apps/frontend/*"
-      ],
-      "@/services/*": [
-        "./apps/api-gateway/services/*",
-        "./libs/shared-services/*"
-      ],
-      "@/types/*": [
-        "./libs/shared-types/*"
-      ],
-      "@app/*": [
-        "./apps/frontend/app/*"
-      ],
-      "@components/*": [
-        "./apps/frontend/components/*"
-      ],
-      "@agents/*": [
-        "./libs/agents/*"
-      ],
-      "@workers/*": [
-        "./apps/worker/*"
-      ],
-      "@queue": [
-        "./libs/shared-services/queue/index.ts"
-      ],
-      "@queue/*": [
-        "./libs/shared-services/queue/*"
-      ],
-      "@services/*": [
-        "./apps/api-gateway/services/*",
-        "./libs/shared-services/*"
-      ],
-      "@shared/*": [
-        "./libs/shared-utils/*"
-      ],
-      "@shared/services/*": [
-        "./libs/shared-services/*"
-      ],
-      "@shared/types/*": [
-        "./libs/shared-types/*"
-      ],
-      "@services/orchestrator": [
-        "./apps/api-gateway/services/orchestrator.ts"
-      ],
-      "@libs/*": [
-        "./libs/*"
-      ],
-      "@config/*": [
-        "./libs/shared-utils/config/*"
-      ],
-      "@templates/*": [
-        "./libs/templates/*"
-      ],
-      "@shared-types/*": [
-        "./libs/shared-types/*"
-      ],
-      "@runtime/*": [
-        "./apps/preview-runtime/*"
-      ],
-      "@registry/*": [
-        "./libs/registry/*"
-      ],
-      "@build-engine/*": [
-        "./libs/build-engine/*"
-      ],
-      "@validator/*": [
-        "./libs/validator/*"
-      ],
-      "@hooks/*": [
-        "./libs/shared-utils/hooks/*"
-      ],
-      "@lib/*": [
-        "./libs/shared-utils/lib/*"
-      ],
-      "@context/*": [
-        "./libs/context/*"
-      ]
-    },
-    "target": "ES2017"
+      "@libs/*": ["packages/*/src"],
+      "@config/*": ["packages/utils/config/*"],
+      "@utils/*": ["packages/utils/services/*"],
+      "@services/*": ["packages/utils/services/*"],
+      "@shared/*": ["packages/utils/*"],
+      "@shared-types/*": ["packages/contracts/*"],
+      "@multi-agent/supabase": ["packages/supabase/index"]
+    }
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "templates",
-    "tmp",
-    ".next"
-  ]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
 }

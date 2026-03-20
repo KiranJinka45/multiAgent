@@ -1,0 +1,738 @@
+﻿
+> @libs/agents@0.1.0 build C:\multiagentic_project\multiAgent-main\packages\agents
+> tsup src/index.ts
+
+[34mCLI[39m Building entry: src/index.ts
+[34mCLI[39m Using tsconfig: tsconfig.json
+[34mCLI[39m tsup v8.5.1
+[34mCLI[39m Using tsup config: C:\multiagentic_project\multiAgent-main\packages\agents\tsup.config.ts
+[34mCLI[39m Target: node20
+[34mCLI[39m Cleaning output folder
+[34mCJS[39m Build start
+[34mESM[39m Build start
+node.exe : X [ERROR] Could not resolve 
+"@agents/base-agent"
+At C:\Users\Kiran\AppData\Roaming\npm\pnpm.ps1:24 
+char:5
++     & "node$exe"  
+"$basedir/node_modules/pnpm/bin/pnpm.cjs" $args
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (X [ERROR] 
+    Could...nts/base-agent":String) [], RemoteExcepti  
+  on
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+    src/deploy-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+X [ERROR] Could not resolve "@agents/base-agent"
+
+    src/backend-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+X [ERROR] Could not resolve "@agents/base-agent"
+
+    src/critic-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+X [ERROR] Could not resolve "@agents/base-agent"
+
+    src/frontend-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           X [ERROR] Could 
+not resolve "@agents/base-agent"
+
+    src/evolution-agent.ts:1:55:
+      1 Γöé ...BaseAgent, AgentResponse, AgentRequest 
+} from '@agents/base-agent';
+        Γò╡                                            
+      ~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+X [ERROR]X [ERROR] Could not resolve 
+"@agents/base-agent" Could not resolve 
+"@agents/base-agent"
+
+    src/saas-monetization-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+
+
+    src/backend-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+X [ERROR] Could not resolve "@agents/base-agent"
+
+    src/debug-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+X [ERROR] Could not resolve "@agents/base-agent"
+
+    src/intent-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+X [ERROR] Could not resolve "@agents/base-agent"
+
+    src/security-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+X [ERROR] Could not resolve "@agents/base-agent"
+
+    src/architecture-agent.ts:1:55:
+      1 Γöé ...BaseAgent, AgentResponse, AgentRequest 
+} from '@agents/base-agent';
+        Γò╡                                            
+      ~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+X [ERROR] Could not resolve "@agents/base-agent"
+
+    src/sandbox-editor-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+X [ERROR] Could not resolve "@agents/base-agent"
+
+    src/meta-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+X [X [ERROR] Could not resolve 
+"@agents/base-agent"ERROR] Could not resolve 
+"@agents/base-agent"
+
+    src/planner-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+
+    src/healing-agent.ts:1:55:
+'@agents/base-agent';
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+      1 Γöé ...BaseAgent, AgentResponse, AgentRequest 
+} from '@agents/base-agent';
+        Γò╡                                            
+      ~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+X [ERROR] Could not resolve "@agents/base-agent"
+
+    src/database-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+X [X ERROR[] Could not resolve "@agents/base-agent"
+
+    src/validator-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           ERROR] Could not 
+resolve "@agents/base-agent"
+
+    src/coder-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+X [ERROR] Could not resolve "@agents/base-agent"
+
+    src/monitoring-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           X [ERROR] 
+~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+Could not resolve "@agents/base-agent"
+
+    src/architecture-agent.ts:1:55:
+      1 Γöé ...BaseAgent, AgentResponse, AgentRequest 
+} from '@agents/base-agent'X ;
+        Γò╡                                            
+      ~~~~~~~~~~~~~~~~~~~~[ERROR] 
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+Could not resolve "@agents/base-agent"
+
+    src/repair-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+X [ERROR] Could not resolve "@agents/base-agent"
+
+    src/planner-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+X [ERROR] Could not resolve "@agents/base-agent"
+
+    src/critic-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+X [ERRORX ][ERROR] Could not resolve 
+"@agents/base-agent" Could not resolve 
+"@agents/base-agent"
+
+    src/chat-edit-agent.ts:1:55:
+      1 Γöé ...BaseAgent, AgentResponse, AgentRequest 
+} from '@agents/base-agent';
+        Γò╡                                            
+      ~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+
+
+    src/customizer-agent.ts:1:55:
+      1 Γöé ...BaseAgent, AgentResponse, AgentRequest 
+} from '@agents/base-agent';
+        Γò╡                                            
+      ~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+X [ERROR] Could not resolve "@agents/base-agent"
+
+    src/research-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+X [ERROR] Could not resolve "@agents/base-agent"
+
+    src/database-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+X [ERRORX ] Could not resolve "@agents/base-agent"
+
+    src/evolution-agent.ts:1:55:
+      1 Γöé ...BaseAgent, AgentResponse, AgentRequest 
+} from '@agents/base-agent';
+        Γò╡                                            
+      ~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+[ERROR] Could not resolve "@agents/base-agent"
+
+    src/coder-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+X [ERRORX ] Could not resolve "@agents/base-agent"
+
+    src/deploy-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+[ERROR] Could not resolve "@agents/base-agent"
+
+    src/monitoring-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+X [ERROR] X [Could not resolve "@agents/base-agent"
+
+    src/ranking-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           
+ERROR]~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+ Could not resolve "@agents/base-agent"
+
+    src/research-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~X [ERROR] Could not resolve 
+"@agents/base-agent"
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+
+
+    src/sandbox-editor-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           X 
+[ERROR~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+] Could not resolve "@agents/base-agent"
+
+    src/repair-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~X [ERROR]
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+ X [ERRORCould not resolve "@agents/base-agent"
+
+    src/saas-monetization-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+] Could not resolve "@agents/base-agent"
+
+    src/intent-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from X [ERROR] Could 
+not resolve "@agents/base-agent"'@agents/base-agent';
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+
+
+    src/testing-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+X [ERROR] Could not resolve "@agents/base-agent"
+
+    src/frontend-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           X [ERROR] Could 
+not resolve "@agents/base-agent"
+
+    src/customizer-agent.ts:1:55:
+      1 Γöé ...BaseAgent, AgentResponse, AgentRequest 
+} from '@agents/base-agent'~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+;
+        Γò╡                                            
+      ~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+X [X ERROR[] Could not resolve "@agents/base-agent"
+
+    src/testing-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+ERROR] X Could not resolve "@agents/base-agent"[
+
+    src/validator-agent.ts:1:26:
+ERROR      1 Γöé import { BaseAgent } from 
+]'@agents/base-agent' Could not resolve 
+"@agents/base-agent"
+
+    src/debug-agent.ts:1:26:
+;
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~X 
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+[ERROR]X [ ERRORCould not resolve 
+"@agents/base-agent"] Could not resolve 
+"@agents/base-agent"
+
+    src/healing-agent.ts:1:55:
+
+
+    src/security-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from       1 Γöé 
+...BaseAgent, AgentResponse, AgentRequest } from 
+'@agents/base-agent';
+        Γò╡                                            
+      ~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+'@agents/base-agent';
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+X [ERROR]X [ Could not resolve "@agents/base-agent"
+
+    src/chat-edit-agent.ts:1:55:
+      1 Γöé ...BaseAgent, AgentResponse, AgentRequest 
+} from '@agents/base-agent'ERROR] Could not resolve 
+"./redis";
+        Γò╡                                            
+      ~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+
+
+    src/services/agent-memory.ts:1:21:
+      1 Γöé ∩╗┐import redis from './redis';
+        Γò╡                   ~~~~~~~~~
+
+X [ERROR] Could not resolve "@agents/base-agent"X 
+
+    src/ranking-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+[ERROR] X Could not resolve "@libs/agents"
+
+    src/services/agent-registry.ts:2:30:
+      2 Γöé import { DatabaseAgent } from 
+'@libs/agents';
+        Γò╡                               
+~~~~~~~~~~~~~~
+
+  The module "./dist/index.mjs" was not found on the 
+file system:
+
+    package.json:15:16:
+      15 Γöé       "import": "./dist/index.mjs",
+         Γò╡                 ~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@libs/agents" as external to 
+exclude it from the bundle, which will remove this 
+error and leave the unresolved path in the bundle.
+
+[ERROR] Could not resolve "@agents/base-agent"
+
+    src/meta-agent.ts:1:26:
+      1 Γöé import { BaseAgent } from 
+'@agents/base-agent';
+        Γò╡                           
+~~~~~~~~~~~~~~~~~~~~<anonymous_script>:1
+
+
+SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at parseJSON (C:\multiagentic_project\multiAgent-ma
+in\node_modules\.pnpm\esbuild@0.27.4\node_modules\esbui
+ld\lib\main.js:1882:15)
+    at buildResponseToResult (C:\multiagentic_project\m
+ultiAgent-main\node_modules\.pnpm\esbuild@0.27.4\node_m
+odules\esbuild\lib\main.js:1202:48)
+    at C:\multiagentic_project\multiAgent-main\node_mod
+ules\.pnpm\esbuild@0.27.4\node_modules\esbuild\lib\main
+.js:1232:16
+    at responseCallbacks.<computed> (C:\multiagentic_pr
+oject\multiAgent-main\node_modules\.pnpm\esbuild@0.27.4
+\node_modules\esbuild\lib\main.js:884:9)
+    at handleIncomingPacket (C:\multiagentic_project\mu
+ltiAgent-main\node_modules\.pnpm\esbuild@0.27.4\node_mo
+dules\esbuild\lib\main.js:939:12)
+    at Socket.readFromStdout (C:\multiagentic_project\m
+ultiAgent-main\node_modules\.pnpm\esbuild@0.27.4\node_m
+odules\esbuild\lib\main.js:862:7)
+    at Socket.emit (node:events:524:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode 
+(node:internal/streams/readable:512:3)
+
+
+  You can mark the path "@agents/base-agent" as 
+external to exclude it from the bundle, which will 
+remove this error and leave the unresolved path in the 
+bundle.
+
+
+Node.js v20.20.0
+X [ERROR] Could not resolve "./redis"
+
+    src/services/agent-memory.ts:1:21:
+      1 Γöé ∩╗┐import redis from './redis';
+        Γò╡                   ~~~~~~~~~
+
+X [ERROR] Could not resolve "@libs/agents"
+
+    src/services/agent-registry.ts:2:30:
+      2 Γöé import { DatabaseAgent } from 
+'@libs/agents';
+        Γò╡                               
+~~~~~~~~~~~~~~
+
+  The module "./dist/index.mjs" was not found on the 
+file system:
+
+ΓÇëELIFECYCLEΓÇë Command failed with exit code 1.
+    package.json:15:16:
+      15 Γöé       "import": "./dist/index.mjs",
+         Γò╡                 ~~~~~~~~~~~~~~~~~~
+
+  You can mark the path "@libs/agents" as external to 
+exclude it from the bundle, which will remove this 
+error and leave the unresolved path in the bundle.
+

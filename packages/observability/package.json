@@ -1,0 +1,38 @@
+{
+  "name": "@libs/observability",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./src/index.ts",
+  "scripts": {
+    "build": "tsup src/index.ts",
+    "dev": "tsup src/index.ts --watch"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./*": {
+       "types": "./dist/*.d.ts",
+       "import": "./dist/*.mjs",
+       "require": "./dist/*.js"
+    }
+  },
+  "dependencies": {
+    "@libs/utils": "workspace:*",
+    "@opentelemetry/auto-instrumentations-node": "latest",
+    "@opentelemetry/exporter-otlp-http": "latest",
+    "@opentelemetry/resources": "latest",
+    "@opentelemetry/sdk-node": "latest",
+    "@opentelemetry/semantic-conventions": "latest",
+    "@opentelemetry/api": "latest"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "tsup": "^8.0.0",
+    "@types/node": "^20.0.0"
+  }
+}

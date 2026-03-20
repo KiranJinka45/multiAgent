@@ -1,0 +1,143 @@
+// packages/db/schema.prisma
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  role      Role     @default(USER)
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  projects  Project[]
+  createdAt DateTime @default(now())
+}
+
+model Tenant {
+  id        String   @id @default(uuid())
+  name      String
+  plan      Plan     @default(FREE)
+  users     User[]
+  projects  Project[]
+  subscriptions Subscription[]
+  usage     Usage?
+  createdAt DateTime @default(now())
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  name        String
+  prompt      String
+  status      ProjectStatus @default(CREATED)
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  createdBy   String
+  creator     User     @relation(fields: [createdBy], references: [id])
+  builds      Build[]
+  files       File[]
+  createdAt   DateTime @default(now())
+}
+
+model Build {
+  id         String   @id @default(uuid())
+  projectId  String
+  project    Project  @relation(fields: [projectId], references: [id])
+  status     BuildStatus @default(QUEUED)
+  logs       String?
+  previewUrl String?
+  createdAt  DateTime @default(now())
+}
+
+model File {
+  id        String   @id @default(uuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id])
+  path      String
+  content   String
+  updatedAt DateTime @updatedAt
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+}
+
+model Subscription {
+  id         String   @id @default(uuid())
+  tenantId   String
+  tenant     Tenant   @relation(fields: [tenantId], references: [id])
+  plan       Plan     @default(FREE)
+  status     String
+  stripeId   String   @unique
+  createdAt  DateTime @default(now())
+}
+
+model Usage {
+  id        String   @id @default(uuid())
+  tenantId  String   @unique
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  builds    Int      @default(0)
+  apiCalls  Int      @default(0)
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Plan {
+  FREE
+  PRO
+}
+
+enum ProjectStatus {
+  CREATED
+  BUILDING
+  READY
+  FAILED
+}
+
+enum BuildStatus {
+  QUEUED
+  RUNNING
+  SUCCESS
+  FAILED
+}
+
+model AiEvaluation {
+  id        String   @id @default(uuid())
+  tenantId  String
+  model     String
+  score     Float
+  metrics   Json     // buildSuccess, lintScore, typeScore, testScore, diffScore
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([model])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  tenantId  String
+  userId    String
+  action    String
+  resource  String
+  metadata  Json?
+  ipAddress String?
+  hash      String   // SHA-256 chain hash
+  createdAt DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([userId])
+}

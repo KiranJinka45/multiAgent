@@ -1,0 +1,16 @@
+{
+  "name": "@libs/db",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsup index.ts --no-dts",
+    "dev": "tsup index.ts --watch"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.10.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  }
+}

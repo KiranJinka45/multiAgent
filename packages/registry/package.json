@@ -1,0 +1,13 @@
+﻿{
+  "name": "@libs/registry",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsup src/index.ts --no-dts",
+    "dev": "tsup src/index.ts --watch"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "tsup": "^8.0.0"
+  }
+}

@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  gateway:
+    build:
+      context: .
+      dockerfile: apps/gateway/Dockerfile
+    ports:
+      - "4000:4000"
+    environment:
+      - PORT=4000
+      - AUTH_SERVICE_URL=http://auth-service:4002
+      - ORCHESTRATOR_URL=http://orchestrator:4001
+      - BILLING_SERVICE_URL=http://billing-service:4003
+      - INTERNAL_KEY=local-secret-key
+    depends_on:
+      - auth-service
+      - orchestrator
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: apps/auth-service/Dockerfile
+    ports:
+      - "4002:4002"
+    environment:
+      - PORT=4002
+      - INTERNAL_KEY=local-secret-key
+
+  billing-service:
+    build:
+      context: .
+      dockerfile: apps/billing-service/Dockerfile
+    ports:
+      - "4003:4003"
+    environment:
+      - PORT=4003
+      - INTERNAL_KEY=local-secret-key
+      - AUTH_SERVICE_URL=http://auth-service:4002
+
+  orchestrator:
+    build:
+      context: .
+      dockerfile: apps/orchestrator/Dockerfile
+    ports:
+      - "4001:4001"
+    environment:
+      - PORT=4001
+      - INTERNAL_KEY=local-secret-key
+    depends_on:
+      - temporal-server
+
+  worker:
+    build:
+      context: .
+      dockerfile: apps/worker/Dockerfile
+    environment:
+      - TEMPORAL_ADDRESS=temporal-server:7233
+    depends_on:
+      - temporal-server
+
+  temporal-server:
+    image: temporalio/admin-tools:1.22.0
+    ports:
+      - "7233:7233"
+    # This is a placeholder, real temporal setup usually requires more services (postgres, etc)
+    # For local dev, a simple temporal-server image or a full compose is used.
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+networks:
+  default:
+    name: multi-agent-network

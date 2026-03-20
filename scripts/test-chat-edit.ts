@@ -109,10 +109,11 @@ async function main() {
     const { PlannerAgent } = await import('./src/agents/planner-agent');
     const planner = new PlannerAgent();
 
-    const planResult = await planner.execute(
-        { prompt: 'Build a SaaS dashboard with auth, analytics charts, and billing settings' },
-        {} as any
-    );
+    const planResult = await planner.execute({
+        tenantId: 'test-tenant',
+        taskType: 'planner',
+        params: { prompt: 'Build a SaaS dashboard with auth, analytics charts, and billing settings' }
+    });
 
     if (!planResult.success || !planResult.data) {
         fail('PlannerAgent failed: ' + planResult.error);
@@ -134,24 +135,28 @@ async function main() {
     const editAgent = new ChatEditAgent();
 
     const editResult = await editAgent.execute({
-        editRequest: 'Add dark mode with a toggle button in the header',
-        projectContext: projectMemory.buildContextSummary(memory),
-        currentFiles: [
-            {
-                path: '/app/globals.css',
-                content: `@tailwind base;\n@tailwind components;\n@tailwind utilities;\nbody { background: white; color: black; }`
-            },
-            {
-                path: '/tailwind.config.ts',
-                content: `import type { Config } from 'tailwindcss';\nconst config: Config = { content: ['./app/**/*.{ts,tsx}'], theme: { extend: {} }, plugins: [] };\nexport default config;`
-            },
-            {
-                path: '/app/layout.tsx',
-                content: `export default function RootLayout({ children }: { children: React.ReactNode }) { return <html><body>{children}</body></html>; }`
-            }
-        ],
-        techStack: { framework: 'nextjs', styling: 'tailwind', backend: 'api-routes', database: 'supabase' }
-    }, {} as any);
+        tenantId: 'test-tenant',
+        taskType: 'code-gen',
+        params: {
+            editRequest: 'Add dark mode with a toggle button in the header',
+            projectContext: projectMemory.buildContextSummary(memory),
+            currentFiles: [
+                {
+                    path: '/app/globals.css',
+                    content: `@tailwind base;\n@tailwind components;\n@tailwind utilities;\nbody { background: white; color: black; }`
+                },
+                {
+                    path: '/tailwind.config.ts',
+                    content: `import type { Config } from 'tailwindcss';\nconst config: Config = { content: ['./app/**/*.{ts,tsx}'], theme: { extend: {} }, plugins: [] };\nexport default config;`
+                },
+                {
+                    path: '/app/layout.tsx',
+                    content: `export default function RootLayout({ children }: { children: React.ReactNode }) { return <html><body>{children}</body></html>; }`
+                }
+            ],
+            techStack: { framework: 'nextjs', styling: 'tailwind', backend: 'api-routes', database: 'supabase' }
+        }
+    });
 
     if (!editResult.success || !editResult.data) {
         fail('ChatEditAgent failed: ' + editResult.error);

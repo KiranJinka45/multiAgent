@@ -1,0 +1,199 @@
+'use client';
+
+import { LucideIcon, LayoutDashboard, ListTodo, CheckSquare, Settings, X, Github, MessageSquare, Pin } from 'lucide-react';
+import { Chat } from '@libs/contracts';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useState, useEffect, useCallback } from 'react';
+import { useSidebar } from '@context/SidebarContext';
+import { motion, AnimatePresence } from 'framer-motion';
+import { supabase } from '@/lib/supabase-browser';
+import { useRealtimeSubscription } from '@hooks/useRealtimeSubscription';
+import { chatService } from '@libs/utils';
+import type { User } from '@libs/supabase';
+
+type MobileMenuProps = {
+    isOpen: boolean;
+    onClose: () => void;
+    chats?: Chat[];
+};
+
+type MenuItemProps = {
+    icon: LucideIcon;
+    label: string;
+    href: string;
+    active?: boolean;
+    onClick?: () => void;
+};
+
+const MenuItem = ({ icon: Icon, label, href, active, onClick }: MenuItemProps) => (
+    <div className="w-full">
+        <Link
+            href={href}
+            onClick={onClick}
+            className={`w-full flex items-center gap-4 px-4 py-4 rounded-xl transition-all ${active
+                ? 'bg-blue-600/10 text-blue-500'
+                : 'text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200'
+                }`}
+        >
+            <Icon size={24} strokeWidth={1.5} />
+            <span className="font-medium text-lg">{label}</span>
+            {active && (
+                <div className="ml-auto w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]"></div>
+            )}
+        </Link>
+    </div>
+);
+
+export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
+    const pathname = usePathname();
+    const { setIsGithubModalOpen } = useSidebar();
+    const [chats, setChats] = useState<Chat[]>([]);
+    const [user, setUser] = useState<User | null>(null);
+    
+
+    const fetchChats = useCallback(async () => {
+        if (!user) return;
+        const data = await chatService.getChats();
+        setChats(data);
+    }, [user]);
+
+    useEffect(() => {
+        const getUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            setUser(user);
+        };
+        getUser();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+        if (user) {
+            fetchChats();
+        }
+    }, [user, fetchChats]);
+
+    useRealtimeSubscription('mobile-menu-changes', {
+        event: '*',
+        schema: 'public',
+        table: 'chats'
+    }, () => {
+        if (user) fetchChats();
+    });
+
+    return (
+        <AnimatePresence>
+            {isOpen && (
+                <>
+                    {/* Backdrop */}
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={onClose}
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] md:hidden"
+                    />
+
+                    {/* Menu Panel */}
+                    <motion.div
+                        initial={{ x: '100%' }}
+                        animate={{ x: 0 }}
+                        exit={{ x: '100%' }}
+                        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                        className="fixed right-0 top-0 bottom-0 w-80 bg-[#0a0a0a] border-l border-white/10 z-[70] p-6 flex flex-col md:hidden shadow-2xl shadow-black"
+                    >
+                        <div className="flex items-center justify-between mb-8">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-900/20">
+                                    <div className="w-3 h-3 bg-white rounded-full"></div>
+                                </div>
+                                <span className="font-bold text-lg tracking-tight text-white">MultiAgent</span>
+                            </div>
+                            <button
+                                onClick={onClose}
+                                className="p-2 rounded-full bg-neutral-900 text-neutral-400 hover:text-white transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <div className="mb-6">
+                            <button onClick={onClose} className="w-full flex items-center gap-3 px-3 py-3 rounded-xl border border-white/10 hover:bg-white/5 transition-colors text-left group">
+                                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors">
+                                    <span className="font-bold text-lg">+</span>
+                                </div>
+                                <div>
+                                    <span className="block text-sm font-medium text-white">New Mission</span>
+                                    <span className="block text-xs text-neutral-500">Start fresh orbit</span>
+                                </div>
+                            </button>
+                        </div>
+
+                        <div className="flex-1 overflow-y-auto space-y-6">
+                            <div>
+                                <h3 className="px-4 text-xs font-semibold text-neutral-500 mb-2 uppercase tracking-wider">Orbit Control</h3>
+                                <nav className="space-y-0.5">
+                                    <MenuItem icon={LayoutDashboard} label="Mission Center" href="/" active={pathname === '/'} onClick={onClose} />
+                                    <button
+                                        onClick={() => { setIsGithubModalOpen(true); onClose(); }}
+                                        className="w-full flex items-center gap-4 px-4 py-4 rounded-xl transition-all text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200"
+                                    >
+                                        <Github size={24} strokeWidth={1.5} />
+                                        <span className="font-medium text-lg">GitHub Integration</span>
+                                    </button>
+                                    <MenuItem icon={ListTodo} label="My Tasks" href="/my-tasks" active={pathname === '/my-tasks'} onClick={onClose} />
+                                    <MenuItem icon={CheckSquare} label="Completed" href="/completed" active={pathname === '/completed'} onClick={onClose} />
+                                </nav>
+                            </div>
+                            <div>
+                                <h3 className="px-4 text-xs font-semibold text-neutral-500 mb-2 uppercase tracking-wider">Recent Chats</h3>
+                                <nav className="space-y-0.5 max-h-48 overflow-y-auto">
+                                    {chats
+                                        .filter(chat => !chat.is_archived)
+                                        .sort((a, b) => {
+                                            if (a.is_pinned && !b.is_pinned) return -1;
+                                            if (!a.is_pinned && b.is_pinned) return 1;
+                                            return 0;
+                                        })
+                                        .slice(0, 5)
+                                        .map(chat => (
+                                            <Link
+                                                key={chat.id}
+                                                href={`/c/${chat.id}`}
+                                                onClick={onClose}
+                                                className="w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200"
+                                            >
+                                                <MessageSquare size={20} className="shrink-0" />
+                                                <div className="flex items-center gap-2 min-w-0 flex-1">
+                                                    {chat.is_pinned && <Pin size={12} className="text-primary fill-primary shrink-0" />}
+                                                    <span className="font-medium text-base truncate">{chat.title}</span>
+                                                </div>
+                                            </Link>
+                                        ))}
+                                    {chats.length === 0 && (
+                                        <div className="px-4 py-2 text-sm text-neutral-600 italic">No recent chats</div>
+                                    )}
+                                </nav>
+                            </div>
+                        </div>
+
+                        <div className="mt-auto pt-4 border-t border-white/5">
+                            <Link href="/login" onClick={onClose} className="flex items-center gap-3 px-4 py-3 w-full rounded-xl hover:bg-white/5 transition-colors text-left">
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-xs font-bold">
+                                    K
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <span className="block text-sm font-medium text-white truncate">Kiran</span>
+                                    <span className="block text-xs text-neutral-500 truncate">Sign In / Up &rarr;</span>
+                                </div>
+                                <Settings size={16} className="text-neutral-500" />
+                            </Link>
+                        </div>
+                    </motion.div>
+                </>
+            )}
+
+        </AnimatePresence>
+    );
+}
+
