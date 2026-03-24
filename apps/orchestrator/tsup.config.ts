@@ -7,7 +7,7 @@ export default defineConfig({
   sourcemap: true,
   clean: true,
   target: 'node20',
-  entry: ['index.ts'],
+  entry: ['src/index.ts'],
   external: [
     'bullmq',
     'ioredis',

@@ -1,11 +1,11 @@
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { createRouteHandlerClient } from '@libs/supabase';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { Octokit } from 'octokit';
-import { projectService } from '@services/project-service';
-import { RateLimiter } from '@config/rate-limiter';
-import { withObservability, ApiHandler } from '@config/api-wrapper';
-import logger from '@config/logger';
+import { projectService } from '@libs/utils';
+import { RateLimiter } from '@libs/utils';
+import { withObservability, ApiHandler } from '@libs/utils';
+import logger from '@libs/utils';
 
 async function handler(req: NextRequest) {
     try {

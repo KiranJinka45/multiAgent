@@ -4,10 +4,10 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, LayoutGrid, MessageSquare, Plus, Sparkles, Settings, Box, type LucideIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { projectService } from '@services/project-service';
-import { chatService } from '@services/chat-service';
-import { Project } from '@shared-types/project';
-import { Chat } from '@shared-types/chat';
+import { projectService } from '@libs/utils';
+import { chatService } from '@libs/utils';
+import { Project } from '@libs/contracts';
+import { Chat } from '@libs/contracts';
 
 interface ResultItem {
     icon: LucideIcon;

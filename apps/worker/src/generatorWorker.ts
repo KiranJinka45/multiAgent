@@ -2,7 +2,7 @@ import 'dotenv/config';
 
 import { Worker, Job } from 'bullmq';
 import { QUEUE_GENERATOR, validatorQueue } from '../lib/queue/agent-queues';
-import redis from '@libs/utils';
+import redis from '../shared/services/queue/redis-client';
 import logger from '../config/logger';
 import { PlannerAgent } from '../agents/planner-agent';
 import { TaskGraph, TaskExecutor } from '../api-gateway/services/task-engine';
@@ -11,7 +11,7 @@ import { DatabaseAgent } from '../agents/database-agent';
 import { BackendAgent } from '../agents/backend-agent';
 import { FrontendAgent } from '../agents/frontend-agent';
 import { VirtualFileSystem, CommitManager } from '../api-gateway/services/vfs';
-import { eventBus } from '../api/services/memory/event-bus';
+import { eventBus } from '../shared/services/event-bus';
 import { DistributedExecutionContext } from '../api-gateway/services/execution-context';
 import path from 'path';
 import fs from 'fs';

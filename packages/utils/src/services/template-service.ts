@@ -1,7 +1,7 @@
-﻿import fs from 'fs-extra';
+import fs from 'fs-extra';
 import path from 'path';
 import { AgentContext } from '@libs/contracts';
-import logger from '../config/logger';
+import logger from '../logger';
 
 export class TemplateService {
     private templatesDir = path.join(process.cwd(), 'templates');

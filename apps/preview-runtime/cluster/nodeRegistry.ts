@@ -16,9 +16,9 @@
 import { randomUUID } from 'crypto';
 import { DistributedLock } from './distributedLock';
 import os from 'os';
-import { nodeCpuUsage, nodeMemoryUsage } from '@config/metrics';
-import redis from '@queue/redis-client';
-import logger from '@config/logger';
+import { nodeCpuUsage, nodeMemoryUsage } from '@libs/utils';
+import redis from '@libs/utils';
+import logger from '@libs/utils';
 
 // ─── Config ────────────────────────────────────────────────────────────────
 

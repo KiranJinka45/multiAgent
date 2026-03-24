@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@libs/utils';
 import { projectMemory } from '@libs/utils';
-import { previewManager } from '@/runtime/preview-manager';
+import { previewManager } from '@libs/runtime/preview-manager';
 import logger from '@libs/utils';
 
 export const dynamic = 'force-dynamic';

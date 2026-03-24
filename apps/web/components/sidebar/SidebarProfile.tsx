@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LogOut, Settings, Sparkles, ListTodo, ChevronDown, Github } from 'lucide-react';
-import { useSidebar } from '@context/SidebarContext';
+import { useSidebar } from '@libs/context';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 // Auth helpers import (unused)

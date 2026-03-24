@@ -2,14 +2,16 @@ export interface AgentContext {
     executionId: string;
     projectId: string;
     userId: string;
-    vfs: any;
+    vfs: unknown;
     history: unknown[];
     metadata: Record<string, unknown>;
+    prompt?: string;
     fileCount?: number;
     errorDepth?: number;
     getExecutionId(): string;
     getProjectId(): string;
-    getVFS(): any;
-    atomicUpdate(updater: (ctx: any) => void): Promise<void>;
+    getVFS(): unknown;
+    get(): Promise<unknown>;
+    atomicUpdate(updater: (ctx: unknown) => void): Promise<void>;
     [key: string]: unknown;
 }

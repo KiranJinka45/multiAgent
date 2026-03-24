@@ -2,10 +2,12 @@ import '../scripts/pre-init';
 
 import { Worker, Job } from 'bullmq';
 import { QUEUE_SUPERVISOR, supervisorQueue } from '../lib/queue/agent-queues';
-import redis from '@libs/utils';
-import logger from '../config/logger';
-import { supervisorService } from '../api-gateway/services/supervisor';
-import { DistributedExecutionContext } from '../api-gateway/services/execution-context';
+import redis from '../shared/services/queue/redis-client';
+import { 
+    logger, 
+    supervisorService, 
+    DistributedExecutionContext 
+} from '@libs/utils/server';
 import { PreviewWatchdog } from '../runtime/watchdog';
 
 PreviewWatchdog.start();

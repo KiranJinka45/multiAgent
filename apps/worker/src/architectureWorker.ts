@@ -2,12 +2,12 @@ import 'dotenv/config';
 
 import { Worker, Job } from 'bullmq';
 import { QUEUE_ARCHITECTURE, generatorQueue } from '../lib/queue/agent-queues';
-import redis from '@libs/utils';
+import redis from '../shared/services/queue/redis-client';
 import logger from '../config/logger';
 import { TemplateEngine } from '../api-gateway/services/template-engine';
 import { CustomizerAgent } from '../agents/customizer-agent';
 import { VirtualFileSystem, CommitManager } from '../api-gateway/services/vfs';
-import { eventBus } from '../api/services/memory/event-bus';
+import { eventBus } from '../shared/services/event-bus';
 import { DistributedExecutionContext } from '../api-gateway/services/execution-context';
 import path from 'path';
 import * as fs from 'fs-extra';

@@ -2,10 +2,10 @@ import '../scripts/pre-init';
 
 import { Worker, Job } from 'bullmq';
 import { QUEUE_DOCKER, deployQueue } from '../lib/queue/agent-queues';
-import redis from '@libs/utils';
+import redis from '../shared/services/queue/redis-client';
 import logger from '../config/logger';
 import { DockerDeployer } from '../api-gateway/services/devops/docker-deployer';
-import { eventBus } from '../api/services/memory/event-bus';
+import { eventBus } from '../shared/services/event-bus';
 import { DistributedExecutionContext } from '../api-gateway/services/execution-context';
 import { IS_PRODUCTION } from '../config/build-mode';
 import path from 'path';

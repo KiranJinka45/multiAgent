@@ -1,4 +1,4 @@
-﻿import archiver from 'archiver';
+import archiver from 'archiver';
 import fs from 'fs-extra';
 import path from 'path';
 import logger from './config/logger';

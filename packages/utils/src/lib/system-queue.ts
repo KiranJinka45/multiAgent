@@ -1,4 +1,4 @@
-﻿import { Queue, Worker, ConnectionOptions } from 'bullmq';
+import { Queue, Worker, ConnectionOptions } from 'bullmq';
 import redis from '../services/redis';
 import logger from '../config/logger';
 

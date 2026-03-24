@@ -1,4 +1,4 @@
-﻿import logger from './logger';
+import logger from './logger';
 
 export enum CircuitState {
     CLOSED, // System is healthy

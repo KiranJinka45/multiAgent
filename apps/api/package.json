@@ -3,13 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "tsup src/index.ts --clean",
-    "dev": "tsup src/index.ts --watch",
-    "start": "node dist/index.js"
+    "build": "tsup",
+    "dev": "tsup --watch --onSuccess \"node dist/index.js\"",
+    "start": "node dist/index.js",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@kubernetes/client-node": "^0.22.0",
+    "@libs/db": "workspace:*",
     "@libs/memory": "workspace:*",
+    "@libs/observability": "workspace:*",
     "@libs/shared-services": "workspace:*",
     "@libs/supabase": "workspace:*",
     "@libs/utils": "workspace:*",
@@ -41,9 +45,11 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
-    "@types/node": "^20",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/node": "^22.13.9",
     "tsup": "^8.5.1",
-    "typescript": "^5"
+    "typescript": "^5.9.3"
   }
 }

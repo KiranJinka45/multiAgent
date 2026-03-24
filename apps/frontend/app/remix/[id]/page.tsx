@@ -2,7 +2,7 @@
 
 import { useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { projectService } from '@services/project-service';
+import { projectService } from '@libs/utils';
 import { toast } from 'sonner';
 
 function RemixContent({ params }: { params: { id: string } }) {

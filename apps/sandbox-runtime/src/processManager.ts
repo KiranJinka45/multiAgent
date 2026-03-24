@@ -9,7 +9,8 @@
  */
 
 import { spawn, ChildProcess } from 'child_process';
-import logger from '@libs/utils';
+import { logger } from '@libs/utils/server';
+import { RuntimeGuard } from './runtimeGuard';
 
 export type ProcessStatus = 'IDLE' | 'STARTING' | 'RUNNING' | 'FAILED' | 'STOPPED';
 
@@ -39,13 +40,7 @@ export const ProcessManager = {
     ): Promise<{ pid: number; cwd: string }> {
         logger.info({ projectId, cwd, command, args }, '[ProcessManager] Spawning process');
 
-        const child = spawn(command, args, {
-            cwd,
-            env: { ...process.env, ...env },
-            detached: false,
-            shell: true,
-            stdio: ['ignore', 'pipe', 'pipe']
-        });
+        const child = spawn(command, args, RuntimeGuard.safeSpawnOptions(cwd, env as Record<string, string>));
 
         const managed: ManagedProcess = {
             pid: child.pid!,

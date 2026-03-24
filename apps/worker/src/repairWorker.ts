@@ -3,12 +3,12 @@ import path from 'path';
 
 import { Worker, Job } from 'bullmq';
 import { QUEUE_REPAIR, validatorQueue } from '../lib/queue/agent-queues';
-import redis from '@libs/utils';
+import redis from '../shared/services/queue/redis-client';
 import logger from '../config/logger';
 import { RepairAgent } from '../agents/repair-agent';
 import { DistributedExecutionContext } from '../api-gateway/services/execution-context';
 import { VirtualFileSystem, CommitManager } from '../api-gateway/services/vfs';
-import { eventBus } from '../api/services/memory/event-bus';
+import { eventBus } from '../shared/services/event-bus';
 
 import fs from 'fs';
 const logPath = path.join(process.cwd(), 'repair_direct.log');

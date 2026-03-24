@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 };
 
 import { Toaster } from 'sonner';
-import { SidebarProvider } from '@context/SidebarContext';
+import { SidebarProvider } from '@libs/context';
 import CommandPalette from '@components/CommandPalette';
 import FeedbackButton from '@components/FeedbackButton';
 

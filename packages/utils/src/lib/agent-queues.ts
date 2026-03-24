@@ -1,4 +1,4 @@
-﻿import { Queue, QueueEvents, DefaultJobOptions, ConnectionOptions } from 'bullmq';
+import { Queue, QueueEvents, DefaultJobOptions, ConnectionOptions } from 'bullmq';
 import redis from '../services/redis';
 import logger from '../config/logger';
 
@@ -20,11 +20,15 @@ const defaultOptions: DefaultJobOptions = {
         type: 'exponential',
         delay: 5000,
     },
-    removeOnComplete: false,
-    removeOnFail: {
-        age: 24 * 3600, // keep for 24 hours
+    removeOnComplete: {
+        age: 3600, // Keep completed for 1 hour
+        count: 100
     },
+    removeOnFail: false, // Don't remove on fail so we can dead-letter it
 };
+
+export const QUEUE_DLQ = 'dead-letter-queue';
+export const deadLetterQueue = new Queue(QUEUE_DLQ, { connection });
 
 // Isolated stage queues
 export const plannerQueue = new Queue(QUEUE_PLANNER, { connection, defaultJobOptions: defaultOptions });

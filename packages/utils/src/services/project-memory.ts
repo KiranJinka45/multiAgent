@@ -1,9 +1,9 @@
-﻿import { supabaseAdmin } from './supabase-admin';
-import logger from '../config/logger';
+import { supabaseAdmin } from './supabase-admin';
+import logger from '../logger';
 import { CodeChunker } from './memory/code-chunker';
 import { EmbeddingsEngine } from './memory/embeddings-engine';
 import { VectorStore } from './memory/vector-store';
-import { redis } from './redis';
+import { redis } from './redis/index';
 import { createHash } from 'crypto';
 import { eventBus } from './event-bus';
 
@@ -121,7 +121,7 @@ class ProjectMemoryService {
         await this.persistMemory(memory);
         this.memoryCache.set(projectId, memory);
 
-        // â”€â”€ Global AI Memory: Index Code Chunks â”€â”€
+        // ── Global AI Memory: Index Code Chunks ──
         try {
             const chunks = CodeChunker.chunkProject(techStack, files);
             const contents = chunks.map(c => c.content);
@@ -333,7 +333,7 @@ Recent Edits: ${memory.editHistory.slice(-5).map(e => `${e.action} ${e.filePath}
 File Map: ${memory.fileManifest.map(f => `${f.path} [${f.purpose}]`).join(', ')}`;
     }
 
-    // â”€â”€ Private Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Private Helpers ──────────────────────────────────────────────
 
     private tableAvailable: boolean | null = null; // null = not yet checked
 

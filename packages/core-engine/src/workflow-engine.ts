@@ -5,10 +5,8 @@
  */
 
 import { AgentRequest, AgentResponse, AgentContext } from '@libs/contracts';
-import { agentRegistry } from '../../apps/api-gateway/services/task-engine/agent-registry';
-import { eventBus } from '@shared/services/event-bus';
-import { redis } from '@libs/utils';
-import logger from '@libs/utils';
+import { agentRegistry } from '@libs/agents';
+import { projectMemory, eventBus, logger } from '@libs/utils/server';
 
 export interface WorkflowTask {
     id: string;

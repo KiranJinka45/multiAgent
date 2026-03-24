@@ -1,4 +1,4 @@
-﻿import { z } from 'zod';
+import { z } from 'zod';
 
 export const ProjectGenerationSchema = z.object({
     projectId: z.string().min(1, { message: "Project ID is required" }),
@@ -23,4 +23,13 @@ export const StripeWebhookSchema = z.object({
     data: z.object({
         object: z.any(),
     }),
+});
+
+export const ChatRequestSchema = z.object({
+    message: z.string().min(1).max(10000),
+    model: z.enum(['Fast', 'Thinking', 'Pro']).optional().default('Fast'),
+});
+
+export const TaskCreateSchema = z.object({
+    title: z.string().min(1).max(500),
 });

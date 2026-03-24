@@ -9,7 +9,7 @@ export * from './env';
 export * from './governance';
 export * from './lock';
 export * from './logger';
-export * from './metrics';
+// export * from './metrics'; (Server-only, avoid leaking to browser)
 export * from './orchestrator-lock';
 export * from './pusher';
 export * from './rate-limiter';

@@ -37,7 +37,7 @@
       "@lib/*": ["../../packages/utils/src/lib/*"],
       "@agents/*": ["../../packages/agents/src/*"],
       "@workers/*": ["../../apps/worker/src/*"],
-      "@runtime/*": ["../../apps/sandbox-runtime/src/*"],
+      "@libs/runtime/*": ["../../apps/sandbox-runtime/src/*"],
       "@registry/*": ["../../packages/registry/src/*"],
       "@build-engine/*": ["../../packages/build-engine/src/*"],
       "@validator/*": ["../../packages/validator/src/*"],

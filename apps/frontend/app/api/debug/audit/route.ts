@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@libs/supabase';
 import Redis from 'ioredis';
 import {
     plannerQueue, architectureQueue, generatorQueue,
     validatorQueue, dockerQueue, deployQueue,
     supervisorQueue, repairQueue, metaQueue
-} from '@lib/agent-queues';
+} from '@libs/utils';
 
 export async function GET() {
     const results: Record<string, unknown> = {

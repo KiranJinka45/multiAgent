@@ -3,12 +3,12 @@ export interface Project {
     user_id: string;
     name: string;
     description?: string;
-    status: 'draft' | 'running' | 'completed' | 'failed' | 'cancelled';
+    status: 'draft' | 'running' | 'completed' | 'failed' | 'cancelled' | 'brainstorming' | string;
     project_type?: 'web_app' | 'application' | 'landing_page' | 'other' | string;
     created_at: string;
     updated_at: string;
     is_public?: boolean;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
     preview_url?: string;
     thumbnail_url?: string;
 }
@@ -22,3 +22,5 @@ export interface ProjectFile {
     created_at: string;
     updated_at: string;
 }
+
+export type ProjectUpdate = Partial<Project>;

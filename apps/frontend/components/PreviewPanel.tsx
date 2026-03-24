@@ -15,15 +15,16 @@ import {
     Copy,
     Check
 } from 'lucide-react';
-import { BuildUpdate } from '@shared-types/build';
+import { BuildUpdate } from '@libs/contracts';
 
 interface PreviewPanelProps {
     buildProgress: BuildUpdate | null;
     files: { path: string }[];
     onRedeploy: () => void;
+    onDeploy?: () => void;
 }
 
-const PreviewPanel: React.FC<PreviewPanelProps> = ({ buildProgress, onRedeploy }) => {
+const PreviewPanel: React.FC<PreviewPanelProps> = ({ buildProgress, onRedeploy, onDeploy }) => {
     const [previewSize, setPreviewSize] = useState<'mobile' | 'desktop'>('desktop');
     const [showConfetti, setShowConfetti] = useState(false);
     const [confetti, setConfetti] = useState<{ left: string, duration: number, color: string }[]>([]);
@@ -32,6 +33,7 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({ buildProgress, onRedeploy }
 
     const isCompleted = buildProgress?.status === 'completed';
     const isExecuting = buildProgress?.status === 'executing';
+    const isDeploying = buildProgress?.status === 'deploying';
     const previewUrl = buildProgress?.previewUrl ?? null;
 
     // Confetti trigger on completion
@@ -273,6 +275,14 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({ buildProgress, onRedeploy }
                                         <ExternalLink size={13} /> Open Live Version
                                     </a>
                                 )}
+                                <button
+                                    onClick={onDeploy}
+                                    disabled={isDeploying}
+                                    className={`flex-1 py-3 font-black rounded-xl hover:opacity-90 transition-all shadow-[0_10px_30px_-10px_rgba(139,92,246,0.5)] flex items-center justify-center gap-2 uppercase tracking-widest text-[10px] ${isDeploying ? 'bg-violet-600/50 cursor-not-allowed' : 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white'}`}
+                                >
+                                    <Rocket size={13} className={isDeploying ? 'animate-pulse' : ''} /> 
+                                    {isDeploying ? 'Deploying...' : 'Deploy to Production'}
+                                </button>
                             </div>
                         </div>
                     </motion.div>

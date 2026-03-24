@@ -1,7 +1,9 @@
-﻿import { redis } from './redis';
+import { redis } from './redis';
 import { Mission, MissionUpdate } from '@libs/contracts';
-import logger from '../config/logger';
+import logger from '../logger';
 import { eventBus } from './event-bus';
+import { Queue } from 'bullmq';
+import { DEPLOYMENT_QUEUE } from './redis';
 
 class MissionController {
     private PREFIX = 'mission:';
@@ -111,13 +113,31 @@ class MissionController {
             'repairing': ['assembling', 'failed'],
             'assembling': ['deploying', 'failed'],
             'deploying': ['previewing', 'failed'],
-            'previewing': ['complete', 'failed'],
-            'complete': [], 
+            'previewing': ['complete', 'deploying', 'failed'],
+            'complete': ['deploying'], 
             'failed': ['init']
         };
 
         const allowedNext = allowed[current] || [];
         return allowedNext.includes(next);
+    }
+    
+    async triggerDeployment(missionId: string): Promise<void> {
+        const mission = await this.getMission(missionId);
+        if (!mission) throw new Error('Mission not found');
+        
+        // Push to deployment queue
+        const deployQueue = new Queue(DEPLOYMENT_QUEUE, { connection: redis });
+        await deployQueue.add('deploy-manual', {
+            projectId: mission.projectId,
+            executionId: mission.id,
+            sandboxDir: mission.metadata.sandboxDir, // Ensure this exists from build stage
+            userId: mission.userId
+        });
+        
+        // Update status
+        await this.updateMission(missionId, { status: 'deploying' });
+        logger.info({ missionId, projectId: mission.projectId }, '[MissionController] Manual deployment triggered');
     }
 }
 

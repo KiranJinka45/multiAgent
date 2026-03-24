@@ -8,8 +8,8 @@
  * Supabase `projects.runtime_status` is updated asynchronously for persistence.
  */
 
-import redis from '@libs/utils';
-import logger from '@libs/utils';
+import { redis, logger } from '@libs/utils/server';
+
 import crypto from 'crypto';
 
 export type RuntimeStatus = 'PROVISIONED' | 'STARTING' | 'RUNNING' | 'FAILED' | 'STOPPED';
@@ -21,6 +21,7 @@ export interface RuntimeRecord {
     userId?: string;                // For per-user capacity tracking
     status: RuntimeStatus;
     previewUrl: string | null;
+    port?: number;                  // Primary port for health checks (legacy/bridge support)
     ports: number[];
     pids: number[];
     startedAt: string;

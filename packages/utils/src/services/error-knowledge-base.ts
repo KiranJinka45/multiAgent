@@ -1,6 +1,6 @@
-﻿import { redis } from './redis';
+import { redis } from './redis';
 import crypto from 'crypto';
-import logger from '../config/logger';
+import logger from '../logger';
 
 export interface ErrorSolution {
     explanation: string;

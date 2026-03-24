@@ -1,13 +1,9 @@
 import { defineConfig } from 'tsup';
+import { baseConfig } from '../../tsup.config.base';
 
 export default defineConfig({
-  entry: ['src/index.ts'],
-  format: ['cjs', 'esm'],
-  dts: false,
-  splitting: false,
-  sourcemap: true,
-  clean: true,
-  target: 'node20',
+  ...baseConfig,
+  entry: ['src/index.ts', 'src/server.ts'],
   external: [
     'bullmq',
     'ioredis',
@@ -25,6 +21,10 @@ export default defineConfig({
     'socket.io-client',
     '@libs/supabase',
     '@libs/contracts',
+    '@libs/registry',
+    '@libs/validator',
+    '@libs/observability',
+    '@libs/db',
     '@temporalio/client',
     'axios'
   ],

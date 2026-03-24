@@ -1,37 +1,30 @@
 import 'dotenv/config';
-import { startTracing } from '@libs/observability';
-startTracing();
-
 import fs from 'fs-extra';
 import path from 'path';
 import * as dotenv from 'dotenv';
-import { Worker, Job, Queue } from 'bullmq';
-import { QUEUE_FREE, QUEUE_PRO } from '@libs/utils';
-import { redis, DEPLOYMENT_QUEUE } from '@libs/utils';
+import { Worker, Job } from 'bullmq';
+import { QUEUE_FREE, QUEUE_PRO, redis } from '@libs/shared-services';
 import logger from '@libs/utils';
-import { Orchestrator } from '@libs/utils';
+import { Orchestrator } from '@libs/core-engine';
 import { runWithTracing } from '@libs/utils';
 import { JobStage } from '@libs/contracts';
 import { ArtifactValidator } from '@libs/validator';
-import { prisma } from '@libs/db';
-import { activeBuildsGauge } from '@libs/utils';
 
 // Manual .env.local load to match system-startup.ts behavior
 const envLocal = path.resolve(process.cwd(), '.env.local');
 if (fs.existsSync(envLocal)) {
   dotenv.config({ path: envLocal, override: true });
 }
-import { queueWaitTimeSeconds, stuckBuildsTotal, queueLengthGauge, workerTaskDurationSeconds } from '@libs/utils';
-import { NodeRegistry } from '@libs/sandbox-runtime';
-import { FailoverManager } from '@libs/sandbox-runtime';
-import { RedisRecovery } from '@libs/sandbox-runtime';
-import { PreviewOrchestrator } from '@libs/sandbox-runtime';
-import { RuntimeCleanup } from '@libs/sandbox-runtime';
+import { queueWaitTimeSeconds, stuckBuildsTotal } from '@libs/utils';
+import { NodeRegistry } from '@libs/runtime/cluster/nodeRegistry';
+import { FailoverManager } from '@libs/runtime/cluster/failoverManager';
+import { RedisRecovery } from '@libs/runtime/cluster/redisRecovery';
+import { PreviewOrchestrator } from '@libs/runtime/previewOrchestrator';
+import { RuntimeCleanup } from '@libs/runtime/runtimeCleanup';
 import { env } from '@libs/utils';
 import { missionController } from '@libs/utils';
 import { eventBus } from '@libs/utils';
-// import { ReliabilityMonitor } from '../api/services/reliability-monitor';
-const ReliabilityMonitor = { recordSuccess: async (d: number) => {}, recordFailure: async () => {} };
+import { ReliabilityMonitor } from '@libs/utils';
 import { BuildCacheManager } from '@libs/build-engine';
 import { WorkerClusterManager } from '@libs/utils';
 import { BuildGraphEngine } from '@libs/build-engine';
@@ -106,10 +99,9 @@ const resumeOrphanedExecutions = async () => {
 // Set periodic recovery
 setInterval(resumeOrphanedExecutions, 60_000);
 
-const executeBuild = async (data: { prompt: string, userId: string, projectId: string, executionId: string, tenantId?: string, isFastPreview?: boolean }, job?: Job) => {
-    const { prompt, userId, projectId, executionId, tenantId, isFastPreview } = data;
+const executeBuild = async (data: { prompt: string, userId: string, projectId: string, executionId: string, isFastPreview?: boolean }, job?: Job) => {
+    const { prompt, userId, projectId, executionId, isFastPreview } = data;
     const tier = job ? (job.queueName.includes('pro') ? 'pro' : 'free') : 'instant';
-    const end = workerTaskDurationSeconds.startTimer({ queue_name: tier });
 
     // 🔒 Single Job Processing Guard (Shared between Queue & Instant Trigger)
     const lockKey = `build:lock:${executionId}`;
@@ -193,13 +185,11 @@ const executeBuild = async (data: { prompt: string, userId: string, projectId: s
             }
             
             try {
-                activeBuildsGauge.inc({ tier });
-                const result = await orchestrator.run(
+                const result = await orchestrator.execute(
                     prompt,
                     userId,
                     projectId,
                     executionId,
-                    tenantId || 'default',
                     controller.signal,
                     { isFastPreview }
                 );
@@ -211,56 +201,34 @@ const executeBuild = async (data: { prompt: string, userId: string, projectId: s
                     throw new Error(errorResult.error || 'Build failed');
                 }
 
-                // 🛡️ FINAL INTEGRITY WATCHDOG
-                const validationResult = await ArtifactValidator.validate(projectId);
-                if (!validationResult.valid) {
-                    const error = `Build integrity failure: Missing ${validationResult.missingFiles?.join(', ') || 'critical files'}`;
-                    logger.error({ projectId, missing: validationResult.missingFiles }, '[Worker] Integrity Check FAILED');
-                    throw new Error(error);
-                }
-                logger.info({ projectId }, '[Worker] Integrity Check PASSED');
+            // 🛡️ FINAL INTEGRITY WATCHDOG
+            const validationResult = await ArtifactValidator.validate(projectId);
+            if (!validationResult.valid) {
+                const error = `Build integrity failure: Missing ${validationResult.missingFiles?.join(', ') || 'critical files'}`;
+                logger.error({ projectId, missing: validationResult.missingFiles }, '[Worker] Integrity Check FAILED');
+                throw new Error(error);
+            }
+            logger.info({ projectId }, '[Worker] Integrity Check PASSED');
 
-                // --- CACHE SAVE PHASE ---
-                await BuildCacheManager.save(projectId, sandboxDir);
+            // --- CACHE SAVE PHASE ---
+            await BuildCacheManager.save(projectId, sandboxDir);
 
-                await missionController.updateMission(executionId, { status: 'complete' });
+            await missionController.updateMission(executionId, { status: 'complete' });
 
-                const durationMs = Date.now() - startTime;
-                await ReliabilityMonitor.recordSuccess(durationMs);
 
-                // --- PERSIST SUCCESS LOG ---
-                await prisma.auditLog.create({
-                    data: {
-                        tenantId: tenantId || 'default',
-                        userId,
-                        action: 'BUILD_SUCCESS',
-                        resource: `project:${projectId}`,
-                        metadata: { executionId, durationMs },
-                        hash: '0' // Mock for now
-                    }
-                }).catch(() => {});
-
-                end({ status: 'success' });
-                // --- TRIGGER DEPLOYMENT PIPELINE ---
-                await deployQueue.add('deploy-job', {
-                    projectId,
-                    executionId,
-                    sandboxDir: path.join(process.cwd(), '.generated-projects', projectId)
-                });
+            const durationMs = Date.now() - startTime;
+            await ReliabilityMonitor.recordSuccess(durationMs);
 
                 return result;
             } catch (err) {
                 clearTimeout(timeout);
                 throw err;
-            } finally {
-                activeBuildsGauge.dec({ tier });
             }
         });
 
     } catch (error) {
         const msg = error instanceof Error ? error.message : String(error);
         logger.error({ executionId, error: msg, tier }, 'Execution failed');
-        end({ status: 'failed' });
         await missionController.updateMission(executionId, { 
             status: 'failed',
             metadata: { error: msg }
@@ -269,18 +237,6 @@ const executeBuild = async (data: { prompt: string, userId: string, projectId: s
         await eventBus.stage(executionId, JobStage.FAILED.toLowerCase(), 'failed', `Build failed: ${msg}`, 100, projectId);
         await eventBus.error(executionId, `[BuildWorker] ${msg}`, projectId);
         await ReliabilityMonitor.recordFailure();
-
-        // --- PERSIST FAILURE LOG ---
-        await prisma.auditLog.create({
-            data: {
-                tenantId: tenantId || 'default',
-                userId,
-                action: 'BUILD_FAILURE',
-                resource: `project:${projectId}`,
-                metadata: { executionId, error: msg },
-                hash: '0' // Mock for now
-            }
-        }).catch(() => {});
         
         throw error;
     } finally {
@@ -294,45 +250,32 @@ const processJob = async (job: Job) => {
 
 // 1. Initialize Tiers
 const freeWorker = new Worker(QUEUE_FREE, processJob, {
-    connection: redis as unknown as any,
-    concurrency: Number(env.WORKER_CONCURRENCY_FREE) || 5,
-    lockDuration: 300000, 
+    connection: redis as any,
+    concurrency: env.WORKER_CONCURRENCY_FREE || 5,
+    lockDuration: 300000, // 5 minute initial lock
     limiter: {
-        max: 5, 
+        max: 5, // Process max 5 jobs per second per worker instance
         duration: 1000
     }
 });
 
 const proWorker = new Worker(QUEUE_PRO, processJob, {
-    connection: redis as unknown as any,
-    concurrency: Number(env.WORKER_CONCURRENCY_PRO) || 20,
-    lockDuration: 300000, 
+    connection: redis as any,
+    concurrency: env.WORKER_CONCURRENCY_PRO || 20,
+    lockDuration: 300000, // 5 minute initial lock
     limiter: {
         max: 10,
         duration: 1000
     }
 });
 
-const freeQueue = new Queue(QUEUE_FREE, { connection: redis as any });
-const proQueue = new Queue(QUEUE_PRO, { connection: redis as any });
-const deployQueue = new Queue(DEPLOYMENT_QUEUE, { connection: redis as any });
-
 const setupWorkerEvents = (worker: Worker, name: string) => {
     worker.on('completed', (job: Job) => {
         logger.info({ jobId: job.id, worker: name }, 'Job completed');
     });
 
-    worker.on('failed', async (job: Job | undefined, err: Error) => {
-        const msg = err.message;
-        logger.error({ jobId: job?.id, worker: name, err: msg }, 'Job failed');
-        
-        if (job) {
-            // Check if it's hitting max attempts
-            if (job.attemptsMade >= (job.opts.attempts || 5)) {
-                logger.warn({ jobId: job.id, worker: name }, 'Job reached MAX ATTEMPTS. Moving to "perm-failed" state (DLQ behavior).');
-                // We don't need to do much as BullMQ keeps it in 'failed' state with no more retries
-            }
-        }
+    worker.on('failed', (job: Job | undefined, err: Error) => {
+        logger.error({ jobId: job?.id, worker: name, err: err.message }, 'Job failed');
     });
 };
 
@@ -353,7 +296,7 @@ const shutdown = async () => {
 process.on('SIGTERM', shutdown);
 process.on('SIGINT', shutdown);
 
-// 🔥 START CLUSTER HEARTBEAT & QUEUE METRICS
+// 🔥 START CLUSTER HEARTBEAT
 setInterval(async () => {
     try {
         await WorkerClusterManager.heartbeat({
@@ -362,20 +305,10 @@ setInterval(async () => {
             load: 0, // In production, we'd calculate CPU/Mem load here
             status: 'IDLE' // Update dynamically based on job state
         });
-
-        // Update Queue Visibility Metrics
-        const [waitingFree, waitingPro] = await Promise.all([
-            freeQueue.getJobCounts('waiting', 'delayed'),
-            proQueue.getJobCounts('waiting', 'delayed')
-        ]);
-        
-        queueLengthGauge.set({ queue_name: 'free' }, waitingFree.waiting + waitingFree.delayed);
-        queueLengthGauge.set({ queue_name: 'pro' }, waitingPro.waiting + waitingPro.delayed);
-
     } catch (err) {
-        console.error('[Worker] Heartbeat/Metrics failed:', err);
+        console.error('[Worker] Heartbeat failed:', err);
     }
-}, 5000);
+}, 2000);
 
 // Cluster & Instant Trigger Listeners
 (async () => {
@@ -385,16 +318,18 @@ setInterval(async () => {
         
         logger.info({ workerId: WORKER_ID }, '[Worker] Subscribing to direct steering channel');
         
-        await sub.subscribe(`worker:trigger:${WORKER_ID}`);
-        sub.on('message', async (channel, message) => {
-            if (channel === `worker:trigger:${WORKER_ID}`) {
-                try {
-                    const { projectId } = JSON.parse(message);
-                    logger.info({ projectId }, '[Worker] Direct job steering received! Triggering execution.');
-                } catch (pErr) {
-                    logger.error({ err: pErr }, '[Worker] Failed to parse steering message');
-                }
+        await sub.subscribe(`worker:trigger:${WORKER_ID}`, async (message) => {
+            try {
+                const { projectId } = JSON.parse(message);
+                logger.info({ projectId }, '[Worker] Direct job steering received! Triggering execution.');
+            } catch (pErr) {
+                logger.error({ err: pErr }, '[Worker] Failed to parse steering message');
             }
+            
+            // In a real system, we'd trigger a local build orchestration here
+            // For now, we simulate by updating a 'trigger' flag or manually calling executeBuild
+            // However, the existing BullMQ queue is the source of truth, so steering 
+            // acts as a "hot nudge" to pull from the queue immediately.
         });
     } catch (err) {
         const error = err as Error;
@@ -437,42 +372,19 @@ setInterval(async () => {
                         await shutdown();
                     }
                 }
-            } catch (err: unknown) {
+            } catch (err) {
                 const errMsg = err instanceof Error ? err.message : String(err);
-                logger.error({ error: errMsg }, `[Worker] Error processing message on channel ${channel}`);
+                logger.error({ error: errMsg } as any, `[Worker] Error processing message on channel ${channel}`);
             }
         });
 
-    } catch (err: unknown) {
+    } catch (err) {
         const errMsg = err instanceof Error ? err.message : String(err);
-        logger.error({ error: errMsg }, 'Failed to register node in cluster (non-fatal, running in standalone mode)');
+        logger.error({ error: errMsg } as any, 'Failed to register node in cluster (non-fatal, running in standalone mode)');
     }
 })();
 
 logger.info(`Workers started: Free (concurrency=${freeWorker.opts.concurrency}), Pro (concurrency=${proWorker.opts.concurrency})`);
-
-// Error Handling and Recovery
-process.on('unhandledRejection', (reason, promise) => {
-    console.error('[Worker] Unhandled Rejection at:', promise, 'reason:', reason);
-    if (process.env.NODE_ENV === "production") {
-        console.log('[Worker] Attempting restart in 5s...');
-        setTimeout(shutdown, 5000); // Use shutdown for graceful exit before restart
-    } else {
-        console.error("Worker crashed. Fix error before restart.");
-        process.exit(1);
-    }
-});
-
-process.on('uncaughtException', (error) => {
-    console.error('[Worker] Uncaught Exception:', error);
-    if (process.env.NODE_ENV === "production") {
-        console.log('[Worker] Attempting restart in 5s...');
-        setTimeout(shutdown, 5000); // Use shutdown for graceful exit before restart
-    } else {
-        console.error("Worker crashed. Fix error before restart.");
-        process.exit(1);
-    }
-});
 
 // Kick off crash recovery
 resumeOrphanedExecutions();

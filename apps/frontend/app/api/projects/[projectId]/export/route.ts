@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs-extra';
 import path from 'path';
 import JSZip from 'jszip';
-import logger from '@config/logger';
+import { logger } from '@libs/utils/src/server';
 
 export async function GET(
   request: NextRequest,

@@ -1,5 +1,5 @@
-﻿/**
- * lib/pusher.ts â€” Legacy compatibility stub.
+/**
+ * lib/pusher.ts — Legacy compatibility stub.
  *
  * The task-orchestrator used to call `pusher.triggerBuildUpdate()` but the
  * module never existed, causing all build events to be silently swallowed.

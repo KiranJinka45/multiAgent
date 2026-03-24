@@ -6,27 +6,21 @@
   "module": "./dist/index.mjs",
   "types": "./src/index.ts",
   "scripts": {
-    "build": "tsup src/index.ts",
-    "dev": "tsup src/index.ts --watch"
-  },
-  "exports": {
-    ".": {
-      "types": "./src/index.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
-    },
-    "./*": {
-       "types": "./dist/*.d.ts",
-       "import": "./dist/*.mjs",
-       "require": "./dist/*.js"
-    }
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@libs/utils": "workspace:*",
     "@opentelemetry/auto-instrumentations-node": "latest",
     "@opentelemetry/exporter-otlp-http": "latest",
+    "@opentelemetry/sdk-trace-base": "latest",
+    "@opentelemetry/sdk-trace-node": "latest",
     "@opentelemetry/resources": "latest",
     "@opentelemetry/sdk-node": "latest",
+    "@supabase/auth-helpers-nextjs": "^0.10.0",
+    "pino": "^10.3.1",
     "@opentelemetry/semantic-conventions": "latest",
     "@opentelemetry/api": "latest"
   },
@@ -34,5 +28,18 @@
     "typescript": "^5.0.0",
     "tsup": "^8.0.0",
     "@types/node": "^20.0.0"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./*": {
+      "types": "./src/*.ts",
+      "import": "./dist/*.js",
+      "default": "./dist/*.js"
+    }
   }
 }

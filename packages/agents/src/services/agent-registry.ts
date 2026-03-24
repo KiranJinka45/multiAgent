@@ -69,6 +69,8 @@ import { SecurityAgent } from '../index';
 import { MonitoringAgent } from '../index';
 import { DebugAgent } from '../index';
 import { JudgeAgent } from '../index';
+import { SaaSMonetizationAgent } from '../index';
+import { SandboxEditorAgent } from '../index';
 
 // Global registry export
 export const agentRegistry = new AgentRegistry();
@@ -85,3 +87,5 @@ agentRegistry.register('debug', new DebugAgent());
 agentRegistry.register('judge', new JudgeAgent());
 agentRegistry.register('test', new TestingAgent());
 agentRegistry.register('validator', new ValidatorAgent());
+agentRegistry.register('monetization', new SaaSMonetizationAgent());
+agentRegistry.register('sandbox-editor', new SandboxEditorAgent());

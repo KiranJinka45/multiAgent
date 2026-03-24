@@ -3,21 +3,29 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "tsup src/index.ts --clean",
-    "dev": "tsup src/index.ts --watch",
-    "start": "node dist/index.js"
+    "build": "tsup",
+    "dev": "tsup --watch --onSuccess \"node dist/index.js\"",
+    "crsi:init": "tsx src/crsi-init.ts",
+    "start": "node dist/index.js",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@kubernetes/client-node": "^0.22.0",
     "@libs/agents": "workspace:*",
     "@libs/ai": "workspace:*",
     "@libs/brain": "workspace:*",
+    "@libs/core-engine": "workspace:*",
+    "@libs/runtime": "workspace:*",
     "@libs/build-engine": "workspace:*",
     "@libs/db": "workspace:*",
     "@libs/sandbox-runtime": "workspace:*",
     "@libs/shared-services": "workspace:*",
     "@libs/supabase": "workspace:*",
     "@libs/utils": "workspace:*",
+    "@libs/observability": "workspace:*",
+    "@libs/contracts": "workspace:*",
+    "@libs/validator": "workspace:*",
     "@supabase/supabase-js": "^2.43.2",
     "@temporalio/client": "^1.15.0",
     "@temporalio/worker": "^1.15.0",
@@ -30,7 +38,7 @@
     "fs-extra": "^11.3.4",
     "ioredis": "^5.10.1",
     "jsonwebtoken": "^9.0.3",
-    "next": "^16.2.0",
+    "next": "14.2.13",
     "pino": "^10.3.1",
     "prom-client": "^15.1.0",
     "react": "^19.2.4",
@@ -42,8 +50,11 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@types/node": "^20",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/node": "^22.13.9",
     "tsup": "^8.5.1",
-    "typescript": "^5"
+    "typescript": "^5.9.3"
   }
 }

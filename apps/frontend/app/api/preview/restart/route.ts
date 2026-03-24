@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { previewManager } from '@/runtime/preview-manager';
-import logger from '@config/logger';
+import { previewManager } from '@libs/runtime';
+import { logger } from '@libs/utils/server';
 
 export async function POST(req: NextRequest) {
     try {

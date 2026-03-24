@@ -1,4 +1,4 @@
-﻿import io from 'socket.io-client';
+import io from 'socket.io-client';
 import type * as SocketIOClient from 'socket.io-client';
 
 export interface SocketManagerOptions {

@@ -1,9 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
 import * as crypto from 'crypto';
-import { redis } from '../services/redis';
-import logger from '../config/logger';
+import { redis } from './redis';
+import logger from '../logger';
 import { eventBus } from './event-bus';
-import { AgentContext } from '@libs/contracts';
+import { AgentContext, PipelineStatus } from '@libs/contracts';
+
 import { OrchestratorLock } from '../config/orchestrator-lock';
 import { VirtualFileSystem, VirtualFile } from './vfs/virtual-fs';
 
@@ -61,6 +62,15 @@ export interface RetryPolicy {
     lastError?: string;
 }
 
+export interface LuaTransitionResult {
+    ok?: string;
+    err?: string;
+    version?: number;
+    owner?: string;
+    current?: number;
+    expected?: number;
+}
+
 export interface ExecutionContextType {
     executionId: string;
     userId: string;
@@ -81,13 +91,14 @@ export interface ExecutionContextType {
     locked?: boolean;
     lastCommitHash: string;
     vfsSnapshot?: [string, VirtualFile][];
-    [key: string]: unknown;
+    history: unknown[];
 }
 
 export class DistributedExecutionContext implements ExecutionContextType, AgentContext {
     public executionId: string;
     private key: string;
     public vfs: VirtualFileSystem = new VirtualFileSystem();
+    public history: unknown[] = [];
     private static TTL = 86400; // 24 hours
 
     // Properties from ExecutionContextType
@@ -104,14 +115,10 @@ export class DistributedExecutionContext implements ExecutionContextType, AgentC
     public retryPolicies: Record<string, RetryPolicy> = {};
     public metrics: ExecutionMetrics = { startTime: new Date().toISOString() };
     public metadata: Record<string, unknown> = {};
-    public history: unknown[] = [];
     public correlationId: string = '';
     public lastCommitHash: string = '0'.repeat(64); // Seed hash
     public locked?: boolean;
     public finalFiles?: VirtualFile[];
-    public vfsSnapshot?: [string, VirtualFile][];
-    [key: string]: any;
-
 
     private static LUA_TRANSITION_SCRIPT = `
         local contextKey = KEYS[1]
@@ -206,6 +213,10 @@ export class DistributedExecutionContext implements ExecutionContextType, AgentC
         this.executionId = executionId || uuidv4();
         this.key = `execution:${this.executionId}`;
     }
+    [key: string]: unknown;
+    fileCount?: number;
+    errorDepth?: number;
+    vfsSnapshot?: [string, VirtualFile][];
 
     getVFS() {
         return this.vfs;
@@ -259,7 +270,8 @@ export class DistributedExecutionContext implements ExecutionContextType, AgentC
             },
             metadata: { planType },
             lastCommitHash: '0'.repeat(64),
-            vfsSnapshot: this.vfs.createSnapshot()
+            vfsSnapshot: this.vfs.createSnapshot(),
+            history: []
         };
 
         await redis.setex(this.key, DistributedExecutionContext.TTL, JSON.stringify(context));
@@ -294,6 +306,9 @@ export class DistributedExecutionContext implements ExecutionContextType, AgentC
             if (data.metadata) this.metadata = data.metadata;
             if (data.vfsSnapshot) {
                 this.vfs.restoreSnapshot(data.vfsSnapshot);
+            }
+            if (data.history) {
+                this.history = data.history;
             }
         }
         return data;
@@ -344,7 +359,7 @@ export class DistributedExecutionContext implements ExecutionContextType, AgentC
                 (await this.get())?.lastCommitHash || '0'.repeat(64),
                 { stageId, inputHash, outputHash, stageIndex }
             ) : ''
-        ) as any;
+        ) as unknown as LuaTransitionResult;
 
         if (result.err) {
             if (result.err === 'LOCK_LOST') {
@@ -444,8 +459,8 @@ export class DistributedExecutionContext implements ExecutionContextType, AgentC
         });
     }
 
-    async updateUiStage(stage: string, status: string, msg: string): Promise<void> {
-        await eventBus.stage(this.executionId, stage, status as any, msg, 0, this.projectId);
+    async updateUiStage(stage: string, status: PipelineStatus | string, msg: string): Promise<void> {
+        await eventBus.stage(this.executionId, stage, status, msg, 0, this.projectId);
     }
 
     async finalize(status: 'completed' | 'failed', expectedVersion?: number): Promise<void> {
@@ -492,8 +507,6 @@ export class DistributedExecutionContext implements ExecutionContextType, AgentC
         for (let i = 0; i < 5; i++) { // Max retries for optimistic locking
             try {
                 await redis.watch(this.key);
-                const { getSupabaseAdmin } = await import('../services/supabase-admin');
-                const supabaseAdmin = getSupabaseAdmin();
                 const data = await redis.get(this.key);
                 if (!data) throw new Error(`Execution context ${this.executionId} not found`);
 
@@ -505,9 +518,9 @@ export class DistributedExecutionContext implements ExecutionContextType, AgentC
                 if (context.vfsSnapshot && this.vfs.isEmpty()) {
                     this.vfs.restoreSnapshot(context.vfsSnapshot);
                 }
-                
+
                 updater(context);
-                
+
                 // Keep snapshot in sync after updater runs
                 context.vfsSnapshot = this.vfs.createSnapshot();
 

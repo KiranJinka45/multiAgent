@@ -3,12 +3,12 @@
 import { Sparkles, PanelLeft, Edit3, FolderPlus, Image, Github, Terminal, Compass } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { getSupabaseClient } from '@lib/supabaseClient';
-import { useRealtimeSubscription } from '@hooks/useRealtimeSubscription';
-import type { User } from '@supabase/auth-helpers-nextjs';
-import { chatService } from '@services/chat-service';
-import { Chat } from '@shared-types/chat';
-import { useSidebar } from '@context/SidebarContext';
+import { getSupabaseClient } from '@libs/utils';
+import { useRealtimeSubscription } from '@libs/utils';
+import type { User } from '@libs/supabase';
+import { chatService } from '@libs/utils';
+import { Chat } from '@libs/contracts';
+import { useSidebar } from '@libs/context';
 import { toast } from 'sonner';
 
 // Sub-components

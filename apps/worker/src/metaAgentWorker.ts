@@ -2,11 +2,11 @@ import 'dotenv/config';
 
 import { Worker, Job } from 'bullmq';
 import { QUEUE_META, plannerQueue } from '../lib/queue/agent-queues';
-import redis from '@libs/utils';
+import redis from '../shared/services/queue/redis-client';
 import logger from '../config/logger';
 import { MetaAgent } from '../agents/meta-agent';
 import { DistributedExecutionContext } from '../api-gateway/services/execution-context';
-import { eventBus } from '../api/services/memory/event-bus';
+import { eventBus } from '../shared/services/event-bus';
 
 const metaAgent = new MetaAgent();
 

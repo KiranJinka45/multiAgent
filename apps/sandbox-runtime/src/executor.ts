@@ -1,5 +1,6 @@
 import { spawn } from 'child_process';
-import { getExecutionLogger } from '@libs/utils';
+import { getExecutionLogger } from '@libs/utils/server';
+import { RuntimeGuard } from './runtimeGuard';
 
 export interface ExecutionOptions {
     cwd: string;
@@ -27,11 +28,7 @@ export const runtimeExecutor = {
             let stdout = '';
             let stderr = '';
             
-            const child = spawn(command, args, {
-                cwd: options.cwd,
-                env: { ...process.env, ...options.env },
-                shell: true
-            });
+            const child = spawn(command, args, RuntimeGuard.safeSpawnOptions(options.cwd, options.env as Record<string, string>));
 
             const timeout = options.timeoutMs ? setTimeout(() => {
                 child.kill();

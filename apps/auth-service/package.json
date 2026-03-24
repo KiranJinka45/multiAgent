@@ -2,6 +2,13 @@
   "name": "@apps/auth-service",
   "version": "0.1.0",
   "private": true,
+  "scripts": {
+    "dev": "tsup --watch --onSuccess \"node dist/index.js\"",
+    "build": "tsup",
+    "start": "node dist/index.js",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
   "dependencies": {
     "@kubernetes/client-node": "^0.22.0",
     "@supabase/supabase-js": "^2.99.3",
@@ -25,6 +32,17 @@
     "socket.io-client": "^4.7.5",
     "stripe": "^14.25.0",
     "uuid": "^13.0.0",
-    "zod": "^4.3.6"
+    "zod": "^4.3.6",
+    "@libs/utils": "workspace:*",
+    "@libs/contracts": "workspace:*",
+    "@libs/observability": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/node": "^22.13.9",
+    "tsup": "^8.3.1",
+    "typescript": "^5.6.3"
   }
 }

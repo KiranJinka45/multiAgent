@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getSupabaseClient } from '@lib/supabaseClient';
+import { getSupabaseClient } from '@libs/utils';
 import { toast } from 'sonner';
 
 export default function WelcomeModal() {

@@ -6,10 +6,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, Github, Chrome } from "lucide-react";
-import { userAuthSchema, userRegisterSchema, type UserAuthSchema, type UserRegisterSchema } from '@lib/validations/auth';
-import { cn } from "@config/utils";
+import { userAuthSchema, userRegisterSchema, type UserAuthSchema, type UserRegisterSchema } from '@libs/utils';
+import { cn } from "@libs/utils";
 import { toast } from "sonner";
-import { getSupabaseClient } from '@lib/supabaseClient';
+import { getSupabaseClient } from '@libs/utils';
 import { useSearchParams, useRouter } from "next/navigation";
 
 type AuthMode = "login" | "register";

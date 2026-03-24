@@ -7,8 +7,8 @@ import { useRouter } from 'next/navigation';
 import Sidebar from '@components/Sidebar';
 import TopNav from '@components/TopNav';
 import MobileMenu from '@components/MobileMenu';
-import { Project } from '@shared-types/project';
-import { formatDate } from '@config/date';
+import { Project } from '@libs/contracts';
+import { formatDate } from '@libs/utils';
 
 export default function ExplorePage() {
     const [projects, setProjects] = useState<Project[]>([]);

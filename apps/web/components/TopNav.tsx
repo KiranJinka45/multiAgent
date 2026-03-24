@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Menu, PanelLeft, ChevronDown, Sparkles } from 'lucide-react';
 import { supabase } from '@/lib/supabase-browser';
 import { useEffect, useState } from 'react';
-import { useSidebar } from '@context/SidebarContext';
+import { useSidebar } from '@libs/context';
 import { motion, AnimatePresence } from 'framer-motion';
 
 type TopNavProps = {

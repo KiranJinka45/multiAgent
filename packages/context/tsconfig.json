@@ -1,8 +1,12 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "./dist",
-    "rootDir": "./src"
+    "outDir": "dist",
+    "baseUrl": ".",
+    "paths": {
+      "@libs/contracts": ["../contracts/src"],
+      "@libs/utils": ["../utils/src"]
+    }
   },
   "include": [
     "src/**/*"

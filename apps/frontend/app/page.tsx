@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { getSupabaseClient } from '@shared/lib/supabaseClient';
+import { getSupabaseClient } from '@libs/utils';
 import { toast } from 'sonner';
 import Sidebar from '@components/Sidebar';
 import MobileMenu from '@components/MobileMenu';
@@ -10,9 +10,9 @@ import TaskInput, { TaskInputHandle } from '@components/TaskInput';
 import ChatList from '@components/ChatList';
 import TopNav from '@components/TopNav';
 import WelcomeModal from '@components/WelcomeModal';
-import { chatService } from '@services/chat-service';
-import { projectService } from '@services/project-service';
-import { Message } from '@shared-types/chat';
+import { chatService } from '@libs/utils';
+import { projectService } from '@libs/utils';
+import { Message } from '@libs/contracts';
 
 export default function Dashboard() {
     const [messages, setMessages] = useState<Message[]>([]);

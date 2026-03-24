@@ -1,2 +1,30 @@
 // Entry point for @libs/brain
-export {};
+export { Groq } from 'groq-sdk';
+
+export * from './architecture-agent';
+export * from './backend-agent';
+export * from './base-agent';
+export * from './chat-edit-agent';
+export * from './coder-agent';
+export * from './context-builder';
+export * from './critic-agent';
+export * from './customizer-agent';
+export * from './database-agent';
+export * from './debug-agent';
+export * from './deploy-agent';
+export * from './evolution-agent';
+export * from './frontend-agent';
+export * from './healing-agent';
+export * from './intent-agent';
+export * from './meta-agent';
+export * from './planner-agent';
+export * from './planner';
+export * from './ranking-agent';
+export * from './repair-agent';
+export * from './research-agent';
+export * from './task-graph';
+export * from './testing-agent';
+export * from './validator-agent';
+export * from './resume-agent';
+export * from './social-agent';
+export * from './seo-agent';

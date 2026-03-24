@@ -1,4 +1,4 @@
-﻿import redis from '../services/redis';
+import redis from '../services/redis';
 import logger from './logger';
 
 export interface RateLimitResult {

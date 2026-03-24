@@ -1,20 +1,39 @@
-import { PreviewRegistry } from '@registry/previewRegistry';
-import { previewManager } from '@runtime/preview-manager';
-import { AnalyticsService } from '@services/analytics-service';
-import { ShareOverlay } from '@components/ShareOverlay';
+'use client';
+
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { githubService, type GithubRepo } from '@libs/utils';
+import { PreviewRegistry } from '@libs/registry';
+import { ShareOverlay } from '@/components/ShareOverlay';
 import { Loader2 } from 'lucide-react';
-import { headers } from 'next/headers';
 
-export const dynamic = 'force-dynamic';
-
-export default async function SharePage({ params }: { params: { id: string } }) {
+export default function SharePage({ params }: { params: { id: string } }) {
     const previewId = params.id;
-    const headerList = headers();
-    const referrer = headerList.get('referer') || undefined;
+    const [reg, setReg] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
 
-    let reg = await PreviewRegistry.lookupByPreviewId(previewId);
-    if (!reg) {
-        reg = await PreviewRegistry.get(previewId);
+    useEffect(() => {
+        const loadRegistry = async () => {
+            try {
+                let r = await PreviewRegistry.lookupByPreviewId(previewId);
+                if (!r) {
+                    r = await PreviewRegistry.get(previewId);
+                }
+                setReg(r);
+            } catch (err) {
+                console.error('Failed to load registry:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadRegistry();
+    }, [previewId]);
+
+    if (loading) {
+        return (
+            <div className="flex h-screen items-center justify-center bg-black">
+                <Loader2 className="animate-spin text-blue-500" size={40} />
+            </div>
+        );
     }
 
     if (!reg) {
@@ -42,16 +61,7 @@ export default async function SharePage({ params }: { params: { id: string } }) 
         );
     }
 
-    // Track viral hit (non-blocking)
-    AnalyticsService.trackShareView(previewId, referrer).catch(() => {});
-
     const isRunning = reg.status === 'RUNNING';
-    
-    // Auto-wake if not running (Drives retention during viral hits)
-    if (!isRunning) {
-        previewManager.restartPreview(reg.projectId).catch(() => {});
-    }
-
     const previewUrl = isRunning 
         ? `/preview/${previewId}${reg.accessToken ? `?token=${reg.accessToken}` : ''}`
         : null;
@@ -81,8 +91,6 @@ export default async function SharePage({ params }: { params: { id: string } }) 
                             Bringing the autonomous environment online. This page will refresh automatically.
                         </p>
                     </div>
-                    
-                    {/* Auto-refresh logic (Meta tag for simple landing pages) */}
                     <meta httpEquiv="refresh" content="4" />
                 </div>
             ) : (

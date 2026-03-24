@@ -1,4 +1,4 @@
-import { createServerSupabaseClient } from '../../../packages/supabase/index';
+import { createServerSupabaseClient } from '@libs/supabase';
 
 /**
  * API-layer Supabase client (Service Role).

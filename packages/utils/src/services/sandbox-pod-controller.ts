@@ -1,4 +1,4 @@
-﻿import * as k8s from '@kubernetes/client-node';
+import * as k8s from '@kubernetes/client-node';
 import logger from '../config/logger';
 
 export class SandboxPodController {

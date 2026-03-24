@@ -1,36 +1,42 @@
 import { defineConfig } from 'tsup';
 
-export const baseConfig = {
-  format: ['cjs', 'esm'],
-  dts: false, // Disabled to prevent heap issues in large monorepos
-  splitting: false,
-  sourcemap: true,
-  clean: true,
+export const baseConfig = defineConfig({
   target: 'node20',
+  format: ['cjs', 'esm'], // 🔥 Added ESM
+  clean: true,
+  sourcemap: process.env.NODE_ENV !== 'production',
+  dts: false,
+  bundle: true,
+  minify: true, // 🔥 Always minify for prod/size check
+  treeshake: true, // 🔥 Critical for bundle size
+  splitting: true, // 🔥 Critical for code splitting
+  outDir: 'dist',
+  shims: true,
   external: [
-    'bullmq',
-    'ioredis',
-    'pino',
-    'uuid',
-    'fs-extra',
-    'archiver',
-    'dotenv',
-    'zod',
     'react',
-    'stripe',
-    'prom-client',
-    'redlock',
+    'react-dom',
     'next',
-    'socket.io-client',
-    '@supabase/supabase-js',
-    '@temporalio/client',
-    '@temporalio/worker',
+    'ioredis',
+    'bullmq',
+    'dotenv',
+    'pino',
+    'zod',
+    'uuid',
+    '@libs/utils',
+    '@libs/contracts',
+    '@libs/registry',
+    '@libs/observability',
+    '@libs/validator',
+    '@libs/supabase',
+    '@libs/runtime',
+    'fs-extra',
     'axios',
-    'express',
-    'socket.io',
-    'cors',
-    'jsonwebtoken'
+    'groq-sdk',
+    'undici',
+    'readable-stream',
+    '@prisma/client', // 🔥 Externalized
+    'openai',        // 🔥 Externalized
+    'redis',         // 🔥 Externalized
+    'pg'             // 🔥 Externalized
   ],
-};
-
-export default defineConfig(baseConfig as any);
+});

@@ -1,87 +1,85 @@
-import { Worker, Job, Queue } from 'bullmq';
-import { redis, logger, DEPLOYMENT_QUEUE } from '@libs/utils';
-import { prisma } from '@libs/db';
-import { startTracing } from '@libs/observability';
-import path from 'path';
+import 'dotenv/config';
+import { initTelemetry } from '@libs/observability';
+initTelemetry('multiagent-deploy-service');
 
-// Initialize Tracing
-startTracing();
-
-const VERCEL_TOKEN = process.env.VERCEL_TOKEN;
-
-/**
- * Cloud Deployment Orchestrator
- * In a real production setup, this would utilize the Vercel API or a custom Kubernetes deployer.
- */
-async function deployToCloud(projectId: string, sandboxDir: string): Promise<string> {
-    logger.info({ projectId, sandboxDir }, '[DeployService] Initiating cloud deployment...');
-    
-    if (!VERCEL_TOKEN) {
-        logger.warn('[DeployService] VERCEL_TOKEN missing. Using mock deployment URL.');
-        // Deterministic mock URL for development stability
-        const shortId = projectId.split('-')[0];
-        return `https://multiagent-${shortId}.vercel.app`;
-    }
-
-    // --- PROD PATH: Vercel API Integration (Simulated) ---
-    // In a full implementation, we would:
-    // 1. Zip the sandboxDir
-    // 2. POST to https://api.vercel.com/v13/deployments
-    // 3. Poll for status
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    return `https://multiagent-${projectId.slice(0, 8)}.vercel.app`;
-}
+import { Worker, Job } from 'bullmq';
+import { 
+    redis, 
+    DEPLOYMENT_QUEUE, 
+    logger, 
+    ReliabilityMonitor 
+} from '@libs/utils/server';
+import { db as prisma } from '@libs/db';
+import { VercelDeployer } from './deployer';
 
 const worker = new Worker(DEPLOYMENT_QUEUE, async (job: Job) => {
     const { projectId, executionId, sandboxDir } = job.data;
     
-    logger.info({ projectId, jobId: job.id }, '[DeployService] Processing deployment job');
-    
+    logger.info({ projectId, executionId }, '[DeployService] Starting deployment');
+
     try {
-        const liveUrl = await deployToCloud(projectId, sandboxDir);
-        
-        // Update Build record with the live URL
-        await prisma.build.update({
+        // 1. Update status to 'deploying'
+        await prisma.mission.update({
             where: { id: executionId },
             data: { 
-                previewUrl: liveUrl,
-                status: 'SUCCESS'
+                status: 'deploying',
+                updatedAt: new Date()
             }
         });
 
-        // Elevate Project status to READY
-        await prisma.project.update({
-            where: { id: projectId },
-            data: { status: 'READY' }
+        // 2. Perform deployment
+        const deployer = new VercelDeployer();
+        const url = await deployer.deploy(projectId, sandboxDir);
+
+        logger.info({ projectId, executionId, url }, '[DeployService] Deployment successful');
+
+        // 3. Update mission with URL and status 'complete'
+        await prisma.mission.update({
+            where: { id: executionId },
+            data: { 
+                status: 'complete',
+                metadata: {
+                    ...(await prisma.mission.findUnique({ where: { id: executionId } }))?.metadata as Record<string, unknown>,
+                    url,
+                    deployedAt: new Date().toISOString()
+                }
+            }
         });
 
-        logger.info({ projectId, liveUrl }, '[DeployService] Deployment successful!');
-        return { success: true, url: liveUrl };
-    } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
-        logger.error({ err: msg, projectId }, '[DeployService] Deployment failed');
+        return { url };
+    } catch (err: unknown) {
+        const error = err as Error;
+        logger.error({ projectId, executionId, error: error.message }, '[DeployService] Deployment failed');
         
-        await prisma.build.update({
-            where: { id: executionId },
-            data: { status: 'FAILED' }
+        await ReliabilityMonitor.recordError({
+            service: 'deploy-service',
+            error: error.message,
+            stack: error.stack,
+            executionId,
+            context: { projectId, sandboxDir },
+            timestamp: new Date().toISOString()
         });
-        
+
+        await prisma.mission.update({
+            where: { id: executionId },
+            data: { 
+                status: 'failed',
+                metadata: {
+                    ...(await prisma.mission.findUnique({ where: { id: executionId } }))?.metadata as Record<string, unknown>,
+                    deploymentError: error.message
+                }
+            }
+        });
+
         throw err;
     }
-}, { 
-    connection: redis as any,
-    concurrency: 5 
+}, {
+    connection: redis,
+    concurrency: 2
 });
 
-logger.info(`[Deployment-Pipeline] Service started on pid ${process.pid}`);
+worker.on('failed', (job, err) => {
+    logger.error({ jobId: job?.id, error: err.message }, '[DeployService] Job failed permanently');
+});
 
-// Graceful Shutdown
-const shutdown = async () => {
-    logger.info('[DeployService] Shutting down...');
-    await worker.close();
-    await redis.quit();
-    process.exit(0);
-};
-
-process.on('SIGTERM', shutdown);
-process.on('SIGINT', shutdown);
+logger.info('[DeployService] Worker started, listening on DEPLOYMENT_QUEUE');

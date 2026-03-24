@@ -1,4 +1,4 @@
-﻿import logger from './logger';
+import logger from './logger';
 import { supabaseAdmin } from '../services/supabase-admin';
 
 export async function sendBuildSuccessEmail(userId: string, projectId: string, executionId: string, previewUrl: string) {
@@ -18,7 +18,7 @@ export async function sendBuildSuccessEmail(userId: string, projectId: string, e
 
         logger.info(
             { email, projectId, executionId, previewUrl },
-            'ðŸ“§ MOCK EMAIL DISPATCHED: "Your MultiAgent Build is Complete!"'
+            '📧 MOCK EMAIL DISPATCHED: "Your MultiAgent Build is Complete!"'
         );
 
         return true;

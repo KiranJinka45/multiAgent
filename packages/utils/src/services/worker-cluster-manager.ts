@@ -1,5 +1,5 @@
-﻿import { redis } from './redis';
-import logger from '../config/logger';
+import { redis } from './redis';
+import logger from '../logger';
 
 export interface WorkerNode {
     workerId: string;
@@ -21,7 +21,7 @@ export class WorkerClusterManager {
         const now = Date.now();
         
         return Object.values(data)
-            .map(v => JSON.parse(v as string) as WorkerNode)
+            .map(v => JSON.parse(v) as WorkerNode)
             .filter(w => (now - w.lastHeartbeat) < this.HEARTBEAT_TIMEOUT && w.status !== 'ERROR');
     }
 

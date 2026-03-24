@@ -6,8 +6,10 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsup src/index.ts",
-    "dev": "tsup src/index.ts --watch"
+    "build": "tsup",
+    "dev": "tsup --watch --onSuccess \"node dist/index.js\"",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
   },
   "exports": {
     ".": {

@@ -1,4 +1,5 @@
-// Generated index for src
+// Entry point for @libs/agents
+
 export * from './architecture-agent';
 export * from './backend-agent';
 export * from './base-agent';
@@ -23,6 +24,6 @@ export * from './research-agent';
 export * from './saas-monetization-agent';
 export * from './sandbox-editor-agent';
 export * from './security-agent';
-export * from './services';
 export * from './testing-agent';
 export * from './validator-agent';
+export * from './services';

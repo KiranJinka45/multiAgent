@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { freeQueue } from '@queue';
+import { freeQueue } from '@libs/utils/src/server';
 
 export async function GET() {
     try {

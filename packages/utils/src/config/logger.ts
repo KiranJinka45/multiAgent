@@ -2,6 +2,26 @@ import pino from 'pino';
 import { getCorrelationId } from './tracing';
 import { trace, context } from '@opentelemetry/api';
 
+const transports = pino.transport({
+    targets: [
+        {
+            target: 'pino/file', // Default console output
+            options: { destination: 1 }, // stdout
+            level: process.env.LOG_LEVEL || 'info',
+        },
+        ...(process.env.LOKI_URL ? [{
+            target: 'pino-loki',
+            options: {
+                host: process.env.LOKI_URL,
+                labels: { service: 'multi-agent-platform' },
+                batching: true,
+                interval: 5,
+            },
+            level: 'info',
+        }] : []),
+    ],
+});
+
 const logger = pino({
     level: process.env.LOG_LEVEL || 'info',
     base: {
@@ -24,7 +44,7 @@ const logger = pino({
         },
     },
     timestamp: pino.stdTimeFunctions.isoTime,
-});
+}, transports);
 
 /**
  * Creates a child logger with a fixed executionId for a specific build job.

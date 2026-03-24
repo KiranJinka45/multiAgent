@@ -23,10 +23,10 @@
 import { NodeRegistry } from './nodeRegistry';
 import { RuntimeScheduler, ScheduleRequest } from './runtimeScheduler';
 import { DistributedLock } from './distributedLock';
-import { PreviewRegistry } from '@registry/previewRegistry';
-import { redis } from '@queue';
-import { missionController } from '@services/mission-controller';
-import logger from '@config/logger';
+import { PreviewRegistry } from '@libs/registry';
+import { redis } from '@libs/utils';
+import { missionController } from '@libs/utils';
+import logger from '@libs/utils';
 
 // ─── Config ────────────────────────────────────────────────────────────────
 

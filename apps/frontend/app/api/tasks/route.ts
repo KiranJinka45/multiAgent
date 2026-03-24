@@ -1,6 +1,7 @@
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { createRouteHandlerClient } from '@libs/supabase';
 import { cookies } from 'next/headers';
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
+import { TaskCreateSchema, RateLimiter } from '@libs/utils/server';
 
 export async function GET() {
     const supabase = createRouteHandlerClient({ cookies });
@@ -19,7 +20,7 @@ export async function GET() {
     return NextResponse.json(data);
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
     const supabase = createRouteHandlerClient({ cookies });
     const { data: { session } } = await supabase.auth.getSession();
 
@@ -27,15 +28,36 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { title } = await req.json();
-    if (!title) return NextResponse.json({ error: 'Title required' }, { status: 400 });
+    // Rate Limiting
+    const rateLimiter = new RateLimiter();
+    const { allowed } = await rateLimiter.checkLimit(session.user.id, 'task-create');
+    if (!allowed) {
+        return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
+    }
 
-    const { data, error } = await supabase
-        .from('tasks')
-        .insert([{ title, user_id: session.user.id }])
-        .select()
-        .single();
+    try {
+        const body = await req.json();
+        const validation = TaskCreateSchema.safeParse(body);
+        
+        if (!validation.success) {
+            return NextResponse.json({ 
+                error: 'Invalid task data', 
+                details: validation.error.format() 
+            }, { status: 400 });
+        }
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-    return NextResponse.json(data);
+        const { title } = validation.data;
+
+        const { data, error } = await supabase
+            .from('tasks')
+            .insert([{ title, user_id: session.user.id }])
+            .select()
+            .single();
+
+        if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+        return NextResponse.json(data);
+    } catch (err) {
+        logger.error({ err }, 'Failed to create task');
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    }
 }

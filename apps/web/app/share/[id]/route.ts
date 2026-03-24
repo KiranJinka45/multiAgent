@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { PreviewRegistry } from '@libs/registry';
-import { previewManager } from '@runtime/preview-manager';
+import { previewManager } from '@libs/runtime/preview-manager';
 import { AnalyticsService } from '@libs/utils';
 
 export async function GET(

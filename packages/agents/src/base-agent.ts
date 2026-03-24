@@ -6,7 +6,8 @@ import { eventBus } from '@libs/utils';
 import { RetryManager } from '@libs/utils';
 import { StrategyConfig } from '@libs/utils';
 import { selectModel, RoutingContext, TaskType } from '@libs/ai';
-import { CostGovernanceService, SemanticCacheService } from '@libs/utils';
+import { CostGovernanceService, SemanticCacheService, usageService } from '@libs/utils';
+
 
 const retry = new RetryManager(5, 3000); // 5 retries, 3s base delay
 
@@ -87,6 +88,23 @@ export abstract class BaseAgent {
                     // --- COST GOVERNANCE & TRACKING ---
                     const executionId = (request.context as { executionId?: string })?.executionId || 'unknown';
                     await CostGovernanceService.recordTokenUsage(request.tenantId, tokensUsed, executionId);
+
+                    // --- NEW USAGE TRACKING (Prisma) ---
+                    if (request.context.userId && request.tenantId) {
+                        usageService.recordAiUsage({
+                            model,
+                            promptTokens: response.usage?.prompt_tokens || 0,
+                            completionTokens: response.usage?.completion_tokens || 0,
+                            totalTokens: tokensUsed,
+                            userId: request.context.userId,
+                            tenantId: request.tenantId,
+                            metadata: {
+                                executionId,
+                                agent: this.getName(),
+                                model
+                            }
+                        }).catch(err => logger.error({ err }, '[BaseAgent] Usage tracking failed'));
+                    }
 
                     const result = {
                         result: JSON.parse(content),

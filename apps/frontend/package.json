@@ -17,7 +17,14 @@
     "sonner": "^2.0.7",
     "next-themes": "^0.4.6",
     "clsx": "^2.1.1",
-    "tailwind-merge": "^2.6.1"
+    "tailwind-merge": "^2.6.1",
+    "@libs/utils": "workspace:*",
+    "@libs/brain": "workspace:*",
+    "@libs/contracts": "workspace:*",
+    "@libs/core-engine": "workspace:*",
+    "@libs/runtime": "workspace:*",
+    "@libs/supabase": "workspace:*",
+    "prom-client": "^15.1.3"
   },
   "devDependencies": {
     "typescript": "^5",

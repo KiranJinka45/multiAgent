@@ -1,4 +1,4 @@
-﻿import { prisma } from '@libs/db';
+import { prisma } from '@libs/db';
 import logger from '../config/logger';
 import crypto from 'crypto';
 

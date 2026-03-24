@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Event Bus â€” Redis Streams backbone for build event streaming.
  *
  * Uses Redis XADD (publish) + XREAD BLOCK (subscribe) instead of pub/sub
@@ -12,8 +12,10 @@
  */
 
 import { redis } from './redis';
-import logger from '../config/logger';
+import { logger } from '../logger';
 import { PersistenceStore } from './persistence-store';
+import { PipelineStatus } from '@libs/contracts';
+
 
 const STREAM_TTL_SECONDS = 4 * 60 * 60; // 4 hours
 const THROTTLE_MS = 100; // 100ms throttle for progress/thought events
@@ -225,7 +227,7 @@ export const eventBus = {
     },
 
     /** Emit a stage transition event */
-    stage(executionId: string, stageId: string, stageStatus: string, message: string, progress: number, projectId?: string, files?: { path: string; content?: string }[], metrics?: { tokens?: number; duration?: number; cost?: number }) {
+    stage(executionId: string, stageId: string, stageStatus: PipelineStatus | string, message: string, progress: number, projectId?: string, files?: { path: string; content?: string }[], metrics?: { tokens?: number; duration?: number; cost?: number }) {
         return publishBuildEvent({
             type: 'stage',
             executionId,

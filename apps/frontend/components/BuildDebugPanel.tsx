@@ -7,7 +7,7 @@ import {
     Loader2,
     Terminal
 } from 'lucide-react';
-import { BuildUpdate } from '@shared-types/build';
+import { BuildUpdate } from '@libs/contracts';
 
 interface BuildDebugPanelProps {
     buildProgress: BuildUpdate | null;

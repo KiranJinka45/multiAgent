@@ -2,7 +2,7 @@ import { exec } from 'child_process';
 import path from 'path';
 import fs from 'fs';
 import util from 'util';
-import logger from '@libs/utils';
+import { logger, getSafeEnv } from '@libs/utils/server';
 
 const execAsync = util.promisify(exec);
 
@@ -70,7 +70,7 @@ export class ProcessSandbox {
             logs.push('[Sandbox] Running npm install...');
             const { stdout, stderr } = await execAsync(
                 'npm install --no-audit --legacy-peer-deps --loglevel=error',
-                { cwd: sandboxDir, timeout: 120000, env: { ...process.env, NODE_ENV: 'development' } }
+                { cwd: sandboxDir, timeout: 120000, env: getSafeEnv({ NODE_ENV: 'development' }) }
             );
 
             if (stdout) logs.push(stdout.substring(0, 500));
@@ -78,8 +78,9 @@ export class ProcessSandbox {
             logs.push('[Sandbox] Dependencies installed successfully.');
 
             return { success: true, logs };
-        } catch (e: any) {
-            logs.push(`[error] npm install failed: ${e.stderr?.substring(0, 300) || e.message}`);
+        } catch (e: unknown) {
+            const err = e as { stderr?: string; message?: string };
+            logs.push(`[error] npm install failed: ${err.stderr?.substring(0, 300) || err.message}`);
             return { success: false, logs };
         }
     }
@@ -94,8 +95,9 @@ export class ProcessSandbox {
                 { cwd: sandboxDir, timeout: 60000 }
             );
             return { success: true, error: stderr, stdout };
-        } catch (e: any) {
-            return { success: false, error: e.stderr || e.message, stdout: e.stdout || '' };
+        } catch (e: unknown) {
+            const err = e as { stderr?: string; stdout?: string; message?: string };
+            return { success: false, error: err.stderr || err.message || 'Unknown error', stdout: err.stdout || '' };
         }
     }
 

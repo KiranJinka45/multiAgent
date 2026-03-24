@@ -1,76 +1,89 @@
-version: '3.8'
+version: "3.9"
 
 services:
   gateway:
-    build:
-      context: .
-      dockerfile: apps/gateway/Dockerfile
+    build: .
+    container_name: gateway
     ports:
-      - "4000:4000"
-    environment:
-      - PORT=4000
-      - AUTH_SERVICE_URL=http://auth-service:4002
-      - ORCHESTRATOR_URL=http://orchestrator:4001
-      - BILLING_SERVICE_URL=http://billing-service:4003
-      - INTERNAL_KEY=local-secret-key
+      - "3000:3000"
     depends_on:
-      - auth-service
-      - orchestrator
-
-  auth-service:
-    build:
-      context: .
-      dockerfile: apps/auth-service/Dockerfile
-    ports:
-      - "4002:4002"
+      - postgres
+      - redis
     environment:
-      - PORT=4002
-      - INTERNAL_KEY=local-secret-key
-
-  billing-service:
-    build:
-      context: .
-      dockerfile: apps/billing-service/Dockerfile
-    ports:
-      - "4003:4003"
-    environment:
-      - PORT=4003
-      - INTERNAL_KEY=local-secret-key
-      - AUTH_SERVICE_URL=http://auth-service:4002
-
-  orchestrator:
-    build:
-      context: .
-      dockerfile: apps/orchestrator/Dockerfile
-    ports:
-      - "4001:4001"
-    environment:
-      - PORT=4001
-      - INTERNAL_KEY=local-secret-key
-    depends_on:
-      - temporal-server
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/multiagent
+      - REDIS_URL=redis://redis:6379
+      - LOKI_URL=http://loki:3100
 
   worker:
-    build:
-      context: .
-      dockerfile: apps/worker/Dockerfile
-    environment:
-      - TEMPORAL_ADDRESS=temporal-server:7233
+    build: .
+    command: node apps/worker/dist/index.js
     depends_on:
-      - temporal-server
+      - redis
+    environment:
+      - NODE_ENV=production
+      - REDIS_URL=redis://redis:6379
+      - LOKI_URL=http://loki:3100
 
-  temporal-server:
-    image: temporalio/admin-tools:1.22.0
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: multiagent
     ports:
-      - "7233:7233"
-    # This is a placeholder, real temporal setup usually requires more services (postgres, etc)
-    # For local dev, a simple temporal-server image or a full compose is used.
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
   redis:
-    image: redis:alpine
+    image: redis:7
+    container_name: redis
     ports:
       - "6379:6379"
 
-networks:
-  default:
-    name: multi-agent-network
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    depends_on:
+      - gateway
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
+      - loki
+
+  loki:
+    image: grafana/loki
+    container_name: loki
+    ports:
+      - "3100:3100"
+
+  promtail:
+    image: grafana/promtail
+    container_name: promtail
+    volumes:
+      - /var/log:/var/log
+    command: -config.file=/etc/promtail/config.yml
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - gateway
+
+volumes:
+  postgres_data:

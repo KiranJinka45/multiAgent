@@ -1,6 +1,8 @@
 # dependencies
 node_modules/
 **/node_modules/
+.turbo/
+**/.turbo/
 
 # next.js
 .next/
@@ -8,7 +10,12 @@ node_modules/
 out/
 
 # production
+dist/
+**/dist/
 build/
+**/build/
+.env*
+**/.env*
 
 # misc
 .DS_Store
@@ -39,11 +46,11 @@ next-env.d.ts
 system.log
 validate_*.txt
 tsc_*.log
+*.txt
+*.log
 Redis/*.pid
 .sandboxes/
 .previews/
 system-startup.log
-/scripts/boot-fleet.ps1
-/.snapshots/
 /.microvms/
 file_list.txt

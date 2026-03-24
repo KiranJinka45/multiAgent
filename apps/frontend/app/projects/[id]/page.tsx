@@ -12,15 +12,14 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { projectService } from '@services/project-service';
-import { Project, ProjectFile } from '@shared-types/project';
+import { projectService } from '@libs/utils';
+import { Project, ProjectFile } from '@libs/contracts';
 import { toast } from 'sonner';
-import { BuildUpdate } from '@shared-types/build';
 import DevOpsDashboard from '@components/DevOpsDashboard';
 import TechStackSelector, { TechStack } from '@components/TechStackSelector';
 import PushToGithubModal from '@components/PushToGithubModal';
-import { useSocket } from '@hooks/use-socket';
-import { useRealtimeSubscription } from '@hooks/useRealtimeSubscription';
+import { useSocket } from '@libs/utils';
+import { useRealtimeSubscription } from '@libs/utils';
 
 const FileItem = memo(({ file, isSelected, onClick }: { file: ProjectFile, isSelected: boolean, onClick: () => void }) => {
     const fileName = file.path.split('/').pop() || file.path;
@@ -135,6 +134,33 @@ export default function ProjectEditorPage({ params }: { params: { id: string } }
         }
     }, [params.id, isGenerating, project?.description]);
 
+    const handleDeploy = useCallback(async () => {
+        const executionId = buildProgress?.executionId || project?.last_execution_id;
+        if (!executionId) {
+            toast.error("Execution context not found. Cannot deploy.");
+            return;
+        }
+
+        const toastId = toast.loading("Initiating Production Deployment...");
+        
+        try {
+            const res = await fetch(`/api/missions/${executionId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.error || 'Deployment failed');
+            }
+
+            toast.success("Deployment Signal Broadcasted", { id: toastId });
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            toast.error(errorMessage || "Failed to trigger deployment", { id: toastId });
+        }
+    }, [buildProgress, project]);
+
     const handleStartBuildExplicit = (stack: TechStack) => {
         setIsReviewing(false);
         const stackHeader = '[Architecture Requirements]';
@@ -168,7 +194,7 @@ Database: ${stack.database}`;
                 return;
             }
             setProject(p);
-            const currentIsGenerating = p.status.startsWith('generating') || p.status === 'brainstorming';
+            const currentIsGenerating = (p.status as string).startsWith('generating') || p.status === 'brainstorming';
             if (currentIsGenerating && p.last_execution_id) {
                 setIsGenerating(true);
                 if (!buildProgress || connectionMode === 'failover') {
@@ -302,7 +328,7 @@ Database: ${stack.database}`;
                                     files={displayFiles}
                                     projectId={params.id}
                                     onDownload={() => { window.location.href = `/api/build/${params.id}/export`; }}
-                                    onDeploy={() => { }}
+                                    onDeploy={handleDeploy}
                                     onPushToGithub={() => setIsGithubModalOpen(true)}
                                     onRedeploy={handleGenerate}
                                     projectTitle={project?.name || 'Tactical Project'}

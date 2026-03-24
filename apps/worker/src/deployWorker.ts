@@ -2,15 +2,17 @@ import '../scripts/pre-init';
 
 import { Worker, Job } from 'bullmq';
 import { QUEUE_DEPLOY } from '../lib/queue/agent-queues';
-import redis from '@libs/utils';
-import logger from '../config/logger';
-import { projectMemory } from '../api-gateway/services/project-memory';
-import { InfraProvisioner } from '../api-gateway/services/devops/infra-provisioner';
-import { CICDManager } from '../api-gateway/services/devops/cicd-manager';
-import { TenantService } from '../api-gateway/services/tenant-service';
-import { eventBus } from '../api/services/memory/event-bus';
-import { DistributedExecutionContext } from '../api-gateway/services/execution-context';
-import { IS_PRODUCTION } from '../config/build-mode';
+import redis from '../shared/services/queue/redis-client';
+import { 
+    logger, 
+    projectMemory, 
+    InfraProvisioner, 
+    CICDManager, 
+    TenantService, 
+    eventBus, 
+    DistributedExecutionContext 
+} from '@libs/utils/server';
+import { IS_PRODUCTION } from '@libs/utils';
 import path from 'path';
 import fs from 'fs';
 

@@ -1,4 +1,4 @@
-﻿import logger from './config/logger';
+import logger from './config/logger';
 
 // Mock AgentMetrics since it's missing from the codebase
 const AgentMetrics = {

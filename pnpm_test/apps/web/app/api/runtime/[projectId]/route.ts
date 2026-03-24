@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PreviewOrchestrator } from '@runtime/previewOrchestrator';
+import { PreviewOrchestrator } from '@libs/runtime/previewOrchestrator';
 import logger from '@config/logger';
 
 export const dynamic = 'force-dynamic';

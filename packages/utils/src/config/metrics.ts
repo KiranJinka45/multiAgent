@@ -1,6 +1,14 @@
 import logger from './logger';
-import { Registry, Histogram, Counter, Gauge } from 'prom-client';
-import redis from '../services/redis';
+
+const promClient = typeof window === 'undefined' ? require('prom-client') : null;
+const { Registry, Histogram, Counter, Gauge } = promClient || {
+    Registry: class { setDefaultLabels() { } getSingleMetric() { } },
+    Histogram: class { },
+    Counter: class { },
+    Gauge: class { }
+};
+
+const redis = typeof window === 'undefined' ? require('../services/redis').default : null;
 
 export const registry = new Registry();
 

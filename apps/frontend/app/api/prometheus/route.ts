@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { registry } from '@config/metrics';
-import logger from '@config/logger';
+import { registry, logger } from '@libs/utils/server';
 
 export const dynamic = 'force-dynamic';
 

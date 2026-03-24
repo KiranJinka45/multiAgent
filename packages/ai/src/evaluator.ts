@@ -1,4 +1,4 @@
-import { prisma } from '@libs/db';
+import { db as prisma } from '@libs/db';
 import logger from '@libs/utils';
 
 export interface EvalMetrics {
@@ -71,8 +71,8 @@ export class EvaluatorService {
           tenantId: params.tenantId,
           model: params.model,
           score: params.result.score,
-          metrics: params.result.metrics as unknown as Record<string, unknown>,
-          metadata: params.metadata as unknown as Record<string, unknown>
+          metrics: params.result.metrics as any,
+          metadata: params.metadata as any
         }
       });
       logger.info({ model: params.model, score: params.result.score }, '[Evaluator] Recorded AI performance metric');

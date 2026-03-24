@@ -1,10 +1,10 @@
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createServerComponentClient } from '@libs/supabase';
 import { cookies } from 'next/headers';
 import Sidebar from '@components/Sidebar';
 import TopNav from '@components/TopNav';
 import ProjectGallery from '@components/ProjectGallery';
 import MobileMenu from '@components/MobileMenu';
-import { projectService } from '@services/project-service';
+import { projectService } from '@libs/utils';
 
 export default async function ProjectsPage() {
     let projects = null;

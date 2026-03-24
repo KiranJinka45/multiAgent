@@ -1,3 +1,4 @@
+import { ProjectFile } from './project';
 /**
  * shared/types/pipeline-types.ts
  * 
@@ -26,9 +27,19 @@ export enum JobStage {
 export type PipelineStatus = 'pending' | 'in_progress' | 'completed' | 'failed';
 
 export interface PipelineState {
-    stage: JobStage;
-    status: PipelineStatus;
+    stage: JobStage | string;
+    status: PipelineStatus | string;
     message: string;
     progress: number;
     updatedAt: number;
+}
+
+/**
+ * Legacy compatibility type for frontend BuildUpdate.
+ */
+export interface BuildUpdate extends PipelineState {
+    currentStage?: string;
+    totalProgress?: number;
+    type?: string;
+    files?: ProjectFile[];
 }

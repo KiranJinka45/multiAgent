@@ -1,7 +1,8 @@
 import { spawn, ChildProcess, exec } from 'child_process';
 import util from 'util';
-import logger from '@libs/utils';
-import { eventBus } from '@libs/utils';
+import { logger, eventBus } from '@libs/utils/server';
+import { RuntimeGuard } from './runtimeGuard';
+import { ContainerManager } from './containerManager';
 
 const execPromise = util.promisify(exec);
 
@@ -64,11 +65,38 @@ export class SandboxRunner {
                 });
             }
 
-            const child = spawn(command, args, {
-                cwd,
-                env: { ...process.env, ...env },
-                shell: true
-            });
+            // 🛡️ Phase 20: Docker-Based Isolation Refactor
+            if (ContainerManager.isAvailable() && options.cwd.includes('.generated-projects')) {
+                const projectId = options.cwd.split('.generated-projects').pop()?.replace(/\\|\//g, '') || '';
+                
+                if (projectId) {
+                    logger.info({ projectId, command }, '[SandboxRunner] Using Docker-based execution');
+                    
+                    (async () => {
+                        try {
+                            if (!ContainerManager.isRunning(projectId)) {
+                                // Default port for non-server commands - doesn't matter much as long as unique
+                                const port = 5000 + Math.floor(Math.random() * 1000); 
+                                await ContainerManager.start(projectId, port);
+                            }
+                            
+                            const container = `ma-preview-${projectId.slice(0, 12)}`;
+                            const result = await ContainerManager.executeCommand(container, command, args);
+                            
+                            return resolve({
+                                success: result.exitCode === 0,
+                                exitCode: result.exitCode,
+                                stdout: result.stdout,
+                                stderr: result.stderr
+                            });
+                        } catch (err: any) {
+                             logger.error({ err }, '[SandboxRunner] Docker execution failed. Falling back to host.');
+                        }
+                    })();
+                }
+            }
+
+            const child = spawn(command, args, RuntimeGuard.safeSpawnOptions(cwd, env));
 
             let stdout = '';
             let stderr = '';
@@ -174,11 +202,7 @@ export class SandboxRunner {
     ): ChildProcess {
         const { cwd, env = {}, executionId, agentName } = options;
 
-        const child = spawn(command, args, {
-            cwd,
-            env: { ...process.env, ...env },
-            shell: true
-        });
+        const child = spawn(command, args, RuntimeGuard.safeSpawnOptions(cwd, env));
 
         child.stdout?.on('data', (data) => {
             eventBus.thought(executionId, agentName, `[Server] ${data.toString().trim()}`);

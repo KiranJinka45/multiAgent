@@ -42,7 +42,7 @@ function containerName(projectId: string): string {
 function exec(cmd: string): string {
     try {
         return execSync(cmd, { encoding: 'utf-8', timeout: 120_000 }).trim();
-    } catch (err: any) {
+    } catch (err: unknown) {
         const error = err as { message: string, stderr?: string };
         throw new Error(`Docker CLI failed: ${error.stderr || error.message}`);
     }
@@ -132,6 +132,20 @@ export const ContainerManager = {
         logger.info({ containerId, projectDir }, '[ContainerManager] Hot injecting code');
         exec(`docker cp "${projectDir}/." ${containerId}:/app/`);
         exec(`docker exec -u root ${containerId} chown -R node:node /app`);
+    },
+
+    async executeCommand(containerId: string, cmd: string, args: string[]): Promise<{ stdout: string; stderr: string; exitCode: number }> {
+        const fullCmd = `${cmd} ${args.join(' ')}`;
+        try {
+            const stdout = exec(`docker exec ${containerId} ${fullCmd}`);
+            return { stdout, stderr: '', exitCode: 0 };
+        } catch (err: unknown) {
+            return { 
+                stdout: '', 
+                stderr: (err as Error).message, 
+                exitCode: (err as any).status || 1 
+            };
+        }
     },
 
     async waitForHealthy(projectId: string, containerId: string, timeoutMs: number): Promise<void> {

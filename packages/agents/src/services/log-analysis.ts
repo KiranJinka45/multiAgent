@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LogAnalysisEngine
  * 
  * Specialized utility to parse build logs and extract:

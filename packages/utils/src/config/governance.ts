@@ -1,5 +1,12 @@
-import { redis } from '../services/redis';
 import logger from './logger';
+
+const GOVERNANCE_BYPASS_TOKEN = process.env.GOVERNANCE_BYPASS_TOKEN;
+
+if (!GOVERNANCE_BYPASS_TOKEN && process.env.NODE_ENV === 'production') {
+    throw new Error('CRITICAL: GOVERNANCE_BYPASS_TOKEN is not set in production!');
+}
+
+const DEFAULT_BYPASS_TOKEN = GOVERNANCE_BYPASS_TOKEN || 'chaos-test-dev-only';
 
 export interface GovernanceConfig {
     maxDailyGenerations: number;
@@ -85,7 +92,7 @@ export class CostGovernanceService {
             return false;
         }
 
-        if (config?.governanceBypass && config?.userId && config?.executionId) {
+        if (config?.governanceBypass && config?.userId && config?.executionId && process.env.GOVERNANCE_BYPASS_TOKEN === DEFAULT_BYPASS_TOKEN) {
             await this.auditOwnerOverride(config.userId, config.executionId);
             return false;
         }
@@ -101,13 +108,43 @@ export class CostGovernanceService {
         }
     }
 
-    /**
-     * Checks if a user can execute a generation job based on their daily limits from Supabase.
-     */
     static async checkAndIncrementExecutionLimit(userId: string): Promise<{ allowed: boolean; currentCount: number }> {
-        // TEMPORARY BYPASS: Hardcode true to allow infinite testing locally
-        logger.info({ userId }, "TEMPORARY BYPASS: Skipping execution limit check completely.");
-        return { allowed: true, currentCount: 0 };
+        const today = new Date().toISOString().split('T')[0];
+        const key = `governance:executions:${userId}:${today}`;
+
+        try {
+            const countStr = await redis.get(key);
+            const currentCount = countStr ? parseInt(countStr, 10) : 0;
+
+            const { getSupabaseAdmin } = await import('../services/supabase-admin');
+            const supabaseAdmin = getSupabaseAdmin();
+            if (!supabaseAdmin) throw new Error('Supabase admin not initialized');
+
+            const { data: profile } = await supabaseAdmin
+                .from('user_profiles')
+                .select('plan_type, role')
+                .eq('id', userId)
+                .single();
+
+            const plan = (profile?.role === 'owner' ? 'owner' : profile?.plan_type || 'free') as keyof typeof PLAN_LIMITS;
+            const limit = PLAN_LIMITS[plan].maxDailyGenerations;
+
+            if (currentCount >= limit) {
+                logger.warn({ userId, currentCount, limit, plan }, 'User exceeded daily generation limit');
+                return { allowed: false, currentCount };
+            }
+
+            const newCount = await redis.incr(key);
+            if (newCount === 1) {
+                await redis.expire(key, 86400); // 1 day
+            }
+
+            return { allowed: true, currentCount: newCount };
+        } catch (error) {
+            logger.error({ error, userId }, 'Failed to check execution limits');
+            // Fail closed for billing safety
+            return { allowed: false, currentCount: 0 };
+        }
     }
 
     /**

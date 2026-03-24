@@ -5,13 +5,12 @@ import net from 'net';
 import { SandboxRunner } from './sandbox-runner';
 import { PreviewRegistry } from '@libs/registry';
 import http from 'http';
-import { redis } from '@libs/utils';
+import { logger, redis, getSafeEnv } from '@libs/utils/server';
 import { SnapshotManager } from './snapshot-manager';
 import { SandboxPoolManager } from './sandbox-pool';
 import { SnapshotLibrary } from './snapshot-library';
 import { AdmissionController } from './admission-controller';
 import { MicroVMManager } from './microvm-manager';
-import logger from '@libs/utils';
 import { ArtifactValidator } from '@libs/validator';
 
 class PortAllocator {
@@ -220,10 +219,9 @@ export class PreviewServerManager {
                     executionId: projectId,
                     agentName: 'System',
                     action: 'preview_server',
-                    env: {
-                        ...process.env,
+                    env: getSafeEnv({
                         NODE_OPTIONS: `--max-old-space-size=${memoryLimitMb}`
-                    }
+                    })
                 });
 
                 this.startHeartbeatMonitor(projectId, child);

@@ -3,10 +3,10 @@
 import { Github, X, ExternalLink, GitBranch, GitPullRequest, Code2, CheckCircle2, Lock, RotateCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useCallback } from 'react';
-import { githubService, GithubRepo } from '@services/github-service';
-import { useSidebar } from '@context/SidebarContext';
+import { githubService, GithubRepo } from '@libs/utils';
+import { useSidebar } from '@libs/context';
 import { toast } from 'sonner';
-import { formatDate } from '@config/date';
+import { formatDate } from '@libs/utils';
 
 type GithubIntegrationModalProps = {
     isOpen: boolean;

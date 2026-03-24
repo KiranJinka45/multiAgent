@@ -30,10 +30,11 @@ export default function CodeEditor({ content, onChange, fileName, projectId }: C
     const doc = new Y.Doc();
     docRef.current = doc;
     
-    // Connect to websocket provider
+    // Connect to websocket provider with standardized room naming
+    const roomName = `project:${projectId}:file:${fileName}`;
     const provider = new WebsocketProvider(
-      'ws://localhost:3011', 
-      `${projectId}-${fileName}`, 
+      process.env.NEXT_PUBLIC_YJS_URL || 'ws://localhost:3011', 
+      roomName, 
       doc
     );
     providerRef.current = provider;

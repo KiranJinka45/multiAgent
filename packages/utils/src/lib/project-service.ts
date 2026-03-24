@@ -1,3 +1,3 @@
-﻿export async function getProject() {
+export async function getProject() {
     return null
 }

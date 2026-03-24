@@ -1,4 +1,4 @@
-﻿import redis from '../services/redis';
+import redis from '../services/redis';
 import logger from './logger';
 import { v4 as uuidv4 } from 'uuid';
 

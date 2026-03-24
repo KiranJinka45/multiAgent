@@ -4,11 +4,11 @@ import { Sparkles, PanelLeft, Edit3, FolderPlus, Image, Github, Terminal, Compas
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { supabase } from '@/lib/supabase-browser';
-import { useRealtimeSubscription } from '@hooks/useRealtimeSubscription';
+import { useRealtimeSubscription } from '@libs/utils';
 import type { User } from '@libs/supabase';
 import { chatService } from '@libs/utils';
 import { Chat } from '@libs/contracts';
-import { useSidebar } from '@context/SidebarContext';
+import { useSidebar } from '@libs/context';
 import { toast } from 'sonner';
 
 // Sub-components

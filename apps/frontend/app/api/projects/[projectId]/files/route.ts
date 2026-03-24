@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs-extra';
-import path from 'path';
-import logger from '@config/logger';
+import fs from 'node:fs/promises';
+import { existsSync } from 'node:fs';
+import path from 'node:path';
+import { logger, projectService } from '@libs/utils/src/server';
+import { createRouteHandlerClient } from '@libs/supabase';
+import { cookies } from 'next/headers';
 
 interface FileTreeEntry {
   name: string;
@@ -15,10 +18,29 @@ export async function GET(
   { params }: { params: { projectId: string } }
 ) {
   const { projectId } = params;
-  const sandboxDir = path.join(process.cwd(), '.generated-projects', projectId);
+  const supabase = createRouteHandlerClient({ cookies });
 
   try {
-    if (!await fs.pathExists(sandboxDir)) {
+    // 1. Authentication
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // 2. Authorization (Tenant/Owner Check)
+    const project = await projectService.getProject(projectId, supabase);
+    if (!project) {
+        return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+    }
+
+    if (project.user_id !== session.user.id) {
+        logger.warn({ userId: session.user.id, projectId }, '[Security] Unauthorized access attempt to project files');
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    const sandboxDir = path.join(process.cwd(), '.generated-projects', projectId);
+
+    if (!existsSync(sandboxDir)) {
       return NextResponse.json({ 
         projectId,
         files: [],

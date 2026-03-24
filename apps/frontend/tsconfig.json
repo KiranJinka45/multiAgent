@@ -1,57 +1,22 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": false,
+    "outDir": "dist",
     "noEmit": true,
-    "incremental": true,
-    "module": "esnext",
-    "esModuleInterop": true,
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
     "plugins": [
       {
         "name": "next"
       }
-    ],
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./*"],
-      "@app/*": ["./app/*"],
-      "@components/*": ["./components/*"],
-      "@services/*": ["../../apps/api-gateway/services/*", "../../libs/shared-services/*"],
-      "@types/*": ["../../libs/shared-types/*"],
-      "@context/*": ["../../libs/context/*"],
-      "@shared/*": ["../../libs/shared-utils/*"],
-      "@shared-types/*": ["../../libs/shared-types/*"],
-      "@libs/*": ["../../libs/*"],
-      "@config/*": ["../../libs/shared-utils/config/*"],
-      "@hooks/*": ["../../libs/shared-utils/hooks/*"],
-      "@lib/*": ["../../libs/shared-utils/lib/*"],
-      "@agents/*": ["../../libs/agents/*"],
-      "@workers/*": ["../../apps/worker/*"],
-      "@runtime/*": ["../../apps/preview-runtime/*"],
-      "@registry/*": ["../../libs/registry/*"],
-      "@build-engine/*": ["../../libs/build-engine/*"],
-      "@validator/*": ["../../libs/validator/*"],
-      "@queue": ["../../libs/shared-services/queue/index.ts"],
-      "@queue/*": ["../../libs/shared-services/queue/*"]
-    }
+    ]
   },
   "include": [
     "next-env.d.ts",
-    ".next/types/**/*.ts",
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx",
+    ".next/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "dist"
   ]
 }

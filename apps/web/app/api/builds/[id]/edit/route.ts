@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ChatEditAgent } from '@libs/agents';
 import { projectMemory } from '@libs/utils';
 import { projectService } from '@libs/utils';
-import { sandbox } from '@runtime/sandbox';
+import { sandbox } from '@libs/runtime/sandbox';
 import { patchVerifier } from '@libs/utils';
 import { supabaseAdmin } from '@libs/utils';
 import { VirtualFileSystem, PatchEngine, CommitManager } from '@libs/utils';
 import path from 'path';
 import fs from 'fs';
-import { previewManager } from '@/runtime/preview-manager';
+import { previewManager } from '@libs/runtime/preview-manager';
 import logger from '@libs/utils';
 
 /**

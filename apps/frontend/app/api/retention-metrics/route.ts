@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@queue/supabase-admin';
-import logger from '@config/logger';
-import { withObservability } from '@config/api-wrapper';
+import { supabaseAdmin, logger, withObservability } from '@libs/utils/src/server';
 
 async function handler() {
     try {

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PreviewRegistry } from '@libs/registry';
-import { previewManager } from '@runtime/preview-manager';
+import { previewManager } from '@libs/runtime/preview-manager';
 import logger from '@libs/utils';
 
 export async function GET(

@@ -1,0 +1,280 @@
+// packages/db/schema.prisma
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  name      String?
+  role      Role      @default(USER)
+  tenantId  String
+  tenant    Tenant    @relation(fields: [tenantId], references: [id])
+  projects  Project[]
+  createdAt DateTime  @default(now())
+}
+
+model Tenant {
+  id            String         @id @default(uuid())
+  name          String
+  plan          Plan           @default(FREE)
+  users         User[]
+  projects      Project[]
+  subscriptions Subscription[]
+  usage         Usage?
+  products      Product[]      // Products managed by this tenant (if any)
+  createdAt     DateTime       @default(now())
+}
+
+model Product {
+  id            String          @id @default(uuid())
+  name          String
+  slug          String          @unique
+  description   String?
+  price         Int             // in paise/cents
+  tenantId      String?         // Optional: if products are tenant-specific
+  tenant        Tenant?         @relation(fields: [tenantId], references: [id])
+  subscriptions Subscription[]
+  metrics       ProductMetric[]
+  createdAt     DateTime        @default(now())
+}
+
+model Project {
+  id        String        @id @default(uuid())
+  name      String
+  prompt    String
+  status    ProjectStatus @default(CREATED)
+  tenantId  String
+  tenant    Tenant        @relation(fields: [tenantId], references: [id])
+  createdBy String
+  creator   User          @relation(fields: [createdBy], references: [id])
+  builds    Build[]
+  files     File[]
+  createdAt DateTime      @default(now())
+}
+
+model Build {
+  id         String      @id @default(uuid())
+  projectId  String
+  project    Project     @relation(fields: [projectId], references: [id])
+  status     BuildStatus @default(QUEUED)
+  logs       String?
+  previewUrl String?
+  createdAt  DateTime    @default(now())
+}
+
+model File {
+  id        String   @id @default(uuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id])
+  path      String
+  content   String
+  updatedAt DateTime @updatedAt
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+}
+
+model Subscription {
+  id          String   @id @default(uuid())
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  productId   String?
+  product     Product? @relation(fields: [productId], references: [id])
+  plan        Plan     @default(FREE)
+  status      String   // active, canceled, trialing
+  stripeId    String   @unique // Stripe Subscription ID
+  createdAt   DateTime @default(now())
+}
+
+model Event {
+  id        String   @id @default(uuid())
+  userId    String?
+  tenantId  String?
+  type      String   // page_view, signup, build_started, etc.
+  metadata  Json
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([tenantId])
+  @@index([type])
+}
+
+model ProductMetric {
+  id          String   @id @default(uuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id])
+  date        DateTime
+  revenue     Float
+  users       Int
+  conversions Int
+  metadata    Json?
+
+  @@index([productId])
+  @@index([date])
+}
+
+model Usage {
+  id               String   @id @default(uuid())
+  tenantId         String   @unique
+  tenant           Tenant   @relation(fields: [tenantId], references: [id])
+  builds           Int      @default(0)
+  apiCalls         Int      @default(0)
+  totalTokens      Int      @default(0)
+  promptTokens     Int      @default(0)
+  completionTokens Int      @default(0)
+  totalCost        Float    @default(0)
+  updatedAt        DateTime @updatedAt
+}
+
+model AiUsageLog {
+  id               String   @id @default(uuid())
+  tenantId         String
+  userId           String
+  model            String
+  promptTokens     Int
+  completionTokens Int
+  totalTokens      Int
+  cost             Float
+  metadata         Json?
+  createdAt        DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([userId])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Plan {
+  FREE
+  PRO
+}
+
+enum ProjectStatus {
+  CREATED
+  BUILDING
+  READY
+  FAILED
+}
+
+enum BuildStatus {
+  QUEUED
+  RUNNING
+  SUCCESS
+  FAILED
+}
+
+model AiEvaluation {
+  id        String   @id @default(uuid())
+  tenantId  String
+  model     String
+  score     Float
+  metrics   Json // buildSuccess, lintScore, typeScore, testScore, diffScore
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([model])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  tenantId  String
+  userId    String
+  action    String
+  resource  String
+  metadata  Json?
+  ipAddress String?
+  hash      String // SHA-256 chain hash
+  createdAt DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([userId])
+}
+
+model CollaborativeDoc {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  updates   Bytes // Store merged Yjs updates
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ExecutionLog {
+  id        String   @id @default(uuid())
+  taskType  String
+  input     Json
+  output    Json
+  success   Boolean
+  latency   Int
+  cost      Float    @default(0)
+  score     Float?
+  createdAt DateTime @default(now())
+
+  @@index([taskType])
+  @@index([success])
+}
+
+model Strategy {
+  id        String   @id @default(uuid())
+  agent     String
+  version   Int
+  config    Json
+  score     Float    @default(0)
+  isActive  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([agent])
+  @@index([isActive])
+}
+
+model Pattern {
+  id          String   @id @default(uuid())
+  type        String // success_pattern | failure_pattern
+  description String
+  weight      Float
+  metadata    Json
+  createdAt   DateTime @default(now())
+
+  @@index([type])
+}
+
+model CodeModule {
+  id          String   @id @default(uuid())
+  path        String   @unique
+  name        String
+  summary     String
+  riskLevel   String   // low, medium, high
+  deps        String[] // paths of dependent modules
+  lastUpdated DateTime @default(now())
+}
+
+model ProposedChange {
+  id             String   @id @default(uuid())
+  agentId        String
+  targetPath     String
+  changeType     String   // optimization, bugfix, feature
+  reason         String
+  patch          String   @db.Text
+  expectedImpact Json
+  status         String   @default("proposed") // proposed, simulating, validated, rejected, promoted
+  simulationLogs String?  @db.Text
+  validationScore Float?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([status])
+}

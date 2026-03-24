@@ -18,10 +18,10 @@
 
 import { NodeRegistry, NodeInfo } from './nodeRegistry';
 import { DistributedLock } from './distributedLock';
-import { PreviewRegistry } from '@registry/previewRegistry';
+import { PreviewRegistry } from '@libs/registry';
 import { StaleEvictor } from './staleEvictor';
-import redis from '@queue/redis-client';
-import logger from '@config/logger';
+import redis from '@libs/utils';
+import logger from '@libs/utils';
 
 // ─── Config ────────────────────────────────────────────────────────────────
 

@@ -1,15 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ChatEditAgent } from '@agents/chat-edit-agent';
-import { projectMemory } from '@services/project-memory';
-import { projectService } from '@services/project-service';
-import { sandbox } from '@runtime/sandbox';
-import { patchVerifier } from '@services/patch-verifier';
-import { supabaseAdmin } from '@queue/supabase-admin';
-import { VirtualFileSystem, PatchEngine, CommitManager } from '@services/vfs';
+import { ChatEditAgent } from '@libs/brain';
+import { 
+    projectMemory, 
+    projectService, 
+    patchVerifier, 
+    supabaseAdmin, 
+    VirtualFileSystem, 
+    PatchEngine, 
+    CommitManager,
+    logger
+} from '@libs/utils/src/server';
 import path from 'path';
 import fs from 'fs';
-import { previewManager } from '@/runtime/preview-manager';
-import logger from '@config/logger';
+import { previewManager } from '@libs/runtime/preview-manager';
 
 /**
  * POST /api/projects/[id]/edit

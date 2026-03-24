@@ -1,13 +1,13 @@
 import '../scripts/pre-init';
 import { Worker, Job } from 'bullmq';
 import { QUEUE_VALIDATOR, dockerQueue, repairQueue } from '../lib/queue/agent-queues';
-import redis from '@libs/utils';
+import redis from '../shared/services/queue/redis-client';
 import logger from '../config/logger';
 import { patchVerifier } from '../api-gateway/services/patch-verifier';
 import { DebugAgent } from '../agents/debug-agent';
 import { VirtualFileSystem, CommitManager, PatchEngine } from '../api-gateway/services/vfs';
 import { AgentMemory } from '../shared/services/agent-memory';
-import { eventBus } from '../api/services/memory/event-bus';
+import { eventBus } from '../shared/services/event-bus';
 import { DistributedExecutionContext } from '../api-gateway/services/execution-context';
 import path from 'path';
 import fs from 'fs';

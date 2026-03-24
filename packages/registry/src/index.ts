@@ -1,2 +1,4 @@
 // Entry point for @libs/registry
-export {};
+
+export * from './preview-registry';
+export * from './previewRegistry';

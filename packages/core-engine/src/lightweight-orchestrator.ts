@@ -5,9 +5,8 @@
  */
 
 import { AgentRequest, AgentResponse, AgentContext } from '@libs/contracts';
-import { agentRegistry } from '../../apps/api-gateway/services/task-engine/agent-registry'; // Temporary bridge
-import { eventBus } from '@shared/services/event-bus';
-import logger from '@libs/utils';
+import { agentRegistry } from '@libs/agents'; // Temporary bridge
+import { eventBus, logger } from '@libs/utils/server';
 
 export interface LightweightTask {
     id: string;

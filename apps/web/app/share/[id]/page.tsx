@@ -1,5 +1,5 @@
 import { PreviewRegistry } from '@libs/registry';
-import { previewManager } from '@runtime/preview-manager';
+import { previewManager } from '@libs/runtime/preview-manager';
 import { AnalyticsService } from '@libs/utils';
 import { GrowthHeader } from '@/components/GrowthHeader';
 import { RemixWatermark } from '@/components/editor/RemixWatermark';

@@ -19,8 +19,8 @@ import { BuildUpdate } from '@libs/contracts';
 import DevOpsDashboard from '@components/DevOpsDashboard';
 import TechStackSelector, { TechStack } from '@components/TechStackSelector';
 import PushToGithubModal from '@components/PushToGithubModal';
-import { useSocket } from '@hooks/use-socket';
-import { useRealtimeSubscription } from '@hooks/useRealtimeSubscription';
+import { useSocket } from '@libs/utils';
+import { useRealtimeSubscription } from '@libs/utils';
 
 const FileItem = memo(({ file, isSelected, onClick }: { file: ProjectFile, isSelected: boolean, onClick: () => void }) => {
     const fileName = file.path.split('/').pop() || file.path;

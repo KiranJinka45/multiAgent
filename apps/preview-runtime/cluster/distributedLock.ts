@@ -11,8 +11,8 @@
  * This single-instance version is safe for single-master Redis setups.
  */
 
-import redis from '@queue/redis-client';
-import logger from '@config/logger';
+import { redis } from '@libs/utils';
+import logger from '@libs/utils';
 
 const LOCK_PREFIX = 'cluster:lock:';
 const DEFAULT_TTL_MS = 30_000;  // 30-second lock timeout

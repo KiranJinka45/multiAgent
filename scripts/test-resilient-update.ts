@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 import * as dotenv from 'dotenv';
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@libs/supabase/supabase-js';
 
 dotenv.config({ path: '.env.local' });
 

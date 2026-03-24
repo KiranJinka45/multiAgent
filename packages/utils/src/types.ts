@@ -1,4 +1,4 @@
-﻿/**
+/**
  * platform/shared/types.ts
  * 
  * Central type definitions for the Aion Production Platform.

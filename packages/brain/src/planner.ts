@@ -66,13 +66,16 @@ OUTPUT FORMAT (JSON):
                     history: [],
                     metadata: {},
                     getExecutionId() { return 'brain-planning'; },
-                    getProjectId() { return 'brain-planning'; }
+                    getProjectId() { return 'brain-planning'; },
+                    getVFS() { return {}; },
+                    async get() { return this; },
+                    async atomicUpdate(updater: any) { updater(this); }
                 },
                 tenantId,
                 taskType: 'planning',
                 params: {}
             };
-            const { result } = await this.promptLLM(system, context.prompt, request);
+            const { result } = await this.promptLLM(system, context.prompt, 'llama-3.3-70b-versatile', undefined, undefined, request.context);
             return result as DeploymentPlan;
         } catch (err) {
             logger.error({ err }, '[Planner] AI planning failed. Falling back to default plan.');

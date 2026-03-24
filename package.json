@@ -3,14 +3,29 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "pnpm -r dev",
-    "build": "pnpm -r build",
-    "start:worker": "pnpm --filter @apps/worker start",
-    "start:deploy": "pnpm --filter @apps/deploy-service start",
-    "dev:gateway": "pnpm --filter @apps/gateway dev",
-    "dev:api": "pnpm --filter @apps/api dev",
-    "dev:worker": "pnpm --filter @apps/worker dev",
-    "dev:deploy": "pnpm --filter @apps/deploy-service dev"
+    "dev": "turbo run dev --parallel",
+    "dev:apps": "turbo run dev --filter=apps/*",
+    "build": "turbo run build",
+    "build:analyze": "turbo run build && npx source-map-explorer apps/gateway/dist/index.js",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "prebuild": "node scripts/verify-reliability.js",
+    "boot": "node scripts/system-startup.js"
   },
-  "packageManager": "pnpm@9.0.0"
+  "packageManager": "pnpm@9.0.0",
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "ioredis": "^5.10.1",
+    "tsconfig-paths": "^4.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "eslint-plugin-boundaries": "^6.0.1",
+    "prisma": "^5.10.0",
+    "source-map-explorer": "^2.5.3",
+    "tsup": "^8.5.1",
+    "tsx": "^4.21.0",
+    "turbo": "^2.8.20",
+    "typescript": "^5.9.3"
+  }
 }

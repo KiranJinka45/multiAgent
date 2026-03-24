@@ -1,5 +1,5 @@
-﻿import { AuditLogger } from './audit-logger';
-import logger from '../config/logger';
+import { AuditLogger } from './audit-logger';
+import { logger } from '../logger';
 
 /**
  * AnchoringService handles cryptographic anchoring of audit log root hashes

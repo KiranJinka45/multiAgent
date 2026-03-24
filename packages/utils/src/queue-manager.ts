@@ -17,24 +17,44 @@ export class QueueManager {
             const queue = new Queue(name, { 
                 connection: redis as any,
                 defaultJobOptions: {
-                    attempts: 5,
+                    attempts: 3,
                     backoff: {
                         type: 'exponential',
-                        delay: 10000 // Start with 10s
+                        delay: 5000 // 5s initial delay
                     },
                     removeOnComplete: {
-                        age: 3600 * 24, // Keep for 24h
-                        count: 1000
+                        age: 3600, // Keep completed jobs for 1 hour
+                        count: 100
                     },
                     removeOnFail: {
-                        age: 3600 * 24 * 7, // Keep failed for 7 days (DLQ behavior)
-                        count: 5000
+                        age: 24 * 3600 // Keep failed jobs for 24 hours
                     }
                 }
             });
             this.queues.set(name, queue);
         }
         return this.queues.get(name)!;
+    }
+
+    async moveToDLQ(job: any, error: Error) {
+        const dlqName = 'dead-letter-queue';
+        const dlq = this.getQueue(dlqName);
+        
+        await dlq.add(job.name, {
+            originalQueue: job.queueName,
+            originalData: job.data,
+            failedReason: error.message,
+            stack: error.stack,
+            failedAt: new Date().toISOString(),
+            originalJobId: job.id,
+            attemptsMade: job.attemptsMade
+        }, { 
+            jobId: `dlq_${job.id}_${Date.now()}`,
+            removeOnComplete: false,
+            removeOnFail: false
+        });
+
+        logger.warn({ jobId: job.id, dlqName, error: error.message }, '[QueueManager] Job moved to DLQ');
     }
 
     async addJob(queueName: string, data: any, jobId?: string) {

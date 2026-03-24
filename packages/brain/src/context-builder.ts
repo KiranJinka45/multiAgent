@@ -1,4 +1,4 @@
-import { MemoryService } from '../memory/memory-service';
+import { MemoryService } from '@libs/memory';
 import logger from '@libs/utils';
 
 export interface BrainContext {

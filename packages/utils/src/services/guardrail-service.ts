@@ -1,4 +1,4 @@
-﻿import logger from '../config/logger';
+import logger from '../logger';
 
 export interface GuardrailResult {
     isValid: boolean;

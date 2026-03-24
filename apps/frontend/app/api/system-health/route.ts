@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { redis } from '@queue';
+import { redis } from '@libs/utils/server';
 import Docker from 'dockerode';
 
 const docker = new Docker();

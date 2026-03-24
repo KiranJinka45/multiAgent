@@ -1,2 +1,4 @@
 // Entry point for @libs/templates
-export {};
+export const templates = {};
+
+

@@ -1,4 +1,4 @@
-﻿import dotenv from "dotenv";
+import dotenv from "dotenv";
 import path from "path";
 import fs from "fs";
 
@@ -35,6 +35,41 @@ export const env = {
     WORKER_POOL_SIZE: Number(process.env.WORKER_POOL_SIZE) || 3,
     REDIS_URL: process.env.REDIS_URL || "redis://localhost:6379",
 };
+
+/**
+ * Returns a sanitized environment object for sandbox execution.
+ * Whitelists only safe, necessary variables to prevent secret leakage.
+ */
+export function getSafeEnv(userEnv: Record<string, string> = {}): NodeJS.ProcessEnv {
+    const whitelist = [
+        'PATH',
+        'NODE_ENV',
+        'PORT',
+        'TERM',
+        'HOME',
+        'LANG',
+        'LC_ALL'
+    ];
+
+    const safeEnv = {} as NodeJS.ProcessEnv;
+
+    // 1. Add whitelisted system variables
+    for (const key of whitelist) {
+        if (process.env[key]) {
+            safeEnv[key] = process.env[key];
+        }
+    }
+
+    // 2. Add NEXT_PUBLIC_ variables (safe for client-side/preview)
+    for (const key in process.env) {
+        if (key.startsWith('NEXT_PUBLIC_')) {
+            safeEnv[key] = process.env[key];
+        }
+    }
+
+    // 3. Merge user-provided variables (already validated or specific to the project)
+    return { ...safeEnv, ...userEnv };
+}
 
 // Validation
 const isProd = env.NODE_ENV === "production";

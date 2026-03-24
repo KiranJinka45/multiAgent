@@ -1,5 +1,8 @@
-import { Groq } from 'groq-sdk';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { createRouteHandlerClient } from '@libs/supabase';
+import { cookies } from 'next/headers';
+import { ChatRequestSchema, RateLimiter } from '@libs/utils/server';
+import { Groq } from '@libs/brain';
 
 // Initialize Groq inside the handler or with a check to avoid top-level crashes if API key is missing
 const getGroqClient = () => {
@@ -12,10 +15,41 @@ const getGroqClient = () => {
 
 export const runtime = 'edge';
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+    const supabase = createRouteHandlerClient({ cookies });
+
     try {
+        // 1. Authentication
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+            return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+        }
+
+        // 1.5 Rate Limiting
+        const rateLimiter = new RateLimiter();
+        const { allowed, remaining } = await rateLimiter.checkLimit(session.user.id, 'chat');
+        if (!allowed) {
+            return NextResponse.json({ 
+                error: 'Rate limit exceeded',
+                message: 'You have reached the maximum number of chat requests for today.'
+            }, { 
+                status: 429,
+                headers: { 'X-RateLimit-Remaining': remaining.toString() }
+            });
+        }
+
         const body = await req.json().catch(() => ({}));
-        const { message, model } = body;
+        
+        // 2. Validation
+        const validation = ChatRequestSchema.safeParse(body);
+        if (!validation.success) {
+            return NextResponse.json({ 
+                error: 'Invalid request', 
+                details: validation.error.format() 
+            }, { status: 400 });
+        }
+
+        const { message, model } = validation.data;
 
         if (!message) {
             return NextResponse.json({ error: 'Message is required' }, { status: 400 });

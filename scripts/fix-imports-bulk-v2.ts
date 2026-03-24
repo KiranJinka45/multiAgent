@@ -33,8 +33,8 @@ walkDir(rootDir, (filePath) => {
     // 1. Replace @config/ with @config/
     content = content.replace(/@configs\//g, '@config/');
 
-    // 2. Replace @runtime/ with @runtime/
-    content = content.replace(/@services\/runtime\//g, '@runtime/');
+    // 2. Replace @libs/runtime/ with @libs/runtime/
+    content = content.replace(/@services\/runtime\//g, '@libs/runtime/');
 
     // 3. Replace agent imports from @services/ to @agents/
     agents.forEach(agent => {

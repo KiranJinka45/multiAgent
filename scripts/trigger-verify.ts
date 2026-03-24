@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "@libs/supabase/supabase-js";
 import { Queue } from "bullmq";
 import Redis from "ioredis";
 import * as dotenv from "dotenv";

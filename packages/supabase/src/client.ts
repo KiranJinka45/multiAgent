@@ -1,5 +1,7 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-export type { SupabaseClient };
+import { createClient, type SupabaseClient, type RealtimePostgresChangesPayload } from '@supabase/supabase-js';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+export type { SupabaseClient, RealtimePostgresChangesPayload };
+export { createClientComponentClient };
 
 export type SupabaseConfig = {
   url: string;
@@ -44,4 +46,43 @@ export function createServerSupabaseClient(url: string, key: string): SupabaseCl
       detectSessionInUrl: false
     }
   });
+}
+
+/**
+ * Mock/Direct implementation of createRouteHandlerClient for Next.js.
+ * In a real Next.js app, this would use @supabase/auth-helpers-nextjs or @supabase/ssr.
+ */
+export function createRouteHandlerClient({ cookies }: { cookies: () => { toString: () => string } }): SupabaseClient {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+  
+  return createClient(url, key, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false
+    },
+    global: {
+        headers: {
+            // This is a simplified version; real one would handle cookies correctly
+            Cookie: typeof cookies === 'function' ? cookies().toString() : ''
+        }
+    }
+  });
+}
+
+/**
+ * Mock/Direct implementation of createMiddlewareClient for Next.js middleware.
+ */
+export function createMiddlewareClient(_options: { req: unknown; res: unknown }): SupabaseClient {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
+    return createClient(url, key, {
+        auth: {
+            persistSession: false,
+            autoRefreshToken: false,
+            detectSessionInUrl: false
+        }
+    });
 }

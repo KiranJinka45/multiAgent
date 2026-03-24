@@ -4,7 +4,7 @@ import { Github, X, ExternalLink, GitBranch, GitPullRequest, Code2, CheckCircle2
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useCallback } from 'react';
 import { githubService, GithubRepo } from '@libs/utils';
-import { useSidebar } from '@context/SidebarContext';
+import { useSidebar } from '@libs/context';
 import { toast } from 'sonner';
 import { formatDate } from '@libs/utils';
 

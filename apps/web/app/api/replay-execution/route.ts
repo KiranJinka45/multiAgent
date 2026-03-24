@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Orchestrator } from '@libs/utils';
+import { Orchestrator } from '@libs/core-engine';
 import { DistributedExecutionContext as ExecutionContext } from '@libs/utils';
 import logger from '@libs/utils';
 

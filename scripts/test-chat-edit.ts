@@ -1,7 +1,7 @@
 /**
  * Clean plain-text E2E test — no ANSI color codes, easy to read in log
  */
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@libs/supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;

@@ -1,2 +1,3 @@
 // Entry point for @libs/context
-export {};
+
+export * from './SidebarContext';

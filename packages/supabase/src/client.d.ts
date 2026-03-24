@@ -1,4 +1,4 @@
-import { type SupabaseClient } from '@libs/supabase';
+import { type SupabaseClient } from './index';
 export type SupabaseConfig = {
     url: string;
     anonKey: string;

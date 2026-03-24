@@ -158,14 +158,16 @@ export const RuntimeGuard = {
      * Returns safe spawn options to limit resource exposure.
      * These are the options to pass to child_process.spawn().
      */
-    safeSpawnOptions(cwd: string): object {
+    safeSpawnOptions(cwd: string, env: Record<string, string> = {}): any {
+        const { getSafeEnv } = require('@libs/utils'); // Deferred to avoid circularity if any
+        
         return {
             cwd,
+            env: getSafeEnv(env),
             detached: false,   // Process dies with parent
             shell: false,       // No shell injection
             stdio: ['ignore', 'pipe', 'pipe'] as const,
-            // On Linux/Mac you'd add: uid, gid for process isolation
-            // On Windows: no direct equivalent — use Docker for isolation
+            windowsHide: true,  // Hide console on Windows
         };
     },
 };

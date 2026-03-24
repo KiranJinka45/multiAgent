@@ -1,6 +1,6 @@
 'use client';
 
-import { getSupabaseClient } from '@lib/supabaseClient';
+import { getSupabaseClient } from '@libs/utils';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { User, LogOut, Monitor, Shield, Bell, Moon, Sun, Smartphone, Trash2, Check, ChevronRight } from 'lucide-react';
@@ -10,10 +10,10 @@ import MobileMenu from '@components/MobileMenu';
 import TopNav from '@components/TopNav';
 import { toast } from 'sonner';
 import { Archive, RotateCcw } from 'lucide-react';
-import { chatService } from '@services/chat-service';
-import { formatRelative } from '@config/date';
-import { User as SupabaseUser } from '@supabase/supabase-js';
-import { Chat } from '@shared-types/chat';
+import { chatService } from '@libs/utils';
+import { formatRelative } from '@libs/utils';
+import { User as SupabaseUser } from '@libs/supabase';
+import { Chat } from '@libs/contracts';
 
 type SettingsTab = 'profile' | 'appearance' | 'security' | 'notifications' | 'archive';
 

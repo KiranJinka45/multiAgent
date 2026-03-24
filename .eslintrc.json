@@ -1,6 +1,43 @@
 {
+  "ignorePatterns": ["dist", ".next", "node_modules"],
+  "plugins": ["boundaries"],
   "extends": [
     "next/core-web-vitals",
     "next/typescript"
-  ]
+  ],
+  "settings": {
+    "boundaries/elements": [
+      { "type": "app", "pattern": "apps/*" },
+      { "type": "lib", "pattern": "packages/*" },
+      { "type": "memory-core", "pattern": "packages/memory-core/*" },
+      { "type": "memory-vector", "pattern": "packages/memory-vector/*" },
+      { "type": "memory-cache", "pattern": "packages/memory-cache/*" }
+    ]
+  },
+  "rules": {
+    "boundaries/element-types": [2, {
+      "default": "allow",
+      "message": "${file.type} is not allowed to import ${dependency.type}",
+      "rules": [
+        {
+          "from": "app",
+          "disallow": ["app"],
+          "message": "Apps cannot import from other apps directly"
+        },
+        {
+          "from": "memory-core",
+          "disallow": ["memory-vector", "memory-cache"],
+          "message": "Core interfaces cannot depend on implementations (vector/cache)"
+        },
+        {
+          "from": "memory-vector",
+          "allow": ["memory-core", "lib"]
+        },
+        {
+          "from": "memory-cache",
+          "allow": ["memory-core", "lib"]
+        }
+      ]
+    }]
+  }
 }

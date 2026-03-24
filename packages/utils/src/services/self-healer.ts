@@ -1,4 +1,4 @@
-﻿import logger from '../config/logger';
+import logger from '../config/logger';
 import { JobArtifact } from '@libs/contracts';
 
 const FORBIDDEN_PATTERNS = [
