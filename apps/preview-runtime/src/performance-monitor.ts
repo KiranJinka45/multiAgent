@@ -1,4 +1,4 @@
-import logger from '@libs/utils';
+import { logger } from '@libs/utils/server';
 
 export interface PerformanceMetrics {
     projectId: string;

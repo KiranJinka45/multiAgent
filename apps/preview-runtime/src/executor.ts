@@ -1,5 +1,5 @@
 import { spawn } from 'child_process';
-import { getExecutionLogger } from '@libs/utils';
+import { getExecutionLogger } from '@libs/utils/server';
 
 export interface ExecutionOptions {
     cwd: string;

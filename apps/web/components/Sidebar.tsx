@@ -6,7 +6,6 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { supabase } from '@/lib/supabase-browser';
 import { useRealtimeSubscription } from '@libs/utils';
 import type { User } from '@libs/supabase';
-import { chatService } from '@libs/utils';
 import { Chat } from '@libs/contracts';
 import { useSidebar } from '@libs/context';
 import { toast } from 'sonner';

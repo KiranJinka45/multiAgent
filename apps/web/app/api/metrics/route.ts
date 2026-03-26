@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { createRouteHandlerClient } from '@libs/supabase';
 import { cookies } from 'next/headers';
-import redis from '@libs/utils';
-import { withObservability } from '@libs/utils';
+import redis from '@libs/utils/server';
+import { withObservability } from '@libs/utils/server';
 
 async function handler() {
     const supabase = createRouteHandlerClient({ cookies });
@@ -65,3 +65,5 @@ async function handler() {
 }
 
 export const GET = withObservability(handler);
+
+export const dynamic = 'force-dynamic';

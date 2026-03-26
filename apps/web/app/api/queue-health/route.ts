@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { freeQueue } from '@libs/utils';
+import { freeQueue } from '@libs/utils/server';
 
 export async function GET() {
     try {
@@ -28,3 +28,5 @@ export async function GET() {
         }, { status: 500 });
     }
 }
+
+export const dynamic = 'force-dynamic';

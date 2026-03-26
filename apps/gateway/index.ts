@@ -101,7 +101,8 @@ const authenticate = (req: Request, res: Response, next: NextFunction) => {
         (req as AuthenticatedRequest).user = decoded;
         next();
     } catch (err: unknown) {
-        elog.error({ err }, 'Authentication failed');
+        const errorMessage = err instanceof Error ? err.message : String(err);
+        elog.error({ err }, `Authentication failed: ${errorMessage}`);
         return res.status(401).json({ error: 'Unauthorized' });
     }
 };
@@ -146,7 +147,7 @@ app.post('/auth/login', async (req: Request, res: Response) => {
 
         res.json(response.data);
     } catch (err: unknown) {
-        const axiosError = err as { response?: { status: number, data: Record<string, unknown> } };
+        const axiosError = err as any;
         res.status(axiosError.response?.status || 500).json(axiosError.response?.data || { error: 'Auth failed' });
     }
 });

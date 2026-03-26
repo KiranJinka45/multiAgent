@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@libs/utils';
+import { supabaseAdmin } from '@libs/utils/server';
 
 /**
  * GET /api/projects/[id]/preview
@@ -35,3 +35,5 @@ export async function GET(
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
+
+export const dynamic = 'force-dynamic';

@@ -1,7 +1,6 @@
 import { DistributedExecutionContext } from './execution-context';
-import logger from '@libs/utils';
-import { eventBus } from '@libs/utils';
-import { repairQueue, plannerQueue, architectureQueue, generatorQueue, validatorQueue, dockerQueue, deployQueue } from '../../lib/queue/agent-queues';
+import { logger } from '@libs/observability';
+import { eventBus, repairQueue, plannerQueue, architectureQueue, generatorQueue, validatorQueue, dockerQueue, deployQueue } from '@libs/utils/server';
 
 export type SupervisorDecision = 'RETRY' | 'REPAIR' | 'ABORT' | 'NONE';
 

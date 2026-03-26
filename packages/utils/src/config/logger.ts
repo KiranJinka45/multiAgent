@@ -1,5 +1,5 @@
 import pino from 'pino';
-import { getCorrelationId } from './tracing';
+import { getCorrelationId } from '../server/tracing';
 import { trace, context } from '@opentelemetry/api';
 
 const transports = pino.transport({

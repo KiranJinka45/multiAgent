@@ -18,11 +18,11 @@
  */
 
 import { PreviewRegistry } from '@libs/registry';
-import { PreviewOrchestrator } from '../previewOrchestrator';
-import { RuntimeMetrics } from '../runtimeMetrics';
+import { PreviewOrchestrator } from '../';
+import { RuntimeMetrics } from '../';
 import { runtimeEvictionsTotal } from '@libs/utils';
-import redis from '@libs/utils';
-import logger from '@libs/utils';
+import { redis } from '@libs/utils/server';
+import { logger } from '@libs/utils/server';
 
 // ─── Config ────────────────────────────────────────────────────────────────
 

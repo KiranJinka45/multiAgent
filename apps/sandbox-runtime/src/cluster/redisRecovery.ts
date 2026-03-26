@@ -16,15 +16,15 @@
  * This module is purely recovery logic. No scheduling. No container logic.
  */
 
-import redis from '@libs/utils';
+import { redis } from '@libs/utils/server';
 import { NodeRegistry } from './nodeRegistry';
-import { ProcessManager } from '../processManager';
-import { ContainerManager } from '../containerManager';
+import { ProcessManager } from '../';
+import { ContainerManager } from '../';
 import { PreviewRegistry } from '@libs/registry';
-import { PortManager } from '../portManager';
-import { RuntimeCapacity } from '../runtimeCapacity';
-import { RuntimeHeartbeat } from '../runtimeHeartbeat';
-import logger from '@libs/utils';
+import { PortManager } from '../';
+import { RuntimeCapacity } from '../';
+import { RuntimeHeartbeat } from '../';
+import { logger } from '@libs/utils/server';
 
 // ─── Config ────────────────────────────────────────────────────────────────
 

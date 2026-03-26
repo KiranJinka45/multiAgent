@@ -1,8 +1,9 @@
 import { BaseWorker } from './base-worker';
 import { Job } from 'bullmq';
-import { JobPayload } from '../shared/types';
-import logger from '../shared/logger';
-import { AgentMemory } from '../shared/services/agent-memory';
+import { JobPayload } from '@libs/utils';
+import { logger } from '@libs/observability';
+import { eventBus } from '@libs/shared-services';
+import { AgentMemory } from '@libs/agents/services/agent-memory';
 
 /**
  * FrontendWorker
@@ -22,10 +23,11 @@ export class FrontendWorker extends BaseWorker {
     getName() { return 'FrontendAgent'; }
     getWorkerId() { return `frontend-worker-${process.pid}`; }
 
-    protected async processJob(job: Job<JobPayload>): Promise<any> {
-        const { missionId, taskId, payload } = job.data;
+    protected async processJob(job: Job<JobPayload>): Promise<unknown> {
+        const { missionId, taskId } = job.data;
         
-        logger.info({ missionId, taskId }, '[FrontendWorker] Starting task');
+        try {
+            logger.info({ missionId, taskId }, '[FrontendWorker] Starting task');
         await this.streamThought(missionId, "Designing UI components and responsive layouts...");
 
         // Simulate UI generation
@@ -46,6 +48,12 @@ export class FrontendWorker extends BaseWorker {
         await AgentMemory.appendTranscript(missionId, this.getName(), "Generated fundamental UI components and styles.");
 
         return result;
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        logger.error({ error, missionId, taskId }, '[FrontendWorker] Task failed');
+        await eventBus.error(missionId, `Frontend Error: ${errorMessage}`);
+        throw error;
+    }
     }
 }
 

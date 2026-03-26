@@ -1,5 +1,5 @@
 import Redlock from 'redlock';
-import { independentRedisClients } from '../services/redis';
+import { independentRedisClients } from '@libs/shared-services';
 import logger from './logger';
 
 // 1. Initialize Redlock

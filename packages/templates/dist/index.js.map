@@ -1,1 +1,1 @@
-{"version":3,"sources":["../src/index.ts"],"sourcesContent":["// Entry point for @libs/templates\nexport {};"],"mappings":";;;;;;;;;;;;;;;AAAA;AAAA;","names":[]}
+{"version":3,"sources":["../src/index.ts"],"names":["templates"],"mappings":"aACO,IAAMA,EAAY","file":"index.js","sourcesContent":["// Entry point for @libs/templates\r\nexport const templates = {};\r\n\r\n\r\n"]}

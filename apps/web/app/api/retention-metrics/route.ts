@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@libs/utils';
-import logger from '@libs/utils';
-import { withObservability } from '@libs/utils';
+import { supabaseAdmin } from '@libs/utils/server';
+import { logger } from '@libs/utils/server';
+import { withObservability } from '@libs/utils/server';
 
 async function handler() {
     try {
@@ -20,3 +20,5 @@ async function handler() {
 }
 
 export const GET = withObservability(handler);
+
+export const dynamic = 'force-dynamic';

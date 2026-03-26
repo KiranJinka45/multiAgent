@@ -1,7 +1,18 @@
 import { defineConfig } from 'tsup';
-import { baseConfig } from '../../tsup.config.base';
 
 export default defineConfig({
-  ...baseConfig,
-  entry: ['src/index.ts'],
+  entry: ['src/index.ts', 'src/planner.ts', 'src/memory.ts'],
+  format: ['cjs', 'esm'],
+  dts: false,
+  clean: true,
+  external: [
+    'openai',
+    'zod',
+    'groq-sdk',
+    '@libs/utils',
+    '@libs/contracts',
+    '@libs/observability',
+    '@libs/db',
+    '@libs/core-engine'
+  ],
 });

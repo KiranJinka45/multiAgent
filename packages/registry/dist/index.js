@@ -1,18 +1,3 @@
-var __defProp = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-  }
-  return to;
-};
-var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-
-// src/index.ts
-var index_exports = {};
-module.exports = __toCommonJS(index_exports);
+'use strict';var server=require('@libs/utils/server'),d=require('crypto');function _interopDefault(e){return e&&e.__esModule?e:{default:e}}var d__default=/*#__PURE__*/_interopDefault(d);var a="runtime:registry:",g="runtime:idmap:",p=86400,s={async init(t,e,r){let i=await this.get(t),c=i?.previewId||d__default.default.randomUUID(),l={previewId:c,projectId:t,executionId:e,userId:r,status:"PROVISIONED",previewUrl:null,ports:[],pids:[],accessToken:i?.accessToken||d__default.default.randomUUID(),startedAt:i?.startedAt||new Date().toISOString(),updatedAt:new Date().toISOString(),healthChecks:0,runtimeVersion:i&&i.runtimeVersion||1,crashCount:i?.crashCount||0,restartDisabled:i?.restartDisabled||false};return await this.save(l),server.logger.info({projectId:t,executionId:e,previewId:c},"[PreviewRegistry] Record initialized (stable)"),l},async update(t,e){let r=await this.get(t);if(!r)return server.logger.warn({projectId:t},"[PreviewRegistry] Update on non-existent record"),null;let i={...r,...e,updatedAt:new Date().toISOString()};return await this.save(i),server.logger.info({projectId:t,status:i.status,previewUrl:i.previewUrl},"[PreviewRegistry] Record updated"),i},async markRunning(t,e,r,i){return this.update(t,{status:"RUNNING",previewUrl:e,ports:r,pids:i})},async markFailed(t,e){return this.update(t,{status:"FAILED",failureReason:e})},async markStopped(t){return this.update(t,{status:"STOPPED",previewUrl:null,pids:[],ports:[]})},async recordHealthCheck(t){let e=await this.get(t);e&&await this.update(t,{healthChecks:e.healthChecks+1,lastHealthCheck:new Date().toISOString()});},async get(t){let e=await server.redis.get(`${a}${t}`);return e?JSON.parse(e):null},async lookupByPreviewId(t){let e=await server.redis.get(`${g}${t}`);return e?this.get(e):null},async getPreviewUrl(t){return (await this.get(t))?.previewUrl??null},async save(t){let e=server.redis.pipeline();e.setex(`${a}${t.projectId}`,p,JSON.stringify(t)),e.setex(`${g}${t.previewId}`,p,t.projectId),await e.exec();},async delete(t){await server.redis.del(`${a}${t}`);},async remove(t){await this.delete(t);},async listAll(){let t=await server.redis.keys(`${a}*`);return t.length?(await server.redis.mget(...t)).filter(Boolean).map(r=>JSON.parse(r)):[]}};var I={async lookup(t){let e=await s.lookupByPreviewId(t);if(e)return u(e);let r=await s.get(t);return r?u(r):null},async getPreviewId(t){return (await s.get(t))?.previewId??null},async getAll(){return (await s.listAll()).map(u)},async updateStatus(t,e){let r=await s.lookupByPreviewId(t);r&&await s.update(r.projectId,{status:e.toUpperCase()});},async heartbeat(t){let e=await s.lookupByPreviewId(t);e&&await s.update(e.projectId,{lastHeartbeatAt:new Date().toISOString()});},async register(t,e,r){let i=await s.init(t,"bridge-"+t);return await s.update(t,{port:r,previewUrl:`http://${e}:${r}`}),i.previewId},async unregisterByProject(t){await s.delete(t);}};function u(t){return {previewId:t.previewId,projectId:t.projectId,status:t.status?.toLowerCase()??"unknown",containerHost:"localhost",containerPort:t.port??0,accessToken:t.accessToken??null,createdAt:t.startedAt?new Date(t.startedAt).getTime():Date.now(),lastAccessedAt:t.lastHeartbeatAt?new Date(t.lastHeartbeatAt).getTime():t.startedAt?new Date(t.startedAt).getTime():Date.now()}}
+exports.PreviewRegistry=s;exports.previewRegistry=I;//# sourceMappingURL=index.js.map
 //# sourceMappingURL=index.js.map

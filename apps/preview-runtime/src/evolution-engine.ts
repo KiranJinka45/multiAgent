@@ -1,7 +1,7 @@
 import { PerformanceMonitor } from './performance-monitor';
-import { memoryPlane } from '../api-gateway/services/memory-plane';
-import logger from '@libs/utils';
-import { redis } from '@libs/utils';
+import { memoryPlane } from '@libs/api-gateway/services/memory-plane';
+import { logger } from '@libs/utils/server';
+import { redis } from '@libs/utils/server';
 
 export class EvolutionEngine {
     private static isRunning = false;

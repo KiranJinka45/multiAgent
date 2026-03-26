@@ -26,7 +26,7 @@ import { DistributedLock } from './distributedLock';
 import { PreviewRegistry } from '@libs/registry';
 import { redis } from '@libs/utils';
 import { missionController } from '@libs/utils';
-import logger from '@libs/utils';
+import { logger } from '@libs/utils/server';
 
 // ─── Config ────────────────────────────────────────────────────────────────
 

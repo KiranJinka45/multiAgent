@@ -8,7 +8,7 @@
  * sites work without changes. All new code should use eventBus directly.
  */
 
-import { eventBus } from '../services/event-bus';
+import { eventBus } from '@libs/services/event-bus';
 import logger from './logger';
 
 export const pusher = {

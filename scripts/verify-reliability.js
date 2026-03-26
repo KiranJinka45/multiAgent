@@ -8,7 +8,7 @@ const { execSync } = require('child_process');
 
 const LIBS = [
     'agents', 'ai', 'brain', 'build-engine', 'context', 'contracts', 
-    'core-engine', 'db', 'memory', 'observability', 'registry', 
+    'core-engine', 'db', 'memory', 'observability', 'registry', 'resilience', 
     'sdk', 'shared-services', 'supabase', 'templates', 'tools', 
     'ui', 'utils', 'validator'
 ];

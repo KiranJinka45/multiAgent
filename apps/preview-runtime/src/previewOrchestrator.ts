@@ -27,9 +27,9 @@ import { RuntimeGuard } from './runtimeGuard';
 import { RuntimeCapacity } from './runtimeCapacity';
 import { RuntimeHeartbeat } from './runtimeHeartbeat';
 import { RuntimeEscalation } from './runtimeEscalation';
-import { redis } from '@libs/utils';
+import { redis } from '@libs/utils/server';
 import path from 'path';
-import logger from '@libs/utils';
+import { logger } from '@libs/utils/server';
 import { ArtifactValidator } from '@libs/validator';
 
 // ─── Configuration ────────────────────────────────────────────────────────────

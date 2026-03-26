@@ -2,10 +2,10 @@ import { createRouteHandlerClient } from '@libs/supabase';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { Octokit } from 'octokit';
-import { projectService } from '@libs/utils';
-import { RateLimiter } from '@libs/utils';
-import { withObservability, ApiHandler } from '@libs/utils';
-import logger from '@libs/utils';
+import { projectService } from '@libs/utils/server';
+import { RateLimiter } from '@libs/utils/server';
+import { withObservability, ApiHandler } from '@libs/utils/server';
+import { logger } from '@libs/utils/server';
 
 async function handler(req: NextRequest) {
     try {
@@ -140,3 +140,5 @@ async function handler(req: NextRequest) {
 }
 
 export const POST = withObservability(handler as unknown as ApiHandler);
+
+export const dynamic = 'force-dynamic';

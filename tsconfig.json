@@ -20,10 +20,14 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@libs/*": ["packages/*/src"],
-      "@config/*": ["packages/utils/config/*"],
-      "@utils/*": ["packages/utils/services/*"],
-      "@services/*": ["packages/utils/services/*"],
+      "@libs/config/*": ["packages/utils/src/config/*"],
+      "@libs/observability": ["packages/observability/src"],
+      "@libs/observability/*": ["packages/observability/src/*"],
+      "@libs/*": ["packages/*/src", "packages/*/src/index.ts"],
+      "@libs/*/package.json": ["packages/*/package.json"],
+      "@config/*": ["packages/utils/src/config/*"],
+      "@utils/*": ["packages/utils/src/services/*"],
+      "@services/*": ["packages/utils/src/services/*"],
       "@shared/*": ["packages/utils/*"],
       "@shared-types/*": ["packages/contracts/*"],
       "@multi-agent/supabase": ["packages/supabase/index"]

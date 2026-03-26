@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createRouteHandlerClient } from '@libs/supabase';
 import { cookies } from 'next/headers';
-import { projectService } from '@libs/utils';
-import logger from '@libs/utils';
+import { projectService } from '@libs/utils/server';
+import { logger } from '@libs/utils/server';
 
 export async function GET(
     req: NextRequest,
@@ -34,3 +34,5 @@ export async function GET(
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
+
+export const dynamic = 'force-dynamic';

@@ -1,10 +1,9 @@
-import { freeQueue } from '@libs/utils';
+import { freeQueue, eventBus } from '@libs/utils/server';
 import { Mission } from '@libs/contracts';
 import crypto from 'crypto';
-import logger from '@libs/utils';
+import { logger } from '@libs/observability';
 import { missionController } from './mission-controller';
 import { Queue } from 'bullmq';
-import { eventBus } from '@libs/utils';
 
 export const commandGateway = {
     async submitMission(userId: string, projectId: string, prompt: string, options: { isFastPreview?: boolean, missionId?: string, queue?: Queue, template?: string } = {}) {

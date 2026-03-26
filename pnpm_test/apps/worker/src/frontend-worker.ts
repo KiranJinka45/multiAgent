@@ -1,7 +1,7 @@
 import { BaseWorker } from './base-worker';
 import { Job } from 'bullmq';
 import { JobPayload } from '../shared/types';
-import logger from '../shared/logger';
+import logger from '@libs/observability';
 import { AgentMemory } from '../shared/services/agent-memory';
 
 /**

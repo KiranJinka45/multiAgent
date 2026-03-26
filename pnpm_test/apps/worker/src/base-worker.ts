@@ -1,5 +1,5 @@
 import { Worker, Job } from 'bullmq';
-import logger from '../shared/logger';
+import logger from '@libs/observability';
 import { eventBus } from '../shared/services/event-bus';
 import redis from '../shared/services/redis';
 

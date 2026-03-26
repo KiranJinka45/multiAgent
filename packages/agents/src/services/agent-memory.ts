@@ -1,5 +1,6 @@
-import redis from '@libs/utils';
-import logger from '@libs/utils';
+import { redis } from '@libs/shared-services';
+import { logger } from '@libs/observability';
+import { Redis } from 'ioredis';
 
 /**
  * AgentMemory
@@ -27,7 +28,7 @@ export class AgentMemory {
         return this.instances.get(missionId)!;
     }
 
-    async set(key: string, value: any) {
+    async set(key: string, value: unknown) {
         return AgentMemory.set(this.missionId, key, value);
     }
 
@@ -44,9 +45,9 @@ export class AgentMemory {
     /**
      * Store a key-value pair in mission memory.
      */
-    static async set(missionId: string, key: string, value: any) {
+    static async set(missionId: string, key: string, value: unknown) {
         const fullKey = `memory:${missionId}:${key}`;
-        await (redis as any).setex(fullKey, this.TTL, JSON.stringify(value));
+        await (redis as unknown as Redis).set(fullKey, JSON.stringify(value), 'EX', this.TTL);
         logger.debug({ missionId, key }, '[Memory] Value stored');
     }
 
@@ -55,12 +56,12 @@ export class AgentMemory {
      */
     static async get<T>(missionId: string, key: string): Promise<T | null> {
         const fullKey = `memory:${missionId}:${key}`;
-        const data = await (redis as any).get(fullKey);
+        const data = await (redis as unknown as Redis).get(fullKey);
         if (!data) return null;
         try {
             return JSON.parse(data) as T;
         } catch (e) {
-            return data as any;
+            return data as unknown as T;
         }
     }
 
@@ -74,7 +75,7 @@ export class AgentMemory {
             agent: agentName,
             message
         });
-        await (redis as any).rpush(key, entry);
-        await (redis as any).expire(key, this.TTL);
+        await (redis as unknown as Redis).rpush(key, entry);
+        await (redis as unknown as Redis).expire(key, this.TTL);
     }
 }

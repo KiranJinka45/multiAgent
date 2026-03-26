@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import JSZip from 'jszip';
-import { projectService } from '@libs/utils';
+import { projectService } from '@libs/utils/server';
 import { createRouteHandlerClient } from '@libs/supabase';
 import { cookies } from 'next/headers';
-import { RateLimiter } from '@libs/utils';
+import { RateLimiter } from '@libs/utils/server';
 
 export async function GET(
     req: NextRequest,
@@ -129,3 +129,5 @@ export async function GET(
         }, { status: 500 });
     }
 }
+
+export const dynamic = 'force-dynamic';

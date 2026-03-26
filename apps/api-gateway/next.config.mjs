@@ -25,6 +25,10 @@ const nextConfig = {
             },
         ];
     },
+    experimental: {
+        serverExternalPackages: ['pino', 'pino-pretty', '@libs/observability'],
+        instrumentationHook: true,
+    },
 };
 
 export default nextConfig;

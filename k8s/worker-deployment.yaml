@@ -27,7 +27,15 @@ spec:
                   name: platform-secrets
                   key: database-url
             - name: REDIS_URL
-              value: "redis://redis:6379"
+              valueFrom:
+                secretKeyRef:
+                  name: platform-secrets
+                  key: redis-url
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: platform-secrets
+                  key: otel-endpoint
           resources:
             requests:
               cpu: "200m"

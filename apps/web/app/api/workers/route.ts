@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import redis from '@libs/utils';
+import redis from '@libs/utils/server';
 
 export async function GET() {
     try {
@@ -26,3 +26,5 @@ export async function GET() {
         }, { status: 500 });
     }
 }
+
+export const dynamic = 'force-dynamic';

@@ -1,5 +1,5 @@
-import { redis } from '@libs/utils';
-import logger from '@libs/utils';
+import { redis } from '@libs/utils/server';
+import { logger } from '@libs/observability';
 
 export interface WorkerNode {
     workerId: string;

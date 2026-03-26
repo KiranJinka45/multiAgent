@@ -4,8 +4,16 @@ declare global {
   var prisma: PrismaClient | undefined;
 }
 
-export const prisma = global.prisma || new PrismaClient();
+function getPrisma(): PrismaClient {
+  if (!global.prisma) {
+    global.prisma = new PrismaClient();
+  }
+  return global.prisma;
+}
 
-if (process.env.NODE_ENV !== 'production') global.prisma = prisma;
+// Lazy proxy — PrismaClient is only created when first accessed at runtime
+export const prisma: PrismaClient = new Proxy({} as PrismaClient, {
+  get: (_target, prop) => (getPrisma() as any)[prop],
+});
 
 export * from '@prisma/client';

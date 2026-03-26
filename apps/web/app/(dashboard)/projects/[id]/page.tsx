@@ -12,13 +12,12 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { projectService } from '@libs/utils';
 import { Project, ProjectFile } from '@libs/contracts';
 import { toast } from 'sonner';
 import { BuildUpdate } from '@libs/contracts';
-import DevOpsDashboard from '@components/DevOpsDashboard';
-import TechStackSelector, { TechStack } from '@components/TechStackSelector';
-import PushToGithubModal from '@components/PushToGithubModal';
+import DevOpsDashboard from '../../../../components/DevOpsDashboard';
+import TechStackSelector, { TechStack } from '../../../../components/TechStackSelector';
+import PushToGithubModal from '../../../../components/PushToGithubModal';
 import { useSocket } from '@libs/utils';
 import { useRealtimeSubscription } from '@libs/utils';
 

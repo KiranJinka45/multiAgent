@@ -1,10 +1,3 @@
-// src/queue.ts
-var queue = {
-  add: async (job) => {
-    console.log("Queue job:", job);
-  }
-};
-export {
-  queue
-};
+import U from'ioredis';import {createLazyProxy}from'@libs/utils/server';import {logger}from'@libs/observability';var x="build-free",d="build-pro",u="deployment",R="architect",l="repair",m="validate",_="planner",f="supervisor",Q="watchdog",A="generator",v="docker",B="backend",h="frontend",y="meta-agent";var a=process.env.REDIS_URL||"redis://localhost:6379",g=createLazyProxy(()=>new U(a,{maxRetriesPerRequest:null}),"Redis_Shared");var I={async progress(r,t,e){logger.info({executionId:r,progress:t,message:e},"[EventBus] Progress Update");},async stage(r,t,e,E,i,p){logger.info({executionId:r,stage:t,status:e,message:E,progress:i,projectId:p},"[EventBus] Stage Update");},async thought(r,t,e){logger.info({executionId:r,agent:t,thought:e},"[EventBus] Agent Thought");},async error(r,t){logger.error({executionId:r,message:t},"[EventBus] Build Error");},async complete(r,t,e){logger.info({executionId:r,previewUrl:t,metadata:e},"[EventBus] Build Complete");}};
+export{R as QUEUE_ARCHITECT,B as QUEUE_BACKEND,u as QUEUE_DEPLOY,v as QUEUE_DOCKER,x as QUEUE_FREE,h as QUEUE_FRONTEND,A as QUEUE_GENERATOR,y as QUEUE_META,_ as QUEUE_PLANNER,d as QUEUE_PRO,l as QUEUE_REPAIR,f as QUEUE_SUPERVISOR,m as QUEUE_VALIDATE,Q as QUEUE_WATCHDOG,g as default,I as eventBus,g as redis};//# sourceMappingURL=index.mjs.map
 //# sourceMappingURL=index.mjs.map

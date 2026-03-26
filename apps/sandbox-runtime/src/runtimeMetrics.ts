@@ -9,8 +9,8 @@
  * No process logic. No port logic.
  */
 
-import redis from '@libs/utils';
-import logger from '@libs/utils';
+import { redis } from '@libs/utils/server';
+import { logger } from '@libs/utils/server';
 import {
     runtimeStartupDuration,
     runtimeCrashesTotal,

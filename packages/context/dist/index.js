@@ -1,18 +1,2 @@
-var __defProp = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-  }
-  return to;
-};
-var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-
-// src/index.ts
-var index_exports = {};
-module.exports = __toCommonJS(index_exports);
+'use strict';var C=require('react'),utils=require('@libs/utils');function _interopDefault(e){return e&&e.__esModule?e:{default:e}}var C__default=/*#__PURE__*/_interopDefault(C);var l=C.createContext(void 0);function g({children:o}){let[n,d]=C.useState(false),[i,a]=C.useState(260);C.useEffect(()=>{let e=localStorage.getItem("sidebar-width"),t=localStorage.getItem("sidebar-collapsed");e&&a(parseInt(e)),t&&d(t==="true");},[]),C.useEffect(()=>{localStorage.setItem("sidebar-width",i.toString()),localStorage.setItem("sidebar-collapsed",n.toString());let e=document.documentElement;n?e.style.setProperty("--sidebar-width","64px"):e.style.setProperty("--sidebar-width",`${i}px`);},[i,n]);let[b,u]=C.useState(false),[h,c]=C.useState(false);return C.useEffect(()=>{(async()=>{try{let t=await utils.githubService.isConnected();c(t);}catch(t){console.error("Error checking github connection:",t);}})();},[]),C__default.default.createElement(l.Provider,{value:{isCollapsed:n,setIsCollapsed:d,width:i,setWidth:a,isGithubModalOpen:b,setIsGithubModalOpen:u,isGithubConnected:h,setIsGithubConnected:c}},o)}function w(){let o=C.useContext(l);if(!o)throw new Error("useSidebar must be used within a SidebarProvider.");return o}exports.SidebarProvider=g;exports.useSidebar=w;//# sourceMappingURL=index.js.map
 //# sourceMappingURL=index.js.map

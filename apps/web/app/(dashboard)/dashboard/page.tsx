@@ -1,5 +1,5 @@
 // app/dashboard/page.tsx
-import { Card } from "@/components/Card";
+import { Card } from "../../../components/Card";
 
 export default function Dashboard() {
   return (

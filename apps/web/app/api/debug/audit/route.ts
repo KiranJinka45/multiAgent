@@ -5,7 +5,7 @@ import {
     plannerQueue, architectureQueue, generatorQueue,
     validatorQueue, dockerQueue, deployQueue,
     supervisorQueue, repairQueue, metaQueue
-} from '@libs/utils';
+} from '@libs/utils/server';
 
 export async function GET() {
     const results: Record<string, unknown> = {
@@ -57,3 +57,5 @@ export async function GET() {
 
     return NextResponse.json(results);
 }
+
+export const dynamic = 'force-dynamic';

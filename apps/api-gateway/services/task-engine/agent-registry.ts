@@ -7,7 +7,7 @@ import { DeploymentAgent } from '@agents/deploy-agent';
 import { TestingAgent } from '@agents/testing-agent';
 import { ValidatorAgent } from '@agents/validator-agent';
 
-import { StrategyConfig } from '../agent-intelligence/strategy-engine';
+import { StrategyConfig } from '@libs/agent-intelligence/strategy-engine';
 import { AgentContext } from '@shared-types/agent-context';
 
 export interface TaskAgent {

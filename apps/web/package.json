@@ -30,7 +30,19 @@
     "@libs/tools": "workspace:*",
     "@libs/ui": "workspace:*",
     "@libs/utils": "workspace:*",
-    "@libs/validator": "workspace:*"
+    "@libs/validator": "workspace:*",
+    "lucide-react": "^0.441.0",
+    "next-themes": "^0.3.0",
+    "sonner": "^1.5.0",
+    "yjs": "^13.6.18",
+    "y-websocket": "^2.0.4",
+    "y-monaco": "^0.1.6",
+    "@monaco-editor/react": "^4.6.0",
+    "react-syntax-highlighter": "^15.5.0",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^2.5.2",
+    "framer-motion": "^11.5.4",
+    "canvas-confetti": "^1.9.3"
   },
   "devDependencies": {
     "@types/node": "^20",

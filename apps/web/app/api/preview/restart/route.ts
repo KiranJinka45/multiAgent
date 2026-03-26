@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { previewManager } from '@libs/runtime/preview-manager';
-import logger from '@libs/utils';
+import { logger } from '@libs/utils/server';
 
 export async function POST(req: NextRequest) {
     try {
@@ -20,3 +20,5 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
+
+export const dynamic = 'force-dynamic';

@@ -1,5 +1,5 @@
 import { Worker } from '@temporalio/worker';
-import * as activities from '../orchestrator/activities/agentActivities';
+import * as activities from '@libs/orchestrator/activities/agentActivities';
 import path from 'path';
 
 // --- AGENT REGISTRATION ---

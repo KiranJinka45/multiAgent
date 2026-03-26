@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PreviewRegistry } from '@libs/runtime/previewRegistry';
+import { PreviewRegistry } from '@libs/registry';
 import { ClusterProxy } from '@libs/runtime/clusterProxy';
 import { RuntimeGuard } from '@libs/runtime/runtimeGuard';
 import { RuntimeMetrics } from '@libs/runtime/runtimeMetrics';
-import logger from '@libs/utils';
+import { logger } from '@libs/utils/server';
 
 export const dynamic = 'force-dynamic';
 

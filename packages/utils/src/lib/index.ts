@@ -3,5 +3,4 @@
 // export * from './agent-queues'; (Server-only)
 // export * from './system-queue'; (Server-only)
 export * from './socketManager';
-export * from './supabaseClient';
 export * from './realtimeManager';

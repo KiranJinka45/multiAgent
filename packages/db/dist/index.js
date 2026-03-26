@@ -18,19 +18,38 @@ var __copyProps = (to, from, except, desc) => {
 var __reExport = (target, mod, secondTarget) => (__copyProps(target, mod, "default"), secondTarget && __copyProps(secondTarget, mod, "default"));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-// index.ts
+// src/index.ts
 var index_exports = {};
 __export(index_exports, {
-  prisma: () => prisma
+  db: () => db,
+  readDb: () => readDb
 });
 module.exports = __toCommonJS(index_exports);
 var import_client = require("@prisma/client");
 __reExport(index_exports, require("@prisma/client"), module.exports);
-var prisma = global.prisma || new import_client.PrismaClient();
-if (process.env.NODE_ENV !== "production") global.prisma = prisma;
+function getDb() {
+  if (!global.prisma) {
+    global.prisma = new import_client.PrismaClient({
+      datasources: { db: { url: process.env.DATABASE_URL } }
+    });
+  }
+  return global.prisma;
+}
+function getReadDb() {
+  if (!global.readPrisma) {
+    global.readPrisma = process.env.READ_REPLICA_URL ? new import_client.PrismaClient({ datasources: { db: { url: process.env.READ_REPLICA_URL } } }) : getDb();
+  }
+  return global.readPrisma;
+}
+var db = new Proxy({}, {
+  get: (_target, prop) => getDb()[prop]
+});
+var readDb = new Proxy({}, {
+  get: (_target, prop) => getReadDb()[prop]
+});
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  prisma,
+  db,
+  readDb,
   ...require("@prisma/client")
 });
-//# sourceMappingURL=index.js.map

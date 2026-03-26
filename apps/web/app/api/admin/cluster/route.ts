@@ -5,7 +5,7 @@ import { FailoverManager } from '@libs/runtime/cluster/failoverManager';
 import { RollingRestart } from '@libs/runtime/cluster/rollingRestart';
 import { StaleEvictor } from '@libs/runtime/cluster/staleEvictor';
 import { RedisRecovery } from '@libs/runtime/cluster/redisRecovery';
-import logger from '@libs/utils';
+import { logger } from '@libs/utils/server';
 
 export const dynamic = 'force-dynamic';
 

@@ -6,11 +6,10 @@ import { useEffect, useState } from 'react';
 import { User, LogOut, Monitor, Shield, Bell, Moon, Sun, Smartphone, Trash2, Check, ChevronRight } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
-import MobileMenu from '@components/MobileMenu';
-import TopNav from '@components/TopNav';
+import MobileMenu from '@/components/MobileMenu';
+import TopNav from '@/components/TopNav';
 import { toast } from 'sonner';
 import { Archive, RotateCcw } from 'lucide-react';
-import { chatService } from '@libs/utils';
 import { formatRelative } from '@libs/utils';
 import { User as SupabaseUser } from '@libs/supabase';
 import { Chat } from '@libs/contracts';

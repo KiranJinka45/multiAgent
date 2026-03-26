@@ -2,7 +2,7 @@ import { exec } from 'child_process';
 import path from 'path';
 import fs from 'fs';
 import { previewManager } from './preview-manager';
-import logger from '@libs/utils';
+import { logger } from '@libs/utils/server';
 
 /**
  * Preview Runtime Service

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { AnalyticsService } from '@libs/utils';
+import { AnalyticsService } from '@libs/utils/server';
 
 export async function POST(req: Request) {
     try {
@@ -15,3 +15,5 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
+
+export const dynamic = 'force-dynamic';

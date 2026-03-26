@@ -1,11 +1,8 @@
 // src/base-agent.ts
 import { Groq } from "groq-sdk";
-import logger from "@libs/utils";
-import { breakers } from "@libs/utils";
-import { eventBus } from "@libs/utils";
-import { RetryManager } from "@libs/utils";
+import { logger } from "@libs/observability";
+import { breakers, eventBus, RetryManager, CostGovernanceService, SemanticCacheService, usageService } from "@libs/utils/server";
 import { selectModel } from "@libs/ai";
-import { CostGovernanceService, SemanticCacheService } from "@libs/utils";
 var retry = new RetryManager(5, 3e3);
 var BaseAgent = class {
   groq;
@@ -59,6 +56,21 @@ var BaseAgent = class {
           if (!content) throw new Error("Empty response from LLM");
           const executionId = request.context?.executionId || "unknown";
           await CostGovernanceService.recordTokenUsage(request.tenantId, tokensUsed, executionId);
+          if (request.context.userId && request.tenantId) {
+            usageService.recordAiUsage({
+              model,
+              promptTokens: response.usage?.prompt_tokens || 0,
+              completionTokens: response.usage?.completion_tokens || 0,
+              totalTokens: tokensUsed,
+              userId: request.context.userId,
+              tenantId: request.tenantId,
+              metadata: {
+                executionId,
+                agent: this.getName(),
+                model
+              }
+            }).catch((err) => logger.error({ err }, "[BaseAgent] Usage tracking failed"));
+          }
           const result = {
             result: JSON.parse(content),
             tokens: tokensUsed,
@@ -1528,9 +1540,78 @@ ${(params.roles || []).join(", ")}`;
   }
 };
 
+// src/testing-agent.ts
+var TestingAgent = class extends BaseAgent {
+  getName() {
+    return "TestingAgent";
+  }
+  async execute(request, signal, strategy) {
+    const { prompt, context, params } = request;
+    const start = Date.now();
+    this.log(`Generating Test cases and QA scripts...`, { executionId: context.executionId });
+    try {
+      const system = `You are a QA Engineer. 
+            Generate unit and integration tests.
+            Output JSON with "files" (array of {path: string, content: string}) for testing.`;
+      request.taskType = "testing";
+      const { result, tokens } = await this.promptLLM(system, `Project: ${prompt}
+Files Context: ${JSON.stringify(params.allFiles)}`, request, signal, strategy);
+      this.log(`Generated ${result.files?.length || 0} testing files.`, { executionId: context.executionId });
+      return {
+        success: true,
+        data: result,
+        artifacts: result.files?.map((f) => ({ path: f.path, content: f.content, type: "documentation" })) || [],
+        metrics: { durationMs: Date.now() - start, tokensTotal: tokens }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        data: null,
+        artifacts: [],
+        metrics: { durationMs: 0, tokensTotal: 0 },
+        error: error instanceof Error ? error.message : String(error)
+      };
+    }
+  }
+};
+
+// src/validator-agent.ts
+var ValidatorAgent = class extends BaseAgent {
+  getName() {
+    return "ValidatorAgent";
+  }
+  async execute(request, signal, strategy) {
+    const { params, context } = request;
+    const start = Date.now();
+    this.log(`Validating output for ${params.agentName}...`, { executionId: context.executionId });
+    try {
+      const system = `You are a Senior QA Automation Engineer.
+            Validate agent output against spec. Output JSON: { "confidenceScore": 0.9, "isValid": true, "feedback": "..." }`;
+      request.taskType = "validation";
+      const { result, tokens } = await this.promptLLM(system, `Agent: ${params.agentName}
+Spec: ${params.spec}
+Output: ${JSON.stringify(params.output)}`, request, signal, strategy);
+      return {
+        success: true,
+        data: result,
+        artifacts: [],
+        metrics: { durationMs: Date.now() - start, tokensTotal: tokens }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        data: null,
+        artifacts: [],
+        metrics: { durationMs: 0, tokensTotal: 0 },
+        error: error instanceof Error ? error.message : String(error)
+      };
+    }
+  }
+};
+
 // src/services/agent-memory.ts
-import redis from "@libs/utils";
-import logger4 from "@libs/utils";
+import { redis } from "@libs/shared-services";
+import { logger as logger4 } from "@libs/observability";
 var AgentMemory = class _AgentMemory {
   static instances = /* @__PURE__ */ new Map();
   missionId;
@@ -1562,7 +1643,7 @@ var AgentMemory = class _AgentMemory {
    */
   static async set(missionId, key, value) {
     const fullKey = `memory:${missionId}:${key}`;
-    await redis.setex(fullKey, this.TTL, JSON.stringify(value));
+    await redis.set(fullKey, JSON.stringify(value), "EX", this.TTL);
     logger4.debug({ missionId, key }, "[Memory] Value stored");
   }
   /**
@@ -1647,6 +1728,8 @@ agentRegistry.register("debug", new DebugAgent());
 agentRegistry.register("judge", new JudgeAgent());
 agentRegistry.register("test", new TestingAgent());
 agentRegistry.register("validator", new ValidatorAgent());
+agentRegistry.register("monetization", new SaaSMonetizationAgent());
+agentRegistry.register("sandbox-editor", new SandboxEditorAgent());
 
 // src/services/knowledge-service.ts
 import { VectorStore, EmbeddingsEngine, memoryPlane } from "@libs/utils";
@@ -1731,75 +1814,6 @@ var LogAnalysisEngine = class {
     return { errors, summary };
   }
 };
-
-// src/testing-agent.ts
-var TestingAgent = class extends BaseAgent {
-  getName() {
-    return "TestingAgent";
-  }
-  async execute(request, signal, strategy) {
-    const { prompt, context, params } = request;
-    const start = Date.now();
-    this.log(`Generating Test cases and QA scripts...`, { executionId: context.executionId });
-    try {
-      const system = `You are a QA Engineer. 
-            Generate unit and integration tests.
-            Output JSON with "files" (array of {path: string, content: string}) for testing.`;
-      request.taskType = "testing";
-      const { result, tokens } = await this.promptLLM(system, `Project: ${prompt}
-Files Context: ${JSON.stringify(params.allFiles)}`, request, signal, strategy);
-      this.log(`Generated ${result.files?.length || 0} testing files.`, { executionId: context.executionId });
-      return {
-        success: true,
-        data: result,
-        artifacts: result.files?.map((f) => ({ path: f.path, content: f.content, type: "documentation" })) || [],
-        metrics: { durationMs: Date.now() - start, tokensTotal: tokens }
-      };
-    } catch (error) {
-      return {
-        success: false,
-        data: null,
-        artifacts: [],
-        metrics: { durationMs: 0, tokensTotal: 0 },
-        error: error instanceof Error ? error.message : String(error)
-      };
-    }
-  }
-};
-
-// src/validator-agent.ts
-var ValidatorAgent = class extends BaseAgent {
-  getName() {
-    return "ValidatorAgent";
-  }
-  async execute(request, signal, strategy) {
-    const { params, context } = request;
-    const start = Date.now();
-    this.log(`Validating output for ${params.agentName}...`, { executionId: context.executionId });
-    try {
-      const system = `You are a Senior QA Automation Engineer.
-            Validate agent output against spec. Output JSON: { "confidenceScore": 0.9, "isValid": true, "feedback": "..." }`;
-      request.taskType = "validation";
-      const { result, tokens } = await this.promptLLM(system, `Agent: ${params.agentName}
-Spec: ${params.spec}
-Output: ${JSON.stringify(params.output)}`, request, signal, strategy);
-      return {
-        success: true,
-        data: result,
-        artifacts: [],
-        metrics: { durationMs: Date.now() - start, tokensTotal: tokens }
-      };
-    } catch (error) {
-      return {
-        success: false,
-        data: null,
-        artifacts: [],
-        metrics: { durationMs: 0, tokensTotal: 0 },
-        error: error instanceof Error ? error.message : String(error)
-      };
-    }
-  }
-};
 export {
   AgentMemory,
   AgentRegistry,
@@ -1833,4 +1847,3 @@ export {
   ValidatorAgent,
   agentRegistry
 };
-//# sourceMappingURL=index.mjs.map

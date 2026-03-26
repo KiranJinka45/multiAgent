@@ -3,15 +3,13 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { chatService } from '@libs/utils';
-import { projectService } from '@libs/utils';
 import { Message } from '@libs/contracts';
-import Sidebar from '@components/Sidebar';
-import MobileMenu from '@components/MobileMenu';
-import TopNav from '@components/TopNav';
-import ChatList from '@components/ChatList';
-import TaskInput, { TaskInputHandle } from '@components/TaskInput';
-import Canvas from '@components/Canvas';
+import Sidebar from '../../../../components/Sidebar';
+import MobileMenu from '../../../../components/MobileMenu';
+import TopNav from '../../../../components/TopNav';
+import ChatList from '../../../../components/ChatList';
+import TaskInput, { TaskInputHandle } from '../../../../components/TaskInput';
+import Canvas from '../../../../components/Canvas';
 
 export default function ChatPage({ params }: { params: { id: string } }) {
     const [messages, setMessages] = useState<Message[]>([]);

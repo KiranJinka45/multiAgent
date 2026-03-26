@@ -1,42 +1,20 @@
 import 'dotenv/config';
-if (process.env.NODE_ENV !== 'production') {
-  console.log('[Gateway Diagnostics] process.env.NEXT_PUBLIC_SUPABASE_URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
-  console.log('[Gateway Diagnostics] NODE_ENV:', process.env.NODE_ENV);
-}
 import express, { Request, Response, NextFunction } from 'express';
-import { ClientRequest } from 'http';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
-import pino from 'pino';
 import http from 'http';
+import helmet from 'helmet';
+import { logger, register, startTracing } from '@libs/observability';
+import { requestContext } from './middleware/requestContext';
+import { metricsMiddleware } from './middleware/metricsMiddleware';
+import { rateLimitMiddleware } from '@libs/resilience';
 import { initSocket } from './socket';
-import { 
-    RateLimiter, 
-    apiRequestDurationSeconds, 
-    registry, 
-    CostGovernanceService,
-} from '@libs/utils/server';
-// Start Telemetry (Wrapped/Delayed)
-if (process.env.NODE_ENV === 'production') {
-    import('@libs/observability').then(({ initTelemetry }) => {
-        initTelemetry('multiagent-gateway');
-    });
-}
+import { CostGovernanceService } from '@libs/utils/server';
 
-const elog = pino({
-    level: process.env.LOG_LEVEL || 'info',
-    transport: {
-        target: 'pino-pretty',
-        options: {
-            colorize: true,
-            translateTime: 'SYS:standard',
-            ignore: 'pid,hostname',
-        },
-    },
-});
+// Initialize tracing as early as possible
+startTracing();
 
 const app = express();
-app.use(eventTracker);
 const PORT = process.env.PORT || 4000;
 const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-key';
 const INTERNAL_KEY = process.env.INTERNAL_KEY || 'default-internal-secret';
@@ -47,42 +25,22 @@ const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL || 'http://localhost:4002'
 const BILLING_SERVICE_URL = process.env.BILLING_SERVICE_URL || 'http://localhost:4003';
 const CORE_API_URL = process.env.CORE_API_URL || 'http://localhost:3001';
 
+app.use(requestContext);
+app.use(metricsMiddleware);
+app.use(rateLimitMiddleware);
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
-// --- RATE LIMITING ---
-const rateLimiter = new RateLimiter();
-const globalRateLimit = async (req: Request, res: Response, next: NextFunction) => {
-    const ip = req.ip || 'unknown';
-    const { allowed, remaining } = await rateLimiter.checkLimit(ip, 'gateway-global');
-    if (!allowed) {
-        return res.status(429).json({ 
-            error: 'Too many requests', 
-            retryAfter: '60s' 
-        });
-    }
-    res.setHeader('X-RateLimit-Remaining', remaining.toString());
-    next();
-};
-
-app.use(globalRateLimit);
-
-// Metrics & Tracing middleware
+// Tracing Propagation Logger
 app.use((req, res, next) => {
-    const start = Date.now();
-    
-    // OTel Trace Propagation Logging
     const traceparent = req.headers['traceparent'];
     if (traceparent) {
-        elog.debug({ traceparent }, '[Gateway] Incoming trace context');
+        logger.debug({ 
+            requestId: (req as any).requestId,
+            traceparent 
+        }, '[Gateway] Incoming trace context detected');
     }
-
-    res.on('finish', () => {
-        const duration = (Date.now() - start) / 1000;
-        const route = req.route ? req.route.path : `${req.baseUrl || ''}${req.path}`;
-        apiRequestDurationSeconds.labels(req.method, route, res.statusCode.toString()).observe(duration);
-    });
     next();
 });
 
@@ -109,7 +67,7 @@ const authenticate = (req: Request, res: Response, next: NextFunction) => {
         (req as AuthenticatedRequest).user = decoded;
         next();
     } catch (err: unknown) {
-        elog.error({ err }, 'Authentication failed');
+        logger.error({ err }, 'Authentication failed');
         return res.status(401).json({ error: 'Unauthorized' });
     }
 };
@@ -142,7 +100,7 @@ const checkGovernance = async (req: Request, res: Response, next: NextFunction) 
 
         next();
     } catch (err) {
-        elog.error({ err, userId: authReq.user.id }, 'Governance check failed');
+        logger.error({ err, userId: authReq.user.id }, 'Governance check failed');
         res.status(500).json({ error: 'Governance validation failed' });
     }
 };
@@ -150,12 +108,26 @@ const checkGovernance = async (req: Request, res: Response, next: NextFunction) 
 // --- ROUTES ---
 
 app.get('/metrics', async (req, res) => {
-    res.set('Content-Type', registry.contentType);
-    res.end(await registry.metrics());
+    try {
+        res.set('Content-Type', register.contentType);
+        res.end(await register.metrics());
+    } catch {
+        res.status(500).end();
+    }
 });
 
 app.get('/health', (req, res) => {
-    res.json({ status: 'healthy', service: 'gateway', version: '2.0.0-prod' });
+    res.json({ 
+        status: 'healthy', 
+        service: 'gateway', 
+        version: '2.0.0-prod',
+        timestamp: new Date().toISOString()
+    });
+});
+
+app.get('/ready', (req, res) => {
+    // Check downstream dependencies if needed (Redis, DB)
+    res.json({ status: 'ready' });
 });
 
 // --- SCHEMAS ---
@@ -271,16 +243,34 @@ initSocket(server);
 
 // --- WARM STARTUP STRATEGY (Step 9) ---
 const preloadModules = async () => {
-    elog.info('[Gateway] Preloading critical modules...');
+    logger.info('[Gateway] Preloading critical modules...');
     await Promise.all([
         import('@libs/db'),
         import('@libs/memory-cache'),
         import('@libs/utils')
     ]);
-    elog.info('[Gateway] Warm startup complete');
+    logger.info('[Gateway] Warm startup complete');
 };
 
 server.listen(PORT, async () => {
     await preloadModules();
-    elog.info({ port: PORT }, '[Gateway] Production BFF operational');
+    logger.info({ port: PORT }, '[Gateway] Production BFF operational');
 });
+
+// --- GRACEFUL SHUTDOWN ---
+const shutdown = async (signal: string) => {
+    logger.info({ signal }, '[Gateway] Shutdown initiated');
+    server.close(() => {
+        logger.info('[Gateway] HTTP server closed');
+        process.exit(0);
+    });
+
+    // Force exit after 10s
+    setTimeout(() => {
+        logger.error('[Gateway] Forced shutdown after timeout');
+        process.exit(1);
+    }, 10000);
+};
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));

@@ -4,7 +4,7 @@ import { SnapshotOverlayManager } from './snapshot-overlay';
 import { SnapshotLibrary } from './snapshot-library';
 import path from 'path';
 import fs from 'fs-extra';
-import logger from '@libs/utils';
+import { logger } from '@libs/utils/server';
 
 export class MicroVMManager {
     private static provider: MicroVMProvider = new FirecrackerDriver();

@@ -37,3 +37,5 @@ The landscape for "${message}" is rapidly evolving. Key players are increasingly
         return NextResponse.json({ error: 'Failed to conduct research' }, { status: 500 });
     }
 }
+
+export const dynamic = 'force-dynamic';

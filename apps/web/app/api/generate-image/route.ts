@@ -49,3 +49,5 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Failed to generate image' }, { status: 500 });
     }
 }
+
+export const dynamic = 'force-dynamic';

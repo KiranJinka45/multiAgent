@@ -1,6 +1,6 @@
 import { Server } from 'socket.io';
-import { eventBus } from '@libs/utils';
-import logger from '../../shared/logger';
+import { eventBus } from '@libs/utils/server';
+import { logger } from '@libs/observability';
 
 /**
  * LogStreamingService

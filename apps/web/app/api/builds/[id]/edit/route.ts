@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ChatEditAgent } from '@libs/agents';
-import { projectMemory } from '@libs/utils';
-import { projectService } from '@libs/utils';
+import { projectMemory } from '@libs/utils/server';
+import { projectService } from '@libs/utils/server';
 import { sandbox } from '@libs/runtime/sandbox';
-import { patchVerifier } from '@libs/utils';
-import { supabaseAdmin } from '@libs/utils';
-import { VirtualFileSystem, PatchEngine, CommitManager } from '@libs/utils';
+import { patchVerifier } from '@libs/utils/server';
+import { supabaseAdmin } from '@libs/utils/server';
+import { VirtualFileSystem, PatchEngine, CommitManager } from '@libs/utils/server';
 import path from 'path';
 import fs from 'fs';
 import { previewManager } from '@libs/runtime/preview-manager';
-import logger from '@libs/utils';
+import { logger } from '@libs/utils/server';
 
 /**
  * POST /api/projects/[id]/edit
@@ -301,3 +301,5 @@ export async function POST(
         }, { status: 500 });
     }
 }
+
+export const dynamic = 'force-dynamic';

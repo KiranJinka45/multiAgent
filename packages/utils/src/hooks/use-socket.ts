@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { BuildUpdate } from '@libs/contracts';
-import { socketManager } from '../lib/socketManager';
+import { socketManager } from '../client/socketManager';
 
 export interface UseSocketOptions {
     projectId: string;

@@ -1,33 +1,32 @@
 import 'dotenv/config';
+import { initInstrumentation } from './instrumentation';
+
+// Initialize tracing before any other imports
+initInstrumentation('build-worker');
 import fs from 'fs-extra';
 import path from 'path';
-import * as dotenv from 'dotenv';
 import { Worker, Job } from 'bullmq';
-import { QUEUE_FREE, QUEUE_PRO, redis } from '@libs/shared-services';
-import logger from '@libs/utils';
+import { logger } from '@libs/observability';
+import { redis, QUEUE_FREE, QUEUE_PRO } from '@libs/shared-services';
 import { Orchestrator } from '@libs/core-engine';
-import { runWithTracing } from '@libs/utils';
+import { 
+    runWithTracing, 
+    queueWaitTimeSeconds, 
+    stuckBuildsTotal, 
+    env, 
+    missionController, 
+    eventBus, 
+    ReliabilityMonitor, 
+    WorkerClusterManager 
+} from '@libs/utils/server';
 import { JobStage } from '@libs/contracts';
 import { ArtifactValidator } from '@libs/validator';
-
-// Manual .env.local load to match system-startup.ts behavior
-const envLocal = path.resolve(process.cwd(), '.env.local');
-if (fs.existsSync(envLocal)) {
-  dotenv.config({ path: envLocal, override: true });
-}
-import { queueWaitTimeSeconds, stuckBuildsTotal } from '@libs/utils';
-import { NodeRegistry } from '@libs/runtime/cluster/nodeRegistry';
-import { FailoverManager } from '@libs/runtime/cluster/failoverManager';
-import { RedisRecovery } from '@libs/runtime/cluster/redisRecovery';
+import { NodeRegistry } from '@libs/sandbox-runtime/cluster/nodeRegistry';
+import { FailoverManager } from '@libs/sandbox-runtime/cluster/failoverManager';
+import { RedisRecovery } from '@libs/sandbox-runtime/cluster/redisRecovery';
 import { PreviewOrchestrator } from '@libs/runtime/previewOrchestrator';
 import { RuntimeCleanup } from '@libs/runtime/runtimeCleanup';
-import { env } from '@libs/utils';
-import { missionController } from '@libs/utils';
-import { eventBus } from '@libs/utils';
-import { ReliabilityMonitor } from '@libs/utils';
-import { BuildCacheManager } from '@libs/build-engine';
-import { WorkerClusterManager } from '@libs/utils';
-import { BuildGraphEngine } from '@libs/build-engine';
+import { BuildCacheManager, BuildGraphEngine } from '@libs/build-engine';
 import os from 'os';
 
 const WORKER_ID = `worker-${os.hostname()}-${process.pid}`;
@@ -250,6 +249,7 @@ const processJob = async (job: Job) => {
 
 // 1. Initialize Tiers
 const freeWorker = new Worker(QUEUE_FREE, processJob, {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     connection: redis as any,
     concurrency: env.WORKER_CONCURRENCY_FREE || 5,
     lockDuration: 300000, // 5 minute initial lock
@@ -260,6 +260,7 @@ const freeWorker = new Worker(QUEUE_FREE, processJob, {
 });
 
 const proWorker = new Worker(QUEUE_PRO, processJob, {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     connection: redis as any,
     concurrency: env.WORKER_CONCURRENCY_PRO || 20,
     lockDuration: 300000, // 5 minute initial lock
@@ -318,18 +319,16 @@ setInterval(async () => {
         
         logger.info({ workerId: WORKER_ID }, '[Worker] Subscribing to direct steering channel');
         
-        await sub.subscribe(`worker:trigger:${WORKER_ID}`, async (message) => {
+        await sub.subscribe(`worker:trigger:${WORKER_ID}`);
+        
+        sub.on('message', async (channel, message) => {
+            if (channel !== `worker:trigger:${WORKER_ID}`) return;
             try {
                 const { projectId } = JSON.parse(message);
                 logger.info({ projectId }, '[Worker] Direct job steering received! Triggering execution.');
             } catch (pErr) {
                 logger.error({ err: pErr }, '[Worker] Failed to parse steering message');
             }
-            
-            // In a real system, we'd trigger a local build orchestration here
-            // For now, we simulate by updating a 'trigger' flag or manually calling executeBuild
-            // However, the existing BullMQ queue is the source of truth, so steering 
-            // acts as a "hot nudge" to pull from the queue immediately.
         });
     } catch (err) {
         const error = err as Error;
@@ -374,13 +373,13 @@ setInterval(async () => {
                 }
             } catch (err) {
                 const errMsg = err instanceof Error ? err.message : String(err);
-                logger.error({ error: errMsg } as any, `[Worker] Error processing message on channel ${channel}`);
+                logger.error({ error: errMsg }, `[Worker] Error processing message on channel ${channel}`);
             }
         });
 
     } catch (err) {
         const errMsg = err instanceof Error ? err.message : String(err);
-        logger.error({ error: errMsg } as any, 'Failed to register node in cluster (non-fatal, running in standalone mode)');
+        logger.error({ error: errMsg }, 'Failed to register node in cluster (non-fatal, running in standalone mode)');
     }
 })();
 
@@ -395,7 +394,7 @@ RuntimeCleanup.start();
 // Redis connection error handling & auto-recovery
 redis.on('error', (err: Error) => {
     logger.error({ err: err.message }, '[Worker] Redis connection error');
-    if ((err as any).code === 'ECONNREFUSED' || (err as any).code === 'ETIMEDOUT') {
+    if ('code' in err && (err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT')) {
         RedisRecovery.handleRedisCrash().catch(recErr => {
             logger.error({ err: recErr.message }, '[Worker] Critical recovery failure');
         });

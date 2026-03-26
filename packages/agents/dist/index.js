@@ -1,3 +1,4 @@
+"use strict";
 var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
@@ -65,13 +66,10 @@ module.exports = __toCommonJS(index_exports);
 
 // src/base-agent.ts
 var import_groq_sdk = require("groq-sdk");
-var import_utils = __toESM(require("@libs/utils"));
-var import_utils2 = require("@libs/utils");
-var import_utils3 = require("@libs/utils");
-var import_utils4 = require("@libs/utils");
+var import_observability = require("@libs/observability");
+var import_server = require("@libs/utils/server");
 var import_ai = require("@libs/ai");
-var import_utils5 = require("@libs/utils");
-var retry = new import_utils4.RetryManager(5, 3e3);
+var retry = new import_server.RetryManager(5, 3e3);
 var BaseAgent = class {
   groq;
   logs = [];
@@ -82,9 +80,9 @@ var BaseAgent = class {
   }
   log(message, meta = {}) {
     const { executionId, ...rest } = meta;
-    import_utils.default.info({ agent: this.getName(), ...rest }, message);
+    import_observability.logger.info({ agent: this.getName(), ...rest }, message);
     if (executionId) {
-      import_utils3.eventBus.thought(executionId, this.getName(), message);
+      import_server.eventBus.thought(executionId, this.getName(), message);
     }
   }
   async promptLLM(system, user, request, signal, strategy) {
@@ -96,12 +94,12 @@ var BaseAgent = class {
     const modelConfig = await (0, import_ai.selectModel)(taskType, context);
     const model = modelConfig.model;
     const temperature = strategy?.temperature ?? 0.7;
-    const budgetStatus = await import_utils5.CostGovernanceService.checkTokenLimit(request.tenantId);
+    const budgetStatus = await import_server.CostGovernanceService.checkTokenLimit(request.tenantId);
     if (!budgetStatus.allowed) {
       this.log(`Critical: Budget exceeded for tenant ${request.tenantId}. Halted.`);
       throw new Error(`BudgetExceeded: Monthly token limit reached for tenant ${request.tenantId}`);
     }
-    const cachedResult = await import_utils5.SemanticCacheService.get(user, system, model);
+    const cachedResult = await import_server.SemanticCacheService.get(user, system, model);
     if (cachedResult) {
       this.log(`Semantic Cache HIT - Reusing result for ${taskType}`);
       return cachedResult;
@@ -109,7 +107,7 @@ var BaseAgent = class {
     this.log(`Invoking LLM (${model}) for task: ${taskType} [Tier: ${modelConfig.quality > 0.9 ? "PREMIUM" : "BALANCED"}]`);
     try {
       const llmResponse = await retry.executeWithRetry(async () => {
-        return await import_utils2.breakers.llm.execute(async () => {
+        return await import_server.breakers.llm.execute(async () => {
           const response = await this.groq.chat.completions.create({
             messages: [
               { role: "system", content: system },
@@ -123,14 +121,29 @@ var BaseAgent = class {
           const tokensUsed = response.usage?.total_tokens || 0;
           if (!content) throw new Error("Empty response from LLM");
           const executionId = request.context?.executionId || "unknown";
-          await import_utils5.CostGovernanceService.recordTokenUsage(request.tenantId, tokensUsed, executionId);
+          await import_server.CostGovernanceService.recordTokenUsage(request.tenantId, tokensUsed, executionId);
+          if (request.context.userId && request.tenantId) {
+            import_server.usageService.recordAiUsage({
+              model,
+              promptTokens: response.usage?.prompt_tokens || 0,
+              completionTokens: response.usage?.completion_tokens || 0,
+              totalTokens: tokensUsed,
+              userId: request.context.userId,
+              tenantId: request.tenantId,
+              metadata: {
+                executionId,
+                agent: this.getName(),
+                model
+              }
+            }).catch((err) => import_observability.logger.error({ err }, "[BaseAgent] Usage tracking failed"));
+          }
           const result = {
             result: JSON.parse(content),
             tokens: tokensUsed,
             promptTokens: response.usage?.prompt_tokens || 0,
             completionTokens: response.usage?.completion_tokens || 0
           };
-          await import_utils5.SemanticCacheService.set(user, result, system, model);
+          await import_server.SemanticCacheService.set(user, result, system, model);
           return result;
         });
       }, this.getName(), {});
@@ -984,7 +997,7 @@ Output strictly valid JSON:
 };
 
 // src/judge-agent.ts
-var import_utils6 = __toESM(require("@libs/utils"));
+var import_utils = __toESM(require("@libs/utils"));
 var JudgeAgent = class extends BaseAgent {
   constructor() {
     super();
@@ -995,7 +1008,7 @@ var JudgeAgent = class extends BaseAgent {
   async execute(request) {
     const { prompt, params, tenantId } = request;
     const artifactsSummary = params.artifacts.map((a) => `- ${a.path}`).join("\n");
-    import_utils6.default.info({ tenantId }, "[JudgeAgent] Evaluating intent vs output");
+    import_utils.default.info({ tenantId }, "[JudgeAgent] Evaluating intent vs output");
     const systemPrompt = `
 You are a Principal AI Judge. Your task is to evaluate whether the provided artifacts satisfy the User's Intent.
 
@@ -1026,7 +1039,7 @@ Respond in JSON format:
         confidence: evaluation.confidence
       };
     } catch (err) {
-      import_utils6.default.error({ err }, "[JudgeAgent] Failed to perform intent evaluation");
+      import_utils.default.error({ err }, "[JudgeAgent] Failed to perform intent evaluation");
       return {
         success: false,
         data: null,
@@ -1039,7 +1052,7 @@ Respond in JSON format:
 };
 
 // src/meta-agent.ts
-var import_utils7 = __toESM(require("@libs/utils"));
+var import_utils2 = __toESM(require("@libs/utils"));
 var MetaAgent = class extends BaseAgent {
   getName() {
     return "MetaAgent";
@@ -1083,7 +1096,7 @@ Output strictly valid JSON matching this schema:
         metrics: { durationMs: 0, tokensTotal: tokens }
       };
     } catch (error) {
-      import_utils7.default.error({ error }, "MetaAgent analysis failed");
+      import_utils2.default.error({ error }, "MetaAgent analysis failed");
       return {
         success: false,
         data: null,
@@ -1593,210 +1606,6 @@ ${(params.roles || []).join(", ")}`;
   }
 };
 
-// src/services/agent-memory.ts
-var import_utils8 = __toESM(require("@libs/utils"));
-var import_utils9 = __toESM(require("@libs/utils"));
-var AgentMemory = class _AgentMemory {
-  static instances = /* @__PURE__ */ new Map();
-  missionId;
-  constructor(missionId) {
-    this.missionId = missionId;
-  }
-  /**
-   * Factory method for mission-specific memory instance.
-   */
-  static async create(missionId) {
-    if (!this.instances.has(missionId)) {
-      this.instances.set(missionId, new _AgentMemory(missionId));
-    }
-    return this.instances.get(missionId);
-  }
-  async set(key, value) {
-    return _AgentMemory.set(this.missionId, key, value);
-  }
-  async get(key) {
-    return _AgentMemory.get(this.missionId, key);
-  }
-  async appendTranscript(agentName, message) {
-    return _AgentMemory.appendTranscript(this.missionId, agentName, message);
-  }
-  static TTL = 3600 * 24;
-  // 24 hours
-  /**
-   * Store a key-value pair in mission memory.
-   */
-  static async set(missionId, key, value) {
-    const fullKey = `memory:${missionId}:${key}`;
-    await import_utils8.default.setex(fullKey, this.TTL, JSON.stringify(value));
-    import_utils9.default.debug({ missionId, key }, "[Memory] Value stored");
-  }
-  /**
-   * Retrieve a value from mission memory.
-   */
-  static async get(missionId, key) {
-    const fullKey = `memory:${missionId}:${key}`;
-    const data = await import_utils8.default.get(fullKey);
-    if (!data) return null;
-    try {
-      return JSON.parse(data);
-    } catch (e) {
-      return data;
-    }
-  }
-  /**
-   * Persist agent thought/state for UI and debugging.
-   */
-  static async appendTranscript(missionId, agentName, message) {
-    const key = `transcript:${missionId}`;
-    const entry = JSON.stringify({
-      timestamp: Date.now(),
-      agent: agentName,
-      message
-    });
-    await import_utils8.default.rpush(key, entry);
-    await import_utils8.default.expire(key, this.TTL);
-  }
-};
-
-// src/services/agent-registry.ts
-var import_utils10 = __toESM(require("@libs/utils"));
-var AgentRegistry = class {
-  agents = /* @__PURE__ */ new Map();
-  /**
-   * Registers a specific agent subclass implementation against a common task action.
-   */
-  register(taskType, agent) {
-    this.agents.set(taskType, agent);
-  }
-  getAgent(taskType) {
-    return this.agents.get(taskType);
-  }
-  hasAgent(taskType) {
-    return this.agents.has(taskType);
-  }
-  async runTaskDirectly(taskType, request, signal, strategy) {
-    const agent = this.getAgent(taskType);
-    if (!agent) {
-      return {
-        success: false,
-        data: null,
-        artifacts: [],
-        metrics: { durationMs: 0, tokensTotal: 0 },
-        error: `No agent registered in AgentRegistry for task type: ${taskType}`
-      };
-    }
-    try {
-      import_utils10.default.info({ taskType, executionId: request.context.executionId }, "System dispatching to specialized Agent");
-      return await agent.execute(request, signal, strategy);
-    } catch (error) {
-      import_utils10.default.error({ error, taskType }, "Specialized agent crashed during execution");
-      return {
-        success: false,
-        data: null,
-        artifacts: [],
-        metrics: { durationMs: 0, tokensTotal: 0 },
-        error: error instanceof Error ? error.message : String(error)
-      };
-    }
-  }
-};
-var agentRegistry = new AgentRegistry();
-agentRegistry.register("planner", new PlannerAgent());
-agentRegistry.register("database", new DatabaseAgent());
-agentRegistry.register("frontend", new FrontendAgent());
-agentRegistry.register("backend", new BackendAgent());
-agentRegistry.register("deploy", new DeploymentAgent());
-agentRegistry.register("security", new SecurityAgent());
-agentRegistry.register("monitor", new MonitoringAgent());
-agentRegistry.register("debug", new DebugAgent());
-agentRegistry.register("judge", new JudgeAgent());
-agentRegistry.register("test", new TestingAgent());
-agentRegistry.register("validator", new ValidatorAgent());
-
-// src/services/knowledge-service.ts
-var import_utils11 = require("@libs/utils");
-var import_utils12 = __toESM(require("@libs/utils"));
-var KnowledgeService = class {
-  /**
-   * Retrieves relevant context for a given prompt using semantic search.
-   */
-  static async getContext(prompt, techStack, limit = 3) {
-    try {
-      import_utils12.default.info({ prompt, techStack }, "[KnowledgeService] Fetching contextual intelligence...");
-      const embedding = await import_utils11.EmbeddingsEngine.generate(prompt);
-      if (!embedding) {
-        import_utils12.default.warn("[KnowledgeService] Failed to generate embedding. Proceeding without context.");
-        return [];
-      }
-      const results = await import_utils11.VectorStore.searchSimilarCode(embedding, techStack, limit);
-      return results.map((r) => ({
-        type: "code_snippet",
-        content: r.chunk_content,
-        relevance: r.similarity || 0,
-        metadata: r.metadata
-      }));
-    } catch (error) {
-      import_utils12.default.error({ error }, "[KnowledgeService] Context retrieval failed");
-      return [];
-    }
-  }
-  /**
-   * Augments a prompt with retrieved context from MemoryPlane (Layer 11).
-   */
-  static async augmentPrompt(basePrompt, projectId) {
-    if (!projectId) {
-      const context = await this.getContext(basePrompt);
-      if (context.length === 0) return basePrompt;
-      const contextString = context.map((c) => `[Context: ${c.metadata.purpose}]
-${c.content}`).join("\n\n---\n\n");
-      return `System Context:
-
-${contextString}
-
-Mission: ${basePrompt}`;
-    }
-    try {
-      const multiDimContext = await import_utils11.memoryPlane.getRelevantContext(projectId, basePrompt);
-      return `
-MISSION RECALL & ARCHITECTURAL GUIDANCE:
-${multiDimContext}
-
-BASED ON THE ABOVE MEMORY, PROCEED WITH THE MISSION:
-${basePrompt}
-            `.trim();
-    } catch (error) {
-      import_utils12.default.error({ error }, "[KnowledgeService] Failed to augment prompt with MemoryPlane");
-      return basePrompt;
-    }
-  }
-};
-
-// src/services/log-analysis.ts
-var LogAnalysisEngine = class {
-  static ERROR_PATTERNS = [
-    { name: "typescript", regex: /(.+)\((\d+),(\d+)\): error (TS\d+): (.+)/g },
-    { name: "node_module", regex: /Error: Cannot find module '(.+)'/g },
-    { name: "syntax", regex: /SyntaxError: (.+)/g },
-    { name: "reference", regex: /ReferenceError: (.+) is not defined/g }
-  ];
-  static parse(logs) {
-    const errors = [];
-    for (const pattern of this.ERROR_PATTERNS) {
-      let match;
-      while ((match = pattern.regex.exec(logs)) !== null) {
-        errors.push({
-          type: pattern.name,
-          file: match[1],
-          line: match[2],
-          message: match[5] || match[1]
-        });
-      }
-    }
-    const summary = errors.length > 0 ? `Found ${errors.length} specific errors in build logs.` : "No specific error patterns matched in logs.";
-    return { errors, summary };
-  }
-};
-
 // src/testing-agent.ts
 var TestingAgent = class extends BaseAgent {
   getName() {
@@ -1865,6 +1674,212 @@ Output: ${JSON.stringify(params.output)}`, request, signal, strategy);
     }
   }
 };
+
+// src/services/agent-memory.ts
+var import_shared_services = require("@libs/shared-services");
+var import_observability2 = require("@libs/observability");
+var AgentMemory = class _AgentMemory {
+  static instances = /* @__PURE__ */ new Map();
+  missionId;
+  constructor(missionId) {
+    this.missionId = missionId;
+  }
+  /**
+   * Factory method for mission-specific memory instance.
+   */
+  static async create(missionId) {
+    if (!this.instances.has(missionId)) {
+      this.instances.set(missionId, new _AgentMemory(missionId));
+    }
+    return this.instances.get(missionId);
+  }
+  async set(key, value) {
+    return _AgentMemory.set(this.missionId, key, value);
+  }
+  async get(key) {
+    return _AgentMemory.get(this.missionId, key);
+  }
+  async appendTranscript(agentName, message) {
+    return _AgentMemory.appendTranscript(this.missionId, agentName, message);
+  }
+  static TTL = 3600 * 24;
+  // 24 hours
+  /**
+   * Store a key-value pair in mission memory.
+   */
+  static async set(missionId, key, value) {
+    const fullKey = `memory:${missionId}:${key}`;
+    await import_shared_services.redis.set(fullKey, JSON.stringify(value), "EX", this.TTL);
+    import_observability2.logger.debug({ missionId, key }, "[Memory] Value stored");
+  }
+  /**
+   * Retrieve a value from mission memory.
+   */
+  static async get(missionId, key) {
+    const fullKey = `memory:${missionId}:${key}`;
+    const data = await import_shared_services.redis.get(fullKey);
+    if (!data) return null;
+    try {
+      return JSON.parse(data);
+    } catch (e) {
+      return data;
+    }
+  }
+  /**
+   * Persist agent thought/state for UI and debugging.
+   */
+  static async appendTranscript(missionId, agentName, message) {
+    const key = `transcript:${missionId}`;
+    const entry = JSON.stringify({
+      timestamp: Date.now(),
+      agent: agentName,
+      message
+    });
+    await import_shared_services.redis.rpush(key, entry);
+    await import_shared_services.redis.expire(key, this.TTL);
+  }
+};
+
+// src/services/agent-registry.ts
+var import_utils3 = __toESM(require("@libs/utils"));
+var AgentRegistry = class {
+  agents = /* @__PURE__ */ new Map();
+  /**
+   * Registers a specific agent subclass implementation against a common task action.
+   */
+  register(taskType, agent) {
+    this.agents.set(taskType, agent);
+  }
+  getAgent(taskType) {
+    return this.agents.get(taskType);
+  }
+  hasAgent(taskType) {
+    return this.agents.has(taskType);
+  }
+  async runTaskDirectly(taskType, request, signal, strategy) {
+    const agent = this.getAgent(taskType);
+    if (!agent) {
+      return {
+        success: false,
+        data: null,
+        artifacts: [],
+        metrics: { durationMs: 0, tokensTotal: 0 },
+        error: `No agent registered in AgentRegistry for task type: ${taskType}`
+      };
+    }
+    try {
+      import_utils3.default.info({ taskType, executionId: request.context.executionId }, "System dispatching to specialized Agent");
+      return await agent.execute(request, signal, strategy);
+    } catch (error) {
+      import_utils3.default.error({ error, taskType }, "Specialized agent crashed during execution");
+      return {
+        success: false,
+        data: null,
+        artifacts: [],
+        metrics: { durationMs: 0, tokensTotal: 0 },
+        error: error instanceof Error ? error.message : String(error)
+      };
+    }
+  }
+};
+var agentRegistry = new AgentRegistry();
+agentRegistry.register("planner", new PlannerAgent());
+agentRegistry.register("database", new DatabaseAgent());
+agentRegistry.register("frontend", new FrontendAgent());
+agentRegistry.register("backend", new BackendAgent());
+agentRegistry.register("deploy", new DeploymentAgent());
+agentRegistry.register("security", new SecurityAgent());
+agentRegistry.register("monitor", new MonitoringAgent());
+agentRegistry.register("debug", new DebugAgent());
+agentRegistry.register("judge", new JudgeAgent());
+agentRegistry.register("test", new TestingAgent());
+agentRegistry.register("validator", new ValidatorAgent());
+agentRegistry.register("monetization", new SaaSMonetizationAgent());
+agentRegistry.register("sandbox-editor", new SandboxEditorAgent());
+
+// src/services/knowledge-service.ts
+var import_utils4 = require("@libs/utils");
+var import_utils5 = __toESM(require("@libs/utils"));
+var KnowledgeService = class {
+  /**
+   * Retrieves relevant context for a given prompt using semantic search.
+   */
+  static async getContext(prompt, techStack, limit = 3) {
+    try {
+      import_utils5.default.info({ prompt, techStack }, "[KnowledgeService] Fetching contextual intelligence...");
+      const embedding = await import_utils4.EmbeddingsEngine.generate(prompt);
+      if (!embedding) {
+        import_utils5.default.warn("[KnowledgeService] Failed to generate embedding. Proceeding without context.");
+        return [];
+      }
+      const results = await import_utils4.VectorStore.searchSimilarCode(embedding, techStack, limit);
+      return results.map((r) => ({
+        type: "code_snippet",
+        content: r.chunk_content,
+        relevance: r.similarity || 0,
+        metadata: r.metadata
+      }));
+    } catch (error) {
+      import_utils5.default.error({ error }, "[KnowledgeService] Context retrieval failed");
+      return [];
+    }
+  }
+  /**
+   * Augments a prompt with retrieved context from MemoryPlane (Layer 11).
+   */
+  static async augmentPrompt(basePrompt, projectId) {
+    if (!projectId) {
+      const context = await this.getContext(basePrompt);
+      if (context.length === 0) return basePrompt;
+      const contextString = context.map((c) => `[Context: ${c.metadata.purpose}]
+${c.content}`).join("\n\n---\n\n");
+      return `System Context:
+
+${contextString}
+
+Mission: ${basePrompt}`;
+    }
+    try {
+      const multiDimContext = await import_utils4.memoryPlane.getRelevantContext(projectId, basePrompt);
+      return `
+MISSION RECALL & ARCHITECTURAL GUIDANCE:
+${multiDimContext}
+
+BASED ON THE ABOVE MEMORY, PROCEED WITH THE MISSION:
+${basePrompt}
+            `.trim();
+    } catch (error) {
+      import_utils5.default.error({ error }, "[KnowledgeService] Failed to augment prompt with MemoryPlane");
+      return basePrompt;
+    }
+  }
+};
+
+// src/services/log-analysis.ts
+var LogAnalysisEngine = class {
+  static ERROR_PATTERNS = [
+    { name: "typescript", regex: /(.+)\((\d+),(\d+)\): error (TS\d+): (.+)/g },
+    { name: "node_module", regex: /Error: Cannot find module '(.+)'/g },
+    { name: "syntax", regex: /SyntaxError: (.+)/g },
+    { name: "reference", regex: /ReferenceError: (.+) is not defined/g }
+  ];
+  static parse(logs) {
+    const errors = [];
+    for (const pattern of this.ERROR_PATTERNS) {
+      let match;
+      while ((match = pattern.regex.exec(logs)) !== null) {
+        errors.push({
+          type: pattern.name,
+          file: match[1],
+          line: match[2],
+          message: match[5] || match[1]
+        });
+      }
+    }
+    const summary = errors.length > 0 ? `Found ${errors.length} specific errors in build logs.` : "No specific error patterns matched in logs.";
+    return { errors, summary };
+  }
+};
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   AgentMemory,
@@ -1899,4 +1914,3 @@ Output: ${JSON.stringify(params.output)}`, request, signal, strategy);
   ValidatorAgent,
   agentRegistry
 });
-//# sourceMappingURL=index.js.map

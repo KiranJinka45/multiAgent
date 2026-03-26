@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { eventBus } from '@libs/utils';
+import { eventBus } from '@libs/utils/server';
 
 export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
@@ -45,3 +45,5 @@ export async function GET(req: NextRequest) {
         }, { status: 500 });
     }
 }
+
+export const dynamic = 'force-dynamic';

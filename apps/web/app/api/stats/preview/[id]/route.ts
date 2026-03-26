@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { AnalyticsService } from '@libs/utils';
+import { AnalyticsService } from '@libs/utils/server';
 
 export async function GET(
     req: Request,
@@ -26,3 +26,5 @@ export async function GET(
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
+
+export const dynamic = 'force-dynamic';

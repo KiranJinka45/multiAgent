@@ -1,6 +1,6 @@
 import { ErrorAnalyzer, BuildError } from './error-analyzer';
 import { KnowledgeStore } from './knowledge-store';
-import logger from '@libs/utils';
+import { logger } from '@libs/observability';
 
 export class FixRecommender {
     /**

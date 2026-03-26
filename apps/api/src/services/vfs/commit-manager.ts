@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { VirtualFileSystem } from './virtual-fs';
-import logger from '@libs/utils';
+import { logger } from '@libs/observability';
 
 export class CommitManager {
     /**

@@ -1,7 +1,8 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import { redis, logger, registry } from '@libs/utils';
+import { redis, registry } from '@libs/utils/server';
+import { logger } from '@libs/observability';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import { initTelemetry } from '@libs/observability';

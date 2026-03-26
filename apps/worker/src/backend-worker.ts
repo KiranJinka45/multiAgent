@@ -1,9 +1,9 @@
 import { BaseWorker } from './base-worker';
 import { Job } from 'bullmq';
-import { JobPayload } from '../shared/types';
-import logger from '../shared/logger';
-import { eventBus } from '../shared/services/event-bus';
-import { AgentMemory } from '../shared/services/agent-memory';
+import { JobPayload } from '@libs/utils';
+import { logger } from '@libs/observability';
+import { eventBus } from '@libs/shared-services';
+import { AgentMemory } from '@libs/agents/services/agent-memory';
 
 /**
  * BackendWorker
@@ -23,10 +23,11 @@ export class BackendWorker extends BaseWorker {
     getName() { return 'BackendAgent'; }
     getWorkerId() { return `backend-worker-${process.pid}`; }
 
-    protected async processJob(job: Job<JobPayload>): Promise<any> {
-        const { missionId, taskId, payload } = job.data;
+    protected async processJob(job: Job<JobPayload>): Promise<unknown> {
+        const { missionId, taskId } = job.data;
         
-        logger.info({ missionId, taskId }, '[BackendWorker] Starting task');
+        try {
+            logger.info({ missionId, taskId }, '[BackendWorker] Starting task');
         await this.streamThought(missionId, "Analyzing backend requirements and designing API routes...");
 
         // Simulate logic generation
@@ -47,9 +48,15 @@ export class BackendWorker extends BaseWorker {
         await AgentMemory.set(missionId, `backend:result:${taskId}`, result);
         await AgentMemory.appendTranscript(missionId, this.getName(), "Successfully generated API routes and schema.");
 
-        await eventBus.agent(missionId, this.getName(), 'COMPLETED', `Generated ${result.files.length} backend files`, '');
+        await eventBus.stage(missionId, this.getName(), 'COMPLETED', `Generated ${result.files.length} backend files`, 100);
 
         return result;
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        logger.error({ error, missionId, taskId }, '[BackendWorker] Task failed');
+        await eventBus.error(missionId, `Backend Error: ${errorMessage}`);
+        throw error;
+    }
     }
 }
 

@@ -1,4 +1,4 @@
-import logger from '@libs/utils';
+import { logger } from '@libs/observability';
 
 export interface BuildError {
     type: 'dependency' | 'syntax' | 'type' | 'runtime' | 'unknown';

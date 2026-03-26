@@ -38,6 +38,9 @@
           "allow": ["memory-core", "lib"]
         }
       ]
+    }],
+    "no-restricted-imports": ["error", {
+      "patterns": ["../*", "../../shared/*", "../../lib/*"]
     }]
   }
 }

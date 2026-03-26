@@ -1,98 +1,44 @@
-import { BrainContext } from './context-builder';
-import logger from '@libs/utils';
-import { BaseAgent } from '@libs/agents';
-import { AgentRequest, AgentResponse } from '@libs/contracts';
+import OpenAI from "openai";
 
 export interface Task {
-    id: string;
-    agent: string;
-    description: string;
-    dependencies: string[];
+  id: string;
+  title: string;
+  description: string;
+  status: 'pending' | 'in_progress' | 'completed' | 'failed';
+  subtasks?: Task[];
 }
 
-export interface DeploymentPlan {
-    tasks: Task[];
-    reasoning: string;
-}
+export class Planner {
+  private client: OpenAI;
 
-export class Planner extends BaseAgent {
-    getName() { return 'BrainPlanner'; }
+  constructor(apiKey: string) {
+    this.client = new OpenAI({ apiKey });
+  }
 
-    /**
-     * Required by BaseAgent.
-     * Can be used to run a plan as a single agent execution if needed.
-     */
-    async execute(request: AgentRequest<BrainContext>): Promise<AgentResponse<DeploymentPlan>> {
-        const plan = await this.plan(request.params, request.tenantId);
-        return {
-            success: true,
-            data: plan,
-            artifacts: [],
-            metrics: { durationMs: 0, tokensTotal: 0 }
-        };
+  async plan(objective: string): Promise<Task[]> {
+    console.log(`🧠 [Brain] Planning objective: "${objective}"`);
+    
+    try {
+      const response = await this.client.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: "You are a master task planner. Break down the user objective into a logical sequence of granular tasks for a multi-agent system."
+          },
+          {
+            role: "user",
+            content: objective
+          }
+        ],
+        response_format: { type: "json_object" }
+      });
+
+      const content = JSON.parse(response.choices[0].message.content || '{}');
+      return content.tasks || [];
+    } catch (error) {
+      console.error("Planner Error:", error);
+      return [];
     }
-
-    async plan(context: BrainContext, tenantId: string): Promise<DeploymentPlan> {
-        this.log('🧠 Brain reasoning about the deployment strategy...', { prompt: context.prompt });
-
-        const system = `You are a Senior AI Systems Architect.
-Your goal is to decompose a user prompt into a high-level Task Graph (DAG).
-
-RESOURCES:
-- Past Memories: ${JSON.stringify(context.memories)}
-
-TASK:
-- Break the requirement into discrete agent tasks.
-- Agents available: planner, frontend, backend, database, security, validator.
-- Define dependencies between tasks.
-
-OUTPUT FORMAT (JSON):
-{
-  "reasoning": "Explain your architectural decisions",
-  "tasks": [
-    { "id": "task1", "agent": "...", "description": "...", "dependencies": [] },
-    { "id": "task2", "agent": "...", "description": "...", "dependencies": ["task1"] }
-  ]
-}`;
-
-        try {
-            const request: AgentRequest = {
-                prompt: context.prompt,
-                context: {
-                    executionId: 'brain-planning',
-                    projectId: 'brain-planning',
-                    userId: 'system',
-                    vfs: {},
-                    history: [],
-                    metadata: {},
-                    getExecutionId() { return 'brain-planning'; },
-                    getProjectId() { return 'brain-planning'; },
-                    getVFS() { return {}; },
-                    async get() { return this; },
-                    async atomicUpdate(updater: any) { updater(this); }
-                },
-                tenantId,
-                taskType: 'planning',
-                params: {}
-            };
-            const { result } = await this.promptLLM(system, context.prompt, 'llama-3.3-70b-versatile', undefined, undefined, request.context);
-            return result as DeploymentPlan;
-        } catch (err) {
-            logger.error({ err }, '[Planner] AI planning failed. Falling back to default plan.');
-            return this.getDefaultPlan();
-        }
-    }
-
-    private getDefaultPlan(): DeploymentPlan {
-        return {
-            reasoning: "Fallback to default linear strategy",
-            tasks: [
-                { id: 'plan', agent: 'planner', description: 'Initial decomposition', dependencies: [] },
-                { id: 'fe', agent: 'frontend', description: 'UI generation', dependencies: ['plan'] },
-                { id: 'be', agent: 'backend', description: 'Logic generation', dependencies: ['plan'] },
-                { id: 'db', agent: 'database', description: 'Schema generation', dependencies: ['plan'] },
-                { id: 'sec', agent: 'security', description: 'Hardening', dependencies: ['fe', 'be', 'db'] }
-            ]
-        };
-    }
+  }
 }

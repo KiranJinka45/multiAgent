@@ -1,6 +1,6 @@
 import { eventBus, BuildEvent } from '@shared/services/event-bus';
 import { agentRegistry } from './agent-registry';
-import { DistributedExecutionContext } from '../execution-context';
+import { DistributedExecutionContext } from '@libs/execution-context';
 import logger from '@config/logger';
 
 /**

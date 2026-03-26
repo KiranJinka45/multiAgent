@@ -27,3 +27,5 @@ export async function GET(req: NextRequest) {
     previewUrl,
   });
 }
+
+export const dynamic = 'force-dynamic';

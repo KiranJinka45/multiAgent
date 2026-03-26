@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from 'react';
-import { realtimeManager, PostgresBinding } from '../lib/realtimeManager';
+import { realtimeManager, PostgresBinding } from '../client/realtimeManager';
 import type { RealtimePostgresChangesPayload } from '@libs/supabase';
 
 /**
@@ -15,8 +15,8 @@ import type { RealtimePostgresChangesPayload } from '@libs/supabase';
  * @param binding The strict Postgres changes matching object
  * @param callback The function to execute when payloads multiplex to this component
  */
-export function useRealtimeSubscription<T extends { [key: string]: any } = any>(
-    channelName: string,
+export function useRealtimeSubscription<T extends Record<string, any>>(
+    baseChannelName: string,
     binding: PostgresBinding,
     callback: (payload: RealtimePostgresChangesPayload<T>) => void
 ) {
@@ -29,7 +29,11 @@ export function useRealtimeSubscription<T extends { [key: string]: any } = any>(
         if (isSubscribedRef.current) return;
         isSubscribedRef.current = true;
 
-        const unsubscribe = realtimeManager.subscribe(channelName, binding, callback);
+        const unsubscribe = realtimeManager.subscribe(
+            baseChannelName,
+            binding,
+            (payload) => callback(payload as RealtimePostgresChangesPayload<T>)
+        );
 
         return () => {
             isSubscribedRef.current = false;
@@ -39,5 +43,5 @@ export function useRealtimeSubscription<T extends { [key: string]: any } = any>(
         // We explicitly ignore the `callback` function passing here because the registry 
         // controls local callback sets directly and recreating connections per function inline is dangerous.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [channelName, bindingHash]);
+    }, [baseChannelName, bindingHash]);
 }

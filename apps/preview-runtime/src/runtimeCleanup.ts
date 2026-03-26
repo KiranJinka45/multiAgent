@@ -24,7 +24,7 @@ import { RuntimeHeartbeat } from './runtimeHeartbeat';
 import { RuntimeCapacity } from './runtimeCapacity';
 import { RuntimeEscalation } from './runtimeEscalation';
 import { StaleEvictor } from './cluster/staleEvictor';
-import logger from '@libs/utils';
+import { logger } from '@libs/utils/server';
 
 const RUNTIME_MODE = (process.env.RUNTIME_MODE as 'process' | 'docker') || 'process';
 

@@ -4,8 +4,6 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, LayoutGrid, MessageSquare, Plus, Sparkles, Settings, Box, type LucideIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { projectService } from '@libs/utils';
-import { chatService } from '@libs/utils';
 import { Project } from '@libs/contracts';
 import { Chat } from '@libs/contracts';
 

@@ -86,3 +86,17 @@ export function createMiddlewareClient(_options: { req: unknown; res: unknown })
         }
     });
 }
+
+/**
+ * Convenience helper for server-side/build-time clients using env vars.
+ */
+export function getSupabaseClient(): SupabaseClient {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  
+  if (!url || !key) {
+    throw new Error("[Supabase SDK] Missing environment variables (SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY)");
+  }
+  
+  return createServerSupabaseClient(url, key);
+}

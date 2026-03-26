@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createRouteHandlerClient } from '@libs/supabase';
 import { cookies } from 'next/headers';
-import { createPortalSession } from '@libs/utils';
-import logger from '@libs/utils';
+import { createPortalSession } from '@libs/utils/server';
+import { logger } from '@libs/utils/server';
 
 export async function POST(req: NextRequest) {
     const supabase = createRouteHandlerClient({ cookies });
@@ -35,3 +35,5 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Failed to create portal session' }, { status: 500 });
     }
 }
+
+export const dynamic = 'force-dynamic';

@@ -15,3 +15,5 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to start build' }, { status: 500 });
   }
 }
+
+export const dynamic = 'force-dynamic';

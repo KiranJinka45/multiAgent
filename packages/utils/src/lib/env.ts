@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import logger from '../config/logger';
+import logger from '@libs/observability';
 
 const envSchema = z.object({
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import logger from './logger';
-import { runWithTracing } from './tracing';
+import { runWithTracing } from '../server/tracing';
 
 export type ApiHandler = (req: NextRequest, ...args: unknown[]) => Promise<NextResponse>;
 

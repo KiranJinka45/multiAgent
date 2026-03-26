@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Orchestrator } from '@libs/core-engine';
-import { DistributedExecutionContext as ExecutionContext } from '@libs/utils';
-import logger from '@libs/utils';
+import { DistributedExecutionContext as ExecutionContext } from '@libs/utils/server';
+import { logger } from '@libs/utils/server';
 
 export async function POST(
     req: NextRequest,
@@ -46,3 +46,5 @@ export async function POST(
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
+
+export const dynamic = 'force-dynamic';

@@ -1,36 +1,3 @@
-var __defProp = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
-};
-var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-  }
-  return to;
-};
-var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-
-// src/index.ts
-var index_exports = {};
-__export(index_exports, {
-  queue: () => queue
-});
-module.exports = __toCommonJS(index_exports);
-
-// src/queue.ts
-var queue = {
-  add: async (job) => {
-    console.log("Queue job:", job);
-  }
-};
-// Annotate the CommonJS export names for ESM import in node:
-0 && (module.exports = {
-  queue
-});
+'use strict';Object.defineProperty(exports,'__esModule',{value:true});var p=require('ioredis'),server=require('@libs/utils/server'),observability=require('@libs/observability');function _interopDefault(e){return e&&e.__esModule?e:{default:e}}var p__default=/*#__PURE__*/_interopDefault(p);var g="build-free",x="build-pro",d="deployment",u="architect",R="repair",l="validate",m="planner",_="supervisor",f="watchdog",Q="generator",A="docker",v="backend",B="frontend",h="meta-agent";var c=process.env.REDIS_URL||"redis://localhost:6379",a=server.createLazyProxy(()=>new p__default.default(c,{maxRetriesPerRequest:null}),"Redis_Shared");var b={async progress(r,t,e){observability.logger.info({executionId:r,progress:t,message:e},"[EventBus] Progress Update");},async stage(r,t,e,s,E,i){observability.logger.info({executionId:r,stage:t,status:e,message:s,progress:E,projectId:i},"[EventBus] Stage Update");},async thought(r,t,e){observability.logger.info({executionId:r,agent:t,thought:e},"[EventBus] Agent Thought");},async error(r,t){observability.logger.error({executionId:r,message:t},"[EventBus] Build Error");},async complete(r,t,e){observability.logger.info({executionId:r,previewUrl:t,metadata:e},"[EventBus] Build Complete");}};
+exports.QUEUE_ARCHITECT=u;exports.QUEUE_BACKEND=v;exports.QUEUE_DEPLOY=d;exports.QUEUE_DOCKER=A;exports.QUEUE_FREE=g;exports.QUEUE_FRONTEND=B;exports.QUEUE_GENERATOR=Q;exports.QUEUE_META=h;exports.QUEUE_PLANNER=m;exports.QUEUE_PRO=x;exports.QUEUE_REPAIR=R;exports.QUEUE_SUPERVISOR=_;exports.QUEUE_VALIDATE=l;exports.QUEUE_WATCHDOG=f;exports.default=a;exports.eventBus=b;exports.redis=a;//# sourceMappingURL=index.js.map
 //# sourceMappingURL=index.js.map

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { registry } from '@libs/utils';
-import logger from '@libs/utils';
+import { registry } from '@libs/utils/server';
+import { logger } from '@libs/utils/server';
 
 export const dynamic = 'force-dynamic';
 

@@ -1,5 +1,5 @@
 import { exec } from 'child_process';
-import logger from '@libs/utils';
+import { logger } from '@libs/utils/server';
 
 /**
  * Container & Process Cleaner

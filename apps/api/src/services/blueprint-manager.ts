@@ -1,6 +1,6 @@
 import * as fsLib from 'fs-extra';
 import pathLib from 'path';
-import logger from '@libs/utils';
+import { logger } from '@libs/observability';
 
 export interface Blueprint {
     project_name: string;

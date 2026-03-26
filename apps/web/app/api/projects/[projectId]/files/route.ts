@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs-extra';
 import path from 'path';
-import logger from '@libs/utils';
+import { logger } from '@libs/utils/server';
 
 interface FileTreeEntry {
   name: string;
@@ -67,3 +67,5 @@ export async function GET(
     return NextResponse.json({ error: 'Failed to read file tree' }, { status: 500 });
   }
 }
+
+export const dynamic = 'force-dynamic';

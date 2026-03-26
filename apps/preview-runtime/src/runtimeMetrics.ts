@@ -9,14 +9,14 @@
  * No process logic. No port logic.
  */
 
-import redis from '@libs/utils';
-import logger from '@libs/utils';
+import { redis } from '@libs/utils/server';
+import { logger } from '@libs/utils/server';
 import {
     runtimeStartupDuration,
     runtimeCrashesTotal,
     runtimeActiveTotal,
     runtimeProxyErrorsTotal
-} from '@libs/utils';
+} from '@libs/utils/server';
 
 const RUNTIME_MODE = (process.env.RUNTIME_MODE as 'process' | 'docker') || 'process';
 

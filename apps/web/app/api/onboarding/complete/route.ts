@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createRouteHandlerClient } from '@libs/supabase';
 import { cookies } from 'next/headers';
-import logger from '@libs/utils';
-import { withObservability } from '@libs/utils';
+import { logger } from '@libs/utils/server';
+import { withObservability } from '@libs/utils/server';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function handler(_req: NextRequest) {
@@ -32,3 +32,5 @@ async function handler(_req: NextRequest) {
 }
 
 export const POST = withObservability(handler);
+
+export const dynamic = 'force-dynamic';

@@ -1,7 +1,7 @@
 import fs from 'fs-extra';
 import path from 'path';
 import { SnapshotLibrary } from './snapshot-library';
-import logger from '@libs/utils';
+import { logger } from '@libs/utils/server';
 
 export interface WarmedSandbox {
     id: string;

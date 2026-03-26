@@ -2,19 +2,42 @@ import express from 'express';
 import { createServer, request as httpRequest } from 'http';
 import { Server } from 'socket.io';
 import Redis from 'ioredis';
-import { redis } from '@queue';
-import dotenv from 'dotenv';
+import { redis } from '@libs/shared-services/redis';
+import * as dotenv from 'dotenv';
 import cors from 'cors';
+import { logger, register } from '@libs/observability';
+import { requestContext } from '../middleware/requestContext';
+import { metricsMiddleware } from '../middleware/metricsMiddleware';
+import { rateLimitMiddleware } from '../middleware/rateLimitMiddleware';
 
 dotenv.config({ path: '.env.local' });
 
 const app = express();
+
+// Apply Observability & Resilience Middlewares
+app.use(requestContext);
+app.use(metricsMiddleware);
+app.use(rateLimitMiddleware);
 app.use(cors());
 
-// Global Debug Logger
+// Health & Metrics Endpoint
+app.get('/metrics', async (req, res) => {
+    try {
+        res.set('Content-Type', register.contentType);
+        res.end(await register.metrics());
+    } catch {
+        res.status(500).end();
+    }
+});
+
+// Global Debug Logger (Structured)
 app.use((req, res, next) => {
     if (req.url.startsWith('/preview') || req.url === '/health') {
-        console.log(`[SocketServer] ${req.method} ${req.url}`);
+        logger.info({
+            requestId: (req as express.Request & { requestId: string }).requestId,
+            method: req.method,
+            url: req.url,
+        }, '[SocketServer] Request received');
     }
     next();
 });
@@ -102,8 +125,8 @@ app.get('/health', async (req, res) => {
             redis: redis.status,
             id: 'socket-server-v2'
         });
-    } catch (error) {
-        res.status(500).json({ status: 'error', error: String(error) });
+    } catch (error: unknown) {
+        res.status(500).json({ status: 'error', error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -128,8 +151,8 @@ io.on('connection', (socket) => {
                 socket.emit('build-update', JSON.parse(latestState));
                 console.log(`[Socket.IO] Sent catch-up state to ${socket.id} for project ${projectId}`);
             }
-        } catch (error) {
-            console.error('[Socket.IO] Catch-up error:', error);
+        } catch (_error) {
+            console.error('[Socket.IO] Catch-up error:', _error);
         }
     });
 
@@ -162,8 +185,8 @@ redisSub.on('message', (channel, message) => {
                 // If no project ID context, broadcast to all
                 io.emit('build-update', payload);
             }
-        } catch (error) {
-            console.error('[Socket.IO] Failed to parse Redis message:', error);
+        } catch (_error) {
+            console.error('[Socket.IO] Failed to parse Redis message:', _error);
         }
     }
 });

@@ -13,6 +13,7 @@ export const baseConfig = defineConfig({
   outDir: 'dist',
   shims: true,
   external: [
+    /^@libs\/.*/,
     'react',
     'react-dom',
     'next',
@@ -22,21 +23,14 @@ export const baseConfig = defineConfig({
     'pino',
     'zod',
     'uuid',
-    '@libs/utils',
-    '@libs/contracts',
-    '@libs/registry',
-    '@libs/observability',
-    '@libs/validator',
-    '@libs/supabase',
-    '@libs/runtime',
     'fs-extra',
     'axios',
     'groq-sdk',
     'undici',
     'readable-stream',
-    '@prisma/client', // 🔥 Externalized
-    'openai',        // 🔥 Externalized
-    'redis',         // 🔥 Externalized
-    'pg'             // 🔥 Externalized
+    '@prisma/client',
+    'openai',
+    'redis',
+    'pg'
   ],
 });

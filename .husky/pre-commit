@@ -1,0 +1,1 @@
+pnpm refactor && pnpm lint && pnpm check:deps && pnpm build

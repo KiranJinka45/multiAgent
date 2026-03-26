@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createRouteHandlerClient } from '@libs/supabase';
 import { cookies } from 'next/headers';
-import { stripe, STRIPE_CONFIG } from '@libs/utils';
-import logger from '@libs/utils';
+import { stripe, STRIPE_CONFIG } from '@libs/utils/server';
+import { logger } from '@libs/utils/server';
 
 export async function POST(req: NextRequest) {
     const supabase = createRouteHandlerClient({ cookies });
@@ -39,3 +39,5 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
     }
 }
+
+export const dynamic = 'force-dynamic';

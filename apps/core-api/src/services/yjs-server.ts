@@ -2,7 +2,7 @@ import { WebSocketServer } from 'ws';
 // @ts-expect-error - y-websocket doesn't have official types for bin/utils
 import { setupWSConnection } from 'y-websocket/bin/utils';
 import { collaborationPersistence } from './collaboration-persistence';
-import logger from '@libs/utils';
+import { logger } from '@libs/observability';
 import url from 'url';
 
 /**

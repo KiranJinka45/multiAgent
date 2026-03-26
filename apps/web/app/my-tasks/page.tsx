@@ -1,11 +1,11 @@
 'use client';
 
-import TopNav from '@components/TopNav';
+import TopNav from '@/components/TopNav';
 import { useState } from 'react';
 
-import MobileMenu from '@components/MobileMenu';
-import TaskInput from '@components/TaskInput';
-import TaskList, { Task } from '@components/TaskList';
+import MobileMenu from '@/components/MobileMenu';
+import TaskInput from '@/components/TaskInput';
+import TaskList, { Task } from '@/components/TaskList';
 import { ListTodo } from 'lucide-react';
 
 export default function MyTasksPage() {

@@ -1,10 +1,10 @@
 'use client';
 
 
-import TopNav from '@components/TopNav';
-import StrategyGuide from '@components/StrategyGuide';
+import TopNav from '@/components/TopNav';
+import StrategyGuide from '@/components/StrategyGuide';
 import { useState } from 'react';
-import MobileMenu from '@components/MobileMenu';
+import MobileMenu from '@/components/MobileMenu';
 
 export default function StrategyPage() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

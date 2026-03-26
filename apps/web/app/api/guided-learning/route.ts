@@ -36,3 +36,5 @@ We'll wrap up by building a robust project together to solidify your knowledge. 
         return NextResponse.json({ error: 'Failed to generate learning path' }, { status: 500 });
     }
 }
+
+export const dynamic = 'force-dynamic';

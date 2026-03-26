@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs-extra';
 import path from 'path';
 import JSZip from 'jszip';
-import logger from '@libs/utils';
+import { logger } from '@libs/utils/server';
 
 export async function GET(
     _request: NextRequest,
@@ -52,3 +52,5 @@ async function addDirectoryToZip(rootPath: string, currentPath: string, zip: JSZ
     }
   }
 }
+
+export const dynamic = 'force-dynamic';

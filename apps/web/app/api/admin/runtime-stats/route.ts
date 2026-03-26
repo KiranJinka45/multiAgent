@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { PreviewOrchestrator } from '@libs/runtime/previewOrchestrator';
 import { RuntimeMetrics } from '@libs/runtime/runtimeMetrics';
 import { ProcessManager } from '@libs/runtime/processManager';
-import logger from '@libs/utils';
+import { logger } from '@libs/utils/server';
 
 export const dynamic = 'force-dynamic';
 

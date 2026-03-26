@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
-import logger from '@libs/utils';
+import { logger } from '@libs/utils/server';
 
 export class StorageGC {
     private static TTL_MS = 2 * 60 * 60 * 1000; // 2 hours for previews

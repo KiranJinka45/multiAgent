@@ -1,6 +1,6 @@
 import * as fs from 'fs-extra';
 import path from 'path';
-import logger from '@libs/utils';
+import { logger } from '@libs/observability';
 
 export class TemplateEngine {
     private static TEMPLATES_DIR = path.join(process.cwd(), 'templates');

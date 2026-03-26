@@ -9,7 +9,6 @@ import { useSidebar } from '@libs/context';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabase-browser';
 import { useRealtimeSubscription } from '@libs/utils';
-import { chatService } from '@libs/utils';
 import type { User } from '@libs/supabase';
 
 type MobileMenuProps = {

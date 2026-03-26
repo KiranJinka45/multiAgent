@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { redis } from '@libs/utils';
+import { redis } from '@libs/utils/server';
 
 export async function GET() {
     try {
@@ -43,3 +43,5 @@ export async function GET() {
         }, { status: 200 }); // Still return 200 to prevent fetch errors but show 'offline'
     }
 }
+
+export const dynamic = 'force-dynamic';

@@ -1,5 +1,5 @@
 import { AgentMetrics } from './agent-metrics';
-import logger from '@libs/utils';
+import { logger } from '@libs/observability';
 
 export type AgentStrategy = 'direct_generation' | 'memory_augmented' | 'template_driven' | 'multi_pass_review';
 

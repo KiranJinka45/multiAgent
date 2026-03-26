@@ -5,8 +5,8 @@ import { Compass, Search, Layout, Globe, ArrowUpRight, Zap, RefreshCw } from 'lu
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 
-import TopNav from '@components/TopNav';
-import MobileMenu from '@components/MobileMenu';
+import TopNav from '@/components/TopNav';
+import MobileMenu from '@/components/MobileMenu';
 import { Project } from '@libs/contracts';
 import { formatDate } from '@libs/utils';
 
@@ -37,6 +37,11 @@ export default function ExplorePage() {
         };
         fetchMarketplace();
     }, [activeTab]);
+
+    const filteredProjects = projects.filter(p => 
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        (p.description || '').toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     return (
         <div className="flex h-screen bg-background text-foreground font-sans overflow-hidden">

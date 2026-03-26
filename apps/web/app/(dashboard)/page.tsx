@@ -5,13 +5,11 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase-browser';
 import { toast } from 'sonner';
 
-import MobileMenu from '@components/MobileMenu';
-import TaskInput, { TaskInputHandle } from '@components/TaskInput';
-import ChatList from '@components/ChatList';
-import TopNav from '@components/TopNav';
-import WelcomeModal from '@components/WelcomeModal';
-import { chatService } from '@libs/utils';
-import { projectService } from '@libs/utils';
+import MobileMenu from '@/components/MobileMenu';
+import TaskInput, { TaskInputHandle } from '@/components/TaskInput';
+import ChatList from '@/components/ChatList';
+import TopNav from '@/components/TopNav';
+import WelcomeModal from '@/components/WelcomeModal';
 import { Message } from '@libs/contracts';
 
 export default function Dashboard() {
@@ -248,8 +246,8 @@ export default function Dashboard() {
                 </div>
 
                 {messages.length > 0 && <TaskInput ref={taskInputRef} onAddTask={addMessage} />}
-            </main >
-        </div >
+            </div>
+        </div>
     );
 }
 

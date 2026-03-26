@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import { stripe } from '@libs/utils';
-import { supabaseAdmin } from '@libs/utils';
-import logger from '@libs/utils';
-import { stripeWebhookEventsTotal } from '@libs/utils';
+import { stripe } from '@libs/utils/server';
+import { supabaseAdmin } from '@libs/utils/server';
+import { logger } from '@libs/utils/server';
+import { stripeWebhookEventsTotal } from '@libs/utils/server';
 
 export async function POST(req: Request) {
     const body = await req.text();
@@ -53,3 +53,5 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Webhook Error' }, { status: 400 });
     }
 }
+
+export const dynamic = 'force-dynamic';

@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server';
-import { redis } from '@libs/utils';
-import Docker from 'dockerode';
+import { redis } from '@libs/utils/server';
 
-const docker = new Docker();
+// Dynamic import to avoid webpack bundling native ssh2/dockerode modules
+let docker: any = null;
+try {
+    const Docker = require('dockerode');
+    docker = new Docker();
+} catch { /* dockerode not available — health check will report docker=false */ }
 
 export async function GET() {
     try {
@@ -56,3 +60,5 @@ export async function GET() {
         }, { status: 500 });
     }
 }
+
+export const dynamic = 'force-dynamic';

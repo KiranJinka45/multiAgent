@@ -2,7 +2,10 @@ variable "vpc_id" {}
 variable "private_subnet_ids" { type = list(string) }
 variable "db_name" { default = "multiagent" }
 variable "db_username" { default = "postgres" }
-variable "db_password" { sensitive = true; default = null }
+variable "db_password" {
+  sensitive = true
+  default   = null
+}
 variable "replicate_source_db" { default = null }
 
 resource "aws_db_subnet_group" "db_group" {

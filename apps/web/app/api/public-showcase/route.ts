@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { projectService } from '@libs/utils';
+import { projectService } from '@libs/utils/server';
 
 export async function GET() {
     try {
@@ -15,3 +15,5 @@ export async function GET() {
         return NextResponse.json({ error: 'Failed to fetch showcase' }, { status: 500 });
     }
 }
+
+export const dynamic = 'force-dynamic';

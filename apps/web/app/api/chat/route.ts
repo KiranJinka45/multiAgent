@@ -113,3 +113,5 @@ If the user's message indicates they want to BUILD a website, landing page, or a
         );
     }
 }
+
+export const dynamic = 'force-dynamic';

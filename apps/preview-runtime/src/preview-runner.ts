@@ -1,5 +1,5 @@
 import { previewManager } from './preview-manager';
-import logger from '@libs/utils';
+import { logger } from '@libs/utils/server';
 
 export async function previewRunner(projectId: string, files: any[]) {
     logger.info({ projectId }, '[PreviewRunner] Initiating local dev preview...');

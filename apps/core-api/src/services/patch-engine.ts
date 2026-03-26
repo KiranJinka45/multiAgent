@@ -1,4 +1,4 @@
-import logger from '@libs/utils';
+import { logger } from '@libs/observability';
 import fs from 'fs-extra';
 import path from 'path';
 

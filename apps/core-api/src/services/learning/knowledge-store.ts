@@ -1,5 +1,5 @@
-import { supabaseAdmin } from '@libs/utils';
-import logger from '@libs/utils';
+import { supabaseAdmin } from '@libs/utils/server';
+import { logger } from '@libs/observability';
 
 export interface FixPattern {
     error_signature: string;

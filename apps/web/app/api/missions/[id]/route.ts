@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { missionController } from '@libs/utils';
-import logger from '@libs/utils';
+import { missionController } from '@libs/utils/server';
+import { logger } from '@libs/utils/server';
 
 export async function GET(
     req: NextRequest,
@@ -21,3 +21,5 @@ export async function GET(
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
+
+export const dynamic = 'force-dynamic';

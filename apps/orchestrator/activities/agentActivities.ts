@@ -8,11 +8,11 @@ import {
     ValidationResult, 
     BrainPlan 
 } from '@libs/contracts';
-import { publishLog } from '../../worker/services/logger';
+import { publishLog } from '@libs/worker/services/logger';
 import * as fs from 'fs-extra';
 import path from 'path';
 import logger from '@libs/utils';
-import { safetyService } from '../../api/services/safety';
+import { safetyService } from '@libs/api/services/safety';
 
 export const createActivities = (executionId: string) => {
     logger.info({ executionId }, '[Activities] Initializing activities for worker');

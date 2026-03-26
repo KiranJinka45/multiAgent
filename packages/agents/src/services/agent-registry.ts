@@ -1,12 +1,12 @@
 import logger from '@libs/utils';
-import { DatabaseAgent } from '../index';
-import { BackendAgent } from '../index';
-import { FrontendAgent } from '../index';
-import { DeploymentAgent } from '../index';
-import { TestingAgent } from '../index';
-import { ValidatorAgent } from '../index';
+import { DatabaseAgent } from '../';
+import { BackendAgent } from '../';
+import { FrontendAgent } from '../';
+import { DeploymentAgent } from '../';
+import { TestingAgent } from '../';
+import { ValidatorAgent } from '../';
 
-import { StrategyConfig } from './agent-intelligence/strategy-engine';
+import { StrategyConfig } from '@libs/utils';
 import { AgentRequest, AgentResponse } from '@libs/contracts';
 
 export interface TaskAgent {
@@ -64,13 +64,13 @@ export class AgentRegistry {
     }
 }
 
-import { PlannerAgent } from '../index';
-import { SecurityAgent } from '../index';
-import { MonitoringAgent } from '../index';
-import { DebugAgent } from '../index';
-import { JudgeAgent } from '../index';
-import { SaaSMonetizationAgent } from '../index';
-import { SandboxEditorAgent } from '../index';
+import { PlannerAgent } from '../';
+import { SecurityAgent } from '../';
+import { MonitoringAgent } from '../';
+import { DebugAgent } from '../';
+import { JudgeAgent } from '../';
+import { SaaSMonetizationAgent } from '../';
+import { SandboxEditorAgent } from '../';
 
 // Global registry export
 export const agentRegistry = new AgentRegistry();

@@ -1,12 +1,8 @@
 import { Groq } from 'groq-sdk';
-import logger from '@libs/utils';
+import { logger } from '@libs/observability';
 import { AgentRequest, AgentResponse } from '@libs/contracts';
-import { breakers } from '@libs/utils';
-import { eventBus } from '@libs/utils';
-import { RetryManager } from '@libs/utils';
-import { StrategyConfig } from '@libs/utils';
+import { breakers, eventBus, RetryManager, StrategyConfig, CostGovernanceService, SemanticCacheService, usageService } from '@libs/utils/server';
 import { selectModel, RoutingContext, TaskType } from '@libs/ai';
-import { CostGovernanceService, SemanticCacheService, usageService } from '@libs/utils';
 
 
 const retry = new RetryManager(5, 3000); // 5 retries, 3s base delay

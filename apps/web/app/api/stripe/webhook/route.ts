@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { stripe, STRIPE_CONFIG } from '@libs/utils';
-import { supabaseAdmin } from '@libs/utils';
-import logger from '@libs/utils';
+import { stripe, STRIPE_CONFIG } from '@libs/utils/server';
+import { supabaseAdmin } from '@libs/utils/server';
+import { logger } from '@libs/utils/server';
 
 export async function POST(req: NextRequest) {
     const body = await req.text();
@@ -139,3 +139,5 @@ async function handleSubscriptionUpdated(subscription: {
 
     logger.info({ customerId, status }, 'Updated subscription status via webhook');
 }
+
+export const dynamic = 'force-dynamic';

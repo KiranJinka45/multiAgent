@@ -1,7 +1,7 @@
 import { projectMemory } from './project-memory';
 import { VectorStore } from './memory/vector-store';
 import { EmbeddingsEngine } from './memory/embeddings-engine';
-import logger from '@libs/utils';
+import { logger } from '@libs/observability';
 
 export interface ExperienceLesson {
     action: string;
