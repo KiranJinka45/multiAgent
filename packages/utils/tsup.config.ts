@@ -4,7 +4,10 @@ export default defineConfig({
   entry: [
     "src/index.ts",
     "src/client/index.ts",
-    "src/server/index.ts"
+    "src/server/**/*.ts",
+    "src/shared/**/*.ts",
+    "src/config/**/*.ts",
+    "src/types.ts"
   ],
   format: ["cjs", "esm"],
   dts: false,
@@ -24,6 +27,22 @@ export default defineConfig({
     "fs-extra",
     "archiver",
     "dotenv",
-    "groq-sdk"
+    "groq-sdk",
+    "@packages/contracts",
+    "@packages/db",
+    "@packages/observability",
+    "@packages/registry",
+    "@packages/supabase",
+    "@packages/validator",
+    "@packages/core-engine",
+    "@packages/sandbox",
+    "@packages/agents",
+    "@apps/sandbox-runtime",
+    "@apps/preview-runtime",
+    "@packages/agents",
+    "@packages/ai",
+    "@packages/brain",
+    "@packages/build-engine",
+    "@packages/context"
   ]
 });

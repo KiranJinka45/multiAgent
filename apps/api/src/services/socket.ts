@@ -1,15 +1,16 @@
 import express from 'express';
 import { createServer } from 'http';
-import { Server } from 'socket.io';
-import { redis, apiRequestDurationSeconds, registry } from '@libs/utils/server';
+import { redis, apiRequestDurationSeconds, registry } from '@packages/utils/server';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import { initTelemetry } from '@libs/observability';
+import { Server } from 'socket.io';
 
 import { startCollaborationServer } from './yjs-server';
+import { commandGateway } from './command-gateway';
+import { missionController } from '@packages/utils/server';
 
 // Initialize OpenTelemetry Tracing
-initTelemetry('multiagent-api-orchestrator');
+// initInstrumentation('multiagent-api-orchestrator');
 
 
 dotenv.config({ path: '.env.local' });
@@ -42,6 +43,48 @@ app.get('/metrics', async (req, res) => {
         res.end(await registry.metrics());
     } catch (err) {
         res.status(500).end(err);
+    }
+});
+
+/**
+ * REST API: Zero-Iteration Sandbox
+ */
+
+// POST /generate - Initiate an app generation mission
+app.post('/generate', express.json(), async (req, res) => {
+    const { prompt, userId, projectId, template } = req.body;
+    
+    if (!prompt) {
+        return res.status(400).json({ error: 'Prompt is required' });
+    }
+
+    const result = await commandGateway.submitMission(
+        userId || 'anonymous',
+        projectId || `proj-${Date.now()}`,
+        prompt,
+        { template }
+    );
+
+    if (result.success) {
+        res.status(202).json(result);
+    } else {
+        res.status(500).json(result);
+    }
+});
+
+// GET /status/:missionId - Poll for mission progress
+app.get('/status/:missionId', async (req, res) => {
+    const { missionId } = req.params;
+    
+    try {
+        const mission = await missionController.getMission(missionId);
+        if (!mission) {
+            return res.status(404).json({ error: 'Mission not found' });
+        }
+        res.json(mission);
+    } catch (err) {
+        console.error(`[StatusAPI] Error fetching mission ${missionId}:`, err);
+        res.status(500).json({ error: 'Failed to fetch mission status' });
     }
 });
 

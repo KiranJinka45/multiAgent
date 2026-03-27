@@ -1,5 +1,5 @@
 {
-  "name": "@libs/utils",
+  "name": "@packages/utils",
   "version": "0.1.0",
   "private": true,
   "main": "./dist/index.js",
@@ -13,12 +13,12 @@
   },
   "dependencies": {
     "@kubernetes/client-node": "^0.22.0",
-    "@libs/contracts": "workspace:*",
-    "@libs/db": "workspace:*",
-    "@libs/observability": "workspace:*",
-    "@libs/registry": "workspace:*",
-    "@libs/supabase": "workspace:*",
-    "@libs/validator": "workspace:*",
+    "@packages/contracts": "workspace:*",
+    "@packages/db": "workspace:*",
+    "@packages/observability": "workspace:*",
+    "@packages/registry": "workspace:*",
+    "@packages/supabase": "workspace:*",
+    "@packages/validator": "workspace:*",
     "@opentelemetry/api": "latest",
     "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/supabase-js": "^2.43.2",
@@ -28,6 +28,7 @@
     "bullmq": "^5.70.1",
     "clsx": "^2.1.1",
     "cors": "^2.8.6",
+    "dockerode": "^4.0.9",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "fs-extra": "^11.3.4",
@@ -50,10 +51,13 @@
   "devDependencies": {
     "@types/archiver": "^6.0.2",
     "@types/cors": "^2.8.17",
+    "@types/dockerode": "^4.0.1",
     "@types/express": "^5.0.0",
     "@types/fs-extra": "^11.0.4",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
     "@types/socket.io-client": "^3.0.0",
     "@types/uuid": "^10.0.0",
     "tsup": "^8.5.1",
@@ -74,6 +78,8 @@
       "types": "./src/server/index.ts",
       "import": "./dist/server/index.mjs",
       "require": "./dist/server/index.js"
-    }
+    },
+    "./src/*": "./src/*"
   }
 }
+

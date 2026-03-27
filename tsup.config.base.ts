@@ -1,36 +1,51 @@
-import { defineConfig } from 'tsup';
+import { Options } from 'tsup';
 
-export const baseConfig = defineConfig({
-  target: 'node20',
-  format: ['cjs', 'esm'], // 🔥 Added ESM
-  clean: true,
-  sourcemap: process.env.NODE_ENV !== 'production',
+export const baseConfig: Options = {
+  format: ['cjs', 'esm'],
   dts: false,
-  bundle: true,
-  minify: true, // 🔥 Always minify for prod/size check
-  treeshake: true, // 🔥 Critical for bundle size
-  splitting: true, // 🔥 Critical for code splitting
-  outDir: 'dist',
-  shims: true,
+  clean: true,
+  sourcemap: true,
+  minify: false,
+  splitting: false,
+  target: 'node20',
   external: [
-    /^@libs\/.*/,
-    'react',
-    'react-dom',
-    'next',
-    'ioredis',
     'bullmq',
-    'dotenv',
+    'ioredis',
     'pino',
-    'zod',
     'uuid',
     'fs-extra',
+    'archiver',
+    'dotenv',
+    'zod',
+    'react',
+    'stripe',
+    'prom-client',
+    'redlock',
+    'next',
+    'socket.io-client',
+    '@supabase/supabase-js',
+    '@temporalio/client',
+    '@temporalio/worker',
     'axios',
-    'groq-sdk',
-    'undici',
-    'readable-stream',
-    '@prisma/client',
-    'openai',
-    'redis',
-    'pg'
+    'express',
+    'socket.io',
+    'cors',
+    'jsonwebtoken',
+    '@packages/contracts',
+    '@packages/db',
+    '@packages/observability',
+    '@packages/shared-services',
+    '@packages/memory',
+    '@packages/supabase',
+    '@packages/validator',
+    '@packages/core-engine',
+    '@packages/sandbox',
+    '@packages/agents',
+    '@packages/ai',
+    '@packages/brain',
+    '@packages/build-engine',
+    '@packages/context',
+    '@packages/queue',
+    '@packages/utils'
   ],
-});
+};

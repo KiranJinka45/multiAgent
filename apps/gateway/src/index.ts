@@ -4,15 +4,33 @@ import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import http from 'http';
 import helmet from 'helmet';
-import { logger, register, startTracing } from '@libs/observability';
+import { logger, register, initInstrumentation } from '@packages/observability';
 import { requestContext } from './middleware/requestContext';
 import { metricsMiddleware } from './middleware/metricsMiddleware';
-import { rateLimitMiddleware } from '@libs/resilience';
+import { rateLimitMiddleware } from '@packages/resilience';
 import { initSocket } from './socket';
-import { CostGovernanceService } from '@libs/utils/server';
+import { CostGovernanceService } from '@packages/utils/server';
+import { z } from 'zod';
+import { createProxyMiddleware } from 'http-proxy-middleware';
+import { ClientRequest } from 'http';
+import { db } from '@packages/db';
+import { trackEvent } from './routes/events';
+import { StripeService } from './services/stripe';
 
 // Initialize tracing as early as possible
-startTracing();
+// initInstrumentation('gateway');
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at Gateway:', reason);
+    logger.error({ reason, promise }, 'Unhandled Rejection at Gateway');
+    process.exit(1);
+});
+
+process.on('uncaughtException', (error) => {
+    console.error('Uncaught Exception at Gateway:', error);
+    logger.error({ error }, 'Uncaught Exception at Gateway');
+    process.exit(1);
+});
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -224,7 +242,7 @@ app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), asyn
         const event = await StripeService.constructEvent(req.body, sig);
         
         if (event.type === 'checkout.session.completed') {
-            const { QueueManager } = await import('@libs/utils');
+            const { QueueManager } = await import('@packages/utils/server');
             await QueueManager.add('billing-events', {
                 type: 'subscription_created',
                 data: event.data.object,
@@ -245,9 +263,9 @@ initSocket(server);
 const preloadModules = async () => {
     logger.info('[Gateway] Preloading critical modules...');
     await Promise.all([
-        import('@libs/db'),
-        import('@libs/memory-cache'),
-        import('@libs/utils')
+        import('@packages/db'),
+        import('@packages/memory-cache'),
+        import('@packages/utils')
     ]);
     logger.info('[Gateway] Warm startup complete');
 };

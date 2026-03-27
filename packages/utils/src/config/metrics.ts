@@ -26,8 +26,9 @@ export const registry = createLazyProxy(() => {
     return reg;
 });
 
-const getPC = () => isRuntime() ? require('prom-client') : { Histogram: MockMetric, Counter: MockMetric, Gauge: MockMetric };
-const getRedis = () => isRuntime() ? require('../server/redis').default : { pipeline: () => ({ incr: () => {}, incrby: () => {}, incrbyfloat: () => {}, exec: () => Promise.resolve() }) };
+const safeRequire = require;
+const getPC = () => isRuntime() ? safeRequire('prom-client') : { Histogram: MockMetric, Counter: MockMetric, Gauge: MockMetric };
+const getRedis = () => isRuntime() ? safeRequire('../server/redis').default : { pipeline: () => ({ incr: () => {}, incrby: () => {}, incrbyfloat: () => {}, exec: () => Promise.resolve() }) };
 
 // --- Phase 6: Runtime Platform Metrics ---
 

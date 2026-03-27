@@ -2,13 +2,13 @@ import 'dotenv/config';
 import { initInstrumentation } from './instrumentation';
 
 // Initialize tracing before any other imports
-initInstrumentation('build-worker');
+// initInstrumentation('build-worker');
 import fs from 'fs-extra';
 import path from 'path';
 import { Worker, Job } from 'bullmq';
-import { logger } from '@libs/observability';
-import { redis, QUEUE_FREE, QUEUE_PRO } from '@libs/shared-services';
-import { Orchestrator } from '@libs/core-engine';
+import { logger } from '@packages/observability';
+import { redis, QUEUE_FREE, QUEUE_PRO } from '@packages/shared-services';
+import { Orchestrator } from '@packages/core-engine';
 import { 
     runWithTracing, 
     queueWaitTimeSeconds, 
@@ -18,15 +18,15 @@ import {
     eventBus, 
     ReliabilityMonitor, 
     WorkerClusterManager 
-} from '@libs/utils/server';
-import { JobStage } from '@libs/contracts';
-import { ArtifactValidator } from '@libs/validator';
-import { NodeRegistry } from '@libs/sandbox-runtime/cluster/nodeRegistry';
-import { FailoverManager } from '@libs/sandbox-runtime/cluster/failoverManager';
-import { RedisRecovery } from '@libs/sandbox-runtime/cluster/redisRecovery';
-import { PreviewOrchestrator } from '@libs/runtime/previewOrchestrator';
-import { RuntimeCleanup } from '@libs/runtime/runtimeCleanup';
-import { BuildCacheManager, BuildGraphEngine } from '@libs/build-engine';
+} from '@packages/utils/server';
+import { JobStage } from '@packages/contracts';
+import { ArtifactValidator } from '@packages/validator';
+import { NodeRegistry } from '@packages/sandbox-runtime/cluster/nodeRegistry';
+import { FailoverManager } from '@packages/sandbox-runtime/cluster/failoverManager';
+import { RedisRecovery } from '@packages/sandbox-runtime/cluster/redisRecovery';
+import { PreviewOrchestrator } from '@packages/runtime/previewOrchestrator';
+import { RuntimeCleanup } from '@packages/runtime/runtimeCleanup';
+import { BuildCacheManager, BuildGraphEngine } from '@packages/build-engine';
 import os from 'os';
 
 const WORKER_ID = `worker-${os.hostname()}-${process.pid}`;
