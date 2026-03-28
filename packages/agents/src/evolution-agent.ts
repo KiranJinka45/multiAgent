@@ -1,5 +1,5 @@
 import { BaseAgent, AgentResponse, AgentRequest } from './base-agent';
-import { EvolutionParams } from '@libs/contracts';
+import { EvolutionParams } from '@packages/contracts';
 
 export interface EvolutionResult {
     optimized: boolean;

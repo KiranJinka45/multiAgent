@@ -1,16 +1,16 @@
 import { Worker, Job, Queue } from 'bullmq';
 import { Redis } from 'ioredis';
-import { logger } from '@libs/observability';
-import { redis, eventBus } from '@libs/shared-services';
+import { logger } from '@packages/observability';
+import { redis, eventBus } from '@packages/shared-services';
 import { 
     DistributedExecutionContext, 
     usageService, 
     TenantService, 
     SLOService 
-} from '@libs/utils/server';
-import { DEFAULT_RETRY_OPTIONS, DEAD_LETTER_QUEUE_NAME, createBreaker } from '@libs/resilience';
+} from '@packages/utils/server';
+import { DEFAULT_RETRY_OPTIONS, DEAD_LETTER_QUEUE_NAME, createBreaker } from '@packages/resilience';
 
-// Mock metrics for now if they are not in @libs/utils/server or use a generic one
+// Mock metrics for now if they are not in @packages/utils/server or use a generic one
 const workerTaskDurationSeconds = { observe: (...args: any[]) => {} };
 const agentFailuresTotal = { inc: (...args: any[]) => {} };
 

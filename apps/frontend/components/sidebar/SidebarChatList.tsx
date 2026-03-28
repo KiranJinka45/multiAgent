@@ -4,7 +4,7 @@ import { MessageSquare, Pin, MoreHorizontal, Share2, Users, Edit3, Archive, Tras
 import Link from 'next/link';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Chat } from '@libs/contracts';
+import { Chat } from '@packages/contracts';
 
 type SidebarChatListProps = {
     chats: Chat[];

@@ -1,4 +1,4 @@
-import logger from '@config/logger';
+import { logger } from '@packages/utils/server';
 import { retryCountTotal } from '@config/metrics';
 
 export class RetryManager {

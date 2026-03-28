@@ -1,5 +1,5 @@
-import { BaseAgent, AgentResponse } from './index';
-import { AgentContext } from '@libs/contracts';
+import { BaseAgent, AgentResponse } from './base-agent';
+import { AgentContext } from '@packages/contracts';
 
 export interface ResumeInput {
     resumeText: string;
@@ -18,7 +18,7 @@ export class ResumeAgent extends BaseAgent {
         this.log(`Optimizing resume for role: ${input.targetRole || 'General'}`);
 
         // 1. Fetch Active/Candidate Strategy for A/B Testing
-        const { db } = await import('@libs/db');
+        const { db } = await import('@packages/db');
         const strategies = await db.strategy.findMany({ where: { agent: 'ResumeAgent' } });
         
         // Simple A/B split: 50% chance to try a candidate if exists, otherwise active

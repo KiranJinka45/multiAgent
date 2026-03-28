@@ -3,8 +3,8 @@ import express from 'express';
 import cors from 'cors';
 import Stripe from 'stripe';
 import axios from 'axios';
-import { initTelemetry } from '@libs/observability';
-import { logger, registry } from '@libs/utils/server';
+import { initTelemetry } from '@packages/observability';
+import { logger, registry } from '@packages/utils/server';
 import dotenv from 'dotenv';
 
 dotenv.config();

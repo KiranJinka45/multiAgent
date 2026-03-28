@@ -1,6 +1,6 @@
 import { validateSystem } from "./validator";
 import { SystemMetrics } from "./types";
-import { main as runAutoRefactor } from "@libs/refactor-agent";
+import { main as runAutoRefactor } from "@packages/refactor-agent";
 import { analyzeSystem } from "./analyzer";
 import { proposeFix } from "./architect";
 

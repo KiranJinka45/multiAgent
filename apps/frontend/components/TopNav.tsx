@@ -2,9 +2,9 @@
 
 import Link from 'next/link';
 import { Menu, PanelLeft, ChevronDown, Sparkles } from 'lucide-react';
-import { getSupabaseClient } from '@libs/utils';
+import { getSupabaseClient } from '@packages/utils';
 import { useEffect, useState } from 'react';
-import { useSidebar } from '@libs/context';
+import { useSidebar } from '@packages/context';
 import { motion, AnimatePresence } from 'framer-motion';
 
 type TopNavProps = {

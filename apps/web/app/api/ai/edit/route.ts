@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Planner } from '@libs/brain';
-import { chatService } from '@libs/utils/server';
+import { Planner } from '@packages/brain';
+import { chatService } from '@packages/utils/server';
 
 export async function POST(req: NextRequest) {
   try {

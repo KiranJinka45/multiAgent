@@ -1,4 +1,4 @@
-import logger from '@libs/observability';
+import logger from '@packages/observability';
 
 export interface CodeChunk {
     content: string;

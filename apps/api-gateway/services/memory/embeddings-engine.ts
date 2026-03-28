@@ -1,5 +1,5 @@
 import axios from 'axios';
-import logger from '@config/logger';
+import { logger } from '@packages/utils/server';
 
 export class EmbeddingsEngine {
     private static readonly OPENAI_API_URL = 'https://api.openai.com/v1/embeddings';

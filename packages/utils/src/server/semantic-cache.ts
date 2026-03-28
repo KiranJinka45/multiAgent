@@ -1,6 +1,6 @@
 import { redis } from './redis';
 import crypto from 'crypto';
-import { logger } from '@libs/observability';
+import { logger } from '@packages/observability';
 
 /**
  * Semantic Caching Layer

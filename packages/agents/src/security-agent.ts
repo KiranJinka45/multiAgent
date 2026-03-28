@@ -1,6 +1,6 @@
 import { BaseAgent } from './base-agent';
-import { AgentRequest, AgentResponse, SecurityParams } from '@libs/contracts';
-import { StrategyConfig } from '@libs/utils';
+import { AgentRequest, AgentResponse, SecurityParams } from '@packages/contracts';
+import { StrategyConfig } from '@packages/utils';
 
 export class SecurityAgent extends BaseAgent {
     getName() { return 'SecurityAgent'; }

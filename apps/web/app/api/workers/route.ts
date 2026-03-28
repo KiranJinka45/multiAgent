@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import redis from '@libs/utils/server';
+import redis from '@packages/utils/server';
 
 export async function GET() {
     try {

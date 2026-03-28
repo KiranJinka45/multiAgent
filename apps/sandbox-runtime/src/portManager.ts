@@ -9,8 +9,8 @@
  */
 
 import net from 'net';
-import { redis } from '@libs/utils/server';
-import { logger } from '@libs/utils/server';
+import { redis } from '@packages/utils/server';
+import { logger } from '@packages/utils/server';
 
 const PORT_START = 4100;
 const PORT_END = 4999;

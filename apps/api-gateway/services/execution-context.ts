@@ -1,9 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
 import * as crypto from 'crypto';
 import { redis } from '@queue/redis-client';
-import logger from '@config/logger';
-import { eventBus } from '@shared/services/event-bus';
-import { AgentContext } from '@shared-types/agent-context';
+import { logger } from '@packages/utils/server';
+import { eventBus } from '@packages/shared-services';
+import { AgentContext } from '@packages/contractsagent-context';
 import { OrchestratorLock } from '@config/orchestrator-lock';
 import { VirtualFileSystem, VirtualFile } from './vfs/virtual-fs';
 

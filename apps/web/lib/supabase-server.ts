@@ -1,4 +1,4 @@
-import { createServerSupabaseClient } from '@libs/supabase';
+import { createServerSupabaseClient } from '@packages/supabase';
 
 /**
  * Next.js Server-side factory for Supabase.

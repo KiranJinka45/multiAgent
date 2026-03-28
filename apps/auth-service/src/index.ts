@@ -3,8 +3,8 @@ dotenv.config();
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import cors from 'cors';
-import { initTelemetry } from '@libs/observability';
-import { logger, registry } from '@libs/utils/server';
+import { initTelemetry } from '@packages/observability';
+import { logger, registry } from '@packages/utils/server';
 
 initTelemetry('multiagent-auth-service');
 

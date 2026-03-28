@@ -1,8 +1,8 @@
 import { Worker, Job } from 'bullmq';
 import { Redis } from 'ioredis';
-import { logger } from '@libs/observability';
-import { redis, QUEUE_DOCKER, eventBus } from '@libs/shared-services';
-import { DistributedExecutionContext, SandboxPodController } from '@libs/utils/server';
+import { logger } from '@packages/observability';
+import { redis, QUEUE_DOCKER, eventBus } from '@packages/shared-services';
+import { DistributedExecutionContext, SandboxPodController } from '@packages/utils/server';
 
 const podController = new SandboxPodController();
 

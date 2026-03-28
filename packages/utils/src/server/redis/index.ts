@@ -1,6 +1,6 @@
 import Redis from 'ioredis';
-import { logger } from '@libs/observability';
-import { createLazyProxy } from '@libs/utils/server/runtime';
+import { logger } from '@packages/observability';
+import { createLazyProxy } from '@packages/utils/server/runtime';
 
 const REDIS_URLS = process.env.REDIS_URLS ? process.env.REDIS_URLS.split(',') : [process.env.REDIS_URL || 'redis://localhost:6379'];
 const SENTINEL_NAME = process.env.REDIS_SENTINEL_NAME || null;
@@ -27,7 +27,7 @@ class RedisClient {
                     }
                     return delay;
                 },
-                reconnectOnError: (err) => {
+                reconnectOnError: (err: any) => {
                     const targetError = 'READONLY';
                     if (err.message.includes(targetError)) {
                         return true;
@@ -70,7 +70,7 @@ class RedisClient {
 
             this.instance.on('connect', () => logger.info('Redis connected successfully'));
             this.instance.on('ready', () => logger.info('Redis ready to receive commands'));
-            this.instance.on('error', (err) => logger.error({ err: err.message || err }, 'Redis connection error'));
+            this.instance.on('error', (err: any) => logger.error({ err: err.message || err }, 'Redis connection error'));
         }
         return this.instance;
     }

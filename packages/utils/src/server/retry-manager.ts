@@ -1,5 +1,5 @@
-import logger from '@libs/observability';
-import { retryCountTotal } from '@libs/config/metrics';
+import logger from '@packages/observability';
+import { retryCountTotal } from '../config/metrics';
 
 export class RetryManager {
     private maxRetries: number;

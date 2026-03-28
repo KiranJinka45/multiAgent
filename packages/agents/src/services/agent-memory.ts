@@ -1,5 +1,5 @@
-import { redis } from '@libs/shared-services';
-import { logger } from '@libs/observability';
+import { redis } from '@packages/shared-services';
+import { logger } from '@packages/observability';
 import { Redis } from 'ioredis';
 
 /**

@@ -15,7 +15,7 @@
 
 import crypto from 'crypto';
 import path from 'path';
-import { logger } from '@libs/utils/server';
+import { logger } from '@packages/utils/server';
 
 // ─── Config ────────────────────────────────────────────────────────────────
 
@@ -159,7 +159,7 @@ export const RuntimeGuard = {
      * These are the options to pass to child_process.spawn().
      */
     safeSpawnOptions(cwd: string, env: Record<string, string> = {}): any {
-        const { getSafeEnv } = require('@libs/utils'); // Deferred to avoid circularity if any
+        const { getSafeEnv } = require('@packages/utils'); // Deferred to avoid circularity if any
         
         return {
             cwd,

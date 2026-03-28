@@ -1,5 +1,5 @@
 import axios from 'axios';
-import logger from '@libs/observability';
+import logger from '@packages/observability';
 
 export class RecoveryNotifier {
     private webhookUrl: string | undefined = process.env.ALERTS_WEBHOOK_URL;

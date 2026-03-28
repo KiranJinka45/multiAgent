@@ -1,5 +1,5 @@
 import Redis from 'ioredis';
-import logger from '@libs/packages/utils/config/logger';
+import logger from '@packages/packages/utils/config/logger';
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 const redis = new Redis(REDIS_URL);

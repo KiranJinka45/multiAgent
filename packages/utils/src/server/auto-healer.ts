@@ -74,8 +74,9 @@ export class DevinAutoHealer {
         try {
             const { stdout, stderr } = await execAsync(cmd, { cwd: dir, timeout: 90000 });
             return { success: true, stdout, error: stderr };
-        } catch (e: any) {
-            return { success: false, stdout: e.stdout || '', error: e.stderr || e.message || '' };
+        } catch (e: unknown) {
+            const err = e as { stdout?: string, stderr?: string, message?: string };
+            return { success: false, stdout: err.stdout || '', error: err.stderr || err.message || '' };
         }
     }
 
@@ -84,17 +85,32 @@ export class DevinAutoHealer {
         this.readCodeDir(dir, '', files);
 
         try {
-            const { RepairAgent } = require('@libs/brain');
+            // lazy load RepairAgent to avoid circular dependency
+            const { RepairAgent } = await import('@packages/brain');
             const repairAgent = new RepairAgent();
 
             // Execute autonomous agent directly to heal the filesystem bounds
             const response = await repairAgent.execute(
                 { error: stderr, stdout, files: files.slice(0, 20) },
-                {} as any // Placeholder context, not strictly required for this localized agent
+                { 
+                    projectId: path.basename(dir), 
+                    executionId: 'auto-heal-' + Date.now(),
+                    userId: 'system',
+                    vfs: null,
+                    history: [],
+                    metadata: {},
+                    getExecutionId: () => '',
+                    getProjectId: () => '',
+                    getVFS: () => null,
+                    get: async () => ({}),
+                    atomicUpdate: async () => {}
+                }
             );
 
-            if (response.success && response.data?.patches?.length > 0) {
-                for (const patch of response.data.patches) {
+            const data = response.data as { patches?: { path: string, content: string }[] } | undefined;
+
+            if (response.success && data?.patches && data.patches.length > 0) {
+                for (const patch of data.patches) {
                     const filePath = path.join(dir, patch.path.startsWith('/') ? patch.path.slice(1) : patch.path);
                     const patchDir = path.dirname(filePath);
                     if (!fs.existsSync(patchDir)) fs.mkdirSync(patchDir, { recursive: true });
@@ -111,7 +127,7 @@ export class DevinAutoHealer {
         return false;
     }
 
-    private readCodeDir(base: string, sub: string, out: any[]) {
+    private readCodeDir(base: string, sub: string, out: { path: string, content: string }[]) {
         const fullPath = path.join(base, sub);
         if (!fs.existsSync(fullPath)) return;
         const entries = fs.readdirSync(fullPath, { withFileTypes: true });

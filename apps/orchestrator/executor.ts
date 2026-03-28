@@ -1,7 +1,7 @@
 import pLimit from "p-limit";
-import { Task } from '@libs/contracts';
-import { agentRegistry } from '@libs/utils';
-import logger from '@libs/utils';
+import { Task } from '@packages/contracts';
+import { agentRegistry } from '@packages/utils';
+import logger from '@packages/utils';
 import { DistributedExecutionContext } from "@context/execution-context";
 
 const limit = pLimit(3); // parallel control

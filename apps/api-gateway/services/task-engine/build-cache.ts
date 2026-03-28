@@ -1,5 +1,5 @@
 import { redis } from '@queue';
-import logger from '@config/logger';
+import { logger } from '@packages/utils/server';
 
 /**
  * BuildCache - Redis-backed cache for granular build artifacts.

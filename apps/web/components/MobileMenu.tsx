@@ -1,15 +1,15 @@
 'use client';
 
 import { LucideIcon, LayoutDashboard, ListTodo, CheckSquare, Settings, X, Github, MessageSquare, Pin } from 'lucide-react';
-import { Chat } from '@libs/contracts';
+import { Chat } from '@packages/contracts';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect, useCallback } from 'react';
-import { useSidebar } from '@libs/context';
+import { useSidebar } from '@packages/context';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabase-browser';
-import { useRealtimeSubscription } from '@libs/utils';
-import type { User } from '@libs/supabase';
+import { useRealtimeSubscription } from '@packages/utils';
+import type { User } from '@packages/supabase';
 
 type MobileMenuProps = {
     isOpen: boolean;

@@ -1,5 +1,5 @@
 {
-  "name": "@libs/contracts",
+  "name": "@packages/contracts",
   "version": "0.1.0",
   "private": true,
   "main": "./dist/index.js",
@@ -19,7 +19,7 @@
     }
   },
   "scripts": {
-    "build": "tsup",
+    "build": "tsup --config tsup.config.js",
     "dev": "tsup --watch",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"

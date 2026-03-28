@@ -1,4 +1,4 @@
-import logger from '@config/logger';
+import { logger } from '@packages/utils/server';
 import fs from 'fs-extra';
 import path from 'path';
 

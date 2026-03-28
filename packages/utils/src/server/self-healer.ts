@@ -1,5 +1,5 @@
-import logger from '@libs/observability';
-import { JobArtifact } from '@libs/contracts';
+import logger from '@packages/observability';
+import { JobArtifact } from '@packages/contracts';
 
 const FORBIDDEN_PATTERNS = [
     'rm -rf',

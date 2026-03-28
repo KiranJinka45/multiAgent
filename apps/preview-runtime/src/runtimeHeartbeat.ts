@@ -21,8 +21,8 @@
  * No process logic. No port logic. No URL logic.
  */
 
-import { redis } from '@libs/utils/server';
-import { logger } from '@libs/utils/server';
+import { redis } from '@packages/utils/server';
+import { logger } from '@packages/utils/server';
 
 const HEARTBEAT_PREFIX = 'runtime:heartbeat:';
 const HEARTBEAT_TTL_SEC = 45;  // Key auto-expires if heartbeat stops

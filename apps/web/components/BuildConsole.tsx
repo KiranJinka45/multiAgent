@@ -7,8 +7,8 @@ import {
     Loader2
 } from 'lucide-react';
 import BuildDebugPanel from './BuildDebugPanel';
-import { formatTime } from '@libs/utils';
-import { BuildUpdate } from '@libs/contracts';
+import { formatTime } from '@packages/utils';
+import { BuildUpdate } from '@packages/contracts';
 
 interface BuildConsoleProps {
     buildProgress: BuildUpdate | null;

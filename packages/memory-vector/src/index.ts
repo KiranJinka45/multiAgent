@@ -1,5 +1,5 @@
-import { supabaseAdmin, logger } from '@libs/utils';
-import { MemoryEntry, IMemoryService } from '@libs/memory-core';
+import { supabaseAdmin, logger } from '@packages/utils';
+import { MemoryEntry, IMemoryService } from '@packages/memory-core';
 
 export class MemoryVectorService implements IMemoryService {
     private static SIMILARITY_THRESHOLD = 0.9;

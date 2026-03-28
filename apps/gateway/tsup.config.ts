@@ -8,5 +8,5 @@ export default defineConfig({
   sourcemap: true,
   outDir: 'dist',
   bundle: true,
-  external: ['@libs/utils', '@libs/observability', '@libs/observability/server'],
+  external: ['@packages/utils', '@packages/observability', '@packages/observability/server'],
 });

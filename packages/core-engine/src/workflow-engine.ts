@@ -4,9 +4,9 @@
  * Robust, stateful workflow engine for production-grade agent orchestration.
  */
 
-import { AgentRequest, AgentResponse, AgentContext } from '@libs/contracts';
-import { agentRegistry } from '@libs/agents';
-import { projectMemory, eventBus, logger } from '@libs/utils/server';
+import { AgentRequest, AgentResponse, AgentContext } from '@packages/contracts';
+import { agentRegistry } from '@packages/agents';
+import { projectMemory, eventBus, logger } from '@packages/utils/src/server';
 
 export interface WorkflowTask {
     id: string;

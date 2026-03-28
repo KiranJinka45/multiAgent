@@ -1,6 +1,6 @@
 import { BaseAgent, AgentResponse, AgentRequest } from './base-agent';
-import { AgentContext, EditParams } from '@libs/contracts';
-import { StrategyConfig } from '@libs/utils';
+import { AgentContext, EditParams } from '@packages/contracts';
+import { StrategyConfig } from '@packages/utils';
 
 export interface ArchitectureBlueprint {
     stack: {

@@ -1,5 +1,5 @@
 import { AgentResponse } from '@agents/base-agent';
-import logger from '@config/logger';
+import { logger } from '@packages/utils/server';
 import { DatabaseAgent } from '@agents/database-agent';
 import { BackendAgent } from '@agents/backend-agent';
 import { FrontendAgent } from '@agents/frontend-agent';
@@ -7,8 +7,8 @@ import { DeploymentAgent } from '@agents/deploy-agent';
 import { TestingAgent } from '@agents/testing-agent';
 import { ValidatorAgent } from '@agents/validator-agent';
 
-import { StrategyConfig } from '@libs/agent-intelligence/strategy-engine';
-import { AgentContext } from '@shared-types/agent-context';
+import { StrategyConfig } from '@packages/agent-intelligence/strategy-engine';
+import { AgentContext } from '@packages/contractsagent-context';
 
 export interface TaskAgent {
     execute(payload: any, context?: AgentContext, signal?: AbortSignal, strategy?: StrategyConfig): Promise<AgentResponse<any>>;

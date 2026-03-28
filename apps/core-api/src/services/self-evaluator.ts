@@ -1,5 +1,5 @@
-import { BaseAgent, AgentResponse } from '@libs/agents';
-import { AgentContext } from '@libs/contracts';
+import { BaseAgent, AgentResponse } from '@packages/agents';
+import { AgentContext } from '@packages/contracts';
 
 export interface DimensionScore {
     score: number;         // 0-1

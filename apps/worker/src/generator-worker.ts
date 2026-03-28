@@ -1,7 +1,7 @@
 import { Worker, Job } from 'bullmq';
 import { Redis } from 'ioredis';
-import { logger } from '@libs/observability';
-import { redis, eventBus, QUEUE_GENERATOR } from '@libs/shared-services';
+import { logger } from '@packages/observability';
+import { redis, eventBus, QUEUE_GENERATOR } from '@packages/shared-services';
 import { 
     validatorQueue, 
     BlueprintManager, 
@@ -9,8 +9,8 @@ import {
     VirtualFileSystem, 
     CommitManager, 
     DistributedExecutionContext 
-} from '@libs/utils/server';
-import { GeneratorAgent } from '@libs/agents/generator-agent';
+} from '@packages/utils/server';
+import { GeneratorAgent } from '@packages/agents/generator-agent';
 
 const generatorAgent = new GeneratorAgent();
 const blueprintManager = new BlueprintManager();

@@ -1,5 +1,5 @@
 import { Task, DeploymentPlan } from './planner';
-import logger from '@libs/utils';
+import logger from '@packages/utils';
 
 export class TaskGraph {
     static resolveExecutionOrder(plan: DeploymentPlan): Task[][] {

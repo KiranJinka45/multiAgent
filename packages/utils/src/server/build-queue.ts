@@ -1,6 +1,6 @@
 import { Queue, ConnectionOptions } from 'bullmq';
 import redis from './redis';
-import logger from '@libs/observability';
+import logger from '@packages/observability';
 import { createLazyProxy } from './runtime';
 
 export const QUEUE_FREE = 'project-generation-free-v1';

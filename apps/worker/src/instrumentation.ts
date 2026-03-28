@@ -1,4 +1,4 @@
-import { initInstrumentation as startTracing } from '@libs/observability';
+import { initInstrumentation as startTracing } from '@packages/observability';
 
 /**
  * Worker Instrumentation

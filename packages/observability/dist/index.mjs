@@ -1,3 +1,61 @@
-import m from'pino';import n from'prom-client';export{default as client}from'prom-client';import*as a from'http';import {NodeSDK}from'@opentelemetry/sdk-node';import {getNodeAutoInstrumentations}from'@opentelemetry/auto-instrumentations-node';import {OTLPTraceExporter}from'@opentelemetry/exporter-trace-otlp-http';import {Resource}from'@opentelemetry/resources';import {SemanticResourceAttributes}from'@opentelemetry/semantic-conventions';var p=m({level:process.env.LOG_LEVEL||"info",base:{service:process.env.SERVICE_NAME||"unknown-service"},timestamp:m.stdTimeFunctions.isoTime});var r=new n.Registry;n.collectDefaultMetrics({register:r});var u=new n.Histogram({name:"http_request_duration_seconds",help:"HTTP request latency",labelNames:["method","route","status"],buckets:[.1,.5,1,2,5]}),l=new n.Histogram({name:"worker_job_duration_seconds",help:"Worker job processing latency",labelNames:["queue","job_name","status"],buckets:[1,5,10,30,60]});r.registerMetric(u);r.registerMetric(l);function b(e=9091){let o=a.createServer(async(t,s)=>{t.url==="/metrics"?(s.setHeader("Content-Type",r.contentType),s.end(await r.metrics())):(s.statusCode=404,s.end());});return o.listen(e,()=>{console.log(`Metrics server listening on port ${e}`);}),o}function I(e){let o=new OTLPTraceExporter({url:process.env.OTEL_EXPORTER_OTLP_ENDPOINT||"http://localhost:4318/v1/traces"}),t=new NodeSDK({resource:new Resource({[SemanticResourceAttributes.SERVICE_NAME]:e}),traceExporter:o,instrumentations:[getNodeAutoInstrumentations()]});return t.start(),process.on("SIGTERM",()=>{t.shutdown().finally(()=>process.exit(0));}),t}var P=p;function q(e){return p.child({executionId:e})}
-export{P as default,q as getExecutionLogger,u as httpRequestDuration,I as initInstrumentation,p as logger,r as register,b as startMetricsServer,l as workerJobDuration};//# sourceMappingURL=index.mjs.map
+// src/logger.ts
+import pino from "pino";
+var logger = pino({
+  level: process.env.LOG_LEVEL || "info",
+  base: {
+    service: process.env.SERVICE_NAME || "unknown-service"
+  },
+  timestamp: pino.stdTimeFunctions.isoTime
+});
+
+// src/metrics.ts
+import client from "prom-client";
+import * as http from "http";
+var register = new client.Registry();
+client.collectDefaultMetrics({ register });
+var httpRequestDuration = new client.Histogram({
+  name: "http_request_duration_seconds",
+  help: "HTTP request latency",
+  labelNames: ["method", "route", "status"],
+  buckets: [0.1, 0.5, 1, 2, 5]
+});
+var workerJobDuration = new client.Histogram({
+  name: "worker_job_duration_seconds",
+  help: "Worker job processing latency",
+  labelNames: ["queue", "job_name", "status"],
+  buckets: [1, 5, 10, 30, 60]
+});
+register.registerMetric(httpRequestDuration);
+register.registerMetric(workerJobDuration);
+function startMetricsServer(port = 9091) {
+  const server = http.createServer(async (req, res) => {
+    if (req.url === "/metrics") {
+      res.setHeader("Content-Type", register.contentType);
+      res.end(await register.metrics());
+    } else {
+      res.statusCode = 404;
+      res.end();
+    }
+  });
+  server.listen(port, () => {
+    console.log(`Metrics server listening on port ${port}`);
+  });
+  return server;
+}
+
+// src/index.ts
+var index_default = logger;
+function getExecutionLogger(executionId) {
+  return logger.child({ executionId });
+}
+export {
+  client,
+  index_default as default,
+  getExecutionLogger,
+  httpRequestDuration,
+  logger,
+  register,
+  startMetricsServer,
+  workerJobDuration
+};
 //# sourceMappingURL=index.mjs.map

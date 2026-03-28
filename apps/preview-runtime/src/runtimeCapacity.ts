@@ -12,8 +12,8 @@
  * No process logic. No port logic. No URL logic.
  */
 
-import { redis } from '@libs/utils/server';
-import { logger } from '@libs/utils/server';
+import { redis } from '@packages/utils/server';
+import { logger } from '@packages/utils/server';
 
 // ─── Config ────────────────────────────────────────────────────────────────
 

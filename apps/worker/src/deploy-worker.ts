@@ -1,13 +1,13 @@
 import { Worker, Job } from 'bullmq';
-import { logger, redis, eventBus, QUEUE_DEPLOY } from '@libs/utils';
+import { logger, redis, eventBus, QUEUE_DEPLOY } from '@packages/utils';
 import { 
     projectMemory, 
     InfraProvisioner, 
     CICDManager, 
     TenantService, 
     DistributedExecutionContext 
-} from '@libs/utils/server';
-import { IS_PRODUCTION } from '@libs/utils';
+} from '@packages/utils/server';
+import { IS_PRODUCTION } from '@packages/utils';
 import path from 'path';
 import fs from 'fs';
 
@@ -99,7 +99,7 @@ export const deployWorker = new Worker(QUEUE_DEPLOY, async (job: Job) => {
     concurrency: 5
 });
 
-log(`Deployment Worker online. Redis: ${(redis as any).options.port}`);
+log(`Deployment Worker online. Redis: ${(redis as { options: { port: number } }).options.port}`);
 logger.info('Deployment Worker online');
 
 setInterval(() => {

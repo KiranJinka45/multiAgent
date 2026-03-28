@@ -1,5 +1,5 @@
 import { ResourceManager } from './resource-manager';
-import { logger } from '@libs/utils/server';
+import { logger } from '@packages/utils/server';
 
 interface PendingRequest {
     projectId: string;

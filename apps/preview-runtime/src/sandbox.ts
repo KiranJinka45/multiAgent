@@ -2,7 +2,7 @@ import { exec } from 'child_process';
 import path from 'path';
 import fs from 'fs';
 import util from 'util';
-import { logger } from '@libs/utils/server';
+import { logger } from '@packages/utils/server';
 
 const execAsync = util.promisify(exec);
 

@@ -1,9 +1,12 @@
 import { redis } from './redis';
-import { Mission, MissionUpdate } from '@libs/contracts';
-import logger from '@libs/observability';
+import { Mission, MissionUpdate } from '@packages/contracts';
+import { logger } from '@packages/observability';
 import { eventBus } from './event-bus';
 import { Queue } from 'bullmq';
 import { DEPLOYMENT_QUEUE } from './redis';
+
+// Note: circular dependency if we import from apps/api/src/services/websocket
+// We'll use a callback or eventBus to decouple
 
 class MissionController {
     private PREFIX = 'mission:';
@@ -69,14 +72,38 @@ class MissionController {
             };
 
             if (update.status && update.status !== existing.status) {
-                if (!this.validateTransition(existing.status, update.status)) {
-                    logger.error({ missionId, from: existing.status, to: update.status }, 'INVALID transition rejected by Pipeline State Guard');
-                    return existing; // Don't change status
+                // If we're moving to 'complete', we map it to 'ready' for the product flow
+                const nextStatus = update.status === 'complete' ? 'ready' : update.status;
+                
+                if (!this.validateTransition(existing.status, nextStatus)) {
+                    logger.error({ missionId, from: existing.status, to: nextStatus }, 'INVALID transition rejected by Pipeline State Guard');
+                    return existing;
                 }
-                updated.status = update.status;
+                updated.status = nextStatus;
             }
             return updated;
         });
+    }
+
+    async addLog(missionId: string, stage: string, message: string): Promise<void> {
+        await this.atomicUpdate(missionId, (existing) => {
+            const logs = (existing.metadata.logs as any[]) || [];
+            logs.push({
+                timestamp: Date.now(),
+                stage,
+                message
+            });
+            return {
+                ...existing,
+                metadata: {
+                    ...existing.metadata,
+                    logs
+                }
+            };
+        });
+        
+        // Fix signature: thought(executionId, agent, thought)
+        await eventBus.thought(missionId, stage, message);
     }
 
     async setFailed(missionId: string, error: string): Promise<void> {
@@ -94,7 +121,7 @@ class MissionController {
             const data = await redis.get(key);
             if (data) {
                 const mission = JSON.parse(data) as Mission;
-                if (!['completed', 'failed'].includes(mission.status)) {
+                if (!['ready', 'failed', 'completed'].includes(mission.status)) {
                     missions.push(mission);
                 }
             }
@@ -102,24 +129,23 @@ class MissionController {
         
         return missions;
     }
+
     private validateTransition(current: string, next: string): boolean {
         const allowed: Record<string, string[]> = {
             'init': ['queued', 'planning', 'failed'],
             'queued': ['planning', 'failed'],
-            'planning': ['graph_ready', 'failed'],
-            'graph_ready': ['executing', 'failed'],
-            'executing': ['building', 'failed'],
-            'building': ['repairing', 'assembling', 'failed'],
-            'repairing': ['assembling', 'failed'],
-            'assembling': ['deploying', 'failed'],
-            'deploying': ['previewing', 'failed'],
-            'previewing': ['complete', 'deploying', 'failed'],
-            'complete': ['deploying'], 
+            'planning': ['generating', 'failed'],
+            'generating': ['validating', 'failed'],
+            'validating': ['deploying', 'failed'],
+            'deploying': ['ready', 'failed'],
+            'ready': ['deploying'],
             'failed': ['init']
         };
 
         const allowedNext = allowed[current] || [];
-        return allowedNext.includes(next);
+        // Add existing legacy status for backward compatibility if needed, 
+        // but for now focus on the new product-aligned flow.
+        return allowedNext.includes(next) || next === 'failed';
     }
     
     async triggerDeployment(missionId: string): Promise<void> {

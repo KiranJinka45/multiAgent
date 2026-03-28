@@ -1,5 +1,5 @@
 import { getSupabaseClient } from './supabaseClient';
-import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@libs/supabase';
+import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@packages/supabase';
 
 // Define strict types for bindings, matching what Supabase server expects
 export interface PostgresBinding {

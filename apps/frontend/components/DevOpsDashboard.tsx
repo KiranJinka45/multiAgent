@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Terminal, Download, Github, Wand2, Share, ChevronDown } from 'lucide-react';
-import { BuildUpdate } from '@libs/contracts';
+import { BuildUpdate } from '@packages/contracts';
 import { toast } from 'sonner';
 import FileExplorer from '@components/FileExplorer';
 import FileViewer from '@components/FileViewer';
@@ -14,7 +14,7 @@ import { DiffViewer, FileDiff } from '@components/DiffViewer';
 import ResourceGraph from '@components/ResourceGraph';
 import AgentTimeline from '@components/AgentTimeline';
 import { ThoughtStream } from '@components/devops/ThoughtStream';
-import { formatTime, formatYear } from '@libs/utils';
+import { formatTime, formatYear } from '@packages/utils';
 
 interface DevOpsDashboardProps {
     buildProgress: BuildUpdate | null;

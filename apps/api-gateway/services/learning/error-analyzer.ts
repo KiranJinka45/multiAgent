@@ -1,4 +1,4 @@
-import logger from '@config/logger';
+import { logger } from '@packages/utils/server';
 
 export interface BuildError {
     type: 'dependency' | 'syntax' | 'type' | 'runtime' | 'unknown';

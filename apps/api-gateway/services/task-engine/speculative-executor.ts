@@ -1,7 +1,7 @@
 import { TaskGraph, BaseTask } from './task-graph';
 import { taskExecutor } from './executor';
-import { AgentContext } from '@shared-types/agent-context';
-import logger from '@config/logger';
+import { AgentContext } from '@packages/contractsagent-context';
+import { logger } from '@packages/utils/server';
 
 /**
  * SpeculativeExecutor - Orchestrates multi-agent competition.

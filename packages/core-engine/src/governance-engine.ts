@@ -1,5 +1,5 @@
-import { db } from '@libs/db';
-import { logger } from '@libs/utils';
+import { db } from '@packages/db';
+import { logger } from '@packages/utils';
 
 export interface GovernanceResult {
   allowed: boolean;

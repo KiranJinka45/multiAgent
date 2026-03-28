@@ -1,6 +1,6 @@
 import { previewManager } from './preview-manager';
-import { PreviewRegistry } from '@libs/registry';
-import { redis, logger } from '@libs/utils/server';
+import { PreviewRegistry } from '@packages/registry';
+import { redis, logger } from '@packages/utils/server';
 
 export class PreviewWatchdog {
     private static interval: NodeJS.Timeout | null = null;

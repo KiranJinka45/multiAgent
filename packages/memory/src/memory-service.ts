@@ -1,5 +1,5 @@
-import { supabaseAdmin } from '@libs/utils/server';
-import logger from '@libs/utils';
+import { supabaseAdmin } from '@packages/utils/src/server';
+import logger from '@packages/utils';
 
 export interface MemoryEntry {
     type: 'error' | 'fix' | 'pattern' | 'project';

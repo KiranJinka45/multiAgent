@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { db } from '@libs/db';
+import { db } from '@packages/db';
 import { notFound } from 'next/navigation';
 
 interface Props {

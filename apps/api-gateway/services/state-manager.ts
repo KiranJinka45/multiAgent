@@ -1,7 +1,7 @@
 import { redis } from '@queue';
-import { eventBus } from '@shared/services/event-bus';
-import { PersistenceStore } from '@shared/services/persistence-store';
-import logger from '@config/logger';
+import { eventBus } from '@packages/shared-services';
+import { PersistenceStore } from '@packages/shared-servicespersistence-store';
+import { logger } from '@packages/utils/server';
 
 export type ProjectLifecycleState = 
     | 'created' 

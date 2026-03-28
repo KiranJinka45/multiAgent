@@ -3,8 +3,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Copy, Check, Linkedin, Instagram, MessageCircle } from 'lucide-react'; // Using Lucide icons
 import { useState, useEffect } from 'react';
-import { Chat } from '@libs/contracts';
-import { formatDate } from '@libs/utils';
+import { Chat } from '@packages/contracts';
+import { formatDate } from '@packages/utils';
 
 type ShareModalProps = {
     isOpen: boolean;

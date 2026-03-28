@@ -1,5 +1,5 @@
-import { BaseAgent, AgentResponse } from './index';
-import type { AgentContext } from '@libs/contracts';
+import { BaseAgent, AgentResponse } from './base-agent';
+import type { AgentContext } from '@packages/contracts';
 
 export class BackendAgent extends BaseAgent {
     getName() { return 'BackendAgent'; }

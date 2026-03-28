@@ -1,6 +1,6 @@
-import { getSupabaseClient, type SupabaseClient } from '@libs/supabase';
-import { type PostgrestError } from '@libs/supabase';
-import { Chat, Message } from '@libs/contracts';
+import { getSupabaseClient, type SupabaseClient } from '@packages/supabase';
+import { type PostgrestError } from '@packages/supabase';
+import { Chat, Message } from '@packages/contracts';
 
 export const chatService = {
     getSupabase: (supabaseServer?: SupabaseClient) => supabaseServer || getSupabaseClient(),

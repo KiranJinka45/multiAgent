@@ -1,6 +1,6 @@
 import { BaseAgent } from './base-agent';
-import { AgentContext, MetaParams, AgentRequest, AgentResponse } from '@libs/contracts';
-import logger from '@libs/utils';
+import { AgentContext, MetaParams, AgentRequest, AgentResponse } from '@packages/contracts';
+import logger from '@packages/utils';
 
 export interface MetaStrategy {
     intent: 'NEW_PROJECT' | 'FEATURE_UPDATE' | 'BUG_FIX' | 'OPTIMIZATION';

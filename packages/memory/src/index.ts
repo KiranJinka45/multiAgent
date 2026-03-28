@@ -1,7 +1,7 @@
-export * from '@libs/memory-core';
-export { memoryVector, MemoryVectorService } from '@libs/memory-vector';
-export { SemanticCacheService } from '@libs/memory-cache';
+export * from '@packages/memory-core';
+export { memoryVector, MemoryVectorService } from '@packages/memory-vector';
+export { SemanticCacheService } from '@packages/memory-cache';
 
 // Backward compatibility (optional, but good for now)
-import { memoryVector } from '@libs/memory-vector';
+import { memoryVector } from '@packages/memory-vector';
 export const MemoryService = memoryVector;

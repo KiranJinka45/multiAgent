@@ -1,5 +1,5 @@
 import * as k8s from '@kubernetes/client-node';
-import logger from '@libs/observability';
+import logger from '@packages/observability';
 
 export class SandboxPodController {
     private k8sApi: k8s.CoreV1Api;

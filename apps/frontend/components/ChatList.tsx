@@ -10,9 +10,9 @@ import {
     Upload, RotateCw, Brain, Zap
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { Message } from '@libs/contracts';
+import { Message } from '@packages/contracts';
 import CodeBlock from './CodeBlock';
-import { projectService } from '@libs/utils';
+import { projectService } from '@packages/utils';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import ShareDialog from './ShareDialog';

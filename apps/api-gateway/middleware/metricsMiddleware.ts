@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { httpRequestDuration } from "@libs/observability";
+import { httpRequestDuration } from "@packages/observability";
 
 /**
  * Middleware to track HTTP request duration and status.

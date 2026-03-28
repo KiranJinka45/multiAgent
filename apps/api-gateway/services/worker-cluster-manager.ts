@@ -1,5 +1,5 @@
 import { redis } from '@queue/redis-client';
-import logger from '@config/logger';
+import { logger } from '@packages/utils/server';
 
 export interface WorkerNode {
     workerId: string;

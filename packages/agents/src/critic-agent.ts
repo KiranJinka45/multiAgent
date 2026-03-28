@@ -1,6 +1,6 @@
 import { BaseAgent } from './base-agent';
-import { AgentRequest, AgentResponse, CriticParams } from '@libs/contracts';
-import { StrategyConfig } from '@libs/utils';
+import { AgentRequest, AgentResponse, CriticParams } from '@packages/contracts';
+import { StrategyConfig } from '@packages/utils';
 
 export interface CriticOutput {
     evaluation: 'pass' | 'fail';

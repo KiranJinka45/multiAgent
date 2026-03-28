@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import JSZip from 'jszip';
-import { projectService } from '@libs/utils';
-import { createRouteHandlerClient } from '@libs/supabase';
+import { projectService } from '@packages/utils';
+import { createRouteHandlerClient } from '@packages/supabase';
 import { cookies } from 'next/headers';
-import { RateLimiter } from '@libs/utils';
+import { RateLimiter } from '@packages/utils';
 
 export async function GET(
     req: NextRequest,

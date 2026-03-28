@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { stripe, STRIPE_CONFIG, supabaseAdmin, logger, stripeWebhookEventsTotal } from '@libs/utils/server';
-import { previewManager } from '@libs/runtime';
+import { stripe, STRIPE_CONFIG, supabaseAdmin, logger, stripeWebhookEventsTotal } from '@packages/utils/server';
+import { previewManager } from '@packages/runtime';
 
 export async function POST(req: Request) {
     const body = await req.text();

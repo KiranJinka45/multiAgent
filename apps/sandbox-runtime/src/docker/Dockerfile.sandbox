@@ -1,46 +1,23 @@
 # ============================================================
-# Sandbox Dockerfile for generated project previews
-#
-# Multi-stage: installs deps in builder, copies to slim runtime.
-# Enforced: non-root user, read-only FS (except /app and /tmp),
-# built-in HEALTHCHECK for Docker-native crash detection.
+# Optimized Sandbox Dockerfile
+# Inherits from prebuilt base image with dependencies.
 # ============================================================
 
-FROM node:20-alpine AS builder
-
-WORKDIR /build
-
-# Copy generated project files (mounted by containerManager)
-COPY . .
-
-# Install dependencies and build
-RUN npm ci --prefer-offline --no-audit --no-fund 2>/dev/null || npm install --prefer-offline --no-audit --no-fund
-RUN npm run build 2>/dev/null || true
-
-# ──────────────────────────────────────────────────────────────
-FROM node:20-alpine AS runtime
-
-# Security: run as non-root
-RUN addgroup -S sandbox && adduser -S sandbox -G sandbox
+FROM multiagent-sandbox-base
 
 WORKDIR /app
 
-# Copy built project from builder
-COPY --from=builder --chown=sandbox:sandbox /build /app
+# Copy generated project files
+# We expect files to be injected into /app
+COPY . .
 
-# Healthcheck: curl the dev server every 30s, 5s timeout, 3 retries
-HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-    CMD wget --spider --quiet http://localhost:${PORT:-3000}/ || exit 1
+# Environment setup
+ENV PORT=3000
+EXPOSE ${PORT}
 
-# Metadata labels
-LABEL maintainer="multiagent-platform"
-LABEL purpose="preview-sandbox"
+# Healthcheck
+HEALTHCHECK --interval=5s --timeout=3s --start-period=5s --retries=3 \
+    CMD wget --spider --quiet http://localhost:${PORT}/ || exit 1
 
-# Expose the dynamic port (overridden at runtime via -e PORT=xxxx)
-EXPOSE ${PORT:-3000}
-
-# Drop to non-root user
-USER sandbox
-
-# Default command — overridden by containerManager if needed
-CMD ["npm", "run", "dev"]
+# Start dev server (Vite)
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "3000"]

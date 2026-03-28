@@ -1,4 +1,4 @@
-import logger from '@libs/observability';
+import logger from '@packages/observability';
 import { redis } from './redis/index';
 
 export class AnalyticsService {

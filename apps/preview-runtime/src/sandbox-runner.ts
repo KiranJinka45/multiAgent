@@ -1,6 +1,6 @@
 import { spawn, ChildProcess, exec } from 'child_process';
 import util from 'util';
-import { logger, eventBus } from '@libs/utils/server';
+import { logger, eventBus } from '@packages/utils/server';
 
 const execPromise = util.promisify(exec);
 

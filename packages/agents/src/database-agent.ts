@@ -1,6 +1,6 @@
 import { BaseAgent } from './base-agent';
-import { AgentRequest, AgentResponse } from '@libs/contracts';
-import { StrategyConfig } from '@libs/utils';
+import { AgentRequest, AgentResponse } from '@packages/contracts';
+import { StrategyConfig } from '@packages/utils';
 
 export class DatabaseAgent extends BaseAgent {
     getName() { return 'DatabaseAgent'; }

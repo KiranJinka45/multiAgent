@@ -2,7 +2,7 @@
 
 import { Bell, Search, Menu } from 'lucide-react';
 import { usePathname } from 'next/navigation';
-import { useSidebar } from '@libs/context';
+import { useSidebar } from '@packages/context';
 import OrgSwitch from './dashboard/OrgSwitch';
 
 export default function Header() {

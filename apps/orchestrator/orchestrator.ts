@@ -1,11 +1,11 @@
-import { missionController } from '@libs/utils';
-import { Mission } from '@libs/contracts';
-import { stateManager } from '@libs/utils';
-import { eventBus } from '@libs/utils';
-import { getExecutionLogger } from '@libs/utils';
-import { ExecutionResult } from '@libs/contracts';
-import { JobStage } from '@libs/contracts';
-import logger from '@libs/utils';
+import { missionController } from '@packages/utils';
+import { Mission } from '@packages/contracts';
+import { stateManager } from '@packages/utils';
+import { eventBus } from '@packages/utils';
+import { getExecutionLogger } from '@packages/utils';
+import { ExecutionResult } from '@packages/contracts';
+import { JobStage } from '@packages/contracts';
+import logger from '@packages/utils';
 
 export enum StageState {
     IDLE = 'IDLE',

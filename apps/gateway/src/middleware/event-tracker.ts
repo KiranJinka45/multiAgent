@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { db } from '@libs/db';
+import { db } from '@packages/db';
 
 export async function eventTracker(req: Request, res: Response, next: NextFunction) {
   const start = Date.now();

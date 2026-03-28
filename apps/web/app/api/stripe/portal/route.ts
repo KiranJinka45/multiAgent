@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@libs/supabase';
+import { createRouteHandlerClient } from '@packages/supabase';
 import { cookies } from 'next/headers';
-import { createPortalSession } from '@libs/utils/server';
-import { logger } from '@libs/utils/server';
+import { createPortalSession } from '@packages/utils/server';
+import { logger } from '@packages/utils/server';
 
 export async function POST(req: NextRequest) {
     const supabase = createRouteHandlerClient({ cookies });

@@ -1,6 +1,6 @@
 'use client';
 
-import { createClientComponentClient } from '@libs/supabase';
+import { createClientComponentClient } from '@packages/supabase';
 
 export interface GithubRepo {
     id: number;

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { RateLimiter } from "@libs/resilience";
-import { redis } from "@libs/shared-services/redis";
+import { RateLimiter } from "@packages/resilience";
+import { redis } from "@packages/shared-services/redis";
 
 const limiter = new RateLimiter(redis, "api-gateway", 100, 60); // 100 requests per minute
 

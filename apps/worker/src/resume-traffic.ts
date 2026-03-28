@@ -1,4 +1,4 @@
-import { QueueManager, logger } from '@libs/utils';
+import { QueueManager, logger } from '@packages/utils';
 
 /**
  * ResumeTrafficFleet

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PreviewRegistry } from '@libs/registry';
+import { PreviewRegistry } from '@packages/registry';
 
 export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);

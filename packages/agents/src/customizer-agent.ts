@@ -1,5 +1,5 @@
 import { BaseAgent, AgentResponse, AgentRequest } from './base-agent';
-import { AgentContext, CustomizerParams } from '@libs/contracts';
+import { AgentContext, CustomizerParams } from '@packages/contracts';
 
 export interface CustomizationPatch {
     path: string;

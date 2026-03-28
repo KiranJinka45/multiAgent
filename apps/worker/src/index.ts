@@ -3,7 +3,7 @@ import { initInstrumentation } from './instrumentation';
 import { startMetricsServer } from '@packages/observability';
 
 // Initialize instrumentation and starts metrics server
-// initInstrumentation('worker-fleet');
+initInstrumentation('worker-fleet');
 startMetricsServer(9091);
 
 import './architecture-worker';

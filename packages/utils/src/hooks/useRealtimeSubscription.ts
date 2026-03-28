@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { realtimeManager, PostgresBinding } from '../client/realtimeManager';
-import type { RealtimePostgresChangesPayload } from '@libs/supabase';
+import type { RealtimePostgresChangesPayload } from '@packages/supabase';
 
 /**
  * A safe React hook for Supabase Realtime Postgres Changes.
@@ -15,7 +15,7 @@ import type { RealtimePostgresChangesPayload } from '@libs/supabase';
  * @param binding The strict Postgres changes matching object
  * @param callback The function to execute when payloads multiplex to this component
  */
-export function useRealtimeSubscription<T extends Record<string, any>>(
+export function useRealtimeSubscription<T extends Record<string, unknown>>(
     baseChannelName: string,
     binding: PostgresBinding,
     callback: (payload: RealtimePostgresChangesPayload<T>) => void

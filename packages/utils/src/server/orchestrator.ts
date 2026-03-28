@@ -1,8 +1,8 @@
 import { missionController } from './mission-controller';
-import { Mission } from '@libs/contracts';
+import { Mission } from '@packages/contracts';
 import { stateManager } from './state-manager';
 import { eventBus } from './event-bus';
-import { getExecutionLogger, logger } from '@libs/observability';
+import { getExecutionLogger, logger } from '@packages/observability';
 
 export enum OrchestratorStageState {
     IDLE = 'IDLE',

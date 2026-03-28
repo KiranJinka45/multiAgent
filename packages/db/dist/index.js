@@ -53,3 +53,4 @@ var readDb = new Proxy({}, {
   readDb,
   ...require("@prisma/client")
 });
+//# sourceMappingURL=index.js.map

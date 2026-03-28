@@ -1,15 +1,15 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { startTracing } from '@libs/observability';
+import { startTracing } from '@packages/observability';
 // startTracing(); // Legacy, use initTelemetry
 
 dotenv.config();
 initTelemetry('multiagent-orchestrator');
 
 import { Orchestrator } from './orchestrator';
-import { logger, registry } from '@libs/utils';
-import { initTelemetry } from '@libs/observability';
+import { logger, registry } from '@packages/utils';
+import { initTelemetry } from '@packages/observability';
 
 const app = express();
 const PORT = process.env.PORT || 4001;

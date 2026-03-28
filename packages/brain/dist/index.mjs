@@ -1,12 +1,196 @@
-import {
-  Memory
-} from "./chunk-LSZG2UDS.mjs";
-import {
-  Planner
-} from "./chunk-BR3OMQ3I.mjs";
+// src/base-agent.ts
+import { Groq } from "groq-sdk";
+import { logger } from "@packages/observability";
+import { breakers, eventBus, RetryManager, usageService, SemanticCacheService } from "@packages/utils/server";
+var retry = new RetryManager(5, 3e3);
+var BaseAgent = class {
+  groq;
+  logs = [];
+  constructor() {
+    const apiKey = process.env.GROQ_API_KEY;
+    if (!apiKey) throw new Error(`${this.getName()} requires GROQ_API_KEY`);
+    this.groq = new Groq({ apiKey });
+  }
+  log(message, meta = {}) {
+    const { executionId, ...rest } = meta;
+    logger.info({ agent: this.getName(), ...rest }, message);
+    if (executionId) {
+      eventBus.thought(executionId, this.getName(), message);
+    }
+  }
+  async execute(input, context, signal, strategy) {
+    const start = Date.now();
+    const { db: db2 } = await import("@packages/db");
+    let activeStrategy = strategy;
+    try {
+      const persistedStrategy = await db2.strategy.findFirst({
+        where: { agent: this.getName(), isActive: true }
+      });
+      if (persistedStrategy) {
+        activeStrategy = {
+          ...strategy,
+          ...persistedStrategy.config
+        };
+      }
+    } catch (err) {
+      this.log("Failed to fetch active strategy, using default");
+    }
+    if (this.getName() === "EvolutionAgent") {
+      const { GovernanceEngine } = await import("@packages/core-engine");
+    }
+    try {
+      const result = await this.run(input, context, signal, activeStrategy);
+      await db2.executionLog.create({
+        data: {
+          taskType: this.getName(),
+          input,
+          output: result,
+          success: result.success,
+          latency: Date.now() - start,
+          cost: result.tokens ? result.tokens / 1e3 * 0.01 : 0
+          // Simplified cost model
+        }
+      }).catch((err) => logger.error({ err }, "[BaseAgent] Telemetry logging failed"));
+      return result;
+    } catch (err) {
+      await db2.executionLog.create({
+        data: {
+          taskType: this.getName(),
+          input,
+          output: { error: err.message },
+          success: false,
+          latency: Date.now() - start,
+          cost: 0
+        }
+      }).catch((e) => logger.error({ e }, "[BaseAgent] Telemetry error logging failed"));
+      throw err;
+    }
+  }
+  async promptLLM(system, user, modelOverride, signal, strategy, context) {
+    const model = strategy?.model || modelOverride || "llama-3.3-70b-versatile";
+    const temperature = strategy?.temperature ?? 0.7;
+    this.log(`Invoking LLM (${model}) with temperature ${temperature}`);
+    const cached = await SemanticCacheService.get(user, system, model);
+    if (cached) {
+      this.log(`Cache Hit: ${model}`);
+      return {
+        result: cached,
+        tokens: 0,
+        // Cached results effectively use 0 tokens for the current call
+        promptTokens: 0,
+        completionTokens: 0
+      };
+    }
+    try {
+      const llmResponse = await retry.executeWithRetry(async () => {
+        return await breakers.llm.execute(async () => {
+          const response = await this.groq.chat.completions.create({
+            messages: [
+              { role: "system", content: system },
+              { role: "user", content: user }
+            ],
+            model,
+            temperature,
+            response_format: { type: "json_object" }
+          }, { signal });
+          const content = response.choices[0].message.content;
+          const tokensUsed = response.usage?.total_tokens || 0;
+          const promptTokens = response.usage?.prompt_tokens || 0;
+          const completionTokens = response.usage?.completion_tokens || 0;
+          if (!content) throw new Error("Empty response from LLM");
+          const result = JSON.parse(content);
+          if (context?.userId && context?.tenantId) {
+            usageService.recordAiUsage({
+              model,
+              promptTokens,
+              completionTokens,
+              totalTokens: tokensUsed,
+              userId: context.userId,
+              tenantId: context.tenantId,
+              metadata: {
+                executionId: context.executionId,
+                agent: this.getName(),
+                model
+              }
+            }).catch((err) => logger.error({ err }, "[BaseAgent] Usage tracking failed"));
+          }
+          await SemanticCacheService.set(user, result, system, model);
+          return {
+            result,
+            tokens: tokensUsed,
+            promptTokens,
+            completionTokens
+          };
+        });
+      }, this.getName(), {});
+      return llmResponse;
+    } catch (error) {
+      this.log(`LLM invocation failed: ${error}`);
+      throw error;
+    }
+  }
+};
+
+// src/planner.ts
+import OpenAI from "openai";
+var Planner = class {
+  client;
+  constructor(apiKey) {
+    this.client = new OpenAI({ apiKey });
+  }
+  async plan(objective) {
+    console.log(`\u{1F9E0} [Brain] Planning objective: "${objective}"`);
+    try {
+      const response = await this.client.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: "You are a master task planner. Break down the user objective into a logical sequence of granular tasks for a multi-agent system."
+          },
+          {
+            role: "user",
+            content: objective
+          }
+        ],
+        response_format: { type: "json_object" }
+      });
+      const content = JSON.parse(response.choices[0].message.content || "{}");
+      return content.tasks || [];
+    } catch (error) {
+      console.error("Planner Error:", error);
+      return [];
+    }
+  }
+};
+
+// src/memory.ts
+var Memory = class {
+  store = /* @__PURE__ */ new Map();
+  async store_context(key, value, tags) {
+    const item = {
+      key,
+      value,
+      timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+      tags
+    };
+    this.store.set(key, item);
+    console.log(`\u{1F4BE} [Brain] Stored context for key: ${key}`);
+  }
+  async retrieve_context(key) {
+    const item = this.store.get(key);
+    return item ? item.value : null;
+  }
+  async query_by_tag(tag) {
+    return Array.from(this.store.values()).filter((item) => item.tags?.includes(tag));
+  }
+  clear() {
+    this.store.clear();
+  }
+};
 
 // src/architecture-agent.ts
-import logger from "@libs/utils";
+import logger2 from "@packages/utils";
 var ArchitectureAgent = class extends BaseAgent {
   constructor() {
     super();
@@ -57,7 +241,7 @@ ${prompt2}`;
         completionTokens: llmResponse.completionTokens
       };
     } catch (error) {
-      logger.error({ error, agent: this.getName() }, "Failed to generate architecture blueprint");
+      logger2.error({ error, agent: this.getName() }, "Failed to generate architecture blueprint");
       return {
         success: false,
         error: `Failed to generate architecture: ${error instanceof Error ? error.message : String(error)}`,
@@ -109,139 +293,6 @@ Schema: ${input.schema || "No explicit schema provided"}`, "llama-3.3-70b-versat
         data: null,
         error: error instanceof Error ? error.message : String(error)
       };
-    }
-  }
-};
-
-// src/base-agent.ts
-import { Groq } from "groq-sdk";
-import { logger as logger2 } from "@libs/observability";
-import { breakers, eventBus, RetryManager, usageService, SemanticCacheService } from "@libs/utils/server";
-var retry = new RetryManager(5, 3e3);
-var BaseAgent = class {
-  groq;
-  logs = [];
-  constructor() {
-    const apiKey = process.env.GROQ_API_KEY;
-    if (!apiKey) throw new Error(`${this.getName()} requires GROQ_API_KEY`);
-    this.groq = new Groq({ apiKey });
-  }
-  log(message, meta = {}) {
-    const { executionId, ...rest } = meta;
-    logger2.info({ agent: this.getName(), ...rest }, message);
-    if (executionId) {
-      eventBus.thought(executionId, this.getName(), message);
-    }
-  }
-  async execute(input, context, signal, strategy) {
-    const start = Date.now();
-    const { db: db2 } = await import("@libs/db");
-    let activeStrategy = strategy;
-    try {
-      const persistedStrategy = await db2.strategy.findFirst({
-        where: { agent: this.getName(), isActive: true }
-      });
-      if (persistedStrategy) {
-        activeStrategy = {
-          ...strategy,
-          ...persistedStrategy.config
-        };
-      }
-    } catch (err) {
-      this.log("Failed to fetch active strategy, using default");
-    }
-    if (this.getName() === "EvolutionAgent") {
-      const { GovernanceEngine } = await import("@libs/core-engine");
-    }
-    try {
-      const result = await this.run(input, context, signal, activeStrategy);
-      await db2.executionLog.create({
-        data: {
-          taskType: this.getName(),
-          input,
-          output: result,
-          success: result.success,
-          latency: Date.now() - start,
-          cost: result.tokens ? result.tokens / 1e3 * 0.01 : 0
-          // Simplified cost model
-        }
-      }).catch((err) => logger2.error({ err }, "[BaseAgent] Telemetry logging failed"));
-      return result;
-    } catch (err) {
-      await db2.executionLog.create({
-        data: {
-          taskType: this.getName(),
-          input,
-          output: { error: err.message },
-          success: false,
-          latency: Date.now() - start,
-          cost: 0
-        }
-      }).catch((e) => logger2.error({ e }, "[BaseAgent] Telemetry error logging failed"));
-      throw err;
-    }
-  }
-  async promptLLM(system, user, modelOverride, signal, strategy, context) {
-    const model = strategy?.model || modelOverride || "llama-3.3-70b-versatile";
-    const temperature = strategy?.temperature ?? 0.7;
-    this.log(`Invoking LLM (${model}) with temperature ${temperature}`);
-    const cached = await SemanticCacheService.get(user, system, model);
-    if (cached) {
-      this.log(`Cache Hit: ${model}`);
-      return {
-        result: cached,
-        tokens: 0,
-        // Cached results effectively use 0 tokens for the current call
-        promptTokens: 0,
-        completionTokens: 0
-      };
-    }
-    try {
-      const llmResponse = await retry.executeWithRetry(async () => {
-        return await breakers.llm.execute(async () => {
-          const response = await this.groq.chat.completions.create({
-            messages: [
-              { role: "system", content: system },
-              { role: "user", content: user }
-            ],
-            model,
-            temperature,
-            response_format: { type: "json_object" }
-          }, { signal });
-          const content = response.choices[0].message.content;
-          const tokensUsed = response.usage?.total_tokens || 0;
-          const promptTokens = response.usage?.prompt_tokens || 0;
-          const completionTokens = response.usage?.completion_tokens || 0;
-          if (!content) throw new Error("Empty response from LLM");
-          const result = JSON.parse(content);
-          if (context?.userId && context?.tenantId) {
-            usageService.recordAiUsage({
-              model,
-              promptTokens,
-              completionTokens,
-              totalTokens: tokensUsed,
-              userId: context.userId,
-              tenantId: context.tenantId,
-              metadata: {
-                executionId: context.executionId,
-                agent: this.getName(),
-                model
-              }
-            }).catch((err) => logger2.error({ err }, "[BaseAgent] Usage tracking failed"));
-          }
-          await SemanticCacheService.set(user, result, system, model);
-          return {
-            result,
-            tokens: tokensUsed,
-            promptTokens,
-            completionTokens
-          };
-        });
-      }, this.getName(), {});
-      return llmResponse;
-    } catch (error) {
-      this.log(`LLM invocation failed: ${error}`);
-      throw error;
     }
   }
 };
@@ -379,105 +430,12 @@ TARGET FILES: ${input.fileTargets.join(", ")}${existingContext}${failureContext}
   }
 };
 
-// ../memory-vector/src/index.ts
-import { supabaseAdmin, logger as logger3 } from "@libs/utils";
-var MemoryVectorService = class _MemoryVectorService {
-  static SIMILARITY_THRESHOLD = 0.9;
-  async getEmbedding(text) {
-    logger3.debug({ length: text.length }, "[MemoryVectorService] Generating mock embedding");
-    return new Array(1536).fill(0).map(() => Math.random());
-  }
-  async store(entry, tenantId) {
-    const embedding = await this.getEmbedding(entry.content);
-    const { data, error } = await supabaseAdmin.from("semantic_memories").insert({
-      tenant_id: tenantId,
-      project_id: entry.projectId,
-      type: entry.type,
-      content: entry.content,
-      embedding,
-      metadata: entry.metadata || {}
-    });
-    if (error) throw new Error(`Database Error: ${error.message}`);
-    return data;
-  }
-  async retrieve(query, tenantId, limit = 5) {
-    const embedding = await this.getEmbedding(query);
-    const { data, error } = await supabaseAdmin.rpc("match_semantic_memories", {
-      query_embedding: embedding,
-      match_threshold: _MemoryVectorService.SIMILARITY_THRESHOLD,
-      match_count: limit,
-      p_tenant_id: tenantId
-    });
-    if (error) return [];
-    return data;
-  }
-  async getRecentFixes(errorPattern, tenantId) {
-    return await this.retrieve(errorPattern, tenantId, 3);
-  }
-};
-var memoryVector = new MemoryVectorService();
-
-// ../memory-cache/src/index.ts
-import { redis, logger as logger4 } from "@libs/utils";
-import crypto from "crypto";
-var SemanticCacheService2 = class {
-  static PREFIX = "cache:llm:";
-  static TTL = 60 * 60 * 24 * 7;
-  // 7-day TTL for optimization
-  /**
-   * Normalizes and hashes the input to create a deterministic cache key.
-   */
-  static generateKey(prompt2, system, model) {
-    const payload = JSON.stringify({
-      prompt: prompt2.trim(),
-      system: system?.trim() || "",
-      model: model || "default"
-    });
-    const hash = crypto.createHash("sha256").update(payload).digest("hex");
-    return `${this.PREFIX}${hash}`;
-  }
-  /**
-   * Attempt to retrieve a cached LLM response.
-   */
-  static async get(prompt2, system, model) {
-    const key = this.generateKey(prompt2, system, model);
-    try {
-      const cached = await redis.get(key);
-      if (cached) {
-        logger4.info({ key }, "[SemanticCache] Hit - skipping LLM invocation");
-        return JSON.parse(cached);
-      }
-    } catch (error) {
-      logger4.error({ error, key }, "[SemanticCache] Get failed");
-    }
-    return null;
-  }
-  /**
-   * Persists an LLM response to the semantic cache.
-   */
-  static async set(prompt2, response, system, model) {
-    const key = this.generateKey(prompt2, system, model);
-    try {
-      await redis.set(key, JSON.stringify(response), "EX", this.TTL);
-      logger4.info({ key }, "[SemanticCache] Response cached");
-    } catch (error) {
-      logger4.error({ error, key }, "[SemanticCache] Set failed");
-    }
-  }
-  static async invalidate(prompt2, system, model) {
-    const key = this.generateKey(prompt2, system, model);
-    await redis.del(key);
-  }
-};
-
-// ../memory/src/index.ts
-var MemoryService = memoryVector;
-
 // src/context-builder.ts
-import logger5 from "@libs/utils";
+import { MemoryService } from "@packages/memory";
+import logger3 from "@packages/utils";
 var ContextBuilder = class {
   static async build(prompt2, tenantId) {
-    logger5.info({ prompt: prompt2, tenantId }, "[ContextBuilder] Building context for reasoning");
+    logger3.info({ prompt: prompt2, tenantId }, "[ContextBuilder] Building context for reasoning");
     const memories = await MemoryService.retrieve(prompt2, tenantId);
     return {
       prompt: prompt2,
@@ -747,7 +705,7 @@ Files: ${JSON.stringify(input.allFiles)}`, "llama-3.3-70b-versatile", signal, st
 };
 
 // src/evolution-agent.ts
-import { db } from "@libs/db";
+import { db } from "@packages/db";
 var EvolutionAgent = class extends BaseAgent {
   getName() {
     return "EvolutionAgent";
@@ -882,7 +840,7 @@ Backend Context: ${JSON.stringify(input.backendFiles)}`, "llama-3.3-70b-versatil
 };
 
 // src/healing-agent.ts
-import logger6 from "@libs/utils";
+import logger4 from "@packages/utils";
 var HealingAgent = class _HealingAgent extends BaseAgent {
   getName() {
     return "HealingAgent";
@@ -906,7 +864,7 @@ var HealingAgent = class _HealingAgent extends BaseAgent {
    */
   static async diagnoseAndFix(request) {
     const { projectId, errorLogs, lastAction } = request;
-    logger6.info({ projectId, lastAction }, "[HealingAgent] Diagnosing build failure...");
+    logger4.info({ projectId, lastAction }, "[HealingAgent] Diagnosing build failure...");
     if (errorLogs.includes("MODULE_NOT_FOUND")) {
       return {
         fixed: true,
@@ -923,7 +881,7 @@ var HealingAgent = class _HealingAgent extends BaseAgent {
         codeFix: "// Fixed via syntax correction healing"
       };
     }
-    logger6.warn({ projectId }, "[HealingAgent] Could not find automated fix pattern.");
+    logger4.warn({ projectId }, "[HealingAgent] Could not find automated fix pattern.");
     return {
       fixed: false,
       explanation: "Unrecognized error pattern. Human intervention or multi-agent research session recommended."
@@ -934,7 +892,7 @@ var HealingAgent = class _HealingAgent extends BaseAgent {
    */
   static async applyFix(projectId, result) {
     if (!result.fixed || !result.targetFile || !result.codeFix) return;
-    logger6.info({ projectId, targetFile: result.targetFile }, "[HealingAgent] Applying autonomous fix...");
+    logger4.info({ projectId, targetFile: result.targetFile }, "[HealingAgent] Applying autonomous fix...");
   }
 };
 
@@ -988,7 +946,7 @@ Output strictly valid JSON:
 };
 
 // src/meta-agent.ts
-import logger7 from "@libs/utils";
+import logger5 from "@packages/utils";
 var MetaAgent = class extends BaseAgent {
   getName() {
     return "MetaAgent";
@@ -1031,7 +989,7 @@ Output strictly valid JSON matching this schema:
         logs: this.logs
       };
     } catch (error) {
-      logger7.error({ error }, "MetaAgent analysis failed");
+      logger5.error({ error }, "MetaAgent analysis failed");
       return {
         success: false,
         data: null,
@@ -1250,7 +1208,7 @@ var ResumeAgent = class extends BaseAgent {
   }
   async run(input, _context, signal, _strategy) {
     this.log(`Optimizing resume for role: ${input.targetRole || "General"}`);
-    const { db: db2 } = await import("@libs/db");
+    const { db: db2 } = await import("@packages/db");
     const strategies = await db2.strategy.findMany({ where: { agent: "ResumeAgent" } });
     const candidate = strategies.find((s) => !s.isActive);
     const active = strategies.find((s) => s.isActive);
@@ -1374,10 +1332,10 @@ var SocialAgent = class extends BaseAgent {
 };
 
 // src/task-graph.ts
-import logger8 from "@libs/utils";
+import logger6 from "@packages/utils";
 var TaskGraph = class {
   static resolveExecutionOrder(plan) {
-    logger8.info({ taskCount: plan.tasks.length }, "[TaskGraph] Resolving execution order");
+    logger6.info({ taskCount: plan.tasks.length }, "[TaskGraph] Resolving execution order");
     const tasks = [...plan.tasks];
     const executionGroups = [];
     const completedTaskIds = /* @__PURE__ */ new Set();
@@ -1386,7 +1344,7 @@ var TaskGraph = class {
         (task) => task.dependencies.every((depId) => completedTaskIds.has(depId))
       );
       if (currentGroup.length === 0) {
-        logger8.error({ tasks }, "[TaskGraph] Circular dependency detected or missing dependency");
+        logger6.error({ tasks }, "[TaskGraph] Circular dependency detected or missing dependency");
         throw new Error("Invalid Task Graph: Circular dependency or missing task");
       }
       executionGroups.push(currentGroup);
@@ -1432,7 +1390,7 @@ Files Context: ${JSON.stringify(input.allFiles)}`;
 };
 
 // src/validator-agent.ts
-import logger9 from "@libs/utils";
+import logger7 from "@packages/utils";
 var ValidatorAgent = class extends BaseAgent {
   getName() {
     return "ValidatorAgent";
@@ -1450,7 +1408,7 @@ var ValidatorAgent = class extends BaseAgent {
 Spec: ${input.spec}
 Output: ${JSON.stringify(input.output)}`;
       const { result, tokens } = await this.promptLLM(system, prompt2, "llama-3.3-70b-versatile", signal, strategy, _context);
-      logger9.info({
+      logger7.info({
         agentValidated: input.agentName,
         confidence: result.confidenceScore,
         tokens,
@@ -1500,3 +1458,4 @@ export {
   TestingAgent,
   ValidatorAgent
 };
+//# sourceMappingURL=index.mjs.map

@@ -1,6 +1,6 @@
 import * as fsLib from 'fs-extra';
 import pathLib from 'path';
-import logger from '@config/logger';
+import { logger } from '@packages/utils/server';
 
 export interface Blueprint {
     project_name: string;

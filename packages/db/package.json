@@ -1,9 +1,9 @@
 {
-  "name": "@libs/db",
+  "name": "@packages/db",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "prisma generate --schema src/schema.prisma && tsup",
+    "build": "prisma generate --schema src/schema.prisma && tsup --config tsup.config.js",
     "dev": "tsup --watch",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@libs/supabase';
+import { createRouteHandlerClient } from '@packages/supabase';
 import { cookies } from 'next/headers';
-import { projectService, logger } from '@libs/utils/src/server';
+import { projectService, logger } from '@packages/utils/src/server';
 
 export async function GET(
     req: NextRequest,

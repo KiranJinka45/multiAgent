@@ -5,7 +5,7 @@ import {
     JobArtifact, 
     ValidationResult, 
     AgentResponse 
-} from '@libs/contracts';
+} from '@packages/contracts';
 
 // Activities proxy
 const { 
@@ -41,7 +41,7 @@ export async function appBuilderWorkflow(params: { prompt: string, userId: strin
     
     // 2. Resolve DAG Execution Groups
     // Use dynamic import for deterministic resolver
-    const { TaskGraph } = await import('@libs/brain');
+    const { TaskGraph } = await import('@packages/brain');
     const stages: BrainTask[][] = TaskGraph.resolveExecutionOrder(plan);
 
     let allArtifacts: JobArtifact[] = [];

@@ -1,0 +1,14 @@
+# Base image for MultiAgent Sandbox apps
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Pre-install common dependencies to avoid network delay during generation
+COPY package.base.json ./package.json
+RUN npm install
+
+# Keep the node_modules ready
+ENV PATH /app/node_modules/.bin:$PATH
+
+# Default entrypoint for Vite/Next.js
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

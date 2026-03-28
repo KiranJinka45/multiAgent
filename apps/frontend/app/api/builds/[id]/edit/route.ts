@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ChatEditAgent } from '@libs/brain';
+import { ChatEditAgent } from '@packages/brain';
 import { 
     projectMemory, 
     projectService, 
@@ -9,10 +9,10 @@ import {
     PatchEngine, 
     CommitManager,
     logger
-} from '@libs/utils/src/server';
+} from '@packages/utils/src/server';
 import path from 'path';
 import fs from 'fs';
-import { previewManager } from '@libs/runtime/preview-manager';
+import { previewManager } from '@packages/runtime/preview-manager';
 
 /**
  * POST /api/projects/[id]/edit

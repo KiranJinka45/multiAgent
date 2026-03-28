@@ -1,6 +1,12 @@
-import { AgentResponse, DatabaseAgent, BackendAgent, FrontendAgent, DeploymentAgent, TestingAgent, ValidatorAgent } from '@libs/brain';
-import { logger, StrategyConfig } from '@libs/utils/server';
-import { AgentContext } from '@libs/contracts';
+import { AgentResponse } from '@packages/brain/base-agent';
+import { DatabaseAgent } from '@packages/brain/database-agent';
+import { BackendAgent } from '@packages/brain/backend-agent';
+import { FrontendAgent } from '@packages/brain/frontend-agent';
+import { DeploymentAgent } from '@packages/brain/deploy-agent';
+import { TestingAgent } from '@packages/brain/testing-agent';
+import { ValidatorAgent } from '@packages/brain/validator-agent';
+import { logger, StrategyConfig } from '@packages/utils/src/server';
+import { AgentContext } from '@packages/contracts';
 
 export interface TaskAgent {
     execute(payload: any, context?: AgentContext, signal?: AbortSignal, strategy?: StrategyConfig): Promise<AgentResponse<any>>;

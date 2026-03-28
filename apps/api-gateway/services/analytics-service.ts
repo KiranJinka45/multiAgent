@@ -1,5 +1,5 @@
-import logger from '@config/logger';
-import redis from '@queue/redis-client';
+import { logger } from '@packages/utils/server';
+import { redis } from '@packages/utils/server';
 
 export class AnalyticsService {
     /**

@@ -8,7 +8,7 @@
  * Supabase `projects.runtime_status` is updated asynchronously for persistence.
  */
 
-import { redis, logger } from '@libs/utils/server';
+import { redis, logger } from '@packages/utils/src/server';
 
 import crypto from 'crypto';
 

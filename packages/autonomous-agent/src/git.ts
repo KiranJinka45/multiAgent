@@ -1,5 +1,5 @@
 import { execSync } from 'child_process';
-import { logger } from '@libs/utils';
+import { logger } from '@packages/utils';
 
 export function commitAndPush(featureName: string) {
   const branchName = `feat/autonomous-${featureName.toLowerCase().replace(/\s+/g, '-')}`;

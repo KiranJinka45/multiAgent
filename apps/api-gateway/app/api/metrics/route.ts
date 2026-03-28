@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { register } from "@libs/observability";
+import { register } from "@packages/observability";
 
 export const dynamic = 'force-dynamic';
 

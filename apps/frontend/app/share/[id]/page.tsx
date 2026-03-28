@@ -1,8 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { githubService, type GithubRepo } from '@libs/utils';
-import { PreviewRegistry } from '@libs/registry';
+import { githubService, type GithubRepo } from '@packages/utils';
+import { PreviewRegistry } from '@packages/registry';
 import { ShareOverlay } from '@/components/ShareOverlay';
 import { Loader2 } from 'lucide-react';
 

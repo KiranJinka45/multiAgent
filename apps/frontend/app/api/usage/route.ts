@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@libs/supabase';
+import { createRouteHandlerClient } from '@packages/supabase';
 import { cookies } from 'next/headers';
-import { usageService, logger } from '@libs/utils/server';
+import { usageService, logger } from '@packages/utils/server';
 
 export const dynamic = 'force-dynamic';
 

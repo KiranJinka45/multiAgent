@@ -1,7 +1,7 @@
 console.log('[DEBUG] Loading project-service.ts...');
-import { supabase } from '@libs/supabase';
+import { supabase } from '@packages/supabase';
 import type { SupabaseClient } from 'C:/multiagentic_project/multiAgent-main/node_modules/.pnpm/@supabase+supabase-js@2.99.3/node_modules/@supabase/supabase-js/dist/index.cjs';
-import { Project, ProjectFile } from '@libs/contracts';
+import { Project, ProjectFile } from '@packages/contracts';
 
 export const projectService = {
     getSupabase: (supabaseServer?: SupabaseClient) => supabaseServer || supabase,

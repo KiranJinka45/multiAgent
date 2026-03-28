@@ -1,6 +1,6 @@
 import { Worker, Job } from 'bullmq';
-import { redis, logger, QueueManager } from '@libs/utils';
-import { db } from '@libs/db';
+import { redis, logger, QueueManager } from '@packages/utils';
+import { db } from '@packages/db';
 
 const STRATEGY_QUEUE = 'strategy-tasks';
 

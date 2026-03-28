@@ -1,7 +1,7 @@
-import { BaseAgent, AgentResponse } from './index';
-import logger from '@libs/utils';
-import { AgentContext } from '@libs/contracts';
-import { StrategyConfig } from '@libs/utils';
+import { BaseAgent, AgentResponse } from './base-agent';
+import logger from '@packages/utils';
+import { AgentContext } from '@packages/contracts';
+import { StrategyConfig } from '@packages/utils';
 
 export class ValidatorAgent extends BaseAgent {
     getName() { return 'ValidatorAgent'; }

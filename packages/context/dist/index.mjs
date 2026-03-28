@@ -1,2 +1,59 @@
-import f,{createContext,useState,useEffect,useContext}from'react';import {githubService}from'@libs/utils';var l=createContext(void 0);function w({children:o}){let[n,d]=useState(false),[i,a]=useState(260);useEffect(()=>{let e=localStorage.getItem("sidebar-width"),t=localStorage.getItem("sidebar-collapsed");e&&a(parseInt(e)),t&&d(t==="true");},[]),useEffect(()=>{localStorage.setItem("sidebar-width",i.toString()),localStorage.setItem("sidebar-collapsed",n.toString());let e=document.documentElement;n?e.style.setProperty("--sidebar-width","64px"):e.style.setProperty("--sidebar-width",`${i}px`);},[i,n]);let[b,u]=useState(false),[h,c]=useState(false);return useEffect(()=>{(async()=>{try{let t=await githubService.isConnected();c(t);}catch(t){console.error("Error checking github connection:",t);}})();},[]),f.createElement(l.Provider,{value:{isCollapsed:n,setIsCollapsed:d,width:i,setWidth:a,isGithubModalOpen:b,setIsGithubModalOpen:u,isGithubConnected:h,setIsGithubConnected:c}},o)}function I(){let o=useContext(l);if(!o)throw new Error("useSidebar must be used within a SidebarProvider.");return o}export{w as SidebarProvider,I as useSidebar};//# sourceMappingURL=index.mjs.map
+// src/SidebarContext.tsx
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { githubService } from "@packages/utils";
+var SidebarContext = createContext(void 0);
+function SidebarProvider({ children }) {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [width, setWidth] = useState(260);
+  useEffect(() => {
+    const savedWidth = localStorage.getItem("sidebar-width");
+    const savedCollapsed = localStorage.getItem("sidebar-collapsed");
+    if (savedWidth) setWidth(parseInt(savedWidth));
+    if (savedCollapsed) setIsCollapsed(savedCollapsed === "true");
+  }, []);
+  useEffect(() => {
+    localStorage.setItem("sidebar-width", width.toString());
+    localStorage.setItem("sidebar-collapsed", isCollapsed.toString());
+    const root = document.documentElement;
+    if (isCollapsed) {
+      root.style.setProperty("--sidebar-width", "64px");
+    } else {
+      root.style.setProperty("--sidebar-width", `${width}px`);
+    }
+  }, [width, isCollapsed]);
+  const [isGithubModalOpen, setIsGithubModalOpen] = useState(false);
+  const [isGithubConnected, setIsGithubConnected] = useState(false);
+  useEffect(() => {
+    const checkConnection = async () => {
+      try {
+        const connected = await githubService.isConnected();
+        setIsGithubConnected(connected);
+      } catch (err) {
+        console.error("Error checking github connection:", err);
+      }
+    };
+    checkConnection();
+  }, []);
+  return /* @__PURE__ */ React.createElement(SidebarContext.Provider, { value: {
+    isCollapsed,
+    setIsCollapsed,
+    width,
+    setWidth,
+    isGithubModalOpen,
+    setIsGithubModalOpen,
+    isGithubConnected,
+    setIsGithubConnected
+  } }, children);
+}
+function useSidebar() {
+  const context = useContext(SidebarContext);
+  if (!context) {
+    throw new Error("useSidebar must be used within a SidebarProvider.");
+  }
+  return context;
+}
+export {
+  SidebarProvider,
+  useSidebar
+};
 //# sourceMappingURL=index.mjs.map

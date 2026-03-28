@@ -1,5 +1,5 @@
 import { BaseAgent } from './base-agent';
-import { AgentRequest, AgentResponse, AgentContext } from '@libs/contracts';
+import { AgentRequest, AgentResponse, AgentContext } from '@packages/contracts';
 
 export interface Patch {
     path: string;

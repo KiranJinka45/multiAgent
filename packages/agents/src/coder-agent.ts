@@ -1,5 +1,5 @@
 import { BaseAgent } from './base-agent';
-import { AgentRequest, AgentResponse, AgentContext, CoderParams } from '@libs/contracts';
+import { AgentRequest, AgentResponse, AgentContext, CoderParams } from '@packages/contracts';
 
 export interface CodeFile {
     path: string;

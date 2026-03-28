@@ -1,5 +1,5 @@
 import { supabaseAdmin } from './supabase-utils';
-import logger from '@libs/observability';
+import logger from '@packages/observability';
 
 export interface Tenant {
     id: string;

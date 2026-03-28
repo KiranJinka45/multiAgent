@@ -1,6 +1,6 @@
-import { getSupabaseClient } from '@libs/supabase';
-import type { SupabaseClient } from '@libs/supabase';
-import { Project, ProjectFile } from '@libs/contracts';
+import { getSupabaseClient } from '@packages/supabase';
+import type { SupabaseClient } from '@packages/supabase';
+import { ProjectV1 as Project, ProjectFile } from '@packages/contracts';
 
 export const projectService = {
     getSupabase: (supabaseServer?: SupabaseClient) => supabaseServer || getSupabaseClient(),

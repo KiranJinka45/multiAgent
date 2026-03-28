@@ -1,4 +1,4 @@
-import { createRouteHandlerClient } from '@libs/supabase';
+import { createRouteHandlerClient } from '@packages/supabase';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 

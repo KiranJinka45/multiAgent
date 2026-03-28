@@ -1,5 +1,5 @@
 import { MetadataRoute } from 'next';
-import { db } from '@libs/db';
+import { db } from '@packages/db';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const products = await db.product.findMany({

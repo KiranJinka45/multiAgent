@@ -1,6 +1,6 @@
 import { BaseAgent } from './base-agent';
-import { SandboxParams, AgentRequest, AgentResponse } from '@libs/contracts';
-import { StrategyConfig } from '@libs/utils';
+import { SandboxParams, AgentRequest, AgentResponse } from '@packages/contracts';
+import { StrategyConfig } from '@packages/utils';
 
 export interface SandboxEditorOutput {
     editorUrl: string;

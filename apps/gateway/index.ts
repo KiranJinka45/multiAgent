@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { startTracing } from '@libs/observability';
+import { startTracing } from '@packages/observability';
 startTracing();
 
 import express, { Request, Response, NextFunction } from 'express';
@@ -12,7 +12,7 @@ import pino from 'pino';
 import http from 'http';
 import { Registry, Histogram, Counter } from 'prom-client';
 import { initSocket } from './socket';
-import { AuditLogger } from '@libs/utils';
+import { AuditLogger } from '@packages/utils';
 
 dotenv.config();
 

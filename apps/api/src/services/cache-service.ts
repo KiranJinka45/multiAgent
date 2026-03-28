@@ -1,4 +1,4 @@
-import { redis } from '@libs/utils/server';
+import { redis } from '@packages/utils/server';
 import crypto from 'crypto';
 
 export class CacheService {

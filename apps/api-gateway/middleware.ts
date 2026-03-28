@@ -1,4 +1,4 @@
-import { createMiddlewareClient } from "@libs/supabase";
+import { createMiddlewareClient } from "@packages/supabase";
 import { NextResponse, NextRequest } from "next/server";
 
 export async function middleware(req: NextRequest) {

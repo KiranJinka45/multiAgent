@@ -10,14 +10,14 @@ import { IntentDetectionAgent } from '@agents/intent-agent';
 import { TaskGraph, TaskExecutor, BuildWatchdog } from './task-engine';
 import { agentRegistry } from './task-engine/agent-registry';
 import { projectMemory } from './project-memory';
-import { eventBus } from '@shared/services/event-bus';
+import { eventBus } from '@packages/shared-services';
 import { memoryPlane } from './memory-plane';
 import { DistributedExecutionContext } from './execution-context';
-import { AgentMemory } from '@shared/services/agent-memory';
+import { AgentMemory } from '@packages/shared-servicesagent-memory';
 import { RepairAgent } from '@agents/repair-agent';
 import { HealingAgent } from '@agents/healing-agent';
 import { ErrorKnowledgeBase } from './error-knowledge-base';
-import logger, { getExecutionLogger } from '@config/logger';
+import logger, { getExecutionLogger } from '@packages/utils/server';
 import { DockerDeployer } from './devops/docker-deployer';
 type ExecutionLogger = ReturnType<typeof getExecutionLogger>;
 
@@ -25,7 +25,7 @@ import { freeQueue, redis } from '@queue';
 import path from 'path';
 import * as fs from 'fs-extra';
 import { missionController } from './mission-controller';
-import { runtimeExecutor } from '@runtime/executor';
+import { SandboxRunner } from '@packages/sandbox-runtime/sandbox-runner';
 import { ResearchAgent, ResearchFindings } from '@agents/research-agent';
 import { ArchitectureAgent } from '@agents/architecture-agent';
 import { KnowledgeService } from './knowledge-service';
@@ -38,9 +38,9 @@ import { PreviewRegistry } from '@registry/previewRegistry';
 import { stateManager } from './state-manager';
 import { swarmCoordinator } from './task-engine/swarm-coordinator';
 import { RankingAgent } from '@agents/ranking-agent';
-import { ExecutionResult } from '@shared-types/execution';
+import { ExecutionResult } from '@packages/contractsexecution';
 import { RuntimeScheduler } from '@runtime/cluster/runtimeScheduler';
-import { JobStage } from '@shared/types/pipeline-types';
+import { JobStage } from '@packages/contractspipeline-types';
 import { ArtifactValidator } from '@validator/artifact-validator';
 
 // Pre-register agents for the Execution Engine
@@ -461,9 +461,11 @@ export class Orchestrator {
         }
 
         if (!installSuccessful) {
-            const installResult = await runtimeExecutor.execute('npm', ['install', '--no-audit', '--no-fund'], {
+            const installResult = await SandboxRunner.execute('npm', ['install', '--no-audit', '--no-fund'], {
                 cwd: sandboxDir,
                 executionId,
+                agentName: 'System',
+                action: 'npm install',
                 timeoutMs: 120000
             });
             installSuccessful = installResult.success;
@@ -583,9 +585,11 @@ export class Orchestrator {
             await missionController.updateMission(executionId, { status: 'building' });
 
             // 1. Run Build Validation
-            const buildResult = await runtimeExecutor.execute('npm', ['run', 'build'], {
+            const buildResult = await SandboxRunner.execute('npm', ['run', 'build'], {
                 cwd: sandboxDir,
                 executionId,
+                agentName: 'RepairAgent',
+                action: 'npm run build',
                 timeoutMs: 180000
             });
 

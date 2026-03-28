@@ -1,5 +1,5 @@
 import fs from 'fs-extra';
-import { logger } from '@libs/utils';
+import { logger } from '@packages/utils';
 
 export async function registerComponent(registryPath: string, componentName: string, filePath: string) {
   if (!(await fs.pathExists(registryPath))) {

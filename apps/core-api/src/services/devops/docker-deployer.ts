@@ -1,7 +1,7 @@
 import Docker from 'dockerode';
 import path from 'path';
 import fs from 'fs';
-import logger from '@libs/utils';
+import logger from '@packages/utils';
 
 const docker = new Docker(); // Connects to local Docker daemon
 

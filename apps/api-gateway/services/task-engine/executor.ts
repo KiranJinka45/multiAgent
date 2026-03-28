@@ -1,12 +1,12 @@
 import { TaskGraph, BaseTask } from './task-graph';
 import { agentRegistry } from './agent-registry';
-import { AgentContext } from '@shared-types/agent-context';
-import { StrategyEngine } from '@libs/agent-intelligence/strategy-engine';
-import logger from '@config/logger';
-import { eventBus } from '@shared/services/event-bus';
+import { AgentContext } from '@packages/contractsagent-context';
+import { StrategyEngine } from '@packages/agent-intelligence/strategy-engine';
+import { logger } from '@packages/utils/server';
+import { eventBus } from '@packages/shared-services';
 import { DebugAgent } from '@agents/debug-agent';
 import { AgentResponse } from '@agents/base-agent';
-import { patchEngine } from '@libs/patch-engine';
+import { patchEngine } from '@packages/patch-engine';
 import { BuildCache } from './build-cache';
 import { previewManager } from '@runtime/preview-manager';
 import { workerPool } from './worker-pool';

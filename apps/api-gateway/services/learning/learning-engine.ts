@@ -1,7 +1,7 @@
 import { ErrorAnalyzer } from './error-analyzer';
 import { KnowledgeStore } from './knowledge-store';
 import { FixRecommender } from './fix-recommender';
-import logger from '@config/logger';
+import { logger } from '@packages/utils/server';
 
 /**
  * Self-Improving Learning Engine

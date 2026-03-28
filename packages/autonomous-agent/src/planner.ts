@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import { logger } from '@libs/utils';
+import { logger } from '@packages/utils';
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 

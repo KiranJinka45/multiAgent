@@ -1,6 +1,6 @@
 'use client';
 
-import { SidebarProvider } from '@libs/context';
+import { SidebarProvider } from '@packages/context';
 import { Toaster } from 'sonner';
 import { ThemeProvider } from 'next-themes';
 

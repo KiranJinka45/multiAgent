@@ -1,5 +1,5 @@
-import { VectorStore, EmbeddingsEngine, memoryPlane } from '@libs/utils';
-import logger from '@libs/utils';
+import { VectorStore, EmbeddingsEngine, memoryPlane } from '@packages/utils';
+import logger from '@packages/utils';
 
 export interface KnowledgeContext {
     type: 'code_snippet' | 'documentation' | 'best_practice';

@@ -1,5 +1,5 @@
-import { prisma } from '@libs/db';
-import { logger } from '@libs/observability';
+import { db as prisma } from '@packages/db';
+import { logger } from '@packages/observability';
 
 export class PreviewManager {
     static async generatePreviewUrl(buildId: string): Promise<string> {

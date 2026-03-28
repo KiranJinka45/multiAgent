@@ -1,4 +1,4 @@
-import { logger, eventBus } from '@libs/utils/server';
+import { logger, eventBus } from '@packages/utils/src/server';
 import { agentRegistry } from './agent-registry';
 
 /**

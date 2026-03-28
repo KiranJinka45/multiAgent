@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { logger, projectService } from '@libs/utils/src/server';
-import { createRouteHandlerClient } from '@libs/supabase';
+import { logger, projectService } from '@packages/utils/src/server';
+import { createRouteHandlerClient } from '@packages/supabase';
 import { cookies } from 'next/headers';
 
 interface FileTreeEntry {

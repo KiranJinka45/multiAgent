@@ -1,6 +1,6 @@
 import '../config/env';
-import { createServerSupabaseClient } from '@libs/supabase';
-import { type SupabaseClient } from '@libs/supabase';
+import { createServerSupabaseClient } from '@packages/supabase';
+import { type SupabaseClient } from '@packages/supabase';
 
 /**
  * Internal Admin client factory.

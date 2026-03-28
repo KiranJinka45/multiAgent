@@ -1,5 +1,5 @@
 import { BaseAgent, AgentResponse, AgentRequest } from './base-agent';
-import { AgentContext, EditParams } from '@libs/contracts';
+import { AgentContext, EditParams } from '@packages/contracts';
 
 export interface EditPatch {
     path: string;

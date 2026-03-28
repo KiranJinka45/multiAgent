@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { VirtualFileSystem } from './virtual-fs';
-import logger from '@config/logger';
+import { logger } from '@packages/utils/server';
 
 export class CommitManager {
     /**

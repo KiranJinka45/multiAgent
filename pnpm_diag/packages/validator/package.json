@@ -1,5 +1,5 @@
 {
-  "name": "@libs/validator",
+  "name": "@packages/validator",
   "version": "0.1.0",
   "private": true,
   "scripts": {

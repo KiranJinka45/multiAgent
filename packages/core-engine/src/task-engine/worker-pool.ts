@@ -1,4 +1,4 @@
-import { logger, RateLimiter } from '@libs/utils/server';
+import { logger, RateLimiter } from '@packages/utils/src/server';
 
 /**
  * WorkerPool - Manages global concurrency for agent tasks.

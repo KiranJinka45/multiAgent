@@ -19,16 +19,16 @@
 
 import { ProcessManager } from './processManager';
 import { PortManager } from './portManager';
-import { PreviewRegistry, RuntimeStatus } from '@libs/registry';
+import { PreviewRegistry, RuntimeStatus } from '@packages/registry';
 import { RuntimeMetrics } from './runtimeMetrics';
 import { RuntimeGuard } from './runtimeGuard';
 import { RuntimeCapacity } from './runtimeCapacity';
 import { RuntimeHeartbeat } from './runtimeHeartbeat';
 import { RuntimeEscalation } from './runtimeEscalation';
-import { redis } from '@libs/utils/server';
+import { redis } from '@packages/utils/server';
 import path from 'path';
 import fs from 'fs-extra';
-import { logger } from '@libs/utils/server';
+import { logger } from '@packages/utils/server';
 
 // ─── Configuration ────────────────────────────────────────────────────────────
 

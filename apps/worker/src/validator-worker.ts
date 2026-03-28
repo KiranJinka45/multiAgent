@@ -1,14 +1,14 @@
 import { Worker, Job } from 'bullmq';
 import { Redis } from 'ioredis';
-import { logger } from '@libs/observability';
-import { redis, eventBus, QUEUE_VALIDATE } from '@libs/shared-services';
+import { logger } from '@packages/observability';
+import { redis, eventBus, QUEUE_VALIDATE } from '@packages/shared-services';
 import { 
     dockerQueue, 
     repairQueue, 
     patchVerifier, 
     VirtualFileSystem, 
     DistributedExecutionContext 
-} from '@libs/utils/server';
+} from '@packages/utils/server';
 import path from 'path';
 import fs from 'fs';
 

@@ -1,4 +1,4 @@
-import logger from '@libs/utils';
+import logger from '@packages/utils';
 import { DatabaseAgent } from '../';
 import { BackendAgent } from '../';
 import { FrontendAgent } from '../';
@@ -6,8 +6,8 @@ import { DeploymentAgent } from '../';
 import { TestingAgent } from '../';
 import { ValidatorAgent } from '../';
 
-import { StrategyConfig } from '@libs/utils';
-import { AgentRequest, AgentResponse } from '@libs/contracts';
+import { StrategyConfig } from '@packages/utils';
+import { AgentRequest, AgentResponse } from '@packages/contracts';
 
 export interface TaskAgent {
     execute(request: AgentRequest<unknown>, signal?: AbortSignal, strategy?: StrategyConfig): Promise<AgentResponse<unknown>>;

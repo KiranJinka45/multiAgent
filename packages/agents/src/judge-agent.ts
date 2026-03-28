@@ -1,6 +1,6 @@
 import { BaseAgent } from './base-agent';
-import { AgentRequest, AgentResponse, JobArtifact } from '@libs/contracts';
-import logger from '@libs/utils';
+import { AgentRequest, AgentResponse, JobArtifact } from '@packages/contracts';
+import logger from '@packages/utils';
 
 /**
  * JudgeAgent (AI Judge) - Phase 19 Hardening

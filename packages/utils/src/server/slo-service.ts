@@ -1,4 +1,4 @@
-import { logger } from '@libs/observability';
+import { logger } from '@packages/observability';
 
 export const SLO_THRESHOLDS = {
     LATENCY_P95_SECONDS: 300, // 5 minutes for heavy AI jobs

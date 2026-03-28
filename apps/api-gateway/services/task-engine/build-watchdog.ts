@@ -1,6 +1,5 @@
-import logger from '@config/logger';
+import { logger, eventBus } from '@packages/utils/server';
 import { TaskGraph } from './task-graph';
-import { eventBus } from '@shared/services/event-bus';
 
 export class BuildWatchdog {
     private interval: NodeJS.Timeout | null = null;

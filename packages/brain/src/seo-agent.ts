@@ -1,6 +1,6 @@
-import { BaseAgent, AgentResponse } from './index';
-import { AgentContext } from '@libs/contracts';
-import { db } from '@libs/db';
+import { BaseAgent, AgentResponse } from './base-agent';
+import { AgentContext } from '@packages/contracts';
+import { db } from '@packages/db';
 
 export interface SeoInput {
     niche: string;

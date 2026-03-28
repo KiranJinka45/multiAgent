@@ -1,6 +1,6 @@
 import { Worker, Job } from 'bullmq';
-import { redis, logger } from '@libs/utils';
-import { db } from '@libs/db';
+import { redis, logger } from '@packages/utils';
+import { db } from '@packages/db';
 import { SandboxRunner } from './sandbox-runner';
 
 const MODIFICATION_QUEUE = 'self-modification-tasks';
@@ -14,7 +14,7 @@ export const selfModificationWorker = new Worker(MODIFICATION_QUEUE, async (job:
   if (!proposal) return;
 
   // 1. Governance Gate
-  const { GovernanceEngine } = await import('@libs/core-engine/src/governance-engine');
+  const { GovernanceEngine } = await import('@packages/core-engine/src/governance-engine');
   const gov = await GovernanceEngine.evaluateProposal(proposalId);
 
   if (!gov.allowed) {

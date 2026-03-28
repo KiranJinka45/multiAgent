@@ -1,9 +1,9 @@
 import { Worker, Job } from 'bullmq';
 import { Redis } from 'ioredis';
-import { logger } from '@libs/observability';
-import { redis, QUEUE_SUPERVISOR, supervisorQueue } from '@libs/shared-services';
-import { supervisorService, DistributedExecutionContext } from '@libs/utils/server';
-import { PreviewWatchdog } from '@libs/runtime/watchdog';
+import { logger } from '@packages/observability';
+import { redis, QUEUE_SUPERVISOR, supervisorQueue } from '@packages/shared-services';
+import { supervisorService, DistributedExecutionContext } from '@packages/utils/server';
+import { PreviewWatchdog } from '@packages/runtime/watchdog';
 
 PreviewWatchdog.start();
 

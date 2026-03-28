@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { db } from '@libs/db';
+import { db } from '@packages/db';
 
 export const trackEvent = async (req: Request, res: Response) => {
   const { type, metadata } = req.body;

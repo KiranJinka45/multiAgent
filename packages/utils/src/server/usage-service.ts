@@ -1,6 +1,6 @@
-import { prisma } from '@libs/db';
-import { logger } from '@libs/observability';
-import { redis } from '@libs/shared-services';
+import { db as prisma } from '@packages/db';
+import { logger } from './logger';
+import { redis } from './redis';
 
 export interface UsageMetric {
     model: string;
@@ -68,7 +68,7 @@ export class UsageService {
                         completionTokens: metric.completionTokens,
                         totalTokens: metric.totalTokens,
                         cost: cost,
-                        metadata: metric.metadata as Record<string, unknown>
+                        metadata: metric.metadata as any
                     }
                 })
             ]);

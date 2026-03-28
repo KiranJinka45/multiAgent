@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import redis from '@libs/utils';
-import logger from '@libs/utils';
+import redis from '@packages/utils';
+import logger from '@packages/utils';
 
 export const dynamic = 'force-dynamic';
 

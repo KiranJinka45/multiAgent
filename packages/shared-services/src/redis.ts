@@ -1,5 +1,5 @@
 import Redis from 'ioredis';
-import { createLazyProxy } from '@libs/utils/server';
+import { createLazyProxy } from '@packages/utils/server';
 
 const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
 

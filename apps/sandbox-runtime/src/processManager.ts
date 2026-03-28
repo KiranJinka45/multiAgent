@@ -9,7 +9,7 @@
  */
 
 import { spawn, ChildProcess } from 'child_process';
-import { logger } from '@libs/utils/server';
+import { logger } from '@packages/utils/server';
 import { RuntimeGuard } from './runtimeGuard';
 
 export type ProcessStatus = 'IDLE' | 'STARTING' | 'RUNNING' | 'FAILED' | 'STOPPED';

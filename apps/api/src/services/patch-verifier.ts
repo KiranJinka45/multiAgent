@@ -2,7 +2,7 @@ import { exec } from 'child_process';
 import path from 'path';
 import fs from 'fs';
 import util from 'util';
-import { logger } from '@libs/observability';
+import { logger } from '@packages/observability';
 import { learningEngine } from './learning';
 import { VirtualFileSystem } from './vfs';
 

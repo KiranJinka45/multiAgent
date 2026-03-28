@@ -1,9 +1,9 @@
 {
-  "name": "@libs/shared-services",
+  "name": "@packages/shared-services",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "tsup",
+    "build": "tsup --config tsup.config.js",
     "dev": "tsup --watch",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
@@ -26,6 +26,7 @@
       "types": "./src/*.ts",
       "import": "./dist/*.js",
       "default": "./dist/*.js"
-    }
+    },
+    "./src/*": "./src/*"
   }
 }

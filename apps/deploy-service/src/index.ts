@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { initTelemetry } from '@libs/observability';
+import { initTelemetry } from '@packages/observability';
 initTelemetry('multiagent-deploy-service');
 
 import { Worker, Job } from 'bullmq';
@@ -8,8 +8,8 @@ import {
     DEPLOYMENT_QUEUE, 
     logger, 
     ReliabilityMonitor 
-} from '@libs/utils/server';
-import { db as prisma } from '@libs/db';
+} from '@packages/utils/server';
+import { db as prisma } from '@packages/db';
 import { VercelDeployer } from './deployer';
 
 const worker = new Worker(DEPLOYMENT_QUEUE, async (job: Job) => {

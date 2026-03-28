@@ -1,4 +1,4 @@
-import { createMiddlewareClient } from '@libs/supabase';
+import { createMiddlewareClient } from '@packages/supabase';
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 

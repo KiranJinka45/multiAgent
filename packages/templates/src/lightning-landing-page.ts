@@ -1,4 +1,4 @@
-import { Project } from '@libs/contracts';
+import { Project } from '@packages/contracts';
 
 export const LightningLandingPageTemplate = {
   id: 'lightning-landing-page',

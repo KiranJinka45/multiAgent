@@ -1,20 +1,27 @@
 {
-  "name": "@libs/autonomous-agent",
+  "name": "@packages/autonomous-agent",
   "version": "0.1.0",
   "private": true,
   "main": "dist/index.js",
   "bin": {
     "autonomous": "dist/cli.js"
   },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
   "scripts": {
-    "build": "tsup",
+    "build": "tsup --config tsup.config.js",
     "dev": "tsup --watch"
   },
   "dependencies": {
     "bullmq": "^5.71.0",
     "ioredis": "^5.10.1",
-    "@libs/utils": "workspace:*",
-    "@libs/contracts": "workspace:*",
+    "@packages/utils": "workspace:*",
+    "@packages/contracts": "workspace:*",
     "fs-extra": "^11.3.4",
     "openai": "^4.82.0",
     "pino": "^10.3.1"

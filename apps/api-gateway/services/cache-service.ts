@@ -1,4 +1,4 @@
-import redis from '@queue/redis-client';
+import { redis } from '@packages/utils/server';
 import crypto from 'crypto';
 
 export class CacheService {

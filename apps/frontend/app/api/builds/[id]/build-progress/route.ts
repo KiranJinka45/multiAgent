@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { redis, projectService } from '@libs/utils/src/server';
+import { redis, projectService } from '@packages/utils/src/server';
 
 export const dynamic = 'force-dynamic';
 

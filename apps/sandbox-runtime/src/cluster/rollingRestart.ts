@@ -22,9 +22,9 @@
 import { NodeRegistry, NodeInfo } from './nodeRegistry';
 import { RuntimeScheduler } from './runtimeScheduler';
 import { DistributedLock, LockHandle } from './distributedLock';
-import { PreviewRegistry } from '@libs/registry';
-import { redis } from '@libs/utils/server';
-import { logger } from '@libs/utils/server';
+import { PreviewRegistry } from '@packages/registry';
+import { redis } from '@packages/utils/server';
+import { logger } from '@packages/utils/server';
 
 // ─── Config ────────────────────────────────────────────────────────────────
 

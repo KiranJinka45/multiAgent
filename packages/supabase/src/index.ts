@@ -1,4 +1,4 @@
-// Entry point for @libs/supabase
+// Entry point for @packages/supabase
 
 export * from './client';
-export type { User } from '@supabase/supabase-js';
+export type { User, PostgrestError } from '@supabase/supabase-js';

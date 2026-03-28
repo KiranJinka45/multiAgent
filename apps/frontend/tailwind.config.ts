@@ -9,8 +9,7 @@ const config: Config = {
     "./context/**/*.{js,ts,jsx,tsx,mdx}",
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/**/*.{js,ts,jsx,tsx,mdx}",
-    "../../libs/**/*.{js,ts,jsx,tsx,mdx}",
-    "../../libs/shared-utils/**/*.{js,ts,jsx,tsx,mdx}",
+    "../../packages/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {

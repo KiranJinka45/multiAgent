@@ -1,6 +1,6 @@
 import { getSupabaseClient } from '@lib/supabaseClient';
 import type { SupabaseClient } from '@supabase/auth-helpers-nextjs';
-import { Project, ProjectFile } from '@shared-types/project';
+import { Project, ProjectFile } from '@packages/contractsproject';
 
 export const projectService = {
     getSupabase: (supabaseServer?: SupabaseClient) => supabaseServer || getSupabaseClient(),

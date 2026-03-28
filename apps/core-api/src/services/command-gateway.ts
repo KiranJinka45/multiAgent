@@ -1,7 +1,7 @@
-import { freeQueue, eventBus } from '@libs/utils/server';
-import { Mission } from '@libs/contracts';
+import { freeQueue, eventBus } from '@packages/utils/server';
+import { Mission } from '@packages/contracts';
 import crypto from 'crypto';
-import { logger } from '@libs/observability';
+import { logger } from '@packages/observability';
 import { missionController } from './mission-controller';
 import { Queue } from 'bullmq';
 

@@ -1,4 +1,4 @@
-import { createBrowserSupabaseClient } from '@libs/supabase';
+import { createBrowserSupabaseClient } from '@packages/supabase';
 
 /**
  * Standard accessor for Supabase client in the frontend.

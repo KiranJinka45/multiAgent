@@ -1,4 +1,4 @@
-// Entry point for @libs/contracts
+// Entry point for @packages/contracts
 
 export * from './agent-context';
 export * from './agent-contracts';

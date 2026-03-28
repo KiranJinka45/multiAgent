@@ -1,5 +1,5 @@
 import { AuditLogger } from './audit-logger';
-import { logger } from '@libs/observability';
+import { logger } from '@packages/observability';
 
 /**
  * AnchoringService handles cryptographic anchoring of audit log root hashes

@@ -1,16 +1,16 @@
 import 'dotenv/config';
 
 import { Worker, Job } from 'bullmq';
-import { logger } from '@libs/observability';
-import { redis, eventBus, QUEUE_ARCHITECT } from '@libs/shared-services';
+import { logger } from '@packages/observability';
+import { redis, eventBus, QUEUE_ARCHITECT } from '@packages/shared-services';
 import { 
     generatorQueue, 
     TemplateEngine, 
     VirtualFileSystem, 
     CommitManager, 
     DistributedExecutionContext 
-} from '@libs/utils/server';
-import { CustomizerAgent } from '@libs/agents/customizer-agent';
+} from '@packages/utils/server';
+import { CustomizerAgent } from '@packages/agents';
 import path from 'path';
 import * as fs from 'fs-extra';
 

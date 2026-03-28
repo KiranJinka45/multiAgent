@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
-import { logger } from '@libs/observability';
+import { logger } from '@packages/observability';
 
 export interface ValidationResult {
     valid: boolean;

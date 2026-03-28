@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
-import { logger } from '@libs/utils/server';
+import { logger } from '@packages/utils/server';
 
 export interface BaseSnapshot {
     id: string;

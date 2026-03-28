@@ -1,8 +1,8 @@
 import pLimit from "p-limit";
-import { Task, AgentRequest, AgentResponse } from '@libs/contracts';
-import { agentRegistry } from '@libs/agents';
-import { logger } from '@libs/utils/server';
-import { DistributedExecutionContext } from "@libs/context";
+import { Task, AgentRequest, AgentResponse } from '@packages/contracts';
+import { agentRegistry } from '@packages/agents';
+import { logger } from '@packages/utils/server';
+import { DistributedExecutionContext } from "@packages/context";
 
 const limit = pLimit(3);
 

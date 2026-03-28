@@ -1,7 +1,7 @@
 import { VectorStore } from './memory/vector-store';
 import { EmbeddingsEngine } from './memory/embeddings-engine';
 import { memoryPlane } from './memory-plane';
-import logger from '@libs/observability';
+import logger from '@packages/observability';
 
 export interface KnowledgeContext {
     type: 'code_snippet' | 'documentation' | 'best_practice';

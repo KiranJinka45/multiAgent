@@ -1,4 +1,4 @@
-import redis from '@libs/shared-services';
+import { redis } from '../server/redis';
 import logger from './logger';
 
 export interface RateLimitResult {

@@ -1,4 +1,4 @@
-import { db } from '@libs/db';
+import { db } from '@packages/db';
 import pino from 'pino';
 
 const logger = pino();

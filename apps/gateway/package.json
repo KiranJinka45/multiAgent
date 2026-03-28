@@ -10,11 +10,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@libs/db": "workspace:*",
-    "@libs/utils": "workspace:*",
-    "@libs/observability": "workspace:*",
-    "@libs/brain": "workspace:*",
-    "@libs/core-engine": "workspace:*",
+    "@packages/db": "workspace:*",
+    "@packages/utils": "workspace:*",
+    "@packages/observability": "workspace:*",
+    "@packages/brain": "workspace:*",
+    "@packages/core-engine": "workspace:*",
     "@opentelemetry/api": "latest",
     "pino-http": "^10.4.0",
     "@kubernetes/client-node": "^0.22.0",

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { eventBus } from '@libs/utils/server';
+import { eventBus } from '@packages/utils/server';
 
 export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);

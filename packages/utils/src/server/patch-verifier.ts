@@ -2,7 +2,7 @@ import { exec } from 'child_process';
 import path from 'path';
 import fs from 'fs';
 import util from 'util';
-import logger from '@libs/observability';
+import logger from '@packages/observability';
 import { learningEngine } from './learning';
 import { VirtualFileSystem } from './vfs';
 
@@ -167,7 +167,7 @@ export class PatchVerifier {
     ): Promise<boolean> {
         try {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const { RepairAgent } = require('@libs/brain');
+            const { RepairAgent } = require('@packages/brain');
             const repairAgent = new RepairAgent();
 
             let filesToRepair = vfs.getDirtyFiles();

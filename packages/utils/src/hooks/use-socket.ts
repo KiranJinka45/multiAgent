@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
-import { BuildUpdate } from '@libs/contracts';
+import { BuildUpdate } from '@packages/contracts';
 import { socketManager } from '../client/socketManager';
 
 export interface UseSocketOptions {

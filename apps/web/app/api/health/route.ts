@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { redis } from '@libs/utils/server';
+import { redis } from '@packages/utils/server';
 
 export async function GET() {
     try {
@@ -9,7 +9,7 @@ export async function GET() {
         // 2. Check Socket Server
         let isSocketUp = false;
         try {
-            const socketRes = await fetch('http://localhost:3010/health', { signal: AbortSignal.timeout(500) });
+            const socketRes = await fetch('http://localhost:3011/health', { signal: AbortSignal.timeout(500) });
             isSocketUp = socketRes.ok;
         } catch {}
 

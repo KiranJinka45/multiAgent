@@ -1,4 +1,4 @@
-import redis from '@libs/shared-services';
+import redis from '@packages/shared-services';
 import logger from './logger';
 import { v4 as uuidv4 } from 'uuid';
 

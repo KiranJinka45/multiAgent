@@ -1,7 +1,7 @@
 import { freeQueue } from './build-queue';
-import { Mission } from '@libs/contracts';
+import { Mission } from '@packages/contracts';
 import crypto from 'crypto';
-import logger from '@libs/observability';
+import logger from '@packages/observability';
 import { missionController } from './mission-controller';
 import { Queue } from 'bullmq';
 import { eventBus } from './event-bus';

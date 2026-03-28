@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { AnalyticsService } from '@libs/utils/server';
+import { AnalyticsService } from '@packages/utils/server';
 
 export async function GET(
     req: Request,

@@ -1,7 +1,7 @@
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import { redis } from '@libs/utils';
+import { redis } from '@packages/utils';
 import dotenv from 'dotenv';
 import cors from 'cors';
 

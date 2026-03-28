@@ -1,8 +1,8 @@
-import { PreviewRegistry } from '@libs/registry';
-import { previewManager } from '@libs/runtime/preview-manager';
+import { PreviewRegistry } from '@packages/registry';
+import { previewManager } from '@packages/runtime/preview-manager';
 import { GrowthHeader } from '@/components/GrowthHeader';
 import { RemixWatermark } from '@/components/editor/RemixWatermark';
-import {} from '@libs/utils';
+import {} from '@packages/utils';
 import { Loader2 } from 'lucide-react';
 import { headers } from 'next/headers';
 import type { Metadata } from 'next';

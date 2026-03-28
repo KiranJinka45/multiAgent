@@ -7,7 +7,14 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@components/*": ["./components/*"],
+      "@packages/*": ["../../packages/*"],
+      "@packages/*": ["../../packages/*"],
+      "@/*": ["./*"]
+    }
   },
   "include": [
     "src/**/*",

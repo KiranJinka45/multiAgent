@@ -1,7 +1,7 @@
-import { createRouteHandlerClient } from '@libs/supabase';
+import { createRouteHandlerClient } from '@packages/supabase';
 import { cookies } from 'next/headers';
 import { NextResponse, NextRequest } from 'next/server';
-import { TaskCreateSchema, RateLimiter } from '@libs/utils/server';
+import { TaskCreateSchema, RateLimiter } from '@packages/utils/server';
 
 export async function GET() {
     const supabase = createRouteHandlerClient({ cookies });

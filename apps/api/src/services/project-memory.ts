@@ -1,11 +1,11 @@
-import { supabaseAdmin } from '@libs/utils/server';
-import { logger } from '@libs/observability';
+import { supabaseAdmin } from '@packages/utils/server';
+import { logger } from '@packages/observability';
 import { CodeChunker } from './memory/code-chunker';
 import { EmbeddingsEngine } from './memory/embeddings-engine';
 import { VectorStore } from './memory/vector-store';
-import redis from '@libs/utils';
+import redis from '@packages/utils';
 import { createHash } from 'crypto';
-import { eventBus } from '@libs/utils/server';
+import { eventBus } from '@packages/utils/server';
 
 export interface ProjectMemory {
     projectId: string;

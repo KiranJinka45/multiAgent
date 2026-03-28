@@ -1,5 +1,5 @@
 import { BaseAgent, AgentResponse, AgentRequest } from './base-agent';
-import { HealingParams } from '@libs/contracts';
+import { HealingParams } from '@packages/contracts';
 
 export interface HealingResult {
     fixed: boolean;

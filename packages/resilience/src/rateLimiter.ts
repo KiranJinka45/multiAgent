@@ -1,6 +1,7 @@
 import { RateLimiterRedis } from 'rate-limiter-flexible';
 import Redis from 'ioredis';
-import { logger } from '@libs/observability';
+import { logger } from '@packages/observability';
+import { Request, Response, NextFunction } from 'express';
 
 const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
 const redis = new Redis(redisUrl, {
@@ -24,9 +25,29 @@ export const rateLimiter = new RateLimiterRedis({
 });
 
 /**
+ * RateLimiter wrapper for api-gateway
+ */
+export class RateLimiter {
+  private limiter: RateLimiterRedis;
+  
+  constructor(client: Redis, keyPrefix: string, points: number, duration: number) {
+    this.limiter = new RateLimiterRedis({
+      storeClient: client,
+      keyPrefix: `resilience_${keyPrefix}`,
+      points,
+      duration,
+    });
+  }
+
+  async consume(key: string) {
+    return this.limiter.consume(key);
+  }
+}
+
+/**
  * Higher-level middleware for Express
  */
-export async function rateLimitMiddleware(req: any, res: any, next: any) {
+export async function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
   try {
     const ip = req.ip || 'unknown';
     await rateLimiter.consume(ip);

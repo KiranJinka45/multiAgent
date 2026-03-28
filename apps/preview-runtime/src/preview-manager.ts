@@ -3,15 +3,15 @@ import path from 'path';
 import fs from 'fs-extra';
 import net from 'net';
 import { SandboxRunner } from './sandbox-runner';
-import { PreviewRegistry } from '@libs/registry';
+import { PreviewRegistry } from '@packages/registry';
 import http from 'http';
-import { redis, logger } from '@libs/utils/server';
+import { redis, logger } from '@packages/utils/server';
 import { SnapshotManager } from './snapshot-manager';
 import { SandboxPoolManager } from './sandbox-pool';
 import { SnapshotLibrary } from './snapshot-library';
 import { AdmissionController } from './admission-controller';
 import { MicroVMManager } from './microvm-manager';
-import { ArtifactValidator } from '@libs/validator';
+import { ArtifactValidator } from '@packages/validator';
 
 class PortAllocator {
     private basePort = 3001;

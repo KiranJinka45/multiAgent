@@ -211,7 +211,7 @@ async function startup() {
     startManagedProcess(`Build Worker #${i + 1}`, npmCmd, ["--prefix", "apps/api-gateway", "run", "start:worker"]);
   }
   await waitForSocketHealth("http://localhost:3011/health");
-  const webProcess = (0, import_child_process.spawn)(npmCmd, ["--prefix", "apps/frontend", "run", "dev"], { stdio: "inherit", shell: true });
+  const webProcess = (0, import_child_process.spawn)(npmCmd, ["--prefix", "apps/web", "run", "dev"], { stdio: "inherit", shell: true });
   activeProcesses.add(webProcess);
   process.on("SIGINT", () => {
     console.log("\n\u{1F6D1} Stopping all services...");

@@ -10,10 +10,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@libs/db": "workspace:*",
-    "@libs/utils": "workspace:*",
-    "@libs/observability": "workspace:*",
-    "@libs/contracts": "workspace:*",
+    "@packages/db": "workspace:*",
+    "@packages/utils": "workspace:*",
+    "@packages/observability": "workspace:*",
+    "@packages/contracts": "workspace:*",
     "bullmq": "^5.71.0",
     "dotenv": "^17.3.1",
     "fs-extra": "^11.3.4",

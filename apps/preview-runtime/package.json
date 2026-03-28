@@ -1,5 +1,5 @@
 {
-  "name": "@libs/runtime",
+  "name": "@packages/runtime",
   "version": "0.1.0",
   "private": true,
   "main": "./dist/index.js",
@@ -25,10 +25,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@libs/utils": "workspace:*",
-    "@libs/registry": "workspace:*",
-    "@libs/validator": "workspace:*",
-    "@libs/contracts": "workspace:*",
+    "@packages/utils": "workspace:*",
+    "@packages/registry": "workspace:*",
+    "@packages/validator": "workspace:*",
+    "@packages/contracts": "workspace:*",
     "fs-extra": "^11.2.0",
     "ioredis": "^5.10.1",
     "dotenv": "^17.3.1"

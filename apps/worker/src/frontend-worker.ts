@@ -1,9 +1,9 @@
 import { BaseWorker } from './base-worker';
 import { Job } from 'bullmq';
-import { JobPayload } from '@libs/utils';
-import { logger } from '@libs/observability';
-import { eventBus } from '@libs/shared-services';
-import { AgentMemory } from '@libs/agents/services/agent-memory';
+import { JobPayload } from '@packages/utils';
+import { logger } from '@packages/observability';
+import { eventBus } from '@packages/shared-services';
+import { AgentMemory } from '@packages/agents/services/agent-memory';
 
 /**
  * FrontendWorker

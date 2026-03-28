@@ -1,4 +1,4 @@
-import logger from '@config/logger';
+import { logger } from '@packages/utils/server';
 
 /**
  * WorkerPool - Manages global concurrency for agent tasks.

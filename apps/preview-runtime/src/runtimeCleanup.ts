@@ -14,7 +14,7 @@
  */
 
 import { PreviewOrchestrator } from './previewOrchestrator';
-import { PreviewRegistry } from '@libs/registry';
+import { PreviewRegistry } from '@packages/registry';
 import { ProcessManager } from './processManager';
 import { ContainerManager } from './containerManager';
 import { PortManager } from './portManager';
@@ -24,7 +24,7 @@ import { RuntimeHeartbeat } from './runtimeHeartbeat';
 import { RuntimeCapacity } from './runtimeCapacity';
 import { RuntimeEscalation } from './runtimeEscalation';
 import { StaleEvictor } from './cluster/staleEvictor';
-import { logger } from '@libs/utils/server';
+import { logger } from '@packages/utils/server';
 
 const RUNTIME_MODE = (process.env.RUNTIME_MODE as 'process' | 'docker') || 'process';
 

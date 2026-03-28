@@ -1,2 +1,6 @@
-var o={};export{o as templates};//# sourceMappingURL=index.mjs.map
+// src/index.ts
+var templates = {};
+export {
+  templates
+};
 //# sourceMappingURL=index.mjs.map

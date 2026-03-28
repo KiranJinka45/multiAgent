@@ -1,4 +1,4 @@
-import logger from '@libs/observability';
+import { logger } from './logger';
 
 /**
  * Checks if the code is running during the Next.js build phase.

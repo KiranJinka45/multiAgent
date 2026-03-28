@@ -1,8 +1,8 @@
-import { logger } from '@libs/observability';
+import { logger } from '@packages/observability';
 
 /**
  * Event Bus (Minimal implementation for standardizing imports)
- * This facilitates the transition from relative imports to @libs/shared-services.
+ * This facilitates the transition from relative imports to @packages/shared-services.
  */
 export const eventBus = {
   async progress(executionId: string, progress: number, message: string) {

@@ -1,4 +1,4 @@
-import { logger } from '@libs/observability';
+import { logger } from '@packages/observability';
 
 export interface PatchAction {
     type: 'replace_section' | 'append_after' | 'prepend_before' | 'insert_at_top';

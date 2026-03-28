@@ -1,7 +1,7 @@
 import { Groq } from 'groq-sdk';
-import { logger } from '@libs/observability';
-import { AgentContext } from '@libs/contracts';
-import { breakers, eventBus, RetryManager, StrategyConfig, usageService, SemanticCacheService } from '@libs/utils/server';
+import { logger } from '@packages/observability';
+import { AgentContext } from '@packages/contracts';
+import { breakers, eventBus, RetryManager, StrategyConfig, usageService, SemanticCacheService } from '@packages/utils/server';
 
 const retry = new RetryManager(5, 3000); // 5 retries, 3s base delay
 
@@ -41,7 +41,7 @@ export abstract class BaseAgent {
 
     async execute(input: unknown, context: AgentContext, signal?: AbortSignal, strategy?: StrategyConfig): Promise<AgentResponse> {
         const start = Date.now();
-        const { db } = await import('@libs/db');
+        const { db } = await import('@packages/db');
         
         // 1. Resolve Active Strategy (Level 4 Adaptation)
         let activeStrategy = strategy;
@@ -61,7 +61,7 @@ export abstract class BaseAgent {
 
         // 2. Governance Gate (Level 5 Safety)
         if (this.getName() === 'EvolutionAgent') {
-            const { GovernanceEngine } = await import('@libs/core-engine');
+            const { GovernanceEngine } = await import('@packages/core-engine');
             // Simplified check: we'll check governance inside EvolutionAgent.run or here.
             // For now, we ensure the engine is accessible.
         }

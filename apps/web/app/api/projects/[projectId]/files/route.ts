@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs-extra';
 import path from 'path';
-import { logger } from '@libs/utils/server';
+import { logger } from '@packages/utils/server';
 
 interface FileTreeEntry {
   name: string;

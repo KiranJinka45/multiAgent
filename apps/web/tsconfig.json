@@ -22,11 +22,11 @@
       "@styles/*": [
         "./styles/*"
       ],
-      "@libs/*": [
+      "@packages/*": [
         "../../packages/*/src",
         "../../packages/*/src/index.ts"
       ],
-      "@libs/runtime/*": [
+      "@packages/runtime/*": [
         "../../apps/preview-runtime/src/*"
       ]
     },

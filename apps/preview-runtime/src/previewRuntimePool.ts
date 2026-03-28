@@ -1,7 +1,7 @@
 import { ContainerManager, ManagedContainer } from './containerManager';
 import { PortManager } from './portManager';
-import { PreviewRegistry } from '@libs/registry';
-import { logger } from '@libs/utils/server';
+import { PreviewRegistry } from '@packages/registry';
+import { logger } from '@packages/utils/server';
 
 export class PreviewRuntimePool {
     private static pool: ManagedContainer[] = [];

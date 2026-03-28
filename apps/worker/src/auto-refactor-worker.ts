@@ -1,8 +1,8 @@
 import { Worker, Job } from 'bullmq';
 import { Redis } from 'ioredis';
-import { logger } from '@libs/observability';
-import { redis } from '@libs/shared-services';
-import { applyFixes } from '@libs/refactor-agent'; // Using exported member
+import { logger } from '@packages/observability';
+import { redis } from '@packages/shared-services';
+import { applyFixes } from '@packages/refactor-agent'; // Using exported member
 
 const QUEUE_REFACTOR = 'auto-refactor';
 

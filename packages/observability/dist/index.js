@@ -1,3 +1,104 @@
-'use strict';Object.defineProperty(exports,'__esModule',{value:true});var p=require('pino'),n=require('prom-client'),m=require('http'),sdkNode=require('@opentelemetry/sdk-node'),autoInstrumentationsNode=require('@opentelemetry/auto-instrumentations-node'),exporterTraceOtlpHttp=require('@opentelemetry/exporter-trace-otlp-http'),resources=require('@opentelemetry/resources'),semanticConventions=require('@opentelemetry/semantic-conventions');function _interopDefault(e){return e&&e.__esModule?e:{default:e}}function _interopNamespace(e){if(e&&e.__esModule)return e;var n=Object.create(null);if(e){Object.keys(e).forEach(function(k){if(k!=='default'){var d=Object.getOwnPropertyDescriptor(e,k);Object.defineProperty(n,k,d.get?d:{enumerable:true,get:function(){return e[k]}});}})}n.default=e;return Object.freeze(n)}var p__default=/*#__PURE__*/_interopDefault(p);var n__default=/*#__PURE__*/_interopDefault(n);var m__namespace=/*#__PURE__*/_interopNamespace(m);var c=p__default.default({level:process.env.LOG_LEVEL||"info",base:{service:process.env.SERVICE_NAME||"unknown-service"},timestamp:p__default.default.stdTimeFunctions.isoTime});var r=new n__default.default.Registry;n__default.default.collectDefaultMetrics({register:r});var a=new n__default.default.Histogram({name:"http_request_duration_seconds",help:"HTTP request latency",labelNames:["method","route","status"],buckets:[.1,.5,1,2,5]}),u=new n__default.default.Histogram({name:"worker_job_duration_seconds",help:"Worker job processing latency",labelNames:["queue","job_name","status"],buckets:[1,5,10,30,60]});r.registerMetric(a);r.registerMetric(u);function v(e=9091){let o=m__namespace.createServer(async(t,s)=>{t.url==="/metrics"?(s.setHeader("Content-Type",r.contentType),s.end(await r.metrics())):(s.statusCode=404,s.end());});return o.listen(e,()=>{console.log(`Metrics server listening on port ${e}`);}),o}function y(e){let o=new exporterTraceOtlpHttp.OTLPTraceExporter({url:process.env.OTEL_EXPORTER_OTLP_ENDPOINT||"http://localhost:4318/v1/traces"}),t=new sdkNode.NodeSDK({resource:new resources.Resource({[semanticConventions.SemanticResourceAttributes.SERVICE_NAME]:e}),traceExporter:o,instrumentations:[autoInstrumentationsNode.getNodeAutoInstrumentations()]});return t.start(),process.on("SIGTERM",()=>{t.shutdown().finally(()=>process.exit(0));}),t}var D=c;function P(e){return c.child({executionId:e})}
-Object.defineProperty(exports,"client",{enumerable:true,get:function(){return n__default.default}});exports.default=D;exports.getExecutionLogger=P;exports.httpRequestDuration=a;exports.initInstrumentation=y;exports.logger=c;exports.register=r;exports.startMetricsServer=v;exports.workerJobDuration=u;//# sourceMappingURL=index.js.map
+"use strict";
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+// src/index.ts
+var index_exports = {};
+__export(index_exports, {
+  client: () => import_prom_client.default,
+  default: () => index_default,
+  getExecutionLogger: () => getExecutionLogger,
+  httpRequestDuration: () => httpRequestDuration,
+  logger: () => logger,
+  register: () => register,
+  startMetricsServer: () => startMetricsServer,
+  workerJobDuration: () => workerJobDuration
+});
+module.exports = __toCommonJS(index_exports);
+
+// src/logger.ts
+var import_pino = __toESM(require("pino"));
+var logger = (0, import_pino.default)({
+  level: process.env.LOG_LEVEL || "info",
+  base: {
+    service: process.env.SERVICE_NAME || "unknown-service"
+  },
+  timestamp: import_pino.default.stdTimeFunctions.isoTime
+});
+
+// src/metrics.ts
+var import_prom_client = __toESM(require("prom-client"));
+var http = __toESM(require("http"));
+var register = new import_prom_client.default.Registry();
+import_prom_client.default.collectDefaultMetrics({ register });
+var httpRequestDuration = new import_prom_client.default.Histogram({
+  name: "http_request_duration_seconds",
+  help: "HTTP request latency",
+  labelNames: ["method", "route", "status"],
+  buckets: [0.1, 0.5, 1, 2, 5]
+});
+var workerJobDuration = new import_prom_client.default.Histogram({
+  name: "worker_job_duration_seconds",
+  help: "Worker job processing latency",
+  labelNames: ["queue", "job_name", "status"],
+  buckets: [1, 5, 10, 30, 60]
+});
+register.registerMetric(httpRequestDuration);
+register.registerMetric(workerJobDuration);
+function startMetricsServer(port = 9091) {
+  const server = http.createServer(async (req, res) => {
+    if (req.url === "/metrics") {
+      res.setHeader("Content-Type", register.contentType);
+      res.end(await register.metrics());
+    } else {
+      res.statusCode = 404;
+      res.end();
+    }
+  });
+  server.listen(port, () => {
+    console.log(`Metrics server listening on port ${port}`);
+  });
+  return server;
+}
+
+// src/index.ts
+var index_default = logger;
+function getExecutionLogger(executionId) {
+  return logger.child({ executionId });
+}
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  client,
+  getExecutionLogger,
+  httpRequestDuration,
+  logger,
+  register,
+  startMetricsServer,
+  workerJobDuration
+});
 //# sourceMappingURL=index.js.map

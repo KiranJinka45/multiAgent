@@ -1,10 +1,10 @@
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import { redis, apiRequestDurationSeconds, registry } from '@libs/utils/server';
+import { redis, apiRequestDurationSeconds, registry } from '@packages/utils/server';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import { initTelemetry } from '@libs/observability';
+import { initTelemetry } from '@packages/observability';
 
 import { startCollaborationServer } from './yjs-server';
 

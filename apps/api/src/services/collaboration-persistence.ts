@@ -1,6 +1,6 @@
 import * as Y from 'yjs';
-import { db as prisma } from '@libs/db';
-import { logger } from '@libs/observability';
+import { db as prisma } from '@packages/db';
+import { logger } from '@packages/observability';
 
 /**
  * CollaborationPersistence

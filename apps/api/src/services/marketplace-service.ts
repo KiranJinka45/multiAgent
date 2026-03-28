@@ -1,4 +1,4 @@
-import { supabase } from '@libs/supabase';
+import { supabase } from '@packages/supabase';
 
 export interface Template {
   id: string;

@@ -12,14 +12,14 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { projectService } from '@libs/utils';
-import { Project, ProjectFile } from '@libs/contracts';
+import { projectService } from '@packages/utils';
+import { Project, ProjectFile } from '@packages/contracts';
 import { toast } from 'sonner';
 import DevOpsDashboard from '@components/DevOpsDashboard';
 import TechStackSelector, { TechStack } from '@components/TechStackSelector';
 import PushToGithubModal from '@components/PushToGithubModal';
-import { useSocket } from '@libs/utils';
-import { useRealtimeSubscription } from '@libs/utils';
+import { useSocket } from '@packages/utils';
+import { useRealtimeSubscription } from '@packages/utils';
 
 const FileItem = memo(({ file, isSelected, onClick }: { file: ProjectFile, isSelected: boolean, onClick: () => void }) => {
     const fileName = file.path.split('/').pop() || file.path;

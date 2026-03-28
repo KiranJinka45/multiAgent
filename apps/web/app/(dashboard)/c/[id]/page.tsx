@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { Message } from '@libs/contracts';
+import { Message } from '@packages/contracts';
 import Sidebar from '../../../../components/Sidebar';
 import MobileMenu from '../../../../components/MobileMenu';
 import TopNav from '../../../../components/TopNav';

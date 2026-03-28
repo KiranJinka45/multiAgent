@@ -1,25 +1,28 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   transpilePackages: [
-    "@libs/agents",
-    "@libs/ai",
-    "@libs/brain",
-    "@libs/build-engine",
-    "@libs/context",
-    "@libs/contracts",
-    "@libs/core-engine",
-    "@libs/db",
-    "@libs/memory",
-    "@libs/observability",
-    "@libs/registry",
-    "@libs/sdk",
-    "@libs/shared-services",
-    "@libs/supabase",
-    "@libs/templates",
-    "@libs/tools",
-    "@libs/ui",
-    "@libs/utils",
-    "@libs/validator"
+    "@packages/agents",
+    "@packages/ai",
+    "@packages/brain",
+    "@packages/build-engine",
+    "@packages/context",
+    "@packages/contracts",
+    "@packages/core-engine",
+    "@packages/db",
+    "@packages/memory",
+    "@packages/observability",
+    "@packages/registry",
+    "@packages/sdk",
+    "@packages/shared-services",
+    "@packages/supabase",
+    "@packages/templates",
+    "@packages/tools",
+    "@packages/ui",
+    "@packages/utils",
+    "@packages/validator",
+    "@packages/auto-healer",
+    "@packages/queue",
+    "@packages/sandbox"
   ],
   experimental: {
     externalDir: true,
@@ -28,6 +31,7 @@ const nextConfig = {
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
+        http2: false,
         fs: false,
         net: false,
         tls: false,
@@ -37,6 +41,7 @@ const nextConfig = {
         async_hooks: false,
         perf_hooks: false,
         dns: false,
+
       };
     }
     config.externals = [...(config.externals || []), 'ssh2', 'cpu-features', 'nan'];

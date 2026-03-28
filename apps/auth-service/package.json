@@ -33,9 +33,9 @@
     "stripe": "^14.25.0",
     "uuid": "^13.0.0",
     "zod": "^4.3.6",
-    "@libs/utils": "workspace:*",
-    "@libs/contracts": "workspace:*",
-    "@libs/observability": "workspace:*"
+    "@packages/utils": "workspace:*",
+    "@packages/contracts": "workspace:*",
+    "@packages/observability": "workspace:*"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

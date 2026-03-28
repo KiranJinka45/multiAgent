@@ -1,7 +1,7 @@
 import { Worker, Job } from 'bullmq';
-import { logger } from '@libs/observability';
-import { redis } from '@libs/shared-services';
-import { SelfEvolver, SystemMetrics } from '@libs/self-evolution';
+import { logger } from '@packages/observability';
+import { redis } from '@packages/shared-services';
+import { SelfEvolver, SystemMetrics } from '@packages/self-evolution';
 
 const QUEUE_EVOLUTION = 'self-evolution';
 const evolver = new SelfEvolver({ autoRefactor: true });

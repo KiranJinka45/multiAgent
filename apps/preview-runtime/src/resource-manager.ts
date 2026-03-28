@@ -1,5 +1,5 @@
 import os from 'os';
-import { logger } from '@libs/utils/server';
+import { logger } from '@packages/utils/server';
 
 export interface ResourceSnapshot {
     totalMem: number;

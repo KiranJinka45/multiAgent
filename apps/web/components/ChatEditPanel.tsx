@@ -20,7 +20,8 @@ import {
     RefreshCw,
     Zap,
     Brain,
-    ChevronRight
+    ChevronRight,
+    Terminal
 } from 'lucide-react';
 
 // ── Types ─────────────────────────────────────────────────────────────
@@ -59,13 +60,13 @@ interface ChatEditPanelProps {
 
 const SUGGESTIONS = [
     { icon: '🌙', label: 'Add dark mode toggle' },
-    { icon: '📊', label: 'Add analytics dashboard' },
-    { icon: '🔒', label: 'Add user authentication' },
-    { icon: '💳', label: 'Add Stripe payments' },
+    { icon: '🔑', label: 'Add login page & auth' },
+    { icon: '✨', label: 'Improve the overall UI' },
+    { icon: '📊', label: 'Add analytics charts' },
     { icon: '📱', label: 'Make fully responsive' },
-    { icon: '🎨', label: 'Improve the visual design' },
-    { icon: '🗄️', label: 'Add database schema' },
     { icon: '⚡', label: 'Add loading skeletons' },
+    { icon: '🎨', label: 'Refine the color palette' },
+    { icon: '📧', label: 'Add a contact form' },
 ];
 
 // ── Build status pill ──────────────────────────────────────────────
@@ -424,6 +425,11 @@ const ChatEditPanel: React.FC<ChatEditPanelProps> = ({
                 if (data.patches?.length) onFilesUpdated?.(data.patches);
                 if (data.previewReloaded) onPreviewReload?.();
 
+                toast.success('✨ Update successful', {
+                  description: 'Your changes have been patched and verified.',
+                  icon: <Sparkles size={16} className="text-violet-400" />
+                });
+
                 const assistantMsg: ChatMessage = {
                     id: `assistant-${Date.now()}`,
                     role: 'assistant',
@@ -565,8 +571,29 @@ const ChatEditPanel: React.FC<ChatEditPanelProps> = ({
                             />
                         ))}
 
+                        {isSubmitting && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="flex flex-col gap-3 py-4 mt-2"
+                            >
+                                <div className="flex items-center gap-3 px-4 py-3 bg-primary/5 border border-primary/20 rounded-xl animate-pulse">
+                                    <div className="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center text-primary">
+                                        <Terminal size={16} />
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-primary">🛠 Applying changes...</p>
+                                            <span className="text-[8px] font-bold text-primary/40 uppercase">Patching Codebase</span>
+                                        </div>
+                                        <p className="text-[9px] text-gray-500 font-medium leading-relaxed">Agent is modifying files and ensuring architectural integrity.</p>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+
                         {/* Suggestion chips */}
-                        {showSuggestions && (
+                        {showSuggestions && !isSubmitting && (
                             <motion.div
                                 initial={{ opacity: 0, y: 8 }}
                                 animate={{ opacity: 1, y: 0 }}

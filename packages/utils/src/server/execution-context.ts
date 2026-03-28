@@ -1,11 +1,11 @@
 import { v4 as uuidv4 } from 'uuid';
 import * as crypto from 'crypto';
 import { redis } from './redis';
-import logger from '@libs/observability';
+import logger from '@packages/observability';
 import { eventBus } from './event-bus';
-import { AgentContext, PipelineStatus } from '@libs/contracts';
+import { AgentContext, PipelineStatus } from '@packages/contracts';
 
-import { OrchestratorLock } from '@libs/shared-services';
+import { OrchestratorLock } from '@packages/shared-services';
 import { VirtualFileSystem, VirtualFile } from './vfs/virtual-fs';
 
 export interface ExecutionMetrics {

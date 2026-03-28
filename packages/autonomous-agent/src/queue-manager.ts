@@ -1,5 +1,5 @@
 import { Queue, Worker } from 'bullmq';
-import { logger } from '@libs/utils';
+import { logger } from '@packages/utils';
 import { runAutonomousAgent } from './index';
 
 const REDIS_CONFIG = {

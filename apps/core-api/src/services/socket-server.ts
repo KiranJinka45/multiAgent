@@ -1,11 +1,11 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import { redis, registry } from '@libs/utils/server';
-import { logger } from '@libs/observability';
+import { redis, registry } from '@packages/utils/server';
+import { logger } from '@packages/observability';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import { initTelemetry } from '@libs/observability';
+import { initTelemetry } from '@packages/observability';
 
 dotenv.config({ path: '.env.local' });
 

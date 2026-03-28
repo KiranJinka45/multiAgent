@@ -1,5 +1,5 @@
-import { QueueManager, logger } from '@libs/utils';
-import { db } from '@libs/db';
+import { QueueManager, logger } from '@packages/utils';
+import { db } from '@packages/db';
 
 /**
  * TrafficExperiment

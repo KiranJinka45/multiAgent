@@ -1,6 +1,6 @@
 import { createClientComponentClient, type SupabaseClient } from '@supabase/auth-helpers-nextjs';
 import { type PostgrestError } from '@supabase/supabase-js';
-import { Chat, Message } from '@shared-types/chat';
+import { Chat, Message } from '@packages/contractschat';
 
 export const chatService = {
     getSupabase: (supabaseServer?: SupabaseClient) => supabaseServer || createClientComponentClient(),

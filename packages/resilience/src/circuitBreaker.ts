@@ -1,5 +1,5 @@
 import CircuitBreaker from 'opossum';
-import { logger } from '@libs/observability';
+import { logger } from '@packages/observability';
 
 const defaultOptions = {
   timeout: 5000,

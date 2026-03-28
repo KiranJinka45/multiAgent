@@ -10,7 +10,7 @@ import TaskInput, { TaskInputHandle } from '@/components/TaskInput';
 import ChatList from '@/components/ChatList';
 import TopNav from '@/components/TopNav';
 import WelcomeModal from '@/components/WelcomeModal';
-import { Message } from '@libs/contracts';
+import { Message } from '@packages/contracts';
 
 export default function Dashboard() {
     const [messages, setMessages] = useState<Message[]>([]);

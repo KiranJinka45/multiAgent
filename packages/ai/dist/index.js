@@ -1,2 +1,202 @@
-'use strict';var db=require('@libs/db'),l=require('@libs/utils');function _interopDefault(e){return e&&e.__esModule?e:{default:e}}var l__default=/*#__PURE__*/_interopDefault(l);var c=class{static normalize(e,r=50){return Math.max(0,1-e/r)}static evaluate(e){let r={buildSuccess:e.success?1:0,lintScore:this.normalize(e.lintErrors||0,100),typeScore:this.normalize(e.typeErrors||0,50),testScore:e.totalTests?(e.testsPassed||0)/e.totalTests:1,diffScore:this.normalize(e.diffSize||0,1e3)};return {score:.3*r.buildSuccess+.2*r.typeScore+.2*r.testScore+.2*r.lintScore+.1*r.diffScore,metrics:r}}static async recordEvaluation(e){try{await db.db.aiEvaluation.create({data:{tenantId:e.tenantId,model:e.model,score:e.result.score,metrics:e.result.metrics,metadata:e.metadata}}),l__default.default.info({model:e.model,score:e.result.score},"[Evaluator] Recorded AI performance metric");}catch(r){l__default.default.error({err:r},"[Evaluator] Failed to persist evaluation");}}static EMA_ALPHA=.3;static async getEMAPerformance(e,r){try{let o=await db.db.aiEvaluation.findMany({where:{model:e,...r?{tenantId:r}:{}},orderBy:{createdAt:"desc"},take:20});if(o.length===0)return null;let s=o[o.length-1].score;for(let a=o.length-2;a>=0;a--)s=this.EMA_ALPHA*o[a].score+(1-this.EMA_ALPHA)*s;return s}catch(o){return l__default.default.error({err:o,model:e},"[Evaluator] Failed to calculate EMA performance"),null}}static async getModelPerformance(e,r=20){try{let o=await db.db.aiEvaluation.findMany({where:{model:e},orderBy:{createdAt:"desc"},take:r,select:{score:!0}});return o.length===0?null:o.reduce((a,u)=>a+u.score,0)/o.length}catch(o){return l__default.default.error({err:o},"[Evaluator] Failed to fetch model performance"),null}}};var t={CHEAP:{model:"llama-3-8b-8192",costPer1k:1e-4,quality:.6,latencyMs:150},BALANCED:{model:"llama-3.3-70b-versatile",costPer1k:6e-4,quality:.85,latencyMs:400},PREMIUM:{model:"mixtral-8x7b-32768",costPer1k:.002,quality:.95,latencyMs:800}};function A(n){let e=0;return (n.fileCount||0)>10&&(e+=.3),(n.errorDepth||0)>2&&(e+=.3),n.hasBackendLogic&&(e+=.2),(n.usesAuth||n.usesDB)&&(e+=.2),Math.min(e,1)}async function L(n,e){let r=A(e),o=e.failCount||0;if(o>=2)return t.PREMIUM;if(o===1)return t.BALANCED;let s=await c.getEMAPerformance(t.CHEAP.model),a=await c.getEMAPerformance(t.BALANCED.model),u=.6,m=false;if(s!==null&&s<u&&(m=true),n==="planning")return t.PREMIUM;if(n==="security-scan")return t.BALANCED;if(n==="debug"){let i=r>.6?t.BALANCED:t.CHEAP;return m&&i===t.CHEAP?t.BALANCED:i}if(n==="code-gen"){let i=r>.7?t.PREMIUM:t.BALANCED;return a!==null&&a<.6&&i===t.BALANCED?t.PREMIUM:i}let d=r>.5?t.BALANCED:t.CHEAP;return m&&d===t.CHEAP?t.BALANCED:d}exports.EvaluatorService=c;exports.MODEL_REGISTRY=t;exports.estimateComplexity=A;exports.selectModel=L;//# sourceMappingURL=index.js.map
+"use strict";
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+// src/index.ts
+var index_exports = {};
+__export(index_exports, {
+  EvaluatorService: () => EvaluatorService,
+  MODEL_REGISTRY: () => MODEL_REGISTRY,
+  estimateComplexity: () => estimateComplexity,
+  selectModel: () => selectModel
+});
+module.exports = __toCommonJS(index_exports);
+
+// src/evaluator.ts
+var import_db = require("@packages/db");
+var import_utils = __toESM(require("@packages/utils"));
+var EvaluatorService = class {
+  /**
+   * Normalizes error counts into a 0-1 score.
+   * Max errors (e.g. 50) maps to 0.0, 0 errors maps to 1.0.
+   */
+  static normalize(errors, max = 50) {
+    return Math.max(0, 1 - errors / max);
+  }
+  /**
+   * Evaluates a build result and returns a weighted score.
+   */
+  static evaluate(buildResult) {
+    const metrics = {
+      buildSuccess: buildResult.success ? 1 : 0,
+      lintScore: this.normalize(buildResult.lintErrors || 0, 100),
+      typeScore: this.normalize(buildResult.typeErrors || 0, 50),
+      testScore: buildResult.totalTests ? (buildResult.testsPassed || 0) / buildResult.totalTests : 1,
+      diffScore: this.normalize(buildResult.diffSize || 0, 1e3)
+      // 1k lines as max
+    };
+    const score = 0.3 * metrics.buildSuccess + 0.2 * metrics.typeScore + 0.2 * metrics.testScore + 0.2 * metrics.lintScore + 0.1 * metrics.diffScore;
+    return { score, metrics };
+  }
+  /**
+   * Persists an evaluation record to the database.
+   */
+  static async recordEvaluation(params) {
+    try {
+      await import_db.db.aiEvaluation.create({
+        data: {
+          tenantId: params.tenantId,
+          model: params.model,
+          score: params.result.score,
+          metrics: params.result.metrics,
+          metadata: params.metadata
+        }
+      });
+      import_utils.default.info({ model: params.model, score: params.result.score }, "[Evaluator] Recorded AI performance metric");
+    } catch (err) {
+      import_utils.default.error({ err }, "[Evaluator] Failed to persist evaluation");
+    }
+  }
+  static EMA_ALPHA = 0.3;
+  /**
+   * Retrieves the average performance score using Exponential Moving Average (EMA).
+   */
+  static async getEMAPerformance(model, tenantId) {
+    try {
+      const records = await import_db.db.aiEvaluation.findMany({
+        where: {
+          model,
+          ...tenantId ? { tenantId } : {}
+        },
+        orderBy: { createdAt: "desc" },
+        take: 20
+      });
+      if (records.length === 0) return null;
+      let ema = records[records.length - 1].score;
+      for (let i = records.length - 2; i >= 0; i--) {
+        ema = this.EMA_ALPHA * records[i].score + (1 - this.EMA_ALPHA) * ema;
+      }
+      return ema;
+    } catch (err) {
+      import_utils.default.error({ err, model }, "[Evaluator] Failed to calculate EMA performance");
+      return null;
+    }
+  }
+  /**
+   * Retrieves the average score for a model over the last N records.
+   */
+  static async getModelPerformance(model, limit = 20) {
+    try {
+      const records = await import_db.db.aiEvaluation.findMany({
+        where: { model },
+        orderBy: { createdAt: "desc" },
+        take: limit,
+        select: { score: true }
+      });
+      if (records.length === 0) return null;
+      const sum = records.reduce((acc, r) => acc + r.score, 0);
+      return sum / records.length;
+    } catch (err) {
+      import_utils.default.error({ err }, "[Evaluator] Failed to fetch model performance");
+      return null;
+    }
+  }
+};
+
+// src/router/modelRegistry.ts
+var MODEL_REGISTRY = {
+  CHEAP: {
+    model: "llama-3-8b-8192",
+    // Groq's cheap model
+    costPer1k: 1e-4,
+    quality: 0.6,
+    latencyMs: 150
+  },
+  BALANCED: {
+    model: "llama-3.3-70b-versatile",
+    // Groq's balanced model
+    costPer1k: 6e-4,
+    quality: 0.85,
+    latencyMs: 400
+  },
+  PREMIUM: {
+    model: "mixtral-8x7b-32768",
+    // Alternative premium or could be gpt-4 via another provider
+    costPer1k: 2e-3,
+    quality: 0.95,
+    latencyMs: 800
+  }
+};
+
+// src/router/modelRouter.ts
+function estimateComplexity(context) {
+  let score = 0;
+  if ((context.fileCount || 0) > 10) score += 0.3;
+  if ((context.errorDepth || 0) > 2) score += 0.3;
+  if (context.hasBackendLogic) score += 0.2;
+  if (context.usesAuth || context.usesDB) score += 0.2;
+  return Math.min(score, 1);
+}
+async function selectModel(task, context) {
+  const complexity = estimateComplexity(context);
+  const failCount = context.failCount || 0;
+  if (failCount >= 2) return MODEL_REGISTRY.PREMIUM;
+  if (failCount === 1) return MODEL_REGISTRY.BALANCED;
+  const cheapPerformance = await EvaluatorService.getEMAPerformance(MODEL_REGISTRY.CHEAP.model);
+  const balancedPerformance = await EvaluatorService.getEMAPerformance(MODEL_REGISTRY.BALANCED.model);
+  const ESCALATION_THRESHOLD = 0.6;
+  let forcedEscalation = false;
+  if (cheapPerformance !== null && cheapPerformance < ESCALATION_THRESHOLD) {
+    forcedEscalation = true;
+  }
+  if (task === "planning") return MODEL_REGISTRY.PREMIUM;
+  if (task === "security-scan") return MODEL_REGISTRY.BALANCED;
+  if (task === "debug") {
+    const base = complexity > 0.6 ? MODEL_REGISTRY.BALANCED : MODEL_REGISTRY.CHEAP;
+    if (forcedEscalation && base === MODEL_REGISTRY.CHEAP) return MODEL_REGISTRY.BALANCED;
+    return base;
+  }
+  if (task === "code-gen") {
+    const base = complexity > 0.7 ? MODEL_REGISTRY.PREMIUM : MODEL_REGISTRY.BALANCED;
+    if (balancedPerformance !== null && balancedPerformance < 0.6 && base === MODEL_REGISTRY.BALANCED) {
+      return MODEL_REGISTRY.PREMIUM;
+    }
+    return base;
+  }
+  const final = complexity > 0.5 ? MODEL_REGISTRY.BALANCED : MODEL_REGISTRY.CHEAP;
+  if (forcedEscalation && final === MODEL_REGISTRY.CHEAP) return MODEL_REGISTRY.BALANCED;
+  return final;
+}
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  EvaluatorService,
+  MODEL_REGISTRY,
+  estimateComplexity,
+  selectModel
+});
 //# sourceMappingURL=index.js.map

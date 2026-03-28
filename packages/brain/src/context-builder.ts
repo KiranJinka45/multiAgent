@@ -1,5 +1,5 @@
-import { MemoryService } from '@libs/memory';
-import logger from '@libs/utils';
+import { MemoryService } from '@packages/memory';
+import logger from '@packages/utils';
 
 export interface BrainContext {
     prompt: string;

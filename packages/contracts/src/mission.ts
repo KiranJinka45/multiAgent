@@ -2,14 +2,10 @@ export type MissionStatus =
     | 'init' 
     | 'queued' 
     | 'planning' 
-    | 'graph_ready' 
-    | 'executing' 
-    | 'building' 
-    | 'repairing' 
-    | 'assembling' 
+    | 'generating'
+    | 'validating'
     | 'deploying' 
-    | 'previewing' 
-    | 'complete' 
+    | 'ready'
     | 'failed';
 
 export interface Mission {

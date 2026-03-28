@@ -17,12 +17,12 @@
  *   score = (userTier × 3) + (activityRecency × 2) + (runtimeAge × -1)
  */
 
-import { PreviewRegistry } from '@libs/registry';
+import { PreviewRegistry } from '@packages/registry';
 import { PreviewOrchestrator } from '../';
 import { RuntimeMetrics } from '../';
-import { runtimeEvictionsTotal } from '@libs/utils';
-import { redis } from '@libs/utils/server';
-import { logger } from '@libs/utils/server';
+import { runtimeEvictionsTotal } from '@packages/utils';
+import { redis } from '@packages/utils/server';
+import { logger } from '@packages/utils/server';
 
 // ─── Config ────────────────────────────────────────────────────────────────
 

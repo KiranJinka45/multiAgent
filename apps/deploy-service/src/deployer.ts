@@ -2,7 +2,7 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import path from 'path';
 import fs from 'fs-extra';
-import { logger } from '@libs/utils';
+import { logger } from '@packages/utils';
 
 const execAsync = promisify(exec);
 

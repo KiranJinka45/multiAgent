@@ -1,12 +1,12 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { startTracing } from '@libs/observability';
+import { startTracing } from '@packages/observability';
 startTracing();
 
 import express from 'express';
 import { Orchestrator } from './orchestrator';
-import { logger } from '@libs/utils';
+import { logger } from '@packages/utils';
 
 const app = express();
 const PORT = process.env.PORT || 4001;

@@ -1,6 +1,6 @@
 // tsup.config.ts
 import { defineConfig } from "tsup";
-import { baseConfig } from "@libs/tsup.config.base";
+import { baseConfig } from "@packages/tsup.config.base";
 var tsup_config_default = defineConfig({
   ...baseConfig,
   entry: ["src/index.ts"]

@@ -3,9 +3,9 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { chatService } from '@libs/utils';
-import { projectService } from '@libs/utils';
-import { Message } from '@libs/contracts';
+import { chatService } from '@packages/utils';
+import { projectService } from '@packages/utils';
+import { Message } from '@packages/contracts';
 import Sidebar from '@components/Sidebar';
 import MobileMenu from '@components/MobileMenu';
 import TopNav from '@components/TopNav';

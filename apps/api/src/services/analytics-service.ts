@@ -1,5 +1,5 @@
-import { logger } from '@libs/observability';
-import { redis } from '@libs/utils/server';
+import { logger } from '@packages/observability';
+import { redis } from '@packages/utils/server';
 
 export class AnalyticsService {
     /**
@@ -36,6 +36,45 @@ export class AnalyticsService {
             logger.info({ previewId }, '[AnalyticsService] Tracked remix');
         } catch (error) {
             logger.error({ error }, '[AnalyticsService] Failed to track remix');
+        }
+    }
+
+    /**
+     * Track an edit event on a project.
+     */
+    static async trackEdit(previewId: string) {
+        try {
+            const key = `stats:preview:${previewId}:edits`;
+            await redis.incr(key);
+            
+            const today = new Date().toISOString().split('T')[0];
+            const dailyKey = `stats:daily:${today}:edits`;
+            await redis.incr(dailyKey);
+
+            logger.info({ previewId }, '[AnalyticsService] Tracked edit');
+        } catch (error) {
+            logger.error({ error }, '[AnalyticsService] Failed to track edit');
+        }
+    }
+
+    /**
+     * Track the "wow moment" when a preview first loads.
+     */
+    static async trackWowMoment(previewId: string) {
+        try {
+            const key = `stats:preview:${previewId}:wow`;
+            const hasWowed = await redis.get(key);
+            if (hasWowed) return;
+
+            await redis.set(key, '1');
+            
+            const today = new Date().toISOString().split('T')[0];
+            const dailyKey = `stats:daily:${today}:wow`;
+            await redis.incr(dailyKey);
+
+            logger.info({ previewId }, '[AnalyticsService] Tracked wow moment');
+        } catch (error) {
+            logger.error({ error }, '[AnalyticsService] Failed to track wow moment');
         }
     }
 

@@ -1,5 +1,5 @@
 import { BaseAgent } from './base-agent';
-import { AgentContext, IntentParams, AgentRequest, AgentResponse } from '@libs/contracts';
+import { AgentContext, IntentParams, AgentRequest, AgentResponse } from '@packages/contracts';
 
 export interface IntentResult {
     templateId: 'nextjs-tailwind-basic' | 'fullstack-app';

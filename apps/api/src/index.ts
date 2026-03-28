@@ -1,8 +1,9 @@
+import { initInstrumentation } from '@packages/observability';
 import app from './app';
 import { createServer } from 'http';
 import { initWebSocket } from './services/websocket';
 
-// initInstrumentation('multiagent-api');
+initInstrumentation('multiagent-api');
 
 const server = createServer(app);
 initWebSocket(server);

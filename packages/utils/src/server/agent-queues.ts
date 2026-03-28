@@ -1,6 +1,6 @@
 import { Queue, QueueEvents, DefaultJobOptions, ConnectionOptions } from 'bullmq';
-import redis from '@libs/shared-services';
-import logger from '@libs/observability';
+import { redis } from './redis';
+import { logger } from './logger';
 import { createLazyProxy } from './runtime';
 
 export const QUEUE_PLANNER = 'planner-queue';
@@ -53,4 +53,4 @@ export const supervisorEvents = createLazyProxy(() => new QueueEvents(QUEUE_SUPE
 export const repairEvents = createLazyProxy(() => new QueueEvents(QUEUE_REPAIR, { connection }), 'Events_Repair');
 export const metaEvents = createLazyProxy(() => new QueueEvents(QUEUE_META, { connection }), 'Events_Meta');
 
-logger.info(`Autonomous Distributed Queues initialized: Planner, Architecture, Generator, Validator, Docker, Deploy, Supervisor, Repair, Meta`);
+// Queues are initialized lazily via proxies

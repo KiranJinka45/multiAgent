@@ -15,7 +15,7 @@ import {
     Copy,
     Check
 } from 'lucide-react';
-import { BuildUpdate } from '@libs/contracts';
+import { BuildUpdate } from '@packages/contracts';
 
 interface PreviewPanelProps {
     buildProgress: BuildUpdate | null;

@@ -25,10 +25,10 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 var import_express = __toESM(require("express"));
 var import_http = require("http");
 var import_socket = require("socket.io");
-var import_server = require("@libs/utils/src/server");
+var import_server = require("@packages/utils/src/server");
 var import_dotenv = __toESM(require("dotenv"));
 var import_cors = __toESM(require("cors"));
-var import_observability = require("@libs/observability");
+var import_observability = require("@packages/observability");
 
 // src/services/yjs-server.ts
 var import_ws = require("ws");
@@ -36,8 +36,8 @@ var import_utils2 = require("y-websocket/bin/utils");
 
 // src/services/collaboration-persistence.ts
 var Y = __toESM(require("yjs"));
-var import_db = require("@libs/db");
-var import_utils = __toESM(require("@libs/utils"));
+var import_db = require("@packages/db");
+var import_utils = __toESM(require("@packages/utils"));
 var CollaborationPersistence = class {
   /**
    * Binds a Yjs document to Postgres persistence.
@@ -85,7 +85,7 @@ var CollaborationPersistence = class {
 var collaborationPersistence = new CollaborationPersistence();
 
 // src/services/yjs-server.ts
-var import_utils3 = __toESM(require("@libs/utils"));
+var import_utils3 = __toESM(require("@packages/utils"));
 var import_url = __toESM(require("url"));
 function startCollaborationServer(port = 3011) {
   const wss = new import_ws.WebSocketServer({ port, host: "0.0.0.0" });

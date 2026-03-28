@@ -10,9 +10,9 @@ import MobileMenu from '@/components/MobileMenu';
 import TopNav from '@/components/TopNav';
 import { toast } from 'sonner';
 import { Archive, RotateCcw } from 'lucide-react';
-import { formatRelative } from '@libs/utils';
-import { User as SupabaseUser } from '@libs/supabase';
-import { Chat } from '@libs/contracts';
+import { formatRelative } from '@packages/utils';
+import { User as SupabaseUser } from '@packages/supabase';
+import { Chat } from '@packages/contracts';
 
 type SettingsTab = 'profile' | 'appearance' | 'security' | 'notifications' | 'archive';
 

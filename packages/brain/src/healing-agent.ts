@@ -1,6 +1,6 @@
-import { BaseAgent, AgentResponse } from './index';
-import { AgentContext } from '@libs/contracts';
-import logger from '@libs/utils';
+import { BaseAgent, AgentResponse } from './base-agent';
+import { AgentContext } from '@packages/contracts';
+import logger from '@packages/utils';
 
 export interface HealingRequest {
     projectId: string;

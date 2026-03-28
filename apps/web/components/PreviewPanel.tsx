@@ -118,10 +118,38 @@ export default function PreviewPanel({ url, prompt }: PreviewPanelProps) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute inset-0 bg-[#1e1e1e] flex flex-col items-center justify-center z-10"
+                className="absolute inset-0 bg-[#0A0A0B] flex flex-col z-10 p-8"
               >
-                <Loader2 size={32} className="text-primary animate-spin mb-4" />
-                <p className="text-[10px] font-black uppercase tracking-widest text-gray-500">Injecting Runtime...</p>
+                {/* Premium Skeleton Header */}
+                <div className="flex items-center justify-between mb-8 opacity-20">
+                    <div className="flex gap-2">
+                        <div className="w-3 h-3 rounded-full bg-white/20" />
+                        <div className="w-3 h-3 rounded-full bg-white/20" />
+                        <div className="w-3 h-3 rounded-full bg-white/20" />
+                    </div>
+                    <div className="w-32 h-4 bg-white/10 rounded-full" />
+                </div>
+                
+                {/* Premium Skeleton Body */}
+                <div className="flex-1 space-y-6">
+                    <div className="w-3/4 h-8 bg-white/5 rounded-xl animate-pulse" />
+                    <div className="grid grid-cols-3 gap-4">
+                        <div className="h-32 bg-white/[0.03] rounded-2xl border border-white/5 animate-shimmer" />
+                        <div className="h-32 bg-white/[0.03] rounded-2xl border border-white/5 animate-shimmer" />
+                        <div className="h-32 bg-white/[0.03] rounded-2xl border border-white/5 animate-shimmer" />
+                    </div>
+                    <div className="space-y-3 pt-4">
+                        <div className="w-full h-3 bg-white/5 rounded-full" />
+                        <div className="w-5/6 h-3 bg-white/5 rounded-full" />
+                        <div className="w-4/6 h-3 bg-white/5 rounded-full" />
+                    </div>
+                </div>
+
+                {/* Loading Indicator */}
+                <div className="mt-auto flex items-center justify-center gap-3 py-6">
+                    <Loader2 size={20} className="text-primary animate-spin" />
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60">Injecting Runtime...</p>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>

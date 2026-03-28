@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Planner } from '@libs/brain';
+import { Planner } from '@packages/brain';
 
 export async function POST(req: NextRequest) {
   try {

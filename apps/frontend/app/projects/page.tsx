@@ -1,10 +1,10 @@
-import { createServerComponentClient } from '@libs/supabase';
+import { createServerComponentClient } from '@packages/supabase';
 import { cookies } from 'next/headers';
 import Sidebar from '@components/Sidebar';
 import TopNav from '@components/TopNav';
 import ProjectGallery from '@components/ProjectGallery';
 import MobileMenu from '@components/MobileMenu';
-import { projectService } from '@libs/utils';
+import { projectService } from '@packages/utils';
 
 export default async function ProjectsPage() {
     let projects = null;

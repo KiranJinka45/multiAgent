@@ -1,12 +1,15 @@
-import { PlannerAgent, TaskPlan, TaskStep } from '@libs/brain';
-import { DebugAgent } from '@libs/brain';
-import { CoderAgent } from '@libs/brain';
-import { DatabaseAgent } from '@libs/brain';
-import { BackendAgent } from '@libs/brain';
-import { FrontendAgent } from '@libs/brain';
-import { DeploymentAgent } from '@libs/brain';
-import { TestingAgent } from '@libs/brain';
-import { IntentDetectionAgent } from '@libs/brain';
+import { PlannerAgent, TaskPlan, TaskStep } from '@packages/brain/planner-agent';
+import { DebugAgent } from '@packages/brain/debug-agent';
+import { CoderAgent } from '@packages/brain/coder-agent';
+import { DatabaseAgent } from '@packages/brain/database-agent';
+import { BackendAgent } from '@packages/brain/backend-agent';
+import { FrontendAgent } from '@packages/brain/frontend-agent';
+import { DeploymentAgent } from '@packages/brain/deploy-agent';
+import { TestingAgent } from '@packages/brain/testing-agent';
+import { IntentDetectionAgent } from '@packages/brain/intent-agent';
+import { ResearchAgent } from '@packages/brain/research-agent';
+import { RepairAgent } from '@packages/brain/repair-agent';
+import { HealingAgent } from '@packages/brain/healing-agent';
 import { TaskGraph, TaskExecutor, BuildWatchdog } from './task-engine';
 import { agentRegistry } from './task-engine/agent-registry';
 import { 
@@ -25,22 +28,24 @@ import {
     guardrailService,
     patchEngine,
     RateLimiter,
-    StrategyEngine
-} from '@libs/utils/server';
+    StrategyEngine,
+    StrategyConfig,
+    redis
+} from '@packages/utils/server';
 type ExecutionLogger = ReturnType<typeof getExecutionLogger>;
 
 import path from 'path';
 import * as fs from 'fs-extra';
-import { runtimeExecutor } from '@libs/runtime/executor';
-import { ArchitectureAgent } from '@libs/brain';
-import { PreviewRegistry } from '@libs/registry';
+import { runtimeExecutor } from '@packages/runtime/executor';
+import { ArchitectureAgent } from '@packages/brain/architecture-agent';
+import { PreviewRegistry } from '@packages/registry';
 import { swarmCoordinator } from './task-engine/swarm-coordinator';
-import { RankingAgent } from '@libs/brain';
-import { ExecutionResult, JobStage } from '@libs/contracts';
-import { RuntimeScheduler } from '@libs/runtime/cluster/runtimeScheduler';
-import { ArtifactValidator } from '@libs/validator';
-import { AgentMemory } from '@libs/agents';
-import { db } from '@libs/db';
+import { RankingAgent } from '@packages/brain/ranking-agent';
+import { ExecutionResult, JobStage } from '@packages/contracts';
+import { RuntimeScheduler } from '@packages/runtime/cluster/runtimeScheduler';
+import { ArtifactValidator } from '@packages/validator';
+import { AgentMemory } from '@packages/agents';
+import { db } from '@packages/db';
 
 async function trackEvent(type: string, metadata: any) {
     try {
@@ -64,6 +69,8 @@ agentRegistry.register('CoderAgent', new CoderAgent());
 agentRegistry.register('DebugAgent', new DebugAgent());
 agentRegistry.register('PlannerAgent', new PlannerAgent());
 agentRegistry.register('ResearchAgent', new ResearchAgent());
+agentRegistry.register('RepairAgent', new RepairAgent());
+agentRegistry.register('HealingAgent', new HealingAgent());
 
 
 

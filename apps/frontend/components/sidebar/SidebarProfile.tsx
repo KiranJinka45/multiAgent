@@ -3,12 +3,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LogOut, Settings, Sparkles, ListTodo, ChevronDown, Github } from 'lucide-react';
-import { useSidebar } from '@libs/context';
+import { useSidebar } from '@packages/context';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 // Auth helpers import (unused)
 
-import { type SupabaseClient, type User } from '@libs/supabase';
+import { type SupabaseClient, type User } from '@packages/supabase';
 
 type SidebarProfileProps = {
     user: User | null;

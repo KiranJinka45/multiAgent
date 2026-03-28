@@ -1,26 +1,26 @@
-export interface Project {
-    id: string;
-    user_id: string;
-    name: string;
-    description?: string;
-    status: 'draft' | 'running' | 'completed' | 'failed' | 'cancelled' | 'brainstorming' | string;
-    project_type?: 'web_app' | 'application' | 'landing_page' | 'other' | string;
-    created_at: string;
-    updated_at: string;
-    is_public?: boolean;
-    metadata?: Record<string, unknown>;
-    preview_url?: string;
-    thumbnail_url?: string;
+export interface ProjectV1 {
+  id: string;
+  name: string;
+  userId: string;
+  description?: string;
+  createdAt: number;
+  updatedAt: number;
+  productionUrl?: string;
+  missionId: string; // Latest successful mission
+}
+
+export interface ProjectHistoryV1 {
+  id: string;
+  projectId: string;
+  missionId: string;
+  prompt: string;
+  createdAt: number;
 }
 
 export interface ProjectFile {
-    id: string;
-    project_id: string;
-    path: string;
-    content: string;
-    language?: string;
-    created_at: string;
-    updated_at: string;
+  id: string;
+  projectId: string;
+  path: string;
+  content: string;
+  language?: string;
 }
-
-export type ProjectUpdate = Partial<Project>;

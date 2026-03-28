@@ -1,7 +1,7 @@
 import fs from 'fs-extra';
 import path from 'path';
-import { AgentContext } from '@libs/contracts';
-import logger from '@libs/observability';
+import { AgentContext } from '@packages/contracts';
+import logger from '@packages/observability';
 
 export class TemplateService {
     private templatesDir = path.join(process.cwd(), 'templates');
@@ -20,7 +20,7 @@ export class TemplateService {
 
             const vfs = context.getVFS();
             for (const [filePath, content] of Object.entries(files)) {
-                vfs.setFile(filePath, content);
+                (vfs as any).setFile(filePath, content);
             }
 
             await context.atomicUpdate(() => {});

@@ -1,7 +1,7 @@
 import { redis } from '@queue';
-import { Mission, MissionUpdate } from '@shared-types/mission';
-import logger from '@config/logger';
-import { eventBus } from '@shared/services/event-bus';
+import { Mission, MissionUpdate } from '@packages/contractsmission';
+import { logger } from '@packages/utils/server';
+import { eventBus } from '@packages/shared-services';
 
 class MissionController {
     private PREFIX = 'mission:';

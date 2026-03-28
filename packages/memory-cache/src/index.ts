@@ -1,4 +1,4 @@
-import { redis, logger } from '@libs/utils';
+import { redis, logger } from '@packages/utils';
 import crypto from 'crypto';
 
 /**

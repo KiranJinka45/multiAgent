@@ -1,6 +1,6 @@
 import { Worker, Job } from 'bullmq';
-import { redis, logger } from '@libs/utils';
-import { db } from '@libs/db';
+import { redis, logger } from '@packages/utils';
+import { db } from '@packages/db';
 import * as fs from 'fs';
 import * as path from 'path';
 

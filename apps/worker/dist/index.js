@@ -1,8 +1,1242 @@
-'use strict';var observability=require('@libs/observability');require('dotenv/config');var bullmq=require('bullmq'),sharedServices=require('@libs/shared-services'),server=require('@libs/utils/server'),customizerAgent=require('@libs/agents/customizer-agent'),q=require('path'),U=require('fs-extra'),resilience=require('@libs/resilience'),agentMemory=require('@libs/agents/services/agent-memory'),coreEngine=require('@libs/core-engine'),contracts=require('@libs/contracts'),validator=require('@libs/validator'),nodeRegistry=require('@libs/sandbox-runtime/cluster/nodeRegistry'),failoverManager=require('@libs/sandbox-runtime/cluster/failoverManager'),redisRecovery=require('@libs/sandbox-runtime/cluster/redisRecovery'),previewOrchestrator=require('@libs/runtime/previewOrchestrator'),runtimeCleanup=require('@libs/runtime/runtimeCleanup'),buildEngine=require('@libs/build-engine'),Re=require('os'),utils=require('@libs/utils'),xr=require('fs'),generatorAgent=require('@libs/agents/generator-agent'),metaAgent=require('@libs/agents/meta-agent'),intentAgent=require('@libs/agents/intent-agent'),repairAgent=require('@libs/agents/repair-agent'),watchdog=require('@libs/runtime/watchdog'),autonomousAgent=require('@libs/autonomous-agent'),selfEvolution=require('@libs/self-evolution'),refactorAgent=require('@libs/refactor-agent');function _interopDefault(e){return e&&e.__esModule?e:{default:e}}function _interopNamespace(e){if(e&&e.__esModule)return e;var n=Object.create(null);if(e){Object.keys(e).forEach(function(k){if(k!=='default'){var d=Object.getOwnPropertyDescriptor(e,k);Object.defineProperty(n,k,d.get?d:{enumerable:true,get:function(){return e[k]}});}})}n.default=e;return Object.freeze(n)}var q__default=/*#__PURE__*/_interopDefault(q);var U__namespace=/*#__PURE__*/_interopNamespace(U);var Re__default=/*#__PURE__*/_interopDefault(Re);var xr__default=/*#__PURE__*/_interopDefault(xr);var D=(o=>typeof require<"u"?require:typeof Proxy<"u"?new Proxy(o,{get:(r,e)=>(typeof require<"u"?require:r)[e]}):o)(function(o){if(typeof require<"u")return require.apply(this,arguments);throw Error('Dynamic require of "'+o+'" is not supported')});async function M(o){return observability.initInstrumentation(o)}var qe=new customizerAgent.CustomizerAgent,ze=q__default.default.join(process.cwd(),"architecture_worker.log"),S=o=>{let r=new Date().toISOString();U__namespace.appendFileSync(ze,`[${r}] ${o}
-`);};new bullmq.Worker(sharedServices.QUEUE_ARCHITECT,async o=>{let{projectId:r,executionId:e,userId:a,prompt:n,intent:t,strategy:i}=o.data,s=q__default.default.join(process.cwd(),".generated-projects",r);S(`[Architecture] Job received for ${e}`),observability.logger.info({projectId:r,executionId:e},"[Architecture Worker] Started");try{await sharedServices.eventBus.stage(e,"initializing","in_progress","Architecture Agent: Designing project structure...",30),observability.logger.info({projectId:r,template:t.templateId},"[Architecture Worker] Initializing template");let c=await server.TemplateEngine.copyTemplate(t.templateId,s);observability.logger.info({projectId:r},"[Architecture Worker] Applying surgical edits");let l=new server.VirtualFileSystem,u=await Promise.all(c.map(async w=>{let L=w.replace(/^[\\\/]+/,""),y=q__default.default.join(s,L),v=await U__namespace.readFile(y,"utf-8");return {path:L,content:v}}));l.loadFromDiskState(u);let g=await qe.execute({prompt:n,templateId:t.templateId,files:u.filter(w=>w.path.endsWith(".tsx")||w.path.endsWith(".ts")),branding:t.branding,features:t.features},{});if(g.success&&g.data.patches.length>0){for(let w of g.data.patches)l.setFile(w.path,w.content);await server.CommitManager.commit(l,s),observability.logger.info({projectId:r,patches:g.data.patches.length},"[Architecture Worker] Applied patches");}await new server.DistributedExecutionContext(e).atomicUpdate(w=>{w.metadata.architectureReady=!0,w.finalFiles=l.getAllFiles();}),await sharedServices.eventBus.stage(e,"architecture","completed","Project structure and branding applied.",40),await server.generatorQueue.add("generate-code",{projectId:r,executionId:e,userId:a,prompt:n,intent:t,strategy:i});let m=process.memoryUsage(),k=Math.round(m.heapUsed/1024/1024*100)/100;S(`[Architecture] Memory usage: ${k} MB (Heap Used)`),observability.logger.info({executionId:e,memoryMb:k},"[Architecture Worker] Memory Usage"),await sharedServices.eventBus.stage(e,"initializing","completed","Architecture design complete. Multi-agent code generation started.",40);}catch(c){let l=c instanceof Error?c.message:String(c);throw S(`[Architecture] ERROR: ${l}`),observability.logger.error({error:c,executionId:e},"[Architecture Worker] Failed"),await sharedServices.eventBus.error(e,`Architecture Error: ${l}`),c}},{connection:sharedServices.redis,concurrency:5});S(`Architecture Worker online. Redis: ${sharedServices.redis.options.port}`);observability.logger.info("Architecture Worker online");setInterval(()=>{let o=process.memoryUsage(),r=Math.round(o.heapUsed/1024/1024*100)/100;S(`Heartbeat... Memory: ${r} MB`);},3e4);new Promise(()=>{});var or={observe:(...o)=>{}},nr={inc:(...o)=>{}},W=class{worker;dlq;breaker;constructor(r){this.breaker=resilience.createBreaker(async e=>this.processJob(e),{timeout:3e4,errorThresholdPercentage:50,resetTimeout:1e4}),this.worker=new bullmq.Worker(r,async e=>{if(!e.id)return this.breaker.fire(e);let a=e.data.tenantId||"global";if(!await server.TenantService.checkQuota(a))throw observability.logger.error({tenantId:a,jobId:e.id},"[Worker] Tenant quota exceeded"),new Error(`QUOTA_EXCEEDED: ${a}`);let t=Date.now(),i="success";try{let s=await this.breaker.fire(e);if(s&&typeof s=="object"&&"metrics"in s){let c=s.metrics;await server.usageService.recordAiUsage({model:s.model||"default",promptTokens:c.promptTokens||0,completionTokens:c.completionTokens||0,totalTokens:c.totalTokens||0,userId:e.data.userId||"system",tenantId:e.data.tenantId||"global",metadata:{jobId:e.id,queue:r}});}return s}catch(s){throw i="failed",nr.inc({agent_name:this.getName()}),s}finally{let s=(Date.now()-t)/1e3;or.observe({queue_name:r,status:i},s),server.SLOService.checkLatency(r,s);}},{connection:sharedServices.redis,...resilience.DEFAULT_RETRY_OPTIONS}),this.dlq=new bullmq.Queue(resilience.DEAD_LETTER_QUEUE_NAME,{connection:sharedServices.redis}),this.worker.on("failed",async(e,a)=>{e&&e.attemptsMade>=(resilience.DEFAULT_RETRY_OPTIONS.attempts||3)&&await this.dlq.add("failed-job",{originalQueue:r,jobId:e.id,data:e.data,error:a.message});});}};var z=class extends W{constructor(){super("backend_queue");}queueName="backend_queue";getName(){return "BackendAgent"}getWorkerId(){return `backend-worker-${process.pid}`}async processJob(r){let{missionId:e,taskId:a}=r.data;try{observability.logger.info({missionId:e,taskId:a},"[BackendWorker] Starting task"),await this.streamThought(e,"Analyzing backend requirements and designing API routes..."),await new Promise(t=>setTimeout(t,3e3));let n={files:[{path:"server/api/routes.ts",content:`// Generated Express routes
-export const routes = [];`},{path:"server/models/schema.ts",content:"// Generated DB Schema"}],metrics:{tokens:1200,duration:3e3}};return await agentMemory.AgentMemory.set(e,`backend:result:${a}`,n),await agentMemory.AgentMemory.appendTranscript(e,this.getName(),"Successfully generated API routes and schema."),await sharedServices.eventBus.stage(e,this.getName(),"COMPLETED",`Generated ${n.files.length} backend files`,100),n}catch(n){let t=n instanceof Error?n.message:String(n);throw observability.logger.error({error:n,missionId:e,taskId:a},"[BackendWorker] Task failed"),await sharedServices.eventBus.error(e,`Backend Error: ${t}`),n}}};D.main===module&&new z;M("build-worker");var $=`worker-${Re__default.default.hostname()}-${process.pid}`,hr=new coreEngine.Orchestrator,K=`worker-${Math.random().toString(36).substring(2,9)}`,yr=5e3;setInterval(async()=>{try{let o={status:"online",lastSeen:Date.now(),memory:process.memoryUsage().heapUsed/1024/1024,uptime:process.uptime(),workerId:K};await sharedServices.redis.set(`worker:heartbeat:${K}`,JSON.stringify(o),"EX",15),await sharedServices.redis.set("system:health:worker",JSON.stringify(o),"EX",15);}catch{observability.logger.warn("Failed to update worker heartbeat");}},yr);var Er=6e4,We=async()=>{observability.logger.info("Scanning for orphaned missions to resume...");try{let o=await server.missionController.listActiveMissions(),r=await sharedServices.redis.keys("worker:heartbeat:*"),e=new Set(r.map(a=>a.split(":").pop()));for(let a of o){let n=a.metadata?.workerId,t=Date.now()-a.updatedAt>Er,i=n&&!e.has(n);(t||i)&&(observability.logger.info({missionId:a.id,status:a.status,isStale:t,isOwnerDead:i},"Resuming orphaned mission..."),server.stuckBuildsTotal.inc(),X({prompt:a.prompt,userId:a.userId,projectId:a.projectId,executionId:a.id,isFastPreview:!!a.metadata?.fastPath}).catch(s=>observability.logger.error({err:s,missionId:a.id},"Failed to resume orphaned mission")));}}catch(o){observability.logger.error({err:o},"Error during orphaned mission scan");}};setInterval(We,6e4);var X=async(o,r)=>{let{prompt:e,userId:a,projectId:n,executionId:t,isFastPreview:i}=o,s=r?r.queueName.includes("pro")?"pro":"free":"instant",c=`build:lock:${t}`;if(!await sharedServices.redis.set(c,t,"EX",600,"NX")){r&&observability.logger.warn({executionId:t,jobId:r.id,tier:s},"Duplicate execution (Queue) detected. Skipping.");return}let u=new AbortController;if(r){let m=(Date.now()-r.timestamp)/1e3;server.queueWaitTimeSeconds.observe({queue_name:s},m);}let g=setInterval(async()=>{try{if(r&&await r.isActive()&&await r.extendLock(r.token,3e5),await sharedServices.redis.get(c)!==t)throw new Error("Execution lock ownership lost (Heartbeat Violation)");await sharedServices.redis.expire(c,600),observability.logger.debug({executionId:t,tier:s},"Execution locks extended (Heartbeat)");}catch(m){let k=m instanceof Error?m.message:String(m);observability.logger.error({executionId:t,error:k,tier:s},"CRITICAL: Lock heartbeat failed. Aborting."),u.abort();}},3e4),p=Date.now();try{await server.missionController.updateMission(t,{status:"planning",metadata:{workerId:K}});let m=900*1e3,k=setTimeout(()=>{observability.logger.error({executionId:t},"[Worker] Build timeout reached. Aborting."),u.abort();},m);return await server.runWithTracing(t,async()=>{observability.logger.info({executionId:t,userId:a,projectId:n,tier:s},"Worker entering executeBuild loop");let w=q__default.default.join(process.cwd(),".generated-projects",n);if(await U__namespace.default.ensureDir(w),await buildEngine.BuildCacheManager.restore(n,w)){observability.logger.info({projectId:n},"[Worker] Incremental build: Cache restored successfully"),await server.eventBus.stage(t,contracts.JobStage.PLAN.toLowerCase(),"completed","Incremental build: Restored previous build cache",20,n);let y=await buildEngine.BuildGraphEngine.getAffectedNodes(w);y.length===0?(observability.logger.info({projectId:n},"[Worker] Zero affected nodes. Skipping full build."),await server.eventBus.stage(t,contracts.JobStage.PLAN.toLowerCase(),"completed","No changes detected. Reusing existing artifacts.",30,n)):observability.logger.info({projectId:n,count:y.length},"[Worker] Partial changes detected");}try{let y=await hr.execute(e,a,n,t,u.signal,{isFastPreview:i});if(clearTimeout(k),y&&!y.success){let G=y;throw new Error(G.error||"Build failed")}let v=await validator.ArtifactValidator.validate(n);if(!v.valid){let G=`Build integrity failure: Missing ${v.missingFiles?.join(", ")||"critical files"}`;throw observability.logger.error({projectId:n,missing:v.missingFiles},"[Worker] Integrity Check FAILED"),new Error(G)}observability.logger.info({projectId:n},"[Worker] Integrity Check PASSED"),await buildEngine.BuildCacheManager.save(n,w),await server.missionController.updateMission(t,{status:"complete"});let Je=Date.now()-p;return await server.ReliabilityMonitor.recordSuccess(Je),y}catch(y){throw clearTimeout(k),y}})}catch(m){let k=m instanceof Error?m.message:String(m);throw observability.logger.error({executionId:t,error:k,tier:s},"Execution failed"),await server.missionController.updateMission(t,{status:"failed",metadata:{error:k}}),await server.eventBus.stage(t,contracts.JobStage.FAILED.toLowerCase(),"failed",`Build failed: ${k}`,100,n),await server.eventBus.error(t,`[BuildWorker] ${k}`,n),await server.ReliabilityMonitor.recordFailure(),m}finally{clearInterval(g);}},ve=async o=>await X(o.data,o),Y=new bullmq.Worker(sharedServices.QUEUE_FREE,ve,{connection:sharedServices.redis,concurrency:server.env.WORKER_CONCURRENCY_FREE||5,lockDuration:3e5,limiter:{max:5,duration:1e3}}),Z=new bullmq.Worker(sharedServices.QUEUE_PRO,ve,{connection:sharedServices.redis,concurrency:server.env.WORKER_CONCURRENCY_PRO||20,lockDuration:3e5,limiter:{max:10,duration:1e3}}),Se=(o,r)=>{o.on("completed",e=>{observability.logger.info({jobId:e.id,worker:r},"Job completed");}),o.on("failed",(e,a)=>{observability.logger.error({jobId:e?.id,worker:r,err:a.message},"Job failed");});};Se(Y,"free");Se(Z,"pro");var ee=async()=>{observability.logger.info("Shutting down workers..."),failoverManager.FailoverManager.stop(),await runtimeCleanup.RuntimeCleanup.shutdownAll(),await nodeRegistry.NodeRegistry.deregister(),await Promise.all([Y.close(),Z.close()]),await sharedServices.redis.quit(),process.exit(0);};process.on("SIGTERM",ee);process.on("SIGINT",ee);setInterval(async()=>{try{await server.WorkerClusterManager.heartbeat({workerId:$,hostname:Re__default.default.hostname(),load:0,status:"IDLE"});}catch(o){console.error("[Worker] Heartbeat failed:",o);}},2e3);(async()=>{try{let o=sharedServices.redis.duplicate();observability.logger.info({workerId:$},"[Worker] Subscribing to direct steering channel"),await o.subscribe(`worker:trigger:${$}`),o.on("message",async(r,e)=>{if(r===`worker:trigger:${$}`)try{let{projectId:a}=JSON.parse(e);observability.logger.info({projectId:a},"[Worker] Direct job steering received! Triggering execution.");}catch(a){observability.logger.error({err:a},"[Worker] Failed to parse steering message");}});}catch(o){let r=o;observability.logger.error({err:r.message},"[Worker] Direct steering listener failed");}})();(async()=>{try{let o=await nodeRegistry.NodeRegistry.register();observability.logger.info({nodeId:o},"Node registered in cluster"),failoverManager.FailoverManager.start();let r=sharedServices.redis.duplicate();await r.subscribe("cluster:schedule:assign","cluster:node:restart","build:init:trigger"),r.on("message",async(e,a)=>{try{let n=JSON.parse(a);e==="build:init:trigger"?(observability.logger.info({executionId:n.executionId},"\u26A1 Instant Trigger received. Initiating build..."),X(n).catch(t=>observability.logger.error({err:t,executionId:n.executionId},"Instant Trigger execution failed"))):e==="cluster:schedule:assign"?n.targetNodeId===o&&(observability.logger.info({projectId:n.request.projectId},"[Worker] Picking up assigned runtime"),previewOrchestrator.PreviewOrchestrator.start(n.request.projectId,n.request.executionId,n.request.userId).catch(t=>{let i=t instanceof Error?t.message:String(t);observability.logger.error({err:i,projectId:n.request.projectId},"Failed to start assigned runtime");})):e==="cluster:node:restart"&&n.nodeId===o&&(observability.logger.warn({reason:n.reason},"[Worker] Received restart signal. Shutting down gracefully..."),await ee());}catch(n){let t=n instanceof Error?n.message:String(n);observability.logger.error({error:t},`[Worker] Error processing message on channel ${e}`);}});}catch(o){let r=o instanceof Error?o.message:String(o);observability.logger.error({error:r},"Failed to register node in cluster (non-fatal, running in standalone mode)");}})();observability.logger.info(`Workers started: Free (concurrency=${Y.opts.concurrency}), Pro (concurrency=${Z.opts.concurrency})`);We();runtimeCleanup.RuntimeCleanup.start();sharedServices.redis.on("error",o=>{observability.logger.error({err:o.message},"[Worker] Redis connection error"),"code"in o&&(o.code==="ECONNREFUSED"||o.code==="ETIMEDOUT")&&redisRecovery.RedisRecovery.handleRedisCrash().catch(r=>{observability.logger.error({err:r.message},"[Worker] Critical recovery failure");});});var Dr=q__default.default.join(process.cwd(),"deploy_worker.log"),b=o=>{let r=new Date().toISOString();xr__default.default.appendFileSync(Dr,`[${r}] ${o}
-`);};new bullmq.Worker(sharedServices.QUEUE_DEPLOY,async o=>{let{projectId:r,executionId:e,previewUrl:a}=o.data,n=q__default.default.join(process.cwd(),".generated-projects",r);b(`[Deploy] Job received for ${e}`),observability.logger.info({projectId:r,executionId:e},"[Deploy Worker] Finalizing Deployment");try{await sharedServices.eventBus.stage(e,"cicd","in_progress","Deployment Agent: Finalizing project lifecycle...",95);let t=new server.DistributedExecutionContext(e),i=await t.get(),s=i?.finalFiles||[],c=i?.metadata?.intent;await server.projectMemory.initializeMemory(r,{framework:c?.templateId||"nextjs",styling:"tailwind",backend:"api-routes",database:"supabase"},s);let l=await server.TenantService.getTenantForUser(i?.userId||"unknown");if(l&&utils.IS_PRODUCTION){b("[Deploy Worker] Production Mode: Provisioning resources...");let p=await server.InfraProvisioner.provisionResources(r,l.plan);await server.CICDManager.setupPipeline(r,n,c?.templateId||"nextjs"),await t.atomicUpdate(m=>{m.metadata.infra=p,m.metadata.deploymentStatus="deployed";});}else b("[Deploy Worker] Dev Mode: Skipping infrastructure provisioning");await t.atomicUpdate(p=>{p.status="completed",p.locked=!0;}),await sharedServices.eventBus.stage(e,"deployment","completed","Build success! Preview online.",100),await sharedServices.eventBus.complete(e,a,{taskCount:s.length,autonomousCycles:1});let u=process.memoryUsage(),g=Math.round(u.heapUsed/1024/1024*100)/100;b(`[Deploy] Memory usage: ${g} MB (Heap Used)`),observability.logger.info({executionId:e,memoryMb:g},"[Deploy Worker] Memory Usage");}catch(t){let i=t instanceof Error?t.message:String(t);throw b(`[Deploy] ERROR: ${i}`),observability.logger.error({error:t,executionId:e},"[Deploy Worker] Failed"),await new server.DistributedExecutionContext(e).atomicUpdate(c=>{c.status="failed",c.agentResults.DeployAgent={agentName:"DeployAgent",status:"failed",error:i,attempts:(c.agentResults.DeployAgent?.attempts||0)+1,startTime:new Date().toISOString()};}),await sharedServices.eventBus.error(e,`Deployment Error: ${i}`),t}},{connection:sharedServices.redis,concurrency:5});b(`Deployment Worker online. Redis: ${sharedServices.redis.options.port}`);observability.logger.info("Deployment Worker online");setInterval(()=>{let o=process.memoryUsage(),r=Math.round(o.heapUsed/1024/1024*100)/100;b(`Heartbeat... Memory: ${r} MB`);},3e4);new Promise(()=>{});var $r=new server.SandboxPodController;new bullmq.Worker(sharedServices.QUEUE_DOCKER,async o=>{let{projectId:r,executionId:e}=o.data;observability.logger.info({projectId:r,executionId:e},"[Docker Worker] Starting deployment");try{await sharedServices.eventBus.stage(e,"deployment","in_progress","Docker Agent: Creating sandbox environment...",90);let a=new server.DistributedExecutionContext(e),n=await a.get(),t=await $r.deploy(r,e,n?.finalFiles||[]);if(!t.success)throw new Error(`Docker: Sandbox deployment failed. ${t.error||""}`);await a.atomicUpdate(i=>{i.metadata.previewUrl=t.url,i.status="completed";}),await sharedServices.eventBus.complete(e,t.url,{tokensTotal:n?.metadata?.tokensTotal,durationMs:n?.metadata?.durationMs},r,n?.finalFiles);}catch(a){let n=a instanceof Error?a.message:String(a);throw observability.logger.error({error:a,executionId:e},"[Docker Worker] Failed"),await sharedServices.eventBus.error(e,`Docker Error: ${n}`),a}},{connection:sharedServices.redis,concurrency:2});observability.logger.info("Docker Worker online");var oe=class extends W{constructor(){super("frontend_queue");}queueName="frontend_queue";getName(){return "FrontendAgent"}getWorkerId(){return `frontend-worker-${process.pid}`}async processJob(r){let{missionId:e,taskId:a}=r.data;try{observability.logger.info({missionId:e,taskId:a},"[FrontendWorker] Starting task"),await this.streamThought(e,"Designing UI components and responsive layouts..."),await new Promise(t=>setTimeout(t,4e3));let n={files:[{path:"src/components/Dashboard.tsx",content:"export const Dashboard = () => <div>Aion Dashboard</div>;"},{path:"src/styles/globals.css",content:"/* Generated Styles */"}],metrics:{tokens:1500,duration:4e3}};return await agentMemory.AgentMemory.set(e,`frontend:result:${a}`,n),await agentMemory.AgentMemory.appendTranscript(e,this.getName(),"Generated fundamental UI components and styles."),n}catch(n){let t=n instanceof Error?n.message:String(n);throw observability.logger.error({error:n,missionId:e,taskId:a},"[FrontendWorker] Task failed"),await sharedServices.eventBus.error(e,`Frontend Error: ${t}`),n}}};D.main===module&&new oe;var Lr=new generatorAgent.GeneratorAgent,Gr=new server.BlueprintManager;new bullmq.Worker(sharedServices.QUEUE_GENERATOR,async o=>{let{projectId:r,executionId:e,userId:a,prompt:n,intent:t,strategy:i}=o.data;observability.logger.info({projectId:r,executionId:e},"[Generator Worker] Generating codebase");try{await sharedServices.eventBus.stage(e,"generating","in_progress","Generator Agent: Creating file blueprints...",45);let s=await Gr.getForTemplate(t.templateId),c=await Lr.execute({prompt:n,blueprints:s,techStack:i?.recommendedTechStack},{executionId:e,userId:a,projectId:r});if(!c.success)throw new Error(`Generator: Failed to generate files. ${c.error||""}`);let l=c.data.files;new server.VirtualFileSystem().loadFromDiskState(l),await new server.DistributedExecutionContext(e).atomicUpdate(p=>{p.finalFiles=l,p.status="executing";}),await sharedServices.eventBus.stage(e,"generating","completed",`Generated ${l.length} files. Starting verification...`,70),await server.validatorQueue.add("validate-build",{projectId:r,executionId:e,userId:a,prompt:n,strategy:i});}catch(s){let c=s instanceof Error?s.message:String(s);throw observability.logger.error({error:s,executionId:e},"[Generator Worker] Failed"),await sharedServices.eventBus.error(e,`Generator Error: ${c}`),s}},{connection:sharedServices.redis,concurrency:3});observability.logger.info("Generator Worker online");var Yr=new metaAgent.MetaAgent;new bullmq.Worker(sharedServices.QUEUE_META,async o=>{let{executionId:r,prompt:e,userId:a,projectId:n}=o.data;observability.logger.info({executionId:r,projectId:n},"[Meta Worker] Analyzing project intent");try{await sharedServices.eventBus.stage(r,"meta-analysis","in_progress","Analyzing project requirements...",10);let t=await Yr.execute({prompt:e},{executionId:r,userId:a,projectId:n});if(!t.success)throw new Error(t.error||"MetaAgent analysis failed");let i=t.data;observability.logger.info({projectId:n,executionId:r},"[Meta Worker] Analysis complete"),await sharedServices.eventBus.stage(r,"meta-analysis","completed","Analysis complete. Recommended stack identified.",15),await server.plannerQueue.add("plan-project",{projectId:n,executionId:r,userId:a,prompt:e,strategy:i});}catch(t){let i=t instanceof Error?t.message:String(t);throw observability.logger.error({error:t,executionId:r},"[Meta Worker] Failed"),await sharedServices.eventBus.error(r,`Meta-Agent Error: ${i}`),t}},{connection:sharedServices.redis,concurrency:5});observability.logger.info("Meta Worker online");var at=new intentAgent.IntentDetectionAgent;new bullmq.Worker(sharedServices.QUEUE_PLANNER,async o=>{let{projectId:r,executionId:e,userId:a,prompt:n,strategy:t}=o.data;observability.logger.info({projectId:r,executionId:e},"[Planner Worker] Started");try{await sharedServices.eventBus.stage(e,"initializing","in_progress","Planner Agent: Analyzing user intent...",20);let i=await at.execute({prompt:n,context:{techStack:t?.recommendedTechStack}},{executionId:e,userId:a,projectId:r});if(!i.success)throw new Error(`Planner: Failed to detect intent. ${i.error||""}`);let s=i.data;observability.logger.info({projectId:r,template:s.templateId},"[Planner Worker] Intent detected"),await new server.DistributedExecutionContext(e).atomicUpdate(l=>{l.metadata.intent=s,l.metadata.strategy=t||l.metadata.strategy,l.status="executing";}),await sharedServices.eventBus.stage(e,"PlannerAgent","in_progress",`Selected template: ${s.templateId}`,30),await server.architectureQueue.add("design-architecture",{projectId:r,executionId:e,userId:a,prompt:n,intent:s,strategy:t}),await sharedServices.eventBus.stage(e,"initializing","completed","Planning complete. Architecture design started.",30);}catch(i){let s=i instanceof Error?i.message:String(i);throw observability.logger.error({error:i,executionId:e},"[Planner Worker] Failed"),await sharedServices.eventBus.error(e,`Planner Error: ${s}`),i}},{connection:sharedServices.redis,concurrency:5});observability.logger.info("Planner Worker online");var gt=q__default.default.join(process.cwd(),"repair_direct.log"),E=o=>xr__default.default.appendFileSync(gt,`[${new Date().toISOString()}] ${o}
-`);E("Repair Worker script started");var ft=new repairAgent.RepairAgent;new bullmq.Worker(sharedServices.QUEUE_REPAIR,async o=>{let{executionId:r,projectId:e,prompt:a}=o.data;E(`[Repair] Job received for ${r}`);let n=q__default.default.join(process.cwd(),".generated-projects",e);observability.logger.info({executionId:r,projectId:e},"[Repair Worker] Starting autonomous repair");try{let t=new server.DistributedExecutionContext(r),i=await t.get();if(!i)return;let s=await sharedServices.redis.hincrby(`mission:stats:${r}`,"repair_attempts",1);if(s>3){E(`[Repair] Limit exceeded (${s}). Failing mission.`),await sharedServices.eventBus.error(r,"Build failed autonomously after 3 repair attempts. Manual intervention required.");return}await sharedServices.eventBus.stage(r,"testing","in_progress",`Supervisor: Engaging Repair Agent to fix build errors (Attempt ${s}/3)...`,80);let c=Object.values(i.agentResults).find(p=>p.status==="failed"),l=c?.error||"Unknown error",u=i.finalFiles||[],g=await ft.execute({error:l,stdout:"",files:u.slice(0,20)},{});if(g.success&&g.data.patches?.length>0){let p=new server.VirtualFileSystem;p.loadFromDiskState(u);for(let m of g.data.patches)p.setFile(m.path,m.content);await server.CommitManager.commit(p,n),await t.atomicUpdate(m=>{m.finalFiles=p.getAllFiles(),c&&(m.agentResults[c.agentName].status="pending");}),E(`[Repair] Success! Applied ${g.data.patches.length} patches.`),E("[Repair] Re-enqueuing validator..."),await server.validatorQueue.add("verify-repaired-build",{projectId:e,executionId:r,prompt:a});}else throw E("[Repair] Failed to generate patches."),new Error("RepairAgent could not generate valid patches.")}catch(t){let i=t instanceof Error?t.message:String(t);throw E(`[Repair] CRITICAL ERROR: ${i}`),observability.logger.error({err:t,executionId:r},"[Repair Worker] Repair failed"),await sharedServices.eventBus.error(r,`Repair failed: ${i}`),t}},{connection:sharedServices.redis,concurrency:2});observability.logger.info("Repair Worker online");process.on("SIGINT",()=>{console.log("RECEIVED SIGINT"),process.exit(0);});process.on("SIGTERM",()=>{console.log("RECEIVED SIGTERM"),process.exit(0);});setInterval(()=>{E("Heartbeat...");},3e4);new Promise(()=>{});watchdog.PreviewWatchdog.start();new bullmq.Worker(sharedServices.QUEUE_SUPERVISOR,async o=>{if(o.name==="health-check-loop"){let r=await server.DistributedExecutionContext.getActiveExecutions();observability.logger.info({count:r.length},"[Supervisor Worker] Running global health check");for(let e of r)try{let a=await server.supervisorService.checkHealth(e);a!=="NONE"&&await server.supervisorService.handleDecision(e,a);}catch(a){observability.logger.error({id:e,err:a},"[Supervisor Worker] Error checking execution health");}}},{connection:sharedServices.redis,concurrency:1});async function It(){(await sharedServices.supervisorQueue.getRepeatableJobs()).find(r=>r.name==="health-check-loop")||(await sharedServices.supervisorQueue.add("health-check-loop",{},{repeat:{every:3e4}}),observability.logger.info("[Supervisor Worker] Repeatable health-check-loop job scheduled."));}It().catch(o=>observability.logger.error({err:o},"Failed to setup supervisor cron"));observability.logger.info("Supervisor Worker online");setInterval(()=>{},3e4);new Promise(()=>{});var Tt=q__default.default.join(process.cwd(),"validator_direct.log"),R=o=>xr__default.default.appendFileSync(Tt,`[${new Date().toISOString()}] ${o}
-`);new bullmq.Worker(sharedServices.QUEUE_VALIDATE,async o=>{let{projectId:r,executionId:e,prompt:a,strategy:n}=o.data;R(`[Validator] Job received for ${e}`);let t=q__default.default.join(process.cwd(),".generated-projects",r);observability.logger.info({projectId:r,executionId:e},"[Validator Worker] Started Verification");try{await sharedServices.eventBus.stage(e,"testing","in_progress","Validator Agent: Running type checks...",75);let i=new server.DistributedExecutionContext(e),c=(await i.get())?.finalFiles||[],l=new server.VirtualFileSystem;l.loadFromDiskState(c),R(`[Validator] Running verifier on ${t}`);let u=await server.patchVerifier.verify(t,l);u.passed?(R("[Validator] PASSED"),await sharedServices.eventBus.stage(e,"ValidatorAgent","completed","Build verification passed \u2705",100),await server.dockerQueue.add("build-container",{projectId:r,executionId:e,prompt:a,strategy:n}),await sharedServices.eventBus.stage(e,"testing","completed","Verification complete.",85)):(R(`[Validator] FAILED with ${u.errors?.length} errors: ${u.errors?.join(" | ")}`),R("Triggering Repair."),await i.atomicUpdate(m=>{m.status="executing",m.agentResults||(m.agentResults={}),m.agentResults.ValidatorAgent={agentName:"ValidatorAgent",status:"failed",error:u.errors?.join(`
-`)||"TypeScript verification failed",attempts:1,startTime:new Date().toISOString()};}),await sharedServices.eventBus.stage(e,"testing","in_progress","Validator Agent: Build failed. Routing to Repair Agent...",80),await server.repairQueue.add("repair-build",{projectId:r,executionId:e,prompt:a}));let g=process.memoryUsage(),p=Math.round(g.heapUsed/1024/1024*100)/100;R(`[Validator] Memory usage: ${p} MB (Heap Used)`),observability.logger.info({executionId:e,memoryMb:p},"[Validator Worker] Memory Usage");}catch(i){let s=i instanceof Error?i.message:String(i);throw R(`[Validator] ERROR: ${s}`),observability.logger.error({error:i,executionId:e},"[Validator Worker] Failed"),await sharedServices.eventBus.error(e,`Validator Error: ${s}`),i}},{connection:sharedServices.redis,concurrency:5});observability.logger.info("Validator Worker online");async function Ut(){observability.logger.info("[WatchdogWorker] Starting background resource monitor..."),watchdog.PreviewWatchdog.start(),process.on("SIGTERM",()=>{observability.logger.info("[WatchdogWorker] Shutting down..."),watchdog.PreviewWatchdog.stop(),process.exit(0);}),process.on("SIGINT",()=>{observability.logger.info("[WatchdogWorker] Shutting down..."),watchdog.PreviewWatchdog.stop(),process.exit(0);}),setInterval(()=>{},1e3);}Ut().catch(o=>{observability.logger.error({err:o},"[WatchdogWorker] Critical startup failure"),process.exit(1);});var Ct="self-evolution",Jt=new selfEvolution.SelfEvolver({autoRefactor:true});new bullmq.Worker(Ct,async o=>{observability.logger.info({jobId:o.id},"[Evolution Worker] Starting system evolution cycle");try{let r={cpuUsage:80,memoryUsage:90,errorRate:5,latencyTarget:200,actualLatency:350},e=["WARN: High latency detected in API Gateway","ERROR: Connection timeout to Redis"],a=await Jt.evolve(r,e);return observability.logger.info({result:a},"[Evolution Worker] Evolution cycle completed"),a}catch(r){let e=r instanceof Error?r.message:String(r);throw observability.logger.error({err:r},"[Evolution Worker] Evolution cycle failed"),new Error(`Evolution Error: ${e}`)}},{connection:sharedServices.redis,concurrency:1});observability.logger.info("Self-Evolution Worker online");var Bt="auto-refactor";new bullmq.Worker(Bt,async o=>{let{targetPath:r}=o.data;observability.logger.info({jobId:o.id,targetPath:r},"[Auto-Refactor Worker] Starting refactoring process");try{if(!r)throw new Error("targetPath is required for auto-refactor");let e=await refactorAgent.applyFixes(r);return observability.logger.info({fixed:e,targetPath:r},"[Auto-Refactor Worker] Refactoring completed"),e}catch(e){let a=e instanceof Error?e.message:String(e);throw observability.logger.error({err:e,targetPath:r},"[Auto-Refactor Worker] Refactoring failed"),new Error(`Refactor Error: ${a}`)}},{connection:sharedServices.redis,concurrency:2});observability.logger.info("Auto-Refactor Worker online");M("worker-fleet");observability.startMetricsServer(9091);autonomousAgent.setupAutonomousWorker();//# sourceMappingURL=index.js.map
+"use strict";
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
+
+// src/instrumentation.ts
+var import_observability = require("@packages/observability");
+async function initInstrumentation(serviceName) {
+  return (0, import_observability.initInstrumentation)(serviceName);
+}
+
+// src/index.ts
+var import_observability18 = require("@packages/observability");
+
+// src/architecture-worker.ts
+var import_config = require("dotenv/config");
+var import_bullmq = require("bullmq");
+var import_observability2 = require("@packages/observability");
+var import_shared_services = require("@packages/shared-services");
+var import_server = require("@packages/utils/server");
+var import_agents = require("@packages/agents");
+var import_path = __toESM(require("path"));
+var fs = __toESM(require("fs-extra"));
+var customizerAgent = new import_agents.CustomizerAgent();
+var logPath = import_path.default.join(process.cwd(), "architecture_worker.log");
+var log = (msg) => {
+  const timestamp = (/* @__PURE__ */ new Date()).toISOString();
+  fs.appendFileSync(logPath, `[${timestamp}] ${msg}
+`);
+};
+var architectureWorker = new import_bullmq.Worker(import_shared_services.QUEUE_ARCHITECT, async (job) => {
+  const { projectId, executionId, userId, prompt, intent, strategy } = job.data;
+  const sandboxDir = import_path.default.join(process.cwd(), ".generated-projects", projectId);
+  log(`[Architecture] Job received for ${executionId}`);
+  import_observability2.logger.info({ projectId, executionId }, "[Architecture Worker] Started");
+  try {
+    await import_shared_services.eventBus.stage(executionId, "initializing", "in_progress", "Architecture Agent: Designing project structure...", 30);
+    import_observability2.logger.info({ projectId, template: intent.templateId }, "[Architecture Worker] Initializing template");
+    const relativeFilePaths = await import_server.TemplateEngine.copyTemplate(intent.templateId, sandboxDir);
+    import_observability2.logger.info({ projectId }, "[Architecture Worker] Applying surgical edits");
+    const vfs = new import_server.VirtualFileSystem();
+    const initialFiles = await Promise.all(relativeFilePaths.map(async (relPath) => {
+      const safeRelPath = relPath.replace(/^[\\\/]+/, "");
+      const fullPath = import_path.default.join(sandboxDir, safeRelPath);
+      const content = await fs.readFile(fullPath, "utf-8");
+      return { path: safeRelPath, content };
+    }));
+    vfs.loadFromDiskState(initialFiles);
+    const customizationResult = await customizerAgent.execute({
+      prompt,
+      templateId: intent.templateId,
+      files: initialFiles.filter((f) => f.path.endsWith(".tsx") || f.path.endsWith(".ts")),
+      branding: intent.branding,
+      features: intent.features
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }, {});
+    if (customizationResult.success && customizationResult.data.patches.length > 0) {
+      for (const patch of customizationResult.data.patches) {
+        vfs.setFile(patch.path, patch.content);
+      }
+      await import_server.CommitManager.commit(vfs, sandboxDir);
+      import_observability2.logger.info({ projectId, patches: customizationResult.data.patches.length }, "[Architecture Worker] Applied patches");
+    }
+    const context = new import_server.DistributedExecutionContext(executionId);
+    await context.atomicUpdate((ctx) => {
+      ctx.metadata.architectureReady = true;
+      ctx.finalFiles = vfs.getAllFiles();
+    });
+    await import_shared_services.eventBus.stage(executionId, "architecture", "completed", "Project structure and branding applied.", 40);
+    await import_server.generatorQueue.add("generate-code", {
+      projectId,
+      executionId,
+      userId,
+      prompt,
+      intent,
+      strategy
+    });
+    const mem = process.memoryUsage();
+    const memMb = Math.round(mem.heapUsed / 1024 / 1024 * 100) / 100;
+    log(`[Architecture] Memory usage: ${memMb} MB (Heap Used)`);
+    import_observability2.logger.info({ executionId, memoryMb: memMb }, "[Architecture Worker] Memory Usage");
+    await import_shared_services.eventBus.stage(executionId, "initializing", "completed", "Architecture design complete. Multi-agent code generation started.", 40);
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    log(`[Architecture] ERROR: ${errorMessage}`);
+    import_observability2.logger.error({ error, executionId }, "[Architecture Worker] Failed");
+    await import_shared_services.eventBus.error(executionId, `Architecture Error: ${errorMessage}`);
+    throw error;
+  }
+}, {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  connection: import_shared_services.redis,
+  concurrency: 5
+});
+log(`Architecture Worker online. Redis: ${import_shared_services.redis.options.port}`);
+import_observability2.logger.info("Architecture Worker online");
+setInterval(() => {
+  const mem = process.memoryUsage();
+  const memMb = Math.round(mem.heapUsed / 1024 / 1024 * 100) / 100;
+  log(`Heartbeat... Memory: ${memMb} MB`);
+}, 3e4);
+new Promise(() => {
+});
+
+// src/base-worker.ts
+var import_bullmq2 = require("bullmq");
+var import_observability3 = require("@packages/observability");
+var import_shared_services2 = require("@packages/shared-services");
+var import_server2 = require("@packages/utils/server");
+var import_resilience = require("@packages/resilience");
+var workerTaskDurationSeconds = { observe: (...args) => {
+} };
+var agentFailuresTotal = { inc: (...args) => {
+} };
+var BaseWorker = class {
+  worker;
+  dlq;
+  breaker;
+  constructor(queueName) {
+    this.breaker = (0, import_resilience.createBreaker)(async (job) => {
+      return this.processJob(job);
+    }, {
+      timeout: 3e4,
+      errorThresholdPercentage: 50,
+      resetTimeout: 1e4
+    });
+    this.worker = new import_bullmq2.Worker(queueName, async (job) => {
+      if (!job.id) return this.breaker.fire(job);
+      const tenantId = job.data.tenantId || "global";
+      const hasQuota = await import_server2.TenantService.checkQuota(tenantId);
+      if (!hasQuota) {
+        import_observability3.logger.error({ tenantId, jobId: job.id }, "[Worker] Tenant quota exceeded");
+        throw new Error(`QUOTA_EXCEEDED: ${tenantId}`);
+      }
+      const startTime = Date.now();
+      let status = "success";
+      try {
+        const result = await this.breaker.fire(job);
+        if (result && typeof result === "object" && "metrics" in result) {
+          const metrics = result.metrics;
+          await import_server2.usageService.recordAiUsage({
+            model: result.model || "default",
+            promptTokens: metrics.promptTokens || 0,
+            completionTokens: metrics.completionTokens || 0,
+            totalTokens: metrics.totalTokens || 0,
+            userId: job.data.userId || "system",
+            tenantId: job.data.tenantId || "global",
+            metadata: { jobId: job.id, queue: queueName }
+          });
+        }
+        return result;
+      } catch (err) {
+        status = "failed";
+        agentFailuresTotal.inc({ agent_name: this.getName() });
+        throw err;
+      } finally {
+        const duration = (Date.now() - startTime) / 1e3;
+        workerTaskDurationSeconds.observe({ queue_name: queueName, status }, duration);
+        import_server2.SLOService.checkLatency(queueName, duration);
+      }
+    }, {
+      connection: import_shared_services2.redis,
+      ...import_resilience.DEFAULT_RETRY_OPTIONS
+    });
+    this.dlq = new import_bullmq2.Queue(import_resilience.DEAD_LETTER_QUEUE_NAME, { connection: import_shared_services2.redis });
+    this.worker.on("failed", async (job, err) => {
+      if (job && job.attemptsMade >= (import_resilience.DEFAULT_RETRY_OPTIONS.attempts || 3)) {
+        await this.dlq.add("failed-job", {
+          originalQueue: queueName,
+          jobId: job.id,
+          data: job.data,
+          error: err.message
+        });
+      }
+    });
+  }
+};
+
+// src/backend-worker.ts
+var import_observability4 = require("@packages/observability");
+var import_shared_services3 = require("@packages/shared-services");
+var import_agent_memory = require("@packages/agents/services/agent-memory");
+var BackendWorker = class extends BaseWorker {
+  constructor() {
+    super("backend_queue");
+  }
+  queueName = "backend_queue";
+  getName() {
+    return "BackendAgent";
+  }
+  getWorkerId() {
+    return `backend-worker-${process.pid}`;
+  }
+  async processJob(job) {
+    const { missionId, taskId } = job.data;
+    try {
+      import_observability4.logger.info({ missionId, taskId }, "[BackendWorker] Starting task");
+      await this.streamThought(missionId, "Analyzing backend requirements and designing API routes...");
+      await new Promise((resolve) => setTimeout(resolve, 3e3));
+      const result = {
+        files: [
+          { path: "server/api/routes.ts", content: "// Generated Express routes\nexport const routes = [];" },
+          { path: "server/models/schema.ts", content: "// Generated DB Schema" }
+        ],
+        metrics: {
+          tokens: 1200,
+          duration: 3e3
+        }
+      };
+      await import_agent_memory.AgentMemory.set(missionId, `backend:result:${taskId}`, result);
+      await import_agent_memory.AgentMemory.appendTranscript(missionId, this.getName(), "Successfully generated API routes and schema.");
+      await import_shared_services3.eventBus.stage(missionId, this.getName(), "COMPLETED", `Generated ${result.files.length} backend files`, 100);
+      return result;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      import_observability4.logger.error({ error, missionId, taskId }, "[BackendWorker] Task failed");
+      await import_shared_services3.eventBus.error(missionId, `Backend Error: ${errorMessage}`);
+      throw error;
+    }
+  }
+};
+if (require.main === module) {
+  new BackendWorker();
+}
+
+// src/build-worker.ts
+var import_config2 = require("dotenv/config");
+var import_fs_extra = __toESM(require("fs-extra"));
+var import_path2 = __toESM(require("path"));
+var import_bullmq3 = require("bullmq");
+var import_observability5 = require("@packages/observability");
+var import_shared_services4 = require("@packages/shared-services");
+var import_core_engine = require("@packages/core-engine");
+var import_server3 = require("@packages/utils/server");
+var import_contracts = require("@packages/contracts");
+var import_validator = require("@packages/validator");
+var import_nodeRegistry = require("@packages/sandbox-runtime/cluster/nodeRegistry");
+var import_failoverManager = require("@packages/sandbox-runtime/cluster/failoverManager");
+var import_redisRecovery = require("@packages/sandbox-runtime/cluster/redisRecovery");
+var import_previewOrchestrator = require("@packages/runtime/previewOrchestrator");
+var import_runtimeCleanup = require("@packages/runtime/runtimeCleanup");
+var import_build_engine = require("@packages/build-engine");
+var import_os = __toESM(require("os"));
+var WORKER_ID = `worker-${import_os.default.hostname()}-${process.pid}`;
+var orchestrator = new import_core_engine.Orchestrator();
+var workerId = `worker-${Math.random().toString(36).substring(2, 9)}`;
+var HEARTBEAT_INTERVAL = 5e3;
+setInterval(async () => {
+  try {
+    const heartbeat = {
+      status: "online",
+      lastSeen: Date.now(),
+      memory: process.memoryUsage().heapUsed / 1024 / 1024,
+      // MB
+      uptime: process.uptime(),
+      workerId
+    };
+    await import_shared_services4.redis.set(`worker:heartbeat:${workerId}`, JSON.stringify(heartbeat), "EX", 15);
+    await import_shared_services4.redis.set("system:health:worker", JSON.stringify(heartbeat), "EX", 15);
+  } catch {
+    import_observability5.logger.warn("Failed to update worker heartbeat");
+  }
+}, HEARTBEAT_INTERVAL);
+var RECOVERY_STALE_MS = 6e4;
+var resumeOrphanedExecutions = async () => {
+  import_observability5.logger.info("Scanning for orphaned missions to resume...");
+  try {
+    const activeMissions = await import_server3.missionController.listActiveMissions();
+    const activeHeartbeatKeys = await import_shared_services4.redis.keys("worker:heartbeat:*");
+    const activeWorkerIds = new Set(activeHeartbeatKeys.map((k) => k.split(":").pop()));
+    for (const mission of activeMissions) {
+      const missionWorkerId = mission.metadata?.workerId;
+      const isStale = Date.now() - mission.updatedAt > RECOVERY_STALE_MS;
+      const isOwnerDead = missionWorkerId && !activeWorkerIds.has(missionWorkerId);
+      if (isStale || isOwnerDead) {
+        import_observability5.logger.info({
+          missionId: mission.id,
+          status: mission.status,
+          isStale,
+          isOwnerDead
+        }, "Resuming orphaned mission...");
+        import_server3.stuckBuildsTotal.inc();
+        executeBuild({
+          prompt: mission.prompt,
+          userId: mission.userId,
+          projectId: mission.projectId,
+          executionId: mission.id,
+          isFastPreview: !!mission.metadata?.fastPath
+        }).catch((err) => import_observability5.logger.error({ err, missionId: mission.id }, "Failed to resume orphaned mission"));
+      }
+    }
+  } catch (err) {
+    import_observability5.logger.error({ err }, "Error during orphaned mission scan");
+  }
+};
+setInterval(resumeOrphanedExecutions, 6e4);
+var executeBuild = async (data, job) => {
+  const { prompt, userId, projectId, executionId, isFastPreview } = data;
+  const tier = job ? job.queueName.includes("pro") ? "pro" : "free" : "instant";
+  const lockKey = `build:lock:${executionId}`;
+  const lock = await import_shared_services4.redis.set(lockKey, executionId, "EX", 600, "NX");
+  if (!lock) {
+    if (job) import_observability5.logger.warn({ executionId, jobId: job.id, tier }, "Duplicate execution (Queue) detected. Skipping.");
+    return;
+  }
+  const controller = new AbortController();
+  if (job) {
+    const waitTime = (Date.now() - job.timestamp) / 1e3;
+    import_server3.queueWaitTimeSeconds.observe({ queue_name: tier }, waitTime);
+  }
+  const lockExtensionInterval = setInterval(async () => {
+    try {
+      if (job && await job.isActive()) {
+        await job.extendLock(job.token, 3e5);
+      }
+      const owner = await import_shared_services4.redis.get(lockKey);
+      if (owner !== executionId) {
+        throw new Error("Execution lock ownership lost (Heartbeat Violation)");
+      }
+      await import_shared_services4.redis.expire(lockKey, 600);
+      import_observability5.logger.debug({ executionId, tier }, "Execution locks extended (Heartbeat)");
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      import_observability5.logger.error({ executionId, error: errorMessage, tier }, "CRITICAL: Lock heartbeat failed. Aborting.");
+      controller.abort();
+    }
+  }, 3e4);
+  const startTime = Date.now();
+  try {
+    await import_server3.missionController.updateMission(executionId, {
+      status: "planning",
+      metadata: { workerId }
+    });
+    const BUILD_TIMEOUT_MS = 15 * 60 * 1e3;
+    const timeout = setTimeout(() => {
+      import_observability5.logger.error({ executionId }, "[Worker] Build timeout reached. Aborting.");
+      controller.abort();
+    }, BUILD_TIMEOUT_MS);
+    return await (0, import_server3.runWithTracing)(executionId, async () => {
+      import_observability5.logger.info({ executionId, userId, projectId, tier }, "Worker entering executeBuild loop");
+      const sandboxDir = import_path2.default.join(process.cwd(), ".generated-projects", projectId);
+      await import_fs_extra.default.ensureDir(sandboxDir);
+      const cacheRestored = await import_build_engine.BuildCacheManager.restore(projectId, sandboxDir);
+      if (cacheRestored) {
+        import_observability5.logger.info({ projectId }, "[Worker] Incremental build: Cache restored successfully");
+        await import_server3.eventBus.stage(executionId, import_contracts.JobStage.PLAN.toLowerCase(), "completed", "Incremental build: Restored previous build cache", 20, projectId);
+        const affectedNodes = await import_build_engine.BuildGraphEngine.getAffectedNodes(sandboxDir);
+        if (affectedNodes.length === 0) {
+          import_observability5.logger.info({ projectId }, "[Worker] Zero affected nodes. Skipping full build.");
+          await import_server3.eventBus.stage(executionId, import_contracts.JobStage.PLAN.toLowerCase(), "completed", "No changes detected. Reusing existing artifacts.", 30, projectId);
+        } else {
+          import_observability5.logger.info({ projectId, count: affectedNodes.length }, "[Worker] Partial changes detected");
+        }
+      }
+      try {
+        const result = await orchestrator.execute(
+          prompt,
+          userId,
+          projectId,
+          executionId,
+          controller.signal,
+          { isFastPreview }
+        );
+        clearTimeout(timeout);
+        if (result && !result.success) {
+          const errorResult = result;
+          throw new Error(errorResult.error || "Build failed");
+        }
+        const validationResult = await import_validator.ArtifactValidator.validate(projectId);
+        if (!validationResult.valid) {
+          const error = `Build integrity failure: Missing ${validationResult.missingFiles?.join(", ") || "critical files"}`;
+          import_observability5.logger.error({ projectId, missing: validationResult.missingFiles }, "[Worker] Integrity Check FAILED");
+          throw new Error(error);
+        }
+        import_observability5.logger.info({ projectId }, "[Worker] Integrity Check PASSED");
+        await import_build_engine.BuildCacheManager.save(projectId, sandboxDir);
+        await import_server3.missionController.updateMission(executionId, { status: "complete" });
+        const durationMs = Date.now() - startTime;
+        await import_server3.ReliabilityMonitor.recordSuccess(durationMs);
+        return result;
+      } catch (err) {
+        clearTimeout(timeout);
+        throw err;
+      }
+    });
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    import_observability5.logger.error({ executionId, error: msg, tier }, "Execution failed");
+    await import_server3.missionController.updateMission(executionId, {
+      status: "failed",
+      metadata: { error: msg }
+    });
+    await import_server3.eventBus.stage(executionId, import_contracts.JobStage.FAILED.toLowerCase(), "failed", `Build failed: ${msg}`, 100, projectId);
+    await import_server3.eventBus.error(executionId, `[BuildWorker] ${msg}`, projectId);
+    await import_server3.ReliabilityMonitor.recordFailure();
+    throw error;
+  } finally {
+    clearInterval(lockExtensionInterval);
+  }
+};
+var processJob = async (job) => {
+  return await executeBuild(job.data, job);
+};
+var freeWorker = new import_bullmq3.Worker(import_shared_services4.QUEUE_FREE, processJob, {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  connection: import_shared_services4.redis,
+  concurrency: import_server3.env.WORKER_CONCURRENCY_FREE || 5,
+  lockDuration: 3e5,
+  // 5 minute initial lock
+  limiter: {
+    max: 5,
+    // Process max 5 jobs per second per worker instance
+    duration: 1e3
+  }
+});
+var proWorker = new import_bullmq3.Worker(import_shared_services4.QUEUE_PRO, processJob, {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  connection: import_shared_services4.redis,
+  concurrency: import_server3.env.WORKER_CONCURRENCY_PRO || 20,
+  lockDuration: 3e5,
+  // 5 minute initial lock
+  limiter: {
+    max: 10,
+    duration: 1e3
+  }
+});
+var setupWorkerEvents = (worker, name) => {
+  worker.on("completed", (job) => {
+    import_observability5.logger.info({ jobId: job.id, worker: name }, "Job completed");
+  });
+  worker.on("failed", (job, err) => {
+    import_observability5.logger.error({ jobId: job?.id, worker: name, err: err.message }, "Job failed");
+  });
+};
+setupWorkerEvents(freeWorker, "free");
+setupWorkerEvents(proWorker, "pro");
+var shutdown = async () => {
+  import_observability5.logger.info("Shutting down workers...");
+  import_failoverManager.FailoverManager.stop();
+  await import_runtimeCleanup.RuntimeCleanup.shutdownAll();
+  await import_nodeRegistry.NodeRegistry.deregister();
+  await Promise.all([freeWorker.close(), proWorker.close()]);
+  await import_shared_services4.redis.quit();
+  process.exit(0);
+};
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);
+setInterval(async () => {
+  try {
+    await import_server3.WorkerClusterManager.heartbeat({
+      workerId: WORKER_ID,
+      hostname: import_os.default.hostname(),
+      load: 0,
+      // In production, we'd calculate CPU/Mem load here
+      status: "IDLE"
+      // Update dynamically based on job state
+    });
+  } catch (err) {
+    console.error("[Worker] Heartbeat failed:", err);
+  }
+}, 2e3);
+(async () => {
+  try {
+    const sub = import_shared_services4.redis.duplicate();
+    import_observability5.logger.info({ workerId: WORKER_ID }, "[Worker] Subscribing to direct steering channel");
+    await sub.subscribe(`worker:trigger:${WORKER_ID}`);
+    sub.on("message", async (channel, message) => {
+      if (channel !== `worker:trigger:${WORKER_ID}`) return;
+      try {
+        const { projectId } = JSON.parse(message);
+        import_observability5.logger.info({ projectId }, "[Worker] Direct job steering received! Triggering execution.");
+      } catch (pErr) {
+        import_observability5.logger.error({ err: pErr }, "[Worker] Failed to parse steering message");
+      }
+    });
+  } catch (err) {
+    const error = err;
+    import_observability5.logger.error({ err: error.message }, "[Worker] Direct steering listener failed");
+  }
+})();
+(async () => {
+  try {
+    const nodeId = await import_nodeRegistry.NodeRegistry.register();
+    import_observability5.logger.info({ nodeId }, "Node registered in cluster");
+    import_failoverManager.FailoverManager.start();
+    const sub = import_shared_services4.redis.duplicate();
+    await sub.subscribe("cluster:schedule:assign", "cluster:node:restart", "build:init:trigger");
+    sub.on("message", async (channel, message) => {
+      try {
+        const data = JSON.parse(message);
+        if (channel === "build:init:trigger") {
+          import_observability5.logger.info({ executionId: data.executionId }, "\u26A1 Instant Trigger received. Initiating build...");
+          executeBuild(data).catch((err) => import_observability5.logger.error({ err, executionId: data.executionId }, "Instant Trigger execution failed"));
+        } else if (channel === "cluster:schedule:assign") {
+          if (data.targetNodeId === nodeId) {
+            import_observability5.logger.info({ projectId: data.request.projectId }, "[Worker] Picking up assigned runtime");
+            import_previewOrchestrator.PreviewOrchestrator.start(
+              data.request.projectId,
+              data.request.executionId,
+              data.request.userId
+            ).catch((err) => {
+              const error = err instanceof Error ? err.message : String(err);
+              import_observability5.logger.error({ err: error, projectId: data.request.projectId }, "Failed to start assigned runtime");
+            });
+          }
+        } else if (channel === "cluster:node:restart") {
+          if (data.nodeId === nodeId) {
+            import_observability5.logger.warn({ reason: data.reason }, "[Worker] Received restart signal. Shutting down gracefully...");
+            await shutdown();
+          }
+        }
+      } catch (err) {
+        const errMsg = err instanceof Error ? err.message : String(err);
+        import_observability5.logger.error({ error: errMsg }, `[Worker] Error processing message on channel ${channel}`);
+      }
+    });
+  } catch (err) {
+    const errMsg = err instanceof Error ? err.message : String(err);
+    import_observability5.logger.error({ error: errMsg }, "Failed to register node in cluster (non-fatal, running in standalone mode)");
+  }
+})();
+import_observability5.logger.info(`Workers started: Free (concurrency=${freeWorker.opts.concurrency}), Pro (concurrency=${proWorker.opts.concurrency})`);
+resumeOrphanedExecutions();
+import_runtimeCleanup.RuntimeCleanup.start();
+import_shared_services4.redis.on("error", (err) => {
+  import_observability5.logger.error({ err: err.message }, "[Worker] Redis connection error");
+  if ("code" in err && (err.code === "ECONNREFUSED" || err.code === "ETIMEDOUT")) {
+    import_redisRecovery.RedisRecovery.handleRedisCrash().catch((recErr) => {
+      import_observability5.logger.error({ err: recErr.message }, "[Worker] Critical recovery failure");
+    });
+  }
+});
+
+// src/workers/buildWorker.ts
+var import_bullmq4 = require("bullmq");
+var import_core_engine2 = require("@packages/core-engine");
+var import_queue = require("@packages/queue");
+var import_observability6 = require("@packages/observability");
+var buildWorker = new import_bullmq4.Worker(
+  "build",
+  async (job) => {
+    const { missionId, prompt, isUpdate, isDeploy, vpsIp } = job.data;
+    import_observability6.logger.info({ missionId, jobId: job.id, isUpdate, isDeploy }, "[Worker] Job received");
+    try {
+      if (isDeploy) {
+        const result = await (0, import_core_engine2.deployPipeline)(missionId, vpsIp || "1.1.1.1");
+        return result;
+      } else if (isUpdate) {
+        await (0, import_core_engine2.updatePipeline)(missionId, prompt);
+        return { success: true, missionId };
+      } else {
+        const result = await (0, import_core_engine2.runPipeline)(missionId, prompt);
+        return result;
+      }
+    } catch (error) {
+      import_observability6.logger.error({ missionId, error: error.message }, "[Worker] Pipeline execution crashed");
+      throw error;
+    }
+  },
+  {
+    connection: import_queue.redisConnection,
+    concurrency: 5
+  }
+);
+import_observability6.logger.info("[Worker] Build worker online");
+
+// src/mission-worker.ts
+var import_bullmq5 = require("bullmq");
+var import_server4 = require("@packages/utils/server");
+var import_core_engine3 = require("@packages/core-engine");
+var import_sandbox_runtime = require("@packages/sandbox-runtime");
+var import_path3 = __toESM(require("path"));
+var import_fs_extra2 = __toESM(require("fs-extra"));
+var orchestrator2 = new import_core_engine3.MissionOrchestrator();
+var missionWorker = new import_bullmq5.Worker(import_server4.QUEUE_FREE, async (job) => {
+  const { executionId, prompt, projectId } = job.data;
+  const PROJECTS_ROOT = import_path3.default.join(process.cwd(), ".generated-projects");
+  const sandboxDir = import_path3.default.join(PROJECTS_ROOT, projectId);
+  import_server4.logger.info({ executionId, projectId }, "[MissionWorker] Processing mission");
+  try {
+    const result = await orchestrator2.execute(executionId, prompt, projectId);
+    if (!result.success) throw new Error(result.error || "Mission execution failed");
+    await import_fs_extra2.default.ensureDir(sandboxDir);
+    for (const file of result.files) {
+      const filePath = import_path3.default.join(sandboxDir, file.path);
+      await import_fs_extra2.default.ensureDir(import_path3.default.dirname(filePath));
+      await import_fs_extra2.default.writeFile(filePath, file.content);
+    }
+    await import_server4.missionController.updateMission(executionId, { status: "deploying" });
+    await import_server4.eventBus.stage(executionId, "deploying", "in_progress", "Allocating sandbox resources...", 85, projectId);
+    const [port] = await import_sandbox_runtime.PortManager.acquirePorts(projectId, 1);
+    const { containerId } = await import_sandbox_runtime.ContainerManager.start(projectId, port);
+    const previewUrl = `/preview/${projectId}`;
+    await import_server4.missionController.updateMission(executionId, {
+      status: "complete",
+      metadata: { containerId, port, previewUrl }
+    });
+    await import_server4.eventBus.stage(executionId, "previewing", "completed", "Sandbox is live!", 100, projectId);
+    await import_server4.eventBus.complete(executionId, previewUrl, {
+      taskCount: result.files.length,
+      autonomousCycles: 1
+    });
+    import_server4.logger.info({ executionId, projectId, port }, "[MissionWorker] Sandbox deployed successfully");
+  } catch (error) {
+    import_server4.logger.error({ executionId, error }, "[MissionWorker] Critical failure");
+    await import_server4.eventBus.error(executionId, error instanceof Error ? error.message : String(error), projectId);
+    throw error;
+  }
+}, {
+  connection: import_server4.redis,
+  concurrency: 5
+});
+
+// src/deploy-worker.ts
+var import_bullmq6 = require("bullmq");
+var import_utils = require("@packages/utils");
+var import_server5 = require("@packages/utils/server");
+var import_utils2 = require("@packages/utils");
+var import_path4 = __toESM(require("path"));
+var import_fs = __toESM(require("fs"));
+var logPath2 = import_path4.default.join(process.cwd(), "deploy_worker.log");
+var log2 = (msg) => {
+  const timestamp = (/* @__PURE__ */ new Date()).toISOString();
+  import_fs.default.appendFileSync(logPath2, `[${timestamp}] ${msg}
+`);
+};
+var deployWorker = new import_bullmq6.Worker(import_utils.QUEUE_DEPLOY, async (job) => {
+  const { projectId, executionId, previewUrl } = job.data;
+  const sandboxDir = import_path4.default.join(process.cwd(), ".generated-projects", projectId);
+  log2(`[Deploy] Job received for ${executionId}`);
+  import_utils.logger.info({ projectId, executionId }, "[Deploy Worker] Finalizing Deployment");
+  try {
+    await import_utils.eventBus.stage(executionId, "cicd", "in_progress", "Deployment Agent: Finalizing project lifecycle...", 95);
+    const context = new import_server5.DistributedExecutionContext(executionId);
+    const data = await context.get();
+    const allFiles = data?.finalFiles || [];
+    const intent = data?.metadata?.intent;
+    await import_server5.projectMemory.initializeMemory(
+      projectId,
+      { framework: intent?.templateId || "nextjs", styling: "tailwind", backend: "api-routes", database: "supabase" },
+      allFiles
+    );
+    const tenant = await import_server5.TenantService.getTenantForUser(data?.userId || "unknown");
+    if (tenant && import_utils2.IS_PRODUCTION) {
+      log2("[Deploy Worker] Production Mode: Provisioning resources...");
+      const infra = await import_server5.InfraProvisioner.provisionResources(projectId, tenant.plan);
+      await import_server5.CICDManager.setupPipeline(projectId, sandboxDir, intent?.templateId || "nextjs");
+      await context.atomicUpdate((ctx) => {
+        ctx.metadata.infra = infra;
+        ctx.metadata.deploymentStatus = "deployed";
+      });
+    } else {
+      log2("[Deploy Worker] Dev Mode: Skipping infrastructure provisioning");
+    }
+    await context.atomicUpdate((ctx) => {
+      ctx.status = "completed";
+      ctx.locked = true;
+    });
+    await import_utils.eventBus.stage(executionId, "deployment", "completed", "Build success! Preview online.", 100);
+    await import_utils.eventBus.complete(executionId, previewUrl, {
+      taskCount: allFiles.length,
+      autonomousCycles: 1
+    });
+    const mem = process.memoryUsage();
+    const memMb = Math.round(mem.heapUsed / 1024 / 1024 * 100) / 100;
+    log2(`[Deploy] Memory usage: ${memMb} MB (Heap Used)`);
+    import_utils.logger.info({ executionId, memoryMb: memMb }, "[Deploy Worker] Memory Usage");
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    log2(`[Deploy] ERROR: ${errorMessage}`);
+    import_utils.logger.error({ error, executionId }, "[Deploy Worker] Failed");
+    const context = new import_server5.DistributedExecutionContext(executionId);
+    await context.atomicUpdate((ctx) => {
+      ctx.status = "failed";
+      ctx.agentResults["DeployAgent"] = {
+        agentName: "DeployAgent",
+        status: "failed",
+        error: errorMessage,
+        attempts: (ctx.agentResults["DeployAgent"]?.attempts || 0) + 1,
+        startTime: (/* @__PURE__ */ new Date()).toISOString()
+      };
+    });
+    await import_utils.eventBus.error(executionId, `Deployment Error: ${errorMessage}`);
+    throw error;
+  }
+}, {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  connection: import_utils.redis,
+  concurrency: 5
+});
+log2(`Deployment Worker online. Redis: ${import_utils.redis.options.port}`);
+import_utils.logger.info("Deployment Worker online");
+setInterval(() => {
+  const mem = process.memoryUsage();
+  const memMb = Math.round(mem.heapUsed / 1024 / 1024 * 100) / 100;
+  log2(`Heartbeat... Memory: ${memMb} MB`);
+}, 3e4);
+new Promise(() => {
+});
+
+// src/docker-worker.ts
+var import_bullmq7 = require("bullmq");
+var import_observability7 = require("@packages/observability");
+var import_shared_services5 = require("@packages/shared-services");
+var import_server6 = require("@packages/utils/server");
+var podController = new import_server6.SandboxPodController();
+var dockerWorker = new import_bullmq7.Worker(import_shared_services5.QUEUE_DOCKER, async (job) => {
+  const { projectId, executionId } = job.data;
+  import_observability7.logger.info({ projectId, executionId }, "[Docker Worker] Starting deployment");
+  try {
+    await import_shared_services5.eventBus.stage(executionId, "deployment", "in_progress", "Docker Agent: Creating sandbox environment...", 90);
+    const context = new import_server6.DistributedExecutionContext(executionId);
+    const data = await context.get();
+    const deployment = await podController.deploy(projectId, executionId, data?.finalFiles || []);
+    if (!deployment.success) {
+      throw new Error(`Docker: Sandbox deployment failed. ${deployment.error || ""}`);
+    }
+    await context.atomicUpdate((ctx) => {
+      ctx.metadata.previewUrl = deployment.url;
+      ctx.status = "completed";
+    });
+    await import_shared_services5.eventBus.complete(executionId, deployment.url, {
+      tokensTotal: data?.metadata?.tokensTotal,
+      durationMs: data?.metadata?.durationMs
+    }, projectId, data?.finalFiles);
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    import_observability7.logger.error({ error, executionId }, "[Docker Worker] Failed");
+    await import_shared_services5.eventBus.error(executionId, `Docker Error: ${errorMessage}`);
+    throw error;
+  }
+}, {
+  connection: import_shared_services5.redis,
+  concurrency: 2
+});
+import_observability7.logger.info("Docker Worker online");
+
+// src/frontend-worker.ts
+var import_observability8 = require("@packages/observability");
+var import_shared_services6 = require("@packages/shared-services");
+var import_agent_memory2 = require("@packages/agents/services/agent-memory");
+var FrontendWorker = class extends BaseWorker {
+  constructor() {
+    super("frontend_queue");
+  }
+  queueName = "frontend_queue";
+  getName() {
+    return "FrontendAgent";
+  }
+  getWorkerId() {
+    return `frontend-worker-${process.pid}`;
+  }
+  async processJob(job) {
+    const { missionId, taskId } = job.data;
+    try {
+      import_observability8.logger.info({ missionId, taskId }, "[FrontendWorker] Starting task");
+      await this.streamThought(missionId, "Designing UI components and responsive layouts...");
+      await new Promise((resolve) => setTimeout(resolve, 4e3));
+      const result = {
+        files: [
+          { path: "src/components/Dashboard.tsx", content: "export const Dashboard = () => <div>Aion Dashboard</div>;" },
+          { path: "src/styles/globals.css", content: "/* Generated Styles */" }
+        ],
+        metrics: {
+          tokens: 1500,
+          duration: 4e3
+        }
+      };
+      await import_agent_memory2.AgentMemory.set(missionId, `frontend:result:${taskId}`, result);
+      await import_agent_memory2.AgentMemory.appendTranscript(missionId, this.getName(), "Generated fundamental UI components and styles.");
+      return result;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      import_observability8.logger.error({ error, missionId, taskId }, "[FrontendWorker] Task failed");
+      await import_shared_services6.eventBus.error(missionId, `Frontend Error: ${errorMessage}`);
+      throw error;
+    }
+  }
+};
+if (require.main === module) {
+  new FrontendWorker();
+}
+
+// src/generator-worker.ts
+var import_bullmq8 = require("bullmq");
+var import_observability9 = require("@packages/observability");
+var import_shared_services7 = require("@packages/shared-services");
+var import_server7 = require("@packages/utils/server");
+var import_generator_agent = require("@packages/agents/generator-agent");
+var generatorAgent = new import_generator_agent.GeneratorAgent();
+var blueprintManager = new import_server7.BlueprintManager();
+var generatorWorker = new import_bullmq8.Worker(import_shared_services7.QUEUE_GENERATOR, async (job) => {
+  const { projectId, executionId, userId, prompt, intent, strategy } = job.data;
+  import_observability9.logger.info({ projectId, executionId }, "[Generator Worker] Generating codebase");
+  try {
+    await import_shared_services7.eventBus.stage(executionId, "generating", "in_progress", "Generator Agent: Creating file blueprints...", 45);
+    const blueprints = await blueprintManager.getForTemplate(intent.templateId);
+    const result = await generatorAgent.execute({
+      prompt,
+      blueprints,
+      techStack: strategy?.recommendedTechStack
+    }, { executionId, userId, projectId });
+    if (!result.success) {
+      throw new Error(`Generator: Failed to generate files. ${result.error || ""}`);
+    }
+    const files = result.data.files;
+    const vfs = new import_server7.VirtualFileSystem();
+    vfs.loadFromDiskState(files);
+    const context = new import_server7.DistributedExecutionContext(executionId);
+    await context.atomicUpdate((ctx) => {
+      ctx.finalFiles = files;
+      ctx.status = "executing";
+    });
+    await import_shared_services7.eventBus.stage(executionId, "generating", "completed", `Generated ${files.length} files. Starting verification...`, 70);
+    await import_server7.validatorQueue.add("validate-build", {
+      projectId,
+      executionId,
+      userId,
+      prompt,
+      strategy
+    });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    import_observability9.logger.error({ error, executionId }, "[Generator Worker] Failed");
+    await import_shared_services7.eventBus.error(executionId, `Generator Error: ${errorMessage}`);
+    throw error;
+  }
+}, {
+  connection: import_shared_services7.redis,
+  concurrency: 3
+});
+import_observability9.logger.info("Generator Worker online");
+
+// src/meta-agent-worker.ts
+var import_bullmq9 = require("bullmq");
+var import_observability10 = require("@packages/observability");
+var import_shared_services8 = require("@packages/shared-services");
+var import_server8 = require("@packages/utils/server");
+var import_meta_agent = require("@packages/agents/meta-agent");
+var metaAgent = new import_meta_agent.MetaAgent();
+var metaWorker = new import_bullmq9.Worker(import_shared_services8.QUEUE_META, async (job) => {
+  const { executionId, prompt, userId, projectId } = job.data;
+  import_observability10.logger.info({ executionId, projectId }, "[Meta Worker] Analyzing project intent");
+  try {
+    await import_shared_services8.eventBus.stage(executionId, "meta-analysis", "in_progress", "Analyzing project requirements...", 10);
+    const result = await metaAgent.execute({ prompt }, { executionId, userId, projectId });
+    if (!result.success) {
+      throw new Error(result.error || "MetaAgent analysis failed");
+    }
+    const strategy = result.data;
+    import_observability10.logger.info({ projectId, executionId }, "[Meta Worker] Analysis complete");
+    await import_shared_services8.eventBus.stage(executionId, "meta-analysis", "completed", "Analysis complete. Recommended stack identified.", 15);
+    await import_server8.plannerQueue.add("plan-project", {
+      projectId,
+      executionId,
+      userId,
+      prompt,
+      strategy
+    });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    import_observability10.logger.error({ error, executionId }, "[Meta Worker] Failed");
+    await import_shared_services8.eventBus.error(executionId, `Meta-Agent Error: ${errorMessage}`);
+    throw error;
+  }
+}, {
+  connection: import_shared_services8.redis,
+  concurrency: 5
+});
+import_observability10.logger.info("Meta Worker online");
+
+// src/planner-worker.ts
+var import_bullmq10 = require("bullmq");
+var import_observability11 = require("@packages/observability");
+var import_shared_services9 = require("@packages/shared-services");
+var import_server9 = require("@packages/utils/server");
+var import_agents2 = require("@packages/agents");
+var intentAgent = new import_agents2.IntentDetectionAgent();
+var plannerWorker = new import_bullmq10.Worker(import_shared_services9.QUEUE_PLANNER, async (job) => {
+  const { projectId, executionId, userId, prompt, strategy } = job.data;
+  import_observability11.logger.info({ projectId, executionId }, "[Planner Worker] Started");
+  try {
+    await import_shared_services9.eventBus.stage(executionId, "initializing", "in_progress", "Planner Agent: Analyzing user intent...", 20);
+    const intentResult = await intentAgent.execute({
+      prompt,
+      context: { techStack: strategy?.recommendedTechStack }
+    }, { executionId, userId, projectId });
+    if (!intentResult.success) {
+      throw new Error(`Planner: Failed to detect intent. ${intentResult.error || ""}`);
+    }
+    const intent = intentResult.data;
+    import_observability11.logger.info({ projectId, template: intent.templateId }, "[Planner Worker] Intent detected");
+    const context = new import_server9.DistributedExecutionContext(executionId);
+    await context.atomicUpdate((ctx) => {
+      ctx.metadata.intent = intent;
+      ctx.metadata.strategy = strategy || ctx.metadata.strategy;
+      ctx.status = "executing";
+    });
+    await import_shared_services9.eventBus.stage(executionId, "PlannerAgent", "in_progress", `Selected template: ${intent.templateId}`, 30);
+    await import_server9.architectureQueue.add("design-architecture", {
+      projectId,
+      executionId,
+      userId,
+      prompt,
+      intent,
+      strategy
+    });
+    await import_shared_services9.eventBus.stage(executionId, "initializing", "completed", "Planning complete. Architecture design started.", 30);
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    import_observability11.logger.error({ error, executionId }, "[Planner Worker] Failed");
+    await import_shared_services9.eventBus.error(executionId, `Planner Error: ${errorMessage}`);
+    throw error;
+  }
+}, {
+  connection: import_shared_services9.redis,
+  concurrency: 5
+});
+import_observability11.logger.info("Planner Worker online");
+
+// src/repair-worker.ts
+var import_bullmq11 = require("bullmq");
+var import_observability12 = require("@packages/observability");
+var import_shared_services10 = require("@packages/shared-services");
+var import_server10 = require("@packages/utils/server");
+var import_agents3 = require("@packages/agents");
+var import_path5 = __toESM(require("path"));
+var import_fs2 = __toESM(require("fs"));
+var logPath3 = import_path5.default.join(process.cwd(), "repair_direct.log");
+var log3 = (msg) => import_fs2.default.appendFileSync(logPath3, `[${(/* @__PURE__ */ new Date()).toISOString()}] ${msg}
+`);
+log3("Repair Worker script started");
+var repairAgent = new import_agents3.RepairAgent();
+var repairWorker = new import_bullmq11.Worker(import_shared_services10.QUEUE_REPAIR, async (job) => {
+  const { executionId, projectId, prompt } = job.data;
+  log3(`[Repair] Job received for ${executionId}`);
+  const sandboxDir = import_path5.default.join(process.cwd(), ".generated-projects", projectId);
+  import_observability12.logger.info({ executionId, projectId }, "[Repair Worker] Starting autonomous repair");
+  try {
+    const context = new import_server10.DistributedExecutionContext(executionId);
+    const data = await context.get();
+    if (!data) return;
+    const repairAttempts = await import_shared_services10.redis.hincrby(`mission:stats:${executionId}`, "repair_attempts", 1);
+    if (repairAttempts > 3) {
+      log3(`[Repair] Limit exceeded (${repairAttempts}). Failing mission.`);
+      await import_shared_services10.eventBus.error(executionId, "Build failed autonomously after 3 repair attempts. Manual intervention required.");
+      return;
+    }
+    await import_shared_services10.eventBus.stage(executionId, "testing", "in_progress", `Supervisor: Engaging Repair Agent to fix build errors (Attempt ${repairAttempts}/3)...`, 80);
+    const failedAgent = Object.values(data.agentResults).find((r) => r.status === "failed");
+    const error = failedAgent?.error || "Unknown error";
+    const allFiles = data.finalFiles || [];
+    const repairResult = await repairAgent.execute({
+      error,
+      stdout: "",
+      // We could pipe stdout here if available
+      files: allFiles.slice(0, 20)
+      // Top files for context
+    }, {});
+    if (repairResult.success && repairResult.data.patches?.length > 0) {
+      const vfs = new import_server10.VirtualFileSystem();
+      vfs.loadFromDiskState(allFiles);
+      for (const patch of repairResult.data.patches) {
+        vfs.setFile(patch.path, patch.content);
+      }
+      await import_server10.CommitManager.commit(vfs, sandboxDir);
+      await context.atomicUpdate((ctx) => {
+        ctx.finalFiles = vfs.getAllFiles();
+        if (failedAgent) {
+          ctx.agentResults[failedAgent.agentName].status = "pending";
+        }
+      });
+      log3(`[Repair] Success! Applied ${repairResult.data.patches.length} patches.`);
+      log3(`[Repair] Re-enqueuing validator...`);
+      await import_server10.validatorQueue.add("verify-repaired-build", {
+        projectId,
+        executionId,
+        prompt
+      });
+    } else {
+      log3(`[Repair] Failed to generate patches.`);
+      throw new Error("RepairAgent could not generate valid patches.");
+    }
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    log3(`[Repair] CRITICAL ERROR: ${errorMessage}`);
+    import_observability12.logger.error({ err, executionId }, "[Repair Worker] Repair failed");
+    await import_shared_services10.eventBus.error(executionId, `Repair failed: ${errorMessage}`);
+    throw err;
+  }
+}, {
+  connection: import_shared_services10.redis,
+  concurrency: 2
+});
+import_observability12.logger.info("Repair Worker online");
+process.on("SIGINT", () => {
+  console.log("RECEIVED SIGINT");
+  process.exit(0);
+});
+process.on("SIGTERM", () => {
+  console.log("RECEIVED SIGTERM");
+  process.exit(0);
+});
+setInterval(() => {
+  log3("Heartbeat...");
+}, 3e4);
+new Promise(() => {
+});
+
+// src/supervisor-worker.ts
+var import_bullmq12 = require("bullmq");
+var import_observability13 = require("@packages/observability");
+var import_shared_services11 = require("@packages/shared-services");
+var import_server11 = require("@packages/utils/server");
+var import_watchdog = require("@packages/runtime/watchdog");
+import_watchdog.PreviewWatchdog.start();
+var supervisorWorker = new import_bullmq12.Worker(import_shared_services11.QUEUE_SUPERVISOR, async (job) => {
+  if (job.name === "health-check-loop") {
+    const activeIds = await import_server11.DistributedExecutionContext.getActiveExecutions();
+    import_observability13.logger.info({ count: activeIds.length }, "[Supervisor Worker] Running global health check");
+    for (const id of activeIds) {
+      try {
+        const decision = await import_server11.supervisorService.checkHealth(id);
+        if (decision !== "NONE") {
+          await import_server11.supervisorService.handleDecision(id, decision);
+        }
+      } catch (err) {
+        import_observability13.logger.error({ id, err }, "[Supervisor Worker] Error checking execution health");
+      }
+    }
+  }
+}, {
+  connection: import_shared_services11.redis,
+  concurrency: 1
+});
+async function setupCron() {
+  const repeatableJobs = await import_shared_services11.supervisorQueue.getRepeatableJobs();
+  if (!repeatableJobs.find((j) => j.name === "health-check-loop")) {
+    await import_shared_services11.supervisorQueue.add("health-check-loop", {}, {
+      repeat: {
+        every: 3e4
+        // 30 seconds
+      }
+    });
+    import_observability13.logger.info("[Supervisor Worker] Repeatable health-check-loop job scheduled.");
+  }
+}
+setupCron().catch((err) => import_observability13.logger.error({ err }, "Failed to setup supervisor cron"));
+import_observability13.logger.info("Supervisor Worker online");
+setInterval(() => {
+}, 3e4);
+new Promise(() => {
+});
+
+// src/validator-worker.ts
+var import_bullmq13 = require("bullmq");
+var import_observability14 = require("@packages/observability");
+var import_shared_services12 = require("@packages/shared-services");
+var import_server12 = require("@packages/utils/server");
+var import_path6 = __toESM(require("path"));
+var import_fs3 = __toESM(require("fs"));
+var logPath4 = import_path6.default.join(process.cwd(), "validator_direct.log");
+var log4 = (msg) => import_fs3.default.appendFileSync(logPath4, `[${(/* @__PURE__ */ new Date()).toISOString()}] ${msg}
+`);
+var validatorWorker = new import_bullmq13.Worker(import_shared_services12.QUEUE_VALIDATE, async (job) => {
+  const { projectId, executionId, prompt, strategy } = job.data;
+  log4(`[Validator] Job received for ${executionId}`);
+  const sandboxDir = import_path6.default.join(process.cwd(), ".generated-projects", projectId);
+  import_observability14.logger.info({ projectId, executionId }, "[Validator Worker] Started Verification");
+  try {
+    await import_shared_services12.eventBus.stage(executionId, "testing", "in_progress", "Validator Agent: Running type checks...", 75);
+    const context = new import_server12.DistributedExecutionContext(executionId);
+    const data = await context.get();
+    const allFiles = data?.finalFiles || [];
+    const vfs = new import_server12.VirtualFileSystem();
+    vfs.loadFromDiskState(allFiles);
+    log4(`[Validator] Running verifier on ${sandboxDir}`);
+    const verification = await import_server12.patchVerifier.verify(sandboxDir, vfs);
+    if (verification.passed) {
+      log4(`[Validator] PASSED`);
+      await import_shared_services12.eventBus.stage(executionId, "ValidatorAgent", "completed", "Build verification passed \u2705", 100);
+      await import_server12.dockerQueue.add("build-container", {
+        projectId,
+        executionId,
+        prompt,
+        strategy
+      });
+      await import_shared_services12.eventBus.stage(executionId, "testing", "completed", "Verification complete.", 85);
+    } else {
+      log4(`[Validator] FAILED with ${verification.errors?.length} errors: ${verification.errors?.join(" | ")}`);
+      log4(`Triggering Repair.`);
+      await context.atomicUpdate((ctx) => {
+        ctx.status = "executing";
+        if (!ctx.agentResults) ctx.agentResults = {};
+        ctx.agentResults["ValidatorAgent"] = {
+          agentName: "ValidatorAgent",
+          status: "failed",
+          error: verification.errors?.join("\n") || "TypeScript verification failed",
+          attempts: 1,
+          startTime: (/* @__PURE__ */ new Date()).toISOString()
+        };
+      });
+      await import_shared_services12.eventBus.stage(executionId, "testing", "in_progress", `Validator Agent: Build failed. Routing to Repair Agent...`, 80);
+      await import_server12.repairQueue.add("repair-build", {
+        projectId,
+        executionId,
+        prompt
+      });
+    }
+    const mem = process.memoryUsage();
+    const memMb = Math.round(mem.heapUsed / 1024 / 1024 * 100) / 100;
+    log4(`[Validator] Memory usage: ${memMb} MB (Heap Used)`);
+    import_observability14.logger.info({ executionId, memoryMb: memMb }, "[Validator Worker] Memory Usage");
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    log4(`[Validator] ERROR: ${errorMessage}`);
+    import_observability14.logger.error({ error, executionId }, "[Validator Worker] Failed");
+    await import_shared_services12.eventBus.error(executionId, `Validator Error: ${errorMessage}`);
+    throw error;
+  }
+}, {
+  connection: import_shared_services12.redis,
+  concurrency: 5
+});
+import_observability14.logger.info("Validator Worker online");
+
+// src/watchdog-worker.ts
+var import_config3 = require("dotenv/config");
+var import_watchdog2 = require("@packages/runtime/watchdog");
+var import_observability15 = require("@packages/observability");
+async function main() {
+  import_observability15.logger.info("[WatchdogWorker] Starting background resource monitor...");
+  import_watchdog2.PreviewWatchdog.start();
+  process.on("SIGTERM", () => {
+    import_observability15.logger.info("[WatchdogWorker] Shutting down...");
+    import_watchdog2.PreviewWatchdog.stop();
+    process.exit(0);
+  });
+  process.on("SIGINT", () => {
+    import_observability15.logger.info("[WatchdogWorker] Shutting down...");
+    import_watchdog2.PreviewWatchdog.stop();
+    process.exit(0);
+  });
+  setInterval(() => {
+  }, 1e3);
+}
+main().catch((err) => {
+  import_observability15.logger.error({ err }, "[WatchdogWorker] Critical startup failure");
+  process.exit(1);
+});
+
+// src/index.ts
+var import_autonomous_agent = require("@packages/autonomous-agent");
+
+// src/evolution-worker.ts
+var import_bullmq14 = require("bullmq");
+var import_observability16 = require("@packages/observability");
+var import_shared_services13 = require("@packages/shared-services");
+var import_self_evolution = require("@packages/self-evolution");
+var QUEUE_EVOLUTION = "self-evolution";
+var evolver = new import_self_evolution.SelfEvolver({ autoRefactor: true });
+var evolutionWorker = new import_bullmq14.Worker(QUEUE_EVOLUTION, async (job) => {
+  import_observability16.logger.info({ jobId: job.id }, "[Evolution Worker] Starting system evolution cycle");
+  try {
+    const mockMetrics = {
+      cpuUsage: 80,
+      memoryUsage: 90,
+      errorRate: 5,
+      latencyTarget: 200,
+      actualLatency: 350
+    };
+    const mockLogs = [
+      "WARN: High latency detected in API Gateway",
+      "ERROR: Connection timeout to Redis"
+    ];
+    const result = await evolver.evolve(mockMetrics, mockLogs);
+    import_observability16.logger.info({ result }, "[Evolution Worker] Evolution cycle completed");
+    return result;
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    import_observability16.logger.error({ err }, "[Evolution Worker] Evolution cycle failed");
+    throw new Error(`Evolution Error: ${errorMessage}`);
+  }
+}, {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore - mismatch between local and BullMQ redis typings
+  connection: import_shared_services13.redis,
+  concurrency: 1
+});
+import_observability16.logger.info("Self-Evolution Worker online");
+
+// src/auto-refactor-worker.ts
+var import_bullmq15 = require("bullmq");
+var import_observability17 = require("@packages/observability");
+var import_shared_services14 = require("@packages/shared-services");
+var import_refactor_agent = require("@packages/refactor-agent");
+var QUEUE_REFACTOR = "auto-refactor";
+var autoRefactorWorker = new import_bullmq15.Worker(QUEUE_REFACTOR, async (job) => {
+  const { targetPath } = job.data;
+  import_observability17.logger.info({ jobId: job.id, targetPath }, "[Auto-Refactor Worker] Starting refactoring process");
+  try {
+    if (!targetPath) {
+      throw new Error("targetPath is required for auto-refactor");
+    }
+    const fixed = await (0, import_refactor_agent.applyFixes)(targetPath);
+    import_observability17.logger.info({ fixed, targetPath }, "[Auto-Refactor Worker] Refactoring completed");
+    return fixed;
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    import_observability17.logger.error({ err, targetPath }, "[Auto-Refactor Worker] Refactoring failed");
+    throw new Error(`Refactor Error: ${errorMessage}`);
+  }
+}, {
+  connection: import_shared_services14.redis,
+  concurrency: 2
+});
+import_observability17.logger.info("Auto-Refactor Worker online");
+
+// src/index.ts
+initInstrumentation("worker-fleet");
+(0, import_observability18.startMetricsServer)(9091);
+(0, import_autonomous_agent.setupAutonomousWorker)();
 //# sourceMappingURL=index.js.map

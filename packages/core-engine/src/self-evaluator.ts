@@ -1,5 +1,5 @@
-import { BaseAgent, AgentResponse } from '@libs/brain';
-import { AgentContext } from '@libs/contracts';
+import { BaseAgent, AgentResponse } from '@packages/brain/base-agent';
+import { AgentContext } from '@packages/contracts';
 
 export interface DimensionScore {
     score: number;         // 0-1

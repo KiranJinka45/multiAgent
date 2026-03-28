@@ -2,7 +2,7 @@ import { planFeature } from './planner';
 import { createFile } from './executor';
 import { validateSystem } from './validator';
 import { commitAndPush } from './git';
-import { logger } from '@libs/utils';
+import { logger } from '@packages/utils';
 
 export async function runAutonomousAgent(prompt: string) {
   logger.info('Starting Autonomous Coding Agent workflow...');

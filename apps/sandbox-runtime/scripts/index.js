@@ -35,7 +35,7 @@ var init_runtimeGuard = __esm({
   "src/runtimeGuard.ts"() {
     import_crypto2 = __toESM(require("crypto"));
     import_path = __toESM(require("path"));
-    import_utils6 = __toESM(require("@libs/utils"));
+    import_utils6 = __toESM(require("@packages/utils"));
     PREVIEW_SECRET = process.env.PREVIEW_SIGNING_SECRET || "dev-secret-change-in-production";
     SIGNED_URL_TTL_SECONDS = 3600;
     INACTIVITY_SHUTDOWN_MS = 30 * 60 * 1e3;
@@ -141,7 +141,7 @@ var init_runtimeGuard = __esm({
        * These are the options to pass to child_process.spawn().
        */
       safeSpawnOptions(cwd, env = {}) {
-        const { getSafeEnv: getSafeEnv3 } = require("@libs/utils");
+        const { getSafeEnv: getSafeEnv3 } = require("@packages/utils");
         return {
           cwd,
           env: getSafeEnv3(env),
@@ -184,7 +184,7 @@ var init_containerManager = __esm({
     import_child_process2 = require("child_process");
     import_path3 = __toESM(require("path"));
     import_net2 = __toESM(require("net"));
-    import_utils28 = __toESM(require("@libs/utils"));
+    import_utils28 = __toESM(require("@packages/utils"));
     CPU_LIMIT = process.env.CONTAINER_CPU_LIMIT || "0.5";
     MEMORY_LIMIT = process.env.CONTAINER_MEMORY_LIMIT || "512m";
     NETWORK_NAME = process.env.CONTAINER_NETWORK || "ma-preview-net";
@@ -374,7 +374,7 @@ var import_os2, import_utils33, ResourceManager;
 var init_resource_manager = __esm({
   "src/resource-manager.ts"() {
     import_os2 = __toESM(require("os"));
-    import_utils33 = __toESM(require("@libs/utils"));
+    import_utils33 = __toESM(require("@packages/utils"));
     ResourceManager = class {
       static MAX_MEMORY_USAGE = 0.85;
       // 85% of total RAM
@@ -428,7 +428,7 @@ var import_utils34, AdmissionController;
 var init_admission_controller = __esm({
   "src/admission-controller.ts"() {
     init_resource_manager();
-    import_utils34 = __toESM(require("@libs/utils"));
+    import_utils34 = __toESM(require("@packages/utils"));
     AdmissionController = class {
       static queue = [];
       static DRAIN_INTERVAL = 3e3;
@@ -489,7 +489,7 @@ var init_sandbox_runner = __esm({
   "src/sandbox-runner.ts"() {
     import_child_process3 = require("child_process");
     import_util = __toESM(require("util"));
-    import_server2 = require("@libs/utils/server");
+    import_server2 = require("@packages/utils/server");
     init_runtimeGuard();
     init_containerManager();
     execPromise = import_util.default.promisify(import_child_process3.exec);
@@ -653,8 +653,8 @@ var init_snapshot_manager = __esm({
   "src/snapshot-manager.ts"() {
     import_fs_extra2 = __toESM(require("fs-extra"));
     import_path4 = __toESM(require("path"));
-    import_utils36 = require("@libs/utils");
-    import_utils37 = __toESM(require("@libs/utils"));
+    import_utils36 = require("@packages/utils");
+    import_utils37 = __toESM(require("@packages/utils"));
     SnapshotManager = class {
       baseDir = import_path4.default.join(process.cwd(), ".snapshots");
       constructor() {
@@ -720,7 +720,7 @@ var init_snapshot_library = __esm({
   "src/snapshot-library.ts"() {
     import_fs_extra3 = __toESM(require("fs-extra"));
     import_path5 = __toESM(require("path"));
-    import_utils38 = __toESM(require("@libs/utils"));
+    import_utils38 = __toESM(require("@packages/utils"));
     SnapshotLibrary = class {
       static snapshotDir = import_path5.default.join(process.cwd(), ".snapshots", "base");
       /**
@@ -767,7 +767,7 @@ var init_sandbox_pool = __esm({
     import_fs_extra4 = __toESM(require("fs-extra"));
     import_path6 = __toESM(require("path"));
     init_snapshot_library();
-    import_utils39 = __toESM(require("@libs/utils"));
+    import_utils39 = __toESM(require("@packages/utils"));
     SandboxPoolManager = class {
       static poolDir = import_path6.default.join(process.cwd(), ".previews", "pool");
       static activePool = [];
@@ -857,7 +857,7 @@ var init_snapshot_overlay = __esm({
   "src/snapshot-overlay.ts"() {
     import_fs_extra5 = __toESM(require("fs-extra"));
     import_path7 = __toESM(require("path"));
-    import_utils40 = __toESM(require("@libs/utils"));
+    import_utils40 = __toESM(require("@packages/utils"));
     SnapshotOverlayManager = class {
       /**
        * Prepares a writable overlay for a specific project based on a base snapshot.
@@ -905,7 +905,7 @@ var init_microvm_manager = __esm({
     init_snapshot_library();
     import_path8 = __toESM(require("path"));
     import_fs_extra6 = __toESM(require("fs-extra"));
-    import_utils41 = __toESM(require("@libs/utils"));
+    import_utils41 = __toESM(require("@packages/utils"));
     MicroVMManager = class {
       static provider = new FirecrackerDriver();
       static activeVMs = /* @__PURE__ */ new Map();
@@ -969,15 +969,15 @@ var init_preview_manager = __esm({
     import_fs_extra7 = __toESM(require("fs-extra"));
     import_net3 = __toESM(require("net"));
     init_sandbox_runner();
-    import_registry7 = require("@libs/registry");
+    import_registry7 = require("@packages/registry");
     import_http = __toESM(require("http"));
-    import_server3 = require("@libs/utils/server");
+    import_server3 = require("@packages/utils/server");
     init_snapshot_manager();
     init_sandbox_pool();
     init_snapshot_library();
     init_admission_controller();
     init_microvm_manager();
-    import_validator = require("@libs/validator");
+    import_validator = require("@packages/validator");
     PortAllocator = class {
       basePort = 3001;
       maxPort = 3999;
@@ -1309,8 +1309,8 @@ __export(index_exports, {
 module.exports = __toCommonJS(index_exports);
 
 // src/cluster/distributedLock.ts
-var import_utils = __toESM(require("@libs/utils"));
-var import_utils2 = __toESM(require("@libs/utils"));
+var import_utils = __toESM(require("@packages/utils"));
+var import_utils2 = __toESM(require("@packages/utils"));
 var LOCK_PREFIX = "cluster:lock:";
 var DEFAULT_TTL_MS = 3e4;
 var DistributedLock = {
@@ -1410,9 +1410,9 @@ var DistributedLock = {
 // src/cluster/nodeRegistry.ts
 var import_crypto = require("crypto");
 var import_os = __toESM(require("os"));
-var import_utils3 = require("@libs/utils");
-var import_utils4 = __toESM(require("@libs/utils"));
-var import_utils5 = __toESM(require("@libs/utils"));
+var import_utils3 = require("@packages/utils");
+var import_utils4 = __toESM(require("@packages/utils"));
+var import_utils5 = __toESM(require("@packages/utils"));
 var NODE_PREFIX = "cluster:node:";
 var NODE_SET_KEY = "cluster:nodes";
 var NODE_HEARTBEAT_TTL = 30;
@@ -1556,11 +1556,11 @@ var NodeRegistry = {
 };
 
 // src/cluster/staleEvictor.ts
-var import_registry2 = require("@libs/registry");
+var import_registry2 = require("@packages/registry");
 
 // src/processManager.ts
 var import_child_process = require("child_process");
-var import_server = require("@libs/utils/server");
+var import_server = require("@packages/utils/server");
 init_runtimeGuard();
 var processRegistry = /* @__PURE__ */ new Map();
 var ProcessManager = {
@@ -1658,8 +1658,8 @@ var ProcessManager = {
 
 // src/portManager.ts
 var import_net = __toESM(require("net"));
-var import_utils7 = __toESM(require("@libs/utils"));
-var import_utils8 = __toESM(require("@libs/utils"));
+var import_utils7 = __toESM(require("@packages/utils"));
+var import_utils8 = __toESM(require("@packages/utils"));
 var PORT_START = 4100;
 var PORT_END = 4999;
 var PORT_LEASE_TTL = 3600;
@@ -1764,12 +1764,12 @@ var PortManager = {
 };
 
 // src/previewOrchestrator.ts
-var import_registry = require("@libs/registry");
+var import_registry = require("@packages/registry");
 
 // src/runtimeMetrics.ts
-var import_utils9 = __toESM(require("@libs/utils"));
-var import_utils10 = __toESM(require("@libs/utils"));
-var import_utils11 = require("@libs/utils");
+var import_utils9 = __toESM(require("@packages/utils"));
+var import_utils10 = __toESM(require("@packages/utils"));
+var import_utils11 = require("@packages/utils");
 var RUNTIME_MODE = process.env.RUNTIME_MODE || "process";
 var METRICS_PREFIX = "runtime:metrics:";
 var GLOBAL_STATS_KEY = "runtime:global:stats";
@@ -1862,8 +1862,8 @@ var RuntimeMetrics = {
 init_runtimeGuard();
 
 // src/runtimeCapacity.ts
-var import_utils12 = __toESM(require("@libs/utils"));
-var import_utils13 = __toESM(require("@libs/utils"));
+var import_utils12 = __toESM(require("@packages/utils"));
+var import_utils13 = __toESM(require("@packages/utils"));
 var SYSTEM_MAX_CONCURRENT = parseInt(process.env.RUNTIME_MAX_CONCURRENT ?? "50", 10);
 var USER_MAX_CONCURRENT = parseInt(process.env.RUNTIME_USER_MAX_CONCURRENT ?? "3", 10);
 var SYSTEM_COUNTER_KEY = "runtime:capacity:system:running";
@@ -1978,8 +1978,8 @@ var RuntimeCapacity = {
 };
 
 // src/runtimeHeartbeat.ts
-var import_utils14 = __toESM(require("@libs/utils"));
-var import_utils15 = __toESM(require("@libs/utils"));
+var import_utils14 = __toESM(require("@packages/utils"));
+var import_utils15 = __toESM(require("@packages/utils"));
 var HEARTBEAT_PREFIX = "runtime:heartbeat:";
 var HEARTBEAT_TTL_SEC = 45;
 var HEARTBEAT_EVERY_MS = 15e3;
@@ -2080,8 +2080,8 @@ var RuntimeHeartbeat = {
 };
 
 // src/runtimeEscalation.ts
-var import_utils16 = __toESM(require("@libs/utils"));
-var import_utils17 = __toESM(require("@libs/utils"));
+var import_utils16 = __toESM(require("@packages/utils"));
+var import_utils17 = __toESM(require("@packages/utils"));
 var CRASH_WINDOW_MS = 15 * 60 * 1e3;
 var MAX_CRASHES_IN_WINDOW = 5;
 var FAILURE_HISTORY_KEY = "runtime:failures:";
@@ -2198,10 +2198,10 @@ var RuntimeEscalation = {
 };
 
 // src/previewOrchestrator.ts
-var import_utils18 = __toESM(require("@libs/utils"));
+var import_utils18 = __toESM(require("@packages/utils"));
 var import_path2 = __toESM(require("path"));
 var import_fs_extra = __toESM(require("fs-extra"));
-var import_utils19 = __toESM(require("@libs/utils"));
+var import_utils19 = __toESM(require("@packages/utils"));
 var HEALTH_CHECK_INTERVAL = 3e4;
 var URL_MODE = process.env.PREVIEW_URL_MODE || "local";
 var healthCheckTimers = /* @__PURE__ */ new Map();
@@ -2440,9 +2440,9 @@ var PreviewOrchestrator = {
 };
 
 // src/cluster/staleEvictor.ts
-var import_utils20 = require("@libs/utils");
-var import_utils21 = __toESM(require("@libs/utils"));
-var import_utils22 = __toESM(require("@libs/utils"));
+var import_utils20 = require("@packages/utils");
+var import_utils21 = __toESM(require("@packages/utils"));
+var import_utils22 = __toESM(require("@packages/utils"));
 var MAX_RUNTIME_AGE_MS = parseInt(process.env.RUNTIME_MAX_AGE_MINUTES ?? "120", 10) * 6e4;
 var IDLE_TTL_MS = parseInt(process.env.RUNTIME_IDLE_TTL_MINUTES ?? "30", 10) * 6e4;
 var STARTING_TTL_MS = 5 * 60 * 1e3;
@@ -2587,8 +2587,8 @@ var StaleEvictor = {
 };
 
 // src/cluster/runtimeScheduler.ts
-var import_utils23 = __toESM(require("@libs/utils"));
-var import_utils24 = __toESM(require("@libs/utils"));
+var import_utils23 = __toESM(require("@packages/utils"));
+var import_utils24 = __toESM(require("@packages/utils"));
 var SCHEDULE_CHANNEL = "cluster:schedule:assign";
 var PENDING_QUEUE = "cluster:schedule:pending";
 var ASSIGNMENT_PREFIX = "cluster:assignment:";
@@ -2744,10 +2744,10 @@ var RuntimeScheduler = {
 };
 
 // src/cluster/failoverManager.ts
-var import_registry3 = require("@libs/registry");
-var import_utils25 = require("@libs/utils");
-var import_utils26 = require("@libs/utils");
-var import_utils27 = __toESM(require("@libs/utils"));
+var import_registry3 = require("@packages/registry");
+var import_utils25 = require("@packages/utils");
+var import_utils26 = require("@packages/utils");
+var import_utils27 = __toESM(require("@packages/utils"));
 var FAILOVER_INTERVAL_MS = 6e4;
 var FAILOVER_LOCK_KEY = "cluster:failover:leader";
 var FAILOVER_LOCK_TTL = 55e3;
@@ -2961,10 +2961,10 @@ var FailoverManager = {
 };
 
 // src/cluster/redisRecovery.ts
-var import_utils29 = __toESM(require("@libs/utils"));
+var import_utils29 = __toESM(require("@packages/utils"));
 init_containerManager();
-var import_registry4 = require("@libs/registry");
-var import_utils30 = __toESM(require("@libs/utils"));
+var import_registry4 = require("@packages/registry");
+var import_utils30 = __toESM(require("@packages/utils"));
 var RECOVERY_KEY = "cluster:recovery:lastRun";
 var MAX_RETRIES = 30;
 var RETRY_INTERVAL_MS = 2e3;
@@ -3119,9 +3119,9 @@ var RedisRecovery = {
 };
 
 // src/cluster/rollingRestart.ts
-var import_registry5 = require("@libs/registry");
-var import_utils31 = __toESM(require("@libs/utils"));
-var import_utils32 = __toESM(require("@libs/utils"));
+var import_registry5 = require("@packages/registry");
+var import_utils31 = __toESM(require("@packages/utils"));
+var import_utils32 = __toESM(require("@packages/utils"));
 var ROLLING_RESTART_KEY = "cluster:rolling-restart";
 var DRAINING_PREFIX = "cluster:node:draining:";
 var DRAIN_TIMEOUT_MS = 5 * 60 * 1e3;
@@ -3295,8 +3295,8 @@ var RollingRestart2 = {
 init_admission_controller();
 
 // src/clusterProxy.ts
-var import_registry6 = require("@libs/registry");
-var import_utils35 = __toESM(require("@libs/utils"));
+var import_registry6 = require("@packages/registry");
+var import_utils35 = __toESM(require("@packages/utils"));
 var PREVIEW_DOMAIN = process.env.PREVIEW_BASE_DOMAIN || "preview.multiagent.com";
 var ClusterProxy = {
   /**
@@ -3375,7 +3375,7 @@ var ClusterProxy = {
 
 // src/container-cleaner.ts
 var import_child_process5 = require("child_process");
-var import_utils42 = __toESM(require("@libs/utils"));
+var import_utils42 = __toESM(require("@packages/utils"));
 var CleanupService = class {
   interval = null;
   start(intervalMs = 30 * 60 * 1e3) {
@@ -3421,7 +3421,7 @@ var cleanupService = new CleanupService();
 init_containerManager();
 
 // src/performance-monitor.ts
-var import_utils43 = __toESM(require("@libs/utils"));
+var import_utils43 = __toESM(require("@packages/utils"));
 var PerformanceMonitor = class {
   static metrics = /* @__PURE__ */ new Map();
   /**
@@ -3451,7 +3451,7 @@ var PerformanceMonitor = class {
 };
 
 // src/evolution-engine.ts
-var import_utils44 = require("@libs/utils");
+var import_utils44 = require("@packages/utils");
 var EvolutionEngine = class {
   static isRunning = false;
   static start() {
@@ -3488,7 +3488,7 @@ var EvolutionEngine = class {
 
 // src/executor.ts
 var import_child_process6 = require("child_process");
-var import_server4 = require("@libs/utils/server");
+var import_server4 = require("@packages/utils/server");
 init_runtimeGuard();
 var runtimeExecutor = {
   async execute(command, args, options) {
@@ -3551,7 +3551,7 @@ init_preview_manager();
 
 // src/preview-runner.ts
 init_preview_manager();
-var import_utils45 = __toESM(require("@libs/utils"));
+var import_utils45 = __toESM(require("@packages/utils"));
 async function previewRunner(projectId, files) {
   import_utils45.default.info({ projectId }, "[PreviewRunner] Initiating local dev preview...");
   try {
@@ -3574,7 +3574,7 @@ var import_child_process7 = require("child_process");
 var import_path10 = __toESM(require("path"));
 var import_fs = __toESM(require("fs"));
 init_preview_manager();
-var import_utils46 = __toESM(require("@libs/utils"));
+var import_utils46 = __toESM(require("@packages/utils"));
 async function startPreview(projectId, files) {
   const isDockerAvailable2 = await checkDocker();
   if (isDockerAvailable2) {
@@ -3628,8 +3628,8 @@ async function stopPreview(projectId) {
 
 // src/previewRuntimePool.ts
 init_containerManager();
-var import_registry8 = require("@libs/registry");
-var import_utils47 = __toESM(require("@libs/utils"));
+var import_registry8 = require("@packages/registry");
+var import_utils47 = __toESM(require("@packages/utils"));
 var PreviewRuntimePool = class {
   static pool = [];
   static POOL_SIZE = 3;
@@ -3713,10 +3713,10 @@ var PreviewRuntimePool = class {
 init_resource_manager();
 
 // src/runtimeCleanup.ts
-var import_registry9 = require("@libs/registry");
+var import_registry9 = require("@packages/registry");
 init_containerManager();
 init_runtimeGuard();
-var import_utils48 = __toESM(require("@libs/utils"));
+var import_utils48 = __toESM(require("@packages/utils"));
 var RUNTIME_MODE3 = process.env.RUNTIME_MODE || "process";
 var CLEANUP_INTERVAL_MS = 5 * 60 * 1e3;
 var STALE_STARTING_THRESHOLD_MS = 5 * 60 * 1e3;
@@ -3870,7 +3870,7 @@ var import_child_process8 = require("child_process");
 var import_path11 = __toESM(require("path"));
 var import_fs2 = __toESM(require("fs"));
 var import_util2 = __toESM(require("util"));
-var import_server5 = require("@libs/utils/server");
+var import_server5 = require("@packages/utils/server");
 var execAsync = import_util2.default.promisify(import_child_process8.exec);
 var ProcessSandbox = class {
   sandboxRoot;
@@ -4010,7 +4010,7 @@ init_snapshot_overlay();
 // src/storage-gc.ts
 var import_fs_extra8 = __toESM(require("fs-extra"));
 var import_path12 = __toESM(require("path"));
-var import_utils49 = __toESM(require("@libs/utils"));
+var import_utils49 = __toESM(require("@packages/utils"));
 var StorageGC = class {
   static TTL_MS = 2 * 60 * 60 * 1e3;
   // 2 hours for previews
@@ -4074,8 +4074,8 @@ var StorageGC = class {
 
 // src/watchdog.ts
 init_preview_manager();
-var import_registry10 = require("@libs/registry");
-var import_utils50 = __toESM(require("@libs/utils"));
+var import_registry10 = require("@packages/registry");
+var import_utils50 = __toESM(require("@packages/utils"));
 var PreviewWatchdog = class {
   static interval = null;
   static CHECK_INTERVAL = 3e4;

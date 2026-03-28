@@ -1,9 +1,9 @@
 import { Worker, Job } from 'bullmq';
 import { Redis } from 'ioredis';
-import { logger } from '@libs/observability';
-import { redis, eventBus, QUEUE_PLANNER } from '@libs/shared-services';
-import { architectureQueue, DistributedExecutionContext } from '@libs/utils/server';
-import { IntentDetectionAgent } from '@libs/agents/intent-agent';
+import { logger } from '@packages/observability';
+import { redis, eventBus, QUEUE_PLANNER } from '@packages/shared-services';
+import { architectureQueue, DistributedExecutionContext } from '@packages/utils/server';
+import { IntentDetectionAgent } from '@packages/agents';
 
 const intentAgent = new IntentDetectionAgent();
 

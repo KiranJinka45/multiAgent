@@ -14,8 +14,8 @@
     "start:deploy": "npm --prefix apps/deploy-service run start",
     "check:deps": "depcruise --config .dependency-cruiser.js packages",
     "graph": "madge --image graph.png packages",
-    "refactor": "pnpm --filter @libs/refactor-agent run build && node packages/refactor-agent/dist/index.js",
-    "autonomous": "pnpm --filter @libs/autonomous-agent run build && node packages/autonomous-agent/dist/cli.js"
+    "refactor": "pnpm --filter @packages/refactor-agent run build && node packages/refactor-agent/dist/index.js",
+    "autonomous": "pnpm --filter @packages/autonomous-agent run build && node packages/autonomous-agent/dist/cli.js"
   },
   "packageManager": "pnpm@9.0.0",
   "dependencies": {
@@ -42,5 +42,10 @@
     "tsx": "^4.21.0",
     "turbo": "^2.8.20",
     "typescript": "^5.9.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "ioredis": "^5.10.1"
+    }
   }
 }

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import redis from '@libs/utils';
+import redis from '@packages/utils';
 
 /**
  * MultiAgent Integrity Validator

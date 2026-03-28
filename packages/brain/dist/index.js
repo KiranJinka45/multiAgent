@@ -61,6 +61,139 @@ __export(index_exports, {
 });
 module.exports = __toCommonJS(index_exports);
 
+// src/base-agent.ts
+var import_groq_sdk = require("groq-sdk");
+var import_observability = require("@packages/observability");
+var import_server = require("@packages/utils/server");
+var retry = new import_server.RetryManager(5, 3e3);
+var BaseAgent = class {
+  groq;
+  logs = [];
+  constructor() {
+    const apiKey = process.env.GROQ_API_KEY;
+    if (!apiKey) throw new Error(`${this.getName()} requires GROQ_API_KEY`);
+    this.groq = new import_groq_sdk.Groq({ apiKey });
+  }
+  log(message, meta = {}) {
+    const { executionId, ...rest } = meta;
+    import_observability.logger.info({ agent: this.getName(), ...rest }, message);
+    if (executionId) {
+      import_server.eventBus.thought(executionId, this.getName(), message);
+    }
+  }
+  async execute(input, context, signal, strategy) {
+    const start = Date.now();
+    const { db: db2 } = await import("@packages/db");
+    let activeStrategy = strategy;
+    try {
+      const persistedStrategy = await db2.strategy.findFirst({
+        where: { agent: this.getName(), isActive: true }
+      });
+      if (persistedStrategy) {
+        activeStrategy = {
+          ...strategy,
+          ...persistedStrategy.config
+        };
+      }
+    } catch (err) {
+      this.log("Failed to fetch active strategy, using default");
+    }
+    if (this.getName() === "EvolutionAgent") {
+      const { GovernanceEngine } = await import("@packages/core-engine");
+    }
+    try {
+      const result = await this.run(input, context, signal, activeStrategy);
+      await db2.executionLog.create({
+        data: {
+          taskType: this.getName(),
+          input,
+          output: result,
+          success: result.success,
+          latency: Date.now() - start,
+          cost: result.tokens ? result.tokens / 1e3 * 0.01 : 0
+          // Simplified cost model
+        }
+      }).catch((err) => import_observability.logger.error({ err }, "[BaseAgent] Telemetry logging failed"));
+      return result;
+    } catch (err) {
+      await db2.executionLog.create({
+        data: {
+          taskType: this.getName(),
+          input,
+          output: { error: err.message },
+          success: false,
+          latency: Date.now() - start,
+          cost: 0
+        }
+      }).catch((e) => import_observability.logger.error({ e }, "[BaseAgent] Telemetry error logging failed"));
+      throw err;
+    }
+  }
+  async promptLLM(system, user, modelOverride, signal, strategy, context) {
+    const model = strategy?.model || modelOverride || "llama-3.3-70b-versatile";
+    const temperature = strategy?.temperature ?? 0.7;
+    this.log(`Invoking LLM (${model}) with temperature ${temperature}`);
+    const cached = await import_server.SemanticCacheService.get(user, system, model);
+    if (cached) {
+      this.log(`Cache Hit: ${model}`);
+      return {
+        result: cached,
+        tokens: 0,
+        // Cached results effectively use 0 tokens for the current call
+        promptTokens: 0,
+        completionTokens: 0
+      };
+    }
+    try {
+      const llmResponse = await retry.executeWithRetry(async () => {
+        return await import_server.breakers.llm.execute(async () => {
+          const response = await this.groq.chat.completions.create({
+            messages: [
+              { role: "system", content: system },
+              { role: "user", content: user }
+            ],
+            model,
+            temperature,
+            response_format: { type: "json_object" }
+          }, { signal });
+          const content = response.choices[0].message.content;
+          const tokensUsed = response.usage?.total_tokens || 0;
+          const promptTokens = response.usage?.prompt_tokens || 0;
+          const completionTokens = response.usage?.completion_tokens || 0;
+          if (!content) throw new Error("Empty response from LLM");
+          const result = JSON.parse(content);
+          if (context?.userId && context?.tenantId) {
+            import_server.usageService.recordAiUsage({
+              model,
+              promptTokens,
+              completionTokens,
+              totalTokens: tokensUsed,
+              userId: context.userId,
+              tenantId: context.tenantId,
+              metadata: {
+                executionId: context.executionId,
+                agent: this.getName(),
+                model
+              }
+            }).catch((err) => import_observability.logger.error({ err }, "[BaseAgent] Usage tracking failed"));
+          }
+          await import_server.SemanticCacheService.set(user, result, system, model);
+          return {
+            result,
+            tokens: tokensUsed,
+            promptTokens,
+            completionTokens
+          };
+        });
+      }, this.getName(), {});
+      return llmResponse;
+    } catch (error) {
+      this.log(`LLM invocation failed: ${error}`);
+      throw error;
+    }
+  }
+};
+
 // src/planner.ts
 var import_openai = __toESM(require("openai"));
 var Planner = class {
@@ -120,7 +253,7 @@ var Memory = class {
 };
 
 // src/architecture-agent.ts
-var import_utils = __toESM(require("@libs/utils"));
+var import_utils = __toESM(require("@packages/utils"));
 var ArchitectureAgent = class extends BaseAgent {
   constructor() {
     super();
@@ -223,139 +356,6 @@ Schema: ${input.schema || "No explicit schema provided"}`, "llama-3.3-70b-versat
         data: null,
         error: error instanceof Error ? error.message : String(error)
       };
-    }
-  }
-};
-
-// src/base-agent.ts
-var import_groq_sdk = require("groq-sdk");
-var import_observability = require("@libs/observability");
-var import_server = require("@libs/utils/server");
-var retry = new import_server.RetryManager(5, 3e3);
-var BaseAgent = class {
-  groq;
-  logs = [];
-  constructor() {
-    const apiKey = process.env.GROQ_API_KEY;
-    if (!apiKey) throw new Error(`${this.getName()} requires GROQ_API_KEY`);
-    this.groq = new import_groq_sdk.Groq({ apiKey });
-  }
-  log(message, meta = {}) {
-    const { executionId, ...rest } = meta;
-    import_observability.logger.info({ agent: this.getName(), ...rest }, message);
-    if (executionId) {
-      import_server.eventBus.thought(executionId, this.getName(), message);
-    }
-  }
-  async execute(input, context, signal, strategy) {
-    const start = Date.now();
-    const { db: db2 } = await import("@libs/db");
-    let activeStrategy = strategy;
-    try {
-      const persistedStrategy = await db2.strategy.findFirst({
-        where: { agent: this.getName(), isActive: true }
-      });
-      if (persistedStrategy) {
-        activeStrategy = {
-          ...strategy,
-          ...persistedStrategy.config
-        };
-      }
-    } catch (err) {
-      this.log("Failed to fetch active strategy, using default");
-    }
-    if (this.getName() === "EvolutionAgent") {
-      const { GovernanceEngine } = await import("@libs/core-engine");
-    }
-    try {
-      const result = await this.run(input, context, signal, activeStrategy);
-      await db2.executionLog.create({
-        data: {
-          taskType: this.getName(),
-          input,
-          output: result,
-          success: result.success,
-          latency: Date.now() - start,
-          cost: result.tokens ? result.tokens / 1e3 * 0.01 : 0
-          // Simplified cost model
-        }
-      }).catch((err) => import_observability.logger.error({ err }, "[BaseAgent] Telemetry logging failed"));
-      return result;
-    } catch (err) {
-      await db2.executionLog.create({
-        data: {
-          taskType: this.getName(),
-          input,
-          output: { error: err.message },
-          success: false,
-          latency: Date.now() - start,
-          cost: 0
-        }
-      }).catch((e) => import_observability.logger.error({ e }, "[BaseAgent] Telemetry error logging failed"));
-      throw err;
-    }
-  }
-  async promptLLM(system, user, modelOverride, signal, strategy, context) {
-    const model = strategy?.model || modelOverride || "llama-3.3-70b-versatile";
-    const temperature = strategy?.temperature ?? 0.7;
-    this.log(`Invoking LLM (${model}) with temperature ${temperature}`);
-    const cached = await import_server.SemanticCacheService.get(user, system, model);
-    if (cached) {
-      this.log(`Cache Hit: ${model}`);
-      return {
-        result: cached,
-        tokens: 0,
-        // Cached results effectively use 0 tokens for the current call
-        promptTokens: 0,
-        completionTokens: 0
-      };
-    }
-    try {
-      const llmResponse = await retry.executeWithRetry(async () => {
-        return await import_server.breakers.llm.execute(async () => {
-          const response = await this.groq.chat.completions.create({
-            messages: [
-              { role: "system", content: system },
-              { role: "user", content: user }
-            ],
-            model,
-            temperature,
-            response_format: { type: "json_object" }
-          }, { signal });
-          const content = response.choices[0].message.content;
-          const tokensUsed = response.usage?.total_tokens || 0;
-          const promptTokens = response.usage?.prompt_tokens || 0;
-          const completionTokens = response.usage?.completion_tokens || 0;
-          if (!content) throw new Error("Empty response from LLM");
-          const result = JSON.parse(content);
-          if (context?.userId && context?.tenantId) {
-            import_server.usageService.recordAiUsage({
-              model,
-              promptTokens,
-              completionTokens,
-              totalTokens: tokensUsed,
-              userId: context.userId,
-              tenantId: context.tenantId,
-              metadata: {
-                executionId: context.executionId,
-                agent: this.getName(),
-                model
-              }
-            }).catch((err) => import_observability.logger.error({ err }, "[BaseAgent] Usage tracking failed"));
-          }
-          await import_server.SemanticCacheService.set(user, result, system, model);
-          return {
-            result,
-            tokens: tokensUsed,
-            promptTokens,
-            completionTokens
-          };
-        });
-      }, this.getName(), {});
-      return llmResponse;
-    } catch (error) {
-      this.log(`LLM invocation failed: ${error}`);
-      throw error;
     }
   }
 };
@@ -493,106 +493,13 @@ TARGET FILES: ${input.fileTargets.join(", ")}${existingContext}${failureContext}
   }
 };
 
-// ../memory-vector/src/index.ts
-var import_utils2 = require("@libs/utils");
-var MemoryVectorService = class _MemoryVectorService {
-  static SIMILARITY_THRESHOLD = 0.9;
-  async getEmbedding(text) {
-    import_utils2.logger.debug({ length: text.length }, "[MemoryVectorService] Generating mock embedding");
-    return new Array(1536).fill(0).map(() => Math.random());
-  }
-  async store(entry, tenantId) {
-    const embedding = await this.getEmbedding(entry.content);
-    const { data, error } = await import_utils2.supabaseAdmin.from("semantic_memories").insert({
-      tenant_id: tenantId,
-      project_id: entry.projectId,
-      type: entry.type,
-      content: entry.content,
-      embedding,
-      metadata: entry.metadata || {}
-    });
-    if (error) throw new Error(`Database Error: ${error.message}`);
-    return data;
-  }
-  async retrieve(query, tenantId, limit = 5) {
-    const embedding = await this.getEmbedding(query);
-    const { data, error } = await import_utils2.supabaseAdmin.rpc("match_semantic_memories", {
-      query_embedding: embedding,
-      match_threshold: _MemoryVectorService.SIMILARITY_THRESHOLD,
-      match_count: limit,
-      p_tenant_id: tenantId
-    });
-    if (error) return [];
-    return data;
-  }
-  async getRecentFixes(errorPattern, tenantId) {
-    return await this.retrieve(errorPattern, tenantId, 3);
-  }
-};
-var memoryVector = new MemoryVectorService();
-
-// ../memory-cache/src/index.ts
-var import_utils3 = require("@libs/utils");
-var import_crypto = __toESM(require("crypto"));
-var SemanticCacheService2 = class {
-  static PREFIX = "cache:llm:";
-  static TTL = 60 * 60 * 24 * 7;
-  // 7-day TTL for optimization
-  /**
-   * Normalizes and hashes the input to create a deterministic cache key.
-   */
-  static generateKey(prompt2, system, model) {
-    const payload = JSON.stringify({
-      prompt: prompt2.trim(),
-      system: system?.trim() || "",
-      model: model || "default"
-    });
-    const hash = import_crypto.default.createHash("sha256").update(payload).digest("hex");
-    return `${this.PREFIX}${hash}`;
-  }
-  /**
-   * Attempt to retrieve a cached LLM response.
-   */
-  static async get(prompt2, system, model) {
-    const key = this.generateKey(prompt2, system, model);
-    try {
-      const cached = await import_utils3.redis.get(key);
-      if (cached) {
-        import_utils3.logger.info({ key }, "[SemanticCache] Hit - skipping LLM invocation");
-        return JSON.parse(cached);
-      }
-    } catch (error) {
-      import_utils3.logger.error({ error, key }, "[SemanticCache] Get failed");
-    }
-    return null;
-  }
-  /**
-   * Persists an LLM response to the semantic cache.
-   */
-  static async set(prompt2, response, system, model) {
-    const key = this.generateKey(prompt2, system, model);
-    try {
-      await import_utils3.redis.set(key, JSON.stringify(response), "EX", this.TTL);
-      import_utils3.logger.info({ key }, "[SemanticCache] Response cached");
-    } catch (error) {
-      import_utils3.logger.error({ error, key }, "[SemanticCache] Set failed");
-    }
-  }
-  static async invalidate(prompt2, system, model) {
-    const key = this.generateKey(prompt2, system, model);
-    await import_utils3.redis.del(key);
-  }
-};
-
-// ../memory/src/index.ts
-var MemoryService = memoryVector;
-
 // src/context-builder.ts
-var import_utils4 = __toESM(require("@libs/utils"));
+var import_memory = require("@packages/memory");
+var import_utils2 = __toESM(require("@packages/utils"));
 var ContextBuilder = class {
   static async build(prompt2, tenantId) {
-    import_utils4.default.info({ prompt: prompt2, tenantId }, "[ContextBuilder] Building context for reasoning");
-    const memories = await MemoryService.retrieve(prompt2, tenantId);
+    import_utils2.default.info({ prompt: prompt2, tenantId }, "[ContextBuilder] Building context for reasoning");
+    const memories = await import_memory.MemoryService.retrieve(prompt2, tenantId);
     return {
       prompt: prompt2,
       memories,
@@ -861,7 +768,7 @@ Files: ${JSON.stringify(input.allFiles)}`, "llama-3.3-70b-versatile", signal, st
 };
 
 // src/evolution-agent.ts
-var import_db = require("@libs/db");
+var import_db = require("@packages/db");
 var EvolutionAgent = class extends BaseAgent {
   getName() {
     return "EvolutionAgent";
@@ -996,7 +903,7 @@ Backend Context: ${JSON.stringify(input.backendFiles)}`, "llama-3.3-70b-versatil
 };
 
 // src/healing-agent.ts
-var import_utils5 = __toESM(require("@libs/utils"));
+var import_utils3 = __toESM(require("@packages/utils"));
 var HealingAgent = class _HealingAgent extends BaseAgent {
   getName() {
     return "HealingAgent";
@@ -1020,7 +927,7 @@ var HealingAgent = class _HealingAgent extends BaseAgent {
    */
   static async diagnoseAndFix(request) {
     const { projectId, errorLogs, lastAction } = request;
-    import_utils5.default.info({ projectId, lastAction }, "[HealingAgent] Diagnosing build failure...");
+    import_utils3.default.info({ projectId, lastAction }, "[HealingAgent] Diagnosing build failure...");
     if (errorLogs.includes("MODULE_NOT_FOUND")) {
       return {
         fixed: true,
@@ -1037,7 +944,7 @@ var HealingAgent = class _HealingAgent extends BaseAgent {
         codeFix: "// Fixed via syntax correction healing"
       };
     }
-    import_utils5.default.warn({ projectId }, "[HealingAgent] Could not find automated fix pattern.");
+    import_utils3.default.warn({ projectId }, "[HealingAgent] Could not find automated fix pattern.");
     return {
       fixed: false,
       explanation: "Unrecognized error pattern. Human intervention or multi-agent research session recommended."
@@ -1048,7 +955,7 @@ var HealingAgent = class _HealingAgent extends BaseAgent {
    */
   static async applyFix(projectId, result) {
     if (!result.fixed || !result.targetFile || !result.codeFix) return;
-    import_utils5.default.info({ projectId, targetFile: result.targetFile }, "[HealingAgent] Applying autonomous fix...");
+    import_utils3.default.info({ projectId, targetFile: result.targetFile }, "[HealingAgent] Applying autonomous fix...");
   }
 };
 
@@ -1102,7 +1009,7 @@ Output strictly valid JSON:
 };
 
 // src/meta-agent.ts
-var import_utils6 = __toESM(require("@libs/utils"));
+var import_utils4 = __toESM(require("@packages/utils"));
 var MetaAgent = class extends BaseAgent {
   getName() {
     return "MetaAgent";
@@ -1145,7 +1052,7 @@ Output strictly valid JSON matching this schema:
         logs: this.logs
       };
     } catch (error) {
-      import_utils6.default.error({ error }, "MetaAgent analysis failed");
+      import_utils4.default.error({ error }, "MetaAgent analysis failed");
       return {
         success: false,
         data: null,
@@ -1364,7 +1271,7 @@ var ResumeAgent = class extends BaseAgent {
   }
   async run(input, _context, signal, _strategy) {
     this.log(`Optimizing resume for role: ${input.targetRole || "General"}`);
-    const { db: db2 } = await import("@libs/db");
+    const { db: db2 } = await import("@packages/db");
     const strategies = await db2.strategy.findMany({ where: { agent: "ResumeAgent" } });
     const candidate = strategies.find((s) => !s.isActive);
     const active = strategies.find((s) => s.isActive);
@@ -1488,10 +1395,10 @@ var SocialAgent = class extends BaseAgent {
 };
 
 // src/task-graph.ts
-var import_utils7 = __toESM(require("@libs/utils"));
+var import_utils5 = __toESM(require("@packages/utils"));
 var TaskGraph = class {
   static resolveExecutionOrder(plan) {
-    import_utils7.default.info({ taskCount: plan.tasks.length }, "[TaskGraph] Resolving execution order");
+    import_utils5.default.info({ taskCount: plan.tasks.length }, "[TaskGraph] Resolving execution order");
     const tasks = [...plan.tasks];
     const executionGroups = [];
     const completedTaskIds = /* @__PURE__ */ new Set();
@@ -1500,7 +1407,7 @@ var TaskGraph = class {
         (task) => task.dependencies.every((depId) => completedTaskIds.has(depId))
       );
       if (currentGroup.length === 0) {
-        import_utils7.default.error({ tasks }, "[TaskGraph] Circular dependency detected or missing dependency");
+        import_utils5.default.error({ tasks }, "[TaskGraph] Circular dependency detected or missing dependency");
         throw new Error("Invalid Task Graph: Circular dependency or missing task");
       }
       executionGroups.push(currentGroup);
@@ -1546,7 +1453,7 @@ Files Context: ${JSON.stringify(input.allFiles)}`;
 };
 
 // src/validator-agent.ts
-var import_utils8 = __toESM(require("@libs/utils"));
+var import_utils6 = __toESM(require("@packages/utils"));
 var ValidatorAgent = class extends BaseAgent {
   getName() {
     return "ValidatorAgent";
@@ -1564,7 +1471,7 @@ var ValidatorAgent = class extends BaseAgent {
 Spec: ${input.spec}
 Output: ${JSON.stringify(input.output)}`;
       const { result, tokens } = await this.promptLLM(system, prompt2, "llama-3.3-70b-versatile", signal, strategy, _context);
-      import_utils8.default.info({
+      import_utils6.default.info({
         agentValidated: input.agentName,
         confidence: result.confidenceScore,
         tokens,
@@ -1615,3 +1522,4 @@ Output: ${JSON.stringify(input.output)}`;
   TestingAgent,
   ValidatorAgent
 });
+//# sourceMappingURL=index.js.map

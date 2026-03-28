@@ -12,10 +12,10 @@
  */
 
 import { redis } from './redis';
-import { logger } from '@libs/observability';
+import { logger } from '@packages/observability';
 import { createLazyProxy } from './runtime';
 import { PersistenceStore } from './persistence-store';
-import { PipelineStatus } from '@libs/contracts';
+import { PipelineStatus } from '@packages/contracts';
 
 
 const STREAM_TTL_SECONDS = 4 * 60 * 60; // 4 hours

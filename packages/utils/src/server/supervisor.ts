@@ -1,5 +1,5 @@
 import { DistributedExecutionContext } from './execution-context';
-import logger from '@libs/observability';
+import logger from '@packages/observability';
 import { eventBus } from './event-bus';
 import { repairQueue, plannerQueue, architectureQueue, generatorQueue, validatorQueue, dockerQueue, deployQueue } from './agent-queues';
 

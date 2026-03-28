@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@libs/supabase';
+import { createRouteHandlerClient } from '@packages/supabase';
 import { cookies } from 'next/headers';
-import logger from '@libs/utils';
-import { withObservability } from '@libs/utils';
+import logger from '@packages/utils';
+import { withObservability } from '@packages/utils';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function handler(_req: NextRequest) {

@@ -6,7 +6,7 @@ import { redis } from './redis';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import { registry, apiRequestDurationSeconds } from '../config/metrics';
-import { logger } from '@libs/observability';
+import { logger } from '@packages/observability';
 import { runWithTracing, getCorrelationId } from './tracing';
 import { ReliabilityMonitor } from './reliability-monitor';
 import { createLazyProxy } from './runtime';

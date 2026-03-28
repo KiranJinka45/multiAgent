@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@libs/supabase';
+import { createRouteHandlerClient } from '@packages/supabase';
 import { cookies } from 'next/headers';
-import { ChatRequestSchema, RateLimiter } from '@libs/utils/server';
-import { Groq } from '@libs/brain';
+import { ChatRequestSchema, RateLimiter } from '@packages/utils/server';
+import { Groq } from '@packages/brain';
 
 // Initialize Groq inside the handler or with a check to avoid top-level crashes if API key is missing
 const getGroqClient = () => {

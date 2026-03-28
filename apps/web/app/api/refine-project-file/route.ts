@@ -1,6 +1,6 @@
 import { Groq } from 'groq-sdk';
 import { NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@libs/supabase';
+import { createRouteHandlerClient } from '@packages/supabase';
 import { cookies } from 'next/headers';
 
 const getGroqClient = () => {

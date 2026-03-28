@@ -1,7 +1,7 @@
 import { redis } from './redis';
 import { eventBus } from './event-bus';
 import { PersistenceStore } from './persistence-store';
-import logger from '@libs/observability';
+import logger from '@packages/observability';
 
 export type ProjectLifecycleState = 
     | 'created' 

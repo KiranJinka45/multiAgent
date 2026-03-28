@@ -24,12 +24,12 @@ var baseConfig = defineConfig({
     "pino",
     "zod",
     "uuid",
-    "@libs/utils",
-    "@libs/contracts",
-    "@libs/registry",
-    "@libs/observability",
-    "@libs/validator",
-    "@libs/supabase",
+    "@packages/utils",
+    "@packages/contracts",
+    "@packages/registry",
+    "@packages/observability",
+    "@packages/validator",
+    "@packages/supabase",
     "fs-extra",
     "axios"
   ]

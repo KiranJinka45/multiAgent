@@ -1,1 +1,1 @@
-{"version":3,"sources":["../src/index.ts"],"names":["version"],"mappings":"AACO,IAAMA,CAAAA,CAAU","file":"index.mjs","sourcesContent":["// Entry point for @libs/tools\r\nexport const version = \"0.1.0\";\r\n\r\n\r\n"]}
+{"version":3,"sources":["../src/index.ts"],"sourcesContent":["// Entry point for @packages/tools\r\nexport const version = \"0.1.0\";\r\n\r\n\r\n"],"mappings":";AACO,IAAM,UAAU;","names":[]}

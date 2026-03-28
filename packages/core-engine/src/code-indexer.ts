@@ -1,7 +1,7 @@
-import { db } from '@libs/db';
+import { db } from '@packages/db';
 import * as fs from 'fs';
 import * as path from 'path';
-import { logger } from '@libs/utils';
+import { logger } from '@packages/utils';
 
 export class CodeIndexer {
   private rootDir: string;

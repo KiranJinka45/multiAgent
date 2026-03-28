@@ -26,11 +26,11 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 var import_dotenv = __toESM(require("dotenv"));
 
 // src/orchestrator.ts
-var import_utils = require("@libs/utils");
-var import_utils2 = require("@libs/utils");
-var import_utils3 = require("@libs/utils");
-var import_utils4 = require("@libs/utils");
-var import_utils5 = __toESM(require("@libs/utils"));
+var import_utils = require("@packages/utils");
+var import_utils2 = require("@packages/utils");
+var import_utils3 = require("@packages/utils");
+var import_utils4 = require("@packages/utils");
+var import_utils5 = __toESM(require("@packages/utils"));
 var StageStateMachine = class {
   currentStage = "PLANNING" /* PLANNING */;
   currentState = "IDLE" /* IDLE */;
@@ -97,8 +97,8 @@ var Orchestrator = class {
 };
 
 // src/index.ts
-var import_utils6 = require("@libs/utils");
-var import_observability = require("@libs/observability");
+var import_utils6 = require("@packages/utils");
+var import_observability = require("@packages/observability");
 import_dotenv.default.config();
 import_dotenv.default.config();
 (0, import_observability.initTelemetry)("multiagent-orchestrator");

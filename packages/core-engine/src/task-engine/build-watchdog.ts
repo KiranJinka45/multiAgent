@@ -1,4 +1,4 @@
-import { logger, eventBus } from '@libs/utils/server';
+import { logger, eventBus } from '@packages/utils/src/server';
 
 export class BuildWatchdog {
     private interval: NodeJS.Timeout | null = null;

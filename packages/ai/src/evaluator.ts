@@ -1,5 +1,5 @@
-import { db as prisma } from '@libs/db';
-import logger from '@libs/utils';
+import { db as prisma } from '@packages/db';
+import logger from '@packages/utils';
 
 export interface EvalMetrics {
   buildSuccess: number;

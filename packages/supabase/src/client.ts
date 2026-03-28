@@ -1,6 +1,6 @@
-import { createClient, type SupabaseClient, type RealtimePostgresChangesPayload } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient, type RealtimePostgresChangesPayload, type RealtimeChannel } from '@supabase/supabase-js';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-export type { SupabaseClient, RealtimePostgresChangesPayload };
+export type { SupabaseClient, RealtimePostgresChangesPayload, RealtimeChannel };
 export { createClientComponentClient };
 
 export type SupabaseConfig = {

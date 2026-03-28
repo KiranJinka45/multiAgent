@@ -1,6 +1,6 @@
 import { BaseAgent } from './base-agent';
-import { MonetizationParams, AgentRequest, AgentResponse } from '@libs/contracts';
-import { StrategyConfig } from '@libs/utils';
+import { MonetizationParams, AgentRequest, AgentResponse } from '@packages/contracts';
+import { StrategyConfig } from '@packages/utils';
 
 export interface MonetizationOutput {
     stripeConfig: string;

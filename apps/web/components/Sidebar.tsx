@@ -4,10 +4,10 @@ import { Sparkles, PanelLeft, Edit3, FolderPlus, Image, Github, Terminal, Compas
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { supabase } from '@/lib/supabase-browser';
-import { useRealtimeSubscription } from '@libs/utils';
-import type { User } from '@libs/supabase';
-import { Chat } from '@libs/contracts';
-import { useSidebar } from '@libs/context';
+import { useRealtimeSubscription, chatService } from '@packages/utils';
+import type { User } from '@packages/supabase';
+import { Chat } from '@packages/contracts';
+import { useSidebar } from '@packages/context';
 import { toast } from 'sonner';
 
 // Sub-components
@@ -42,7 +42,7 @@ export default function Sidebar() {
         if (!user) return;
         const data = await chatService.getChats(supabase);
         setChats(data);
-    }, [user]);
+    }, [user, supabase]);
 
     // Resizing logic
     const startResizing = useCallback((e: React.MouseEvent) => {
@@ -215,7 +215,7 @@ export default function Sidebar() {
                 onClose={() => setIsRenameModalOpen(false)}
                 onRename={async (title) => {
                     if (selectedChat) {
-                        const success = await chatService.updateChatTitle(selectedChat.id, title);
+                        const success = await chatService.updateChatTitle(selectedChat.id, title, supabase);
                         if (success) { fetchChats(); toast.success('Renamed'); }
                     }
                 }}
@@ -228,9 +228,9 @@ export default function Sidebar() {
                 isOpen={isGroupModalOpen}
                 onClose={() => setIsGroupModalOpen(false)}
                 onCreateGroup={async (name, members) => {
-                    const { chat } = await chatService.createChat(name);
+                    const { chat } = await chatService.createChat(name, supabase);
                     if (chat) {
-                        await chatService.addMessage(chat.id, `Group created: ${members.join(', ')}`, 'assistant');
+                        await chatService.addMessage(chat.id, `Group created: ${members.join(', ')}`, 'assistant', supabase);
                         fetchChats(); router.push(`/c/${chat.id}`);
                     }
                 }}

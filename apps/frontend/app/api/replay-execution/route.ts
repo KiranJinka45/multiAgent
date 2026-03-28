@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Orchestrator } from '@libs/core-engine';
-import { DistributedExecutionContext as ExecutionContext, logger } from '@libs/utils/src/server';
+import { Orchestrator } from '@packages/core-engine';
+import { DistributedExecutionContext as ExecutionContext, logger } from '@packages/utils/src/server';
 
 export async function POST(
     req: NextRequest,

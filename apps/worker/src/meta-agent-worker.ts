@@ -1,9 +1,9 @@
 import { Worker, Job } from 'bullmq';
 import { Redis } from 'ioredis';
-import { logger } from '@libs/observability';
-import { redis, eventBus, QUEUE_META } from '@libs/shared-services';
-import { plannerQueue, DistributedExecutionContext } from '@libs/utils/server';
-import { MetaAgent } from '@libs/agents/meta-agent';
+import { logger } from '@packages/observability';
+import { redis, eventBus, QUEUE_META } from '@packages/shared-services';
+import { plannerQueue, DistributedExecutionContext } from '@packages/utils/server';
+import { MetaAgent } from '@packages/agents/meta-agent';
 
 const metaAgent = new MetaAgent();
 

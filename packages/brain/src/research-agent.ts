@@ -1,5 +1,5 @@
-import { BaseAgent, AgentResponse } from './index';
-import { AgentContext } from '@libs/contracts';
+import { BaseAgent, AgentResponse } from './base-agent';
+import { AgentContext } from '@packages/contracts';
 
 export interface ResearchFindings {
     vulnerabilities: string[];

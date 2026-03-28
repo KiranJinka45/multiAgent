@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Zap, Clock, DollarSign, TrendingUp, BarChart2 } from 'lucide-react';
-import { BuildUpdate } from '@libs/contracts';
+import { BuildUpdate } from '@packages/contracts';
 
 interface BuildMetric {
     id: string;

@@ -1,6 +1,6 @@
 'use client';
 
-import { createBrowserSupabaseClient } from '@libs/supabase';
+import { createBrowserSupabaseClient } from '@packages/supabase';
 
 /**
  * Next.js Client singleton for Supabase.

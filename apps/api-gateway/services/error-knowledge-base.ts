@@ -1,6 +1,6 @@
 import { redis } from '@queue';
 import crypto from 'crypto';
-import logger from '@config/logger';
+import { logger } from '@packages/utils/server';
 
 export interface ErrorSolution {
     explanation: string;

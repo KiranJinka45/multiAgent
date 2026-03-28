@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
-import { redis, logger } from '@libs/utils/server';
+import { redis, logger } from '@packages/utils/server';
 
 export interface SandboxSnapshot {
     projectId: string;

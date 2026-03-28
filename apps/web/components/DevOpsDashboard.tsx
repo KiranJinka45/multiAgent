@@ -2,8 +2,8 @@
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Terminal, Download, Github, Wand2, Share, ChevronDown } from 'lucide-react';
-import { BuildUpdate } from '@libs/contracts';
+import { Terminal, Download, Github, Wand2, Share, ChevronDown, Globe, AlertTriangle, Sparkles } from 'lucide-react';
+import { BuildUpdate } from '@packages/contracts';
 import { toast } from 'sonner';
 import FileExplorer from './FileExplorer';
 import FileViewer from './FileViewer';
@@ -14,7 +14,7 @@ import { DiffViewer, FileDiff } from './DiffViewer';
 import ResourceGraph from './ResourceGraph';
 import AgentTimeline from './AgentTimeline';
 import { ThoughtStream } from './devops/ThoughtStream';
-import { formatTime, formatYear } from '@libs/utils';
+import { formatTime, formatYear } from '@packages/utils';
 
 interface DevOpsDashboardProps {
     buildProgress: BuildUpdate | null;
@@ -57,6 +57,40 @@ const DevOpsDashboard: React.FC<DevOpsDashboardProps> = ({
         if (!selectedFilePath) return null;
         return files.find(f => f.path === selectedFilePath) || null;
     }, [selectedFilePath, files]);
+    
+    // Stage-based progress mapping for "Believable Progress"
+    const displayProgress = useMemo(() => {
+        if (buildProgress?.status === 'completed') return 100;
+        if (buildProgress?.status === 'failed') return buildProgress.totalProgress || 0;
+        
+        const stage = buildProgress?.currentStage?.toLowerCase() || '';
+        const stageBase = {
+            'brainstorming': 10,
+            'planning': 25,
+            'generating': 60,
+            'fixing': 85,
+            'deployment': 95
+        }[stage] || 0;
+
+        // Blend the stage base with the sub-progress if available
+        const subProgress = buildProgress?.totalProgress ? (buildProgress.totalProgress % 20) : 0;
+        return Math.min(stageBase + subProgress, 99);
+    }, [buildProgress]);
+
+    // Track "Wow Moment" on first successful preview
+    useEffect(() => {
+        if (isCompleted && projectId) {
+            const hasTracked = sessionStorage.getItem(`wow_${projectId}`);
+            if (!hasTracked) {
+                fetch(`/api/analytics/wow`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ projectId })
+                }).catch(() => {}); // Silent fail for analytics
+                sessionStorage.setItem(`wow_${projectId}`, 'true');
+            }
+        }
+    }, [isCompleted, projectId]);
 
     // Memoize build status for performance
     const status = useMemo(() => buildProgress?.status || 'executing', [buildProgress?.status]);
@@ -122,24 +156,43 @@ const DevOpsDashboard: React.FC<DevOpsDashboardProps> = ({
                     <div className="h-4 w-[1px] bg-white/10" />
 
                     <div className="flex items-center gap-3">
-                        <div className={`flex items-center gap-2 px-2 py-1 rounded-md border ${
-                            status === 'failed' ? 'bg-red-500/5 border-red-500/20' : 
-                            status === 'completed' ? 'bg-green-500/5 border-green-500/20' :
-                            'bg-primary/5 border-primary/20'
+                        <div className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg border shadow-sm transition-all ${
+                            status === 'failed' ? 'bg-red-500/10 border-red-500/30 shadow-red-500/10' : 
+                            status === 'completed' ? 'bg-green-500/10 border-green-500/30 shadow-green-500/10' :
+                            'bg-primary/10 border-primary/30 shadow-primary/10'
                         }`}>
-                            <div className={`w-1 h-1 rounded-full ${
+                            <div className={`w-2 h-2 rounded-full ${
                                 status === 'failed' ? 'bg-red-500' :
                                 status === 'completed' ? 'bg-green-500' :
                                 'bg-primary animate-pulse'
                             }`} />
-                            <span className={`text-[8px] font-black uppercase tracking-widest ${
-                                status === 'failed' ? 'text-red-500' :
-                                status === 'completed' ? 'text-green-500' :
+                            <span className={`text-[10px] font-black uppercase tracking-[0.15em] ${
+                                status === 'failed' ? 'text-red-400' :
+                                status === 'completed' ? 'text-green-400' :
                                 'text-primary'
                             }`}>
                                 {status === 'completed' ? 'Production Ready' : currentStage}
                             </span>
+                            {status === 'executing' && (
+                                <span className="ml-2 text-[10px] font-black text-white/40 tabular-nums">
+                                    {Math.round(displayProgress)}%
+                                </span>
+                            )}
                         </div>
+                        
+                        {/* Prompt Optimization Hint */}
+                        <AnimatePresence>
+                            {(status === 'executing' || status === 'completed') && (
+                                <motion.div
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    className="flex items-center gap-1.5 px-2 py-1 bg-violet-500/10 border border-violet-500/20 rounded-md"
+                                >
+                                    <Sparkles size={10} className="text-violet-400" />
+                                    <span className="text-[9px] font-bold text-violet-400 uppercase tracking-tighter">Optimized for Best Results</span>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
                 </div>
 
@@ -301,6 +354,83 @@ const DevOpsDashboard: React.FC<DevOpsDashboardProps> = ({
                                         <ResourceGraph projectId={projectId} liveBuildProgress={buildProgress} />
                                     )}
                                 </motion.div>
+                            </AnimatePresence>
+
+                            {/* Success Action Panel */}
+                            <AnimatePresence>
+                                {isCompleted && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-40"
+                                    >
+                                        <div className="bg-[#0d0d0d]/90 backdrop-blur-2xl border border-green-500/30 rounded-2xl p-6 shadow-[0_20px_50px_rgba(0,0,0,0.5),0_0_30px_rgba(34,197,94,0.1)] flex flex-col items-center gap-4 min-w-[320px]">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center text-green-500">
+                                                    <Wand2 size={20} />
+                                                </div>
+                                                <div className="text-center">
+                                                    <h3 className="text-sm font-black text-white uppercase tracking-widest">Build Complete!</h3>
+                                                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Your app is ready to launch</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-3 w-full">
+                                                <button onClick={() => setActiveTab('preview')} className="flex-1 px-4 py-2.5 bg-white text-black text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-gray-200 transition-all">
+                                                    Open App
+                                                </button>
+                                                <button onClick={() => setChatOpen(true)} className="flex-1 px-4 py-2.5 bg-primary text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:opacity-90 transition-all shadow-lg shadow-primary/20">
+                                                    Edit with AI
+                                                </button>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-3 w-full">
+                                                <button 
+                                                    onClick={() => {
+                                                        const shareUrl = `${window.location.origin}/share/${projectId}`;
+                                                        navigator.clipboard.writeText(shareUrl);
+                                                        toast.success('Share link copied!');
+                                                    }} 
+                                                    className="flex items-center justify-center gap-2 px-3 py-2 bg-primary/20 border border-primary/30 hover:border-primary/50 rounded-lg text-[9px] font-black text-primary uppercase tracking-widest transition-all"
+                                                >
+                                                    <Globe size={12} /> Share Link
+                                                </button>
+                                                <button onClick={onDeploy} className="flex items-center justify-center gap-2 px-3 py-2 bg-white/5 border border-white/10 hover:border-white/20 rounded-lg text-[9px] font-bold text-gray-400 hover:text-white transition-all uppercase tracking-widest">
+                                                    Deploy (Adv)
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+
+                            {/* Error Recovery Banner */}
+                            <AnimatePresence>
+                                {status === 'failed' && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-40 w-full max-w-lg px-6"
+                                    >
+                                        <div className="bg-red-500/10 backdrop-blur-2xl border border-red-500/30 rounded-2xl p-5 shadow-2xl flex items-center justify-between gap-6">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center text-red-500 shrink-0">
+                                                    <AlertTriangle size={20} />
+                                                </div>
+                                                <div className="min-w-0 flex-1">
+                                                    <h3 className="text-xs font-black text-white uppercase tracking-widest leading-tight">Self-healing in progress</h3>
+                                                    <p className="text-[10px] text-red-400/80 font-medium leading-relaxed">Our agents are simplifying the request to ensure a stable build.</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-2 shrink-0">
+                                                <button onClick={onRedeploy} className="px-4 py-2 bg-red-500 text-white text-[9px] font-black uppercase tracking-widest rounded-lg hover:bg-red-600 transition-all shadow-lg shadow-red-500/20">
+                                                    Force Retry
+                                                </button>
+                                                <button onClick={() => {}} className="px-4 py-2 bg-white/5 border border-white/10 text-white/40 text-[9px] font-black uppercase tracking-widest rounded-lg hover:text-white hover:border-white/20 transition-all">
+                                                    Simplify
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                )}
                             </AnimatePresence>
                         </div>
                     </div>

@@ -15,7 +15,7 @@
 
 import crypto from 'crypto';
 import path from 'path';
-import { logger } from '@libs/utils/server';
+import { logger } from '@packages/utils/server';
 
 // ─── Config ────────────────────────────────────────────────────────────────
 

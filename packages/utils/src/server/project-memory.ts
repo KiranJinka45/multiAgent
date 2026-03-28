@@ -1,5 +1,5 @@
 import { supabaseAdmin } from './supabase-utils';
-import logger from '@libs/observability';
+import logger from '@packages/observability';
 import { CodeChunker } from './memory/code-chunker';
 import { EmbeddingsEngine } from './memory/embeddings-engine';
 import { VectorStore } from './memory/vector-store';

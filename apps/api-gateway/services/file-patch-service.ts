@@ -1,4 +1,4 @@
-import logger from '@config/logger';
+import { logger } from '@packages/utils/server';
 
 export interface PatchAction {
     type: 'replace_section' | 'append_after' | 'prepend_before' | 'insert_at_top';

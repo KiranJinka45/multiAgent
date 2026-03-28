@@ -18,7 +18,7 @@ import { trackEvent } from './routes/events';
 import { StripeService } from './services/stripe';
 
 // Initialize tracing as early as possible
-// initInstrumentation('gateway');
+initInstrumentation('gateway');
 
 process.on('unhandledRejection', (reason, promise) => {
     console.error('Unhandled Rejection at Gateway:', reason);

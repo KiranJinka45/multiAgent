@@ -7,7 +7,7 @@
 import { execSync } from 'child_process';
 import path from 'path';
 import net from 'net';
-import { logger } from '@libs/utils/server';
+import { logger } from '@packages/utils/server';
 
 // ─── Config ────────────────────────────────────────────────────────────────
 

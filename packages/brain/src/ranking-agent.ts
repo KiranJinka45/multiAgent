@@ -1,6 +1,6 @@
-import { BaseAgent, AgentResponse } from './index';
-import { AgentContext } from '@libs/contracts';
-import { StrategyConfig } from '@libs/utils';
+import { BaseAgent, AgentResponse } from './base-agent';
+import { AgentContext } from '@packages/contracts';
+import { StrategyConfig } from '@packages/utils';
 
 export interface RankingInput {
     variants: Array<{

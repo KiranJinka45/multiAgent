@@ -1,14 +1,14 @@
 import { Worker, Job } from 'bullmq';
 import { Redis } from 'ioredis';
-import { logger } from '@libs/observability';
-import { redis, eventBus, QUEUE_REPAIR } from '@libs/shared-services';
+import { logger } from '@packages/observability';
+import { redis, eventBus, QUEUE_REPAIR } from '@packages/shared-services';
 import { 
     validatorQueue, 
     DistributedExecutionContext, 
     VirtualFileSystem, 
     CommitManager 
-} from '@libs/utils/server';
-import { RepairAgent } from '@libs/agents/repair-agent';
+} from '@packages/utils/server';
+import { RepairAgent } from '@packages/agents';
 
 import path from 'path';
 import fs from 'fs';

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { redis } from '@libs/utils/server';
+import { redis } from '@packages/utils/server';
 
 // Dynamic import to avoid webpack bundling native ssh2/dockerode modules
 let docker: any = null;

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@libs/utils/src/server';
+import { supabaseAdmin } from '@packages/utils/src/server';
 
 /**
  * GET /api/projects/[id]/preview

@@ -1,3 +1,3 @@
-// Entry point for @libs/ui
+// Entry point for @packages/ui
 
 

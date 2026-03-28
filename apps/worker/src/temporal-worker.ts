@@ -1,23 +1,23 @@
 import { Worker } from '@temporalio/worker';
-import * as activities from '@libs/orchestrator/activities/agentActivities';
+import * as activities from '@packages/orchestrator/activities/agentActivities';
 import path from 'path';
 
 // --- AGENT REGISTRATION ---
-import { agentRegistry } from '@libs/utils';
-import { DatabaseAgent } from '@libs/agents';
-import { BackendAgent } from '@libs/agents';
-import { FrontendAgent } from '@libs/agents';
-import { DeploymentAgent } from '@libs/agents';
-import { SecurityAgent } from '@libs/agents';
-import { MonitoringAgent } from '@libs/agents';
-import { SaaSMonetizationAgent } from '@libs/agents';
-import { PlannerAgent } from '@libs/agents';
-import { ResearchAgent } from '@libs/agents';
-import { DebugAgent } from '@libs/agents';
-import { ArchitectureAgent } from '@libs/agents';
-import { RankingAgent } from '@libs/agents';
-import { RepairAgent } from '@libs/agents';
-import { CriticAgent } from '@libs/agents';
+import { agentRegistry } from '@packages/utils';
+import { DatabaseAgent } from '@packages/agents';
+import { BackendAgent } from '@packages/agents';
+import { FrontendAgent } from '@packages/agents';
+import { DeploymentAgent } from '@packages/agents';
+import { SecurityAgent } from '@packages/agents';
+import { MonitoringAgent } from '@packages/agents';
+import { SaaSMonetizationAgent } from '@packages/agents';
+import { PlannerAgent } from '@packages/agents';
+import { ResearchAgent } from '@packages/agents';
+import { DebugAgent } from '@packages/agents';
+import { ArchitectureAgent } from '@packages/agents';
+import { RankingAgent } from '@packages/agents';
+import { RepairAgent } from '@packages/agents';
+import { CriticAgent } from '@packages/agents';
 
 // Register with standardized lowercase keys
 agentRegistry.register('database', new DatabaseAgent());

@@ -1,8 +1,9 @@
-// Entry point for @libs/agents
-
+export * from './planner';
+export * from './ui';
+export * from './logic';
+export * from './base-agent';
 export * from './architecture-agent';
 export * from './backend-agent';
-export * from './base-agent';
 export * from './chat-edit-agent';
 export * from './coder-agent';
 export * from './critic-agent';
@@ -18,6 +19,7 @@ export * from './judge-agent';
 export * from './meta-agent';
 export * from './monitoring-agent';
 export * from './planner-agent';
+export * from './polish-agent';
 export * from './ranking-agent';
 export * from './repair-agent';
 export * from './research-agent';
@@ -26,4 +28,3 @@ export * from './sandbox-editor-agent';
 export * from './security-agent';
 export * from './testing-agent';
 export * from './validator-agent';
-export * from './services';

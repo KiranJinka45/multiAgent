@@ -1,4 +1,4 @@
-import { DeploymentService } from '@libs/services/deployment';
+import { DeploymentService } from '@packages/services/deployment';
 import path from 'path';
 
 /**

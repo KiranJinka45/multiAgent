@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { db } from '@libs/db';
-import { logger } from '@libs/utils';
-import { ResumeAgent } from '@libs/brain';
-import { DistributedExecutionContext } from '@libs/core-engine';
+import { db } from '@packages/db';
+import { logger } from '@packages/utils';
+import { ResumeAgent } from '@packages/brain/resume-agent';
+import { DistributedExecutionContext } from '@packages/core-engine';
 
 const router = Router();
 const resumeAgent = new ResumeAgent();

@@ -1,5 +1,5 @@
-import { agentRegistry } from '@libs/utils';
-import { ArtifactValidator } from '@libs/validator';
+import { agentRegistry } from '@packages/utils';
+import { ArtifactValidator } from '@packages/validator';
 import { 
     AgentRequest, 
     AgentContext, 
@@ -7,12 +7,12 @@ import {
     JobArtifact, 
     ValidationResult, 
     BrainPlan 
-} from '@libs/contracts';
-import { publishLog } from '@libs/worker/services/logger';
+} from '@packages/contracts';
+import { publishLog } from '@packages/worker/services/logger';
 import * as fs from 'fs-extra';
 import path from 'path';
-import logger from '@libs/utils';
-import { safetyService } from '@libs/api/services/safety';
+import logger from '@packages/utils';
+import { safetyService } from '@packages/api/services/safety';
 
 export const createActivities = (executionId: string) => {
     logger.info({ executionId }, '[Activities] Initializing activities for worker');
@@ -161,8 +161,8 @@ export const createActivities = (executionId: string) => {
         async getBrainPlan(prompt: string, tenantId: string): Promise<BrainPlan> {
             await log('🧠 AI Brain formulating architectural strategy...');
             // Dynamic import to avoid circular dependencies or heavy init
-            const { ContextBuilder } = await import('@libs/brain');
-            const { Planner } = await import('@libs/brain');
+            const { ContextBuilder } = await import('@packages/brain');
+            const { Planner } = await import('@packages/brain');
             
             const brainContext = await ContextBuilder.build(prompt, tenantId);
             const planner = new Planner();

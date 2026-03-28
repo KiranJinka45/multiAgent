@@ -1,7 +1,7 @@
-import { eventBus, BuildEvent } from '@shared/services/event-bus';
+import { eventBus, BuildEvent } from '@packages/shared-servicesevent-bus';
 import { agentRegistry } from './agent-registry';
-import { DistributedExecutionContext } from '@libs/execution-context';
-import logger from '@config/logger';
+import { DistributedExecutionContext } from '@packages/execution-context';
+import { logger } from '@packages/utils/server';
 
 /**
  * SwarmCoordinator - The event-driven brain for Devin-level autonomy.
