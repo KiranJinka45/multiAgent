@@ -1,20 +1,20 @@
 {
-    "name":  "@packages/memory-vector",
-    "version":  "0.1.0",
-    "private":  true,
-    "main":  "./dist/index.js",
-    "module":  "./dist/index.mjs",
-    "types":  "./src/index.ts",
-    "scripts":  {
-                    "build":  "tsup --config tsup.config.js",
-                    "dev":  "tsup --watch"
-                },
-    "dependencies":  {
-                         "@packages/memory-core":  "workspace:*",
-                         "@packages/utils":  "workspace:*"
-                     },
-    "devDependencies":  {
-                            "typescript":  "^5.0.0",
-                            "tsup":  "^8.0.0"
-                        }
+  "name": "@packages/memory-vector",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsup --config tsup.config.js",
+    "dev": "tsup --watch"
+  },
+  "dependencies": {
+    "@packages/memory-core": "workspace:*",
+    "@packages/utils": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "tsup": "^8.0.0"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  }
 }

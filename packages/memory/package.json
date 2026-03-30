@@ -2,21 +2,8 @@
   "name": "@packages/memory",
   "version": "0.1.0",
   "private": true,
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./src/index.ts",
   "exports": {
-    ".": {
-      "types": "./src/index.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
-      "default": "./dist/index.js"
-    },
-    "./*": {
-      "types": "./src/*.ts",
-      "import": "./dist/*.js",
-      "default": "./dist/*.js"
-    }
+    ".": "./src/index.ts"
   },
   "scripts": {
     "build": "tsup --config tsup.config.js",

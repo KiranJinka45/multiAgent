@@ -1,5 +1,5 @@
 {
-  "name": "multi-agent-frontend",
+  "name": "@apps/frontend",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -22,7 +22,7 @@
     "@packages/brain": "workspace:*",
     "@packages/contracts": "workspace:*",
     "@packages/core-engine": "workspace:*",
-    "@packages/runtime": "workspace:*",
+    "@packages/preview-runtime": "workspace:*",
     "@packages/supabase": "workspace:*",
     "prom-client": "^15.1.3"
   },

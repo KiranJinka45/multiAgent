@@ -2,7 +2,7 @@ import { planner, uiAgent, logicAgent, PolishAgent } from '@packages/agents';
 import { validator } from '@packages/validator';
 import { healer } from '@packages/auto-healer';
 import { run as sandboxRun } from '@packages/sandbox';
-import { logger, missionController } from '@packages/utils/src/server';
+import { logger, missionController } from '@packages/utils/server';
 
 export const runPipeline = async (missionId: string, prompt: string) => {
   logger.info({ missionId, prompt }, '[Pipeline] Starting execution');

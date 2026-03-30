@@ -78,12 +78,12 @@ export const previewRegistry = {
 /** Map a RuntimeRecord to the legacy shape some consumers expect */
 function mapToLegacy(rec: RuntimeRecord) {
     return {
-        previewId: rec.previewId,
-        projectId: rec.projectId,
+        previewId: rec.previewId || '',
+        projectId: rec.projectId || '',
         status: rec.status?.toLowerCase() ?? 'unknown',
         containerHost: 'localhost',
         containerPort: rec.port ?? 0,
-        accessToken: rec.accessToken ?? null,
+        accessToken: rec.accessToken ?? '',
         createdAt: rec.startedAt ? new Date(rec.startedAt).getTime() : Date.now(),
         lastAccessedAt: rec.lastHeartbeatAt
             ? new Date(rec.lastHeartbeatAt).getTime()

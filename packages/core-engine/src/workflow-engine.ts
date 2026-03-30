@@ -6,7 +6,7 @@
 
 import { AgentRequest, AgentResponse, AgentContext } from '@packages/contracts';
 import { agentRegistry } from '@packages/agents';
-import { projectMemory, eventBus, logger } from '@packages/utils/src/server';
+import { projectMemory, eventBus, logger } from '@packages/utils/server';
 
 export interface WorkflowTask {
     id: string;

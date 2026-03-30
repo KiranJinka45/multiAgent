@@ -1,20 +1,21 @@
 {
-    "name":  "@packages/refactor-agent",
-    "version":  "0.1.0",
-    "private":  true,
-    "main":  "dist/index.js",
-    "types":  "dist/index.d.ts",
-    "scripts":  {
-                    "build":  "tsup --config tsup.config.js",
-                    "dev":  "tsup --watch"
-                },
-    "dependencies":  {
-                         "@packages/utils":  "workspace:*",
-                         "fs-extra":  "^11.3.4",
-                         "pino":  "^10.3.1"
-                     },
-    "devDependencies":  {
-                            "tsup":  "^8.5.1",
-                            "typescript":  "^5.9.3"
-                        }
+  "name": "@packages/refactor-agent",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsup --config tsup.config.js",
+    "dev": "tsup --watch"
+  },
+  "dependencies": {
+    "@packages/utils": "workspace:*",
+    "fs-extra": "^11.3.4",
+    "pino": "^10.3.1"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  }
 }

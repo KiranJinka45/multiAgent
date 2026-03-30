@@ -36,13 +36,13 @@ type ExecutionLogger = ReturnType<typeof getExecutionLogger>;
 
 import path from 'path';
 import * as fs from 'fs-extra';
-import { runtimeExecutor } from '@packages/runtime/executor';
+import { runtimeExecutor } from '@packages/preview-runtime/executor';
 import { ArchitectureAgent } from '@packages/brain/architecture-agent';
 import { PreviewRegistry } from '@packages/registry';
 import { swarmCoordinator } from './task-engine/swarm-coordinator';
 import { RankingAgent } from '@packages/brain/ranking-agent';
 import { ExecutionResult, JobStage } from '@packages/contracts';
-import { RuntimeScheduler } from '@packages/runtime/cluster/runtimeScheduler';
+import { RuntimeScheduler } from '@packages/preview-runtime/cluster/runtimeScheduler';
 import { ArtifactValidator } from '@packages/validator';
 import { AgentMemory } from '@packages/agents';
 import { db } from '@packages/db';

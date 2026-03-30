@@ -1,7 +1,7 @@
 import { ChatEditAgent } from '@packages/agents';
 import { run as sandboxRun } from '@packages/sandbox';
 import { ContainerManager } from '@apps/sandbox-runtime';
-import { logger, missionController } from '@packages/utils/src/server';
+import { logger, missionController } from '@packages/utils/server';
 import fs from 'fs-extra';
 import path from 'path';
 

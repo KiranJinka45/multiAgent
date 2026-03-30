@@ -61,7 +61,7 @@ export abstract class BaseAgent {
 
         // 2. Governance Gate (Level 5 Safety)
         if (this.getName() === 'EvolutionAgent') {
-            const { GovernanceEngine } = await import('@packages/core-engine');
+            const { GovernanceEngine } = await import('@packages/validator');
             // Simplified check: we'll check governance inside EvolutionAgent.run or here.
             // For now, we ensure the engine is accessible.
         }

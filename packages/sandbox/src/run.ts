@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
-import { PortManager, ContainerManager } from '@apps/sandbox-runtime';
+import { PortManager, ContainerManager } from '@packages/sandbox-runtime';
 import { logger } from '@packages/observability';
 import { VITE_BOILERPLATE } from './template';
 

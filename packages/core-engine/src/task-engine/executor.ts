@@ -1,10 +1,10 @@
 import { TaskGraph, BaseTask } from './task-graph';
 import { agentRegistry } from './agent-registry';
 import { AgentContext } from '@packages/contracts';
-import { StrategyEngine, logger, eventBus, patchEngine, DistributedExecutionContext, AgentMemory } from '@packages/utils/src/server';
+import { StrategyEngine, logger, eventBus, patchEngine, DistributedExecutionContext, AgentMemory } from '@packages/utils/server';
 import { DebugAgent, AgentResponse } from '@packages/brain/debug-agent';
 import { BuildCache } from './build-cache';
-import { previewManager } from '@packages/runtime/preview-manager';
+import { previewManager } from '@packages/preview-runtime/preview-manager';
 import { workerPool } from './worker-pool';
 
 import * as fsLib from 'fs-extra';

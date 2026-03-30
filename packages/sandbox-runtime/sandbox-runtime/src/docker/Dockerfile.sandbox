@@ -1,0 +1,23 @@
+# ============================================================
+# Optimized Sandbox Dockerfile
+# Inherits from prebuilt base image with dependencies.
+# ============================================================
+
+FROM multiagent-sandbox-base
+
+WORKDIR /app
+
+# Copy generated project files
+# We expect files to be injected into /app
+COPY . .
+
+# Environment setup
+ENV PORT=3000
+EXPOSE ${PORT}
+
+# Healthcheck
+HEALTHCHECK --interval=5s --timeout=3s --start-period=5s --retries=3 \
+    CMD wget --spider --quiet http://localhost:${PORT}/ || exit 1
+
+# Start dev server (Vite)
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "3000"]

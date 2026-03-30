@@ -1,4 +1,4 @@
-import { redis, logger } from '@packages/utils/src/server';
+import { redis, logger } from '@packages/utils/server';
 
 /**
  * BuildCache - Redis-backed cache for granular build artifacts.

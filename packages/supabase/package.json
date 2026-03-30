@@ -2,33 +2,22 @@
   "name": "@packages/supabase",
   "version": "0.1.0",
   "private": true,
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./src/index.ts",
   "exports": {
-    ".": {
-      "types": "./src/index.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
-      "default": "./dist/index.js"
-    },
-    "./*": {
-      "types": "./src/*.ts",
-      "import": "./dist/*.js",
-      "default": "./dist/*.js"
-    }
+    ".": "./src/index.ts"
   },
   "scripts": {
-    "build": "tsup --config tsup.config.js",
+    "build": "tsup",
     "dev": "tsup --watch",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.39.1"
+    "@supabase/supabase-js": "^2.39.1",
+    "@supabase/auth-helpers-nextjs": "^0.10.0",
+    "@supabase/auth-helpers-react": "^0.5.0"
   },
   "devDependencies": {
     "tsup": "^8.5.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.0.0"
   }
 }

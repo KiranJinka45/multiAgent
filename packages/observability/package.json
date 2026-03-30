@@ -1,14 +1,8 @@
 {
   "name": "@packages/observability",
   "version": "0.1.0",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
-    }
+    ".": "./src/index.ts"
   },
   "files": [
     "dist"

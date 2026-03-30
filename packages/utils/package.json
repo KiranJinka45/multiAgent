@@ -2,19 +2,11 @@
   "name": "@packages/utils",
   "version": "0.1.0",
   "private": true,
-  "main": "dist/index.js",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
   "exports": {
-    ".": "./dist/index.js",
-    "./server": "./dist/server/index.js",
-    "./server/*": "./dist/server/*.js",
-    "./client": "./dist/client/index.js",
-    "./client/*": "./dist/client/*.js",
-    "./config": "./dist/config/index.js",
-    "./config/*": "./dist/config/*.js",
-    "./package.json": "./package.json",
-    "./src/*": "./src/*"
+    ".": "./src/index.ts",
+    "./server": "./src/server/index.ts",
+    "./client": "./src/client/index.ts",
+    "./config": "./src/config/index.ts"
   },
   "scripts": {
     "build": "tsup --config tsup.config.js",

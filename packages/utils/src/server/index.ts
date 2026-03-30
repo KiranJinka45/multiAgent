@@ -25,10 +25,12 @@ export * from './retry-manager';
 export * from './devops/infra-provisioner';
 export * from './devops/cicd-manager';
 export { DockerDeployer } from './devops/docker-deployer';
-export * from './template-engine';
-export * from './template-service';
+// Moved to @packages/templates
+// export * from './template-engine';
+// export * from './template-service';
 export { PatchEngine as LegacyPatchEngine, patchEngine, type Patch } from './patch-engine';
-export * from './guardrail-service';
+// Moved to @packages/validator
+// export * from './guardrail-service';
 export * from './agent-queues';
 export * from './system-queue';
 export * from './queue-manager';
@@ -38,7 +40,8 @@ export { logger as serverLogger };
 export * from './tracing';
 export * from './audit-logger';
 export * from './anchoring-service';
-export * from './auto-healer';
+// Moved to @packages/auto-healer
+// export * from './auto-healer';
 export * from './blueprint-manager';
 export * from './build-queue';
 export * from './build-state';
@@ -49,14 +52,17 @@ export * from './file-patch-service';
 export * from './impact-analyzer';
 export * from './knowledge-service';
 export * from './log-streaming';
-export * from './orchestrator';
+// Moved to @packages/core-engine (temporal version)
+// export * from './orchestrator';
 export * from './persistence-store';
 export * from './recovery-notifier';
 export * from './sandbox-pod-controller';
-export * from './self-healer';
+// Moved to @packages/auto-healer
+// export * from './self-healer';
 export * from './slo-service';
 // export * from '@packages/utils/config/metrics';
 export * from './supervisor';
 export * from './runtime';
 export * from './strategy-engine';
 export { breakers } from '../config/circuit-breaker';
+export { CostGovernanceService } from '../config/governance';

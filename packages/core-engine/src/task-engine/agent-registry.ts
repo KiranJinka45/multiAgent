@@ -5,7 +5,7 @@ import { FrontendAgent } from '@packages/brain/frontend-agent';
 import { DeploymentAgent } from '@packages/brain/deploy-agent';
 import { TestingAgent } from '@packages/brain/testing-agent';
 import { ValidatorAgent } from '@packages/brain/validator-agent';
-import { logger, StrategyConfig } from '@packages/utils/src/server';
+import { logger, StrategyConfig } from '@packages/utils/server';
 import { AgentContext } from '@packages/contracts';
 
 export interface TaskAgent {

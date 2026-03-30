@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '@packages/utils/src/server';
+import { supabaseAdmin } from '@packages/utils/server';
 import logger from '@packages/utils';
 
 export interface MemoryEntry {

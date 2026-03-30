@@ -1,17 +1,8 @@
 {
   "name": "@packages/agents",
   "version": "1.0.0",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
-    },
-    "./*": "./dist/*.js",
-    "./package.json": "./package.json",
-    "./src/*": "./src/*"
+    ".": "./src/index.ts"
   },
   "scripts": {
     "build": "tsup --config tsup.config.js",

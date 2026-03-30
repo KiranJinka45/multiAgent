@@ -14,7 +14,7 @@ export const selfModificationWorker = new Worker(MODIFICATION_QUEUE, async (job:
   if (!proposal) return;
 
   // 1. Governance Gate
-  const { GovernanceEngine } = await import('@packages/core-engine/src/governance-engine');
+  const { GovernanceEngine } = await import('@packages/validator');
   const gov = await GovernanceEngine.evaluateProposal(proposalId);
 
   if (!gov.allowed) {

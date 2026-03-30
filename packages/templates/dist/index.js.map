@@ -1,1 +1,0 @@
-{"version":3,"sources":["../src/index.ts"],"sourcesContent":["// Entry point for @packages/templates\r\nexport const templates = {};\r\n\r\n\r\n"],"mappings":";;;;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AACO,IAAM,YAAY,CAAC;","names":[]}

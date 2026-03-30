@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker-deployment
+  namespace: multiagent
+  labels:
+    app: worker
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: worker
+  template:
+    metadata:
+      labels:
+        app: worker
+    spec:
+      containers:
+      - name: worker
+        image: multiagent/worker:latest
+        imagePullPolicy: Always
+        envFrom:
+        - secretRef:
+            name: multiagent-secrets
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+          limits:
+            cpu: "2000m"
+            memory: "4Gi"
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: worker-hpa
+  namespace: multiagent
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: worker-deployment
+  minReplicas: 3
+  maxReplicas: 20
+  metrics:
+  - type: External
+    external:
+      metric:
+        name: bullmq_queue_length
+      target:
+        type: AverageValue
+        averageValue: 50

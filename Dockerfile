@@ -1,36 +1,22 @@
-# ---------- BASE ----------
-FROM node:20-alpine AS base
-WORKDIR /app
-RUN npm install -g pnpm
+FROM node:20-alpine
 
-# ---------- DEPENDENCIES ----------
-FROM base AS deps
-COPY pnpm-lock.yaml ./
-COPY package.json ./
+# Use corepack to enable pnpm
+RUN corepack enable
+
+WORKDIR /app
+
+# Install dependencies layer
+COPY package.json pnpm-lock.yaml turbo.json ./
+# Since this is a monorepo, we actually need to copy all packages/apps package.json files first if we want to cash deps,
+# but for simplicity for local build/dev, we can just copy everything.
+COPY . .
+
 RUN pnpm install --frozen-lockfile
 
-# ---------- BUILD ----------
-FROM base AS builder
-WORKDIR /app
-COPY . .
-COPY --from=deps /app/node_modules ./node_modules
-
-# Prisma Generate (Important Step 4)
-RUN pnpm --filter @libs/db prisma generate
-
+# Build the monorepo
 RUN pnpm build
 
-# Step 10: Optimize Image Size
-RUN pnpm prune --prod
+EXPOSE 3006
 
-# ---------- RUNTIME ----------
-FROM node:20-alpine AS runner
-WORKDIR /app
-
-ENV NODE_ENV=production
-
-COPY --from=builder /app ./
-
-EXPOSE 3000
-
-CMD ["node", "apps/gateway/dist/index.js"]
+# Start the monorepo in dev mode for local orchestration as requested
+CMD ["pnpm", "dev"]

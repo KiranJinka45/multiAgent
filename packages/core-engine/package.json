@@ -1,22 +1,20 @@
 {
   "name": "@packages/core-engine",
   "version": "1.0.0",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "private": true,
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
-    },
-    "./src/*": "./src/*"
+    ".": "./src/index.ts"
   },
   "dependencies": {
     "@packages/agents": "workspace:*",
+    "@packages/brain": "workspace:*",
     "@packages/auto-healer": "workspace:*",
     "@packages/validator": "workspace:*",
     "@packages/sandbox": "workspace:*",
     "@packages/utils": "workspace:*",
     "@packages/observability": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
   }
 }

@@ -1,36 +1,23 @@
 {
-    "name":  "@packages/ai",
-    "version":  "0.1.0",
-    "private":  true,
-    "scripts":  {
-                    "build":  "tsup --config tsup.config.js",
-                    "dev":  "tsup --watch",
-                    "lint":  "eslint .",
-                    "typecheck":  "tsc --noEmit"
-                },
-    "devDependencies":  {
-                            "typescript":  "^5.0.0",
-                            "tsup":  "^8.0.0",
-                            "@types/node":  "^20.0.0"
-                        },
-    "dependencies":  {
-                         "@packages/utils":  "workspace:*",
-                         "@packages/db":  "workspace:*"
-                     },
-    "main":  "./dist/index.js",
-    "module":  "./dist/index.mjs",
-    "types":  "./src/index.ts",
-    "exports":  {
-                    ".":  {
-                              "types":  "./src/index.ts",
-                              "import":  "./dist/index.mjs",
-                              "require":  "./dist/index.js",
-                              "default":  "./dist/index.js"
-                          },
-                    "./*":  {
-                                "types":  "./src/*.ts",
-                                "import":  "./dist/*.js",
-                                "default":  "./dist/*.js"
-                            }
-                }
+  "name": "@packages/ai",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsup --config tsup.config.js",
+    "dev": "tsup --watch",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "tsup": "^8.0.0",
+    "@types/node": "^20.0.0"
+  },
+  "dependencies": {
+    "@packages/utils": "workspace:*",
+    "@packages/db": "workspace:*"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  }
 }

@@ -3,7 +3,7 @@ import {
     missionController, 
     eventBus,
     logger
-} from '@packages/utils/src/server';
+} from '@packages/utils/server';
 import { PlannerAgent } from '@packages/brain';
 import { CoderAgent } from '@packages/brain';
 import { ArtifactValidator } from '@packages/validator';

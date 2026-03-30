@@ -2,16 +2,11 @@
   "name": "@packages/autonomous-agent",
   "version": "0.1.0",
   "private": true,
-  "main": "dist/index.js",
   "bin": {
     "autonomous": "dist/cli.js"
   },
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
-    }
+    ".": "./src/index.ts"
   },
   "scripts": {
     "build": "tsup --config tsup.config.js",
