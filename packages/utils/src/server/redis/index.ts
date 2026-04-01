@@ -1,6 +1,6 @@
 import Redis from 'ioredis';
 import { logger } from '@packages/observability';
-import { createLazyProxy } from '@packages/utils/server/runtime';
+import { createLazyProxy } from '../runtime';
 
 const REDIS_URLS = process.env.REDIS_URLS ? process.env.REDIS_URLS.split(',') : [process.env.REDIS_URL || 'redis://localhost:6379'];
 const SENTINEL_NAME = process.env.REDIS_SENTINEL_NAME || null;
@@ -49,12 +49,12 @@ class RedisClient {
                 });
             } else {
                 // Standard Single Node or Load Balancer (e.g. Upstash)
-                const redisUrl = REDIS_URLS[0];
+                const redisUrl = REDIS_URLS[0] || 'redis://localhost:6379';
 
                 // Upstash or secure managed Redis requires TLS
                 const isSecure = redisUrl.startsWith('rediss://') || process.env.REDIS_TLS === 'true';
 
-                const connectionOptions: Record<string, unknown> = {
+                const connectionOptions: Record<string, any> = {
                     ...commonOptions,
                 };
 

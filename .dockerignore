@@ -1,12 +1,74 @@
+# Dependencies
 node_modules
-.git
-.turbo
-.next
+.pnpm-store
+
+# Build artifacts
 dist
-.env*
+.next
+.turbo
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# Version control
+.git
+.gitignore
+
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.production.example
+
+# IDE / Editor
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
-.DS_Store
+system.log
+
+# Test artifacts
+coverage
+.nyc_output
+
+# Docker
+docker-compose*.yml
+Dockerfile*
+.dockerignore
+
+# K8s / Infrastructure
+k8s
+terraform
+infra
+infrastructure
+monitoring
+sandbox-cluster
+
+# Build/Debug artifacts
+*.txt
+*.bak
+*.pid
+dump.rdb
+appendonlydir
+Redis
+Redis_old
+brain
+tmp
+.generated-projects
+.snapshots
+.previews
+.cache
+backup_root
+docs
+tests
+supabase

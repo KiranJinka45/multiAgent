@@ -15,5 +15,5 @@ export * from './pusher';
 export * from './rate-limiter';
 export * from './schemas';
 export * from './stream-client';
-export * from './tracing';
+// Moved to src/server/tracing.ts
 export * from './utils';

@@ -34,7 +34,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <div className="flex min-h-screen bg-background">
+            <div className="flex h-screen w-full bg-background overflow-hidden">
                 {children}
             </div>
             <CommandPalette />

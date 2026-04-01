@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { BuildUpdate } from '@packages/contracts';
 import { socketManager } from '../client/socketManager';
+import { Socket } from 'socket.io-client';
 
 export interface UseSocketOptions {
     projectId: string;
@@ -10,7 +11,13 @@ export interface UseSocketOptions {
     serverUrl?: string;
 }
 
-export function useSocket({ projectId, onUpdate, serverUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3010' }: UseSocketOptions) {
+export interface UseSocketResult {
+    isConnected: boolean;
+    lastUpdate: BuildUpdate | null;
+    reconnect: () => Promise<Socket | null>;
+}
+
+export function useSocket({ projectId, onUpdate, serverUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3010' }: UseSocketOptions): UseSocketResult {
     const [isConnected, setIsConnected] = useState(false);
     const [lastUpdate, setLastUpdate] = useState<BuildUpdate | null>(null);
 
@@ -51,10 +58,11 @@ export function useSocket({ projectId, onUpdate, serverUrl = process.env.NEXT_PU
         });
 
         // 3. Listen to build updates
-        const unmountUpdateListener = socketManager.addUpdateListener('build-update', (data: BuildUpdate) => {
+        const unmountUpdateListener = socketManager.addUpdateListener('build-update', (data: unknown) => {
             if (isMounted) {
-                setLastUpdate(data);
-                if (onUpdateRef.current) onUpdateRef.current(data);
+                const buildData = data as BuildUpdate;
+                setLastUpdate(buildData);
+                if (onUpdateRef.current) onUpdateRef.current(buildData);
             }
         });
 

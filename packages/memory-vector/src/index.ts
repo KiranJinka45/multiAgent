@@ -44,4 +44,5 @@ export class MemoryVectorService implements IMemoryService {
 }
 
 export const memoryVector = new MemoryVectorService();
+export { MemoryVectorService as VectorStore };
 export default memoryVector;

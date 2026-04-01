@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "build": "tsup",
-    "dev": "tsx watch src/index.ts",
+    "dev": "tsx watch -r tsconfig-paths/register src/index.ts",
     "crsi:init": "tsx src/crsi-init.ts",
-    "start": "tsx src/index.ts",
+    "start": "tsx -r tsconfig-paths/register src/index.ts",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
@@ -18,19 +18,19 @@
     "@packages/brain": "workspace:*",
     "@packages/build-engine": "workspace:*",
     "@packages/contracts": "workspace:*",
+    "@packages/core-engine": "workspace:*",
     "@packages/db": "workspace:*",
     "@packages/observability": "workspace:*",
+    "@packages/preview-runtime": "workspace:*",
+    "@packages/queue": "workspace:*",
     "@packages/refactor-agent": "workspace:*",
     "@packages/resilience": "workspace:*",
-    "@packages/preview-runtime": "workspace:*",
     "@packages/sandbox-runtime": "workspace:*",
     "@packages/self-evolution": "workspace:*",
     "@packages/shared-services": "workspace:*",
     "@packages/supabase": "workspace:*",
     "@packages/utils": "workspace:*",
     "@packages/validator": "workspace:*",
-    "@packages/core-engine": "workspace:*",
-    "@packages/queue": "workspace:*",
     "@supabase/supabase-js": "^2.43.2",
     "@temporalio/client": "^1.15.0",
     "@temporalio/worker": "^1.15.0",
@@ -61,8 +61,8 @@
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^22.13.9",
     "@types/uuid": "^10.0.0",
+    "tsconfig-paths": "^4.2.0",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3"
   }
 }
-

@@ -144,3 +144,5 @@ export class DevinAutoHealer {
 }
 
 export const autoHealer = new DevinAutoHealer();
+export * from './missionWatchdog';
+export { MissionWatchdog } from './missionWatchdog';

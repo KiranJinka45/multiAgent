@@ -1,5 +1,5 @@
 import { execSync } from 'child_process';
-import { redis } from '../index';
+import { redis } from '../../redis';
 
 /**
  * Chaos Monkey for MultiAgent (Windows Version)

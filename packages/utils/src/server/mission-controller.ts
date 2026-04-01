@@ -1,12 +1,15 @@
 import { redis } from './redis';
-import { Mission, MissionUpdate } from '@packages/contracts';
+import { Mission, MissionUpdate, MissionStatus } from '@packages/contracts';
 import { logger } from '@packages/observability';
 import { eventBus } from './event-bus';
 import { Queue } from 'bullmq';
-import { DEPLOYMENT_QUEUE } from './redis';
+import { DEPLOYMENT_QUEUE, QUEUE_FREE, QUEUE_PRO } from './redis';
 
 // Note: circular dependency if we import from apps/api/src/services/websocket
 // We'll use a callback or eventBus to decouple
+
+import path from 'path';
+import fs from 'fs';
 
 class MissionController {
     private PREFIX = 'mission:';
@@ -18,6 +21,16 @@ class MissionController {
         
         // Broadcast initialization
         await eventBus.stage(mission.id, mission.status, 'in_progress', 'Mission initialized', 0, mission.projectId);
+
+        // --- Audit Log: Creation ---
+        const { AuditLogger } = await import('./audit-logger');
+        await AuditLogger.log({
+            organizationId: mission.userId, // Defaulting to userId as tenantId for now
+            userId: mission.userId,
+            action: 'mission_created',
+            resource: mission.id,
+            metadata: { projectId: mission.projectId, prompt: mission.prompt.substring(0, 100) }
+        });
     }
 
     async getMission(missionId: string): Promise<Mission | null> {
@@ -45,6 +58,17 @@ class MissionController {
         // Broadcast if status changed
         if (updated.status !== existing.status) {
              logger.info({ missionId, from: existing.status, to: updated.status }, '[MissionController] Atomic Transition');
+             
+             // --- Audit Log: Status Transition ---
+             const { AuditLogger } = await import('./audit-logger');
+             await AuditLogger.log({
+                 organizationId: updated.userId,
+                 userId: updated.userId,
+                 action: 'mission_status_transition',
+                 resource: missionId,
+                 metadata: { from: existing.status, to: updated.status }
+             });
+
              const STATUS_PROGRESS: Record<string, number> = {
                 'init': 5, 'queued': 10, 'planning': 15, 'graph_ready': 25, 'executing': 45,
                 'building': 60, 'repairing': 70, 'assembling': 80, 'deploying': 90, 'previewing': 95, 'complete': 100, 'failed': 0
@@ -52,7 +76,7 @@ class MissionController {
             await eventBus.stage(
                 missionId, 
                 updated.status, 
-                updated.status === 'complete' ? 'completed' : 'in_progress',
+                (updated.status as string) === 'complete' ? 'completed' : 'in_progress',
                 `Stage: ${updated.status}`,
                 STATUS_PROGRESS[updated.status] || 0,
                 updated.projectId
@@ -73,7 +97,7 @@ class MissionController {
 
             if (update.status && update.status !== existing.status) {
                 // If we're moving to 'complete', we map it to 'ready' for the product flow
-                const nextStatus = update.status === 'complete' ? 'ready' : update.status;
+                const nextStatus = (update.status as string) === 'complete' ? 'ready' : update.status as MissionStatus;
                 
                 if (!this.validateTransition(existing.status, nextStatus)) {
                     logger.error({ missionId, from: existing.status, to: nextStatus }, 'INVALID transition rejected by Pipeline State Guard');
@@ -87,7 +111,7 @@ class MissionController {
 
     async addLog(missionId: string, stage: string, message: string): Promise<void> {
         await this.atomicUpdate(missionId, (existing) => {
-            const logs = (existing.metadata.logs as any[]) || [];
+            const logs = (existing.metadata.logs as unknown[]) || [];
             logs.push({
                 timestamp: Date.now(),
                 stage,
@@ -114,7 +138,13 @@ class MissionController {
     }
 
     async listActiveMissions(): Promise<Mission[]> {
+        if (!redis || redis.status !== 'ready') {
+            logger.warn('[MissionController] Redis client not ready');
+            return [];
+        }
         const keys = await redis.keys(`${this.PREFIX}*`);
+        if (!keys || keys.length === 0) return [];
+        
         const missions: Mission[] = [];
         
         for (const key of keys) {
@@ -164,6 +194,49 @@ class MissionController {
         // Update status
         await this.updateMission(missionId, { status: 'deploying' });
         logger.info({ missionId, projectId: mission.projectId }, '[MissionController] Manual deployment triggered');
+    }
+
+    async triggerExecution(missionId: string): Promise<void> {
+        const mission = await this.getMission(missionId);
+        if (!mission) throw new Error('Mission not found');
+
+        const tier = mission.metadata?.tier === 'pro' ? QUEUE_PRO : QUEUE_FREE;
+        const buildQueue = new Queue(tier, { connection: redis });
+
+        await buildQueue.add('build-retry', {
+            prompt: mission.prompt,
+            userId: mission.userId,
+            projectId: mission.projectId,
+            executionId: mission.id
+        });
+
+        await this.updateMission(missionId, { status: 'queued' });
+        logger.info({ missionId, tier }, '[MissionController] Execution re-triggered (re-queued)');
+    }
+
+    async requeueExecution(missionId: string, reason: string): Promise<void> {
+        await this.addLog(missionId, 'auto-healer', `Re-queueing execution. Reason: ${reason}`);
+        await this.triggerExecution(missionId);
+    }
+
+    async applyEvolutionPatch(missionId: string, patch: { path: string, content: string }): Promise<void> {
+        const mission = await this.getMission(missionId);
+        if (!mission) throw new Error('Mission not found');
+
+        const sandboxDir = mission.metadata.sandboxDir as string;
+        if (!sandboxDir) throw new Error('Sandbox directory not found for mission');
+
+        const filePath = path.join(sandboxDir, patch.path.startsWith('/') ? patch.path.slice(1) : patch.path);
+        const folderPath = path.dirname(filePath);
+
+        if (!fs.existsSync(folderPath)) {
+            fs.mkdirSync(folderPath, { recursive: true });
+        }
+
+        fs.writeFileSync(filePath, patch.content, 'utf8');
+        
+        await this.addLog(missionId, 'evolution', `Surgical patch applied autonomously to: ${patch.path}`);
+        logger.info({ missionId, path: patch.path }, '[MissionController] Evolution patch applied');
     }
 }
 

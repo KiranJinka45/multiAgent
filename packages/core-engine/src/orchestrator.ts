@@ -142,6 +142,24 @@ export class Orchestrator {
         try {
             elog.info('Initializing Distributed Multi-Agent Pipeline Gateway');
 
+            // --- 0. Governance & Kill Switch (Critical Safety) ---
+            const { CostGovernanceService } = await import('@packages/utils/server');
+            
+            if (await CostGovernanceService.isKillSwitchActive()) {
+                const killMsg = 'CRITICAL: Global emergency kill-switch active. Generation halted for system maintenance.';
+                elog.error(killMsg);
+                await eventBus.error(executionId, killMsg, projectId);
+                return { success: false, executionId, error: killMsg };
+            }
+
+            const { allowed, currentCount } = await CostGovernanceService.checkAndIncrementExecutionLimit(userId);
+            if (!allowed) {
+                const limitMsg = `User generation limit exceeded for today. (Generations: ${currentCount})`;
+                elog.error({ userId, currentCount }, limitMsg);
+                await eventBus.error(executionId, limitMsg, projectId);
+                return { success: false, executionId, error: limitMsg };
+            }
+
             // 1. Initial State Sync
             await stateManager.transition(executionId, 'created', 'Autonomous cluster initialized. Preparing planner...', 5, projectId);
             await missionController.updateMission(executionId, { status: 'init' });
@@ -575,11 +593,17 @@ export class Orchestrator {
         }, allFiles);
 
         const metrics = context.metrics;
+        const tokensTotal = metrics.tokensTotal || 0;
+
+        // --- 9. Billing Reconciliation (Final Step) ---
+        const { CostGovernanceService } = await import('@packages/utils/server');
+        await CostGovernanceService.recordTokenUsage(userId, tokensTotal, executionId);
+
         await eventBus.complete(executionId, previewUrl, {
             taskCount: 1,
             autonomousCycles: 1,
             fastPath: true,
-            tokensTotal: metrics.tokensTotal || 0,
+            tokensTotal: tokensTotal,
             durationMs: Date.now() - new Date(metrics.startTime).getTime()
         }, projectId);
 
@@ -617,13 +641,19 @@ export class Orchestrator {
                 buildHealthy = true;
                 elog.info('Build validation passed.');
                 
-                // Record recovery success
-                await memoryPlane.recordLesson(projectId, {
-                    action: 'Self-Healing Build',
-                    outcome: 'success',
-                    lesson: `Resolved build error on attempt ${currentRetry}`,
-                    context: { executionId, retryCount: currentRetry }
-                });
+                // Record recovery success (Reinforcement Learning)
+                if (currentRetry > 0) {
+                    await memoryPlane.recordLesson(projectId, {
+                        action: 'Self-Healing Build',
+                        outcome: 'success',
+                        lesson: `Resolved build error: ${errorContext.substring(0, 200)}`,
+                        context: { 
+                            executionId, 
+                            retryCount: currentRetry,
+                            error: errorContext,
+                        }
+                    });
+                }
 
                 break;
             }

@@ -1,0 +1,34 @@
+{
+  "title": "MultiAgent Operational Resilience",
+  "panels": [
+    {
+      "title": "Availability & MTTR (SLA: < 60s)",
+      "type": "heatmap",
+      "targets": [
+        { "expr": "mission_recovery_latency_seconds_bucket" }
+      ]
+    },
+    {
+      "title": "Cache ROI (USD Saved vs Cost)",
+      "type": "graph",
+      "targets": [
+        { "expr": "sum(ai_cache_savings_total)", "legendFormat": "Savings (USD)" },
+        { "expr": "sum(ai_token_cost_total)", "legendFormat": "Cost (USD)" }
+      ]
+    },
+    {
+      "title": "Autonomous Recovery Count",
+      "type": "stat",
+      "targets": [
+        { "expr": "sum(mission_recovery_total)", "legendFormat": "Heals" }
+      ]
+    },
+    {
+      "title": "Cache Hit Rate (%)",
+      "type": "gauge",
+      "targets": [
+        { "expr": "sum(cache_hits_total) / (sum(cache_hits_total) + sum(cache_misses_total)) * 100" }
+      ]
+    }
+  ]
+}

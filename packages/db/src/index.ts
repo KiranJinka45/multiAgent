@@ -7,19 +7,23 @@ declare global {
   var readPrisma: PrismaClient | undefined;
 }
 
-function getDb(): PrismaClient {
+function getDb(): PrismaClient | null {
   if (!global.prisma) {
-    global.prisma = new PrismaClient({
-      datasources: { db: { url: process.env.DATABASE_URL } }
-    });
+    try {
+      global.prisma = new PrismaClient({
+        datasources: { db: { url: process.env.DATABASE_URL! } }
+      });
+    } catch (_e) {
+      return null;
+    }
   }
-  return global.prisma;
+  return global.prisma!;
 }
 
 function getReadDb(): PrismaClient {
   if (!global.readPrisma) {
     global.readPrisma = process.env.READ_REPLICA_URL
-      ? new PrismaClient({ datasources: { db: { url: process.env.READ_REPLICA_URL } } })
+      ? new PrismaClient({ datasources: { db: { url: process.env.READ_REPLICA_URL! } } })
       : getDb();
   }
   return global.readPrisma;
@@ -35,3 +39,19 @@ export const readDb: PrismaClient = new Proxy({} as PrismaClient, {
 });
 
 export * from '@prisma/client';
+
+/**
+ * Verify database connectivity.
+ * Used during system boot to ensure the database is ready.
+ */
+export async function verifyConnection(): Promise<boolean> {
+  try {
+    const client = getDb();
+    // Use a simpler test that doesn't rely on raw SQL parsing if it fails
+    await client.$connect();
+    return true;
+  } catch (err) {
+    console.error('❌ Database connection verification failed:', (err as Error).message);
+    return false;
+  }
+}

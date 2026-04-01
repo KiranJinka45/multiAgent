@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "multiagent.fullname" . }}-gateway
+  labels:
+    app.kubernetes.io/name: {{ include "multiagent.name" . }}-gateway
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.replicaCount.gateway }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "multiagent.name" . }}-gateway
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "multiagent.name" . }}-gateway
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}-gateway
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["node", "apps/api-gateway/dist/services/socket.js"]
+          ports:
+            - name: socketio
+              containerPort: 3011
+              protocol: TCP
+          env:
+            - name: REDIS_URL
+              value: {{ .Values.config.redisUrl | quote }}
+            - name: DATABASE_URL
+              value: {{ .Values.config.databaseUrl | quote }}
+          resources:
+            {{- toYaml .Values.resources.gateway | nindent 12 }}
+          securityContext:
+            sysctls:
+            - name: net.core.somaxconn
+              value: "4096"
+            - name: net.ipv4.ip_local_port_range
+              value: "1024 65535"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3011
+            initialDelaySeconds: 15
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "multiagent.fullname" . }}-gateway
+  labels:
+    app.kubernetes.io/name: {{ include "multiagent.name" . }}-gateway
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.gatewayPort }}
+      targetPort: socketio
+      protocol: TCP
+      name: socketio
+  selector:
+    app.kubernetes.io/name: {{ include "multiagent.name" . }}-gateway

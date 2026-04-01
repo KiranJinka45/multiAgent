@@ -253,14 +253,13 @@ export default function ChatPage({ params }: { params: { id: string } }) {
             <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
 
             <main
-                style={{ marginLeft: 'var(--sidebar-width, 260px)' }}
-                className={`flex-1 flex flex-col h-full relative transition-[margin] duration-300 ease-in-out ${isCanvasOpen ? 'md:mr-[30%] xl:mr-[30%]' : ''}`}
+                className="flex-1 flex flex-col h-full relative overflow-hidden"
             >
                 <TopNav onOpenMobileMenu={() => setIsMobileMenuOpen(true)} />
                 <div className="fixed top-0 left-0 right-0 h-32 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />
 
                 <div className="flex-1 overflow-y-auto w-full scroll-smooth">
-                    <div className="max-w-4xl mx-auto w-full px-4 md:px-6 pt-20 pb-40">
+                    <div className="w-full px-8 md:px-12 pt-20 pb-40">
                         <div className="space-y-8 animate-in fade-in duration-500">
                             <ChatList
                                 messages={messages}

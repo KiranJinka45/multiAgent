@@ -10,7 +10,9 @@
     "dev": "tsup --watch"
   },
   "dependencies": {
-    "@packages/utils": "workspace:*"
+    "lru-cache": "^11.0.1",
+    "@packages/utils": "workspace:*",
+    "@packages/observability": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.0.0",

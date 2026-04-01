@@ -8,6 +8,9 @@ export interface CodeChunkMetadata {
     projectId: string;
 }
 
+/**
+ * Vector Store (Restored in Utils to avoid circular dependencies)
+ */
 export class VectorStore {
     /**
      * Stores code chunks and their embeddings in the Supabase vector store.

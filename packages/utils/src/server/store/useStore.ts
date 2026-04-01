@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { AgentResult, ExecutionContextType } from './index';
+import { ExecutionContextType } from '../execution-context';
 import { ProjectFile } from '@packages/contracts';
 
 interface AppState {
@@ -25,26 +25,26 @@ export const useStore = create<AppState>((set) => ({
     logs: [],
     generatedFiles: [],
 
-    setProject: (projectId) => set({ currentProjectId: projectId }),
+    setProject: (projectId: string) => set({ currentProjectId: projectId }),
 
     startGeneration: () => set({
         isGenerating: true,
         logs: ['[System] Initializing generation engine...']
     }),
 
-    finishGeneration: (context, files) => set((state) => ({
+    finishGeneration: (context: ExecutionContextType, files: ProjectFile[]) => set((state: AppState) => ({
         isGenerating: false,
         executionContext: context,
         generatedFiles: files,
         logs: [...state.logs, '[System] Build completed successfully.']
     })),
 
-    failGeneration: (error) => set((state) => ({
+    failGeneration: (error: string) => set((state: AppState) => ({
         isGenerating: false,
         logs: [...state.logs, `[Error] ${error}`]
     })),
 
-    addLog: (log) => set((state) => ({ logs: [...state.logs, log] })),
+    addLog: (log: string) => set((state: AppState) => ({ logs: [...state.logs, log] })),
 
     reset: () => set({
         isGenerating: false,

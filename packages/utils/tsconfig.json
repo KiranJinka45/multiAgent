@@ -5,7 +5,14 @@
     "declaration": true,
     "emitDeclarationOnly": true,
     "jsx": "react-jsx",
-    "types": ["node"]
+    "baseUrl": ".",
+    "paths": {
+      "@packages/db": ["../db/src/index.ts"],
+      "@packages/supabase": ["../supabase/src/index.ts"],
+      "@packages/contracts": ["../contracts/src/index.ts"],
+      "@packages/observability": ["../observability/src/index.ts"]
+    },
+    "baseUrl": "."
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

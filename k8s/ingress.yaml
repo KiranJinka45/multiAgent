@@ -1,17 +1,59 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: gateway-ingress
+  name: multiagent-ingress
+  namespace: multiagent
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/websocket-services: "gateway-service"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    # WAF & Hardening
+    nginx.ingress.kubernetes.io/enable-modsecurity: "true"
+    nginx.ingress.kubernetes.io/modsecurity-snippet: |
+      SecRuleEngine On
+      SecRequestBodyAccess On
+      # Sample OWASP rule: Block SQL Injection injection attempts
+      SecRule ARGS "@rx (select|union|drop|insert)" "deny,status:403"
+    # Edge-level Rate Limiting
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+
+    # --- PHASE 7: Controlled Rollout (Canary) ---
+    # To enable a 1% Canary split, uncomment the following:
+    # nginx.ingress.kubernetes.io/canary: "true"
+    # nginx.ingress.kubernetes.io/canary-weight: "1"
+    # nginx.ingress.kubernetes.io/canary-by-header: "x-canary" # Optional header-based trigger
+
+    nginx.ingress.kubernetes.io/limit-rps: "10"
+    nginx.ingress.kubernetes.io/limit-burst: "20"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/server-snippet: |
+      add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
 spec:
+  tls:
+    - hosts:
+        - multiagent.local
+        - api.multiagent.local
+      secretName: multiagent-tls-secret
   rules:
-    - http:
+    - host: multiagent.local
+      http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: gateway
+                name: web-service
                 port:
-                  number: 3000
+                  number: 80
+    - host: api.multiagent.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: gateway-service
+                port:
+                  number: 80

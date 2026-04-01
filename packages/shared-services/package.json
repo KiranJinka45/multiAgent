@@ -10,9 +10,7 @@
   },
   "devDependencies": {
     "typescript": "^5.0.0",
-    "tsup": "^8.0.0"
-  },
-  "exports": {
-    ".": "./src/index.ts"
+    "tsup": "^8.0.0",
+    "@packages/utils": "workspace:*"
   }
 }

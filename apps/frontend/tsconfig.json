@@ -11,13 +11,18 @@
     "baseUrl": ".",
     "paths": {
       "@components/*": ["./components/*"],
-      "@packages/*": ["../../packages/*"],
-      "@packages/*": ["../../packages/*"],
+      "@packages/utils/*": ["../../packages/utils/src/*"],
+      "@packages/context/*": ["../../packages/context/src/*"],
+      "@packages/shared-services/*": ["../../packages/shared-services/src/*"],
+      "@packages/db/*": ["../../packages/db/src/*"],
+      "@packages/observability/*": ["../../packages/observability/src/*"],
       "@/*": ["./*"]
     }
   },
   "include": [
     "src/**/*",
+    "app/**/*",
+    "components/**/*",
     ".next/types/**/*.ts"
   ],
   "exclude": [

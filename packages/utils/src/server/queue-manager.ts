@@ -59,7 +59,8 @@ export class QueueManager {
 
     async addJob(queueName: string, data: any, jobId?: string) {
         const queue = this.getQueue(queueName);
-        const job = await queue.add(queueName, data, { jobId });
+        const options = jobId ? { jobId } : {};
+        const job = await queue.add(queueName, data, options);
         logger.info({ queueName, jobId: job.id }, '[QueueManager] Job added');
         return job;
     }

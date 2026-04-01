@@ -1,263 +1,148 @@
-"use strict";
-var __create = Object.create;
-var __defProp = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getProtoOf = Object.getPrototypeOf;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-  }
-  return to;
-};
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-  // If the importer is in node compatibility mode or this is not an ESM
-  // file that has been converted to a CommonJS file using a Babel-
-  // compatible transform (i.e. "__esModule" has not been set), then set
-  // "default" to the CommonJS "module.exports" for node compatibility.
-  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-  mod
-));
+const { spawn, execSync } = require('child_process');
+const http = require('http');
+const os = require('os');
+const path = require('path');
 
-// scripts/system-startup.ts
-var import_child_process = require("child_process");
-var import_net = __toESM(require("net"));
-var import_fs = __toESM(require("fs"));
-var import_path = __toESM(require("path"));
-var import_os = __toESM(require("os"));
-var import_dotenv = __toESM(require("dotenv"));
-import_dotenv.default.config();
-var envLocal = import_path.default.resolve(process.cwd(), ".env.local");
-if (import_fs.default.existsSync(envLocal)) {
-  import_dotenv.default.config({ path: envLocal, override: true });
+process.env.NODE_ENV = 'production';
+
+// 🔥 HARD GUARD: Prevent multiple instances of the orchestrator itself
+if (process.env.MULTIAGENT_ORCHESTRATOR_ACTIVE === 'true') {
+  console.log('⚠️ Orchestrator already active. Skipping duplicate start.');
+  process.exit(0);
 }
-var npmCmd = import_os.default.platform() === "win32" ? "npm.cmd" : "npm";
-var DEFAULT_REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
-var REDIS_PORT = 6379;
-async function isPortInUse(port) {
-  return new Promise((resolve) => {
-    const server = import_net.default.createServer();
-    server.once("error", (err) => {
-      if (err.code === "EADDRINUSE") {
-        resolve(true);
-      } else {
-        resolve(false);
-      }
-    });
-    server.once("listening", () => {
-      server.close();
-      resolve(false);
-    });
-    server.listen(port);
+process.env.MULTIAGENT_ORCHESTRATOR_ACTIVE = 'true';
+
+// Using relative path for binary to bypass Windows path length/mangling issues in shell
+const TSX = 'node_modules\\.bin\\tsx.cmd'; 
+
+console.log('\n=== 🚀 MultiAgent Hardened Boot (v2) ===\n');
+
+const processes = [];
+
+function startProcess(name, appPath, args, customBin, retryCount = 0) {
+  console.log('🚀 Starting ' + name + (retryCount > 0 ? ` (Retry ${retryCount})...` : '...'));
+  
+  let bin;
+  if (customBin) {
+    bin = customBin;
+  } else {
+    const relRoot = appPath.split('/').map(() => '..').join('/');
+    bin = path.join(relRoot, TSX);
+  }
+  
+  const proc = spawn(bin, args, { 
+    cwd: path.join(process.cwd(), appPath),
+    stdio: 'inherit',
+    shell: true,
+    env: { ...process.env, SERVICE_NAME: name, NODE_ENV: 'development' }
   });
+
+  proc.on('exit', (code) => { 
+    if (code !== 0 && code !== null) { 
+        // If EADDRINUSE error is common, we might want to check the output
+        // But for now, we'll just log and fail unless it's a known conflict
+        console.error('\n❌ ' + name + ' exited with code ' + code); 
+        shutdown(); 
+    } 
+  });
+  processes.push(proc);
 }
-async function waitForSocketHealth(url, timeoutMs = 3e4) {
-  console.log(`\u23F3 Waiting for Socket Server health at ${url}...`);
-  const startTime = Date.now();
-  while (Date.now() - startTime < timeoutMs) {
+
+async function waitForHealth(name, url, timeout) {
+  console.log('⏳ Waiting for ' + name + ' health: ' + url);
+  const start = Date.now();
+  while (Date.now() - start < timeout) {
     try {
-      const http = await import("http");
-      const ok = await new Promise((resolve) => {
-        const req = http.get(url, (res) => {
-          resolve(res.statusCode === 200);
+        const ok = await new Promise((resolve) => {
+            const req = http.get(url, (res) => { 
+                if (res.statusCode < 200 || res.statusCode >= 400) {
+                    process.stdout.write(`(${res.statusCode})`);
+                }
+                // Leniency for dev servers (accept 2xx and 3xx redirects)
+                resolve(res.statusCode >= 200 && res.statusCode < 400); 
+            });
+            req.on('error', () => resolve(false));
+            req.setTimeout(10000, () => { req.destroy(); resolve(false); });
+            req.end();
         });
-        req.on("error", () => resolve(false));
-        req.end();
-      });
-      if (ok) {
-        console.log("\u2705 Socket Server is healthy!");
-        return true;
-      }
-    } catch {
-    }
-    process.stdout.write(".");
-    await new Promise((r) => setTimeout(r, 1e3));
+        if (ok) { console.log('\n✅ ' + name + ' is healthy!'); return; }
+    } catch (_) {}
+    process.stdout.write('.');
+    await new Promise((r) => setTimeout(r, 2000));
   }
-  console.warn("\n\u26A0\uFE0F Socket Server health check timed out. Proceeding anyway...");
-  return false;
+  throw new Error('\n❌ ' + name + ' failed health check');
 }
-function checkDockerRunning() {
-  return new Promise((resolve) => {
-    (0, import_child_process.exec)("docker version --format '{{.Server.Version}}'", (error, stdout) => {
-      if (error) {
-        resolve({ ready: false, error: error.message });
-      } else {
-        resolve({ ready: true, version: stdout.trim() });
-      }
-    });
-  });
-}
-function startRedis(isProduction) {
-  console.log(`Starting Redis container or local service on port ${REDIS_PORT}...`);
+
+function killPort(port) {
+  console.log(`🧹 Attempting cleanup of port ${port}...`);
   try {
-    console.log("Attempting to start Redis via Docker Compose...");
-    (0, import_child_process.execSync)("docker compose -f infra/docker-compose.yml up -d redis", { stdio: "pipe" });
-    console.log("\u2705 Redis start command issued via Docker.");
-  } catch (e) {
-    const localRedisServer = import_path.default.join(process.cwd(), "Redis", "redis-server.exe");
-    const localRedisConf = import_path.default.join(process.cwd(), "Redis", "redis.conf");
-    if (import_fs.default.existsSync(localRedisServer)) {
-      console.log("\u26A0\uFE0F Docker failed or unavailable. Attempting to start local Redis binary...");
-      try {
-        const redisProcess = (0, import_child_process.spawn)(localRedisServer, [localRedisConf], {
-          cwd: import_path.default.dirname(localRedisServer),
-          detached: true,
-          stdio: "ignore"
-        });
-        redisProcess.unref();
-        console.log("\u2705 Local Redis process spawned.");
-      } catch (localErr) {
-        const lErr = localErr;
-        console.error("\u274C Failed to start local Redis:", lErr.message);
-        if (isProduction) process.exit(1);
-      }
-    } else {
-      if (isProduction) {
-        console.error("\u274C Failed to start Redis in Production Mode:", e.message);
-        process.exit(1);
-      } else {
-        console.warn("\u26A0\uFE0F  Redis could not be started.");
-      }
+    const { execSync } = require('child_process');
+    if (os.platform() === 'win32') {
+        const stdout = execSync(`netstat -ano | findstr :${port}`).toString().trim();
+        if (stdout) {
+          const lines = stdout.split('\n');
+          const pids = new Set(lines.map(line => line.trim().split(/\s+/).pop()).filter(pid => pid && pid !== '0'));
+          
+          pids.forEach(pid => {
+            try {
+              execSync(`taskkill /PID ${pid} /F`);
+              console.log(`✅ Forced termination of process ${pid} on port ${port}`);
+            } catch (e) {}
+          });
+        }
+        
+        // Specially target Next.js and Orchestrator processes that might be hanging
+        if (port === 3004 || port === 3011) {
+            try {
+              execSync('powershell -Command "Get-Process -Name next-dev, node | Where-Object { $_.CommandLine -like \'*3004*\' -or $_.CommandLine -like \'*3011*\' } -ErrorAction SilentlyContinue | Stop-Process -Force"', { stdio: 'ignore' });
+            } catch(e){}
+        }
     }
-  }
+  } catch (_) {}
 }
-function cleanNextCache() {
-  console.log("\u{1F9F9} Cleaning Next.js cache (.next folder)...");
-  const nextDir = import_path.default.join(process.cwd(), ".next");
-  if (import_fs.default.existsSync(nextDir)) {
-    try {
-      if (process.platform === "win32") {
-        (0, import_child_process.execSync)(`rmdir /s /q "${nextDir}"`, { stdio: "ignore" });
-      } else {
-        (0, import_child_process.execSync)(`rm -rf "${nextDir}"`, { stdio: "ignore" });
-      }
-      console.log("\u2705 Cache cleaned.");
-    } catch {
-      console.warn("\u26A0\uFE0F  Failed to clean .next folder (it might be in use). Skipping.");
-    }
-  } else {
-    console.log("\u23ED\uFE0F No .next folder found. Skipping clean.");
+
+function shutdown() {
+  console.log('\n🛑 Shutting down MultiAgent...\n');
+  for (const proc of processes) { 
+    try { 
+        execSync('taskkill /pid ' + proc.pid + ' /F /T', { stdio: 'ignore' }); 
+    } catch (_) {} 
   }
-}
-async function startup() {
-  console.log("=== MultiAgent System Startup Validation ===");
-  const buildMode = process.env.BUILD_MODE || "dev";
-  const isProduction = buildMode === "production";
-  if (!isProduction) {
-    console.log("\u23ED\uFE0F Skipping Docker engine check (Dev Mode)");
-  } else {
-    console.log("\u23F3 Checking Docker engine availability...");
-    let dockerInfo = { ready: false };
-    for (let i = 0; i < 10; i++) {
-      dockerInfo = await checkDockerRunning();
-      if (dockerInfo.ready) break;
-      if (i === 0) console.log("   Docker CLI or socket not responding yet. Retrying for up to 30s...");
-      process.stdout.write(".");
-      await new Promise((r) => setTimeout(r, 3e3));
-    }
-    if (!dockerInfo.ready) {
-      console.error("\n\u274C Docker engine is not reachable.");
-      console.error("   Diagnostics: " + (dockerInfo.error || "Unknown communication error"));
-      process.exit(1);
-    }
-    console.log(`
-\u2705 Docker engine is running (Version: ${dockerInfo.version}).`);
-  }
-  const redisPortInUse = await isPortInUse(REDIS_PORT);
-  if (!redisPortInUse) {
-    startRedis(isProduction);
-  } else {
-    console.log(`\u2705 Redis is serving on port ${REDIS_PORT}.`);
-  }
-  if (!isProduction) {
-    cleanNextCache();
-  }
-  const activeProcesses = /* @__PURE__ */ new Set();
-  const systemLog = import_fs.default.createWriteStream(import_path.default.join(process.cwd(), "system.log"), { flags: "a" });
-  function startManagedProcess(name, command, args) {
-    console.log(`\u{1F680} Starting ${name} in ${process.cwd()}...`);
-    console.log(`   Command: ${command} ${args.join(" ")}`);
-    const child = (0, import_child_process.spawn)(command, args, { shell: true });
-    child.stdout.on("data", (data) => {
-      const entry = `[${name}] ${data.toString().trim()}
-`;
-      systemLog.write(entry);
-    });
-    child.stderr.on("data", (data) => {
-      const entry = `[${name} ERROR] ${data.toString().trim()}
-`;
-      systemLog.write(entry);
-      console.error(entry.trim());
-    });
-    activeProcesses.add(child);
-    child.on("exit", (code) => {
-      activeProcesses.delete(child);
-      if (!child.manualKill) {
-        console.warn(`\u26A0\uFE0F  ${name} exited with code ${code}. Restarting in 5s...`);
-        setTimeout(() => startManagedProcess(name, command, args), 5e3);
-      }
-    });
-    return child;
-  }
-  console.log("\n=== Launching Application Stack ===");
-  startManagedProcess("Socket Server (3011)", npmCmd, ["--prefix", "apps/api-gateway", "run", "start:socket"]);
-  startManagedProcess("Watchdog", npmCmd, ["--prefix", "apps/api-gateway", "run", "start:watchdog"]);
-  console.log("\u{1F525} Pre-warming Worker Pool...");
-  const workerPoolSize = parseInt(process.env.WORKER_POOL_SIZE || "3");
-  for (let i = 0; i < workerPoolSize; i++) {
-    startManagedProcess(`Build Worker #${i + 1}`, npmCmd, ["--prefix", "apps/api-gateway", "run", "start:worker"]);
-  }
-  await waitForSocketHealth("http://localhost:3011/health");
-  const webProcess = (0, import_child_process.spawn)(npmCmd, ["--prefix", "apps/web", "run", "dev"], { stdio: "inherit", shell: true });
-  activeProcesses.add(webProcess);
-  process.on("SIGINT", () => {
-    console.log("\n\u{1F6D1} Stopping all services...");
-    for (const child of activeProcesses) {
-      child.manualKill = true;
-      child.kill();
-    }
-    process.exit();
-  });
-  console.log(`
-\u23F3 Waiting for Worker heartbeat (Redis ${REDIS_PORT})...`);
-  const Redis = (await import("ioredis")).default;
-  const redis = new Redis(DEFAULT_REDIS_URL);
-  let workerHealthy = false;
-  for (let i = 0; i < 15; i++) {
-    try {
-      const heartbeat = await redis.get("system:health:worker");
-      if (heartbeat) {
-        workerHealthy = true;
-        break;
-      }
-    } catch {
-    }
-    process.stdout.write(".");
-    await new Promise((r) => setTimeout(r, 1e3));
-  }
-  redis.quit();
-  if (!workerHealthy) {
-    console.warn("\n\u26A0\uFE0F  Worker heartbeat NOT detected. Pipeline may stay stuck.");
-  } else {
-    console.log("\n\u2705 Worker heartbeat detected!");
-  }
-  console.log("\n=== Final Health Check ===");
-  try {
-    (0, import_child_process.execSync)("node scripts/diagnostic.js", {
-      stdio: "inherit",
-      env: { ...process.env, REDIS_URL: DEFAULT_REDIS_URL }
-    });
-    console.log("\n\u{1F680} System is now fully operational.");
-    console.log("\u{1F449} Press Ctrl+C to stop all services.");
-  } catch {
-    console.warn("\u26A0\uFE0F  Final diagnostic check failed.");
-  }
-}
-startup().catch((err) => {
-  console.error("FATAL: System startup failed.", err);
   process.exit(1);
-});
-//# sourceMappingURL=system-startup.js.map
+}
+
+process.on('SIGINT', shutdown);
+
+(async () => {
+  try {
+    killPort(3004); killPort(3011);
+
+    // 🔒 0. Database & Prisma Client Check
+    console.log('🔍 Checking Database Health...');
+    try {
+      // Use tsx to verify DB directly from source
+      execSync(`${TSX} -r tsconfig-paths/register -e "require('dotenv').config(); import('@packages/db').then(db => db.verifyConnection().then(ok => ok ? process.exit(0) : process.exit(1)))"`, { stdio: 'inherit' });
+      console.log('✅ Database is ready.');
+    } catch {
+      console.log('⚠️ Database check failed or Prisma client missing. Attempting build...');
+      execSync('pnpm --filter @packages/db run build', { stdio: 'inherit' });
+    }
+
+    // 🚀 1. Socket Server (Orchestrator)
+    startProcess('Socket Server', 'apps/api-gateway', ['-r', 'tsconfig-paths/register', 'services/socket.ts']);
+    await waitForHealth('Socket Server', 'http://127.0.0.1:3011/health', 300000);
+
+    // 🤖 2. Build Worker (Task Execution)
+    startProcess('Build Worker', 'apps/worker', ['-r', 'tsconfig-paths/register', 'src/build-worker.ts']);
+    
+    // 🌐 3. Next.js Frontend
+    startProcess('Frontend', 'apps/frontend', ['run', 'dev'], 'pnpm');
+    await waitForHealth('Frontend', 'http://127.0.0.1:3004', 180000);
+
+    console.log('\n🎉 SYSTEM FULLY OPERATIONAL\n');
+    process.stdin.resume();
+  } catch (err) { 
+    console.error('\n💥 BOOT FAILURE:', err.message); 
+    shutdown(); 
+  }
+})();

@@ -112,9 +112,13 @@ export const NodeRegistry = {
             JSON.stringify(info)
         );
 
-        // Update live Prometheus gauges
-        nodeCpuUsage.set(info.loadAvg1m / info.cpuCount);
-        nodeMemoryUsage.set((os.totalmem() - os.freemem()));
+        // Update live Prometheus gauges (non-fatal if metrics not ready)
+        try {
+            nodeCpuUsage.set(info.loadAvg1m / info.cpuCount);
+            nodeMemoryUsage.set((os.totalmem() - os.freemem()));
+        } catch {
+            // Metrics not yet initialized — safe to skip
+        }
 
         logger.debug({ nodeId: _nodeId, load: info.loadAvg1m }, '[NodeRegistry] Heartbeat sent');
     },

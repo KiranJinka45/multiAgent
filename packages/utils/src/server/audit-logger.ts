@@ -3,7 +3,7 @@ import logger from '@packages/observability';
 import crypto from 'crypto';
 
 export interface AuditEvent {
-  tenantId: string;
+  organizationId: string;
   userId: string;
   action: string;
   resource: string;
@@ -19,7 +19,7 @@ export class AuditLogger {
    */
   private static calculateHash(event: AuditEvent, prevHash: string): string {
     const data = JSON.stringify({
-      tenantId: event.tenantId,
+      organizationId: event.organizationId,
       userId: event.userId,
       action: event.action,
       resource: event.resource,
@@ -36,7 +36,7 @@ export class AuditLogger {
     try {
       // 1. Get the latest log's hash to chain
       const latestLog = await prisma.auditLog.findFirst({
-        where: { tenantId: event.tenantId },
+        where: { tenantId: event.organizationId },
         orderBy: { createdAt: 'desc' },
         select: { hash: true }
       });
@@ -49,17 +49,17 @@ export class AuditLogger {
       // 3. Persist
       await prisma.auditLog.create({
         data: {
-          tenantId: event.tenantId,
+          tenantId: event.organizationId,
           userId: event.userId,
           action: event.action,
           resource: event.resource,
-          metadata: event.metadata as Record<string, unknown>,
-          ipAddress: event.ipAddress,
+          metadata: (event.metadata || {}) as any,
+          ipAddress: event.ipAddress || null,
           hash
         }
       });
 
-      logger.info({ action: event.action, tenantId: event.tenantId }, '[AuditLogger] Recorded secure audit event');
+      logger.info({ action: event.action, organizationId: event.organizationId }, '[AuditLogger] Recorded secure audit event');
     } catch (err: unknown) {
       logger.error({ err }, '[AuditLogger] Failed to record audit event');
     }
@@ -69,10 +69,10 @@ export class AuditLogger {
    * Verifies the integrity of the audit chain for a tenant.
    * Returns true if the chain is intact, false otherwise.
    */
-  public static async verifyChain(tenantId: string): Promise<boolean> {
+  public static async verifyChain(organizationId: string): Promise<boolean> {
     try {
       const logs = await prisma.auditLog.findMany({
-        where: { tenantId },
+        where: { tenantId: organizationId },
         orderBy: { createdAt: 'asc' }
       });
 
@@ -80,11 +80,11 @@ export class AuditLogger {
 
       for (const log of logs) {
         const expectedHash = this.calculateHash({
-          tenantId: log.tenantId,
+          organizationId: log.tenantId,
           userId: log.userId,
           action: log.action,
           resource: log.resource,
-          metadata: log.metadata as Record<string, unknown>
+          metadata: (log.metadata || {}) as any
         }, currentPrevHash);
 
         if (log.hash !== expectedHash) {
@@ -104,9 +104,9 @@ export class AuditLogger {
   /**
    * Retrieves the most recent log entry for a tenant.
    */
-  public static async getLatestLog(tenantId: string): Promise<Record<string, unknown> | null> {
+  public static async getLatestLog(organizationId: string): Promise<Record<string, unknown> | null> {
     const logs = await prisma.auditLog.findMany({
-      where: { tenantId },
+      where: { tenantId: organizationId },
       orderBy: { createdAt: 'desc' },
       take: 1
     });

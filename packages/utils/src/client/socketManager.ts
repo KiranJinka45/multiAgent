@@ -1,5 +1,4 @@
-import io from 'socket.io-client';
-import type * as SocketIOClient from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 
 export interface SocketManagerOptions {
     serverUrl?: string;
@@ -8,7 +7,7 @@ export interface SocketManagerOptions {
 
 class SocketManager {
     private static instance: SocketManager;
-    private socket: SocketIOClient.Socket | null = null;
+    private socket: Socket | null = null;
     private serverUrl: string = typeof window !== 'undefined' ? (process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3010') : 'http://localhost:3010';
     private isConnected: boolean = false;
     private isConnecting: boolean = false;
@@ -45,7 +44,7 @@ class SocketManager {
         if (!this.updateListeners.has(event)) {
             this.updateListeners.set(event, new Set());
             if (this.socket) {
-                this.socket.on(event, (data) => this.notifyUpdateListeners(event, data));
+                this.socket.on(event, (data: unknown) => this.notifyUpdateListeners(event, data));
             }
         }
         this.updateListeners.get(event)!.add(listener);
@@ -91,9 +90,9 @@ class SocketManager {
         }
     }
 
-    private connectionPromise: Promise<SocketIOClient.Socket | null> | null = null;
+    private connectionPromise: Promise<Socket | null> | null = null;
 
-    public async connect(options?: SocketManagerOptions): Promise<SocketIOClient.Socket | null> {
+    public async connect(options?: SocketManagerOptions): Promise<Socket | null> {
         if (options?.serverUrl) {
             this.serverUrl = options.serverUrl;
         }
@@ -107,7 +106,7 @@ class SocketManager {
             return this.connectionPromise;
         }
 
-        this.connectionPromise = (async () => {
+        this.connectionPromise = (async (): Promise<Socket | null> => {
             this.isConnecting = true;
             try {
                 // 1. Check if server is reachable before initializing socket
@@ -170,12 +169,12 @@ class SocketManager {
             this.updateListeners.forEach((_, event) => {
                 if (this.socket) {
                     this.socket.off(event); // clear any existing
-                    this.socket.on(event, (data) => this.notifyUpdateListeners(event, data));
+                    this.socket.on(event, (data: unknown) => this.notifyUpdateListeners(event, data));
                 }
             });
         });
 
-        this.socket.on('disconnect', (reason) => {
+        this.socket.on('disconnect', (reason: string) => {
             console.log(`[SocketManager] Disconnected: ${reason}`);
             this.isConnected = false;
             this.notifyConnectionState();
@@ -187,7 +186,7 @@ class SocketManager {
             }
         });
 
-        this.socket.on('connect_error', (error) => {
+        this.socket.on('connect_error', (error: Error) => {
             console.warn(`[SocketManager] Connect error: ${error.message}`);
             this.isConnected = false;
             this.isConnecting = false;
@@ -265,7 +264,7 @@ class SocketManager {
         return false;
     }
 
-    public getSocket(): SocketIOClient.Socket | null {
+    public getSocket(): Socket | null {
         return this.socket;
     }
 }

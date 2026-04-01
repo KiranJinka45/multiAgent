@@ -126,7 +126,7 @@ export default function Sidebar() {
             <aside
                 ref={sidebarRef}
                 style={{ width: isCollapsed ? 0 : width }}
-                className={`fixed left-0 top-0 h-screen glass border-r border-border/50 flex flex-col z-50 transition-[width] duration-300 ease-in-out ${isCollapsed ? '-translate-x-full overflow-hidden' : 'translate-x-0'}`}
+                className={`h-screen glass border-r border-border/50 flex flex-col z-50 transition-[width] duration-300 ease-in-out ${isCollapsed ? 'overflow-hidden' : ''}`}
             >
                 {/* Resize Handle */}
                 <div onMouseDown={startResizing} className="absolute right-0 top-0 h-full w-1 cursor-col-resize group z-50">

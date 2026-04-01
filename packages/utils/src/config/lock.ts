@@ -1,5 +1,6 @@
-import Redlock from 'redlock';
-import { independentRedisClients } from '@packages/shared-services';
+// @ts-expect-error redlock v5-beta declaration issues
+import { Redlock } from 'redlock';
+import { independentRedisClients } from '../server/redis';
 import logger from './logger';
 
 // 1. Initialize Redlock

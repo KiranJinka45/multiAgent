@@ -129,14 +129,17 @@ export abstract class BaseAgent {
                         response_format: { type: 'json_object' }
                     }, { signal });
 
-                    const content = response.choices[0].message.content;
-                    const tokensUsed = response.usage?.total_tokens || 0;
-                    const promptTokens = response.usage?.prompt_tokens || 0;
-                    const completionTokens = response.usage?.completion_tokens || 0;
-
                     if (!content) throw new Error('Empty response from LLM');
 
                     const result = JSON.parse(content);
+
+                    // --- Phase 7: Autonomous Safety Guardrails ---
+                    const { SafetyValidator } = await import('@packages/utils/server/safety-validator');
+                    const safety = SafetyValidator.check(result);
+                    if (!safety.safe) {
+                        this.log(`CRITICAL: Safety violation detected. Blocking response. Reason: ${safety.reason}`);
+                        throw new Error(`Execution blocked by Safety Guardrail: ${safety.reason}`);
+                    }
 
                     // --- USAGE TRACKING ---
                     if (context?.userId && context?.tenantId) {

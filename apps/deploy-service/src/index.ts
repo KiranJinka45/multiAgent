@@ -1,5 +1,4 @@
-import 'dotenv/config';
-import { initTelemetry } from '@packages/observability';
+import { initTelemetry } from '@packages/observability/telemetry';
 initTelemetry('multiagent-deploy-service');
 
 import { Worker, Job } from 'bullmq';

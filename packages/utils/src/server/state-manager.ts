@@ -54,10 +54,10 @@ export class ProjectStateManager {
             status: newState,
             message,
             progress,
-            tokens: metrics?.tokens,
-            duration: metrics?.duration,
-            cost: metrics?.cost,
-            updatedAt: timestamp
+            updatedAt: timestamp,
+            ...(metrics?.tokens !== undefined && { tokens: metrics.tokens }),
+            ...(metrics?.duration !== undefined && { duration: metrics.duration }),
+            ...(metrics?.cost !== undefined && { cost: metrics.cost })
         };
 
         try {
@@ -72,10 +72,10 @@ export class ProjectStateManager {
                 current_stage: newState,
                 progress_percent: progress,
                 message,
-                tokens_used: metrics?.tokens,
-                duration_ms: metrics?.duration,
-                cost_usd: metrics?.cost,
-                preview_url: metrics?.previewUrl,
+                ...(metrics?.tokens !== undefined && { tokens_used: metrics.tokens }),
+                ...(metrics?.duration !== undefined && { duration_ms: metrics.duration }),
+                ...(metrics?.cost !== undefined && { cost_usd: metrics.cost }),
+                ...(metrics?.previewUrl !== undefined && { preview_url: metrics.previewUrl }),
                 metadata: { transitionTime: timestamp }
             });
 
@@ -84,9 +84,9 @@ export class ProjectStateManager {
 
             // 3. Emit Event via Bus
             await eventBus.stage(executionId, newState, 'in_progress', message, progress, projectId, [], {
-                tokens: metrics?.tokens,
-                duration: metrics?.duration,
-                cost: metrics?.cost
+                ...(metrics?.tokens !== undefined && { tokens: metrics.tokens }),
+                ...(metrics?.duration !== undefined && { duration: metrics.duration }),
+                ...(metrics?.cost !== undefined && { cost: metrics.cost })
             });
             
             logger.info({ executionId, status: newState, progress }, '[StateManager] Transitioned successfully');

@@ -8,20 +8,21 @@
     "start": "tsx src/index.ts",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "start:socket": "tsx services/socket.ts",
-    "start:watchdog": "tsx services/task-engine/build-watchdog.ts",
-    "start:worker": "tsx ../worker/src/build-worker.ts"
+    "start:socket": "tsx -r tsconfig-paths/register services/socket.ts",
+    "start:watchdog": "tsx -r tsconfig-paths/register services/task-engine/build-watchdog.ts",
+    "start:worker": "tsx -r tsconfig-paths/register ../worker/src/build-worker.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
+    "@libsql/client": "^0.17.0",
     "@packages/contracts": "workspace:*",
     "@packages/core-engine": "workspace:*",
     "@packages/observability": "workspace:*",
+    "@packages/preview-runtime": "workspace:*",
     "@packages/registry": "workspace:*",
     "@packages/resilience": "workspace:*",
-    "@packages/preview-runtime": "workspace:*",
     "@packages/utils": "workspace:*",
-    "@libsql/client": "^0.17.0",
+    "@socket.io/redis-adapter": "^8.3.0",
     "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/supabase-js": "^2.45.4",
     "axios": "^1.13.5",
@@ -32,6 +33,7 @@
     "diff": "^8.0.3",
     "dockerode": "^4.0.9",
     "dotenv": "^17.3.1",
+    "event-loop-lag": "^1.4.0",
     "express": "^5.2.1",
     "framer-motion": "^11.18.2",
     "fs-extra": "^11.3.4",
@@ -64,8 +66,8 @@
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.15",
-    "@types/express": "^5.0.0",
     "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^20",
     "@types/react": "^18",
@@ -78,6 +80,7 @@
     "postcss": "^8.5.8",
     "tailwindcss": "^3.4.1",
     "tailwindcss-animate": "^1.0.7",
+    "tsconfig-paths": "^4.2.0",
     "tsx": "^4.21.0",
     "typescript": "^5"
   }

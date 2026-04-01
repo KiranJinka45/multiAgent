@@ -1,5 +1,5 @@
 import logger from './logger';
-import { supabaseAdmin } from '@packages/services/supabase-admin';
+import { supabaseAdmin } from '../server/supabase-utils';
 
 export async function sendBuildSuccessEmail(userId: string, projectId: string, executionId: string, previewUrl: string) {
     try {

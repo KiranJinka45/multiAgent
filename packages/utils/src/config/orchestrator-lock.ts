@@ -1,4 +1,4 @@
-import redis from '@packages/shared-services';
+import { redis } from '../server/redis';
 import logger from './logger';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -80,7 +80,7 @@ export class OrchestratorLock {
                         return 0
                     end
                 `;
-                const result = await redis.eval(script, 1, this.lockKey, this.workerId, this.ttlSeconds);
+                const result = await redis.eval(script, 1, this.lockKey, this.workerId, this.ttlSeconds.toString());
 
                 if (result === 0) {
                     logger.fatal({ executionId: this.executionId, workerId: this.workerId }, 'Lock stolen or expired! Aborting execution.');

@@ -354,7 +354,7 @@ export default function ChatList({ messages, onEdit, onRegenerate }: ChatListPro
     };
 
     return (
-        <div className="max-w-4xl mx-auto px-4 md:px-0 space-y-12 pb-24 pt-8">
+        <div className="w-full space-y-12 pb-24 pt-8">
             <ShareDialog
                 isOpen={shareModalOpen}
                 onClose={() => setShareModalOpen(false)}

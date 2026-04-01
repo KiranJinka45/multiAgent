@@ -1,8 +1,8 @@
 import fs from 'fs-extra';
 import path from 'path';
 import crypto from 'crypto';
-import logger from '@packages/utils';
-import { redis } from '@packages/utils';
+import { logger } from '@packages/observability';
+import { redis } from '@packages/utils/server';
 
 export interface CacheMetadata {
     projectId: string;

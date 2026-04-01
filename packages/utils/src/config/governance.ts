@@ -229,6 +229,10 @@ export class CostGovernanceService {
             const cost = (tokensUsed / 1_000_000) * (COST_PER_1M_TOKENS[provider] || 0.10);
 
             if (cost > 0) {
+                // Phase 7: Prometheus Metric Integration
+                const { aiTokenCostTotal } = await import('@packages/observability');
+                aiTokenCostTotal.inc({ model: 'llama-3.3-70b-versatile', provider }, cost);
+
                 await supabaseAdmin.rpc('increment_user_cost', {
                     user_id_param: userId,
                     cost_param: parseFloat(cost.toFixed(4))

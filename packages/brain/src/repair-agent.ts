@@ -12,6 +12,10 @@ export class RepairAgent extends BaseAgent {
     protected async run(input: { stderr: string, stdout: string, files: any[], command?: string }, _context: AgentContext, signal?: AbortSignal, strategy?: any): Promise<AgentResponse> {
         this.log(`Analyzing build/runtime error autonomously...`);
         try {
+            const { memoryPlane } = await import('@packages/utils/server');
+            const projectId = (_context as any).projectId || 'global';
+            const memoryContext = await memoryPlane.getRelevantContext(projectId, `Error: ${input.stderr.substring(0, 500)}`);
+
             const system = `You are a Senior Autonomous AI Software Healer.
 A generative project hit a fatal compilation, dependency, or runtime error during build validation.
 
@@ -49,6 +53,9 @@ ${input.stdout.substring(0, 1000)}
 
 CURRENT FILE MAP:
 ${JSON.stringify(input.files.map(f => ({ path: f.path, size: f.content?.length || 0 })))}
+
+--- RETRIEVED GLOBAL EXPERIENCE (PAST FIXES) ---
+${memoryContext || 'No matching past lessons found.'}
 `;
 
             const { result, tokens } = await this.promptLLM(system, prompt, 'llama-3.3-70b-versatile', signal, strategy, _context);

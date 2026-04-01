@@ -49,14 +49,20 @@ export class VirtualFileSystem {
             isDirty = false; // The content hasn't changed, don't mark as dirty
         }
 
-        this.tree.set(normalized, {
+        const file: VirtualFile = {
             path: normalized,
             content,
             hash: newHash,
             isDirty: isDirty || (existing ? existing.isDirty : false),
-            agentId: agentId || (existing ? existing.agentId : undefined),
             lastModified: new Date().toISOString()
-        });
+        };
+
+        const finalAgentId = agentId || existing?.agentId;
+        if (finalAgentId !== undefined) {
+            file.agentId = finalAgentId;
+        }
+
+        this.tree.set(normalized, file);
     }
 
     /**

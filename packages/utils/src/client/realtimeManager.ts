@@ -19,7 +19,7 @@ class RealtimeManager {
         channel: RealtimeChannel;
         refCount: number;
         status: 'SUBSCRIBED' | 'TIMED_OUT' | 'CLOSED' | 'CHANNEL_ERROR' | 'CONNECTING';
-        teardownTimer?: NodeJS.Timeout;
+        teardownTimer?: ReturnType<typeof setTimeout>;
         // multiplexing maps: bindingHash -> array of callbacks waiting for this event
         callbacks: Map<string, Set<PayloadCallback>>;
     }> = new Map();
@@ -73,15 +73,15 @@ class RealtimeManager {
             this.channels.set(channelName, channelRecord);
 
             // Execute `.on(...)` exactly ONCE against the Supabase server.
-            newChannel.on('postgres_changes', binding as any, (payload) => {
+            newChannel.on('postgres_changes', binding as any, (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
                 // Fan out to all React components registered to this specific binding hash
                 const listeners = channelRecord?.callbacks.get(bHash);
                 if (listeners) {
                     listeners.forEach(cb => cb(payload));
                 }
-            }).subscribe(async (status, err) => {
+            }).subscribe(async (status: string, err?: Error) => {
                 const record = this.channels.get(channelName);
-                if (record) record.status = status;
+                if (record) record.status = status as any;
 
                 if (status === 'SUBSCRIBED') {
                     console.log(`[RealtimeManager] ${channelName} connected successfully.`);
@@ -110,7 +110,7 @@ class RealtimeManager {
             if (channelRecord.teardownTimer) {
                 console.log(`[RealtimeManager] Cancelling teardown for ${channelName} due to quick StrictMode remount`);
                 clearTimeout(channelRecord.teardownTimer);
-                channelRecord.teardownTimer = undefined;
+                delete channelRecord.teardownTimer;
             }
         }
 

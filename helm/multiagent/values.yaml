@@ -1,0 +1,68 @@
+# Default values for multiagent-helm
+replicaCount:
+  gateway: 3
+  workerFree: 2
+  workerPro: 5
+  frontend: 2
+
+image:
+  repository: my-registry/multiagent
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  gatewayPort: 3011
+  frontendPort: 3004
+
+ingress:
+  enabled: true
+  className: "nginx"
+  host: multiagent.local
+  tls: []
+
+autoscaling:
+  enabled: true
+  gateway:
+    minReplicas: 3
+    maxReplicas: 20
+    cpuAverageUtilization: 70
+    socketConnectionTarget: "2000"
+  workers:
+    free:
+      minReplicas: 2
+      maxReplicas: 10
+      cpuAverageUtilization: 80
+    pro:
+      minReplicas: 5
+      maxReplicas: 50
+      cpuAverageUtilization: 80
+
+resources:
+  gateway:
+    requests:
+      cpu: "1"
+      memory: "2Gi"
+    limits:
+      cpu: "2"
+      memory: "4Gi"
+  worker:
+    requests:
+      cpu: "1"
+      memory: "2Gi"
+    limits:
+      cpu: "4"
+      memory: "8Gi"
+
+config:
+  redisUrl: "redis://redis-master:6379"
+  databaseUrl: "postgresql://postgres:password@postgresql:5432/multiagent"
+
+redis:
+  enabled: true # Set to false to use external AWS ElastiCache
+  architecture: standalone # Use 'replication' for production
+
+postgresql:
+  enabled: true # Set to false to use external AWS RDS
+  postgresqlPassword: "password"
+  postgresqlDatabase: "multiagent"

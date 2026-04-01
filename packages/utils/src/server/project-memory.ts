@@ -5,7 +5,7 @@ import { EmbeddingsEngine } from './memory/embeddings-engine';
 import { VectorStore } from './memory/vector-store';
 import { redis } from './redis/index';
 import { createHash } from 'crypto';
-import { eventBus } from './event-bus';
+//import { eventBus } from './event-bus';
 
 export interface ProjectMemory {
     projectId: string;
@@ -127,10 +127,10 @@ class ProjectMemoryService {
             const contents = chunks.map(c => c.content);
             const embeddings = await EmbeddingsEngine.generateBatch(contents);
 
-            if (embeddings) {
+            if (embeddings && embeddings.length === contents.length) {
                 const chunksWithEmbeddings = chunks.map((c, i) => ({
                     content: c.content,
-                    embedding: embeddings[i],
+                    embedding: embeddings[i] || [], // Fallback for TS safety
                     metadata: { ...c.metadata, projectId }
                 }));
                 await VectorStore.upsertChunks(chunksWithEmbeddings);

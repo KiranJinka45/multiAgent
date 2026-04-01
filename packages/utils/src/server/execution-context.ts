@@ -5,7 +5,7 @@ import logger from '@packages/observability';
 import { eventBus } from './event-bus';
 import { AgentContext, PipelineStatus } from '@packages/contracts';
 
-import { OrchestratorLock } from '@packages/shared-services';
+import { OrchestratorLock } from '../config/orchestrator-lock';
 import { VirtualFileSystem, VirtualFile } from './vfs/virtual-fs';
 
 export interface ExecutionMetrics {
@@ -371,7 +371,7 @@ export class DistributedExecutionContext implements ExecutionContextType, AgentC
             throw new Error(`TRANSITION_FAILED: ${result.err}`);
         }
 
-        return result.version;
+        return result.version ?? 0;
     }
 
     /**
@@ -397,10 +397,10 @@ export class DistributedExecutionContext implements ExecutionContextType, AgentC
                 workerId: lock.getWorkerId(),
                 status,
                 inputHash,
-                outputHash,
                 createdAt: ctx.journals[operationId]?.createdAt || new Date().toISOString(),
                 updatedAt: new Date().toISOString()
             };
+            if (outputHash) entry.outputHash = outputHash;
 
             ctx.journals[operationId] = entry;
             ctx.version += 1;
@@ -446,16 +446,18 @@ export class DistributedExecutionContext implements ExecutionContextType, AgentC
         await this.atomicUpdate((ctx) => {
             const existing = ctx.agentResults[agentName] || {
                 agentName,
-                status: 'pending',
+                status: 'pending' as const,
                 attempts: 0,
                 startTime: new Date().toISOString(),
             };
-
-            ctx.agentResults[agentName] = {
+            const updated: AgentResult = {
                 ...existing,
                 ...result,
-                endTime: result.status === 'completed' || result.status === 'failed' ? new Date().toISOString() : undefined,
             };
+            if (result.status === 'completed' || result.status === 'failed') {
+                updated.endTime = new Date().toISOString();
+            }
+            ctx.agentResults[agentName] = updated;
         });
     }
 

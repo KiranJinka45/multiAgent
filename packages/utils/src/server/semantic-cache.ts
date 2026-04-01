@@ -3,7 +3,7 @@ import crypto from 'crypto';
 import { logger } from '@packages/observability';
 
 /**
- * Semantic Caching Layer
+ * Semantic Caching Layer (Restored in Utils to avoid circular dependencies)
  * Reduces costs and latency by caching canonical prompt results in Redis.
  */
 export class SemanticCacheService {
@@ -43,7 +43,7 @@ export class SemanticCacheService {
     /**
      * Persists an LLM response to the semantic cache.
      */
-    static async set(prompt: string, response: any, system?: string, model?: string): Promise<void> {
+    static async set(prompt: string, response: unknown, system?: string, model?: string): Promise<void> {
         const key = this.generateKey(prompt, system, model);
         try {
             // Encode and store with expiration

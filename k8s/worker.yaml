@@ -1,12 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: worker-deployment
+  name: worker
   namespace: multiagent
   labels:
     app: worker
+    component: processor
 spec:
   replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
   selector:
     matchLabels:
       app: worker
@@ -14,21 +20,63 @@ spec:
     metadata:
       labels:
         app: worker
+        component: processor
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9091"
     spec:
+      terminationGracePeriodSeconds: 60
       containers:
-      - name: worker
-        image: multiagent/worker:latest
-        imagePullPolicy: Always
-        envFrom:
-        - secretRef:
-            name: multiagent-secrets
-        resources:
-          requests:
-            cpu: "500m"
-            memory: "1Gi"
-          limits:
-            cpu: "2000m"
-            memory: "4Gi"
+        - name: worker
+          image: multiagent/worker:latest
+          imagePullPolicy: IfNotPresent
+          command: ["node", "apps/worker/dist/index.js"]
+          ports:
+            - name: metrics
+              containerPort: 9091
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: platform-secrets
+                  key: database-url
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: platform-secrets
+                  key: redis-url
+            - name: KAFKA_BROKERS
+              value: "kafka.multiagent.svc.cluster.local:9092"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: platform-secrets
+                  key: otel-endpoint
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "2000m"
+              memory: "4Gi"
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: 9091
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: 9091
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "sleep 5"]
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -39,10 +87,16 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: worker-deployment
+    name: worker
   minReplicas: 3
   maxReplicas: 20
   metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
   - type: External
     external:
       metric:
@@ -50,3 +104,14 @@ spec:
       target:
         type: AverageValue
         averageValue: 50
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: worker-pdb
+  namespace: multiagent
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: worker

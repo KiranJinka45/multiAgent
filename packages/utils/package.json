@@ -2,12 +2,9 @@
   "name": "@packages/utils",
   "version": "0.1.0",
   "private": true,
-  "exports": {
-    ".": "./src/index.ts",
-    "./server": "./src/server/index.ts",
-    "./client": "./src/client/index.ts",
-    "./config": "./src/config/index.ts"
-  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+
   "scripts": {
     "build": "tsup --config tsup.config.js",
     "dev": "tsup --watch",
@@ -33,9 +30,17 @@
     "uuid": "^10.0.0",
     "zod": "^3.23.8",
     "groq-sdk": "^0.5.0",
+    "socket.io": "^4.7.5",
     "@kubernetes/client-node": "^0.21.0",
     "@temporalio/client": "^1.11.0",
-    "@temporalio/worker": "^1.11.0"
+    "@temporalio/worker": "^1.11.0",
+    "stripe": "^14.25.0",
+    "next": "^14.2.3",
+    "redlock": "^5.0.0-beta.2",
+    "@opentelemetry/api": "^1.8.0",
+    "@packages/observability": "workspace:*",
+    "socket.io-client": "^4.7.5",
+    "zustand": "^4.5.2"
   },
   "devDependencies": {
     "@types/archiver": "^6.0.2",
@@ -46,6 +51,8 @@
     "@types/node": "^22.13.9",
     "@types/uuid": "^10.0.0",
     "tsup": "^8.5.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "react": "^18.3.1",
+    "@types/react": "^18.3.3"
   }
 }

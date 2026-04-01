@@ -1,0 +1,95 @@
+# Zero Trust Network Isolation
+
+# 1. Default Deny All (Best Practice)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: multiagent
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+# 2. Allow Ingress to Gateway and Web
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress-to-services
+  namespace: multiagent
+spec:
+  podSelector:
+    matchLabels:
+      app: gateway # Or 'web'
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx # Adjust if using different ingress namespace
+---
+# 3. Allow Gateway to Infrastructure (Redis, Kafka, Postgres)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-gateway-to-infra
+  namespace: multiagent
+spec:
+  podSelector:
+    matchLabels:
+      app: gateway
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: redis
+    - to:
+        - podSelector:
+            matchLabels:
+              app: kafka
+    - to:
+        - podSelector:
+            matchLabels:
+              app: postgres
+---
+# 4. Allow Worker to Infrastructure (Redis, Kafka, Postgres)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-worker-to-infra
+  namespace: multiagent
+spec:
+  podSelector:
+    matchLabels:
+      app: worker
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: redis
+    - to:
+        - podSelector:
+            matchLabels:
+              app: kafka
+    - to:
+        - podSelector:
+            matchLabels:
+              app: postgres
+---
+# 5. Allow Prometheus Scraping
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-prometheus-scraping
+  namespace: multiagent
+spec:
+  podSelector: {} # Allow to all pods for metrics
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: prometheus
+      ports:
+        - port: 9090
+        - port: 9091
+        - port: 4000

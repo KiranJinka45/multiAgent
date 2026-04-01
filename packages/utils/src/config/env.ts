@@ -11,6 +11,12 @@ const envLocalPath = path.resolve(process.cwd(), ".env.local");
 // Logic: .env.local (if exists) > .env.{env} (if exists) > process.env (system)
 if (fs.existsSync(envLocalPath)) {
     dotenv.config({ path: envLocalPath });
+} else {
+    // Monorepo Support: Check if .env.local exists 2 levels up
+    const rootEnvLocalPath = path.resolve(process.cwd(), "../../.env.local");
+    if (fs.existsSync(rootEnvLocalPath)) {
+        dotenv.config({ path: rootEnvLocalPath });
+    }
 }
 if (fs.existsSync(envPath)) {
     dotenv.config({ path: envPath, override: true });

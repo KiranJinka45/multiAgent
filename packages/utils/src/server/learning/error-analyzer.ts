@@ -20,7 +20,7 @@ export class ErrorAnalyzer {
         for (const line of lines) {
             // TypeScript error pattern: path/to/file.ts(line,col): error TSXXXX: message
             const tsMatch = line.match(/(.+)\((\d+),(\d+)\): error TS\d+: (.+)/);
-            if (tsMatch) {
+            if (tsMatch && tsMatch[1] && tsMatch[2] && tsMatch[4]) {
                 errors.push({
                     type: 'type',
                     file: tsMatch[1],

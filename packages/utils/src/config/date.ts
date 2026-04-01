@@ -9,7 +9,7 @@ export function formatTime(date: string | Date | number) {
     if (!date) return '';
     const d = new Date(date);
     if (isNaN(d.getTime())) return '';
-    return d.toISOString().split('T')[1].split('.')[0];
+    return d.toISOString().split('T')[1]?.split('.')[0] || '';
 }
 
 export function formatYear(date: string | Date | number) {

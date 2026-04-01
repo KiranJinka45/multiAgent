@@ -14,7 +14,7 @@
 import { redis } from './redis';
 import { logger } from '@packages/observability';
 import { createLazyProxy } from './runtime';
-import { PersistenceStore } from './persistence-store';
+import { PersistenceStore, BuildEventRecord } from './persistence-store';
 import { PipelineStatus } from '@packages/contracts';
 
 
@@ -93,14 +93,16 @@ class EventBatcher {
             pipeline.setex(stateKey, STREAM_TTL_SECONDS, payload);
 
             if (event.type === 'stage' || event.type === 'agent' || event.type === 'error' || event.type === 'complete') {
-                PersistenceStore.logEvent({
+                const logPayload: BuildEventRecord = {
                     execution_id: event.executionId,
                     type: event.type,
                     agent_name: event.agent || (event.metadata?.agent as string),
-                    action: event.action,
-                    message: event.message,
                     data: event.metadata || {}
-                }).catch(() => {});
+                };
+                if (event.action) logPayload.action = event.action;
+                if (event.message) logPayload.message = event.message;
+
+                PersistenceStore.logEvent(logPayload).catch(() => {});
             }
 
             pipeline.publish(pubChannel, payload);
@@ -177,7 +179,7 @@ export async function readBuildEvents(
         return messages.map(([id, fields]) => {
             // fields is flat: ['data', '{json}']
             const dataIdx = fields.indexOf('data');
-            const raw = dataIdx !== -1 ? fields[dataIdx + 1] : '{}';
+            const raw = (dataIdx !== -1 ? fields[dataIdx + 1] : '{}') || '{}';
             const event = JSON.parse(raw) as BuildEvent;
             return [id, event] as [string, BuildEvent];
         });
@@ -211,51 +213,56 @@ export async function getLatestBuildState(executionId: string): Promise<BuildEve
 export const eventBus = {
     /** Emit a progress event */
     progress(executionId: string, progress: number, message: string, stage?: string, status = 'executing', projectId?: string, metrics?: { tokens?: number; duration?: number; cost?: number }) {
-        return publishBuildEvent({
+        const event: BuildEvent = {
             type: 'progress',
             executionId,
-            projectId,
             timestamp: Date.now(),
             progress,
             totalProgress: progress,
             message,
-            currentStage: stage,
             status,
-            tokensUsed: metrics?.tokens,
-            durationMs: metrics?.duration,
-            costUsd: metrics?.cost
-        });
+        };
+        if (projectId) event.projectId = projectId;
+        if (stage) event.currentStage = stage;
+        if (metrics?.tokens) event.tokensUsed = metrics.tokens;
+        if (metrics?.duration) event.durationMs = metrics.duration;
+        if (metrics?.cost) event.costUsd = metrics.cost;
+        
+        return publishBuildEvent(event);
     },
 
     /** Emit a stage transition event */
     stage(executionId: string, stageId: string, stageStatus: PipelineStatus | string, message: string, progress: number, projectId?: string, files?: { path: string; content?: string }[], metrics?: { tokens?: number; duration?: number; cost?: number }) {
-        return publishBuildEvent({
+        const event: BuildEvent = {
             type: 'stage',
             executionId,
-            projectId,
             timestamp: Date.now(),
             currentStage: stageId,
             status: stageStatus,
             message: `[Stage] ${message}`,
             progress,
             totalProgress: progress,
-            files,
-            tokensUsed: metrics?.tokens,
-            durationMs: metrics?.duration,
-            costUsd: metrics?.cost
-        });
+        };
+        if (projectId) event.projectId = projectId;
+        if (files) event.files = files;
+        if (metrics?.tokens) event.tokensUsed = metrics.tokens;
+        if (metrics?.duration) event.durationMs = metrics.duration;
+        if (metrics?.cost) event.costUsd = metrics.cost;
+
+        return publishBuildEvent(event);
     },
 
     /** Emit an AI agent thought / log line */
     thought(executionId: string, agent: string, thought: string, projectId?: string) {
-        return publishBuildEvent({
+        const event: BuildEvent = {
             type: 'thought',
             executionId,
-            projectId,
             timestamp: Date.now(),
             message: thought,
             metadata: { agent },
-        });
+        };
+        if (projectId) event.projectId = projectId;
+        return publishBuildEvent(event);
     },
 
     /** Emit final completion event and schedule stream cleanup */
@@ -264,10 +271,9 @@ export const eventBus = {
         const duration = Number(metadata?.durationMs || 0);
         const cost = (tokens / 1000) * 0.002;
 
-        await publishBuildEvent({
+        const event: BuildEvent = {
             type: 'complete',
             executionId,
-            projectId,
             timestamp: Date.now(),
             status: 'completed',
             progress: 100,
@@ -275,11 +281,14 @@ export const eventBus = {
             message: 'Build complete',
             currentStage: 'deployment',
             metadata: { previewUrl, ...metadata },
-            files,
             tokensUsed: tokens,
             durationMs: duration,
             costUsd: cost
-        });
+        };
+        if (projectId) event.projectId = projectId;
+        if (files) event.files = files;
+
+        await publishBuildEvent(event);
         // Schedule stream cleanup â€” expire in 4 hours so replay is available for debugging
         try {
             await redis.expire(`build:stream:${executionId}`, STREAM_TTL_SECONDS);
@@ -289,15 +298,16 @@ export const eventBus = {
 
     /** Emit an agent activity event (appears in the Timeline tab) */
     agent(executionId: string, agentName: string, action: string, message: string, projectId?: string) {
-        return publishBuildEvent({
+        const event: BuildEvent = {
             type: 'agent',
             executionId,
-            projectId,
             timestamp: Date.now(),
             agent: agentName,
             action,
             message,
-        });
+        };
+        if (projectId) event.projectId = projectId;
+        return publishBuildEvent(event);
     },
 
     /**
@@ -312,40 +322,45 @@ export const eventBus = {
      */
     async startTimer(executionId: string, agentName: string, action: string, message: string, projectId?: string) {
         const startedAt = Date.now();
-        await publishBuildEvent({
+        const startEvent: BuildEvent = {
             type: 'agent',
             executionId,
-            projectId,
             timestamp: startedAt,
             agent: agentName,
             action: `${action}:started`,
             message,
-        });
+        };
+        if (projectId) startEvent.projectId = projectId;
+
+        await publishBuildEvent(startEvent);
         return async (completionMessage?: string) => {
             const durationMs = Date.now() - startedAt;
-            await publishBuildEvent({
+            const finishEvent: BuildEvent = {
                 type: 'agent',
                 executionId,
-                projectId,
                 timestamp: Date.now(),
                 agent: agentName,
                 action: `${action}:finished`,
                 message: completionMessage || message,
                 durationMs,
-            });
+            };
+            if (projectId) finishEvent.projectId = projectId;
+
+            await publishBuildEvent(finishEvent);
         };
     },
 
     /** Emit a build failure event */
     error(executionId: string, message: string, projectId?: string) {
-        return publishBuildEvent({
+        const event: BuildEvent = {
             type: 'error',
             executionId,
-            projectId,
             timestamp: Date.now(),
             status: 'failed',
             message,
-        });
+        };
+        if (projectId) event.projectId = projectId;
+        return publishBuildEvent(event);
     },
 
     /** Read new messages from the stream */

@@ -13,6 +13,9 @@
   },
   "devDependencies": {
     "typescript": "^5.0.0",
-    "tsup": "^8.0.0"
+    "tsup": "^8.0.0",
+    "@packages/memory-core": "workspace:*",
+    "@packages/memory-vector": "workspace:*",
+    "@packages/memory-cache": "workspace:*"
   }
 }

@@ -1,50 +1,51 @@
+import path from "path";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    externalDir: true,
+    serverComponentsExternalPackages: ["cpu-features"],
+  },
+
   transpilePackages: [
+    "@packages/utils",
+    "@packages/context",
+    "@packages/shared-services",
+    "@packages/db",
+    "@packages/observability",
     "@packages/agents",
     "@packages/ai",
     "@packages/brain",
     "@packages/build-engine",
-    "@packages/context",
     "@packages/contracts",
     "@packages/core-engine",
-    "@packages/db",
     "@packages/memory",
-    "@packages/observability",
     "@packages/registry",
     "@packages/sdk",
-    "@packages/shared-services",
     "@packages/supabase",
     "@packages/templates",
     "@packages/tools",
     "@packages/ui",
-    "@packages/utils",
     "@packages/validator",
     "@packages/auto-healer",
     "@packages/queue",
     "@packages/sandbox"
   ],
-  experimental: {
-    externalDir: true,
-  },
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        http2: false,
-        fs: false,
-        net: false,
-        tls: false,
-        child_process: false,
-        readline: false,
-        worker_threads: false,
-        async_hooks: false,
-        perf_hooks: false,
-        dns: false,
 
-      };
-    }
-    config.externals = [...(config.externals || []), 'ssh2', 'cpu-features', 'nan'];
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      "@packages/utils": path.resolve(process.cwd(), "../../packages/utils/src"),
+      "@packages/context": path.resolve(process.cwd(), "../../packages/context/src"),
+      "@packages/shared-services": path.resolve(process.cwd(), "../../packages/shared-services/src"),
+      "@packages/db": path.resolve(process.cwd(), "../../packages/db/src"),
+      "@packages/observability": path.resolve(process.cwd(), "../../packages/observability/src"),
+    };
+
+    if (!config.externals) config.externals = [];
+    config.externals.push({
+      "cpu-features": "commonjs cpu-features",
+    });
+
     return config;
   },
   typescript: {

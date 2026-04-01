@@ -1,5 +1,5 @@
 import { logger, missionController } from '@packages/utils/server';
-import { ContainerManager } from '@apps/sandbox-runtime';
+import { ContainerManager } from '@packages/sandbox-runtime';
 import path from 'path';
 import fs from 'fs-extra';
 

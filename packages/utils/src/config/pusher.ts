@@ -8,7 +8,7 @@
  * sites work without changes. All new code should use eventBus directly.
  */
 
-import { eventBus } from '@packages/services/event-bus';
+import { eventBus } from '../server/event-bus';
 import logger from './logger';
 
 export const pusher = {
@@ -32,7 +32,7 @@ export const pusher = {
             stageData.status || 'in_progress',
             stageData.message || '',
             progress
-        ).catch(err => logger.warn({ err }, '[Pusher stub] Failed to route to event bus'));
+        ).catch((err: any) => logger.warn({ err }, '[Pusher stub] Failed to route to event bus'));
     },
 };
 

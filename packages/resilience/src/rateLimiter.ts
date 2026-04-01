@@ -4,13 +4,24 @@ import { logger } from '@packages/observability';
 import { Request, Response, NextFunction } from 'express';
 
 const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
-const redis = new Redis(redisUrl, {
+const USE_SENTINEL = process.env.REDIS_USE_SENTINEL === 'true';
+
+const redisConfig: any = {
   maxRetriesPerRequest: null,
   enableReadyCheck: true,
-});
+};
+
+if (USE_SENTINEL) {
+  redisConfig.sentinels = [
+    { host: 'redis-sentinel.multiagent.svc.cluster.local', port: 26379 }
+  ];
+  redisConfig.name = 'mymaster';
+}
+
+const redis = USE_SENTINEL ? new Redis(redisConfig) : new Redis(redisUrl, redisConfig);
 
 redis.on('error', (err) => {
-  logger.error({ err, url: redisUrl }, '[Resilience] Redis Connection Error');
+  logger.error({ err, url: USE_SENTINEL ? 'sentinel' : redisUrl }, '[Resilience] Redis Connection Error');
 });
 
 /**

@@ -37,23 +37,23 @@ export class FileTreeGenerator {
 
                 if (!child) {
                     child = {
-                        name: part,
+                        name: part!,
                         path: currentPath,
                         type: isLastPart ? 'file' : 'directory',
-                        children: isLastPart ? undefined : []
-                    };
-                    currentNode.children?.push(child);
+                        children: isLastPart ? undefined : [] as FileTreeNode[]
+                    } as FileTreeNode;
+                    currentNode.children!.push(child);
                 }
 
                 if (isLastPart) {
                     child.metadata = {
                         isDirty: file.isDirty,
-                        agentId: file.agentId,
-                        hash: file.hash
+                        hash: file.hash,
+                        ...(file.agentId ? { agentId: file.agentId } : {})
                     };
                 }
 
-                currentNode = child;
+                currentNode = child!;
             }
         }
 

@@ -19,7 +19,7 @@ export * from './state-manager';
 export * from './mission-controller';
 export * from './command-gateway';
 export * from './execution-context';
-export * from './orchestrator';
+// export * from './orchestrator';
 export * from './file-patch-service';
 export * from './patch-verifier';
 export * from './usage-service';

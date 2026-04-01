@@ -47,7 +47,10 @@ async function runLoadTest(concurrency: number, total: number) {
     console.log(`Failure: ${results.failure}`);
 }
 
-const concurrency = parseInt(process.argv.find(a => a === '--concurrency') ? process.argv[process.argv.indexOf('--concurrency') + 1] : '5');
-const total = parseInt(process.argv.find(a => a === '--total') ? process.argv[process.argv.indexOf('--total') + 1] : '20');
+const concurrencyIdx = process.argv.indexOf('--concurrency');
+const concurrency = parseInt(concurrencyIdx !== -1 ? process.argv[concurrencyIdx + 1] || '5' : '5');
+
+const totalIdx = process.argv.indexOf('--total');
+const total = parseInt(totalIdx !== -1 ? process.argv[totalIdx + 1] || '20' : '20');
 
 runLoadTest(concurrency, total);

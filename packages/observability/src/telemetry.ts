@@ -1,27 +1,49 @@
-import { NodeSDK } from "@opentelemetry/sdk-node";
-import { getNodeAutoInstrumentations } from "@opentelemetry/auto-instrumentations-node";
-import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
-import { Resource } from "@opentelemetry/resources";
-import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
+import { register, startMetricsServer, workerJobDuration, httpRequestDuration } from "./metrics";
+import { initInstrumentation } from "./tracing";
+import { logger } from "./logger";
 
-export function initTelemetry(serviceName: string) {
-  const exporter = new OTLPTraceExporter({
-    url: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "http://localhost:4318/v1/traces",
-  });
+export interface TelemetryConfig {
+  serviceName: string;
+  metricsPort?: number;
+  enableTracing?: boolean;
+  startMetricsServer?: boolean;
+}
 
-  const sdk = new NodeSDK({
-    resource: new Resource({
-      [SemanticResourceAttributes.SERVICE_NAME]: serviceName,
-    }),
-    traceExporter: exporter,
-    instrumentations: [getNodeAutoInstrumentations()],
-  });
+/**
+ * Initialize full observability stack for a service:
+ * - OpenTelemetry tracing
+ * - Prometheus metrics server (optional)
+ * - Default metrics collection
+ *
+ * Call this once at the top of your service entrypoint.
+ */
+export function initTelemetry(config: TelemetryConfig) {
+  const { 
+    serviceName, 
+    metricsPort = 9091, 
+    enableTracing = true, 
+    startMetricsServer: shouldStartServer = true 
+  } = config;
 
-  sdk.start();
+  logger.info({ serviceName, metricsPort, enableTracing, shouldStartServer }, '[Telemetry] Initializing observability stack');
 
-  process.on("SIGTERM", () => {
-    sdk.shutdown().finally(() => process.exit(0));
-  });
+  // 1. Start OpenTelemetry tracing
+  if (enableTracing) {
+    initInstrumentation(serviceName);
+    logger.info({ serviceName }, '[Telemetry] OpenTelemetry tracing active');
+  }
 
-  return sdk;
+  // 2. Start standalone metrics server for Prometheus scraping if requested
+  let metricsServer;
+  if (shouldStartServer) {
+    metricsServer = startMetricsServer(metricsPort);
+    logger.info({ serviceName, metricsPort }, '[Telemetry] Prometheus metrics server active');
+  }
+
+  return {
+    register,
+    metricsServer,
+    workerJobDuration,
+    httpRequestDuration,
+  };
 }

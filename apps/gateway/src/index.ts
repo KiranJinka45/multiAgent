@@ -4,10 +4,12 @@ import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import http from 'http';
 import helmet from 'helmet';
-import { logger, register, initInstrumentation } from '@packages/observability';
+import axios from 'axios';
+import { logger, register, initTelemetry } from '@packages/observability';
+import { kafkaManager } from '@packages/events';
+import { rateLimitMiddleware, createBreaker, signServiceToken } from '@packages/resilience';
 import { requestContext } from './middleware/requestContext';
 import { metricsMiddleware } from './middleware/metricsMiddleware';
-import { rateLimitMiddleware } from '@packages/resilience';
 import { initSocket } from './socket';
 import { CostGovernanceService } from '@packages/utils/server';
 import { z } from 'zod';
@@ -17,8 +19,25 @@ import { db } from '@packages/db';
 import { trackEvent } from './routes/events';
 import { StripeService } from './services/stripe';
 
-// Initialize tracing as early as possible
-initInstrumentation('gateway');
+// Configure global Axios defaults for production safety
+axios.defaults.timeout = 5000;
+axios.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        logger.error({ 
+            err: error.message, 
+            url: error.config?.url,
+            status: error.response?.status 
+        }, '[Gateway] Outbound HTTP Failure');
+        return Promise.reject(error);
+    }
+);
+
+// Initialize telemetry as early as possible
+initTelemetry({
+    serviceName: 'gateway',
+    startMetricsServer: false // Gateway handles /metrics via Express
+});
 
 process.on('unhandledRejection', (reason, promise) => {
     console.error('Unhandled Rejection at Gateway:', reason);
@@ -43,12 +62,12 @@ const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL || 'http://localhost:4002'
 const BILLING_SERVICE_URL = process.env.BILLING_SERVICE_URL || 'http://localhost:4003';
 const CORE_API_URL = process.env.CORE_API_URL || 'http://localhost:3001';
 
-app.use(requestContext);
-app.use(metricsMiddleware);
-app.use(rateLimitMiddleware);
 app.use(helmet());
-app.use(cors());
 app.use(express.json());
+app.use(requestContext);
+app.use(rateLimitMiddleware); // Protection against abuse
+app.use(metricsMiddleware);
+app.use(cors());
 
 // Tracing Propagation Logger
 app.use((req, res, next) => {
@@ -144,8 +163,31 @@ app.get('/health', (req, res) => {
 });
 
 app.get('/ready', (req, res) => {
-    // Check downstream dependencies if needed (Redis, DB)
     res.json({ status: 'ready' });
+});
+
+// Circuit Breaker for Stripe (Resilience)
+const stripeBreaker = createBreaker(async (payload: any) => {
+    // In production, this would call StripeService.processPayment(payload)
+    // For now, we simulate a robust call that could fail or timeout
+    return { success: true, transactionId: 'txn_' + Date.now() };
+}, { 
+    timeout: 10000, 
+    errorThresholdPercentage: 50,
+    resetTimeout: 30000 
+});
+
+app.post('/api/checkout', async (req, res) => {
+    try {
+        const result = await stripeBreaker.fire(req.body);
+        res.json(result);
+    } catch (err) {
+        logger.error({ err }, '[Gateway] Checkout Failed / Circuit Open');
+        res.status(503).json({ 
+            error: 'Payment service temporarily unavailable. Please try again later.',
+            code: 'SERVICE_UNAVAILABLE'
+        });
+    }
 });
 
 // --- SCHEMAS ---
@@ -164,7 +206,7 @@ const createServiceProxy = (target: string) => createProxyMiddleware({
         '^/api/core': '',
     },
     headers: {
-        'X-Internal-Key': INTERNAL_KEY
+        'Authorization': `Bearer ${signServiceToken('gateway')}`
     },
     onProxyReq: (proxyReq: ClientRequest, req: Request) => {
         const authReq = req as AuthenticatedRequest;
@@ -278,8 +320,9 @@ server.listen(PORT, async () => {
 // --- GRACEFUL SHUTDOWN ---
 const shutdown = async (signal: string) => {
     logger.info({ signal }, '[Gateway] Shutdown initiated');
-    server.close(() => {
+    server.close(async () => {
         logger.info('[Gateway] HTTP server closed');
+        await kafkaManager.shutdown();
         process.exit(0);
     });
 

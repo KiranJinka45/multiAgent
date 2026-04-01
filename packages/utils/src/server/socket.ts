@@ -19,13 +19,13 @@ app.use(cors());
 // Tracing & Logging Middleware
 app.use((req, res, next) => {
     const correlationId = (req.headers['x-correlation-id'] as string) || req.query.correlationId as string;
-    
+
     runWithTracing(correlationId, () => {
         // Log every incoming request
-        logger.info({ 
-            method: req.method, 
-            url: req.url, 
-            correlationId: getCorrelationId() 
+        logger.info({
+            method: req.method,
+            url: req.url,
+            correlationId: getCorrelationId()
         }, `[SocketServer] Incoming request`);
         next();
     });
@@ -57,13 +57,13 @@ app.get('/metrics', async (req, res) => {
 app.use('/preview', (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const parts = req.url.split('/').filter(Boolean);
     const projectId = parts[0];
-    
+
     if (!projectId) {
         return next();
     }
 
     console.log(`[PreviewProxy] [${req.method}] ${req.url} -> Project: ${projectId}`);
-    
+
     redis.get(`preview:port:${projectId}`).then(port => {
         if (!port) {
             console.warn(`[PreviewProxy] 404 - No port found for ${projectId}`);
@@ -72,7 +72,7 @@ app.use('/preview', (req: express.Request, res: express.Response, next: express.
 
         // Track last access time for idle shutdown
         redis.set(`preview:last_access:${projectId}`, Date.now().toString(), 'EX', 86400); // 1 day TTL
-        
+
         const targetPort = parseInt(port);
         // Stripping project ID from path for internal routing
         const internalPath = req.url.replace(`/${projectId}`, '') || '/';
@@ -104,15 +104,15 @@ app.use('/preview', (req: express.Request, res: express.Response, next: express.
         });
 
         req.pipe(proxyReq);
-        }).catch(err => {
-            ReliabilityMonitor.recordError({
-                service: 'socket-server',
-                error: err.message,
-                context: { projectId, url: req.url },
-                timestamp: new Date().toISOString()
-            });
-            if (!res.headersSent) res.status(500).send('Proxy State Error');
+    }).catch(err => {
+        ReliabilityMonitor.recordError({
+            service: 'socket-server',
+            error: err.message,
+            context: { projectId, url: req.url },
+            timestamp: new Date().toISOString()
         });
+        if (!res.headersSent) res.status(500).send('Proxy State Error');
+    });
 });
 
 
@@ -126,7 +126,8 @@ const io = new Server(server, {
 });
 
 const REDIS_URLS = process.env.REDIS_URLS ? process.env.REDIS_URLS.split(',') : [process.env.REDIS_URL || 'redis://localhost:6379'];
-const redisSub = createLazyProxy(() => new Redis(REDIS_URLS[0]), 'Redis_Sub');
+const redisUrl = REDIS_URLS[0] || 'redis://localhost:6379';
+const redisSub = createLazyProxy(() => new Redis(redisUrl), 'Redis_Sub');
 
 const PORT = parseInt(process.env.SOCKET_PORT || '3011');
 
@@ -208,7 +209,7 @@ redisSub.on('message', (channel, message) => {
 if (process.env.NEXT_PHASE !== 'phase-production-build' && process.env.NEXT_PHASE !== 'phase-export') {
     server.listen(PORT, '0.0.0.0', () => {
         console.log(`[Socket.IO] Realtime server running on http://localhost:${PORT}`);
-        
+
         // Periodically update health status in Redis
         setInterval(() => {
             redis.set('system:health:socket', JSON.stringify({
@@ -223,7 +224,8 @@ if (process.env.NEXT_PHASE !== 'phase-production-build' && process.env.NEXT_PHAS
 }
 
 // Global Error Handler
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+app.use((err: any, req: express.Request, res: express.Response) => {
     ReliabilityMonitor.recordError({
         service: 'socket-server',
         error: err.message,
@@ -233,9 +235,9 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
     });
 
     if (!res.headersSent) {
-        res.status(500).json({ 
-            error: 'Internal Server Error', 
-            correlationId: getCorrelationId() 
+        res.status(500).json({
+            error: 'Internal Server Error',
+            correlationId: getCorrelationId()
         });
     }
 });

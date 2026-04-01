@@ -1,8 +1,7 @@
+console.log('🚀 WORKER BOOT: Loading entries...');
 import 'dotenv/config';
 import { initInstrumentation } from './instrumentation';
 
-// Initialize tracing before any other imports
-// initInstrumentation('build-worker');
 import fs from 'fs-extra';
 import path from 'path';
 import { Worker, Job } from 'bullmq';
@@ -20,6 +19,7 @@ import {
     WorkerClusterManager 
 } from '@packages/utils/server';
 import { JobStage } from '@packages/contracts';
+import { EvolutionManager } from '@packages/auto-healer';
 import { ArtifactValidator } from '@packages/validator';
 import { NodeRegistry } from '@packages/sandbox-runtime/cluster/nodeRegistry';
 import { FailoverManager } from '@packages/sandbox-runtime/cluster/failoverManager';
@@ -29,35 +29,43 @@ import { RuntimeCleanup } from '@packages/runtime/runtimeCleanup';
 import { BuildCacheManager, BuildGraphEngine } from '@packages/build-engine';
 import os from 'os';
 
+console.log('✅ WORKER BOOT: All imports resolved successfully');
+console.log('STEP 1: Starting Worker boot sequence...');
+
 const WORKER_ID = `worker-${os.hostname()}-${process.pid}`;
 const orchestrator = new Orchestrator();
-
-/**
- * CRASH RECOVERY: Scans Redis for executions that are stuck in 'executing' status
- * and attempts to resume them.
- */
 const workerId = `worker-${Math.random().toString(36).substring(2, 9)}`;
 
-// Heartbeat for Control Plane Diagnostics
+// Redis Connectivity Trace
+console.log('STEP 2: Initializing Redis connection (Shared)...');
+redis.on('connect', () => console.log('🔗 Redis: Connecting...'));
+redis.on('ready', () => console.log('✅ Redis: Connection established and ready.'));
+redis.on('error', (err: Error) => console.error('❌ Redis: Connection error:', err.message));
+
+// 💓 Heartbeat handles both Cluster Registration and Orchestration Health
 const HEARTBEAT_INTERVAL = 5000;
 setInterval(async () => {
     try {
-        const heartbeat = {
-            status: 'online',
-            lastSeen: Date.now(),
-            memory: process.memoryUsage().heapUsed / 1024 / 1024, // MB
-            uptime: process.uptime(),
-            workerId
+        const payload = {
+            workerId: WORKER_ID,
+            hostname: os.hostname(),
+            load: 0, // TODO: Map to actual CPU/Job load
+            status: 'IDLE' as const,
+            memory: process.memoryUsage().heapUsed / 1024 / 1024,
+            uptime: process.uptime()
         };
 
-        // Unique key for individual worker tracking
-        await redis.set(`worker:heartbeat:${workerId}`, JSON.stringify(heartbeat), 'EX', 15);
-        // Standard key for global diagnostics heartbeat
-        await redis.set('system:health:worker', JSON.stringify(heartbeat), 'EX', 15);
-    } catch {
-        logger.warn('Failed to update worker heartbeat');
+        // 1. Update Cluster Manager (For steering & pruning)
+        await WorkerClusterManager.heartbeat(payload);
+
+        // 2. Update Legacy Health Key (For system-startup.cjs compatibility)
+        await redis.set('system:health:worker', JSON.stringify({ ...payload, status: 'online' }), 'EX', 15);
+    } catch (err) {
+        logger.warn({ err: (err as Error).message }, '[Worker] Heartbeat sync failed');
     }
 }, HEARTBEAT_INTERVAL);
+
+console.log('STEP 4: Background task initialization started.');
 
 const RECOVERY_STALE_MS = 60000;
 const resumeOrphanedExecutions = async () => {
@@ -228,6 +236,31 @@ const executeBuild = async (data: { prompt: string, userId: string, projectId: s
     } catch (error) {
         const msg = error instanceof Error ? error.message : String(error);
         logger.error({ executionId, error: msg, tier }, 'Execution failed');
+
+        // --- SELF-EVOLUTION HIJACK ---
+        try {
+            const sandboxDir = path.join(process.cwd(), '.generated-projects', projectId);
+            if (fs.existsSync(sandboxDir)) {
+                // Collect context for evolution
+                const entries = await fs.readdir(sandboxDir);
+                const files: { path: string, content: string }[] = [];
+                for (const e of entries.slice(0, 5)) { // Limit to top 5 files for context
+                    const fPath = path.join(sandboxDir, e);
+                    if ((await fs.stat(fPath)).isFile() && (e.endsWith('.ts') || e.name === 'package.json')) {
+                        files.push({ path: e, content: await fs.readFile(fPath, 'utf8') });
+                    }
+                }
+
+                const evolved = await EvolutionManager.evolve(executionId, msg, files);
+                if (evolved) {
+                    logger.info({ executionId }, '[Worker] Self-evolution initiated. Skipping failure state.');
+                    return; // Mission will be re-queued by EvolutionManager
+                }
+            }
+        } catch (evoErr) {
+            logger.error({ executionId, err: (evoErr as Error).message }, '[Worker] Self-evolution trigger failed');
+        }
+
         await missionController.updateMission(executionId, { 
             status: 'failed',
             metadata: { error: msg }
@@ -286,30 +319,23 @@ setupWorkerEvents(proWorker, 'pro');
 // Graceful shutdown
 const shutdown = async () => {
     logger.info('Shutting down workers...');
-    FailoverManager.stop();
-    await RuntimeCleanup.shutdownAll();
-    await NodeRegistry.deregister();
-    await Promise.all([freeWorker.close(), proWorker.close()]);
-    await redis.quit();
+    try {
+        await WorkerClusterManager.deregister(WORKER_ID);
+        FailoverManager.stop();
+        await RuntimeCleanup.shutdownAll();
+        await NodeRegistry.deregister();
+        await Promise.all([freeWorker.close(), proWorker.close()]);
+        await redis.quit();
+    } catch (err) {
+        logger.error({ err }, 'Shutdown cleanup partial failure');
+    }
     process.exit(0);
 };
 
 process.on('SIGTERM', shutdown);
 process.on('SIGINT', shutdown);
 
-// 🔥 START CLUSTER HEARTBEAT
-setInterval(async () => {
-    try {
-        await WorkerClusterManager.heartbeat({
-            workerId: WORKER_ID,
-            hostname: os.hostname(),
-            load: 0, // In production, we'd calculate CPU/Mem load here
-            status: 'IDLE' // Update dynamically based on job state
-        });
-    } catch (err) {
-        console.error('[Worker] Heartbeat failed:', err);
-    }
-}, 2000);
+// --- Consolidated Heartbeat above at line 49 ---
 
 // Cluster & Instant Trigger Listeners
 (async () => {
@@ -383,7 +409,9 @@ setInterval(async () => {
     }
 })();
 
+console.log('STEP 5: Workers created. Listening for jobs.');
 logger.info(`Workers started: Free (concurrency=${freeWorker.opts.concurrency}), Pro (concurrency=${proWorker.opts.concurrency})`);
+console.log(`✅ WORKER BOOT: BullMQ Workers created — Free (${freeWorker.opts.concurrency}), Pro (${proWorker.opts.concurrency})`);
 
 // Kick off crash recovery
 resumeOrphanedExecutions();

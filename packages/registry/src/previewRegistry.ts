@@ -55,11 +55,10 @@ export const PreviewRegistry = {
             previewId,
             projectId,
             executionId,
-            userId,
             status: 'PROVISIONED',
             previewUrl: null,
-            ports: [],
-            pids: [],
+            ports: [] as number[],
+            pids: [] as number[],
             accessToken: existing?.accessToken || crypto.randomUUID(),
             startedAt: existing?.startedAt || new Date().toISOString(),
             updatedAt: new Date().toISOString(),
@@ -68,6 +67,10 @@ export const PreviewRegistry = {
             crashCount: existing?.crashCount || 0,
             restartDisabled: existing?.restartDisabled || false,
         };
+
+        if (userId !== undefined) {
+            record.userId = userId;
+        }
         await this.save(record);
         logger.info({ projectId, executionId, previewId }, '[PreviewRegistry] Record initialized (stable)');
         return record;

@@ -1,3 +1,7 @@
+-- Enable necessary extensions
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "vector" WITH SCHEMA public;
+
 -- Semantic Memories Table (Phase 19 Hardening)
 CREATE TABLE IF NOT EXISTS public.semantic_memories (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

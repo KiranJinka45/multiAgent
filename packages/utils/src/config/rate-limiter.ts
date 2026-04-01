@@ -67,11 +67,14 @@ export class RateLimiter {
 
             const [allowed, remaining, waitMs] = result;
 
-            return {
+            const returnResult: RateLimitResult = {
                 allowed: allowed === 1,
-                remaining: remaining,
-                retryAfter: waitMs ? Math.ceil(waitMs / 1000) : undefined
+                remaining: remaining
             };
+            if (waitMs) {
+                returnResult.retryAfter = Math.ceil(waitMs / 1000);
+            }
+            return returnResult;
         } catch (error) {
             logger.error({ error, action, userId }, 'Rate limiter failure. Failing open for safety.');
             return { allowed: true, remaining: 1 };

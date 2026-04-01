@@ -183,15 +183,14 @@ export default function Dashboard() {
             <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
 
             <main
-                style={{ marginLeft: 'var(--sidebar-width, 260px)' }}
-                className="flex-1 flex flex-col h-full relative transition-[margin] duration-300 ease-in-out"
+                className="flex-1 flex flex-col h-full relative overflow-hidden"
             >
                 <TopNav onOpenMobileMenu={() => setIsMobileMenuOpen(true)} />
                 {/* Top decorative gradient */}
                 <div className="fixed top-0 left-0 right-0 h-32 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />
 
                 <div className="flex-1 overflow-y-auto w-full scroll-smooth">
-                    <div className="max-w-4xl mx-auto w-full px-4 md:px-6 pt-20 pb-40">
+                    <div className="w-full px-8 md:px-12 pt-20 pb-40">
                         {messages.length === 0 ? (
                             <div className="flex flex-col items-center justify-center min-h-[70vh] text-center space-y-12 relative">
                                 {/* Premium Logo & Greeting */}
@@ -208,12 +207,12 @@ export default function Dashboard() {
                                 </div>
 
                                 {/* Centered Input with Glassmorphism */}
-                                <div className="w-full max-w-2xl relative z-40 animate-in fade-in zoom-in-95 duration-1000 delay-200">
+                                <div className="w-full max-w-5xl relative z-40 animate-in fade-in zoom-in-95 duration-1000 delay-200">
                                     <TaskInput ref={taskInputRef} onAddTask={addMessage} centered={true} />
                                 </div>
 
                                 {/* Refined Recommendation Chips */}
-                                <div className="flex flex-wrap items-center justify-center gap-3 max-w-3xl px-4 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-500">
+                                <div className="flex flex-wrap items-center justify-center gap-3 w-full px-4 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-500">
                                     {[
                                         { icon: "🚀", label: "Build a landing page", prompt: "Build a professional landing page for a creative agency" },
                                         { icon: "🎨", label: "Generate an image", prompt: "Create a photorealistic image of a futuristic floating garden" },

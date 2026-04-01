@@ -9,7 +9,14 @@ export type AgentRequest<P = any> = {
     params: P;
 };
 
-export interface AgentResponse<T = any> {
+export type AgentData = 
+    | { type: 'plan'; plan: BrainPlan }
+    | { type: 'code'; files: JobArtifact[] }
+    | { type: 'analysis'; findings: string[]; score: number }
+    | { type: 'validation'; isValid: boolean; errors: string[] }
+    | Record<string, unknown>;
+
+export interface AgentResponse<T = AgentData> {
     success: boolean;
     data: T;
     artifacts: JobArtifact[];

@@ -1,7 +1,7 @@
 import fs from 'fs-extra';
 import path from 'path';
 import crypto from 'crypto';
-import logger from '@packages/utils';
+import { logger } from '@packages/observability';
 
 export interface GraphNode {
     file: string;

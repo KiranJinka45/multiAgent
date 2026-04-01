@@ -4,7 +4,8 @@ export * from './core';
 export * from '../shared';
 export * from './analytics-service';
 export * from './preview-manager';
-export * from './devops/github-service';
+export { githubService } from './devops/github-service';
+export type { GithubRepo } from './devops/github-service';
 export * from './event-bus';
 export * from './supabase-utils';
 // vfs exported specifically to avoid star conflict if necessary, but checking core instead

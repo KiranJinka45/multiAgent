@@ -52,16 +52,19 @@ export class PatchEngine {
             const fileIndex = updatedFiles.findIndex(f => f.path === patch.path);
             
             if (fileIndex !== -1) {
+            const target = updatedFiles[fileIndex];
+            if (target) {
                 if (patch.anchor) {
-                    updatedFiles[fileIndex].content = this.applyAnchorPatch(
-                        updatedFiles[fileIndex].content,
+                    target.content = this.applyAnchorPatch(
+                        target.content,
                         patch.anchor,
                         patch.content
                     );
                 } else {
                     // Whole file replacement if no anchor
-                    updatedFiles[fileIndex].content = patch.content;
+                    target.content = patch.content;
                 }
+            }
             } else {
                 // New file
                 updatedFiles.push({ path: patch.path, content: patch.content });

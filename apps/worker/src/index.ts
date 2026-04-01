@@ -1,10 +1,12 @@
 // Entry point for @apps/worker
-import { initInstrumentation } from './instrumentation';
-import { startMetricsServer } from '@packages/observability';
+// CRITICAL: Telemetry must be initialized BEFORE any other imports to capture all spans.
+import { initTelemetry } from '@packages/observability';
 
-// Initialize instrumentation and starts metrics server
-initInstrumentation('worker-fleet');
-startMetricsServer(9091);
+initTelemetry({
+  serviceName: 'worker-fleet',
+  metricsPort: 9091,
+  enableTracing: true,
+});
 
 import './architecture-worker';
 import './backend-worker';
@@ -29,3 +31,19 @@ setupAutonomousWorker();
 // Phase 4: Self-Improving AI
 import './evolution-worker';
 import './auto-refactor-worker';
+
+import { logger } from '@packages/observability';
+import { kafkaManager } from '@packages/events';
+
+// Graceful shutdown
+const shutdown = async (signal: string) => {
+  logger.info({ signal }, '[Worker] Shutdown initiated');
+  await kafkaManager.shutdown();
+  logger.info('[Worker] Kafka connections closed — exiting');
+  process.exit(0);
+};
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
+
+logger.info('[Worker] Fleet operational with full observability');
