@@ -1,9 +1,0 @@
-{
-  "name": "@apps/worker",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "tsup src/index.ts --watch",
-    "build": "tsup src/index.ts"
-  }
-}

@@ -1,0 +1,23 @@
+<div class="container">
+  <div class="header">
+    <h1>ZTAN CRYPTOGRAPHIC CONSOLE</h1>
+    <div class="status">● LOCAL_RUNTIME: ACTIVE</div>
+  </div>
+
+  <div class="top">
+    <app-input-panel 
+      (run)="run($event)" 
+      (loadVector)="loadVector()"
+      (testNegative)="testNegative($event)"
+      (determinismCheck)="determinismCheck()"
+      (mutationTest)="mutationTest()"
+      (generateScript)="generateVerifyScript()"
+      (exportSession)="exportSession()"
+      (importSession)="importSession($event)"
+      (verifyBackend)="verifyWithBackend($event)">
+    </app-input-panel>
+    <app-output-panel [output]="output" [expectedHash]="expectedHash"></app-output-panel>
+  </div>
+
+  <app-log-console [logs]="logs"></app-log-console>
+</div>

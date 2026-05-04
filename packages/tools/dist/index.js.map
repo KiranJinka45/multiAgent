@@ -1,1 +1,0 @@
-{"version":3,"sources":["../src/index.ts"],"names":["version"],"mappings":"aACO,IAAMA,CAAAA,CAAU","file":"index.js","sourcesContent":["// Entry point for @libs/tools\r\nexport const version = \"0.1.0\";\r\n\r\n\r\n"]}

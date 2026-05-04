@@ -1,1 +1,0 @@
-{"version":3,"sources":["../src/index.ts"],"names":["templates"],"mappings":"AACO,IAAMA,EAAY","file":"index.mjs","sourcesContent":["// Entry point for @libs/templates\r\nexport const templates = {};\r\n\r\n\r\n"]}

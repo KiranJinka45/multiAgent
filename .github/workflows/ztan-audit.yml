@@ -1,0 +1,43 @@
+name: ZTAN Audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  audit:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: [18, 20]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+
+      - name: Install Node Dependencies
+        run: |
+          cd packages/ztan-crypto
+          npm install
+          npm run build
+
+      - name: Run Node Audit
+        run: |
+          cd packages/ztan-crypto
+          npx tsx test/audit.ts
+
+      - name: Run Python Audit
+        run: |
+          python audit/cross_runtime_audit.py

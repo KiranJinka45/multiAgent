@@ -4,19 +4,24 @@
   "private": true,
   "scripts": {
     "build": "tsup",
-    "dev": "tsup --watch --onSuccess \"node dist/index.js\"",
-    "start": "node dist/index.js",
+    "dev": "tsx watch -r tsconfig-paths/register src/index.ts",
+    "start": "tsx -r tsconfig-paths/register src/index.ts",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@kubernetes/client-node": "^0.22.0",
-    "@libs/db": "workspace:*",
-    "@libs/memory": "workspace:*",
-    "@libs/observability": "workspace:*",
-    "@libs/shared-services": "workspace:*",
-    "@libs/supabase": "workspace:*",
-    "@libs/utils": "workspace:*",
+    "@opentelemetry/auto-instrumentations-node": "^0.43.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.216.0",
+    "@packages/auth-internal": "workspace:*",
+    "@packages/business": "workspace:*",
+    "@packages/db": "workspace:*" ,
+    "@packages/memory": "workspace:*",
+    "@packages/observability": "workspace:*",
+    "@packages/shared-services": "workspace:*",
+    "@packages/supabase": "workspace:*",
+    "@packages/utils": "workspace:*",
+    "@packages/ztan-crypto": "workspace:*",
     "@supabase/supabase-js": "^2.43.2",
     "@temporalio/client": "^1.15.0",
     "@temporalio/worker": "^1.15.0",
@@ -48,6 +53,7 @@
     "@types/express": "^5.0.0",
     "@types/node": "^20",
     "tsup": "^8.5.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "tsconfig-paths": "^4.2.0"
   }
 }
