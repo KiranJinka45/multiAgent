@@ -1,0 +1,72 @@
+name: SRE Validation Pipeline
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Start test stack
+        run: docker compose -f docker-compose.test.yml up -d
+
+      - name: Wait for health check
+        run: |
+          for i in {1..20}; do
+            curl -f http://localhost:3000/health && break || sleep 5
+          done
+
+      - name: Install k6
+        run: |
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/bin/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6
+
+      - name: Run Chaos Tests
+        run: |
+          k6 run validation/k6/latency-spike.js
+          k6 run validation/k6/data-loss.js
+
+      - name: Run Validation Runner
+        run: npx ts-node validation/run-validation.ts
+
+      - name: Upload Audit Evidence
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sre-audit-evidence
+          path: |
+            validation/results.json
+            logs/
+
+  deploy-staging:
+    needs: validate
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy
+        run: echo "Deploying to Staging Environment with Certified Governance..."

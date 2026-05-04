@@ -1,0 +1,29 @@
+{
+  "name": "@packages/sandbox",
+  "version": "1.0.0",
+  "dependencies": {
+    "@packages/observability": "workspace:*",
+    "@packages/sandbox-runtime": "workspace:*",
+    "fs-extra": "^11.3.4"
+  },
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^25.6.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    }
+  }
+}

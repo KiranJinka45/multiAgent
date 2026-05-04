@@ -1,0 +1,139 @@
+# â”€â”€ Baseline: Default Deny All Ingress â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: multiagent
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+
+---
+# ── Allow Ingress Controller to Gateway ──────────────────────────────
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress-to-gateway
+  namespace: multiagent
+spec:
+  podSelector:
+    matchLabels:
+      app: gateway
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: ingress-nginx
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/name: ingress-nginx
+---
+# ── Allow Gateway to Service Mesh (North-South) ──────────────────────
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-gateway-to-services
+  namespace: multiagent
+spec:
+  podSelector:
+    matchExpressions:
+    - {key: app, operator: In, values: [auth-service, billing-service, core-api, api]}
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: gateway
+---
+# ── Allow Service Mesh Internal Comms (East-West) ─────────────────────
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-mesh-internal
+  namespace: multiagent
+spec:
+  podSelector:
+    matchExpressions:
+    - {key: app, operator: In, values: [billing-service, worker, core-api, api]}
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: core-api # Orchestrator triggers billing/workers
+    - podSelector:
+        matchLabels:
+          app: api # Neural Link proxies to Core API
+---
+# ── Allow Service Mesh to State Layer (Redis/Postgres) ────────────────
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-mesh-to-state
+  namespace: multiagent
+spec:
+  podSelector:
+    matchExpressions:
+    - {key: app, operator: In, values: [redis, postgres, pgbouncer]}
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: auth-service
+    - podSelector:
+        matchLabels:
+          app: gateway
+    - podSelector:
+        matchLabels:
+          app: billing-service
+    - podSelector:
+        matchLabels:
+          app: core-api
+    - podSelector:
+        matchLabels:
+          app: api
+    - podSelector:
+        matchLabels:
+          app: worker
+---
+# ── SRE Hardening: Allow Observability (Telemetry Paths) ───────────────
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-prometheus-scraping
+  namespace: multiagent
+spec:
+  podSelector:
+    matchLabels:
+      telemetry: "enabled"
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: prometheus
+    ports:
+    - port: 4002 # Auth
+    - port: 4081 # Gateway
+    - port: 4001 # Core API
+    - port: 4003 # Billing
+    - port: 4000 # API Mesh
+    - port: 8082 # Worker
+---
+# ── SRE Hardening: Allow Tracing Egress ──────────────────────────────
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-tracing-egress
+  namespace: multiagent
+spec:
+  podSelector:
+    matchLabels:
+      telemetry: "enabled"
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: jaeger
+    ports:
+    - port: 4317 # OTLP gRPC endpoint
+
+

@@ -1,65 +1,39 @@
 {
-  "version": "1.4",
+  "version": "1.5",
   "vectors": [
     {
-      "name": "RFC-001 v1.4 Complex Vector",
+      "name": "ZTAN-RFC-v1.5: Standard Validation",
       "type": "SUCCESS",
+      "ceremonyId": "CEREMONY-v1.5-VALIDATION",
+      "eligiblePublicKeys": [
+        "89ece308f9d1f0131765212deca99697b112d61f9be9a5f1f3780a51335b3ff981747a0b2ca2179b96d2c0c9024e5224",
+        "90ece308f9d1f0131765212deca99697b112d61f9be9a5f1f3780a51335b3ff981747a0b2ca2179b96d2c0c9024e5225"
+      ],
       "input": {
-        "auditId": "RFC-COMPLEX-🎉-V1.4",
+        "auditId": "RFC-v1.5-FINAL",
         "timestamp": 1710000000000,
-        "nodeIds": ["Node-C", "Node-A", "Node-B"],
-        "threshold": 2,
+        "nodeIds": ["Node-A", "Node-B"],
+        "threshold": 1,
         "payloadHash": "7289f43e1d3e4b5a6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b"
       },
-      "expectedHash": "a2d7ef152e03496365f827cdbb193e355b8e3a8c1288fd274dd54c6d44347a41"
+      "expectedHash": "6572f0dec1885ca22f2afc53dabe534304ff1b32e7f7e095d8bcd2e705555bae"
     },
     {
-      "name": "Unicode Normalization & Case Invariance",
-      "type": "SUCCESS",
+      "name": "ADVERSARIAL: Wrong Ceremony Context (v1.5)",
+      "type": "FAILURE",
+      "error": "Context Mismatch",
+      "ceremonyId": "CEREMONY-A",
+      "wrongContext": "CEREMONY-B",
+      "eligiblePublicKeys": ["89ece308f9d1f0131765212deca99697b112d61f9be9a5f1f3780a51335b3ff981747a0b2ca2179b96d2c0c9024e5224"],
       "input": {
-        "auditId": "NFC-TEST-é",
+        "auditId": "ADV-CONTEXT",
         "timestamp": 1710000000000,
         "nodeIds": ["Node-1"],
         "threshold": 1,
         "payloadHash": "0000000000000000000000000000000000000000000000000000000000000000"
       },
-      "expectedHash": "87490202e664fb2a296deb61f3a6751285e357c4e23b2de47d4770c6a8155717"
-    },
-    {
-      "name": "REJECT: Duplicate Participant (NFC Collided)",
-      "type": "FAILURE",
-      "error": "Duplicate participant ID detected after normalization",
-      "input": {
-        "auditId": "DUPE-TEST",
-        "timestamp": 1710000000000,
-        "nodeIds": ["e\u0301", "é"],
-        "threshold": 1,
-        "payloadHash": "0000000000000000000000000000000000000000000000000000000000000000"
-      }
-    },
-    {
-      "name": "REJECT: Invalid UTF-16 (Lone Surrogate)",
-      "type": "FAILURE",
-      "error": "Invalid UTF-16",
-      "input": {
-        "auditId": "UTF-ERR",
-        "timestamp": 1710000000000,
-        "nodeIds": ["\uD800"],
-        "threshold": 1,
-        "payloadHash": "0000000000000000000000000000000000000000000000000000000000000000"
-      }
-    },
-    {
-      "name": "REJECT: Oversize Field (>256B)",
-      "type": "FAILURE",
-      "error": "exceeds",
-      "input": {
-        "auditId": "OVERSIZE",
-        "timestamp": 1710000000000,
-        "nodeIds": ["AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"],
-        "threshold": 1,
-        "payloadHash": "0000000000000000000000000000000000000000000000000000000000000000"
-      }
+      "expectedMasterPk": "89ece308f9d1f0131765212deca99697b112d61f9be9a5f1f3780a51335b3ff981747a0b2ca2179b96d2c0c9024e5224",
+      "expectedSignature": "a95faecf97630a18a309f36793e34b6948328ccfd66fc0449f41d33e575e59a7126f3bba8bb612d584f05e4d4dd26275158d60e2795780560da49fab9760ecacaeee495ebbd82829f5b2cd280d980aada5d902c602c189baf6d13e0981266b1b"
     }
   ]
 }

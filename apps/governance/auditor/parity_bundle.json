@@ -1,0 +1,39 @@
+{
+  "version": "1.7.0",
+  "input": {
+    "raw": "{\"version\":\"ZTAN_CANONICAL_V1\",\"auditId\":\"PARITY-TEST-🎉\",\"timestamp\":1710000000000,\"nodeIds\":[\"Node-A\",\"Node-B\",\"Node-C\"],\"threshold\":2,\"payloadHash\":\"7272727272727272727272727272727272727272727272727272727272727272\"}",
+    "fingerprint": "2111baebf7e9d75261b04f2f762bff3b192ce211a1e28560965022b88e9965e8"
+  },
+  "reproducibility": {
+    "spec": "ZTAN-RFC-001 v1.4"
+  },
+  "integrity": {
+    "canonicalHash": "36ee5e6f5cac63f5d5398a6745f8632412f94c571a1e86b705653c661923f03a",
+    "finalAnchor": "anchor"
+  },
+  "output": {
+    "hash": "36ee5e6f5cac63f5d5398a6745f8632412f94c571a1e86b705653c661923f03a",
+    "tss": {
+      "masterPublicKey": "a1962a599072531b7f2a2b566a0a5094367cd764bd964c0fb891efde55c3b5e89a006fc3b159cf151fa8fa4f85e1fa67",
+      "aggregatedSignature": "ac1e1f678431179144ad40cd8dbb43548bae0935baef3dd38823c72287bf37dfd7990612e5811489194dc1eeff9c40fc02e086e360caf2101ca49a601ab916f006e22cdbe03203d6528033452fbf9e3d31ffdf9627707526fc7ac55f77b410e1",
+      "currentSigners": [
+        "Node-A",
+        "Node-B"
+      ],
+      "shares": [
+        {
+          "nodeId": "Node-A",
+          "verificationKey": "910e700c359478adba985bbe130bad884d3b37b48d630293900c9ab8087392eb450831e0ccb03fed1c8ea409d33ec20c"
+        },
+        {
+          "nodeId": "Node-B",
+          "verificationKey": "b220767ee061c576ced8960b5024bdd8975557d2f50f7f813110600932cab3aee4663df0c34207a5ce1516e884b6ab5d"
+        },
+        {
+          "nodeId": "Node-C",
+          "verificationKey": "a6e620bac7792d59f2c0ab7b63060bc27c8a477d4ad80dfce468f9c49b6594b9f19b5566f9c38f7fc4f2df385bbe9c9e"
+        }
+      ]
+    }
+  }
+}

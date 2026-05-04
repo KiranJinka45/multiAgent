@@ -1,0 +1,108 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: gateway
+  namespace: multiagent
+  labels:
+    app: gateway
+  annotations:
+    v1.0.0-final: "true"
+spec:
+  replicas: 2
+  strategy:
+    canary:
+      maxUnavailable: 0
+      maxSurge: 1
+      steps:
+      - setWeight: 10
+      - pause: {duration: 2m}
+      - setWeight: 25
+      - pause: {duration: 5m}
+      - setWeight: 50
+      - pause: {duration: 5m}
+      analysis:
+        templates:
+        - templateName: success-rate
+        args:
+        - name: app-name
+          value: gateway
+  selector:
+    matchLabels:
+      app: gateway
+  template:
+    metadata:
+      labels:
+        app: gateway
+        telemetry: "enabled"
+    spec:
+      enableServiceLinks: false
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: "kubernetes.io/hostname"
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app: gateway
+      - maxSkew: 1
+        topologyKey: "topology.kubernetes.io/zone"
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app: gateway
+      containers:
+      - name: gateway
+        image: ghcr.io/kiran/multiagent-gateway:v1.1.0
+
+
+        imagePullPolicy: IfNotPresent
+        command: ["node", "dist/index.js"]
+        # SRE Hardening: Transition from static env-vars to Secret references
+        envFrom:
+        - secretRef:
+            name: multiagent-gateway-secrets
+        ports:
+        - containerPort: 4081
+        resources:
+          requests:
+            cpu: "150m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        # ── Scaling Shock Absorption Capstone ──────────────────────────────
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 4081
+          failureThreshold: 30
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 4081
+          initialDelaySeconds: 10
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 4081
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh", "-c", "sleep 15"] # Graceful drainage
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway
+  namespace: multiagent
+spec:
+  ports:
+  - port: 4081
+    targetPort: 4081
+    protocol: TCP
+  selector:
+    app: gateway
+

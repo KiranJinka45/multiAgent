@@ -1,0 +1,102 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "composite": true,
+    "skipLibCheck": true,
+    "noEmit": false,
+    "declaration": true,
+    "baseUrl": ".",
+    "paths": {
+      "@packages/auth-internal": [
+        "../../packages/auth-internal/src"
+      ],
+      "@packages/config": [
+        "../../packages/config/src"
+      ],
+      "@packages/db": [
+        "../../packages/db/src"
+      ],
+      "@packages/memory": [
+        "../../packages/memory/src"
+      ],
+      "@packages/observability": [
+        "../../packages/observability/src"
+      ],
+      "@packages/queue": [
+        "../../packages/queue/src"
+      ],
+      "@packages/resilience": [
+        "../../packages/resilience/src"
+      ],
+      "@packages/shared-services": [
+        "../../packages/shared-services/src"
+      ],
+      "@packages/supabase": [
+        "../../packages/supabase/src"
+      ],
+      "@packages/utils": [
+        "../../packages/utils/src"
+      ],
+      "@packages/contracts": [
+        "../../packages/contracts/src"
+      ],
+      "@packages/agents": [
+        "../../packages/agents/src"
+      ],
+      "@packages/events": [
+        "../../packages/events/src"
+      ],
+      "@packages/billing": [
+        "../../packages/billing/src"
+      ]
+    }
+  },
+  "include": [
+    "src"
+  ],
+  "references": [
+    {
+      "path": "../../packages/auth-internal"
+    },
+    {
+      "path": "../../packages/config"
+    },
+    {
+      "path": "../../packages/db"
+    },
+    {
+      "path": "../../packages/memory"
+    },
+    {
+      "path": "../../packages/observability"
+    },
+    {
+      "path": "../../packages/queue"
+    },
+    {
+      "path": "../../packages/resilience"
+    },
+    {
+      "path": "../../packages/shared-services"
+    },
+    {
+      "path": "../../packages/supabase"
+    },
+    {
+      "path": "../../packages/utils"
+    },
+    {
+      "path": "../../packages/contracts"
+    },
+    {
+      "path": "../../packages/agents"
+    },
+    {
+      "path": "../../packages/events"
+    },
+    {
+      "path": "../../packages/billing"
+    }
+  ]
+}

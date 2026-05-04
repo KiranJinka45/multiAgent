@@ -1,0 +1,46 @@
+# values.yaml
+replicaCount: 2
+
+image:
+  repository: multiagent/sre-engine
+  tag: "v1.5.0-elite"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 3000
+
+resources:
+  requests:
+    cpu: "250m"
+    memory: "256Mi"
+  limits:
+    cpu: "1000m"
+    memory: "1Gi"
+
+env:
+  SHADOW_MODE: "true" # Start in Shadow Mode for safety
+  SLO_TARGET: "0.999"
+  REDIS_URL: "redis://redis-master:6379"
+  KAFKA_BROKERS: "kafka-controller:9092"
+
+# Security Context for Elite Governance
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+
+# Probes for stability
+readinessProbe:
+  httpGet:
+    path: /healthz
+    port: 3000
+  initialDelaySeconds: 15
+  periodSeconds: 10
+
+livenessProbe:
+  httpGet:
+    path: /livez
+    port: 3000
+  initialDelaySeconds: 30
+  periodSeconds: 20

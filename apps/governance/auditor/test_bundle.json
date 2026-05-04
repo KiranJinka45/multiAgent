@@ -1,0 +1,42 @@
+{
+  "version": "1.7.0",
+  "input": {
+    "raw": "{\"version\": \"ZTAN_CANONICAL_V1\", \"auditId\": \"RFC-COMPLEX-🎉-V1.4\", \"timestamp\": 1710000000000, \"nodeIds\": [\"Node-C\", \"Node-A\", \"Node-B\"], \"threshold\": 2, \"payloadHash\": \"7289f43e1d3e4b5a6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b\"}",
+    "fingerprint": "f722f6ddf0d1cc41d4edf70eb135b9fe4874ad52272182372f7640239ac4ded0"
+  },
+  "reproducibility": {
+    "spec": "ZTAN-RFC-001 v1.4"
+  },
+  "integrity": {
+    "canonicalHash": "6548a80d50df52485303eb2f59239e944747c38520268579d49f059e09d17fba",
+    "finalAnchor": "s3://ztan-audit-vault/RFC-COMPLEX-V1.4.json"
+  },
+  "output": {
+    "hash": "6548a80d50df52485303eb2f59239e944747c38520268579d49f059e09d17fba",
+    "tss": {
+      "masterPublicKey": "f91295245cc8e1da",
+      "aggregatedSignature": "b28509040846152a",
+      "currentSigners": [
+        "Node-A",
+        "Node-B"
+      ],
+      "shares": [
+        {
+          "nodeId": "Node-A",
+          "verificationKey": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "nodeId": "Node-B",
+          "verificationKey": "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+        },
+        {
+          "nodeId": "Node-C",
+          "verificationKey": "222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222"
+        }
+      ]
+    }
+  },
+  "consensus": {
+    "signatures": []
+  }
+}

@@ -26,6 +26,9 @@ import debugRouter from '../controllers/debug-controller';
 import whoamiRouter from '../routes/whoami';
 import { sreEngine } from './sre-engine';
 import { buildCanonicalPayload, hashPayload } from '@packages/ztan-crypto';
+import ztanRouter from '../routes/ztan';
+import { TssCeremonyService } from './tss-ceremony.service';
+import { IdentityService } from './identity.service';
 
 // ZTAN Replay Tracking (Option B: Audit-Flag)
 const replayCache = new Set<string>();
@@ -36,10 +39,12 @@ app.use(cors());
 export const registerRoutes = (app: any) => {
   app.use('/debug', debugRouter);
   app.use('/api', whoamiRouter);
+  app.use('/api/v1/ztan', ztanRouter);
 };
 
 // Debug/Chaos Endpoints
 app.use('/debug', debugRouter);
+app.use('/api/v1/ztan', ztanRouter);
 
 // Health Check (Deep) - MUST come before global auth
 app.get('/api/v1/system-health', async (req, res) => {
@@ -268,7 +273,7 @@ async function bootstrap() {
         console.warn('⚠️ [CoreAPI] SecretProvider.bootstrap is not a function. Skipping...');
     }
 
-    const PORT = process.env.CORE_API_PORT || env.CORE_ENGINE_PORT || 3010;
+    const PORT = process.env.PORT || process.env.CORE_API_PORT || env.CORE_ENGINE_PORT || 3010;
     const YJS_PORT = 3011;
 
     const server = createServer(app);
@@ -293,6 +298,19 @@ async function bootstrap() {
         logger.info('[Bootstrap] USE_REAL_SIGNALS=false — Starting Telemetry Simulator (development mode)');
         telemetrySimulator.start();
     }
+
+    // ZTAN Identity: Seed default nodes and ensure registry is ready
+    await IdentityService.bootstrap();
+
+    // ZTAN MPC: Resume/Recover ceremonies on startup
+    TssCeremonyService.bootstrap();
+
+    // ZTAN MPC Hardening: Start Ceremony Timeout Watchdog
+    setInterval(() => {
+        TssCeremonyService.checkTimeouts().catch(err => {
+            logger.error({ err: err.message }, '[TSS] Timeout Watchdog Failed');
+        });
+    }, 15000); // Check every 15 seconds
 }
 
 bootstrap().catch(err => {

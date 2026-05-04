@@ -1,0 +1,42 @@
+groups:
+- name: multiagent_alerts
+  rules:
+  - alert: HighGatewayErrorRate
+    expr: |
+      sum(rate(gateway_request_duration_seconds_count{status_code!~"2.."}[5m])) 
+      / 
+      sum(rate(gateway_request_duration_seconds_count[5m])) > 0.05
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High error rate on gateway ({{ $value | humanizePercentage }})"
+      description: "Gateway error rate is above 5% for more than 5 minutes."
+
+  - alert: High99thLatency
+    expr: |
+      histogram_quantile(0.99, sum by (le) (rate(gateway_request_duration_seconds_bucket[5m]))) > 1
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High P99 latency ({{ $value }}s)"
+      description: "P99 latency has been over 1s for 5 minutes."
+
+  - alert: CircuitBreakerOpen
+    expr: gateway_circuit_breaker_state == 1
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Circuit Breaker OPEN for {{ $labels.target_service }}"
+      description: "The circuit breaker for {{ $labels.target_service }} has been open for more than 1 minute, indicating persistent downstream failure."
+
+  - alert: ExcessiveRetries
+    expr: sum(rate(gateway_runtime_active_total[5m])) > 1000
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High runtime activity detected"
+      description: "Rate of runtime operations suggests heavy load or retry loops."

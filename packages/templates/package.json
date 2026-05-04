@@ -1,0 +1,34 @@
+{
+  "name": "@packages/templates",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts --watch"
+  },
+  "dependencies": {
+    "fs-extra": "^11.2.0",
+    "path-to-regexp": "^6.2.2",
+    "@packages/contracts": "workspace:*",
+    "@packages/observability": "workspace:*",
+    "@packages/core-engine": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "tsup": "^8.0.0"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    },
+    "./engine": {
+      "require": "./dist/engine.js",
+      "import": "./dist/engine.mjs"
+    }
+  }
+}

@@ -1,0 +1,267 @@
+{
+  "annotations": { "list": [] },
+  "description": "MultiAgent SRE Dashboard — SLO enforcement, idempotency health, and worker fleet observability",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "title": "🟢 System Health",
+      "type": "row",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "collapsed": false
+    },
+    {
+      "title": "Job Success Rate (%)",
+      "description": "SLO Target: 99.9%",
+      "type": "gauge",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "orange", "value": 95 },
+              { "color": "green", "value": 99 }
+            ]
+          },
+          "min": 0,
+          "max": 100,
+          "unit": "percent"
+        }
+      },
+      "targets": [
+        {
+          "expr": "100 * (1 - (sum(rate(worker_job_total{status=\"failed\"}[5m])) / sum(rate(worker_job_total[5m]))))",
+          "legendFormat": "Success Rate"
+        }
+      ]
+    },
+    {
+      "title": "Job Throughput (jobs/sec)",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 9, "x": 6, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "drawStyle": "line", "fillOpacity": 20, "gradientMode": "scheme" },
+          "color": { "mode": "palette-classic" }
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(worker_job_total{status=\"success\"}[5m]))",
+          "legendFormat": "Success/sec"
+        },
+        {
+          "expr": "sum(rate(worker_job_total{status=\"failed\"}[5m]))",
+          "legendFormat": "Failed/sec"
+        }
+      ]
+    },
+    {
+      "title": "Retry Rate (retries/sec)",
+      "description": "SLO: Retries < 20% of total jobs",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 9, "x": 15, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "drawStyle": "bars", "fillOpacity": 40 },
+          "color": { "fixedColor": "orange", "mode": "fixed" }
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(worker_job_retries_total[5m]))",
+          "legendFormat": "Retries/sec"
+        }
+      ]
+    },
+    {
+      "title": "📊 Latency",
+      "type": "row",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 7 },
+      "collapsed": false
+    },
+    {
+      "title": "Job Latency Percentiles",
+      "description": "SLO Target: P95 < 120s",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "drawStyle": "line", "fillOpacity": 10 },
+          "unit": "s"
+        }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, sum(rate(worker_job_duration_seconds_bucket[5m])) by (le))",
+          "legendFormat": "P50"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(worker_job_duration_seconds_bucket[5m])) by (le))",
+          "legendFormat": "P95"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(worker_job_duration_seconds_bucket[5m])) by (le))",
+          "legendFormat": "P99"
+        }
+      ]
+    },
+    {
+      "title": "Queue Depth",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "drawStyle": "line", "fillOpacity": 30, "gradientMode": "scheme" },
+          "color": { "fixedColor": "purple", "mode": "fixed" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 500 },
+              { "color": "red", "value": 1000 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(worker_queue_depth) by (queue_name)",
+          "legendFormat": "{{ queue_name }}"
+        }
+      ]
+    },
+    {
+      "title": "🔒 Idempotency Health",
+      "type": "row",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 16 },
+      "collapsed": false
+    },
+    {
+      "title": "Idempotency Collisions (per sec)",
+      "description": "SLO: Collisions < 5% of total jobs. This is the USP metric — most systems don't track this.",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 17 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "drawStyle": "bars", "fillOpacity": 60, "gradientMode": "scheme" },
+          "color": { "fixedColor": "yellow", "mode": "fixed" }
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(worker_idempotency_collisions_total[5m])) by (action)",
+          "legendFormat": "{{ action }}"
+        }
+      ]
+    },
+    {
+      "title": "Stale Lock Recoveries (per sec)",
+      "description": "SLO: < 1% — indicates dead worker cleanup",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 17 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "drawStyle": "bars", "fillOpacity": 40 },
+          "color": { "fixedColor": "red", "mode": "fixed" }
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(worker_stale_lock_recoveries_total[5m]))",
+          "legendFormat": "Recoveries/sec"
+        }
+      ]
+    },
+    {
+      "title": "⚙️ Worker Fleet",
+      "type": "row",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 25 },
+      "collapsed": false
+    },
+    {
+      "title": "Active Workers",
+      "type": "stat",
+      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 26 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "green", "value": 1 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(worker_active_workers)",
+          "legendFormat": "Active Workers"
+        }
+      ]
+    },
+    {
+      "title": "Worker Memory Usage",
+      "type": "timeseries",
+      "gridPos": { "h": 5, "w": 9, "x": 6, "y": 26 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "custom": { "drawStyle": "line", "fillOpacity": 15 }
+        }
+      },
+      "targets": [
+        {
+          "expr": "worker_process_resident_memory_bytes",
+          "legendFormat": "RSS"
+        }
+      ]
+    },
+    {
+      "title": "Circuit Breaker State",
+      "type": "stat",
+      "gridPos": { "h": 5, "w": 9, "x": 15, "y": 26 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "options": { "0": { "text": "CLOSED ✅", "color": "green" } }, "type": "value" },
+            { "options": { "1": { "text": "OPEN 🔴", "color": "red" } }, "type": "value" },
+            { "options": { "2": { "text": "HALF-OPEN 🟡", "color": "yellow" } }, "type": "value" }
+          ]
+        }
+      },
+      "targets": [
+        {
+          "expr": "worker_circuit_breaker_state",
+          "legendFormat": "Circuit Breaker"
+        }
+      ]
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "style": "dark",
+  "tags": ["multiagent", "sre", "production"],
+  "templating": { "list": [] },
+  "time": { "from": "now-1h", "to": "now" },
+  "title": "MultiAgent SRE Dashboard",
+  "uid": "multiagent-sre-v1",
+  "version": 1
+}

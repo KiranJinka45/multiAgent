@@ -1,0 +1,42 @@
+groups:
+  - name: multiagent_alerts
+    rules:
+      # 1. Availability: Any critical service is unreachable
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service {{ $labels.instance }} down"
+          description: "Microservice {{ $labels.job }} ({{ $labels.instance }}) has been unreachable for more than 1 minute."
+
+      # 2. Reliability: High error rate (5xx responses)
+      - alert: HighErrorRate
+        expr: rate(http_request_duration_seconds_count{status_code=~"5.."}[5m]) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate on {{ $labels.job }}"
+          description: "Service {{ $labels.job }} is returning >5% errors over a 5-minute rolling window."
+
+      # 3. Performance: P95 Latency > 2s
+      - alert: CriticalLatency
+        expr: histogram_quantile(0.95, sum by (le, job) (rate(http_request_duration_seconds_bucket[5m]))) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Latency spike on {{ $labels.job }}"
+          description: "95th percentile latency for {{ $labels.job }} is above 2 seconds."
+
+      # 4. Infrastructure: Redis connectivity loss
+      - alert: RedisConnectionLost
+        expr: multiagent_redis_connected_clients == 0
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Redis down in cluster"
+          description: "The shared Redis event bus has lost all client connections."

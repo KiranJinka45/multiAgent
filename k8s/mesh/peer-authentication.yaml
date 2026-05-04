@@ -1,0 +1,16 @@
+# ── Enterprise SRE: Zero-Trust Identity mTLS ───────────
+# Enforces STRICT mutual TLS across the entire default namespace using Istio.
+# This ensures that all pod-to-pod communication is encrypted and mutually authenticated
+# based on SPIFFE cryptographic identities.
+
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: default
+  namespace: multiagent
+spec:
+  mtls:
+    # STRICT mode drops any plaintext traffic attempting to reach a workload.
+    # Traffic must originate from another Istio sidecar or the Ingress Gateway.
+    mode: STRICT
+

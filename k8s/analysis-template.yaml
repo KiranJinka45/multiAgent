@@ -1,0 +1,32 @@
+# ── Enterprise SRE: Automated Canary Analysis ────────────────────────────
+# This template defines the "Success Gate" for progressive delivery.
+# If the success rate drops below 99% during a rollout, Argo will 
+# automatically abort and rollback to the last stable version.
+
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: success-rate
+spec:
+  metrics:
+  - name: success-rate
+    interval: 30s
+    successCondition: result[0] >= 0.99
+    failureLimit: 2
+    provider:
+      prometheus:
+        address: http://prometheus-operated.monitoring.svc.cluster.local:9090
+        query: |
+          sum(irate(http_requests_total{app="{{args.app-name}}", status!~"5.*"}[1m])) 
+          / 
+          sum(irate(http_requests_total{app="{{args.app-name}}"}[1m]))
+
+  - name: p95-latency
+    interval: 60s
+    successCondition: result[0] <= 0.500
+    failureLimit: 3
+    provider:
+      prometheus:
+        address: http://prometheus-operated.monitoring.svc.cluster.local:9090
+        query: |
+          histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{app="{{args.app-name}}"}[1m])) by (le))

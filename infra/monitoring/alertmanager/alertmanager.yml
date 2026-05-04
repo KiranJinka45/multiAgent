@@ -1,0 +1,25 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  group_by: ['alertname', 'severity']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 3h
+  receiver: 'slack-notifications'
+
+receivers:
+  - name: 'slack-notifications'
+    slack_configs:
+      - api_url: 'https://hooks.slack.com/services/YOUR/WEBHOOK/HERE'
+        channel: '#ops-alerts'
+        title: '{{ .CommonLabels.alertname }} - {{ .CommonLabels.severity }}'
+        text: '{{ .CommonAnnotations.summary }}\n{{ .CommonAnnotations.description }}'
+
+  - name: 'email-notifications'
+    email_configs:
+      - to: 'admin@example.com'
+        from: 'monitoring@multiagent-ops.com'
+        smarthost: 'smtp.example.com:587'
+        auth_username: 'smtp_user'
+        auth_password: 'smtp_password'

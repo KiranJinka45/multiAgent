@@ -1,0 +1,33 @@
+name: Deploy to Kubernetes
+
+on:
+  workflow_run:
+    workflows: ["Build & Push"]
+    types:
+      - completed
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
+
+      - name: Setup Kubeconfig
+        run: |
+          echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
+          export KUBECONFIG=$PWD/kubeconfig.yaml
+
+      - name: Deploy via Helm
+        run: |
+          helm upgrade --install multiagent ./helm/multiagent \
+          --namespace multiagent \
+          --set gateway.image.tag=${{ github.sha }} \
+          --set coreApi.image.tag=${{ github.sha }} \
+          --wait \
+          --timeout 10m

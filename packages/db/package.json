@@ -1,0 +1,33 @@
+{
+  "name": "@packages/db",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src/generated/client",
+    "prisma"
+  ],
+  "scripts": {
+    "build": "tsup && tsc --emitDeclarationOnly --declaration && tsx ../../scripts/copy-prisma-client.ts",
+    "dev": "tsup --watch"
+  },
+  "dependencies": {
+    "@packages/config": "workspace:*",
+    "@packages/observability": "workspace:*",
+    "@prisma/client": "^5.22.0"
+  },
+  "devDependencies": {
+    "prisma": "^5.22.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.4.5"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.js"
+    }
+  }
+}

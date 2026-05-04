@@ -1,0 +1,47 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: worker-scaler
+  namespace: multiagent
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: worker
+  minReplicaCount: 2
+  maxReplicaCount: 20 # Increased for Tier-1 scale
+  triggers:
+    - type: redis
+      metadata:
+        # AWS Tip: Use the ElastiCache primary endpoint provided via Secret or ConfigMap
+        hostFromEnv: REDIS_HOST
+        port: "6379"
+        listName: "bull:build_queue:wait"
+        listLength: "5"
+    - type: redis
+      metadata:
+        hostFromEnv: REDIS_HOST
+        port: "6379"
+        listName: "bull:deploy_queue:wait"
+        listLength: "5"
+---
+# Trigger scaling based on CPU as a secondary signal
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: gateway-hpa
+  namespace: multiagent
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: gateway
+  minReplicas: 3
+  maxReplicas: 15
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70

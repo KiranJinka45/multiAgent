@@ -1,0 +1,11 @@
+{
+  "active": "v1",
+  "history": {
+    "v1": {
+      "weights": {},
+      "avgReward": -5,
+      "incidents": 1,
+      "createdAt": 1777460490930
+    }
+  }
+}

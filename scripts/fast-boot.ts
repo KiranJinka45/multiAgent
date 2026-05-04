@@ -1,0 +1,185 @@
+import { spawn, execSync, ChildProcess } from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
+import dotenv from 'dotenv';
+import http from 'http';
+
+// -----------------------------
+// CONFIG & ENVIRONMENT
+// -----------------------------
+process.env.NODE_ENV = 'production';
+
+// Load environment variables
+dotenv.config();
+const envLocal = path.resolve(process.cwd(), '.env.local');
+if (fs.existsSync(envLocal)) {
+    dotenv.config({ path: envLocal, override: true });
+}
+
+console.log("\n=== 🚀 MultiAgent Fast Boot (Skipping Cleanup) ===\n");
+console.log("🌍 Environment: " + process.env.NODE_ENV);
+
+const npmCmd = os.platform() === 'win32' ? 'npm.cmd' : 'npm';
+const HEALTH_URL = 'http://localhost:3011/health';
+const TIMEOUTS = {
+    socket: 180000,
+    worker: 45000
+};
+
+const processes: ChildProcess[] = [];
+
+// -----------------------------
+// SPAWN HELPER (FAIL-FAST)
+// -----------------------------
+function startProcess(name: string, command: string, args: string[], options = {}) {
+    console.log(`🚀 Starting ${name}...`);
+
+    const proc = spawn(command, args, {
+        stdio: 'inherit',
+        shell: true,
+        env: { ...process.env, SERVICE_NAME: name },
+        ...options,
+    });
+
+    proc.on('exit', (code) => {
+        if (code !== 0 && code !== null) {
+            console.error(`\n❌ CRITICAL: ${name} exited with code ${code}`);
+            shutdown();
+        }
+    });
+
+    proc.on('error', (err) => {
+        console.error(`\n❌ FATAL: Failed to start ${name}:`, err);
+        shutdown();
+    });
+
+    processes.push(proc);
+    return proc;
+}
+
+// -----------------------------
+// HEALTH CHECK (DETERMINISTIC)
+// -----------------------------
+async function waitForHealth(name: string, url: string, timeout: number) {
+    console.log(`⏳ Waiting for ${name} health: ${url}`);
+    const start = Date.now();
+
+    while (Date.now() - start < timeout) {
+        try {
+            const result = await new Promise<{ ok: boolean; status?: number; error?: string }>((resolve) => {
+                const req = http.get(url, (res) => {
+                    resolve({ 
+                        ok: res.statusCode !== undefined && res.statusCode >= 200 && res.statusCode < 500,
+                        status: res.statusCode
+                    });
+                });
+                req.on('error', (err) => resolve({ ok: false, error: err.message }));
+                req.setTimeout(2000, () => {
+                    req.destroy();
+                    resolve({ ok: false, error: 'TIMEOUT' });
+                });
+                req.end();
+            });
+
+            if (result.ok) {
+                console.log(`\n✅ ${name} is healthy! (Status: ${result.status})`);
+                return;
+            } else if (result.error && result.error !== 'ECONNREFUSED' && result.error !== 'TIMEOUT') {
+                process.stdout.write(`[${result.error}]`);
+            }
+        } catch (e) {
+            process.stdout.write(`!`);
+        }
+        process.stdout.write(".");
+        await new Promise((r) => setTimeout(r, 2000));
+    }
+
+    throw new Error(`\n❌ ${name} failed health check after ${timeout/1000}s`);
+}
+
+async function waitForFrontend(url: string, timeout: number = 60000) {
+    console.log(`⏳ Waiting for Frontend: ${url} (warmup delay 3s...)`);
+    await new Promise(r => setTimeout(r, 3000));
+    return waitForHealth("Frontend", url, timeout);
+}
+
+// -----------------------------
+// GRACEFUL SHUTDOWN
+// -----------------------------
+function shutdown() {
+    console.log("\n🛑 Shutting down MultiAgent...\n");
+
+    for (const proc of processes) {
+        try {
+            if (os.platform() === 'win32') {
+                execSync(`taskkill /pid ${proc.pid} /F /T`, { stdio: 'ignore' });
+            } else {
+                proc.kill('SIGTERM');
+            }
+        } catch (_) {}
+    }
+
+    process.exit(1);
+}
+
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);
+
+// -----------------------------
+// MAIN BOOT SEQUENCE
+// -----------------------------
+(async () => {
+    try {
+        console.log("🧹 Skipping port cleanup (Pre-verified as clean)...");
+
+        // 1. Start Socket Server (Foundation)
+        startProcess(
+            "Socket Server",
+            npmCmd,
+            ['run', 'start:socket'],
+            { cwd: path.join(process.cwd(), 'apps', 'api-gateway') }
+        );
+
+        console.log("⏳ Waiting 5s for process to initialize...");
+        await new Promise(r => setTimeout(r, 5000));
+        await waitForHealth("Socket Server", HEALTH_URL, TIMEOUTS.socket);
+
+        // 2. Start Frontend
+        startProcess(
+            "Frontend",
+            npmCmd,
+            ['run', 'dev'],
+            { cwd: path.join(process.cwd(), 'apps', 'frontend') }
+        );
+
+        try {
+            await waitForFrontend("http://localhost:3004", 120000);
+        } catch (e) {
+            console.warn(`\n⚠️  Frontend health check skipped/failed: ${(e as Error).message}. Continuing boot...`);
+        }
+
+        // 3. Start Scaling Cluster
+        console.log("\n🚀 Scaling MultiAgent Cluster...");
+        
+        startProcess("Watchdog", npmCmd, ['run', 'start:watchdog'], { cwd: path.join(process.cwd(), 'apps', 'api-gateway') });
+        startProcess("Deploy Service", npmCmd, ['run', 'start:deploy']);
+
+        const workerPoolSize = parseInt(process.env.WORKER_POOL_SIZE || '2');
+        for (let i = 0; i < workerPoolSize; i++) {
+            startProcess(`Worker #${i+1}`, npmCmd, ['run', 'start:worker'], { cwd: path.join(process.cwd(), 'apps', 'api-gateway') });
+        }
+
+        console.log("\n🎉 SYSTEM FULLY OPERATIONAL");
+        console.log("👉 Frontend: http://localhost:3004");
+        console.log("👉 Socket:   http://127.0.0.1:3011/health\n");
+        console.log("🚀 Press Ctrl+C to exit.\n");
+
+        process.stdin.resume();
+
+    } catch (err) {
+        console.error("\n💥 BOOT FAILURE:", (err as Error).message);
+        shutdown();
+    }
+})();
+

@@ -1,0 +1,74 @@
+# ── Auth Service Pod Disruption Budget ──────────────────────────────────────
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: auth-service-pdb
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: auth-service
+---
+# ── Gateway Pod Disruption Budget ─────────────────────────────────────────
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: gateway-pdb
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: gateway
+---
+# ── Redis Pod Disruption Budget ───────────────────────────────────────────
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: redis-pdb
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: redis
+---
+# ── Core Services Parity: Pod Disruption Budgets ────────────────────────────
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: core-api-pdb
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: core-api
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: billing-service-pdb
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: billing-service
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: worker-pdb
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: worker
+---
+# ── Frontend Edge Boundary: Pod Disruption Budget ──────────────────────────
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: frontend-pdb
+spec:
+  minAvailable: 2 # Guarantee at least 2 UI replicas during maintenance
+  selector:
+    matchLabels:
+      app: frontend

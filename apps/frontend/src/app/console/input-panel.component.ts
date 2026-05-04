@@ -24,6 +24,15 @@ import { FormsModule } from '@angular/forms';
         <button (click)="onLoadVector()">Load RFC v1.4 Vector</button>
       </div>
 
+      <div class="section-label">Ceremony Mode</div>
+      <div class="toggle-row">
+        <label class="switch">
+          <input type="checkbox" [(ngModel)]="tssEnabled" (change)="tssToggle.emit(tssEnabled)">
+          <span class="slider"></span>
+        </label>
+        <span class="toggle-label">Enable Threshold Signing (BLS)</span>
+      </div>
+
       <div class="section-label">Audit Safety Triggers</div>
       <div class="actions grid">
         <button class="danger" (click)="onTestNegative('INVALID_UTF8')">Invalid UTF-8</button>
@@ -37,7 +46,9 @@ import { FormsModule } from '@angular/forms';
         <button (click)="onMutationTest()">Mutation (Avalanche) Test</button>
         <button (click)="onGenerateScript()">Generate Verify Script</button>
         <button (click)="onExportSession()">Export Session Bundle</button>
+        <button (click)="onExportProof()">Export Proof Bundle</button>
         <button (click)="onVerifyBackend()">Verify with Backend</button>
+        <button (click)="onRunTss()">Run TSS Ceremony</button>
       </div>
     </div>
   `,
@@ -86,6 +97,15 @@ import { FormsModule } from '@angular/forms';
     button.danger { border-color: #600; color: #f66; }
     button.danger:hover { background: #f66; color: #000; }
     .small-btn { font-size: 10px; padding: 2px 6px; border-color: #444; color: #888; flex-grow: 0; }
+    
+    .toggle-row { display: flex; align-items: center; gap: 10px; margin: 5px 0; }
+    .toggle-label { font-size: 11px; color: #aaa; }
+    .switch { position: relative; display: inline-block; width: 30px; height: 16px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 16px; }
+    .slider:before { position: absolute; content: ""; height: 10px; width: 10px; left: 3px; bottom: 3px; background-color: #555; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: #0f0; }
+    input:checked + .slider:before { transform: translateX(14px); background-color: #000; }
   `]
 })
 export class InputPanelComponent {
@@ -104,8 +124,13 @@ export class InputPanelComponent {
   @Output() mutationTest = new EventEmitter<void>();
   @Output() generateScript = new EventEmitter<void>();
   @Output() exportSession = new EventEmitter<void>();
+  @Output() exportProof = new EventEmitter<void>();
   @Output() importSession = new EventEmitter<any>();
   @Output() verifyBackend = new EventEmitter<any>();
+  @Output() runTss = new EventEmitter<void>();
+  @Output() tssToggle = new EventEmitter<boolean>();
+
+  tssEnabled = false;
 
   onRun() {
     try {
@@ -140,6 +165,10 @@ export class InputPanelComponent {
     this.exportSession.emit();
   }
 
+  onExportProof() {
+    this.exportProof.emit();
+  }
+
   onVerifyBackend() {
     try {
       const parsed = JSON.parse(this.inputJson);
@@ -147,6 +176,10 @@ export class InputPanelComponent {
     } catch (e) {
       alert("Invalid JSON");
     }
+  }
+
+  onRunTss() {
+    this.runTss.emit();
   }
 
   onImportSession(event: any) {

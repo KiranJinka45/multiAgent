@@ -1,0 +1,36 @@
+{
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "dist",
+    "skipLibCheck": true,
+    "noEmit": false,
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@packages/observability": [
+        "../observability/src"
+      ],
+      "@packages/sandbox-runtime": [
+        "../sandbox-runtime/src"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "extends": "../../tsconfig.base.json",
+  "references": [
+    {
+      "path": "../observability"
+    },
+    {
+      "path": "../sandbox-runtime"
+    }
+  ]
+}

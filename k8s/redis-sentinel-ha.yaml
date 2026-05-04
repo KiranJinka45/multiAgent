@@ -1,0 +1,132 @@
+# ── Redis Headless Service for Stable Network Identity ────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-headless
+spec:
+  clusterIP: None
+  ports:
+  - port: 6379
+    targetPort: 6379
+  selector:
+    app: redis
+---
+# ── Redis Triple-Redundant StatefulSet (1 Master, 2 Slaves) ─────────────────
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+spec:
+  serviceName: "redis-headless"
+  replicas: 3 # Hardened: 1 master, 2 slaves to ensure data safety during failover
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      # SRE Safeguard: Topology Spread Constraints for high availability across nodes and zones
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: "kubernetes.io/hostname"
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app: redis
+      - maxSkew: 1
+        topologyKey: "topology.kubernetes.io/zone"
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app: redis
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        command:
+        - sh
+        - -c
+        - |
+          if [ "$(hostname)" = "redis-0" ]; then
+            redis-server --appendonly yes
+          else
+            redis-server --replicaof redis-0.redis-headless 6379 --appendonly yes
+          fi
+        ports:
+        - containerPort: 6379
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+        readinessProbe:
+          exec:
+            command: ["redis-cli", "ping"]
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+# ── Redis Sentinel Deployment with Topology Spreading ──────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-sentinel
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: redis-sentinel
+  template:
+    metadata:
+      labels:
+        app: redis-sentinel
+    spec:
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: "kubernetes.io/hostname"
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app: redis-sentinel
+      - maxSkew: 1
+        topologyKey: "topology.kubernetes.io/zone"
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app: redis-sentinel
+      containers:
+      - name: sentinel
+        image: redis:7-alpine
+        command:
+        - sh
+        - -c
+        - |
+          until nslookup redis-0.redis-headless; do echo waiting for master dns; sleep 2; done;
+          MASTER_HOST="redis-0.redis-headless"
+          echo "sentinel monitor mymaster $MASTER_HOST 6379 2" > /tmp/sentinel.conf;
+          echo "sentinel down-after-milliseconds mymaster 15000" >> /tmp/sentinel.conf;
+          echo "sentinel failover-timeout mymaster 25000" >> /tmp/sentinel.conf;
+          echo "sentinel parallel-syncs mymaster 1" >> /tmp/sentinel.conf;
+          redis-sentinel /tmp/sentinel.conf
+        ports:
+        - containerPort: 26379
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-sentinel
+spec:
+  ports:
+  - port: 26379
+    targetPort: 26379
+  selector:
+    app: redis-sentinel

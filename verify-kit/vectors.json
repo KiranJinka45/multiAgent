@@ -1,0 +1,19 @@
+{
+  "vectors": [
+    {
+      "description": "Integer Encoding (8-byte Big Endian)",
+      "input": 123456,
+      "output_hex": "000000000001e240"
+    },
+    {
+      "description": "String Encoding (4-byte Length Prefix + UTF8)",
+      "input": "ZTAN",
+      "output_hex": "000000045a54414e"
+    },
+    {
+      "description": "List Sorting (Lexicographical Byte Order)",
+      "input": ["nodeC", "nodeA", "nodeB"],
+      "output_sorted": ["nodeA", "nodeB", "nodeC"]
+    }
+  ]
+}

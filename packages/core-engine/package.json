@@ -1,0 +1,41 @@
+{
+  "name": "@packages/core-engine",
+  "version": "1.0.0",
+  "description": "MultiAgent High-Performance Core Orchestrator",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm",
+
+    "dev": "tsup src/index.ts --watch"
+  },
+  "dependencies": {
+    "@packages/utils": "workspace:*",
+    "@packages/agents": "workspace:*",
+    "@packages/brain": "workspace:*",
+    "@packages/events": "workspace:*",
+    "@packages/sandbox": "workspace:*",
+    "@packages/db": "workspace:*",
+    "@temporalio/client": "^1.16.0",
+    "axios": "^1.15.0",
+    "fs-extra": "^11.3.4",
+    "@packages/observability": "workspace:*",
+    "@packages/sandbox-runtime": "workspace:*",
+    "@packages/validator": "workspace:*",
+    "@packages/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^25.6.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    }
+  }
+}

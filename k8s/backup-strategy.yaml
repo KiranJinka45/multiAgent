@@ -1,0 +1,52 @@
+# ── Postgres Daily Backup CronJob ──────────────────────────────────────────
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: postgres-backup
+spec:
+  schedule: "0 2 * * *" # Every day at 2 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: postgres-backup
+            image: postgres:15-alpine
+            env:
+            - name: PGHOST
+              value: "postgres"
+            - name: PGDATABASE
+              value: "multiagent"
+            - name: PGUSER
+              value: "postgres"
+            - name: PGPASSWORD
+              value: "password"
+            command:
+            - sh
+            - -c
+            - |
+              DATE=$(date +%Y%m%d_%H%M%S)
+              FILENAME="/backups/multiagent_$DATE.sql.gz"
+              echo "Starting backup to $FILENAME..."
+              pg_dump | gzip > $FILENAME
+              echo "Backup complete. Cleaning old backups (> 7 days)..."
+              find /backups -name "*.sql.gz" -mtime +7 -delete
+            volumeMounts:
+            - name: backup-storage
+              mountPath: /backups
+          restartPolicy: OnFailure
+          volumes:
+          - name: backup-storage
+            persistentVolumeClaim:
+              claimName: postgres-backup-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-backup-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi # Sized for 7 days of historical snapshots

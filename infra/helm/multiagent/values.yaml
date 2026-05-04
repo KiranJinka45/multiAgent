@@ -1,0 +1,90 @@
+# Global Configuration for Multi-Agent Platform
+global:
+  namespace: multiagent
+  storageClass: gp2
+
+# Gateway Configuration
+gateway:
+  replicaCount: 2
+  image:
+    repository: multiagent/api-gateway
+    tag: v2.0.0
+    pullPolicy: IfNotPresent
+  service:
+    port: 80
+    targetPort: 4080
+    type: LoadBalancer
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+  hpa:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    cpuTarget: 50
+    memoryTarget: 70
+
+# Core API Configuration
+coreApi:
+  replicaCount: 2
+  image:
+    repository: multiagent/core-api
+    tag: v2.0.0
+    pullPolicy: IfNotPresent
+  service:
+    port: 3001
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+  hpa:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 15
+    cpuTarget: 50
+    memoryTarget: 70
+
+# Persistence Configuration
+postgres:
+  image: postgres:15-alpine
+  storage: 10Gi
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+redis:
+  image: redis:7-alpine
+  storage: 5Gi
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+# Ingress Configuration
+ingress:
+  enabled: true
+  host: "multiagent.local"
+  tls:
+    enabled: true
+    secretName: "tls-secret"
+
+# Secrets (To be overridden via --set or secret values files)
+secrets:
+  jwtSecret: "c3VwZXItc2VjcmV0LWtleQ=="
+  internalKey: "ZGVmYXVsdC1pbnRlcm5hbC1zZWNyZXQ="
+  databaseUrl: "cG9zdGdyZXNxbDovL3Bvc3RncmVzOnBhc3N3b3JkQHBvc3RncmVzLmxvY2FsOjU0MzIvbXVsdGlhZ2VudA=="
+  redisUrl: "cmVkaXM6Ly9yZWRpcy5sb2NhbDo2Mzc5"

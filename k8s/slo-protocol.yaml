@@ -1,0 +1,60 @@
+# ── Enterprise SRE: SLO & Error Budget Protocol ────────────────────────────
+# This manifest defines the SLIs and SLOs for the MultiAgent mesh.
+
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: multiagent-slos
+  labels:
+    role: alert-rules
+spec:
+  groups:
+  - name: availability-slos
+    rules:
+    # 1. SLI: Success Rate (Percentage of non-5xx requests)
+    - record: sli:availability:auth_service:ratio_rate5m
+      expr: |
+        sum(rate(http_requests_total{app="auth-service", status!~"5.."}[5m])) 
+        / 
+        sum(rate(http_requests_total{app="auth-service"}[5m]))
+
+    # 2. SLO: Availability Alert (99.9% target)
+    - alert: SLO_Availability_BurnRate_High
+      expr: sli:availability:auth_service:ratio_rate5m < 0.999
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Auth Service Availability SLO at risk (Error Budget Burning)"
+        description: "Current availability is {{ $value | humanizePercentage }}, target is 99.9%."
+        runbook_url: "docs/playbooks/RUNBOOK_SLO_BURN.md"
+
+  - name: latency-slos
+    rules:
+    # 3. SLI: Latency (P95 of request duration)
+    - record: sli:latency:auth_service:p95_rate5m
+      expr: |
+        histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{app="auth-service"}[5m])) by (le))
+
+    # 4. SLO: Latency Alert (P95 < 500ms target)
+    - alert: SLO_Latency_BurnRate_High
+      expr: sli:latency:auth_service:p95_rate5m > 0.500
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Auth Service Latency SLO at risk"
+        description: "P95 latency is {{ $value | humanizeDuration }}, target is 500ms."
+        runbook_url: "docs/playbooks/RUNBOOK_SLO_BURN.md"
+
+  - name: durability-slos
+    rules:
+    - alert: DataDurabilityProofFailed
+      expr: last_success_backup_timestamp == 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Data Durability Proof Failed"
+        description: "Automated restore validation failed after all retries."
+        runbook_url: "docs/playbooks/RUNBOOK_RESTORE_FAILURE.md"

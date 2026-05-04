@@ -1,0 +1,31 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "include": [
+    "src/**/*"
+  ],
+  "compilerOptions": {
+    "outDir": "dist",
+    "declarationMap": true,
+    "declaration": true,
+    "composite": true,
+    "skipLibCheck": true,
+    "noEmit": false,
+    "baseUrl": ".",
+    "paths": {
+      "@packages/core-engine": [
+        "../core-engine/src"
+      ],
+      "@packages/utils": [
+        "../utils/src"
+      ]
+    }
+  },
+  "references": [
+    {
+      "path": "../core-engine"
+    },
+    {
+      "path": "../utils"
+    }
+  ]
+}

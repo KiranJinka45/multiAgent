@@ -1,0 +1,24 @@
+{
+  "id": "TV-001",
+  "description": "Canonical signer set normalization",
+  "input": {
+    "payload": "df1330657b5ec0233532eabe15c46993749cd2464bf527f5f678cf0d7cda59b1",
+    "participants": [
+      "NodeB",
+      "nodea",
+      "NODEA",
+      "nodeb "
+    ],
+    "threshold": 2
+  },
+  "expected": {
+    "canonicalParticipants": [
+      "6e6f646561",
+      "6e6f646562"
+    ],
+    "canonicalPayloadHex": "000000115a54414e5f43414e4f4e4943414c5f563100000020df1330657b5ec0233532eabe15c46993749cd2464bf527f5f678cf0d7cda59b100000020dbad858633a95353f82f19793c72bfb115798a0ff7cdffbcadfa27623ee45d1f",
+    "messageHash": "d3a8dfdd7ca1978653a691538414fe4737ecf71ff5208f3e5fc81b18dc69439f",
+    "signature": "14c3e8220f7599ce0b328136c2685c13b84ca309b31188ea96c962e1187f49503169265e96152f0654789ddc6202341a158f2205b1e5829e14ff9b1c5837284836f7abdb85404d5f34607afd02c1f93b7c7f41d12099f79593c3645596134937",
+    "valid": true
+  }
+}

@@ -1,0 +1,107 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile.prod
+    ports:
+      - "3000:3000"
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://gateway:80/api
+    depends_on:
+      gateway:
+        condition: service_started
+    networks:
+      - multiagent-prod-network
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile.prod
+    ports:
+      - "4288:4288"
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/multiagent
+      - REDIS_URL=redis://redis:6379
+      - PORT=4288
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - multiagent-prod-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4288/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  worker:
+    build:
+      context: .
+      dockerfile: apps/worker/Dockerfile.prod
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/multiagent
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - multiagent-prod-network
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    command: redis-server --save 60 1 --loglevel warning
+    ports:
+      - "6379:6379"
+    networks:
+      - multiagent-prod-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: multiagent
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - multiagent-prod-network
+
+  gateway:
+    image: nginx:stable-alpine
+    restart: always
+    volumes:
+      - ./infra/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80"
+    depends_on:
+      - web
+      - api
+    networks:
+      - multiagent-prod-network
+
+networks:
+  multiagent-prod-network:
+    driver: bridge

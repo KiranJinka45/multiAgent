@@ -1,0 +1,33 @@
+{
+  "name": "@packages/memory",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm",
+
+    "dev": "tsup src/index.ts --watch",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "tsup": "^8.0.0",
+    "@packages/memory-core": "workspace:*",
+    "@packages/memory-vector": "workspace:*",
+    "@packages/memory-cache": "workspace:*"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "dependencies": {
+    "@packages/utils": "workspace:*",
+    "@packages/observability": "workspace:*"
+  }
+}

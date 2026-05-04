@@ -1,0 +1,86 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: multiagent-backup-pvc
+  labels:
+    component: database
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: postgres-backup
+  labels:
+    component: database
+spec:
+  schedule: "0 2 * * *" # Daily at 2:00 AM
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: postgres-backup
+            image: postgres:15-alpine
+            command:
+            - /bin/sh
+            - -c
+            - |
+              TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+              FILENAME="/backups/multiagent_db_$TIMESTAMP.sql.gz"
+              echo "Starting backup to $FILENAME..."
+              pg_dump -h $DB_HOST -U $DB_USER -d $DB_NAME | gzip > $FILENAME
+              
+              if [ -n "$S3_BUCKET" ]; then
+                echo "Uploading to S3: $S3_BUCKET..."
+                # Assumes aws-cli is installed or available via a sidecar/image
+                aws s3 cp $FILENAME s3://$S3_BUCKET/backups/$(basename $FILENAME) || echo "⚠️ S3 Upload failed, proceeding with local backup only."
+              else
+                echo "ℹ️ S3_BUCKET not set, skipping off-site DR."
+              fi
+
+              echo "Backup complete. Cleaning up local files older than 30 days..."
+              find /backups -name "*.sql.gz" -mtime +30 -delete
+            env:
+            - name: DB_HOST
+              value: "postgres-service"
+            - name: DB_NAME
+              value: "multiagent"
+            - name: DB_USER
+              value: "postgres"
+            - name: S3_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: multiagent-dr-secrets
+                  key: s3-bucket-name
+                  optional: true
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: multiagent-dr-secrets
+                  key: aws-access-key
+                  optional: true
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: multiagent-dr-secrets
+                  key: aws-secret-key
+                  optional: true
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: postgres-password
+            volumeMounts:
+            - name: backup-storage
+              mountPath: /backups
+          restartPolicy: OnFailure
+          volumes:
+          - name: backup-storage
+            persistentVolumeClaim:
+              claimName: multiagent-backup-pvc

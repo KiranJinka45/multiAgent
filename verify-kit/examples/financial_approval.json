@@ -1,0 +1,17 @@
+{
+  "useCase": "High-Value Wire Transfer Approval (> $1M)",
+  "version": "ZTAN_V1.5",
+  "schemaVersion": 1,
+  "ceremonyId": "FIN-WIRE-TX-99812",
+  "timestamp": 1714846000000,
+  "threshold": 3,
+  "participants": ["CFO", "Treasury_Manager", "Compliance_Officer", "CEO"],
+  "metadata": {
+    "intent": "Authorize $5.2M wire transfer to Global-Vendor-X",
+    "eligibleKeys": ["b1...CFO", "b2...Treasury", "b3...Compliance", "b4...CEO"],
+    "actualSigners": ["CFO", "Compliance_Officer", "CEO"],
+    "approvalResult": "THRESHOLD_MET_AND_VERIFIED"
+  },
+  "aggregateSignature": "c0de...final_authorized_signature...",
+  "transcriptHash": "a1b2c3d4e5f6...hash_of_approval_log..."
+}

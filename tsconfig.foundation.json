@@ -1,0 +1,11 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/contracts" },
+    { "path": "./packages/db" },
+    { "path": "./packages/supabase" },
+    { "path": "./packages/registry" },
+    { "path": "./packages/observability" },
+    { "path": "./packages/utils" }
+  ]
+}

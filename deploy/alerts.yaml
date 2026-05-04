@@ -1,0 +1,50 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: sre-engine-alerts
+  namespace: sre-system
+spec:
+  groups:
+    - name: sre_governance.rules
+      rules:
+        # 1. SLO Burn Rate (Critical)
+        - alert: SLOHighBurnRate
+          expr: sre_burn_rate > 5
+          for: 2m
+          labels:
+            severity: critical
+            team: sre-elite
+          annotations:
+            summary: "Critical SLO Burn Detected ({{ $value }}x)"
+            description: "Burn rate exceeds 5x for service. Autonomous ACT pipeline may be suppressed or failing."
+
+        # 2. Consensus Divergence
+        - alert: GovernanceConsensusDiverged
+          expr: sre_consensus_met == 0
+          for: 5m
+          labels:
+            severity: warning
+            team: sre-elite
+          annotations:
+            summary: "Action Consensus Diverged"
+            description: "Majority of reliable agents disagree on action. System is in fallback OBSERVE mode."
+
+        # 3. Canary Failure Rate
+        - alert: HighCanaryRollbackRate
+          expr: rate(sre_canary_rollbacks_total[1h]) > 0.1
+          for: 10m
+          labels:
+            severity: critical
+          annotations:
+            summary: "High Canary Rollback Frequency"
+            description: "More than 10% of autonomous actions are being reverted. Verification logic or detection may be faulty."
+
+        # 4. Detection SLA Breach
+        - alert: DetectionLatencySLAExceeded
+          expr: sre_detection_latency_seconds{quantile="0.95"} > 15
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Detection SLA Breach (>15s)"
+            description: "P95 detection latency is exceeding the 15s SRE requirement."

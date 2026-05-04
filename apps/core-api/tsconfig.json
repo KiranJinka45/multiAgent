@@ -1,0 +1,98 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "noEmit": false,
+    "skipLibCheck": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "ES2020",
+    "baseUrl": ".",
+    "paths": {
+      "@packages/config": [
+        "../../packages/config/src"
+      ],
+      "@packages/auth-internal": [
+        "../../packages/auth-internal/src"
+      ],
+      "@packages/db": [
+        "../../packages/db/src"
+      ],
+      "@packages/memory": [
+        "../../packages/memory/src"
+      ],
+      "@packages/observability": [
+        "../../packages/observability/src"
+      ],
+      "@packages/shared-services": [
+        "../../packages/shared-services/src"
+      ],
+      "@packages/supabase": [
+        "../../packages/supabase/src"
+      ],
+      "@packages/utils": [
+        "../../packages/utils/src"
+      ],
+      "@packages/contracts": [
+        "../../packages/contracts/src"
+      ],
+      "@packages/agents": [
+        "../../packages/agents/src"
+      ],
+      "@packages/events": [
+        "../../packages/events/src"
+      ],
+      "@packages/business": [
+        "../../packages/business/src"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "references": [
+    {
+      "path": "../../packages/config"
+    },
+    {
+      "path": "../../packages/auth-internal"
+    },
+    {
+      "path": "../../packages/db"
+    },
+    {
+      "path": "../../packages/memory"
+    },
+    {
+      "path": "../../packages/observability"
+    },
+    {
+      "path": "../../packages/shared-services"
+    },
+    {
+      "path": "../../packages/supabase"
+    },
+    {
+      "path": "../../packages/utils"
+    },
+    {
+      "path": "../../packages/contracts"
+    },
+    {
+      "path": "../../packages/agents"
+    },
+    {
+      "path": "../../packages/events"
+    },
+    {
+      "path": "../../packages/business"
+    }
+  ]
+}

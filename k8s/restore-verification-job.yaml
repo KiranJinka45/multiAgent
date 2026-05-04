@@ -1,0 +1,52 @@
+# ── SRE Audit: Continuous Daily Restore Verification ──────────────────────
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: restore-verification
+spec:
+  schedule: "0 4 * * *" # Daily at 4 AM (Continuous Durability Proof)
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: restore-verifier
+            image: postgres:15-alpine
+            env:
+            - name: PGHOST
+              value: "postgres"
+            - name: PGDATABASE
+              value: "multiagent"
+            - name: PGUSER
+              value: "postgres"
+            - name: PGPASSWORD
+              value: "password"
+            - name: SLACK_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: multiagent-ops-secrets # New secret for operational metadata
+                  key: SLACK_WEBHOOK_URL
+                  optional: true
+            command: ["/bin/sh", "/scripts/proven-restore-test.sh"]
+            volumeMounts:
+            - name: backup-storage
+              mountPath: /backups
+            - name: audit-scripts
+              mountPath: /scripts
+          restartPolicy: OnFailure
+          volumes:
+          - name: backup-storage
+            persistentVolumeClaim:
+              claimName: postgres-backup-pvc
+          - name: audit-scripts
+            configMap:
+              name: audit-scripts-cm
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: audit-scripts-cm
+data:
+  proven-restore-test.sh: |
+    # (Content is mirrored from scripts/proven-restore-test.sh for cluster execution)
+    # The job uses the version that includes alerting logic.

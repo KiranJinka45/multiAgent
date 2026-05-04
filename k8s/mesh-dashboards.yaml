@@ -1,0 +1,40 @@
+# ── Visual Sovereignty: Dashboards-as-Code ──────────────────────────────────
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mesh-dashboards
+data:
+  mesh-dashboards.json: |
+    {
+      "title": "MultiAgent SRE: Golden Signals & Durability",
+      "panels": [
+        {
+          "title": "Auth Mesh Latency (P95)",
+          "type": "graph",
+          "targets": [
+            { "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{app=\"auth-service\"}[5m])) by (le))" }
+          ]
+        },
+        {
+          "title": "Identity Error Rate (%)",
+          "type": "stat",
+          "targets": [
+            { "expr": "sum(rate(http_requests_total{app=\"auth-service\", status=~\"5..\"}[5m])) / sum(rate(http_requests_total{app=\"auth-service\"}[5m])) * 100" }
+          ]
+        },
+        {
+          "title": "Data Durability: Backup Age (Seconds)",
+          "type": "gauge",
+          "targets": [
+            { "expr": "time() - max(last_success_backup_timestamp)" }
+          ]
+        },
+        {
+          "title": "Compute Saturation: Node CPU Usage",
+          "type": "gauge",
+          "targets": [
+            { "expr": "sum(rate(node_cpu_seconds_total{mode!=\"idle\"}[5m])) / count(node_cpu_seconds_total{mode=\"idle\"}) * 100" }
+          ]
+        }
+      ]
+    }

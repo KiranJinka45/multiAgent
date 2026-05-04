@@ -1,0 +1,49 @@
+<div class="onboarding-container">
+  <div class="glass-card">
+    <div class="progress-bar">
+      <div class="step" [class.active]="step >= 1">1</div>
+      <div class="connector" [class.active]="step >= 2"></div>
+      <div class="step" [class.active]="step >= 2">2</div>
+      <div class="connector" [class.active]="step >= 3"></div>
+      <div class="step" [class.active]="step >= 3">3</div>
+    </div>
+
+    <div class="content-slider" [ngSwitch]="step">
+      <!-- Step 1: Welcome -->
+      <div *ngSwitchCase="1" class="step-content fade-in">
+        <h1>Welcome to the Future of Autonomy</h1>
+        <p>Your workspace is being provisioned with Tier-1 infrastructure. Get ready to launch your first mission.</p>
+        <div class="feature-pills">
+          <span class="pill">Self-Optimizing</span>
+          <span class="pill">Multi-Tenant</span>
+          <span class="pill">SRE-Certified</span>
+        </div>
+      </div>
+
+      <!-- Step 2: First Mission -->
+      <div *ngSwitchCase="2" class="step-content fade-in">
+        <h1>Define Your First Objective</h1>
+        <p>Tell the swarm what you want to build. Our autonomous agents will handle the heavy lifting.</p>
+        <div class="input-preview">
+          <code>"Generate a high-performance API for..."</code>
+        </div>
+      </div>
+
+      <!-- Step 3: Ready -->
+      <div *ngSwitchCase="3" class="step-content fade-in">
+        <h1>System Armed & Ready</h1>
+        <p>Your daily quota of 10 missions is active. All systems are nominal.</p>
+        <div class="status-indicator">
+          <span class="pulse"></span>
+          ONLINE
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn-primary" (click)="nextStep()">
+        {{ step < 3 ? 'Let\'s Begin' : 'Launch Dashboard' }}
+      </button>
+    </div>
+  </div>
+</div>

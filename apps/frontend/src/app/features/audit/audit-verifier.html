@@ -1,0 +1,106 @@
+<div class="audit-container">
+  <!-- Mode Switcher Header -->
+  <header class="view-header">
+    <div class="logo">ZTAN <span>Audit</span></div>
+    <nav class="mode-tabs">
+      <button [class.active]="viewMode === 'SIMPLE'" (click)="setMode('SIMPLE')">Simple</button>
+      <button [class.active]="viewMode === 'DEVELOPER'" (click)="setMode('DEVELOPER')">Developer</button>
+      <button [class.active]="viewMode === 'AUDIT'" (click)="setMode('AUDIT')">Audit Dashboard</button>
+    </nav>
+  </header>
+
+  <main class="view-content" [ngSwitch]="viewMode">
+    
+    <!-- [1] SIMPLE MODE -->
+    <section *ngSwitchCase="'SIMPLE'" class="simple-view animate-fade">
+      <div class="hero-card">
+        <h1>Verify Your Audit Evidence</h1>
+        <p>Paste your audit bundle or load an example to run a cryptographic verification against the ZTAN registry.</p>
+        
+        <div class="action-box">
+          <textarea [(ngModel)]="buffer" placeholder="Paste Proof Bundle JSON here..."></textarea>
+          <button class="verify-btn" (click)="runVerification()" [disabled]="isVerifying">
+            <span *ngIf="!isVerifying">Verify Integrity</span>
+            <span *ngIf="isVerifying" class="blink">Verifying...</span>
+          </button>
+        </div>
+
+        <div *ngIf="lastResult" class="result-card" [ngClass]="lastResult.status.toLowerCase()">
+          <div class="status-icon">{{ lastResult.status === 'VERIFIED' ? '✔' : '✘' }}</div>
+          <div class="status-text">
+            <h3>{{ lastResult.status === 'VERIFIED' ? 'Verification Passed' : 'Verification Failed' }}</h3>
+            <p>{{ explanation }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- [2] DEVELOPER MODE -->
+    <section *ngSwitchCase="'DEVELOPER'" class="developer-view animate-fade">
+      <div class="console-wrapper">
+        <div class="buffer-section" [class.collapsed]="!bufferVisible">
+          <div class="section-header" (click)="toggleBuffer()">
+            <span class="chevron" [class.rotated]="bufferVisible">▼</span>
+            <span class="label">JSON INPUT</span>
+            <span class="meta" *ngIf="buffer.length > 0">{{ buffer.length }} bytes</span>
+          </div>
+          <div class="editor-container" *ngIf="bufferVisible">
+            <textarea class="buffer-textarea" [(ngModel)]="buffer" spellcheck="false"></textarea>
+          </div>
+        </div>
+
+        <div class="terminal-section">
+          <div class="terminal-header">
+            <div class="controls"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+            <span class="title">ztan --infra-shell --session={{sessionId}}</span>
+          </div>
+          <div class="terminal-body" #terminalBody>
+            <div *ngFor="let line of history" class="line" [ngClass]="line.type">
+              <span class="timestamp">{{ line.timestamp }}</span>
+              <span class="content">{{ line.text }}</span>
+            </div>
+          </div>
+          <div class="terminal-footer">
+            <span class="prompt">ztan@audit:~$</span>
+            <input type="text" class="command-input" [(ngModel)]="commandInput" (keydown)="handleKeydown($event)" placeholder="load, verify, clear, stats..." />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- [3] AUDIT MODE -->
+    <section *ngSwitchCase="'AUDIT'" class="audit-dashboard animate-fade">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="val">{{ stats.active }}</span>
+          <span class="label">Active Ceremonies</span>
+        </div>
+        <div class="stat-card success">
+          <span class="val">{{ stats.completed }}</span>
+          <span class="label">Total Verified</span>
+        </div>
+        <div class="stat-card warning">
+          <span class="val">{{ stats.aborted }}</span>
+          <span class="label">Aborted Sessions</span>
+        </div>
+        <div class="stat-card danger">
+          <span class="val">{{ stats.fraudDetected }}</span>
+          <span class="label">Fraud Rejections</span>
+        </div>
+      </div>
+
+      <div class="dashboard-details">
+        <div class="detail-panel">
+          <h3>System Security Indicators</h3>
+          <ul class="security-list">
+            <li><span class="dot green"></span> Identity Registry Enforcement: ACTIVE</li>
+            <li><span class="dot green"></span> Replay Protection Window: 30s (STABLE)</li>
+            <li><span class="dot yellow"></span> Redlock Quorum Consistency: VERIFIED</li>
+            <li><span class="dot red"></span> Last Fraud Attempt: 2h ago (BLOCKED)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>

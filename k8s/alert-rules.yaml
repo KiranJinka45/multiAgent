@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-alerts
+  namespace: multiagent
+data:
+  alerts.yml: |
+    groups:
+      - name: multiagent-alerts
+        rules:
+          - alert: HighRequestLatency
+            expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, service)) > 5
+            for: 2m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High P95 latency on service {{ $labels.service }}"
+              description: "P95 latency is {{ $value }}s over the last 5 minutes."
+
+          - alert: HighErrorRate
+            expr: sum(rate(http_requests_total{status=~"5.."}[5m])) by (service) / sum(rate(http_requests_total[5m])) by (service) > 0.05
+            for: 1m
+            labels:
+              severity: critical
+            annotations:
+              summary: "High error rate on service {{ $labels.service }}"
+              description: "Error rate is {{ $value | humanizePercentage }} over the last 5 minutes."
+
+          - alert: QueueBacklogHigh
+            expr: sum(bullmq_queue_waiting) by (queue) > 1000
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High backlog in queue {{ $labels.queue }}"
+              description: "Queue backlog has been above 1000 for 5 minutes."
+
+          - alert: ServiceDown
+            expr: up == 0
+            for: 1m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Service {{ $labels.app }} is down"
+              description: "Service has been unreachable for 1 minute."

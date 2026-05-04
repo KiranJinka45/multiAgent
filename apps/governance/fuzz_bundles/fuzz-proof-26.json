@@ -1,0 +1,62 @@
+{
+  "version": "ZTAN_AUDIT_EVIDENCE_V1.1",
+  "input": {
+    "raw": "{\"version\":\"ZTAN_CANONICAL_V1\",\"auditId\":\"FUZZ-26-ADWP74\",\"timestamp\":1777831536288,\"payloadHash\":\"8f92b4e28f92b4e28f92b4e28f92b4e28f92b4e28f92b4e28f92b4e28f92b4e2\",\"threshold\":4,\"nodeIds\":[\"nodeA\",\"nodeB\",\"nodeC\",\"node-Extra-26\"]}",
+    "fingerprint": "be29fc0b2fb2940705759942b71c2546359b5c6bd655518a2b4d6b234244003d"
+  },
+  "consensus": {
+    "status": "VERIFIED",
+    "signatures": [
+      {
+        "verifierId": "nodeA",
+        "publicKey": "aa6b021b54e779f81fef487db4e36c5cf0c48905292e08bd598b5deb6398a0dc0bc86deea4aea1e639131623141fc9c6",
+        "algorithm": "BLS12-381-AGG",
+        "signature": "89886fca6aaafd613154b0b116cb18f4669f26e461cc4660ed7568f2a08e66c3f6563a5880aab4e2fe3648f81d00e84f066b05e61b0b245a7ec78ca31af3ed9442be116567534b0586d593c9bda14738acfa5fb613c09d81b5740545f0aa09dc"
+      },
+      {
+        "verifierId": "nodeB",
+        "publicKey": "90b888bcef8ec4235340f488e85fb34f6778f5c9ffc22727b123dd9edb1d3c0fe220b6596207e0e53d73bba5c0d9f7ef",
+        "algorithm": "BLS12-381-AGG",
+        "signature": "b417360d16fc146826f8fc4617cea426bca79e410d3522a081bf3e0c4824d21af7d5fcfb8b6253b07c3ca9cfdae2495e01e9ec32ada96fa0fe5d0c074c0a2ca4881009c2ee6ed1d5284b4ffba7b0714b665b914e8b49b5a0981ce917c0b54b53"
+      },
+      {
+        "verifierId": "nodeC",
+        "publicKey": "858f94e9dc6e8cbc3c79133636efdddf747a620d3a86e293ae3a92871871556742766b3da0c5180d195f0eeefcb2e465",
+        "algorithm": "BLS12-381-AGG",
+        "signature": "a4df8acf4fdaa8370299aed63a9eaf814251b29e5c4885a85fdada9cc8215fb34a696db0d56b56cf5336fd753c9d3b790b32b6d7234a0326c03b0b16aef73baf1bf747a55e63e1022a386faaaa6edb13abf3fa2ce89ffb036ec40fcdf58462bc"
+      },
+      {
+        "verifierId": "node-Extra-26",
+        "publicKey": "923c6322dcb94e96858133d35bfc53c4870c11e50c7055498783a72424bd24095b8c2268846044ab7d70c1b5a25aed81",
+        "algorithm": "BLS12-381-AGG",
+        "signature": "a547313eec66c4fab6fb11439df15c8615c5ec8eb31b964bf1617b4ac3fb4fd3d6c0a63ad7f8c783b727c205a2299e4f017061d656319b6103ce8c44f0ce0e182261b76f38875a829cd7c07393e3fa4a4f193c6c80d8dd41a557124f01ba62c5"
+      }
+    ],
+    "threshold": 4,
+    "payloadHash": "4af135836770a2b27626667fdce9b3f1e947f02263847efde38bc44d8d6115f3"
+  },
+  "integrity": {
+    "canonicalHash": "623cb8d36b03e047f2dbb3f7a876155325359423e4d0777b57d502dc9287c9dc",
+    "finalAnchor": "04537664a40b2676d9ac9af8e2287429fdce503c9aaa00d6606df7e8b27c51a4",
+    "traceChain": [
+      "895a45bc2ede4ed56206ca4fb747c1f94bd512cf931dc5b3bc2f27707a2b96f4",
+      "ec4c0e9bbaa056cded4da730eef8b9a67d5e78980d6182a98a54da8bc64a9830",
+      "17af90049a23256352f21e021b8cf5bc37383d80148450df6e44d98d78014aec",
+      "8e7f0978cd06c8f5e446cd0cbfd53e66dc8cdd0007f8713072557ec6319100b7",
+      "2754091d04e24da9eb079371232970c350c86a4844c8921f64202dca18ecc45d",
+      "bddad7f01fd31eab28744926716d5f36d327ade1e6abb284d3e4a2c15e4bd6ac",
+      "7f55d705affef12f61a0a243930809503da0ffe513ae099ad35a553cac298fb5",
+      "acffe39ad2ec1228e9e90ce901b0165b58351aec9af0a6734dc720369d2fff3e",
+      "382d9c62294d8cb43ae81f9ebeb6b3d27d59fb31f74a240391c844b8815f33f2",
+      "6b19b427acb769835c6deeb389d0dd01d778a03723a8d8c8d8e6a0dab9ab9d7a",
+      "c2b92998b507ef026ec46d24de93d31eb242eac9461ba4c4685905372ebb50ee"
+    ]
+  },
+  "reproducibility": {
+    "algorithms": {
+      "hashing": "SHA-256",
+      "signatures": "BLS12-381-AGG"
+    },
+    "spec": "ZTAN_CANONICAL_V1"
+  }
+}

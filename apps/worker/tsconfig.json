@@ -1,0 +1,155 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "composite": true,
+    "noEmit": false,
+    "declaration": true,
+    "baseUrl": ".",
+    "paths": {
+      "@packages/auth-internal": [
+        "../../packages/auth-internal/src"
+      ],
+      "@packages/config": [
+        "../../packages/config/src"
+      ],
+      "@packages/events": [
+        "../../packages/events/src"
+      ],
+      "@packages/billing": [
+        "../../packages/billing/src"
+      ],
+      "@packages/agents": [
+        "../../packages/agents/src"
+      ],
+      "@packages/ai": [
+        "../../packages/ai/src"
+      ],
+      "@packages/autonomous-agent": [
+        "../../packages/autonomous-agent/src"
+      ],
+      "@packages/brain": [
+        "../../packages/brain/src"
+      ],
+      "@packages/build-engine": [
+        "../../packages/build-engine/src"
+      ],
+      "@packages/contracts": [
+        "../../packages/contracts/src"
+      ],
+      "@packages/core-engine": [
+        "../../packages/core-engine/src"
+      ],
+      "@packages/db": [
+        "../../packages/db/src"
+      ],
+      "@packages/observability": [
+        "../../packages/observability/src"
+      ],
+      "@packages/preview-runtime": [
+        "../../packages/preview-runtime/src"
+      ],
+      "@packages/queue": [
+        "../../packages/queue/src"
+      ],
+      "@packages/refactor-agent": [
+        "../../packages/refactor-agent/src"
+      ],
+      "@packages/resilience": [
+        "../../packages/resilience/src"
+      ],
+      "@packages/sandbox-runtime": [
+        "../../packages/sandbox-runtime/src"
+      ],
+      "@packages/self-evolution": [
+        "../../packages/self-evolution/src"
+      ],
+      "@packages/shared-services": [
+        "../../packages/shared-services/src"
+      ],
+      "@packages/supabase": [
+        "../../packages/supabase/src"
+      ],
+      "@packages/utils": [
+        "../../packages/utils/src"
+      ],
+      "@packages/validator": [
+        "../../packages/validator/src"
+      ]
+    }
+  },
+  "include": [
+    "src"
+  ],
+  "references": [
+    {
+      "path": "../../packages/agents"
+    },
+    {
+      "path": "../../packages/ai"
+    },
+    {
+      "path": "../../packages/auth-internal"
+    },
+    {
+      "path": "../../packages/autonomous-agent"
+    },
+    {
+      "path": "../../packages/billing"
+    },
+    {
+      "path": "../../packages/brain"
+    },
+    {
+      "path": "../../packages/build-engine"
+    },
+    {
+      "path": "../../packages/config"
+    },
+    {
+      "path": "../../packages/contracts"
+    },
+    {
+      "path": "../../packages/core-engine"
+    },
+    {
+      "path": "../../packages/db"
+    },
+    {
+      "path": "../../packages/events"
+    },
+    {
+      "path": "../../packages/observability"
+    },
+    {
+      "path": "../../packages/preview-runtime"
+    },
+    {
+      "path": "../../packages/queue"
+    },
+    {
+      "path": "../../packages/refactor-agent"
+    },
+    {
+      "path": "../../packages/resilience"
+    },
+    {
+      "path": "../../packages/sandbox-runtime"
+    },
+    {
+      "path": "../../packages/self-evolution"
+    },
+    {
+      "path": "../../packages/shared-services"
+    },
+    {
+      "path": "../../packages/supabase"
+    },
+    {
+      "path": "../../packages/utils"
+    },
+    {
+      "path": "../../packages/validator"
+    }
+  ]
+}

@@ -1,0 +1,163 @@
+services:
+  web:
+    build: .
+    container_name: multiagent_web
+    command: npm run dev:web
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    env_file:
+      - .env.local
+    depends_on:
+      - redis
+
+  socket:
+    build: .
+    container_name: multiagent_socket
+    command: npm run dev:socket
+    ports:
+      - "3005:3005"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - .env.local
+    depends_on:
+      - redis
+
+  # Entry orchestrator (Compatibility)
+  worker:
+    build: .
+    container_name: multiagent_orchestrator
+    command: npm run dev:worker
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - .env.local
+    depends_on:
+      - redis
+
+  planner:
+    build: .
+    container_name: multiagent_planner
+    command: npm run dev:planner
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - .env.local
+    depends_on:
+      - redis
+
+  architecture:
+    build: .
+    container_name: multiagent_architecture
+    command: npm run dev:architecture
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - .env.local
+    depends_on:
+      - redis
+
+  generator:
+    build: .
+    container_name: multiagent_generator
+    command: npm run dev:generator
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - .env.local
+    depends_on:
+      - redis
+
+  validator:
+    build: .
+    container_name: multiagent_validator
+    command: npm run dev:validator
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - .env.local
+    depends_on:
+      - redis
+
+  docker-builder:
+    build: .
+    container_name: multiagent_docker_builder
+    command: npm run dev:docker
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /var/run/docker.sock:/var/run/docker.sock
+    env_file:
+      - .env.local
+    depends_on:
+      - redis
+
+  deployer:
+    build: .
+    container_name: multiagent_deployer
+    command: npm run dev:deploy
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - .env.local
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - redis
+
+  supervisor:
+    build: .
+    command: npm run dev:supervisor
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - .env.local
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - redis
+
+  repair-worker:
+    build: .
+    command: npm run dev:repair
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - .env.local
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - redis
+
+  meta-agent:
+    build: .
+    container_name: multiagent_meta
+    command: npm run dev:meta
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - .env.local
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7
+    container_name: multiagent_redis
+    ports:
+      - "6379:6379"

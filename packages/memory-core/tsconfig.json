@@ -1,0 +1,19 @@
+{
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "compilerOptions": {
+    "outDir": "dist",
+    "declarationMap": true,
+    "declaration": true,
+    "composite": true,
+    "noEmit": false,
+    "skipLibCheck": true,
+    "baseUrl": "."
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "extends": "../../tsconfig.base.json"
+}

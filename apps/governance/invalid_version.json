@@ -1,0 +1,6 @@
+{
+  "version": "ZTAN_CANONICAL_V2",
+  "payloadHash": "8f92b4e28f92b4e28f92b4e28f92b4e28f92b4e28f92b4e28f92b4e28f92b4e2",
+  "threshold": 2,
+  "nodeIds": ["nodeA", "nodeB", "nodeC"]
+}

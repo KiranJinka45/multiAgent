@@ -1,0 +1,298 @@
+[
+  {
+    "metrics": {
+      "avgLatency": 150,
+      "errorRate": 0.01
+    },
+    "decision": {
+      "action": "MONITOR"
+    },
+    "timestamp": 1777458805612
+  },
+  {
+    "metrics": {
+      "avgLatency": 200,
+      "errorRate": 0.01
+    },
+    "decision": {
+      "action": "MONITOR"
+    },
+    "timestamp": 1777458805614
+  },
+  {
+    "metrics": {
+      "avgLatency": 300,
+      "errorRate": 0.01
+    },
+    "decision": {
+      "action": "MONITOR"
+    },
+    "timestamp": 1777458805615
+  },
+  {
+    "metrics": {
+      "avgLatency": 500,
+      "errorRate": 0.01
+    },
+    "decision": {
+      "action": "MONITOR"
+    },
+    "timestamp": 1777458805616
+  },
+  {
+    "metrics": {
+      "avgLatency": 750,
+      "errorRate": 0.01
+    },
+    "decision": {
+      "action": "MONITOR"
+    },
+    "timestamp": 1777458805618
+  },
+  {
+    "metrics": {
+      "avgLatency": 1200,
+      "errorRate": 0.15,
+      "redisStatus": "HEALTHY",
+      "activeWorkers": 10,
+      "totalWorkers": 10
+    },
+    "decision": {
+      "action": "MONITOR"
+    },
+    "timestamp": 1777459367234
+  },
+  {
+    "metrics": {
+      "avgLatency": 1200,
+      "errorRate": 0.15,
+      "redisStatus": "HEALTHY",
+      "activeWorkers": 10,
+      "totalWorkers": 10
+    },
+    "decision": {
+      "action": "MONITOR"
+    },
+    "timestamp": 1777459367236
+  },
+  {
+    "metrics": {
+      "avgLatency": 1200,
+      "errorRate": 0.15,
+      "redisStatus": "HEALTHY",
+      "activeWorkers": 10,
+      "totalWorkers": 10
+    },
+    "decision": {
+      "action": "MONITOR"
+    },
+    "timestamp": 1777459367238
+  },
+  {
+    "metrics": {
+      "avgLatency": 1200,
+      "errorRate": 0.15,
+      "redisStatus": "HEALTHY",
+      "activeWorkers": 10,
+      "totalWorkers": 10
+    },
+    "decision": {
+      "action": "MONITOR"
+    },
+    "timestamp": 1777459367239
+  },
+  {
+    "metrics": {
+      "avgLatency": 1200,
+      "errorRate": 0.15,
+      "redisStatus": "HEALTHY",
+      "activeWorkers": 10,
+      "totalWorkers": 10
+    },
+    "decision": {
+      "action": "MONITOR"
+    },
+    "timestamp": 1777459367241
+  },
+  {
+    "metrics": {
+      "avgLatency": 1200,
+      "errorRate": 0.15,
+      "redisStatus": "HEALTHY",
+      "activeWorkers": 10,
+      "totalWorkers": 10
+    },
+    "decision": {
+      "action": "MONITOR"
+    },
+    "timestamp": 1777459367242
+  },
+  {
+    "metrics": {
+      "avgLatency": 1200,
+      "errorRate": 0.15,
+      "redisStatus": "HEALTHY",
+      "queueDepth": 80,
+      "activeWorkers": 10,
+      "totalWorkers": 10
+    },
+    "decision": {
+      "action": "MONITOR"
+    },
+    "timestamp": 1777459400272
+  },
+  {
+    "metrics": {
+      "avgLatency": 1200,
+      "errorRate": 0.15,
+      "redisStatus": "HEALTHY",
+      "queueDepth": 80,
+      "activeWorkers": 10,
+      "totalWorkers": 10
+    },
+    "decision": {
+      "action": "MONITOR"
+    },
+    "timestamp": 1777459400275
+  },
+  {
+    "metrics": {
+      "avgLatency": 1200,
+      "errorRate": 0.15,
+      "redisStatus": "HEALTHY",
+      "queueDepth": 80,
+      "activeWorkers": 10,
+      "totalWorkers": 10
+    },
+    "decision": {
+      "action": "MONITOR"
+    },
+    "timestamp": 1777459400277
+  },
+  {
+    "metrics": {
+      "avgLatency": 1200,
+      "errorRate": 0.15,
+      "redisStatus": "HEALTHY",
+      "queueDepth": 80,
+      "activeWorkers": 10,
+      "totalWorkers": 10
+    },
+    "decision": {
+      "action": "MONITOR"
+    },
+    "timestamp": 1777459400278
+  },
+  {
+    "metrics": {
+      "avgLatency": 1200,
+      "errorRate": 0.15,
+      "redisStatus": "HEALTHY",
+      "queueDepth": 80,
+      "activeWorkers": 10,
+      "totalWorkers": 10
+    },
+    "decision": {
+      "action": "MONITOR"
+    },
+    "timestamp": 1777459400281
+  },
+  {
+    "metrics": {
+      "avgLatency": 1200,
+      "errorRate": 0.15,
+      "redisStatus": "HEALTHY",
+      "queueDepth": 80,
+      "activeWorkers": 10,
+      "totalWorkers": 10
+    },
+    "decision": {
+      "action": "MONITOR"
+    },
+    "timestamp": 1777459400282
+  },
+  {
+    "metrics": {
+      "avgLatency": 1200,
+      "errorRate": 0.15,
+      "redisStatus": "HEALTHY",
+      "queueDepth": 80,
+      "activeWorkers": 10,
+      "totalWorkers": 10
+    },
+    "decision": {
+      "action": "MONITOR"
+    },
+    "timestamp": 1777459529643
+  },
+  {
+    "metrics": {
+      "avgLatency": 1200,
+      "errorRate": 0.15,
+      "redisStatus": "HEALTHY",
+      "queueDepth": 80,
+      "activeWorkers": 10,
+      "totalWorkers": 10
+    },
+    "decision": {
+      "action": "MONITOR"
+    },
+    "timestamp": 1777459529647
+  },
+  {
+    "metrics": {
+      "avgLatency": 1200,
+      "errorRate": 0.15,
+      "redisStatus": "HEALTHY",
+      "queueDepth": 80,
+      "activeWorkers": 10,
+      "totalWorkers": 10
+    },
+    "decision": {
+      "action": "MONITOR"
+    },
+    "timestamp": 1777459529649
+  },
+  {
+    "metrics": {
+      "avgLatency": 1200,
+      "errorRate": 0.15,
+      "redisStatus": "HEALTHY",
+      "queueDepth": 80,
+      "activeWorkers": 10,
+      "totalWorkers": 10
+    },
+    "decision": {
+      "action": "MONITOR"
+    },
+    "timestamp": 1777459529651
+  },
+  {
+    "metrics": {
+      "avgLatency": 1200,
+      "errorRate": 0.15,
+      "redisStatus": "HEALTHY",
+      "queueDepth": 80,
+      "activeWorkers": 10,
+      "totalWorkers": 10
+    },
+    "decision": {
+      "action": "MONITOR"
+    },
+    "timestamp": 1777459529652
+  },
+  {
+    "metrics": {
+      "avgLatency": 1200,
+      "errorRate": 0.15,
+      "redisStatus": "HEALTHY",
+      "queueDepth": 80,
+      "activeWorkers": 10,
+      "totalWorkers": 10
+    },
+    "decision": {
+      "action": "MONITOR"
+    },
+    "timestamp": 1777459529654
+  }
+]

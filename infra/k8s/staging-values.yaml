@@ -1,0 +1,31 @@
+# MONOREPO STAGING CONFIGURATION
+# Purpose: Logical isolation in a shared staging cluster.
+
+global:
+  env: staging
+  namespace: multiagent-staging
+  replicas: 2
+  
+  # Shared Staging Infrastructure
+  redis:
+    url: "redis://shared-staging-redis:6379"
+    maxRetries: 10
+  
+  postgres:
+    url: "postgresql://staging-user:staging-pass@shared-staging-db:5432/multiagent"
+    maxConnections: 50
+
+# Service Specific Overrides
+gateway:
+  bodyLimit: "1mb"
+  timeout: "10s"
+  ingress:
+    enabled: true
+    host: staging.multiagent.com
+    tls: true
+
+auth-service:
+  jwtExpiry: "24h" # Longer for staging ease-of-use
+  
+billing-service:
+  stripeMode: "test" # CRITICAL: Ensure we are in test mode

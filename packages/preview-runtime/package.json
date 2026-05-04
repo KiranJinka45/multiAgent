@@ -1,0 +1,35 @@
+{
+  "name": "@packages/preview-runtime",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "dependencies": {
+    "@packages/utils": "workspace:*",
+    "@packages/registry": "workspace:*",
+    "@packages/validator": "workspace:*",
+    "@packages/contracts": "workspace:*",
+    "fs-extra": "^11.2.0",
+    "ioredis": "^5.10.1",
+    "dotenv": "^17.3.1"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "^5.0.0",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^22.13.9"
+  },
+
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    }
+  }
+}

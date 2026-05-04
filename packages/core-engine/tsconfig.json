@@ -1,0 +1,78 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "dist",
+    "noEmit": false,
+    "baseUrl": ".",
+    "paths": {
+      "@packages/utils": [
+        "../utils/src"
+      ],
+      "@packages/agents": [
+        "../agents/src"
+      ],
+      "@packages/brain": [
+        "../brain/src"
+      ],
+      "@packages/events": [
+        "../events/src"
+      ],
+      "@packages/sandbox": [
+        "../sandbox/src"
+      ],
+      "@packages/db": [
+        "../db/src"
+      ],
+      "@packages/observability": [
+        "../observability/src"
+      ],
+      "@packages/sandbox-runtime": [
+        "../sandbox-runtime/src"
+      ],
+      "@packages/validator": [
+        "../validator/src"
+      ],
+      "@packages/contracts": [
+        "../contracts/src"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "references": [
+    {
+      "path": "../agents"
+    },
+    {
+      "path": "../brain"
+    },
+    {
+      "path": "../contracts"
+    },
+    {
+      "path": "../db"
+    },
+    {
+      "path": "../events"
+    },
+    {
+      "path": "../observability"
+    },
+    {
+      "path": "../sandbox"
+    },
+    {
+      "path": "../sandbox-runtime"
+    },
+    {
+      "path": "../utils"
+    },
+    {
+      "path": "../validator"
+    }
+  ]
+}

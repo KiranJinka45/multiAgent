@@ -1,10 +1,6 @@
-<div class="container">
-  <div class="header">
-    <h1>ZTAN CRYPTOGRAPHIC CONSOLE</h1>
-    <div class="status">● LOCAL_RUNTIME: ACTIVE</div>
-  </div>
-
-  <div class="top">
+<div class="console-layout">
+  <!-- TOP ROW: INPUT | OUTPUT -->
+  <div class="top-row">
     <app-input-panel 
       (run)="run($event)" 
       (loadVector)="loadVector()"
@@ -13,11 +9,41 @@
       (mutationTest)="mutationTest()"
       (generateScript)="generateVerifyScript()"
       (exportSession)="exportSession()"
+      (exportProof)="exportProofBundle()"
       (importSession)="importSession($event)"
-      (verifyBackend)="verifyWithBackend($event)">
+      (verifyBackend)="verifyWithBackend($event)"
+      (tssToggle)="tssEnabled = $event">
     </app-input-panel>
-    <app-output-panel [output]="output" [expectedHash]="expectedHash"></app-output-panel>
+
+    <app-output-panel 
+      [output]="output" 
+      [tssEnabled]="tssEnabled">
+    </app-output-panel>
   </div>
 
-  <app-log-console [logs]="logs"></app-log-console>
+  <!-- MIDDLE ROW: LOGS -->
+  <div class="middle-row">
+    <app-log-console 
+      [logs]="logs" 
+      (onGenerateVerifyScript)="generateVerifyScript()">
+    </app-log-console>
+  </div>
+
+  <!-- BOTTOM ROW: THRESHOLD PANEL -->
+  <div class="bottom-row" *ngIf="tssEnabled">
+    <app-threshold-panel
+      [ceremonyActive]="ceremonyActive"
+      [ceremonyStatus]="ceremonyState?.status || 'INIT'"
+      [participants]="ceremonyParticipants"
+      [signed]="ceremonyCompleted"
+      [adversarialResults]="adversarialResults"
+      [isSimulating]="isSimulating"
+      (onInit)="initCeremony($event)"
+      (onAdvanceDkg)="advanceDkg()"
+      (onSign)="signShares($event)"
+      (onReset)="resetCeremony()"
+      (onRunAdversarial)="runAdversarialSuite()"
+      (onCheckCompliance)="checkCompliance()">
+    </app-threshold-panel>
+  </div>
 </div>

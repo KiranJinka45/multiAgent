@@ -1,0 +1,25 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "include": [
+    "src/**/*"
+  ],
+  "compilerOptions": {
+    "outDir": "dist",
+    "declarationMap": true,
+    "declaration": true,
+    "composite": true,
+    "skipLibCheck": true,
+    "noEmit": false,
+    "baseUrl": ".",
+    "paths": {
+      "@packages/utils": [
+        "../utils/src"
+      ]
+    }
+  },
+  "references": [
+    {
+      "path": "../utils"
+    }
+  ]
+}

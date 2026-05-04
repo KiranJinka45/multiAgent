@@ -1,0 +1,102 @@
+import { missionController, stateManager, eventBus } from '@packages/utils';
+import { getExecutionLogger, logger } from '@packages/observability';
+import { Mission } from '@packages/contracts';
+
+export enum OrchestratorStageState {
+    IDLE = 'IDLE',
+    RUNNING = 'RUNNING',
+    COMPLETED = 'COMPLETED',
+    FAILED = 'FAILED'
+}
+
+export class StageStateMachine {
+    private currentStage: string;
+    private currentState: OrchestratorStageState = OrchestratorStageState.IDLE;
+    private executionId: string;
+    private projectId: string;
+
+    constructor(executionId: string, projectId: string) {
+        this.executionId = executionId;
+        this.projectId = projectId;
+        this.currentStage = 'PLANNING';
+    }
+
+    async transition(stage: string, state: OrchestratorStageState, message: string, progress: number) {
+        this.currentStage = stage;
+        this.currentState = state;
+        
+        logger.info({ executionId: this.executionId, stage, state, message }, `[StageStateMachine] Transitioning to ${stage}:${state}`);
+        
+        const uiStatus = state === OrchestratorStageState.RUNNING ? 'in_progress' : 
+                         state === OrchestratorStageState.COMPLETED ? 'completed' : 
+                         state === OrchestratorStageState.FAILED ? 'failed' : 'pending';
+
+        await eventBus.stage(this.executionId, stage.toLowerCase(), uiStatus, message, progress, this.projectId);
+    }
+
+    getStage() { return this.currentStage; }
+    getState() { return this.currentState; }
+}
+
+export class Orchestrator {
+    async run(
+        taskPrompt: string, 
+        userId: string, 
+        projectId: string, 
+        executionId: string,
+        tenantId: string,
+        _signal?: AbortSignal,
+        _options?: { isFastPreview?: boolean }
+    ): Promise<any> {
+        const elog = getExecutionLogger({ executionId });
+        const fsm = new StageStateMachine(executionId, projectId);
+        
+        try {
+            elog.info('Dispatching to Temporal Production Pipeline');
+            await stateManager.transition(executionId, 'created', 'Cluster online.', 5, projectId);
+            
+            const mission: any = {
+                id: executionId,
+                title: taskPrompt.slice(0, 50),
+                projectId,
+                userId,
+                prompt: taskPrompt,
+                status: 'PENDING',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                metadata: {}
+            };
+            await missionController.createMission(mission).catch(() => {});
+
+            const { Connection, Client, WorkflowIdReusePolicy } = await import('@temporalio/client');
+            const connection = await Connection.connect();
+            const client = new Client({ connection });
+
+            await fsm.transition('PLANNING', OrchestratorStageState.RUNNING, 'Orchestrating Temporal mission...', 10);
+
+            const handle = await client.workflow.start('appBuilderWorkflow', {
+                args: [{ prompt: taskPrompt, userId, projectId, executionId, tenantId }],
+                taskQueue: 'app-builder',
+                workflowId: `build-${projectId}-${executionId}`,
+                workflowIdReusePolicy: WorkflowIdReusePolicy.WORKFLOW_ID_REUSE_POLICY_REJECT_DUPLICATE
+            });
+
+            elog.info(`Workflow started. ID: ${handle.workflowId}`);
+
+            const result = await handle.result() as { previewUrl: string };
+
+            await fsm.transition('COMPLETE', OrchestratorStageState.COMPLETED, 'Project ready via Temporal!', 100);
+            return { success: true, executionId, files: [], previewUrl: result.previewUrl, fastPath: true };
+
+        } catch (error) {
+            const errorMsg = error instanceof Error ? error.message : String(error);
+            elog.error({ error: errorMsg }, 'Pipeline failed');
+            if (fsm) await fsm.transition('FAILED', OrchestratorStageState.FAILED, errorMsg, 0);
+            return { success: false, executionId, error: errorMsg };
+        }
+    }
+}
+
+
+
+

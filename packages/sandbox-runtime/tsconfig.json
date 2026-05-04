@@ -1,0 +1,51 @@
+{
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "dist",
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": true,
+    "types": [
+      "node"
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@packages/registry": [
+        "../registry/src"
+      ],
+      "@packages/utils": [
+        "../utils/src"
+      ],
+      "@packages/observability": [
+        "../observability/src"
+      ],
+      "@packages/validator": [
+        "../validator/src"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "extends": "../../tsconfig.base.json",
+  "references": [
+    {
+      "path": "../observability"
+    },
+    {
+      "path": "../registry"
+    },
+    {
+      "path": "../utils"
+    },
+    {
+      "path": "../validator"
+    }
+  ]
+}

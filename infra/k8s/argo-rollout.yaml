@@ -1,0 +1,58 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: gateway-rollout
+  namespace: multi-agent
+spec:
+  replicas: 2
+  strategy:
+    canary:
+      canaryService: gateway-canary
+      stableService: gateway-stable
+      trafficRouting:
+        istio:
+          virtualService:
+            name: gateway-canary
+            routes:
+            - primary # Corresponds to the first route in the VirtualService
+      steps:
+      - setWeight: 5
+      - pause: { duration: 10m }
+      - setWeight: 25
+      - pause: { duration: 10m }
+      - setWeight: 50
+      - pause: { duration: 10m }
+      - setWeight: 100
+  selector:
+    matchLabels:
+      app: gateway
+  template:
+    metadata:
+      labels:
+        app: gateway
+    spec:
+      containers:
+      - name: gateway
+        image: multiagent/gateway:latest
+        ports:
+        - containerPort: 4000
+        # ... env and resources same as deployment.yaml
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: success-rate
+  namespace: multi-agent
+spec:
+  metrics:
+  - name: success-rate
+    interval: 1m
+    successCondition: result[0] >= 0.95
+    failureLimit: 3
+    provider:
+      prometheus:
+        address: http://prometheus:9090
+        query: |
+          sum(rate(gateway_request_duration_seconds_count{status_code=~"2.*"}[1m])) 
+          / 
+          sum(rate(gateway_request_duration_seconds_count[1m]))

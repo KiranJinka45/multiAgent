@@ -1,5 +1,8 @@
 import * as bls from '@noble/bls12-381';
 import { sha256 } from '@noble/hashes/sha256';
+import { Canonical } from './canonical';
+
+export * from './ztan-bls';
 
 const DST = 'BLS_SIG_ZTAN_AUDIT_V1';
 
@@ -14,6 +17,28 @@ export interface PartialSignature {
   nodeId: string;
   signature: string;
   payloadHash: string;
+  timestamp: number;
+}
+
+export interface ProofBundle {
+  version: string;
+  schemaVersion: number; // For backward compatibility
+  ceremonyId: string;
+  timestamp: number;
+  threshold: number;
+  participants: string[];
+  aggregateSignature: string;
+  transcriptHash: string;
+  metadata?: Record<string, any>;
+}
+
+export interface AuthenticatedMessage {
+  messageId: string; // UUID REQUIRED for idempotency
+  nodeId: string;
+  ceremonyId: string;
+  round: string;
+  payload: string; // Hex or JSON string
+  signature: string;
   timestamp: number;
 }
 
@@ -108,54 +133,23 @@ export class ThresholdCrypto {
   public static readonly EXACT_PAYLOAD_BYTES = 32;
 
   private static encodeUint32BE(value: number): Uint8Array {
-    const arr = new Uint8Array(4);
-    const view = new DataView(arr.buffer);
-    view.setUint32(0, value, false);
-    return arr;
+    return Canonical.encodeUint32BE(value);
   }
 
   private static encodeUint64BE(value: number): Uint8Array {
-    const arr = new Uint8Array(8);
-    const view = new DataView(arr.buffer);
-    // Note: Numbers in JS are double-precision floats, but we treat them as integers.
-    // For values up to Number.MAX_SAFE_INTEGER (2^53 - 1), this is safe.
-    const big = BigInt(value);
-    view.setUint32(0, Number(big >> 32n), false);
-    view.setUint32(4, Number(big & 0xffffffffn), false);
-    return arr;
+    return Canonical.encodeUint64BE(value);
   }
 
   private static safeEncode(str: string): Uint8Array {
-    // 1. NFC Normalization (RFC-001 v1.2)
-    const normalized = str.normalize('NFC');
-    
-    // 2. Reject lone surrogates (prevents TextEncoder replacement char injection)
-    // This effectively rejects invalid UTF-8 sequences at the string boundary.
-    if (/(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])/.test(normalized)) {
-      throw new Error(`[ZTAN] REJECT: Invalid UTF-16 (lone surrogates) in string: ${str}`);
-    }
-    
-    return new TextEncoder().encode(normalized);
+    return Canonical.safeEncode(str);
   }
 
   private static encodeField(bytes: Uint8Array): Uint8Array {
-    if (bytes.length > 0xFFFFFFFF) throw new Error('[ZTAN] REJECT: Field length overflow');
-    const lenBuf = this.encodeUint32BE(bytes.length);
-    const out = new Uint8Array(lenBuf.length + bytes.length);
-    out.set(lenBuf);
-    out.set(bytes, lenBuf.length);
-    return out;
+    return Canonical.encodeField(bytes);
   }
 
   private static concat(arrays: Uint8Array[]): Uint8Array {
-    const totalLength = arrays.reduce((acc, value) => acc + value.length, 0);
-    const result = new Uint8Array(totalLength);
-    let length = 0;
-    for (const array of arrays) {
-      result.set(array, length);
-      length += array.length;
-    }
-    return result;
+    return Canonical.concat(arrays);
   }
 
   private static toHex(bytes: Uint8Array): string {
@@ -298,6 +292,74 @@ export class ThresholdCrypto {
     const secretKey = sha256(new TextEncoder().encode(`SECRET_${verifierId}`));
     const publicKey = bls.getPublicKey(secretKey);
     return this.toHex(publicKey);
+  }
+
+  /**
+   * Hashes a payload for audit binding or signature preimages.
+   * Returns a hex-encoded SHA-256 hash.
+   */
+  public static hashPayload(data: { boundPayloadBytes: Uint8Array }): string {
+    const hash = sha256(data.boundPayloadBytes);
+    return this.toHex(hash);
+  }
+
+  public static async signProtocolMessage(
+    nodeId: string, 
+    ceremonyId: string, 
+    round: string, 
+    payload: string, 
+    sk?: string
+  ): Promise<AuthenticatedMessage> {
+    const timestamp = Date.now();
+    const messageId = crypto.randomUUID ? crypto.randomUUID() : 'simulated-uuid-' + Math.random();
+    
+    // Preimage: SHA256(messageId || nodeId || payload || timestamp)
+    const preimage = `${messageId}${nodeId}${payload}${timestamp}`;
+    const msgHash = sha256(new TextEncoder().encode(preimage));
+    
+    const signingKey = sk || this.toHex(this.safeEncode(`IDENTITY_SK_${nodeId}`)).padEnd(64, '0');
+    const signature = await bls.sign(msgHash, this.fromHex(signingKey));
+
+    return {
+      messageId,
+      nodeId,
+      ceremonyId,
+      round,
+      payload,
+      timestamp,
+      signature: this.toHex(signature)
+    };
+  }
+
+  /**
+   * Validates the schema of a proof bundle to ensure compatibility.
+   */
+  public static validateBundle(bundle: ProofBundle): boolean {
+    if (bundle.schemaVersion < 1) throw new Error('Unsupported schema version');
+    if (!bundle.ceremonyId || !bundle.aggregateSignature) return false;
+    return true;
+  }
+
+  /**
+   * Verifies an identity-signed protocol message.
+   * Finalized Phase 2 Logic: Preimage = SHA256(messageId || nodeId || payload || timestamp)
+   */
+  public static async verifyProtocolMessage(
+    msg: AuthenticatedMessage, 
+    ceremonyId: string, 
+    round: string, 
+    pk: string
+  ): Promise<boolean> {
+    if (msg.ceremonyId !== ceremonyId || msg.round !== round) return false;
+
+    const preimage = `${msg.messageId}${msg.nodeId}${msg.payload}${msg.timestamp}`;
+    const msgHash = sha256(new TextEncoder().encode(preimage));
+    
+    try {
+        return await bls.verify(this.fromHex(msg.signature), msgHash, this.fromHex(pk));
+    } catch (e) {
+        return false;
+    }
   }
 
   public static async verifyAudit(

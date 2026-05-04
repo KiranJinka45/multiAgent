@@ -1,0 +1,52 @@
+{
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "compilerOptions": {
+    "outDir": "dist",
+    "noEmit": false,
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@packages/utils": [
+        "../utils/src"
+      ],
+      "@packages/observability": [
+        "../observability/src"
+      ],
+      "@packages/memory-core": [
+        "../memory-core/src"
+      ],
+      "@packages/memory-vector": [
+        "../memory-vector/src"
+      ],
+      "@packages/memory-cache": [
+        "../memory-cache/src"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "extends": "../../tsconfig.base.json",
+  "references": [
+    {
+      "path": "../memory-cache"
+    },
+    {
+      "path": "../memory-core"
+    },
+    {
+      "path": "../memory-vector"
+    },
+    {
+      "path": "../observability"
+    },
+    {
+      "path": "../utils"
+    }
+  ]
+}

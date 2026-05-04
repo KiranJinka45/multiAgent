@@ -1,0 +1,37 @@
+{
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "compilerOptions": {
+    "types": [
+      "node"
+    ],
+    "outDir": "dist",
+    "noEmit": false,
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@packages/utils": [
+        "../utils/src"
+      ],
+      "@packages/observability": [
+        "../observability/src"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "extends": "../../tsconfig.base.json",
+  "references": [
+    {
+      "path": "../observability"
+    },
+    {
+      "path": "../utils"
+    }
+  ]
+}

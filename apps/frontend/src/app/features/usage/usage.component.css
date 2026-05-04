@@ -1,0 +1,150 @@
+:host {
+  display: block;
+  background-color: #0d0e10;
+  color: #e3e2e5;
+  font-family: 'Inter', sans-serif;
+  padding: 1rem;
+}
+
+.usage-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.usage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0;
+  color: #fff;
+}
+
+.tenant-tag {
+  font-size: 0.8rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.3rem 0.8rem;
+  border-radius: 12px;
+  color: #909094;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.usage-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.glass {
+  background: rgba(31, 32, 34, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  padding: 1.5rem;
+}
+
+.usage-card {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.usage-card.highlight {
+  border-color: rgba(42, 229, 0, 0.2);
+  background: linear-gradient(135deg, rgba(42, 229, 0, 0.05) 0%, rgba(31, 32, 34, 0.6) 100%);
+}
+
+.card-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+}
+
+.card-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 0.75rem;
+  color: #909094;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0.2rem 0;
+}
+
+.sub {
+  font-size: 0.7rem;
+  color: #666;
+}
+
+.icon-primary { color: #2ae500; }
+.icon-secondary { color: #00e3fd; }
+.icon-accent { color: #d1bcff; }
+
+.history-section {
+  padding: 2rem;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+}
+
+h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  color: #909094;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  text-align: left;
+  padding: 0.8rem;
+  font-size: 0.75rem;
+  color: #666;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+td {
+  padding: 1rem 0.8rem;
+  font-size: 0.85rem;
+}
+
+tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.cost-cell {
+  color: #2ae500;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+}

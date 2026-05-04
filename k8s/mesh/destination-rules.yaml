@@ -1,0 +1,16 @@
+# ── Enterprise SRE: Zero-Trust Identity mTLS ───────────
+# Configures Client-Side TLS policies for all outbound traffic from mesh proxies.
+
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: default-mtls
+  namespace: multiagent
+spec:
+  # Apply to all services in the multiagent namespace
+  host: "*.multiagent.svc.cluster.local"
+  trafficPolicy:
+    tls:
+      # Ensures that traffic sent by the client proxy uses Istio mutual TLS
+      mode: ISTIO_MUTUAL
+

@@ -1,0 +1,21 @@
+{
+  "id": "TV-010",
+  "description": "Unicode normalization equivalence",
+  "inputA": {
+    "payload": "239f59ed55e737c77147cf55ad0c1b030b6d7ee748a7426952f9b852d5a935e5",
+    "participants": [
+      "nóde"
+    ],
+    "threshold": 1
+  },
+  "inputB": {
+    "payload": "239f59ed55e737c77147cf55ad0c1b030b6d7ee748a7426952f9b852d5a935e5",
+    "participants": [
+      "nóde"
+    ],
+    "threshold": 1
+  },
+  "expected": {
+    "match": true
+  }
+}

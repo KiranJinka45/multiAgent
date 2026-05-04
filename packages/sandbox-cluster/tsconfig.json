@@ -1,0 +1,43 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": [
+      "node"
+    ],
+    "outDir": "dist",
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "noEmit": false,
+    "baseUrl": ".",
+    "paths": {
+      "@packages/utils": [
+        "../utils/src"
+      ],
+      "@packages/registry": [
+        "../registry/src"
+      ],
+      "@packages/validator": [
+        "../validator/src"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "references": [
+    {
+      "path": "../registry"
+    },
+    {
+      "path": "../utils"
+    },
+    {
+      "path": "../validator"
+    }
+  ]
+}

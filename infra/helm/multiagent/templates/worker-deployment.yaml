@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "multiagent.fullname" . }}-worker-free
+  labels:
+    app.kubernetes.io/name: {{ include "multiagent.name" . }}-worker-free
+spec:
+  replicas: {{ .Values.replicaCount.workerFree }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "multiagent.name" . }}-worker-free
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "multiagent.name" . }}-worker-free
+    spec:
+      containers:
+        - name: worker
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["node", "apps/worker/dist/build-worker.js"]
+          env:
+            - name: REDIS_URL
+              value: {{ .Values.config.redisUrl | quote }}
+            - name: DATABASE_URL
+              value: {{ .Values.config.databaseUrl | quote }}
+            - name: WORKER_TIER
+              value: "free"
+          resources:
+            {{- toYaml .Values.resources.worker | nindent 12 }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "multiagent.fullname" . }}-worker-pro
+  labels:
+    app.kubernetes.io/name: {{ include "multiagent.name" . }}-worker-pro
+spec:
+  replicas: {{ .Values.replicaCount.workerPro }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "multiagent.name" . }}-worker-pro
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "multiagent.name" . }}-worker-pro
+    spec:
+      containers:
+        - name: worker
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["node", "apps/worker/dist/build-worker.js"]
+          env:
+            - name: REDIS_URL
+              value: {{ .Values.config.redisUrl | quote }}
+            - name: DATABASE_URL
+              value: {{ .Values.config.databaseUrl | quote }}
+            - name: WORKER_TIER
+              value: "pro"
+          resources:
+            {{- toYaml .Values.resources.worker | nindent 12 }}

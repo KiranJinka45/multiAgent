@@ -1,0 +1,56 @@
+{
+  "version": "ZTAN_AUDIT_EVIDENCE_V1.1",
+  "input": {
+    "raw": "{\n  \"version\": \"ZTAN_CANONICAL_V1\",\n  \"auditId\": \"TEST-AUDIT-EUG5\",\n  \"timestamp\": 1777796381884,\n  \"payloadHash\": \"8f92b4e28f92b4e28f92b4e28f92b4e28f92b4e28f92b4e28f92b4e28f92b4e2\",\n  \"threshold\": 2,\n  \"nodeIds\": [\n    \"nodeA\",\n    \"nodeB\",\n    \"nodeC\"\n  ]\n}",
+    "fingerprint": "8e54161a07ea91c201ed4e01f9a2f4a853174cdfa647b509040e210caaf0b402"
+  },
+  "consensus": {
+    "status": "VERIFIED",
+    "signatures": [
+      {
+        "verifierId": "SEC-01",
+        "publicKey": "UNKNOWN_PK",
+        "algorithm": "BLS-SIM-V1",
+        "signature": "d2903df000ee0dea200999abe64251ede12ffe11b7ee9165ac3cbb69c72c9e16"
+      },
+      {
+        "verifierId": "SRE-02",
+        "publicKey": "UNKNOWN_PK",
+        "algorithm": "BLS-SIM-V1",
+        "signature": "37f723c8bad3a4aa3302015eb43ee1fb39150eb2b1e5064b4521a2ac3806f60d"
+      },
+      {
+        "verifierId": "GOV-03",
+        "publicKey": "UNKNOWN_PK",
+        "algorithm": "BLS-SIM-V1",
+        "signature": "82e2e2247d7cd1253cf1885610c09923d59b1c8cf545576e7ddac580f63de300"
+      }
+    ],
+    "threshold": 3,
+    "payloadHash": "639b3159c906f1275df10323b0154a107f731a49f6681c7e730092f12166da38"
+  },
+  "integrity": {
+    "canonicalHash": "0d8d551a9d73c7187b621ae90b85deb78974a2296b72b39ef8ad0e1c1c6ac6b3",
+    "finalAnchor": "30a0fd0c0fdd762bc5ee696a6628b58f6bf4bf25a9284c738048a7bbf1c2b5df",
+    "traceChain": [
+      "895a45bc2ede4ed56206ca4fb747c1f94bd512cf931dc5b3bc2f27707a2b96f4",
+      "ec4c0e9bbaa056cded4da730eef8b9a67d5e78980d6182a98a54da8bc64a9830",
+      "17af90049a23256352f21e021b8cf5bc37383d80148450df6e44d98d78014aec",
+      "8e7f0978cd06c8f5e446cd0cbfd53e66dc8cdd0007f8713072557ec6319100b7",
+      "2754091d04e24da9eb079371232970c350c86a4844c8921f64202dca18ecc45d",
+      "027bd13189005b231e2238f80f4675e0fc035f4de919060cf1aeee12c30c75a8",
+      "be52437d818548aebf32308e6cd0672f7f3284d8418505a94c036ae4db651141",
+      "3697dab15903dc6e61ff96008ee202dd6e2b43c003c814d16f97eff93af9ac04",
+      "ca091d855714d881eeff16a7677f4b510279be0366466770ab9920266593e025",
+      "d3a9229b33f72a6ffb55b28e12fb4eedd109683f081cc09d0d7df447710a5ecf"
+    ]
+  },
+  "reproducibility": {
+    "algorithms": {
+      "hashing": "SHA-256",
+      "signatures": "BLS-SIM-V1"
+    },
+    "spec": "ZTAN_CANONICAL_V1",
+    "steps": "1. Verify original raw -> fingerprint. 2. Verify consensus payload hash. 3. Verify traceChain. 4. Re-anchor. 5. Verify authority signatures."
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "title": "MultiAgent Mesh V1",
+  "uid": "multiagent-mesh-v1",
+  "panels": [
+    {
+      "title": "API Latency (P99)",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(gateway_request_duration_seconds_bucket[5m])) by (le, route))",
+          "legendFormat": "{{route}}"
+        }
+      ]
+    },
+    {
+      "title": "Error Rates (Non-2xx)",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum(rate(gateway_request_duration_seconds_count{status_code!~\"2..\"}[5m])) by (status_code, route)",
+          "legendFormat": "{{status_code}} - {{route}}"
+        }
+      ]
+    },
+    {
+      "title": "Circuit Breaker State",
+      "type": "state-timeline",
+      "targets": [
+        {
+          "expr": "gateway_circuit_breaker_state",
+          "legendFormat": "{{target_service}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "type": "value", "options": { "0": { "text": "CLOSED", "color": "green" }, "1": { "text": "OPEN", "color": "red" }, "2": { "text": "HALF-OPEN", "color": "yellow" } } }
+          ]
+        }
+      }
+    },
+    {
+      "title": "Active Runtimes",
+      "type": "gauge",
+      "targets": [
+        { "expr": "sum(gateway_runtime_active_total)" }
+      ]
+    }
+  ]
+}

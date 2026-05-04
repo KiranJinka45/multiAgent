@@ -1,0 +1,30 @@
+{
+  "name": "@packages/queue",
+  "version": "1.0.0",
+  "description": "MultiAgent High-Availability Queue Management (BullMQ)",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup src/index.ts --watch"
+  },
+  "dependencies": {
+    "bullmq": "^5.70.1",
+    "ioredis": "^5.10.1",
+    "@packages/observability": "workspace:*",
+    "@packages/config": "workspace:*",
+    "@packages/utils": "workspace:*"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    }
+  }
+}

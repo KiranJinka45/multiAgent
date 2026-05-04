@@ -1,0 +1,49 @@
+{
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "compilerOptions": {
+    "types": [
+      "node"
+    ],
+    "outDir": "dist",
+    "declarationMap": true,
+    "declaration": true,
+    "composite": true,
+    "noEmit": false,
+    "baseUrl": ".",
+    "paths": {
+      "@packages/utils": [
+        "../utils/src"
+      ],
+      "@packages/registry": [
+        "../registry/src"
+      ],
+      "@packages/validator": [
+        "../validator/src"
+      ],
+      "@packages/contracts": [
+        "../contracts/src"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "extends": "../../tsconfig.base.json",
+  "references": [
+    {
+      "path": "../contracts"
+    },
+    {
+      "path": "../registry"
+    },
+    {
+      "path": "../utils"
+    },
+    {
+      "path": "../validator"
+    }
+  ]
+}

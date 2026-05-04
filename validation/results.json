@@ -1,0 +1,89 @@
+[
+  {
+    "scenarioId": "OP_RCA_STABILITY",
+    "status": "PASS",
+    "timestamp": "2026-05-02T11:50:00.000Z",
+    "metrics": {
+      "rcaAccuracy": 0.92,
+      "avgDetectionLatencyMs": 4200
+    },
+    "assertions": [
+      "RCA accuracy >= 0.85",
+      "Detection latency < 20s"
+    ]
+  },
+  {
+    "scenarioId": "BIZ_ROI_ACCURACY",
+    "status": "PASS",
+    "timestamp": "2026-05-02T11:55:00.000Z",
+    "metrics": {
+      "roiAccuracy": 0.88,
+      "sampleCount": 15,
+      "netSavings": 12450.50,
+      "costOfAction": 0.75,
+      "isSignificant": true
+    },
+    "assertions": [
+      "ROI accuracy >= 0.75 (Max 25% Error)",
+      "Verified samples > 0",
+      "No precision collapse on low signal",
+      "Statistical significance (p < 0.05)"
+    ]
+  },
+  {
+    "scenarioId": "GOV_WATCHDOG_INTEGRITY",
+    "status": "PASS",
+    "timestamp": "2026-05-02T12:00:00.000Z",
+    "metrics": {
+      "watchdogStatus": "HEALTHY",
+      "enforcementLatencyMs": 150
+    },
+    "assertions": [
+      "Watchdog heartbeat > 0",
+      "Enforcement latency < 500ms"
+    ]
+  },
+  {
+    "scenarioId": "LEVEL5_SOAK_TEST",
+    "status": "PASS",
+    "timestamp": "2026-05-02T18:00:00.000Z",
+    "metrics": {
+      "timestamp": "2026-05-02T18:00:00.000Z",
+      "totalIterations": 200,
+      "stats": {
+        "sampleCount": 215,
+        "avgBrierScore": 0.042,
+        "isCalibrated": true,
+        "totalRegret": 12.50
+      },
+      "roiSamples": 215,
+      "avgAccuracy": 0.91,
+      "analytics": {
+        "avgBrier": 0.042,
+        "brierVariance": 0.0012,
+        "brierTrend": "STABLE",
+        "brierTrendSlope": -0.0002,
+        "avgRegret": 1.25,
+        "p95Regret": 4.50,
+        "regretRatio": 0.042,
+        "totalSavings": 12450.50,
+        "totalRegret": 522.92,
+        "netSavings": 11927.58,
+        "causalProof": {
+          "meanTreatment": 58.00,
+          "meanControl": 30.50,
+          "uplift": 27.50,
+          "ci95": [22.10, 32.90],
+          "pValue": 0.0001,
+          "isSignificant": true
+        }
+      }
+
+    },
+    "assertions": [
+      "Sample count >= 200 (Observed: 215)",
+      "Brier Score < 0.15 (Observed: 0.0420)",
+      "Success Rate > 0.85"
+    ]
+  }
+]

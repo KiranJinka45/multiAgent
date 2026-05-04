@@ -1,0 +1,222 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String        @id @default(uuid())
+  email     String        @unique
+  name      String?
+  role      String        @default("viewer") // admin, agent, viewer
+  password  String?
+  tenantId  String?
+  tenant    Tenant?       @relation(fields: [tenantId], references: [id])
+  sessions  UserSession[]
+  createdAt DateTime      @default(now())
+}
+
+model UserSession {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash    String   @unique
+  deviceInfo   String?
+  expiresAt    DateTime
+  lastActiveAt DateTime @default(now())
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Tenant {
+  id        String    @id @default(uuid())
+  name      String
+  users     User[]
+  missions  Mission[]
+  agents    Agent[]
+  projects  Project[]
+  createdAt DateTime  @default(now())
+}
+
+model Project {
+  id          String        @id @default(uuid())
+  name        String
+  description String?
+  status      String        @default("draft") // draft, active, archived
+  tenantId    String?
+  tenant      Tenant?       @relation(fields: [tenantId], references: [id])
+  files       ProjectFile[]
+  metrics     BuildMetric[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model ProjectFile {
+  id        String   @id @default(uuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id])
+  path      String
+  content   String?
+  language  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([projectId, path])
+}
+
+model Mission {
+  id          String   @id @default(uuid())
+  title       String
+  status      String   @default("idle") // idle, in-progress, completed, failed
+  progress    Int      @default(0)
+  type        String   @default("exploration")
+  description String?
+  tenantId    String?
+  tenant      Tenant?  @relation(fields: [tenantId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Agent {
+  id         String   @id @default(uuid())
+  name       String
+  type       String // scout, guardian, architect
+  status     String   @default("standby") // standby, busy, offline
+  health     Int      @default(100)
+  tenantId   String?
+  tenant     Tenant?  @relation(fields: [tenantId], references: [id])
+  lastActive DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  tenantId  String   @default("platform-admin")
+  userId    String?
+  action    String
+  resource  String
+  metadata  Json?
+  status    String?
+  ipAddress String?
+  hash      String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([tenantId])
+}
+
+model ProposedChange {
+  id              String   @id @default(uuid())
+  agentId         String
+  targetPath      String
+  changeType      String
+  reason          String
+  patch           String
+  expectedImpact  Json?
+  validationScore Float?
+  status          String   @default("proposed") // proposed, validated, promoted, rejected
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model ExecutionLog {
+  id          String   @id @default(uuid())
+  executionId String
+  stage       String
+  status      String
+  message     String?
+  progress    Int      @default(0)
+  metadata    Json?
+  eventId     String?  @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([executionId])
+}
+
+model Event {
+  id        String   @id @default(uuid())
+  type      String
+  userId    String?
+  tenantId  String?
+  metadata  Json?
+  eventId   String?  @unique
+  createdAt DateTime @default(now())
+
+  @@index([type])
+  @@index([tenantId])
+}
+
+model Subscription {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  tenantId  String?
+  stripeId  String?
+  productId String?
+  plan      String   @default("free")
+  status    String   @default("active")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tenantId])
+  @@index([stripeId])
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  price       Float
+  createdAt   DateTime @default(now())
+}
+
+model ProductMetric {
+  id        String   @id @default(uuid())
+  productId String
+  metric    String
+  value     Float
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+}
+
+model PaymentEvent {
+  id        String   @id @default(uuid())
+  amount    Float
+  currency  String   @default("USD")
+  status    String
+  createdAt DateTime @default(now())
+}
+
+model CodeModule {
+  id        String   @id @default(uuid())
+  path      String   @unique
+  content   String?
+  hash      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Pattern {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+}
+
+model BuildMetric {
+  id         String   @id @default(uuid())
+  projectId  String
+  project    Project  @relation(fields: [projectId], references: [id])
+  tokensUsed Int      @default(0)
+  durationMs Int      @default(0)
+  costUsd    Float    @default(0)
+  status     String   @default("completed")
+  createdAt  DateTime @default(now())
+
+  @@index([projectId])
+}

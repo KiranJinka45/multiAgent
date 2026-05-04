@@ -1,0 +1,47 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "composite": true,
+    "noEmit": false,
+    "declaration": true,
+    "baseUrl": ".",
+    "paths": {
+      "@packages/auth-internal": [
+        "../../packages/auth-internal/src"
+      ],
+      "@packages/config": [
+        "../../packages/config/src"
+      ],
+      "@packages/db": [
+        "../../packages/db/src"
+      ],
+      "@packages/observability": [
+        "../../packages/observability/src"
+      ],
+      "@packages/utils": [
+        "../../packages/utils/src"
+      ]
+    }
+  },
+  "include": [
+    "src"
+  ],
+  "references": [
+    {
+      "path": "../../packages/auth-internal"
+    },
+    {
+      "path": "../../packages/config"
+    },
+    {
+      "path": "../../packages/db"
+    },
+    {
+      "path": "../../packages/observability"
+    },
+    {
+      "path": "../../packages/utils"
+    }
+  ]
+}

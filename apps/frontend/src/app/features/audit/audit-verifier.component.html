@@ -1,0 +1,45 @@
+<div class="terminal-container">
+  <!-- Sidebar Buffer Area -->
+  <div class="sidebar">
+    <div class="sidebar-header">JSON BUFFER</div>
+    <textarea 
+      class="buffer-editor" 
+      [(ngModel)]="buffer" 
+      placeholder="// Paste audit JSON here or type 'load' in console"
+    ></textarea>
+  </div>
+
+  <!-- Terminal Main Area -->
+  <div class="terminal-main">
+    <div class="terminal-header">
+      <span class="dot red"></span>
+      <span class="dot yellow"></span>
+      <span class="dot green"></span>
+      <span class="title">ztan-verify --infrastructure</span>
+    </div>
+
+    <div class="terminal-body" #terminalBody>
+      <div *ngFor="let line of history" class="line" [ngClass]="line.type">
+        <span class="timestamp">[{{ line.timestamp }}]</span>
+        <span class="content">{{ line.text }}</span>
+      </div>
+      
+      <div *ngIf="isVerifying" class="line info">
+        <span class="timestamp">[*]</span>
+        <span class="content blink">Processing Consensus...</span>
+      </div>
+    </div>
+
+    <div class="terminal-footer">
+      <span class="prompt">ztan@audit:~$</span>
+      <input 
+        type="text" 
+        class="command-input" 
+        [(ngModel)]="commandInput" 
+        (keydown)="handleKeydown($event)"
+        placeholder="Type command (help, load, verify, clear)..."
+        autofocus
+      />
+    </div>
+  </div>
+</div>

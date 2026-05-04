@@ -1,0 +1,26 @@
+# Deep Exclusion Dockerignore
+**/node_modules
+**/.git
+**/.turbo
+**/.next
+**/dist
+**/build
+**/.generated-projects
+**/packages_OLD
+**/supabase/.branches
+**/supabase/.temp
+**/*.log
+**/.env*
+! .env.production
+.vscode
+.idea
+*.bak
+*.tmp
+node_modules
+.git
+.turbo
+.next
+dist
+build
+.generated-projects
+packages_OLD

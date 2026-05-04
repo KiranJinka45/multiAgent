@@ -1,0 +1,32 @@
+{
+  "name": "@packages/refactor-agent",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts --watch"
+  },
+  "dependencies": {
+    "fs-extra": "^11.3.4",
+    "pino": "^10.3.1",
+    "@packages/observability": "workspace:*",
+    "@packages/utils": "workspace:*",
+    "@packages/supabase": "workspace:*"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^22.13.9"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    }
+  }
+}

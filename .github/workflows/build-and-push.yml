@@ -1,0 +1,48 @@
+name: Build & Push
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build packages
+        run: npm run build
+
+      - name: Login to GHCR
+        run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build Docker Images
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}/gateway:${{ github.sha }} ./apps/gateway
+          docker build -t ghcr.io/${{ github.repository }}/core-api:${{ github.sha }} ./apps/core-api
+
+      - name: Snyk Security Scan (Gateway)
+        uses: snyk/actions/docker@master
+        continue-on-error: true # Don't block build in this demo, but log issues
+        with:
+          image: ghcr.io/${{ github.repository }}/gateway:${{ github.sha }}
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      - name: Push Images
+        run: |
+          docker push ghcr.io/${{ github.repository }}/gateway:${{ github.sha }}
+          docker push ghcr.io/${{ github.repository }}/core-api:${{ github.sha }}

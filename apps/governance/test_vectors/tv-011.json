@@ -1,0 +1,18 @@
+{
+  "id": "TV-011",
+  "description": "Binary payload encoding",
+  "input": {
+    "payload": "317221ee43da55689000b52a7bbee3c9f5792e14a62859ee4f6d5d56c5b2d805",
+    "participants": [
+      "NodeB",
+      "nodea",
+      "NODEA",
+      "nodeb "
+    ],
+    "threshold": 2
+  },
+  "expected": {
+    "canonicalHashHex": "cad3a7e0a3bb51f29830962f0afadb0df4cd4ba6ada653f77cc0ebccb7d34b1e",
+    "boundPayloadHex": "000000115a54414e5f43414e4f4e4943414c5f563100000020317221ee43da55689000b52a7bbee3c9f5792e14a62859ee4f6d5d56c5b2d80500000020dbad858633a95353f82f19793c72bfb115798a0ff7cdffbcadfa27623ee45d1f"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "id": "TV-014",
+  "description": "Rejection of threshold exceeding participants",
+  "input": {
+    "payload": "e3eafc91a781f8513062a55a78d6e89243543c43b810168bc61c9b319b628671",
+    "participants": [
+      "nodeA",
+      "nodeB"
+    ],
+    "threshold": 3
+  },
+  "expected": {
+    "error": true,
+    "errorEncountered": true
+  }
+}

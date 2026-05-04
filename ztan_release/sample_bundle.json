@@ -1,0 +1,18 @@
+{
+  "version": "ZTAN_V1.5",
+  "schemaVersion": 1,
+  "ceremonyId": "CER-SAMPLE-2026",
+  "timestamp": 1714845600000,
+  "threshold": 2,
+  "participants": ["nodeA", "nodeB", "nodeC"],
+  "metadata": {
+    "eligibleKeys": [
+      "b14972e3917822b3780a4a6e7275727931322d333831204731204b657920412e2e2e",
+      "b14972e3917822b3780a4a6e7275727931322d333831204731204b657920422e2e2e",
+      "b14972e3917822b3780a4a6e7275727931322d333831204731204b657920432e2e2e"
+    ],
+    "actualSigners": ["nodeA", "nodeB"]
+  },
+  "aggregateSignature": "b8f2...sample_aggregate_signature...",
+  "transcriptHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

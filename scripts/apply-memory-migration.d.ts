@@ -1,0 +1,4 @@
+declare const supabaseUrl: string;
+declare const serviceRoleKey: string;
+declare const sql = "\nCREATE TABLE IF NOT EXISTS project_memory (\n    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,\n    project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,\n    framework TEXT DEFAULT 'nextjs',\n    styling TEXT DEFAULT 'tailwind',\n    backend TEXT DEFAULT 'api-routes',\n    database_type TEXT DEFAULT 'supabase',\n    auth TEXT DEFAULT 'none',\n    features JSONB DEFAULT '[]'::jsonb,\n    file_manifest JSONB DEFAULT '[]'::jsonb,\n    edit_history JSONB DEFAULT '[]'::jsonb,\n    created_at TIMESTAMPTZ DEFAULT NOW(),\n    updated_at TIMESTAMPTZ DEFAULT NOW(),\n    UNIQUE(project_id)\n);\nCREATE INDEX IF NOT EXISTS idx_project_memory_project_id ON project_memory(project_id);\n";
+declare function run(): Promise<void>;

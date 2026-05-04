@@ -1,0 +1,28 @@
+# ── Enterprise SRE: Network Fault Injection ──────────────────────────────
+# Injects synthetic but real network-layer degradation to test application 
+# resilience, retry policies, and timeout handling.
+
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: gateway-chaos
+  namespace: multiagent
+spec:
+  hosts:
+  - gateway
+  http:
+  - fault:
+      delay:
+        percentage:
+          value: 10.0 # Reduced for baseline safety
+        fixedDelay: 500ms
+      abort:
+        percentage:
+          value: 1.0
+        httpStatus: 503
+    route:
+    - destination:
+        host: gateway
+
+---
+# Note: Requires DestinationRule subsets to be defined.

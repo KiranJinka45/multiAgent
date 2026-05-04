@@ -1,0 +1,65 @@
+name: Deploy MultiAgent SaaS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v3
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9.0.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Monorepo
+        run: pnpm build
+
+      - name: Docker Login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and Push Web
+        run: |
+          docker build -t ${{ secrets.DOCKER_USER }}/multiagent-web:latest -f apps/web/Dockerfile .
+          docker push ${{ secrets.DOCKER_USER }}/multiagent-web:latest
+
+      - name: Build and Push API
+        run: |
+          docker build -t ${{ secrets.DOCKER_USER }}/multiagent-api:latest -f apps/api/Dockerfile .
+          docker push ${{ secrets.DOCKER_USER }}/multiagent-api:latest
+
+      - name: Build and Push Worker
+        run: |
+          docker build -t ${{ secrets.DOCKER_USER }}/multiagent-worker:latest -f apps/worker/Dockerfile .
+          docker push ${{ secrets.DOCKER_USER }}/multiagent-worker:latest
+
+      - name: Setup kubectl
+        uses: azure/k8s-set-context@v3
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBECONFIG }}
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f infra/k8s/
+          kubectl rollout status deployment/multiagent-web
+          kubectl rollout status deployment/multiagent-api
+          kubectl rollout status deployment/multiagent-worker

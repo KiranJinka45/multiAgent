@@ -1,0 +1,116 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: auth-service
+  namespace: multiagent
+  labels:
+    app: auth-service
+  annotations:
+    reloader.stakater.com/auto: "true"
+    v1.0.0-final: "true"
+spec:
+  replicas: 3
+  strategy:
+    canary:
+      maxUnavailable: 0
+      maxSurge: 1
+      steps:
+      - setWeight: 10
+      - pause: {duration: 2m}
+      - setWeight: 25
+      - pause: {duration: 5m}
+      - setWeight: 50
+      - pause: {duration: 5m}
+      analysis:
+        templates:
+        - templateName: success-rate
+        args:
+        - name: app-name
+          value: auth-service
+  selector:
+    matchLabels:
+      app: auth-service
+  template:
+    metadata:
+      labels:
+        app: auth-service
+        telemetry: "enabled"
+    spec:
+      enableServiceLinks: false
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: "kubernetes.io/hostname"
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app: auth-service
+      - maxSkew: 1
+        topologyKey: "topology.kubernetes.io/zone"
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app: auth-service
+      containers:
+      - name: auth-service
+        image: ghcr.io/kiran/multiagent-auth:v1.1.0
+
+        imagePullPolicy: IfNotPresent
+        command: ["node", "dist/index.js"]
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "4002"
+        - name: REDIS_SENTINEL_HOSTS
+          value: "redis-sentinel:26379"
+        - name: REDIS_SENTINEL_NAME
+          value: "mymaster"
+        # SRE Hardening: Transition from static env-vars to Secret references
+        envFrom:
+        - secretRef:
+            name: multiagent-auth-secrets
+        ports:
+        - containerPort: 4002
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+          limits:
+            cpu: "300m"
+            memory: "512Mi"
+        # ── Scaling Shock Absorption Capstone ──────────────────────────────
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 4002
+          failureThreshold: 30 # Allow 5 minutes total for slow start (30 * 10s)
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 4002
+          initialDelaySeconds: 5
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 4002
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh", "-c", "sleep 15"] # Allow ingress to drain during rollout
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  namespace: multiagent
+spec:
+  ports:
+  - port: 4002
+    targetPort: 4002
+    protocol: TCP
+  selector:
+    app: auth-service

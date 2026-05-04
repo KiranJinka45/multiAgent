@@ -1,0 +1,29 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "composite": true,
+    "declaration": true,
+    "noEmit": false,
+    "baseUrl": ".",
+    "paths": {
+      "@packages/observability": [
+        "../observability/src"
+      ],
+      "@packages/utils": [
+        "../utils/src"
+      ]
+    }
+  },
+  "include": [
+    "src"
+  ],
+  "references": [
+    {
+      "path": "../observability"
+    },
+    {
+      "path": "../utils"
+    }
+  ]
+}

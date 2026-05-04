@@ -1,0 +1,41 @@
+<div class="pricing-container">
+  <div class="pricing-grid">
+    <div *ngFor="let tier of tiers" 
+         class="pricing-card" 
+         [class.recommended]="tier.recommended"
+         [class.glass]="true">
+      
+      <div class="card-glow" *ngIf="tier.recommended"></div>
+      
+      <div class="recommended-badge" *ngIf="tier.recommended">
+        MOST POPULAR
+      </div>
+
+      <div class="card-header">
+        <div class="icon-box">
+          <lucide-icon [name]="tier.icon" class="icon-primary"></lucide-icon>
+        </div>
+        <h3>{{ tier.name }}</h3>
+        <p class="description">{{ tier.description }}</p>
+      </div>
+
+      <div class="price-box">
+        <span class="price">{{ tier.price }}</span>
+        <span class="period">/ {{ tier.period }}</span>
+      </div>
+
+      <div class="feature-list">
+        <div class="feature-item" *ngFor="let feature of tier.features">
+          <lucide-icon name="check" class="check-icon"></lucide-icon>
+          <span>{{ feature }}</span>
+        </div>
+      </div>
+
+      <button class="btn-primary" 
+              [class.btn-glow]="tier.recommended"
+              (click)="selectPlan(tier.id)">
+        {{ tier.cta }}
+      </button>
+    </div>
+  </div>
+</div>

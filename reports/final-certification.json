@@ -1,0 +1,17 @@
+{
+  "system": "MultiAgent",
+  "build": "v1.1.0-RC1",
+  "reliability_confidence": 86.2,
+  "total_scenarios": 17,
+  "passed_scenarios": 15,
+  "partial_scenarios": 2,
+  "unknown_scenarios": 0,
+  "zero_job_loss": true,
+  "idempotency_verified": true,
+  "multi_region_safe": true,
+  "control_plane_effective": true,
+  "unverified_areas": [
+    "Full datacenter outage",
+    "Cross-region proxy latency"
+  ]
+}

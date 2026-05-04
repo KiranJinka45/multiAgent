@@ -1,0 +1,13 @@
+{
+  "id": "TV-013",
+  "description": "Rejection of empty participant lists",
+  "input": {
+    "payload": "e3eafc91a781f8513062a55a78d6e89243543c43b810168bc61c9b319b628671",
+    "participants": [],
+    "threshold": 2
+  },
+  "expected": {
+    "error": true,
+    "errorEncountered": true
+  }
+}

@@ -1,0 +1,57 @@
+# dependencies
+node_modules/
+**/node_modules/
+.turbo/
+**/.turbo/
+
+# next.js
+.next/
+**/.next/
+out/
+
+# production
+dist/
+**/dist/
+build/
+**/build/
+.env*
+**/.env*
+
+# misc
+.DS_Store
+*.pem
+dump.rdb
+appendonlydir/
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env*.local
+.env
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# scavenger artifacts
+*.png
+
+# custom execution ignored files
+/tmp/
+*.log
+system.log
+validate_*.txt
+tsc_*.log
+*.txt
+*.log
+Redis/*.pid
+.sandboxes/
+.previews/
+system-startup.log
+/.microvms/
+file_list.txt
+k8s/secrets.yaml

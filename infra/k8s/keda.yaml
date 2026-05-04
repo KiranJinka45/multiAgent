@@ -1,0 +1,17 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: worker-scaler
+  namespace: default
+spec:
+  scaleTargetRef:
+    name: multiagent-worker
+  minReplicaCount: 1
+  maxReplicaCount: 20
+  triggers:
+    - type: redis
+      metadata:
+        address: multiagent-redis.default.svc.cluster.local:6379
+        listName: bull:multiagent-queue:wait
+        listLength: "10"
+        passwordFromEnv: REDIS_PASSWORD # If used

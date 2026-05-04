@@ -1,0 +1,140 @@
+{
+  "{\"latency\":627,\"errorRate\":0.018795164407378984,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":527,\"errorRate\":0.018795164407378984,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":427,\"errorRate\":0.018795164407378984,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":327,\"errorRate\":0.018795164407378984,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":227,\"errorRate\":0.018795164407378984,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":639,\"errorRate\":0.04504154642213796,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":539,\"errorRate\":0.04504154642213796,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":439,\"errorRate\":0.04504154642213796,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":339,\"errorRate\":0.04504154642213796,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":239,\"errorRate\":0.04504154642213796,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":641,\"errorRate\":0.036321569745202086,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":541,\"errorRate\":0.036321569745202086,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":441,\"errorRate\":0.036321569745202086,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":341,\"errorRate\":0.036321569745202086,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":241,\"errorRate\":0.036321569745202086,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":635,\"errorRate\":0.170514252360428,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":535,\"errorRate\":0.120514252360428,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":435,\"errorRate\":0.07051425236042799,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":335,\"errorRate\":0.07051425236042799,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":235,\"errorRate\":0.07051425236042799,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":1099,\"errorRate\":0.1957571674566727,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":999,\"errorRate\":0.14575716745667272,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":899,\"errorRate\":0.09575716745667272,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":799,\"errorRate\":0.09575716745667272,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":699,\"errorRate\":0.09575716745667272,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":882,\"errorRate\":0.09287928989683786,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":782,\"errorRate\":0.09287928989683786,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "MONITOR": null
+  },
+  "{\"latency\":782,\"errorRate\":0.10287928989683785,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":682,\"errorRate\":0.05287928989683785,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "MONITOR": null
+  },
+  "{\"latency\":682,\"errorRate\":0.06287928989683784,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":235,\"errorRate\":0.08978438488764287,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":200,\"errorRate\":0.08978438488764287,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":889,\"errorRate\":0.006958623292375333,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":789,\"errorRate\":0.006958623292375333,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":689,\"errorRate\":0.006958623292375333,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "LOAD_SHEDDING": null
+  },
+  "{\"latency\":389,\"errorRate\":0.01,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":289,\"errorRate\":0.01,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":577,\"errorRate\":0.11673349182052228,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":477,\"errorRate\":0.06673349182052228,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":377,\"errorRate\":0.06673349182052228,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":277,\"errorRate\":0.06673349182052228,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":200,\"errorRate\":0.06673349182052228,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":402,\"errorRate\":0.1374977878060602,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":302,\"errorRate\":0.0874977878060602,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":202,\"errorRate\":0.0874977878060602,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  },
+  "{\"latency\":200,\"errorRate\":0.0874977878060602,\"redis\":1,\"mode\":\"NORMAL\"}": {
+    "RESTART_WORKERS": null
+  }
+}

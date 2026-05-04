@@ -1,0 +1,13 @@
+apiVersion: v2
+name: multiagent
+description: A professional Helm chart for the multi-tenant AI agent platform
+type: application
+version: 1.0.0
+appVersion: "2.0.0"
+keywords:
+  - ai-agents
+  - multi-tenant
+  - kubernetes
+maintainers:
+  - name: antigravity
+    email: antigravity@google.com

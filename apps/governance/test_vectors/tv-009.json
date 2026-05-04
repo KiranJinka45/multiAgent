@@ -1,0 +1,18 @@
+{
+  "id": "TV-009",
+  "description": "Delimiter collision safety",
+  "input": {
+    "payload": "7d1dd70436642cb704e785584234c183120889f282c17d4d6fb64c84e6b464a6",
+    "participants": [
+      "NodeB",
+      "nodea",
+      "NODEA",
+      "nodeb "
+    ],
+    "threshold": 2
+  },
+  "expected": {
+    "canonicalHashHex": "57b4407030215a70433f75e107bd574bcf31e309fed678f41b4364a010fe66a4",
+    "boundPayloadHex": "000000115a54414e5f43414e4f4e4943414c5f5631000000207d1dd70436642cb704e785584234c183120889f282c17d4d6fb64c84e6b464a600000020dbad858633a95353f82f19793c72bfb115798a0ff7cdffbcadfa27623ee45d1f"
+  }
+}

@@ -1,0 +1,28 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "alerts.yml"
+
+scrape_configs:
+  - job_name: 'gateway'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['gateway:4080']
+        labels:
+          service: 'gateway'
+
+  - job_name: 'worker-fleet'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['worker:8082']
+        labels:
+          service: 'worker-fleet'
+
+  - job_name: 'auth-service'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['auth-service:4081']
+        labels:
+          service: 'auth-service'

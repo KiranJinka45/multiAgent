@@ -1,0 +1,36 @@
+# ── Disaster Recovery: Multi-Region Traffic Architecture ───────────────────
+# This manifest defines the blueprint for Global High Availability (GHA).
+
+apiVersion: networking.gke.io/v1
+kind: MultiClusterIngress
+metadata:
+  name: multiagent-global-ingress
+  namespace: production
+spec:
+  template:
+    spec:
+      backend:
+        serviceName: gateway
+        servicePort: 4080
+---
+apiVersion: networking.gke.io/v1
+kind: MultiClusterService
+metadata:
+  name: gateway
+  namespace: production
+spec:
+  template:
+    spec:
+      selector:
+        app: gateway
+      ports:
+      - name: http
+        protocol: TCP
+        port: 4080
+        targetPort: 4080
+---
+# ── Architectural Blueprint (DR-OPS) ──────────────────────────────────────
+# 1. Primary Region (us-east1): Active
+# 2. Secondary Region (us-west1): Passive/Warm Standby
+# 3. Data Replication: Cloud SQL Cross-Region Replicas + Redis Global Datastore
+# 4. Failover: Automatic health-check based rerouting via Global Load Balancer

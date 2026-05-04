@@ -1,0 +1,1 @@
+{"version":3,"file":"confidence-engine.d.ts","sourceRoot":"","sources":["confidence-engine.ts"],"names":[],"mappings":"AAAA;;;GAGG;AACH,wBAAgB,mBAAmB,CAAC,OAAO,EAAE;IACzC,WAAW,EAAE,MAAM,CAAC;IACpB,WAAW,EAAE,MAAM,CAAC;IACpB,SAAS,EAAE,MAAM,CAAC;IAClB,OAAO,EAAE,MAAM,CAAC;IAChB,aAAa,EAAE,MAAM,CAAC;CACzB,UAmCA"}

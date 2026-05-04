@@ -1,0 +1,12 @@
+{
+  "weights": {
+    "errorRate": 50.5,
+    "latency": 10.2,
+    "queueDepth": 0.1,
+    "redisUp": 20,
+    "isEmergencyMode": 10,
+    "failoverCount": 5
+  },
+  "learningRate": 0.05,
+  "lastUpdate": 1777458805610
+}

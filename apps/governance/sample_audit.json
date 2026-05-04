@@ -1,0 +1,12 @@
+{
+  "version": "ZTAN_CANONICAL_V1",
+  "auditId": "TEST-AUDIT-EUG5",
+  "timestamp": 1777796381884,
+  "payloadHash": "8f92b4e28f92b4e28f92b4e28f92b4e28f92b4e28f92b4e28f92b4e28f92b4e2",
+  "threshold": 2,
+  "nodeIds": [
+    "nodeA",
+    "nodeB",
+    "nodeC"
+  ]
+}

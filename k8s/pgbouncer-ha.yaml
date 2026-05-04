@@ -1,0 +1,102 @@
+# ── Enterprise SRE: Database Connection Pooling (PgBouncer HA) ───────────
+# This manifest implements PgBouncer to multiplex microservice connections
+# into a fixed poll, preventing Postgres exhaustion during HPA scaling spikes.
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pgbouncer-config
+data:
+  pgbouncer.ini: |
+    [databases]
+    multiagent = host=postgres port=5432 dbname=multiagent auth_user=postgres
+
+    [pgbouncer]
+    listen_addr = 0.0.0.0
+    listen_port = 6432
+    auth_type = md5
+    auth_file = /etc/pgbouncer/userlist.txt
+    pool_mode = transaction
+    max_client_conn = 1000
+    default_pool_size = 50
+    reserve_pool_size = 10
+    reserve_pool_timeout = 5
+    log_connections = 1
+    log_disconnections = 1
+    log_stats = 1
+  userlist.txt: |
+    "postgres" "password"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pgbouncer
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pgbouncer
+  template:
+    metadata:
+      labels:
+        app: pgbouncer
+    spec:
+      containers:
+      - name: pgbouncer
+        image: edoburu/pgbouncer:latest
+        ports:
+        - containerPort: 6432
+        volumeMounts:
+        - name: config
+          mountPath: /etc/pgbouncer
+          readOnly: true
+        readinessProbe:
+          tcpSocket:
+            port: 6432
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 6432
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+      - name: pgbouncer-exporter
+        image: prometheuscommunity/pgbouncer-exporter:v0.8.0
+        ports:
+        - containerPort: 9127
+        env:
+        - name: PGBOUNCER_EXPORTER_CONNECTION_STRING
+          value: "postgresql://postgres:password@localhost:6432/pgbouncer?sslmode=disable"
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+      volumes:
+      - name: config
+        configMap:
+          name: pgbouncer-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pgbouncer
+spec:
+  ports:
+  - port: 6432
+    targetPort: 6432
+    name: pgbouncer
+  - port: 9127
+    targetPort: 9127
+    name: metrics
+  selector:
+    app: pgbouncer

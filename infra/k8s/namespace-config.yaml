@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: multiagent
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: multiagent-config
+  namespace: multiagent
+data:
+  # Base64 encoded secrets
+  JWT_SECRET: "c3VwZXItc2VjcmV0LWtleQ==" # 'super-secret-key'
+  INTERNAL_KEY: "ZGVmYXVsdC1pbnRlcm5hbC1zZWNyZXQ=" # 'default-internal-secret'
+  DATABASE_URL: "cG9zdGdyZXNxbDovL3Bvc3RncmVzOnBhc3N3b3JkQHBvc3RncmVzLmxvY2FsOjU0MzIvbXVsdGlhZ2VudA=="
+  REDIS_URL: "cmVkaXM6Ly9yZWRpcy5sb2NhbDo2Mzc5"
+  AUTH_SERVICE_URL: "http://auth-service.multiagent.svc.cluster.local:4002"
+  BILLING_SERVICE_URL: "http://billing-service.multiagent.svc.cluster.local:4003"
+  CORE_API_URL: "http://core-api.multiagent.svc.cluster.local:3001"
+  ORCHESTRATOR_URL: "http://core-api.multiagent.svc.cluster.local:3001"
+  
+  # Environment
+  NODE_ENV: "production"
+  
+  # Observability
+  ENABLE_TRACING: "true"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://tempo.monitoring.svc.cluster.local:4317"
+  SERVICE_NAME: "api-gateway"

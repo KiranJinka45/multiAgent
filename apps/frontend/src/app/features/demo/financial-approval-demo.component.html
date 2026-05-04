@@ -1,0 +1,112 @@
+<div class="demo-container">
+  <div class="demo-header">
+    <h1>ZTAN Financial Approval Demo</h1>
+    <p>Verifiable Multi-Role Authorization via Threshold Cryptography (FROST/DKG)</p>
+  </div>
+
+  <div class="progress-stepper">
+    <div class="stepper-bar">
+      <div class="stepper-fill" [style.width.%]="progressPercentage"></div>
+    </div>
+    <div class="stepper-labels">
+      <span [class.active]="step === 'DRAFT'">Draft</span>
+      <span [class.active]="step === 'INITIALIZING'">Initializing</span>
+      <span [class.active]="step === 'DKG'">Key Generation</span>
+      <span [class.active]="step === 'SIGNING'">Signing</span>
+      <span [class.active]="step === 'AUTHORIZED'">Authorized</span>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <!-- Left Column: Request Details -->
+    <div class="card glass-card request-card">
+      <div class="card-header">
+        <span class="badge" [class.authorized]="step === 'AUTHORIZED'">{{ step }}</span>
+        <h3>Payment Request: {{ request.id }}</h3>
+      </div>
+      
+      <div class="request-details">
+        <div class="detail-row">
+          <label>Payee</label>
+          <span>{{ request.payee }}</span>
+        </div>
+        <div class="detail-row">
+          <label>Amount</label>
+          <span class="amount">${{ request.amount | number }}</span>
+        </div>
+        <div class="detail-row">
+          <label>Description</label>
+          <span>{{ request.reason }}</span>
+        </div>
+      </div>
+
+      <div class="actions" *ngIf="step === 'DRAFT'">
+        <button class="primary-btn" (click)="submitRequest()" [disabled]="isLoading">
+          <span *ngIf="!isLoading">Submit for Approval</span>
+          <span *ngIf="isLoading" class="spinner"></span>
+        </button>
+      </div>
+
+      <div class="actions" *ngIf="step === 'AUTHORIZED'">
+        <div class="success-message">
+          <i class="material-icons">check_circle</i>
+          <span>Cryptographically Authorized</span>
+        </div>
+        <button class="secondary-btn" (click)="reset()">New Request</button>
+      </div>
+    </div>
+
+    <!-- Right Column: Approvers -->
+    <div class="approvers-list">
+      <div class="card glass-card role-card" *ngFor="let role of roles" [class.approved]="role.status === 'APPROVED'">
+        <div class="role-icon">
+          <i class="material-icons">{{ role.icon }}</i>
+        </div>
+        <div class="role-info">
+          <h4>{{ role.name }}</h4>
+          <p>{{ role.description }}</p>
+        </div>
+        <div class="role-action">
+          <button *ngIf="step === 'SIGNING' && role.status === 'PENDING'" 
+                  class="approve-btn" 
+                  (click)="approve(role.id)" 
+                  [disabled]="isLoading">
+            Approve
+          </button>
+          <span class="status-badge" *ngIf="role.status === 'APPROVED'">
+            <i class="material-icons">verified</i> Verified
+          </span>
+          <span class="status-badge pending" *ngIf="step !== 'SIGNING' && role.status === 'PENDING'">
+            Waiting...
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ZTAN Live Transcript -->
+  <div class="card glass-card transcript-card" *ngIf="ceremonyState">
+    <div class="card-header">
+      <h3>ZTAN MPC Protocol Transcript (Live)</h3>
+      <span class="session-id">ID: {{ ceremonyState.ceremonyId }}</span>
+    </div>
+    <div class="transcript-body">
+      <div class="transcript-line" *ngFor="let event of ceremonyState.transcript">
+        <span class="ts">{{ event.timestamp | date:'HH:mm:ss' }}</span>
+        <span class="node">[{{ event.nodeId }}]</span>
+        <span class="round">{{ event.round }}</span>
+        <span class="hash">H: {{ event.payloadHash.slice(0, 12) }}...</span>
+      </div>
+    </div>
+    <div class="proof-footer" *ngIf="ceremonyState.aggregatedSignature">
+      <label>Aggregated Signature (96-byte G2):</label>
+      <code class="sig">{{ ceremonyState.aggregatedSignature }}</code>
+    </div>
+  </div>
+
+  <div class="error-toast" *ngIf="error">
+    <i class="material-icons">error</i>
+    <span>{{ error }}</span>
+    <button (click)="error = null">&times;</button>
+  </div>
+</div>

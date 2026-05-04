@@ -1,0 +1,26 @@
+name: Helm Lint
+
+on:
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'helm/**'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
+
+      - name: Lint Chart
+        run: helm lint ./helm/multiagent
+
+      - name: Template Check
+        run: helm template ./helm/multiagent \
+          --set global.storageClass=gp2 \
+          --set gateway.replicaCount=1 \
+          --set coreApi.replicaCount=1

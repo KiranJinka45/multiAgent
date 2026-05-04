@@ -1,0 +1,55 @@
+# ── Enterprise SRE: Identity Federation Sovereignty (The Capstone) ─────────
+# This manifest enables external OIDC/SAML federation for the MultiAgent mesh,
+# allowing enterprise tenants to integrate their own Identity Providers (IdP).
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: identity-federation-config
+  labels:
+    component: auth-service
+data:
+  federation-providers.json: |
+    {
+      "enabled": true,
+      "providers": [
+        {
+          "name": "google-workspace",
+          "issuer": "https://accounts.google.com",
+          "clientId": "${GOOGLE_OIDC_CLIENT_ID}",
+          "clientSecret": "${GOOGLE_OIDC_CLIENT_SECRET}",
+          "mapping": {
+            "externalId": "sub",
+            "email": "email",
+            "tenant": "hd"
+          }
+        },
+        {
+          "name": "azure-ad",
+          "issuer": "https://login.microsoftonline.com/common/v2.0",
+          "clientId": "${AZURE_OIDC_CLIENT_ID}",
+          "clientSecret": "${AZURE_OIDC_CLIENT_SECRET}",
+          "mapping": {
+            "externalId": "oid",
+            "email": "preferred_username",
+            "tenant": "tid"
+          }
+        }
+      ],
+      "governance": {
+        "autoProvisionTenants": true,
+        "enforceMfaOnFederation": true,
+        "sessionDuration": 86400
+      }
+    }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: identity-federation
+spec:
+  ports:
+  - port: 8080
+    targetPort: 8080
+  selector:
+    app: auth-service

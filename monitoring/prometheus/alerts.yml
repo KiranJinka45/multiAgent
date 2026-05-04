@@ -1,0 +1,128 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# MultiAgent SRE Alert Rules
+# Production-grade SLO enforcement for the distributed build pipeline
+# ═══════════════════════════════════════════════════════════════════════════════
+
+groups:
+  - name: multiagent.slo.availability
+    rules:
+      # ─── Availability SLO: 99.9% job success over 5 minutes ──────────────────
+      - alert: HighFailureRate
+        expr: |
+          (sum(rate(worker_job_total{status="failed"}[5m]))
+          /
+          sum(rate(worker_job_total[5m]))) > 0.01
+        for: 2m
+        labels:
+          severity: critical
+          team: sre
+        annotations:
+          summary: "Job failure rate exceeds 1% (SLO breach)"
+          description: "The worker fleet failure rate has exceeded 1% over 5 minutes. Current rate: {{ $value | humanizePercentage }}."
+          runbook_url: "https://internal.docs/runbook/high-failure-rate"
+
+      # ─── Latency SLO: P95 < 120 seconds ──────────────────────────────────────
+      - alert: HighLatencyP95
+        expr: |
+          histogram_quantile(0.95, sum(rate(worker_job_duration_seconds_bucket[5m])) by (le)) > 120
+        for: 3m
+        labels:
+          severity: warning
+          team: sre
+        annotations:
+          summary: "P95 job latency exceeds 120 seconds"
+          description: "Build jobs are taking longer than the 120s SLO target at P95. Current P95: {{ $value | humanizeDuration }}."
+
+  - name: multiagent.slo.retry_stability
+    rules:
+      # ─── Retry Storm Detection ───────────────────────────────────────────────
+      - alert: RetryStorm
+        expr: |
+          rate(worker_job_retries_total[5m]) > 10
+        for: 2m
+        labels:
+          severity: warning
+          team: sre
+        annotations:
+          summary: "Retry storm detected (>10 retries/sec over 5min)"
+          description: "BullMQ retry rate is abnormally high. This indicates cascading failures, bad backoff config, or infrastructure instability."
+
+      # ─── Retry Ratio SLO: Retries < 20% of total jobs ───────────────────────
+      - alert: HighRetryRatio
+        expr: |
+          (sum(rate(worker_job_retries_total[5m]))
+          /
+          sum(rate(worker_job_total[5m]))) > 0.2
+        for: 5m
+        labels:
+          severity: warning
+          team: sre
+        annotations:
+          summary: "Retry ratio exceeds 20% of total jobs"
+          description: "More than 20% of jobs are being retried. Current ratio: {{ $value | humanizePercentage }}."
+
+  - name: multiagent.slo.idempotency
+    rules:
+      # ─── Idempotency Collision Spike ─────────────────────────────────────────
+      - alert: IdempotencySpike
+        expr: |
+          rate(worker_idempotency_collisions_total[5m]) > 5
+        for: 2m
+        labels:
+          severity: warning
+          team: sre
+        annotations:
+          summary: "Idempotency collision spike (>5/sec)"
+          description: "The IdempotencyManager is intercepting an abnormal number of duplicate executions. This may indicate split-brain workers, Redis failover issues, or duplicate queue submissions."
+
+      # ─── Idempotency Ratio SLO: Collisions < 5% of total jobs ───────────────
+      - alert: HighIdempotencyRatio
+        expr: |
+          (sum(rate(worker_idempotency_collisions_total[5m]))
+          /
+          sum(rate(worker_job_total[5m]))) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          team: sre
+        annotations:
+          summary: "Idempotency collisions exceed 5% of total jobs (SLO breach)"
+          description: "More than 5% of jobs are hitting idempotency locks. This is a strong signal of systemic duplication. Investigate worker fleet health and Redis connectivity."
+
+      # ─── Stale Lock Recovery ─────────────────────────────────────────────────
+      - alert: StaleLockRecoverySpike
+        expr: |
+          rate(worker_stale_lock_recoveries_total[5m]) > 0.01
+        for: 2m
+        labels:
+          severity: warning
+          team: sre
+        annotations:
+          summary: "Stale lock recoveries detected"
+          description: "Workers are recovering stale idempotency locks from dead workers. Investigate worker crash patterns and LOCK_TIMEOUT_MS tuning."
+
+  - name: multiagent.slo.queue_health
+    rules:
+      # ─── Queue Backlog ───────────────────────────────────────────────────────
+      - alert: QueueBacklog
+        expr: |
+          worker_queue_depth > 1000
+        for: 5m
+        labels:
+          severity: warning
+          team: sre
+        annotations:
+          summary: "Queue depth exceeds 1000 pending jobs"
+          description: "The mission queue has accumulated over 1000 pending jobs. Workers may be starved or underscaled."
+
+      # ─── Worker Starvation ───────────────────────────────────────────────────
+      - alert: WorkerStarvation
+        expr: |
+          worker_active_workers < 1
+        for: 1m
+        labels:
+          severity: critical
+          team: sre
+        annotations:
+          summary: "No active workers detected"
+          description: "The active_workers gauge has dropped to 0. All worker instances may be down."

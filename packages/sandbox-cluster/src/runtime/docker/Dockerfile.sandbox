@@ -1,0 +1,28 @@
+# MultiAgent Sandbox Runtime Dockerfile
+FROM node:20-slim
+
+# System dependencies for sandboxed executions
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Run as non-privileged node user for security
+RUN chown node:node /app
+USER node
+
+# Default port - can be overridden at runtime
+ENV PORT=3000
+EXPOSE ${PORT}
+
+# Healthcheck for cluster management
+HEALTHCHECK --interval=5s --timeout=3s --retries=3 \
+  CMD curl -f http://localhost:${PORT}/ || exit 1
+
+# Start sub-project dev server (placeholder, usually replaced by command)
+CMD ["npm", "start"]

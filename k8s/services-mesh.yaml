@@ -1,0 +1,279 @@
+# ── Billing Service (Hardened) ──────────────────────────────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: billing-service
+  namespace: multiagent
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: billing-service
+  template:
+    metadata:
+      labels:
+        app: billing-service
+        telemetry: "enabled"
+    spec:
+      enableServiceLinks: false
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: "kubernetes.io/hostname"
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app: billing-service
+      - maxSkew: 1
+        topologyKey: "topology.kubernetes.io/zone"
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app: billing-service
+      containers:
+      - name: billing-service
+        image: ghcr.io/kiran/multiagent-billing:v1.1.0
+        imagePullPolicy: IfNotPresent
+        command: ["node", "dist/index.js"]
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "4003"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: multiagent-core-secrets
+              key: DATABASE_URL
+        - name: REDIS_SENTINEL_HOSTS
+          value: "redis-sentinel:26379"
+        - name: REDIS_SENTINEL_NAME
+          value: "mymaster"
+        - name: AUTH_SERVICE_URL
+          value: "http://auth-service:4002"
+        envFrom:
+        - secretRef:
+            name: multiagent-core-secrets
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 200m
+            memory: 512Mi
+        # ── Scaling Shock Absorption Capstone ──────────────────────────────
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 4003
+          failureThreshold: 30
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 4003
+          initialDelaySeconds: 5
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 4003
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh", "-c", "sleep 15"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: billing-service
+  namespace: multiagent
+spec:
+  ports:
+  - port: 4003
+  selector:
+    app: billing-service
+---
+# ── Core API (Hardened) ─────────────────────────────────────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: core-api
+  namespace: multiagent
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: core-api
+  template:
+    metadata:
+      labels:
+        app: core-api
+        telemetry: "enabled"
+    spec:
+      enableServiceLinks: false
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: "kubernetes.io/hostname"
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app: core-api
+      - maxSkew: 1
+        topologyKey: "topology.kubernetes.io/zone"
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app: core-api
+      containers:
+      - name: core-api
+        image: ghcr.io/kiran/multiagent-core-api:v1.1.0
+        imagePullPolicy: IfNotPresent
+        command: ["node", "dist/index.js"]
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "4001"
+        envFrom:
+        - secretRef:
+            name: multiagent-core-secrets
+        resources:
+          requests:
+            cpu: 150m
+            memory: 256Mi
+          limits:
+            cpu: 300m
+            memory: 512Mi
+        # ── Scaling Shock Absorption Capstone ──────────────────────────────
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 4001
+          failureThreshold: 30
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 4001
+          initialDelaySeconds: 5
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 4001
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh", "-c", "sleep 15"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: core-api
+  namespace: multiagent
+spec:
+  ports:
+  - port: 4001
+  selector:
+    app: core-api
+
+---
+# ── API Mesh (Neural Link) ──────────────────────────────────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: multiagent
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+        telemetry: "enabled"
+    spec:
+      enableServiceLinks: false
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: "kubernetes.io/hostname"
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app: api
+      containers:
+      - name: api
+        image: ghcr.io/kiran/multiagent-api:v1.1.0
+        imagePullPolicy: IfNotPresent
+        command: ["node", "dist/index.js"]
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "4000"
+        envFrom:
+        - secretRef:
+            name: multiagent-core-secrets
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 300m
+            memory: 512Mi
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 4000
+          failureThreshold: 30
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 4000
+          initialDelaySeconds: 5
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 4000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+  namespace: multiagent
+spec:
+  ports:
+  - port: 4000
+  selector:
+    app: api

@@ -1,0 +1,42 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "composite": true,
+    "declaration": true,
+    "noEmit": false,
+    "baseUrl": ".",
+    "paths": {
+      "@packages/config": [
+        "../config/src"
+      ],
+      "@packages/db": [
+        "../db/src"
+      ],
+      "@packages/events": [
+        "../events/src"
+      ],
+      "@packages/observability": [
+        "../observability/src"
+      ]
+    }
+  },
+  "include": [
+    "src"
+  ],
+  "references": [
+    {
+      "path": "../config"
+    },
+    {
+      "path": "../db"
+    },
+    {
+      "path": "../events"
+    },
+    {
+      "path": "../observability"
+    }
+  ]
+}

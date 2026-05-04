@@ -1,0 +1,32 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: api-pod-kill
+  namespace: default
+spec:
+  action: pod-kill
+  mode: one
+  duration: "30s"
+  scheduler:
+    cron: "@every 5m"
+  selector:
+    labelSelectors:
+      app: api
+---
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: api-network-delay
+  namespace: default
+spec:
+  action: delay
+  mode: one
+  selector:
+    labelSelectors:
+      app: api
+  delay:
+    latency: "100ms"
+    correlation: "100"
+  duration: "30s"
+  scheduler:
+    cron: "@every 2m"

@@ -1,0 +1,1 @@
+{"version":3,"file":"global-sync.d.ts","sourceRoot":"","sources":["global-sync.ts"],"names":[],"mappings":"AAGA;;;GAGG;AACH,qBAAa,sBAAsB;IAC/B,OAAO,CAAC,MAAM,CAAC,QAAQ,CAAC,aAAa,CAAsB;IAC3D,OAAO,CAAC,MAAM,CAAC,QAAQ,CAAC,SAAS,CAAyC;IAE1E;;OAEG;WACU,iBAAiB;IAuB9B;;OAEG;WACU,eAAe,IAAI,OAAO,CAAC,MAAM,CAAC,MAAM,EAAE,GAAG,CAAC,CAAC;CAU/D"}

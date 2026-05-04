@@ -1,0 +1,72 @@
+<div class="usage-container" *ngIf="billingData$ | async as data">
+  <header class="usage-header">
+    <h2>Usage & Cost Estimation</h2>
+    <span class="tenant-tag">{{ data.tenantId }}</span>
+  </header>
+
+  <div class="usage-grid">
+    <!-- Total Cost Card -->
+    <div class="usage-card glass highlight">
+      <div class="card-icon">
+        <lucide-icon name="credit-card" class="icon-primary"></lucide-icon>
+      </div>
+      <div class="card-info">
+        <span class="label">Total Cumulative Cost</span>
+        <span class="value">${{ data.totalCost | number:'1.2-2' }}</span>
+        <span class="sub">USD (Billed monthly)</span>
+      </div>
+    </div>
+
+    <!-- Dev Hours Saved Card -->
+    <div class="usage-card glass highlight-alt">
+      <div class="card-icon">
+        <lucide-icon name="zap" class="icon-secondary"></lucide-icon>
+      </div>
+      <div class="card-info">
+        <span class="label">Dev Hours Saved</span>
+        <span class="value">{{ data.missionCount * 0.5 | number:'1.1-1' }}h</span>
+        <span class="sub">Estimated efficiency gain</span>
+      </div>
+    </div>
+
+    <!-- SLA Protection Card -->
+    <div class="usage-card glass">
+      <div class="card-icon">
+        <lucide-icon name="shield-check" class="icon-accent"></lucide-icon>
+      </div>
+      <div class="card-info">
+        <span class="label">SLA Protection Status</span>
+        <span class="value">ACTIVE</span>
+        <span class="sub">Autonomous guardrails enabled</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detailed History -->
+  <div class="history-section glass">
+    <div class="section-header">
+      <lucide-icon name="bar-chart" class="icon-sm"></lucide-icon>
+      <h3>Recent Mission Breakdown</h3>
+    </div>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Compute (s)</th>
+            <th>Queue (s)</th>
+            <th>Cost (USD)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let m of data.history">
+            <td>{{ m.createdAt | date:'short' }}</td>
+            <td>{{ m.computeDurationMs / 1000 | number:'1.1-1' }}s</td>
+            <td>{{ m.queueWaitMs / 1000 | number:'1.1-1' }}s</td>
+            <td class="cost-cell">${{ m.totalCostUsd | number:'1.4-4' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

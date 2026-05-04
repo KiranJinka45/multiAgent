@@ -1,0 +1,26 @@
+{
+  "id": "TV-002",
+  "description": "Ordering invariance",
+  "inputA": {
+    "payload": "df1330657b5ec0233532eabe15c46993749cd2464bf527f5f678cf0d7cda59b1",
+    "participants": [
+      "a",
+      "b",
+      "c"
+    ],
+    "threshold": 2
+  },
+  "inputB": {
+    "payload": "df1330657b5ec0233532eabe15c46993749cd2464bf527f5f678cf0d7cda59b1",
+    "participants": [
+      "c",
+      "a",
+      "b"
+    ],
+    "threshold": 2
+  },
+  "expected": {
+    "match": true,
+    "signatureMatch": true
+  }
+}

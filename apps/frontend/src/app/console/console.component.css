@@ -1,78 +1,45 @@
-.container {
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  padding: 10px;
-  background: #000;
-  color: #0f0;
-  min-height: 100vh;
+.console-layout {
   display: flex;
   flex-direction: column;
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 20px;
-  background: #111;
-  border-bottom: 1px solid #333;
-  margin-bottom: 10px;
-  border-radius: 4px;
-}
-
-h1 {
-  margin: 0;
-  font-size: 16px;
-  letter-spacing: 3px;
+  height: 100vh;
+  background: #000;
   color: #0f0;
-  font-weight: 900;
+  padding: 15px;
+  box-sizing: border-box;
+  gap: 15px;
+  overflow: hidden;
 }
 
-.status {
-  font-size: 11px;
-  color: #888;
+.top-row {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  gap: 15px;
+  height: 45%;
+  min-height: 350px;
 }
 
-.status::before {
-  content: "";
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  background: #0f0;
-  border-radius: 50%;
-  box-shadow: 0 0 8px #0f0;
+.middle-row {
+  height: 25%;
+  min-height: 150px;
 }
 
-.top {
-  display: flex;
-  gap: 10px;
+.bottom-row {
   flex-grow: 1;
+  min-height: 200px;
+  overflow-y: auto;
 }
 
 app-input-panel, app-output-panel {
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  overflow: hidden;
 }
 
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #000;
-}
-::-webkit-scrollbar-thumb {
-  background: #222;
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #0f0;
+app-log-console {
+  display: block;
+  height: 100%;
 }
 
-/* Global transitions */
-button { transition: all 0.15s ease; }
-.value { transition: border-color 0.3s ease; }
+/* Global scrollbar styling */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0a0a0a; }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #444; }

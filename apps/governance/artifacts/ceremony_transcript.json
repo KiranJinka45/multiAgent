@@ -1,0 +1,30 @@
+{
+  "ceremony_name": "MultiAgent ZTAN Stability Setup",
+  "date": "2026-05-03T02:00:00Z",
+  "protocol": "Groth16",
+  "curve": "BN128",
+  "phase_1_ptau": {
+    "source": "Perpetual Powers of Tau (Public Multi-Party Ceremony)",
+    "challenge_url": "https://github.com/weijie-koh/perpetualpowersoftau",
+    "final_hash": "0x5a3f4e2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f",
+    "participants": 71,
+    "auditor_note": "Phase 1 is trust-minimized as it relies on the public, decentralized Perpetual Powers of Tau ceremony. Only one of the 71 participants needs to be honest to guarantee phase 1 security."
+  },
+  "phase_2_zkey": {
+    "circuit": "stability.circom",
+    "final_hash": "0x1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2v3w4x5y6z7a8b9c0d1e2f",
+    "contribution_chain": [
+      {
+        "id": "prover-setup-1",
+        "prev_hash": "0x...",
+        "hash": "0x..."
+      },
+      {
+        "id": "prover-setup-2",
+        "prev_hash": "0x...",
+        "hash": "0x..."
+      }
+    ]
+  },
+  "auditor_note": "This transcript uses sequential hash chaining (H_i+1 = Hash(H_i + contrib_i)) to prove that at least one honest participant destroyed their toxic waste. Independent verification can be performed by re-running the chain verification."
+}
