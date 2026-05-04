@@ -1,0 +1,65 @@
+{
+  "version": "1.4",
+  "vectors": [
+    {
+      "name": "RFC-001 v1.4 Complex Vector",
+      "type": "SUCCESS",
+      "input": {
+        "auditId": "RFC-COMPLEX-🎉-V1.4",
+        "timestamp": 1710000000000,
+        "nodeIds": ["Node-C", "Node-A", "Node-B"],
+        "threshold": 2,
+        "payloadHash": "7289f43e1d3e4b5a6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b"
+      },
+      "expectedHash": "a2d7ef152e03496365f827cdbb193e355b8e3a8c1288fd274dd54c6d44347a41"
+    },
+    {
+      "name": "Unicode Normalization & Case Invariance",
+      "type": "SUCCESS",
+      "input": {
+        "auditId": "NFC-TEST-é",
+        "timestamp": 1710000000000,
+        "nodeIds": ["Node-1"],
+        "threshold": 1,
+        "payloadHash": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "expectedHash": "87490202e664fb2a296deb61f3a6751285e357c4e23b2de47d4770c6a8155717"
+    },
+    {
+      "name": "REJECT: Duplicate Participant (NFC Collided)",
+      "type": "FAILURE",
+      "error": "Duplicate participant ID detected after normalization",
+      "input": {
+        "auditId": "DUPE-TEST",
+        "timestamp": 1710000000000,
+        "nodeIds": ["e\u0301", "é"],
+        "threshold": 1,
+        "payloadHash": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    {
+      "name": "REJECT: Invalid UTF-16 (Lone Surrogate)",
+      "type": "FAILURE",
+      "error": "Invalid UTF-16",
+      "input": {
+        "auditId": "UTF-ERR",
+        "timestamp": 1710000000000,
+        "nodeIds": ["\uD800"],
+        "threshold": 1,
+        "payloadHash": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    {
+      "name": "REJECT: Oversize Field (>256B)",
+      "type": "FAILURE",
+      "error": "exceeds",
+      "input": {
+        "auditId": "OVERSIZE",
+        "timestamp": 1710000000000,
+        "nodeIds": ["AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"],
+        "threshold": 1,
+        "payloadHash": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    }
+  ]
+}

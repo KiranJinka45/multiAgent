@@ -1,0 +1,21 @@
+{
+  "name": "@packages/ztan-crypto",
+  "version": "1.0.0",
+  "description": "ZTAN Canonical Cryptography (Browser & Node)",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --target esnext",
+    "test:audit": "tsx test/audit.ts",
+    "replay": "tsx scripts/replay.ts"
+  },
+  "dependencies": {
+    "@noble/bls12-381": "^1.4.0",
+    "@noble/hashes": "^1.4.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
+  }
+}
