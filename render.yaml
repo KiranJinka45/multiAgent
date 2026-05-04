@@ -1,43 +1,31 @@
 services:
   - type: web
     name: ztan-backend
-    env: node
+    runtime: node
     plan: free
+
     buildCommand: pnpm install && pnpm build --filter @apps/core-api
     startCommand: pnpm start --filter @apps/core-api
+
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 3010
+
       - key: DATABASE_URL
         fromDatabase:
           name: ztan-db
           property: connectionString
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: ztan-redis
-          property: connectionString
-      - key: CORE_API_PORT
-        value: 3010
+
       - key: USE_REAL_SIGNALS
-        value: "false" # Keep false for demo to use simulator
+        value: "false"
+
       - key: INTERNAL_SERVICE_TOKEN
         generateValue: true
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_REFRESH_SECRET
         generateValue: true
-    rootDirectory: .
 
 databases:
   - name: ztan-db
     plan: free
-
-# Note: Render Redis is not free, but let's define it.
-# If the user wants a free alternative, they might need Upstash or similar.
-# For now, I'll assume they want the Render setup.
-# Actually, Render Redis is $7/mo.
-# Maybe I can use a mock Redis for the demo if possible?
-# But TssCeremonyService likely uses Redis for coordination.
