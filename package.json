@@ -7,7 +7,7 @@
   "scripts": {
     "predev": "tsx scripts/cleanup.ts && tsx scripts/preflight.ts && tsx scripts/port-check.ts",
     "dev": "pnpm run predev && tsx scripts/start-dev.ts",
-    "build": "turbo build",
+    "build": "pnpm --filter=!@packages/business -r build",
     "start:api": "node apps/api/dist/index.js",
     "start:worker": "node apps/worker/dist/index.js",
     "db:push": "npx prisma db push --schema=packages/db/prisma/schema.prisma",
