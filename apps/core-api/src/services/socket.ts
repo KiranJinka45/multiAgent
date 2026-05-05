@@ -273,7 +273,7 @@ async function bootstrap() {
         console.warn('⚠️ [CoreAPI] SecretProvider.bootstrap is not a function. Skipping...');
     }
 
-    const PORT = process.env.PORT || process.env.CORE_API_PORT || env.CORE_ENGINE_PORT || 3010;
+    const PORT = process.env.PORT || 3010;
     const YJS_PORT = 3011;
 
     const server = createServer(app);
@@ -282,8 +282,8 @@ async function bootstrap() {
         path: '/socket.io'
     });
 
-    server.listen(PORT, () => {
-        console.log(`[CoreAPI] Listening on port ${PORT}`);
+    server.listen(PORT, '0.0.0.0', () => {
+        console.log(`Server running on port ${PORT}`);
     });
 
     startCollaborationServer(YJS_PORT);
