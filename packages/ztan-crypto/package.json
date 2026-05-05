@@ -6,7 +6,7 @@
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts --target esnext",
+    "build": "tsup src/index.ts --format cjs,esm --target esnext",
     "test:audit": "tsx test/audit.ts",
     "test:bls": "tsx test/bls_test.ts",
     "replay": "tsx scripts/replay.ts"

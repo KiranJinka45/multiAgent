@@ -132,31 +132,31 @@ export class ThresholdCrypto {
   public static readonly MAX_AUDIT_ID_BYTES = 1048576; // 1MB (RFC-001 v1.3)
   public static readonly EXACT_PAYLOAD_BYTES = 32;
 
-  private static encodeUint32BE(value: number): Uint8Array {
+  public static encodeUint32BE(value: number): Uint8Array {
     return Canonical.encodeUint32BE(value);
   }
 
-  private static encodeUint64BE(value: number): Uint8Array {
+  public static encodeUint64BE(value: number): Uint8Array {
     return Canonical.encodeUint64BE(value);
   }
 
-  private static safeEncode(str: string): Uint8Array {
+  public static safeEncode(str: string): Uint8Array {
     return Canonical.safeEncode(str);
   }
 
-  private static encodeField(bytes: Uint8Array): Uint8Array {
+  public static encodeField(bytes: Uint8Array): Uint8Array {
     return Canonical.encodeField(bytes);
   }
 
-  private static concat(arrays: Uint8Array[]): Uint8Array {
+  public static concat(arrays: Uint8Array[]): Uint8Array {
     return Canonical.concat(arrays);
   }
 
-  private static toHex(bytes: Uint8Array): string {
+  public static toHex(bytes: Uint8Array): string {
     return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
-  private static fromHex(hex: string): Uint8Array {
+  public static fromHex(hex: string): Uint8Array {
     return new Uint8Array(hex.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
   }
 
