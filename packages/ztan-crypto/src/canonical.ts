@@ -51,13 +51,34 @@ export class Canonical {
     }
 
     /**
+     * Browser-compatible Hex utilities (Replaces Node.js Buffer)
+     */
+    public static hexToBytes(hex: string): Uint8Array {
+        if (hex.length % 2 !== 0) throw new Error('[ZTAN] Invalid hex string');
+        const array = new Uint8Array(hex.length / 2);
+        for (let i = 0; i < hex.length; i += 2) {
+            array[i / 2] = parseInt(hex.substring(i, i + 2), 16);
+        }
+        return array;
+    }
+
+    public static bytesToHex(bytes: Uint8Array): string {
+        return Array.from(bytes)
+            .map(b => b.toString(16).padStart(2, '0'))
+            .join('');
+    }
+
+    /**
      * Sort public keys lexicographically by their raw bytes.
      */
     public static sortPublicKeys(keys: string[]): string[] {
         return [...keys].sort((a, b) => {
-            const bufA = Buffer.from(a, 'hex');
-            const bufB = Buffer.from(b, 'hex');
-            return bufA.compare(bufB);
+            const bytesA = this.hexToBytes(a);
+            const bytesB = this.hexToBytes(b);
+            for (let i = 0; i < Math.min(bytesA.length, bytesB.length); i++) {
+                if (bytesA[i] !== bytesB[i]) return bytesA[i] - bytesB[i];
+            }
+            return bytesA.length - bytesB.length;
         });
     }
 }

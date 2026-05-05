@@ -33,13 +33,13 @@ export class ThresholdBls {
 
             shares.push({
                 nodeId,
-                secretShare: Buffer.from(secretShare).toString('hex'),
-                verificationKey: Buffer.from(verificationKey).toString('hex')
+                secretShare: Canonical.bytesToHex(secretShare),
+                verificationKey: Canonical.bytesToHex(verificationKey)
             });
         }
 
         return {
-            masterPublicKey: Buffer.from(masterPublicKey).toString('hex'),
+            masterPublicKey: Canonical.bytesToHex(masterPublicKey),
             shares
         };
     }
@@ -55,13 +55,13 @@ export class ThresholdBls {
         threshold: number, 
         eligiblePublicKeys: string[]
     ): Promise<string> {
-        const secretShare = Buffer.from(secretShareHex, 'hex');
-        const msg = Buffer.from(messageHash, 'hex');
+        const secretShare = Canonical.hexToBytes(secretShareHex);
+        const msg = Canonical.hexToBytes(messageHash);
         
         // Canonical Context Binding (ZTAN-RFC-001 v1.5)
         const ctxBytes = Canonical.safeEncode(ceremonyId);
         const sortedKeys = Canonical.sortPublicKeys(eligiblePublicKeys);
-        const keysBytes = Canonical.concat(sortedKeys.map(pk => Buffer.from(pk, 'hex')));
+        const keysBytes = Canonical.concat(sortedKeys.map(pk => Canonical.hexToBytes(pk)));
 
         const bindingPayload = Canonical.concat([
             Canonical.encodeField(ctxBytes),
@@ -71,8 +71,8 @@ export class ThresholdBls {
         ]);
         
         const finalMsg = sha256(bindingPayload);
-        const signature = await bls.sign(finalMsg, secretShare, { dst: DST });
-        return Buffer.from(signature).toString('hex');
+        const signature = await bls.sign(finalMsg, secretShare);
+        return Canonical.bytesToHex(signature);
     }
 
     /**
@@ -111,13 +111,13 @@ export class ThresholdBls {
         threshold: number, 
         eligiblePublicKeys: string[]
     ): Promise<boolean> {
-        const sig = Buffer.from(signature, 'hex');
-        const msg = Buffer.from(messageHash, 'hex');
+        const sig = Canonical.hexToBytes(signature);
+        const msg = Canonical.hexToBytes(messageHash);
         
         // Canonical Context Binding (ZTAN-RFC-001 v1.5)
         const ctxBytes = Canonical.safeEncode(ceremonyId);
         const sortedKeys = Canonical.sortPublicKeys(eligiblePublicKeys);
-        const keysBytes = Canonical.concat(sortedKeys.map(pk => Buffer.from(pk, 'hex')));
+        const keysBytes = Canonical.concat(sortedKeys.map(pk => Canonical.hexToBytes(pk)));
 
         const bindingPayload = Canonical.concat([
             Canonical.encodeField(ctxBytes),
@@ -127,8 +127,8 @@ export class ThresholdBls {
         ]);
         
         const finalMsg = sha256(bindingPayload);
-        const groupPk = bls.aggregatePublicKeys(signersPublicKeys.map(pk => Buffer.from(pk, 'hex')));
+        const groupPk = bls.aggregatePublicKeys(signersPublicKeys.map(pk => Canonical.hexToBytes(pk)));
 
-        return await bls.verify(sig, finalMsg, groupPk, { dst: DST });
+        return await bls.verify(sig, finalMsg, groupPk);
     }
 }
