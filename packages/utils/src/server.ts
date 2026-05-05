@@ -189,7 +189,7 @@ export const projectMemory = {
 };
 
 // Redis Initialization
-const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
+const REDIS_URL = process.env.REDIS_URL;
 const redisConfig: any = {
     maxRetriesPerRequest: null,
     enableReadyCheck: false,
@@ -200,7 +200,24 @@ const redisConfig: any = {
 };
 
 if (!(globalThis as any).__redisClient) {
-    (globalThis as any).__redisClient = new Redis(REDIS_URL, redisConfig);
+    if (REDIS_URL) {
+        (globalThis as any).__redisClient = new Redis(REDIS_URL, redisConfig);
+    } else {
+        console.warn('[Redis] No REDIS_URL found. Using mock redis client.');
+        (globalThis as any).__redisClient = {
+            status: 'ready',
+            on: () => {},
+            get: async () => null,
+            set: async () => 'OK',
+            del: async () => 1,
+            publish: async () => 0,
+            subscribe: async () => {},
+            psubscribe: async () => {},
+            quit: async () => 'OK',
+            multi: () => ({ exec: async () => [] }),
+            pipeline: () => ({ exec: async () => [] }),
+        };
+    }
 }
 export const redis = (globalThis as any).__redisClient;
 
