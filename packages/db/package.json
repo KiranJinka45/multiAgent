@@ -1,7 +1,7 @@
 {
   "name": "@packages/db",
   "version": "1.0.0",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "files": [
@@ -26,8 +26,8 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "require": "./dist/index.js",
-      "import": "./dist/index.js"
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.mjs"
     }
   }
 }

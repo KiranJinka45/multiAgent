@@ -27,13 +27,8 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.js"
-    },
-    "./otel": {
-      "types": "./dist/otel.d.ts",
-      "import": "./dist/otel.js",
-      "require": "./dist/otel.js"
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.mjs"
     }
   }
 }

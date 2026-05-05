@@ -2,7 +2,7 @@
   "name": "@packages/ztan-crypto",
   "version": "1.0.0",
   "description": "ZTAN Canonical Cryptography (Browser & Node)",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -18,5 +18,12 @@
   "devDependencies": {
     "tsup": "^8.0.0",
     "typescript": "^5.0.0"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.mjs"
+    }
   }
 }

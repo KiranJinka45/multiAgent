@@ -2,8 +2,8 @@
   "name": "@packages/events",
   "version": "1.0.0",
   "description": "MultiAgent High-Availability Event Bus (Redis-backed)",
-  "main": "dist/index.js",
-  "module": "dist/index.js",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "node ../../node_modules/tsup/dist/cli-default.js src/index.ts --format cjs,esm --no-dts",
@@ -23,8 +23,8 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "require": "./dist/index.js",
-      "import": "./dist/index.js"
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.mjs"
     }
   }
 }

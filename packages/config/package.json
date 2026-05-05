@@ -1,8 +1,8 @@
 {
   "name": "@packages/config",
   "version": "1.0.0",
-  "main": "dist/index.js",
-  "module": "dist/index.js",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "node ../../node_modules/tsup/dist/cli-default.js src/index.ts --format cjs,esm --no-dts",
@@ -20,18 +20,8 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.js"
-    },
-    "./frontend": {
-      "types": "./dist/frontend.d.ts",
-      "import": "./dist/frontend.js",
-      "require": "./dist/frontend.js"
-    },
-    "./backend": {
-      "types": "./dist/backend.d.ts",
-      "import": "./dist/backend.js",
-      "require": "./dist/backend.js"
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.mjs"
     }
   }
 }
