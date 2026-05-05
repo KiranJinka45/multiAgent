@@ -4,7 +4,7 @@ services:
     runtime: node
     plan: free
 
-    buildCommand: pnpm install && pnpm -r --filter=!@packages/business build && pnpm db:push
+    buildCommand: pnpm install && pnpm --filter @apps/core-api... build && pnpm db:push
     startCommand: pnpm --filter @apps/core-api start
 
     envVars:
