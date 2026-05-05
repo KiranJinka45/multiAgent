@@ -13,8 +13,8 @@
     }
   },
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup src/index.ts --watch"
+    "build": "node ../../node_modules/tsup/dist/cli-default.js src/index.ts --format cjs,esm --no-dts",
+    "dev": "node ../../node_modules/tsup/dist/cli-default.js src/index.ts --format cjs,esm --no-dts --watch"
   },
   "dependencies": {
     "@packages/observability": "workspace:*"

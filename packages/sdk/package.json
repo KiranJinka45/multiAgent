@@ -6,9 +6,9 @@
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "build": "node ../../node_modules/tsup/dist/cli-default.js src/index.ts --format cjs,esm --no-dts",
     "stress-test": "tsx src/stress-test.ts",
-    "dev": "tsup src/index.ts --watch",
+    "dev": "node ../../node_modules/tsup/dist/cli-default.js src/index.ts --format cjs,esm --no-dts --watch",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },

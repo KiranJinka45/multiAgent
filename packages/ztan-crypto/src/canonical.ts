@@ -8,14 +8,14 @@ export class Canonical {
 
     public static encodeUint32BE(value: number): Uint8Array {
         const arr = new Uint8Array(4);
-        const view = new DataView(arr.buffer as ArrayBuffer);
+        const view = new DataView(arr.buffer as any);
         view.setUint32(0, value, false);
         return arr;
     }
 
     public static encodeUint64BE(value: number): Uint8Array {
         const arr = new Uint8Array(8);
-        const view = new DataView(arr.buffer as ArrayBuffer);
+        const view = new DataView(arr.buffer as any);
         const big = BigInt(value);
         view.setUint32(0, Number(big >> 32n), false);
         view.setUint32(4, Number(big & 0xffffffffn), false);

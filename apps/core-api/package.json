@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "tsup",
+    "build": "node ../../node_modules/tsup/dist/cli-default.js src/index.ts --format cjs,esm --no-dts",
     "dev": "tsx watch -r tsconfig-paths/register src/index.ts",
     "start": "node dist/index.js",
     "start:dev": "tsx -r tsconfig-paths/register src/index.ts",
@@ -16,7 +16,7 @@
     "@opentelemetry/exporter-trace-otlp-http": "^0.216.0",
     "@packages/auth-internal": "workspace:*",
     "@packages/business": "workspace:*",
-    "@packages/db": "workspace:*" ,
+    "@packages/db": "workspace:*",
     "@packages/memory": "workspace:*",
     "@packages/observability": "workspace:*",
     "@packages/shared-services": "workspace:*",

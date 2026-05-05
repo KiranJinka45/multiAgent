@@ -14,8 +14,8 @@
     }
   },
   "scripts": {
-    "build": "tsup src/index.ts --external @/* --external @packages/* --format cjs,esm",
-    "dev": "tsup --watch --onSuccess \"node dist/index.js\"",
+    "build": "node ../../node_modules/tsup/dist/cli-default.js src/index.ts --format cjs,esm --no-dts",
+    "dev": "node ../../node_modules/tsup/dist/cli-default.js src/index.ts --format cjs,esm --no-dts --watch",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },

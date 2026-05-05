@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "tsup",
+    "build": "node ../../node_modules/tsup/dist/cli-default.js src/index.ts --format cjs,esm --no-dts",
     "dev": "npx tsx watch -r tsconfig-paths/register src/index.ts",
     "crsi:init": "tsx src/crsi-init.ts",
     "start": "tsx -r tsconfig-paths/register src/index.ts",

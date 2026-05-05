@@ -6,8 +6,8 @@
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch"
+    "build": "node ../../node_modules/tsup/dist/cli-default.js src/index.ts --format cjs,esm --no-dts",
+    "dev": "node ../../node_modules/tsup/dist/cli-default.js src/index.ts --format cjs,esm --no-dts --watch"
   },
   "dependencies": {
     "@packages/utils": "workspace:*",
@@ -24,7 +24,6 @@
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^22.13.9"
   },
-
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
