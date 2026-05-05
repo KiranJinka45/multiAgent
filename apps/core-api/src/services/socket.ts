@@ -263,57 +263,82 @@ app.post('/api/v1/sre/policies/:id/toggle', express.json(), (req, res) => {
 });
 
 async function bootstrap() {
-    initTelemetry('multiagent-api-orchestrator');
-    
-    if (typeof SecretProvider.bootstrap === 'function') {
-        await SecretProvider.bootstrap();
-    } else if ((SecretProvider as any).SecretProvider && typeof (SecretProvider as any).SecretProvider.bootstrap === 'function') {
-        await (SecretProvider as any).SecretProvider.bootstrap();
-    } else {
-        console.warn('⚠️ [CoreAPI] SecretProvider.bootstrap is not a function. Skipping...');
-    }
+    console.log("🚀 [CoreAPI] Bootstrap started");
 
-    const PORT = process.env.PORT || 3010;
-    const YJS_PORT = 3011;
+    try {
+        console.log("➡️ [CoreAPI] initTelemetry");
+        initTelemetry('multiagent-api-orchestrator');
+        
+        /* 
+        // --- ISOLATION DEBUGGING: Commenting risky services ---
+        console.log("➡️ [CoreAPI] SecretProvider.bootstrap");
+        if (typeof SecretProvider.bootstrap === 'function') {
+            await SecretProvider.bootstrap();
+        } else if ((SecretProvider as any).SecretProvider && typeof (SecretProvider as any).SecretProvider.bootstrap === 'function') {
+            await (SecretProvider as any).SecretProvider.bootstrap();
+        } else {
+            console.warn('⚠️ [CoreAPI] SecretProvider.bootstrap is not a function. Skipping...');
+        }
+        */
 
-    const server = createServer(app);
-    const io = new Server(server, { 
-        cors: { origin: '*' },
-        path: '/socket.io'
-    });
+        const PORT = process.env.PORT || 3010;
+        const YJS_PORT = 3011;
 
-    server.listen(PORT, '0.0.0.0', () => {
-        console.log(`Server running on port ${PORT}`);
-    });
-
-    startCollaborationServer(YJS_PORT);
-    stateReconciler.connect();
-    new LogStreamingService(io);
-    new SreStreamingService(io);
-
-    if (process.env.USE_REAL_SIGNALS === 'true') {
-        logger.info('[Bootstrap] USE_REAL_SIGNALS=true — Starting OTel Receiver (real telemetry pipeline)');
-        otelReceiver.start();
-    } else {
-        logger.info('[Bootstrap] USE_REAL_SIGNALS=false — Starting Telemetry Simulator (development mode)');
-        telemetrySimulator.start();
-    }
-
-    // ZTAN Identity: Seed default nodes and ensure registry is ready
-    await IdentityService.bootstrap();
-
-    // ZTAN MPC: Resume/Recover ceremonies on startup
-    TssCeremonyService.bootstrap();
-
-    // ZTAN MPC Hardening: Start Ceremony Timeout Watchdog
-    setInterval(() => {
-        TssCeremonyService.checkTimeouts().catch(err => {
-            logger.error({ err: err.message }, '[TSS] Timeout Watchdog Failed');
+        console.log("➡️ [CoreAPI] Creating HTTP server...");
+        const server = createServer(app);
+        
+        console.log("➡️ [CoreAPI] Initializing Socket.io");
+        const io = new Server(server, { 
+            cors: { origin: '*' },
+            path: '/socket.io'
         });
-    }, 15000); // Check every 15 seconds
+
+        console.log(`➡️ [CoreAPI] Attempting server.listen on 0.0.0.0:${PORT}`);
+        server.listen(PORT, '0.0.0.0', () => {
+            console.log(`✅ [CoreAPI] Server running on port ${PORT}`);
+        });
+
+        console.log("➡️ [CoreAPI] Starting subsidiary services");
+        startCollaborationServer(YJS_PORT);
+        stateReconciler.connect();
+        new LogStreamingService(io);
+        new SreStreamingService(io);
+
+        if (process.env.USE_REAL_SIGNALS === 'true') {
+            logger.info('[Bootstrap] USE_REAL_SIGNALS=true — Starting OTel Receiver (real telemetry pipeline)');
+            otelReceiver.start();
+        } else {
+            logger.info('[Bootstrap] USE_REAL_SIGNALS=false — Starting Telemetry Simulator (development mode)');
+            telemetrySimulator.start();
+        }
+
+        /*
+        // ZTAN Identity: Seed default nodes and ensure registry is ready
+        console.log("➡️ [CoreAPI] IdentityService.bootstrap");
+        await IdentityService.bootstrap();
+
+        // ZTAN MPC: Resume/Recover ceremonies on startup
+        console.log("➡️ [CoreAPI] TssCeremonyService.bootstrap");
+        TssCeremonyService.bootstrap();
+
+        // ZTAN MPC Hardening: Start Ceremony Timeout Watchdog
+        console.log("➡️ [CoreAPI] starting Timeout Watchdog");
+        setInterval(() => {
+            TssCeremonyService.checkTimeouts().catch(err => {
+                logger.error({ err: err.message }, '[TSS] Timeout Watchdog Failed');
+            });
+        }, 15000); 
+        */
+
+        console.log("🚀 [CoreAPI] Bootstrap logic completed (ISOLATION MODE)");
+    } catch (err: any) {
+        console.error('💥 [CoreAPI] Bootstrap Internal Failure:', err.message || err);
+        throw err;
+    }
 }
 
+console.log("🎬 [CoreAPI] Module loaded, invoking bootstrap()");
 bootstrap().catch(err => {
-    console.error('Bootstrap Failed:', err);
+    console.error('❌ [CoreAPI] FATAL BOOTSTRAP FAILURE:', err);
     process.exit(1);
 });
