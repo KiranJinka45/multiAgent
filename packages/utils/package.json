@@ -2,18 +2,14 @@
   "name": "@packages/utils",
   "version": "1.0.0",
   "description": "MultiAgent Shared Utility Mesh",
-  "main": "dist/index.js",
-  "module": "dist/index.js",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "require": "./dist/index.js",
-      "import": "./dist/index.js"
-    },
-    "./server": {
-      "require": "./dist/server.js",
-      "import": "./dist/server.js"
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.mjs"
     }
   },
   "scripts": {
