@@ -1,6 +1,7 @@
 {
   "name": "@packages/db",
   "version": "1.0.0",
+  "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -10,18 +11,18 @@
     "prisma"
   ],
   "scripts": {
-    "build": "node ../../node_modules/tsup/dist/cli-default.js src/index.ts --format cjs,esm --no-dts",
-    "dev": "node ../../node_modules/tsup/dist/cli-default.js src/index.ts --format cjs,esm --no-dts --watch"
+    "build": "tsup src/index.ts --no-dts && tsc --emitDeclarationOnly",
+    "dev": "tsup src/index.ts --no-dts --watch"
   },
   "dependencies": {
     "@packages/config": "workspace:*",
     "@packages/observability": "workspace:*",
-    "@prisma/client": "^5.22.0"
+    "@prisma/client": "5.22.0"
   },
   "devDependencies": {
-    "prisma": "^5.22.0",
-    "tsup": "^8.3.5",
-    "typescript": "^5.4.5"
+    "prisma": "5.22.0",
+    "tsup": "8.5.1",
+    "typescript": "5.9.3"
   },
   "exports": {
     ".": {

@@ -1,5 +1,7 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from './generated/client/index.js';
 import { config, IS_DEVELOPMENT } from '@packages/config';
+
+import { getTenantId } from './context.js';
 
 /**
  * DATABASE SINGLETON
@@ -11,7 +13,6 @@ const globalForPrisma = global as unknown as {
     db: any | undefined;
 };
 
-import { getTenantId } from './context';
 
 const createExtendedClient = () => {
     const baseDb = new PrismaClient({
@@ -119,4 +120,5 @@ if (config.NODE_ENV !== 'production') {
 }
 
 export { PrismaClient };
-export * from './context';
+export * from './context.js';
+
