@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ztan-witness-node
+  labels:
+    app: ztan
+    component: witness
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ztan
+      component: witness
+  template:
+    metadata:
+      labels:
+        app: ztan
+        component: witness
+    spec:
+      containers:
+      - name: witness
+        image: ztan-witness:v1.0.0-stable
+        resources:
+          limits:
+            cpu: "2"
+            memory: "4Gi"
+          requests:
+            cpu: "1"
+            memory: "2Gi"
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: INSTITUTION_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        volumeMounts:
+        - name: storage
+          mountPath: /data
+      volumes:
+      - name: storage
+        persistentVolumeClaim:
+          claimName: ztan-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ztan-witness-service
+spec:
+  selector:
+    app: ztan
+    component: witness
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 3000
+  type: LoadBalancer

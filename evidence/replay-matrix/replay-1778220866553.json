@@ -1,0 +1,1629 @@
+{
+  "runId": "replay-1778220866553",
+  "timestamp": "2026-05-08T06:14:28.977Z",
+  "environment": {
+    "platform": "win32",
+    "arch": "x64",
+    "nodeVersion": "v20.20.0",
+    "nodeEnv": "development"
+  },
+  "environmentHash": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+  "results": [
+    {
+      "traceFile": "DEP_1778163942757.trace.json",
+      "missionId": "DEP_1778163942757",
+      "environmentMatch": false,
+      "environmentExpected": "unknown",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 4,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 0 invalid previousHash. Expected 0000000000000000000000000000000000000000000000000000000000000000, got undefined",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:26.563Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778211772424.trace.json",
+      "missionId": "FORENSIC_TEST_1778211772424",
+      "environmentMatch": false,
+      "environmentExpected": "12da5522e6077c266b38ec3b829648ba2ba414acfdeae2e3decd8f0121a4caf7",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 1,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 0 invalid eventHash. Calculated: 6ec02ac64ae04e2552daa0f18106049f543827d4cd3e15a4ed2870aacedca3c5, Stored: d42454eadb2f95d403d39451d808f341a1a28863db23e81c2488e58bedd65a69",
+          "severity": "FATAL"
+        },
+        {
+          "type": "ENVIRONMENT_DRIFT",
+          "detail": "Trace recorded on 12da5522e6077c266b38ec3b829648ba2ba414acfdeae2e3decd8f0121a4caf7, current is b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+          "severity": "WARNING"
+        },
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Missing governanceReceipt (unsigned trace)",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:26.587Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778211843594.trace.json",
+      "missionId": "FORENSIC_TEST_1778211843594",
+      "environmentMatch": false,
+      "environmentExpected": "12da5522e6077c266b38ec3b829648ba2ba414acfdeae2e3decd8f0121a4caf7",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 0 invalid eventHash. Calculated: 613f4dc5a415289ae5bbfc5ac3a8563308e9b1d63c0d5e36c2fb243b0f4d93ee, Stored: 6a540eef7ec0ae1f9b68cf742c3c44ffe8d66177609b0886a35525fdb5261d04",
+          "severity": "FATAL"
+        },
+        {
+          "type": "ENVIRONMENT_DRIFT",
+          "detail": "Trace recorded on 12da5522e6077c266b38ec3b829648ba2ba414acfdeae2e3decd8f0121a4caf7, current is b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+          "severity": "WARNING"
+        },
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Missing governanceReceipt (unsigned trace)",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:26.603Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778211927664.trace.json",
+      "missionId": "FORENSIC_TEST_1778211927664",
+      "environmentMatch": false,
+      "environmentExpected": "12da5522e6077c266b38ec3b829648ba2ba414acfdeae2e3decd8f0121a4caf7",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 0 invalid eventHash. Calculated: 74964d4d2d1457d9fecf209542ff8de0e776ab349d77441e28d8560c2eb66487, Stored: e0f7c1a55e688a3b180271cb5d04a6edd1fb560d218484632a825d0f14e44cc7",
+          "severity": "FATAL"
+        },
+        {
+          "type": "ENVIRONMENT_DRIFT",
+          "detail": "Trace recorded on 12da5522e6077c266b38ec3b829648ba2ba414acfdeae2e3decd8f0121a4caf7, current is b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+          "severity": "WARNING"
+        },
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Missing governanceReceipt (unsigned trace)",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:26.606Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778212365753.trace.json",
+      "missionId": "FORENSIC_TEST_1778212365753",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Legacy HMAC receipt detected — symmetric signing does not provide non-repudiation",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:26.617Z",
+      "verdict": "PASS",
+      "tier": 2
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778212720088.trace.json",
+      "missionId": "FORENSIC_TEST_1778212720088",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 1 invalid eventHash. Calculated: faab0680a2353c40336dd2495d3d6bd9acc37704cb8defc37eccd84aebdb7f80, Stored: b9623b6410ef48caf8757323ba242b6ac34c9a4de20dba5b87707ee001f4f7d2",
+          "severity": "FATAL"
+        },
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Legacy HMAC receipt detected — symmetric signing does not provide non-repudiation",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:26.619Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778212795845.trace.json",
+      "missionId": "FORENSIC_TEST_1778212795845",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 1 invalid eventHash. Calculated: de7a1afbb32e7e02fdc4ba39c89c10d88361dc67c3622741335409d26b375037, Stored: 8158655f9a4ab0becc061677efaee92014b56b6e7157871f93af652df08c016a",
+          "severity": "FATAL"
+        },
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Legacy HMAC receipt detected — symmetric signing does not provide non-repudiation",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:26.622Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778212913821.trace.json",
+      "missionId": "FORENSIC_TEST_1778212913821",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 1 invalid eventHash. Calculated: 6439f1b5ebcf069feec434d0d3086fea208a61c15600d8dc763640e87012d3a1, Stored: 53e4447b6845d25ba653cb120e2a3f25690b0eaa3a447987b3736acb24d08b6b",
+          "severity": "FATAL"
+        },
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Legacy HMAC receipt detected — symmetric signing does not provide non-repudiation",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:26.626Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778213000727.trace.json",
+      "missionId": "FORENSIC_TEST_1778213000727",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Legacy HMAC receipt detected — symmetric signing does not provide non-repudiation",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:26.638Z",
+      "verdict": "PASS",
+      "tier": 2
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778213638659.trace.json",
+      "missionId": "FORENSIC_TEST_1778213638659",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 1 invalid eventHash. Calculated: 1dadc2a37a48b23d6341769cd9263a1c0bc17697f2bc8bfb9e4216f43a8a8401, Stored: 31601e5d9c013bc9bba5a908327fa09d4c3241a22564b27cb14be9dd368b48d7",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:26.655Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778214384925.trace.ndjson",
+      "missionId": "FORENSIC_TEST_1778214384925",
+      "environmentMatch": false,
+      "environmentExpected": "unknown",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 1,
+      "schemaValid": false,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "SCHEMA_INVALID",
+          "detail": "Detached receipt missing for NDJSON trace",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:26.657Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778214438943.trace.ndjson",
+      "missionId": "FORENSIC_TEST_1778214438943",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 1 invalid eventHash. Calculated: fc1acdff3a6cf99c48d6b191b343f75131acc6b47384674b221756c5ca07c30b, Stored: 21ce86dad880bdccda73ec053bdff0d34ae24788d52322b6cafbd56651a087e0",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:26.669Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778216026883.trace.ndjson",
+      "missionId": "FORENSIC_TEST_1778216026883",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 1 invalid eventHash. Calculated: 0ecd7b21a37faaf42742e27c3fae6615e1fa11544f26543551d44e4f749773c3, Stored: 058d654bbcf38d32239de03a5dc481b6c0bc888c0d3c095772677c75f8d244ae",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:26.680Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778216270693.trace.ndjson",
+      "missionId": "FORENSIC_TEST_1778216270693",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 1 invalid eventHash. Calculated: 51e8b12293457518e7ed400fbfad838fa54c07a510405184348b154db8c9d729, Stored: 2e23ea37562b79273ef9a25bc22a19518064dcb115fdaff67829d88d830f8b6a",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:26.706Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778216843498.trace.ndjson",
+      "missionId": "FORENSIC_TEST_1778216843498",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 1 invalid eventHash. Calculated: f60891b28621596c8cef043942f1f7ba49392b7d43f1cbd4bda309f1e9e496e8, Stored: 8dd9a2a8f46539044d36cc454e044958e0f0f8b204ab563eb9c5283ceed35775",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:26.721Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778216986502.trace.ndjson",
+      "missionId": "FORENSIC_TEST_1778216986502",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 1 invalid eventHash. Calculated: 348a35fceaf4e4a15df3909174aa748fdc93dbd55ecdd02044629979bf76bbe6, Stored: 502d45f454907eee9d881ecf855f1a9e7427c3ee085add0b936132a05bc52b9b",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:26.733Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778217113778.trace.ndjson",
+      "missionId": "FORENSIC_TEST_1778217113778",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 1 invalid eventHash. Calculated: 0903d7e437142d9a1c1aea55b1a11f4f8f00bb87dbecf883c425f5289e044e91, Stored: ecab465bae1937be59a3c3872167acdd07c33d7675ac6fea3664170e8792bbc0",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:26.780Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778217245161.trace.ndjson",
+      "missionId": "FORENSIC_TEST_1778217245161",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 1 invalid eventHash. Calculated: bdcaf3ae119e503533f636fcef3a60e98c7d91268a9a083d49aefc0d15aa9bc8, Stored: 4ee0f2ce1d7c575135a3fb6e658d2d01c558a72304ebe685409eddbaf630457e",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:26.816Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778217562573.trace.ndjson",
+      "missionId": "FORENSIC_TEST_1778217562573",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 1 invalid eventHash. Calculated: 57b27c32f0dec25c41c43ce61597ba5c142ed2e5b2e90ff567ecaaf112239378, Stored: 2c53db7c36e0a219fb6dbc03cfd8378e1802251a78f5b07c9c7c0b6ff659e12a",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:26.851Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "FORGED_TEST_1778213662961.trace.json",
+      "missionId": "FORGED_TEST_1778213662961",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Invalid Ed25519 signature (Authorship verification failed)",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:26.907Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "FORGED_TEST_1778214469627.trace.ndjson",
+      "missionId": "FORGED_TEST_1778214469627",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Invalid Ed25519 signature (Authorship verification failed)",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:26.953Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "FORGED_TEST_1778216087619.trace.ndjson",
+      "missionId": "FORGED_TEST_1778216087619",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Invalid Ed25519 signature (Authorship verification failed)",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:27.019Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "FORGED_TEST_1778216297648.trace.ndjson",
+      "missionId": "FORGED_TEST_1778216297648",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Invalid Ed25519 signature (Authorship verification failed)",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:27.025Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "FORGED_TEST_1778216880290.trace.ndjson",
+      "missionId": "FORGED_TEST_1778216880290",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Invalid Ed25519 signature (Authorship verification failed)",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:27.034Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "FORGED_TEST_1778217005787.trace.ndjson",
+      "missionId": "FORGED_TEST_1778217005787",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Invalid Ed25519 signature (Authorship verification failed)",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:27.039Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "FORGED_TEST_1778217138661.trace.ndjson",
+      "missionId": "FORGED_TEST_1778217138661",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Invalid Ed25519 signature (Authorship verification failed)",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:27.045Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "FORGED_TEST_1778217269997.trace.ndjson",
+      "missionId": "FORGED_TEST_1778217269997",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Invalid Ed25519 signature (Authorship verification failed)",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:27.051Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "FORGED_TEST_1778217577610.trace.ndjson",
+      "missionId": "FORGED_TEST_1778217577610",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Invalid Ed25519 signature (Authorship verification failed)",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:27.056Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218374558_1.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218374558_1",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:27.061Z",
+      "verdict": "PASS",
+      "tier": 2
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218374602_2.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218374602_2",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:27.067Z",
+      "verdict": "PASS",
+      "tier": 2
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218374630_3.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218374630_3",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:27.073Z",
+      "verdict": "PASS",
+      "tier": 2
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218465353_1.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218465353_1",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:27.138Z",
+      "verdict": "PASS",
+      "tier": 2
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218465456_2.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218465456_2",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:27.146Z",
+      "verdict": "PASS",
+      "tier": 2
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218465489_3.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218465489_3",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:27.152Z",
+      "verdict": "PASS",
+      "tier": 2
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218617138_1.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218617138_1",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:27.157Z",
+      "verdict": "PASS",
+      "tier": 2
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218617321_2.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218617321_2",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:27.162Z",
+      "verdict": "PASS",
+      "tier": 2
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218617352_3.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218617352_3",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:27.232Z",
+      "verdict": "PASS",
+      "tier": 2
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218685938_1.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218685938_1",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:27.237Z",
+      "verdict": "PASS",
+      "tier": 2
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218685988_2.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218685988_2",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:27.244Z",
+      "verdict": "PASS",
+      "tier": 2
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218686016_3.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218686016_3",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:27.270Z",
+      "verdict": "PASS",
+      "tier": 2
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218789543_1.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218789543_1",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:27.290Z",
+      "verdict": "PASS",
+      "tier": 2
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218789668_2.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218789668_2",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:27.297Z",
+      "verdict": "PASS",
+      "tier": 2
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218789707_3.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218789707_3",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:27.304Z",
+      "verdict": "PASS",
+      "tier": 2
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218922348_1.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218922348_1",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:27.319Z",
+      "verdict": "PASS",
+      "tier": 3
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218922737_2.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218922737_2",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:27.333Z",
+      "verdict": "PASS",
+      "tier": 3
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218922831_3.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218922831_3",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:27.341Z",
+      "verdict": "PASS",
+      "tier": 3
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778219027433_1.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778219027433_1",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:27.351Z",
+      "verdict": "PASS",
+      "tier": 3
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778219027800_2.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778219027800_2",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:27.360Z",
+      "verdict": "PASS",
+      "tier": 3
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778219027854_3.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778219027854_3",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:27.369Z",
+      "verdict": "PASS",
+      "tier": 3
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778219388196_1.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778219388196_1",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:27.379Z",
+      "verdict": "PASS",
+      "tier": 3
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778219388563_2.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778219388563_2",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:27.602Z",
+      "verdict": "PASS",
+      "tier": 3
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778219388627_3.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778219388627_3",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:27.608Z",
+      "verdict": "PASS",
+      "tier": 3
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778220142296_1.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778220142296_1",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:27.620Z",
+      "verdict": "PASS",
+      "tier": 4
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778220142847_2.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778220142847_2",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:27.632Z",
+      "verdict": "PASS",
+      "tier": 4
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778220142921_3.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778220142921_3",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:27.639Z",
+      "verdict": "PASS",
+      "tier": 4
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778220439398_1.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778220439398_1",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:27.646Z",
+      "verdict": "PASS",
+      "tier": 4
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778220439841_2.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778220439841_2",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:27.734Z",
+      "verdict": "PASS",
+      "tier": 4
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778220439960_3.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778220439960_3",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:27.847Z",
+      "verdict": "PASS",
+      "tier": 4
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778220552609_1.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778220552609_1",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:27.975Z",
+      "verdict": "PASS",
+      "tier": 4
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778220553010_2.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778220553010_2",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:28.004Z",
+      "verdict": "PASS",
+      "tier": 4
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778220553083_3.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778220553083_3",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:28.048Z",
+      "verdict": "PASS",
+      "tier": 4
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778220668089_1.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778220668089_1",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:28.065Z",
+      "verdict": "PASS",
+      "tier": 4
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778220668346_2.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778220668346_2",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:28.075Z",
+      "verdict": "PASS",
+      "tier": 4
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778220668406_3.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778220668406_3",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:28.084Z",
+      "verdict": "PASS",
+      "tier": 4
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778220749224_1.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778220749224_1",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:28.093Z",
+      "verdict": "PASS",
+      "tier": 4
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778220749508_2.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778220749508_2",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "WITNESS_WARNING",
+          "detail": "Witness inclusion proof verification FAILED (Log inconsistency detected)",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:28.103Z",
+      "verdict": "PASS",
+      "tier": 3
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778220749557_3.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778220749557_3",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:28.112Z",
+      "verdict": "PASS",
+      "tier": 4
+    },
+    {
+      "traceFile": "PARTIAL_TEST_1778216100063.trace.ndjson",
+      "missionId": "PARTIAL_TEST_1778216100063",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "UNATTESTED_TAIL",
+          "detail": "Truncated partial event at tail: Expected ',' or '}' after property value in JSON at position 46. Recovering remaining chain.",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:28.118Z",
+      "verdict": "PASS",
+      "tier": 2
+    },
+    {
+      "traceFile": "PARTIAL_TEST_1778216311349.trace.ndjson",
+      "missionId": "PARTIAL_TEST_1778216311349",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "UNATTESTED_TAIL",
+          "detail": "Truncated partial event at tail: Expected ',' or '}' after property value in JSON at position 46. Recovering remaining chain.",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:28.122Z",
+      "verdict": "PASS",
+      "tier": 2
+    },
+    {
+      "traceFile": "PARTIAL_TEST_1778216899799.trace.ndjson",
+      "missionId": "PARTIAL_TEST_1778216899799",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "UNATTESTED_TAIL",
+          "detail": "Truncated partial event at tail: Expected ',' or '}' after property value in JSON at position 46. Recovering remaining chain.",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:28.132Z",
+      "verdict": "PASS",
+      "tier": 2
+    },
+    {
+      "traceFile": "PARTIAL_TEST_1778217013583.trace.ndjson",
+      "missionId": "PARTIAL_TEST_1778217013583",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "UNATTESTED_TAIL",
+          "detail": "Truncated partial event at tail: Expected ',' or '}' after property value in JSON at position 46. Recovering remaining chain.",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:28.137Z",
+      "verdict": "PASS",
+      "tier": 2
+    },
+    {
+      "traceFile": "PARTIAL_TEST_1778217152777.trace.ndjson",
+      "missionId": "PARTIAL_TEST_1778217152777",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "UNATTESTED_TAIL",
+          "detail": "Truncated partial event at tail: Expected ',' or '}' after property value in JSON at position 46. Recovering remaining chain.",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:28.144Z",
+      "verdict": "PASS",
+      "tier": 2
+    },
+    {
+      "traceFile": "PARTIAL_TEST_1778217283547.trace.ndjson",
+      "missionId": "PARTIAL_TEST_1778217283547",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "UNATTESTED_TAIL",
+          "detail": "Truncated partial event at tail: Expected ',' or '}' after property value in JSON at position 46. Recovering remaining chain.",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:28.152Z",
+      "verdict": "PASS",
+      "tier": 2
+    },
+    {
+      "traceFile": "PARTIAL_TEST_1778217585772.trace.ndjson",
+      "missionId": "PARTIAL_TEST_1778217585772",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "UNATTESTED_TAIL",
+          "detail": "Truncated partial event at tail: Expected ',' or '}' after property value in JSON at position 46. Recovering remaining chain.",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:28.162Z",
+      "verdict": "PASS",
+      "tier": 2
+    },
+    {
+      "traceFile": "TEST_INTEGRITY_1778211140267.trace.json",
+      "missionId": "TEST_INTEGRITY_1778211140267",
+      "environmentMatch": false,
+      "environmentExpected": "3b46c6ae0422313414eea477cfa24f294d8ede105957df99135d7216555e5398",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 1,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 0 invalid previousHash. Expected 0000000000000000000000000000000000000000000000000000000000000000, got undefined",
+          "severity": "FATAL"
+        },
+        {
+          "type": "ENVIRONMENT_DRIFT",
+          "detail": "Trace recorded on 3b46c6ae0422313414eea477cfa24f294d8ede105957df99135d7216555e5398, current is b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+          "severity": "WARNING"
+        },
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Missing governanceReceipt (unsigned trace)",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:28.169Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "TEST_INTEGRITY_1778211181614.trace.json",
+      "missionId": "TEST_INTEGRITY_1778211181614",
+      "environmentMatch": false,
+      "environmentExpected": "3b46c6ae0422313414eea477cfa24f294d8ede105957df99135d7216555e5398",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 1,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 0 invalid previousHash. Expected 0000000000000000000000000000000000000000000000000000000000000000, got undefined",
+          "severity": "FATAL"
+        },
+        {
+          "type": "ENVIRONMENT_DRIFT",
+          "detail": "Trace recorded on 3b46c6ae0422313414eea477cfa24f294d8ede105957df99135d7216555e5398, current is b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+          "severity": "WARNING"
+        },
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Missing governanceReceipt (unsigned trace)",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:28.175Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "TEST_JS_1778211169614.trace.json",
+      "missionId": "TEST_JS_1778211169614",
+      "environmentMatch": false,
+      "environmentExpected": "test-hash",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 1,
+      "schemaValid": false,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "EVENT_MALFORMED",
+          "detail": "Missing required field: timestamp",
+          "severity": "FATAL"
+        },
+        {
+          "type": "EVENT_MALFORMED",
+          "detail": "Missing required field: metadata",
+          "severity": "FATAL"
+        },
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 0 invalid previousHash. Expected 0000000000000000000000000000000000000000000000000000000000000000, got undefined",
+          "severity": "FATAL"
+        },
+        {
+          "type": "ENVIRONMENT_DRIFT",
+          "detail": "Trace recorded on test-hash, current is b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+          "severity": "WARNING"
+        },
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Missing governanceReceipt (unsigned trace)",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:28.181Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "UNATTESTED_TEST_1778216112069.trace.ndjson",
+      "missionId": "UNATTESTED_TEST_1778216112069",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 4,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 3 invalid previousHash. Expected 457836f316a7392cd4af4e4eb109d552e07c5de0f5a73ac18f0ee02b463448b0, got 65b2490e5bade8aa0faf0661ac4f45e6567d4b97a8a56ee0a90f0573ae5e658b",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:28.251Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "UNATTESTED_TEST_1778216328543.trace.ndjson",
+      "missionId": "UNATTESTED_TEST_1778216328543",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 4,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 3 invalid previousHash. Expected ab7b8b27d9c7a8311c34937bae0429e7c57514d9b6999b2afebe630081f7145e, got f7e42544d6eb31d03825fd98f3256bfcbba48d3876c851177be5fa587d34459d",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:28.485Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "UNATTESTED_TEST_1778216916796.trace.ndjson",
+      "missionId": "UNATTESTED_TEST_1778216916796",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 4,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 3 invalid previousHash. Expected a23003c029cdb264d9f3985b9aedd09824f808e0f87868460c8bbe58e22e667d, got 41d4cda7a10bc5438103b56a04898ac3436b4a41e7e76ff71238fd2166cd1893",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:28.629Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "UNATTESTED_TEST_1778217024630.trace.ndjson",
+      "missionId": "UNATTESTED_TEST_1778217024630",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 4,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 3 invalid previousHash. Expected 17fb4fcd337254bd9f19ad1749a45cc36d8e9cc986dcd497e6f5fc2efdb92753, got 93cec189ec915fd754bcdaad618927ef2f4887b65250f51966e30ab0bb70a757",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:28.884Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "UNATTESTED_TEST_1778217166773.trace.ndjson",
+      "missionId": "UNATTESTED_TEST_1778217166773",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 4,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 3 invalid previousHash. Expected 4700ba0b61f57738b47d20657cabbd0f8114ea630dd9b4b5782d96f0608bac37, got 050753b0aa54a49479c3ba0184b63228b5a0e492e8a1ec12fead6e24b59d4074",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:28.915Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "UNATTESTED_TEST_1778217295792.trace.ndjson",
+      "missionId": "UNATTESTED_TEST_1778217295792",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 4,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 3 invalid previousHash. Expected 1703b9365c93b66373194b4258dc1e1e4f7724b04fd8fb3d5ed0f140ef826fca, got 7fd7a69a85f0cd2bce2ef48fe04f8539d269dc70c54787884a442ac36fb98efa",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:28.930Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "UNATTESTED_TEST_1778217597659.trace.ndjson",
+      "missionId": "UNATTESTED_TEST_1778217597659",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 4,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 3 invalid previousHash. Expected fe776a2a6eaf03816f592720a9f21451d2dbe026412d52088165607b002e5b67, got d2a4ebefbb232b502c28724787aa713bbd6472f729b964efd431e64fb8f90993",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:28.944Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "VALID_TRACE_1778211316011.trace.json",
+      "missionId": "VALID_TRACE_1778211316011",
+      "environmentMatch": false,
+      "environmentExpected": "3b46c6ae0422313414eea477cfa24f294d8ede105957df99135d7216555e5398",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 1,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 0 invalid previousHash. Expected 0000000000000000000000000000000000000000000000000000000000000000, got undefined",
+          "severity": "FATAL"
+        },
+        {
+          "type": "ENVIRONMENT_DRIFT",
+          "detail": "Trace recorded on 3b46c6ae0422313414eea477cfa24f294d8ede105957df99135d7216555e5398, current is b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+          "severity": "WARNING"
+        },
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Missing governanceReceipt (unsigned trace)",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T06:14:28.947Z",
+      "verdict": "FAIL",
+      "tier": 2
+    },
+    {
+      "traceFile": "WITNESS_TEST_1778217179274.trace.ndjson",
+      "missionId": "WITNESS_TEST_1778217179274",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:28.953Z",
+      "verdict": "PASS",
+      "tier": 2
+    },
+    {
+      "traceFile": "WITNESS_TEST_1778217305658.trace.ndjson",
+      "missionId": "WITNESS_TEST_1778217305658",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:28.960Z",
+      "verdict": "PASS",
+      "tier": 2
+    },
+    {
+      "traceFile": "WITNESS_TEST_1778217605966.trace.ndjson",
+      "missionId": "WITNESS_TEST_1778217605966",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T06:14:28.974Z",
+      "verdict": "PASS",
+      "tier": 3
+    }
+  ],
+  "summary": {
+    "total": 88,
+    "passed": 51,
+    "failed": 37,
+    "corrupted": 0,
+    "passRate": 0.5795454545454546
+  }
+}

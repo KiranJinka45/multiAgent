@@ -1,0 +1,47 @@
+# 🛡️ ZTAN Core Runtime v1 (MOC)
+# Bounded, deterministic, and observable runtime.
+
+FROM node:20-slim AS base
+WORKDIR /app
+RUN apt-get update && apt-get install -y python3 make g++ && rm -rf /var/lib/apt/lists/*
+
+# Install dependencies
+COPY package*.json ./
+COPY packages/runtime-core/package.json packages/runtime-core/
+COPY packages/utils/package.json packages/utils/
+COPY packages/observability/package.json packages/observability/
+COPY packages/db/package.json packages/db/
+COPY packages/vfs/package.json packages/vfs/
+COPY packages/events/package.json packages/events/
+
+RUN npm install --include=dev
+
+# Copy source code (Core only)
+COPY tsconfig.json ./
+COPY packages/runtime-core packages/runtime-core
+COPY packages/utils packages/utils
+COPY packages/observability packages/observability
+COPY packages/db packages/db
+COPY packages/vfs packages/vfs
+COPY packages/events packages/events
+
+# Build core packages
+RUN npx tsc -b packages/runtime-core packages/utils
+
+# 🚢 Production Image
+FROM node:20-slim
+WORKDIR /app
+COPY --from=base /app/node_modules ./node_modules
+COPY --from=base /app/packages ./packages
+COPY --from=base /app/package.json ./package.json
+
+# Operational Truth Environment
+ENV ZTAN_CORE_VERSION=v1.0.0
+ENV NODE_ENV=production
+ENV ZTAN_TRACE_DIR=/app/.ztan/trace
+ENV ZTAN_REGISTRY_DIR=/app/.ztan/registry
+
+RUN mkdir -p $ZTAN_TRACE_DIR $ZTAN_REGISTRY_DIR
+
+# First Workload Entrypoint: TDC
+CMD ["node", "packages/runtime-core/dist/workloads/deployment-controller.js"]

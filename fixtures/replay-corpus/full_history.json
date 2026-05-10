@@ -1,0 +1,15 @@
+{
+    "history": [
+        {
+            "receipt": {
+                "sequenceNumber": 1,
+                "epochId": 0,
+                "action": "STATE_CHECKPOINT",
+                "previousGRoot": "0000000000000000000000000000000000000000000000000000000000000000",
+                "gRoot": "f0e1d2c3b4a5968778695a4b3c2d1e0f0e1d2c3b4a5968778695a4b3c2d1e0f",
+                "signatures": []
+            },
+            "appliedAt": "2026-05-09T07:31:49.051Z"
+        }
+    ]
+}

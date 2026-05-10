@@ -1,0 +1,31 @@
+{
+  "metadata": {
+    "environmentHash": "3b46c6ae0422313414eea477cfa24f294d8ede105957df99135d7216555e5398",
+    "modelVersion": "unknown",
+    "modelArtifactHash": "unknown",
+    "decodingParams": {
+      "temperature": 0,
+      "top_p": 1
+    },
+    "platform": "win32",
+    "timestamp": "2026-05-08T03:33:01.618Z",
+    "eventCount": 1,
+    "checksum": "f00555416d45a4c9162bb045a09e67a7e8a278152c0b8076725101e8a8d063b8"
+  },
+  "trace": [
+    {
+      "id": "evt_1",
+      "missionId": "TEST_INTEGRITY_1778211181614",
+      "type": "TEST_START",
+      "timestamp": "2026-05-08T03:33:01.615Z",
+      "payload": {
+        "message": "TAMPERED"
+      },
+      "metadata": {
+        "stepIndex": 0,
+        "agentId": "test_agent",
+        "reproducible": true
+      }
+    }
+  ]
+}

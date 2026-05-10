@@ -1,0 +1,43 @@
+{
+    "witnesses": [
+        {
+            "id": "8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368",
+            "publicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA47klpFQCpq4kj4qvLCBQJpsjZAMtH6K5Jd9pdrywSs4=\n-----END PUBLIC KEY-----",
+            "url": "http://localhost:8081"
+        },
+        {
+            "id": "5b85c135c30900cefff7edad9583ee68e362e34bc4d142d27ae7c4c733da48f0",
+            "publicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAG8jEhMcvFO5rQMJFs3osxPlQSxa5glVeISZRM/omex8=\n-----END PUBLIC KEY-----",
+            "url": "http://localhost:8082"
+        },
+        {
+            "id": "a88ce7ffe6733cf50cfb9292fe0c370f80bb9ccd104a2c15ad7398ec159da6ab",
+            "publicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAU8bANjW6wL5dHtgCbHyIe+2lt5YSPPfbyEysJdfTpOo=\n-----END PUBLIC KEY-----",
+            "url": "http://localhost:8083"
+        }
+    ],
+    "threshold": 2,
+    "council": {
+        "members": [
+            {
+                "id": "8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368",
+                "publicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA47klpFQCpq4kj4qvLCBQJpsjZAMtH6K5Jd9pdrywSs4=\n-----END PUBLIC KEY-----"
+            },
+            {
+                "id": "5b85c135c30900cefff7edad9583ee68e362e34bc4d142d27ae7c4c733da48f0",
+                "publicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAG8jEhMcvFO5rQMJFs3osxPlQSxa5glVeISZRM/omex8=\n-----END PUBLIC KEY-----"
+            },
+            {
+                "id": "a88ce7ffe6733cf50cfb9292fe0c370f80bb9ccd104a2c15ad7398ec159da6ab",
+                "publicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAU8bANjW6wL5dHtgCbHyIe+2lt5YSPPfbyEysJdfTpOo=\n-----END PUBLIC KEY-----"
+            }
+        ],
+        "threshold": 2,
+        "effectiveTimestamp": "1970-01-01T00:00:00.000Z"
+    },
+    "auditors": {
+        "members": [],
+        "threshold": 1,
+        "effectiveTimestamp": "1970-01-01T00:00:00.000Z"
+    }
+}

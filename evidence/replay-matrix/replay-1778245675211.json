@@ -1,0 +1,2443 @@
+{
+  "runId": "replay-1778245675211",
+  "timestamp": "2026-05-08T13:07:56.849Z",
+  "environment": {
+    "platform": "win32",
+    "arch": "x64",
+    "nodeVersion": "v20.20.0",
+    "nodeEnv": "development"
+  },
+  "environmentHash": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+  "results": [
+    {
+      "traceFile": "MERKLE_TEST_1778220142296_1.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778220142296_1",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "WITNESS_WARNING",
+          "detail": "Witness inclusion proof verification FAILED (Log inconsistency detected)",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.353Z",
+      "verdict": "PASS",
+      "tier": 3,
+      "witnessData": {
+        "missionId": "MERKLE_TEST_1778220142296_1",
+        "chainRoot": "0376945107a4f0df6610d1a524b69180592e2e660498740dd56ad7e48849c15e",
+        "tailHash": "dd4124e5fdd276a26856e17cd0e609b34824e6da753cf3c0c7fcabd822e27e19",
+        "operatorSignerKeyId": "11a6c779ed69cf7006d6282f9c640b3ccd1369fec8de8978abee108dfe364052",
+        "operatorGovernanceReceipt": "C4z2KEiT3hfINWCk8YvvBPuH0CxT/ZQTv9ZbxPIPpefem4b6vcJqwfFvHJLbTsjq3g3KPQ0PZ0MNjMXT8M00Cw==",
+        "witnessTimestamp": "2026-05-08T06:02:22.752Z",
+        "witnessSignatureAlgorithm": "ed25519",
+        "witnessKeyId": "8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368",
+        "witnessSignature": "RwxINSP1CdouRJpRNOBcDMWmBk34M+zQ421scdiwzcLTMkZlrlE1SZz9XAG7rCikuIcGUKSt1DnZ9w+A0O8PDA==",
+        "merkleRoot": "ddab8bb7d0622d6930cc272fa47b7c557405b8a9b08efe8d17ee537bf9ad3639",
+        "leafIndex": 0,
+        "inclusionProof": []
+      }
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778220142847_2.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778220142847_2",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "WITNESS_WARNING",
+          "detail": "Witness inclusion proof verification FAILED (Log inconsistency detected)",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.374Z",
+      "verdict": "PASS",
+      "tier": 3,
+      "witnessData": {
+        "missionId": "MERKLE_TEST_1778220142847_2",
+        "chainRoot": "7dd8f4b17edb1288d55802933086b1919f7fa1fbd56664bccb2f92330eeabed4",
+        "tailHash": "aa8fef0c0de13bef09a513559fad6eff950c8857f87f50eeeede8d21e789ec87",
+        "operatorSignerKeyId": "11a6c779ed69cf7006d6282f9c640b3ccd1369fec8de8978abee108dfe364052",
+        "operatorGovernanceReceipt": "mHv6jqHj+h20TQYa6clyjLvGBFgNg7+NmbnBRfehcjcehRtlZDtmz11vy80mh9tglAo3mHUcvMA+CMZIPcIDBQ==",
+        "witnessTimestamp": "2026-05-08T06:02:22.909Z",
+        "witnessSignatureAlgorithm": "ed25519",
+        "witnessKeyId": "8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368",
+        "witnessSignature": "PWoqmNs1K2uz8jAXxYqXa4IBg728oLRnx/2jNBR0nkEnQzhvbRle+K7/RATlqjlCBVY1gPJoq0o+iBM3wi6oCQ==",
+        "merkleRoot": "afb5749a30306e201eb5e0736699ac68fc90ed17d6072b4dc4cbf13cdd131995",
+        "leafIndex": 1,
+        "inclusionProof": [
+          {
+            "position": "left",
+            "hash": "ddab8bb7d0622d6930cc272fa47b7c557405b8a9b08efe8d17ee537bf9ad3639"
+          }
+        ]
+      }
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778220142921_3.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778220142921_3",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "WITNESS_WARNING",
+          "detail": "Witness inclusion proof verification FAILED (Log inconsistency detected)",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.387Z",
+      "verdict": "PASS",
+      "tier": 3,
+      "witnessData": {
+        "missionId": "MERKLE_TEST_1778220142921_3",
+        "chainRoot": "31b59e812e9146b9740067920e4550c35345cdd311493c73e48636c5109902d5",
+        "tailHash": "ba433bc60c4904207a9965ebad33d4244fca582ef5b7568973844d0cbc87b6e3",
+        "operatorSignerKeyId": "11a6c779ed69cf7006d6282f9c640b3ccd1369fec8de8978abee108dfe364052",
+        "operatorGovernanceReceipt": "tzk/3CnU4ovX8s3a4SMOJhDhvN0whqqTpDlTHzBRAivg5MO7/qTjvkvBD+kd6D6d4NJuZFC78CSe2A8F356ECg==",
+        "witnessTimestamp": "2026-05-08T06:02:22.963Z",
+        "witnessSignatureAlgorithm": "ed25519",
+        "witnessKeyId": "8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368",
+        "witnessSignature": "ZIO4M7cpGmXH8d4S7NE8DxfvS8KdFXrV/wTqHx3hALRJI6jSZ/oL2xPie3/7o92a921t7NTVpk5tB8tUwtWTCg==",
+        "merkleRoot": "047150d5e0c04a4e2dbcbc01e28a5205a3c9cadfcdbb889923f7bb7ec00fe4a6",
+        "leafIndex": 2,
+        "inclusionProof": [
+          {
+            "position": "right",
+            "hash": "0ce5c3dbb76ffe579cdf62e7d2960c6dd0c0d2df2f0b9fbdca4b688540e86a47"
+          },
+          {
+            "position": "left",
+            "hash": "afb5749a30306e201eb5e0736699ac68fc90ed17d6072b4dc4cbf13cdd131995"
+          }
+        ]
+      }
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778220439398_1.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778220439398_1",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "WITNESS_WARNING",
+          "detail": "Witness inclusion proof verification FAILED (Log inconsistency detected)",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.398Z",
+      "verdict": "PASS",
+      "tier": 3,
+      "witnessData": {
+        "missionId": "MERKLE_TEST_1778220439398_1",
+        "chainRoot": "f3e204a00ed5df747afa7924079d0961cfa4293c02c4f41451717320c42c9dd7",
+        "tailHash": "ef999dfccb5439f0cae4563c62b3c393640a33cc9b0ddea87a11fc7c52dff3da",
+        "operatorSignerKeyId": "11a6c779ed69cf7006d6282f9c640b3ccd1369fec8de8978abee108dfe364052",
+        "operatorGovernanceReceipt": "/LO24FbeN6hj/6jCPjMGRBu2lIuc2ERSTBzyaNbWtilMV4IOQVobvlrLZmmxq/P2tG+X6SS2L1NFzzfsBhUqCg==",
+        "witnessTimestamp": "2026-05-08T06:07:19.780Z",
+        "witnessSignatureAlgorithm": "ed25519",
+        "witnessKeyId": "8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368",
+        "witnessSignature": "61HVoCVF2EAsyU6fdetlDaHexvjmLsl0P0nrk6ULxclwE6mO90prHEGKyqNSkO8EffP/FaYpaWGlegr1NOPGDw==",
+        "merkleRoot": "84663a87d9454ba3de68f51dd3aef37c41840e2e5632e95b17050254387c3a01",
+        "leafIndex": 3,
+        "inclusionProof": [
+          {
+            "position": "left",
+            "hash": "0ce5c3dbb76ffe579cdf62e7d2960c6dd0c0d2df2f0b9fbdca4b688540e86a47"
+          },
+          {
+            "position": "left",
+            "hash": "afb5749a30306e201eb5e0736699ac68fc90ed17d6072b4dc4cbf13cdd131995"
+          }
+        ]
+      }
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778220439841_2.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778220439841_2",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "WITNESS_WARNING",
+          "detail": "Witness inclusion proof verification FAILED (Log inconsistency detected)",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.515Z",
+      "verdict": "PASS",
+      "tier": 3,
+      "witnessData": {
+        "missionId": "MERKLE_TEST_1778220439841_2",
+        "chainRoot": "5ef71cf29742c75512273d1fb443922605b6ea77e537ee04861db93f8ae2563b",
+        "tailHash": "4609286db681b4b2be2c773a6af02e08e09a07329cc96a829d22f4307a60670a",
+        "operatorSignerKeyId": "11a6c779ed69cf7006d6282f9c640b3ccd1369fec8de8978abee108dfe364052",
+        "operatorGovernanceReceipt": "NgCNbRh/aoW5VLkEPQ9OW7L3LdbXrbjVZmBvYKQo7nE01NjB8v/gg2Y+xRUS04S4H2odB0fXKGjM4McDTuznAA==",
+        "witnessTimestamp": "2026-05-08T06:07:19.949Z",
+        "witnessSignatureAlgorithm": "ed25519",
+        "witnessKeyId": "8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368",
+        "witnessSignature": "VJ5Gq9Tamk9qnqGQVno09ZM6XlbLuQ1Pk7YDdDkrFOdaTD4EoeOUw/Apkko9h0BSyKathQXblNEAC7WNEuFKBA==",
+        "merkleRoot": "77b22d79a9fd0b04c133ce69c83efb38f7d5da6451e68edfe9088d72ed6a7242",
+        "leafIndex": 4,
+        "inclusionProof": [
+          {
+            "position": "right",
+            "hash": "2536394c5c674e082b6044dd36a33d38ad92324135957ec5e12a032a079c55c6"
+          },
+          {
+            "position": "right",
+            "hash": "bb8b78a79b13ff97040f8b588092712f7d9dfd5e6b4bd3819657004df7bcf791"
+          },
+          {
+            "position": "left",
+            "hash": "84663a87d9454ba3de68f51dd3aef37c41840e2e5632e95b17050254387c3a01"
+          }
+        ]
+      }
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778220439960_3.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778220439960_3",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "WITNESS_WARNING",
+          "detail": "Witness inclusion proof verification FAILED (Log inconsistency detected)",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.524Z",
+      "verdict": "PASS",
+      "tier": 3,
+      "witnessData": {
+        "missionId": "MERKLE_TEST_1778220439960_3",
+        "chainRoot": "ca478af4b9ed514973e44f078a6fccc6e1544373ed997e01509d635c7038d406",
+        "tailHash": "fc1638f9d90ea7f32c2c8df010dffc8aa85772f28f85cbc4984f69d5e14c3288",
+        "operatorSignerKeyId": "11a6c779ed69cf7006d6282f9c640b3ccd1369fec8de8978abee108dfe364052",
+        "operatorGovernanceReceipt": "Nvu70F0CDhZhJulzhv7YXPZ/zjVCqKQmZd+m9V6Su7SZ/+suISNzVrTRlHz/2nyWXk7+p+z9/pOrqCA7Xhu1Ag==",
+        "witnessTimestamp": "2026-05-08T06:07:19.999Z",
+        "witnessSignatureAlgorithm": "ed25519",
+        "witnessKeyId": "8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368",
+        "witnessSignature": "5JS4L/YqjvNqHXt7hs2n3BPAfEW2JcfbKmuKKXZo2thRwEshO39IHJ8pu3+nVMrh0IvZ11C/khvGS5FiGKkgCg==",
+        "merkleRoot": "a4196e7d791e9b6db4dc9eb2ef640d48ea97967c9b3ca06f27ae1aa3b95981bf",
+        "leafIndex": 5,
+        "inclusionProof": [
+          {
+            "position": "left",
+            "hash": "2536394c5c674e082b6044dd36a33d38ad92324135957ec5e12a032a079c55c6"
+          },
+          {
+            "position": "right",
+            "hash": "3dc9cbbb76a356ccc0e35733497f99ebf962e1672cf2056acd06ce94b1acddd8"
+          },
+          {
+            "position": "left",
+            "hash": "84663a87d9454ba3de68f51dd3aef37c41840e2e5632e95b17050254387c3a01"
+          }
+        ]
+      }
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778220552609_1.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778220552609_1",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "WITNESS_WARNING",
+          "detail": "Witness inclusion proof verification FAILED (Log inconsistency detected)",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.534Z",
+      "verdict": "PASS",
+      "tier": 3,
+      "witnessData": {
+        "missionId": "MERKLE_TEST_1778220552609_1",
+        "chainRoot": "572de08caee9c974115f2225b04a19a3ab8d7e01282bd85ddeb05ccf975cf3db",
+        "tailHash": "e296450e3cfc8e26ab1f3ac9ad052ce0d6ee3cc15dceb618f2a2bc6dbd5dd0e2",
+        "operatorSignerKeyId": "11a6c779ed69cf7006d6282f9c640b3ccd1369fec8de8978abee108dfe364052",
+        "operatorGovernanceReceipt": "soE/tPzB8KU0rfyzhwVtn+EsRj0Gk3yPsqeFayCwXioZSxje1c2iXmPhyAlU1jlvDUg8Gw/2JyzYC5C2xdNMDQ==",
+        "witnessTimestamp": "2026-05-08T06:09:12.959Z",
+        "witnessSignatureAlgorithm": "ed25519",
+        "witnessKeyId": "8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368",
+        "witnessSignature": "VI8q8bCxWuQctvOQ3RhrPUfoAdHXVf3Dnjhdmyk9Y+To3Z0RyJJyCPgILF7ZKPdzNm7lW5/cPmVW/VciENA6CA==",
+        "merkleRoot": "1350aa4d063dfaf0fb02574f58a406fd7480bf4964c2b03175d1c1bfecec72a0",
+        "leafIndex": 6,
+        "inclusionProof": [
+          {
+            "position": "right",
+            "hash": "8b2741f02aecf8d0587c48c9866c1816a937636366f251b1d1b9e73aef9bd605"
+          },
+          {
+            "position": "left",
+            "hash": "3dc9cbbb76a356ccc0e35733497f99ebf962e1672cf2056acd06ce94b1acddd8"
+          },
+          {
+            "position": "left",
+            "hash": "84663a87d9454ba3de68f51dd3aef37c41840e2e5632e95b17050254387c3a01"
+          }
+        ]
+      }
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778220553010_2.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778220553010_2",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "WITNESS_WARNING",
+          "detail": "Witness inclusion proof verification FAILED (Log inconsistency detected)",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.543Z",
+      "verdict": "PASS",
+      "tier": 3,
+      "witnessData": {
+        "missionId": "MERKLE_TEST_1778220553010_2",
+        "chainRoot": "b0bc372c16db981d9e0c56addf73ecaf9e06ec900b7097b2bc92a3b9ee7d4bfa",
+        "tailHash": "220e0b78ad95def5779e25c72c7c7503f392515041df65f0c04bd2973334db2a",
+        "operatorSignerKeyId": "11a6c779ed69cf7006d6282f9c640b3ccd1369fec8de8978abee108dfe364052",
+        "operatorGovernanceReceipt": "ygRTCPqwOGW7aCmj7BqjryPu9lbO4LEcdvZBE+xhxqAvWdXTfnRNewNfEG/8/Ehle/PUd/P1tZyPuDLTGLWoDA==",
+        "witnessTimestamp": "2026-05-08T06:09:13.074Z",
+        "witnessSignatureAlgorithm": "ed25519",
+        "witnessKeyId": "8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368",
+        "witnessSignature": "35ek5MEIPMVR1Khze4rbtBDeTEu+c3MH494kO/qUMICZ0ZBxr+wztDvefTwnVI32nfIP0e7ATFTsige2B6GWCw==",
+        "merkleRoot": "cd16dd247056b868cacf4d223b378eb0f114ad43e8cacf08f413e759819e9948",
+        "leafIndex": 7,
+        "inclusionProof": [
+          {
+            "position": "left",
+            "hash": "8b2741f02aecf8d0587c48c9866c1816a937636366f251b1d1b9e73aef9bd605"
+          },
+          {
+            "position": "left",
+            "hash": "3dc9cbbb76a356ccc0e35733497f99ebf962e1672cf2056acd06ce94b1acddd8"
+          },
+          {
+            "position": "left",
+            "hash": "84663a87d9454ba3de68f51dd3aef37c41840e2e5632e95b17050254387c3a01"
+          }
+        ]
+      }
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778220553083_3.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778220553083_3",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "WITNESS_WARNING",
+          "detail": "Witness inclusion proof verification FAILED (Log inconsistency detected)",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.553Z",
+      "verdict": "PASS",
+      "tier": 3,
+      "witnessData": {
+        "missionId": "MERKLE_TEST_1778220553083_3",
+        "chainRoot": "2350899794443088bcf67cde176cd93c08242291d83931f361bc669d9ab992a9",
+        "tailHash": "39827d76ff4aa5fa927ab527e01673716a06ea650b82c92e3d7ce8366a8147a5",
+        "operatorSignerKeyId": "11a6c779ed69cf7006d6282f9c640b3ccd1369fec8de8978abee108dfe364052",
+        "operatorGovernanceReceipt": "dFNL7PZaf99oU8C3o0nLEa48jggSUO0UU/fIw5VkxJXWFBLV9lsCBnytD7HQZeL9QwJGDMfbdMZW3w2/HOP6DA==",
+        "witnessTimestamp": "2026-05-08T06:09:13.117Z",
+        "witnessSignatureAlgorithm": "ed25519",
+        "witnessKeyId": "8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368",
+        "witnessSignature": "GbTNBhgu/MnmDSraQjLsGHNFAjnU9mO1Hf8y5dmsP8riL04gQFiqfUG4rmxbsosExG7dPHVzBVZFgrr1rnVrDw==",
+        "merkleRoot": "e30f0931ccafc377efabf4cc60f59a3ab93c9a092fbd83358d08a96a073f6c96",
+        "leafIndex": 8,
+        "inclusionProof": [
+          {
+            "position": "right",
+            "hash": "c99e6aed84348509e89bbbbad557370133a022091c30af1047643bf0b690e825"
+          },
+          {
+            "position": "right",
+            "hash": "fbef62e4380459391c06bf121cf8fb3f57349073ef586a7d0c77a2e17cb49b06"
+          },
+          {
+            "position": "right",
+            "hash": "e3c283edf057d150508c26a521c32f07c9687b952cc028c4e6c9824e96e82970"
+          },
+          {
+            "position": "left",
+            "hash": "cd16dd247056b868cacf4d223b378eb0f114ad43e8cacf08f413e759819e9948"
+          }
+        ]
+      }
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778220668089_1.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778220668089_1",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "WITNESS_WARNING",
+          "detail": "Witness inclusion proof verification FAILED (Log inconsistency detected)",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.566Z",
+      "verdict": "PASS",
+      "tier": 3,
+      "witnessData": {
+        "missionId": "MERKLE_TEST_1778220668089_1",
+        "chainRoot": "253b632a3ede5e9ebe4198aa104c699535f899fd0e81282f14391bf79abe28b8",
+        "tailHash": "e466f10706e0d20cf04730238987f7b5f41faf5670f3327057fff40c13849452",
+        "operatorSignerKeyId": "11a6c779ed69cf7006d6282f9c640b3ccd1369fec8de8978abee108dfe364052",
+        "operatorGovernanceReceipt": "yPsi/HARxC6rATWqNw2NXVYRwihr9weNOrf4EQL/3+ALIypOKy31CKy1uRi3P1OvXDmZBmuVrlnOpTuT2CpBDQ==",
+        "witnessTimestamp": "2026-05-08T06:11:08.316Z",
+        "witnessSignatureAlgorithm": "ed25519",
+        "witnessKeyId": "8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368",
+        "witnessSignature": "WvNGjNYyAXL6SfIUMGA6i6UPk+fycBNFukPRbHPtDZ0/aMwRoxC07BciVnvYVJpoOi7PzOeuBpauilQzFI/iAQ==",
+        "merkleRoot": "34b666bb0b9ee1c14f499a93e9b97af3b8a9b8c517349b1a9b4769285b0cf301",
+        "leafIndex": 9,
+        "inclusionProof": [
+          {
+            "position": "left",
+            "hash": "c99e6aed84348509e89bbbbad557370133a022091c30af1047643bf0b690e825"
+          },
+          {
+            "position": "right",
+            "hash": "64622a2a06d6975ea15f6bcff05e2582efae8c6bf1ee6846e80912d04289e085"
+          },
+          {
+            "position": "right",
+            "hash": "99ec7b630c47f5a30858167c531c48edb4392f0ce91a137953886a6c86dc6ece"
+          },
+          {
+            "position": "left",
+            "hash": "cd16dd247056b868cacf4d223b378eb0f114ad43e8cacf08f413e759819e9948"
+          }
+        ]
+      }
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778220668346_2.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778220668346_2",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "WITNESS_WARNING",
+          "detail": "Witness inclusion proof verification FAILED (Log inconsistency detected)",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.577Z",
+      "verdict": "PASS",
+      "tier": 3,
+      "witnessData": {
+        "missionId": "MERKLE_TEST_1778220668346_2",
+        "chainRoot": "f32931a9cd27f73ba9f0367fe1594bd168f748e66f75020d5549a2df0c647816",
+        "tailHash": "b67c0ebe3b12345f012c9c12f4ac6d6efd19300442412ebe22e6b2518f54af08",
+        "operatorSignerKeyId": "11a6c779ed69cf7006d6282f9c640b3ccd1369fec8de8978abee108dfe364052",
+        "operatorGovernanceReceipt": "lLPJU3WBUY3q7hR9n5nc7jBng2aA3rIurSvrKupS2r9YBZYsG3aQwLvbBsXwqlZGJAaEXDrsG22FnIrAy+/mDg==",
+        "witnessTimestamp": "2026-05-08T06:11:08.397Z",
+        "witnessSignatureAlgorithm": "ed25519",
+        "witnessKeyId": "8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368",
+        "witnessSignature": "cR+dLxoO/SCEE1ZTrP6Ud6HkADsSTknZGYKk3VgF2GtLsn5aet08PynuvIZ8EJuNJmZkbibEs4EHrzD9rUn4CQ==",
+        "merkleRoot": "b5e059b88f679cb2a94f17ac24c80631e2e136ef8eded87bf1d8eebe5cbce618",
+        "leafIndex": 10,
+        "inclusionProof": [
+          {
+            "position": "right",
+            "hash": "ebdd659dbbd38d690c48d98e0799f92f589a12046e2b3878867c6d3bf1f743f5"
+          },
+          {
+            "position": "left",
+            "hash": "64622a2a06d6975ea15f6bcff05e2582efae8c6bf1ee6846e80912d04289e085"
+          },
+          {
+            "position": "right",
+            "hash": "e61982018edc8f01d80ca37b57085b9a3301266005c8eedf5719dffc78af1ae3"
+          },
+          {
+            "position": "left",
+            "hash": "cd16dd247056b868cacf4d223b378eb0f114ad43e8cacf08f413e759819e9948"
+          }
+        ]
+      }
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778220668406_3.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778220668406_3",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "WITNESS_WARNING",
+          "detail": "Witness inclusion proof verification FAILED (Log inconsistency detected)",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.588Z",
+      "verdict": "PASS",
+      "tier": 3,
+      "witnessData": {
+        "missionId": "MERKLE_TEST_1778220668406_3",
+        "chainRoot": "593d16e7bfa637d676a6f4e6fbf2750cf1242f0790b35dc78d67f399b9fdbaef",
+        "tailHash": "c7e5e5aeec10261f82df02f97be3b7f9cb9997e6a5cfb71dcffe8211c4433e69",
+        "operatorSignerKeyId": "11a6c779ed69cf7006d6282f9c640b3ccd1369fec8de8978abee108dfe364052",
+        "operatorGovernanceReceipt": "DWAJntyZSXAspUk9Kngqw2HYSR1iIYnAM0n3ipcBol3Dwhy8knstt7Uk5uhFo7MGb3k2a9nmqFxgg9AgJzC0Dw==",
+        "witnessTimestamp": "2026-05-08T06:11:08.440Z",
+        "witnessSignatureAlgorithm": "ed25519",
+        "witnessKeyId": "8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368",
+        "witnessSignature": "b99/qCyG5kZfFKpkPXkllmg6AihwLP+VwnwrVdW4ioi+/ca1wRIuzQh/PLRulHn5OKmvR03QiMf62Hi3mL/KAA==",
+        "merkleRoot": "bd2e4c5b034bfcd2a36cca2b816803adffa5142a87836c559e1a16f295ca4de4",
+        "leafIndex": 11,
+        "inclusionProof": [
+          {
+            "position": "left",
+            "hash": "ebdd659dbbd38d690c48d98e0799f92f589a12046e2b3878867c6d3bf1f743f5"
+          },
+          {
+            "position": "left",
+            "hash": "64622a2a06d6975ea15f6bcff05e2582efae8c6bf1ee6846e80912d04289e085"
+          },
+          {
+            "position": "right",
+            "hash": "4ad390c752701787d7fe512dfa82d75a3014907526cc630bb7eeaebe7a4904da"
+          },
+          {
+            "position": "left",
+            "hash": "cd16dd247056b868cacf4d223b378eb0f114ad43e8cacf08f413e759819e9948"
+          }
+        ]
+      }
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778220749224_1.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778220749224_1",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "WITNESS_WARNING",
+          "detail": "Witness inclusion proof verification FAILED (Log inconsistency detected)",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.599Z",
+      "verdict": "PASS",
+      "tier": 3,
+      "witnessData": {
+        "missionId": "MERKLE_TEST_1778220749224_1",
+        "chainRoot": "1064ada8944e6b68279e7a5721abdee7127a2adae1a6272735f0a7529d33f3b7",
+        "tailHash": "cde581cc04f35482c1e3d13189677dcb02f806212a7459a4db14ebe0d285a225",
+        "operatorSignerKeyId": "11a6c779ed69cf7006d6282f9c640b3ccd1369fec8de8978abee108dfe364052",
+        "operatorGovernanceReceipt": "kmkj4Ew9u9HTKSKYH0/e7kQSYxBR+luYFBTV9eEDfTW2zTT1sMl9+FeVginA0hlmVf/6oYXF0xkbeN+rcrm5BQ==",
+        "witnessTimestamp": "2026-05-08T06:12:29.476Z",
+        "witnessSignatureAlgorithm": "ed25519",
+        "witnessKeyId": "8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368",
+        "witnessSignature": "uR778m4GxcHFmW7jveZiTJNBLH5//JzyNSQDH+PzB9DDEgPABClCK7TOb65uktFISzU0+IJySE4XN2y57dcACw==",
+        "merkleRoot": "b8f5c8ceea2121b97da3679427111984444e9d275b84cbed124b436e51c84b12",
+        "leafIndex": 12,
+        "inclusionProof": [
+          {
+            "position": "right",
+            "hash": "92aabe3e6e154a481b6c8918965471f08317064b7ada9d0e5cce70f9bd9369fb"
+          },
+          {
+            "position": "right",
+            "hash": "d21cd5a538d9a15d7e82f231b483d995a59e7a8e177241b3829a30cb1f6915bc"
+          },
+          {
+            "position": "left",
+            "hash": "4ad390c752701787d7fe512dfa82d75a3014907526cc630bb7eeaebe7a4904da"
+          },
+          {
+            "position": "left",
+            "hash": "cd16dd247056b868cacf4d223b378eb0f114ad43e8cacf08f413e759819e9948"
+          }
+        ]
+      }
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778220749508_2.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778220749508_2",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "WITNESS_WARNING",
+          "detail": "Witness inclusion proof verification FAILED (Log inconsistency detected)",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.607Z",
+      "verdict": "PASS",
+      "tier": 3,
+      "witnessData": {
+        "missionId": "MERKLE_TEST_1778220749508_2",
+        "chainRoot": "1c27c959f5f81c1cf579a870170086f40ad0a9819f95feaaf3c6dadc4b12bf65",
+        "tailHash": "e85fb30dc168303ec64f437d53dc428cc60d1c38134869804e79c8cb4974beba",
+        "operatorSignerKeyId": "11a6c779ed69cf7006d6282f9c640b3ccd1369fec8de8978abee108dfe364052",
+        "operatorGovernanceReceipt": "86j/ZzdRfbzL7ga9jNqDfwubP+V4L4+BCCLruwb3lEjlTJQGB0BAPJU1fyxiPdv+zpJ7K2D8q8ihEbHZKWJeDQ==",
+        "witnessTimestamp": "2026-05-08T06:12:29.548Z",
+        "witnessSignatureAlgorithm": "ed25519",
+        "witnessKeyId": "8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368",
+        "witnessSignature": "19dcnNMNFfUYZx9odgvl7W8IK2EL67Zp5jHNo3npPUGtJZX+0d1+ggXdz658Ld2ZIa1BXOs+rIBwwznXLunrBA==",
+        "merkleRoot": "391b8b81c917ea436b743fd782c92b7ac155536baa06ff02bc5f780e4563f447",
+        "leafIndex": 13,
+        "inclusionProof": [
+          {
+            "position": "left",
+            "hash": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "position": "right",
+            "hash": "26c3e68fba4aa56318f0d798f326923e775b2f14261dc704d583a426b4b42cd3"
+          },
+          {
+            "position": "left",
+            "hash": "4ad390c752701787d7fe512dfa82d75a3014907526cc630bb7eeaebe7a4904da"
+          },
+          {
+            "position": "left",
+            "hash": "cd16dd247056b868cacf4d223b378eb0f114ad43e8cacf08f413e759819e9948"
+          }
+        ]
+      }
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778220749557_3.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778220749557_3",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "WITNESS_WARNING",
+          "detail": "Witness inclusion proof verification FAILED (Log inconsistency detected)",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.619Z",
+      "verdict": "PASS",
+      "tier": 3,
+      "witnessData": {
+        "missionId": "MERKLE_TEST_1778220749557_3",
+        "chainRoot": "27e2b8d03c4a6f03a37e5e8cc9896921a20688cfdd5461a65943e51f2c6be378",
+        "tailHash": "ce752064c3183410607ccab2d60109a036cfe7b38c53b5a154ad08d6ab349a35",
+        "operatorSignerKeyId": "11a6c779ed69cf7006d6282f9c640b3ccd1369fec8de8978abee108dfe364052",
+        "operatorGovernanceReceipt": "S3AzW1V/jcQNAivT8qqFOamhNOMlyqbCRtKhRnGVcyUVabwGOMR2l8v8+kZWgbfSavDpRJrxeB33rYClFdlPAw==",
+        "witnessTimestamp": "2026-05-08T06:12:29.592Z",
+        "witnessSignatureAlgorithm": "ed25519",
+        "witnessKeyId": "8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368",
+        "witnessSignature": "MKLHa9E20LMCfdHkQ4lTMKOgbNlk3ryzjG9eYG1j+bQWtx1aiyt/sqbYESEN8RT0y6QMpExUe5iGRYmNvS8YBw==",
+        "merkleRoot": "f31a86fd85b067d9961569bc6e3c13a7292699103198406d7c2ae4f302c88eee",
+        "leafIndex": 14,
+        "inclusionProof": [
+          {
+            "position": "right",
+            "hash": "10d343508e5ec453181d55d8366802c305050873f8cbeb2ac754e8f2dbf1c6bd"
+          },
+          {
+            "position": "left",
+            "hash": "26c3e68fba4aa56318f0d798f326923e775b2f14261dc704d583a426b4b42cd3"
+          },
+          {
+            "position": "left",
+            "hash": "4ad390c752701787d7fe512dfa82d75a3014907526cc630bb7eeaebe7a4904da"
+          },
+          {
+            "position": "left",
+            "hash": "cd16dd247056b868cacf4d223b378eb0f114ad43e8cacf08f413e759819e9948"
+          }
+        ]
+      }
+    },
+    {
+      "traceFile": "DEP_1778163942757.trace.json",
+      "missionId": "DEP_1778163942757",
+      "environmentMatch": false,
+      "environmentExpected": "unknown",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 4,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 0 invalid previousHash. Expected 0000000000000000000000000000000000000000000000000000000000000000, got undefined",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.620Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778211772424.trace.json",
+      "missionId": "FORENSIC_TEST_1778211772424",
+      "environmentMatch": false,
+      "environmentExpected": "12da5522e6077c266b38ec3b829648ba2ba414acfdeae2e3decd8f0121a4caf7",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 1,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 0 invalid eventHash. Calculated: 6ec02ac64ae04e2552daa0f18106049f543827d4cd3e15a4ed2870aacedca3c5, Stored: d42454eadb2f95d403d39451d808f341a1a28863db23e81c2488e58bedd65a69",
+          "severity": "FATAL"
+        },
+        {
+          "type": "ENVIRONMENT_DRIFT",
+          "detail": "Trace recorded on 12da5522e6077c266b38ec3b829648ba2ba414acfdeae2e3decd8f0121a4caf7, current is b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+          "severity": "WARNING"
+        },
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Missing governanceReceipt (unsigned trace)",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.624Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778211843594.trace.json",
+      "missionId": "FORENSIC_TEST_1778211843594",
+      "environmentMatch": false,
+      "environmentExpected": "12da5522e6077c266b38ec3b829648ba2ba414acfdeae2e3decd8f0121a4caf7",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 0 invalid eventHash. Calculated: 613f4dc5a415289ae5bbfc5ac3a8563308e9b1d63c0d5e36c2fb243b0f4d93ee, Stored: 6a540eef7ec0ae1f9b68cf742c3c44ffe8d66177609b0886a35525fdb5261d04",
+          "severity": "FATAL"
+        },
+        {
+          "type": "ENVIRONMENT_DRIFT",
+          "detail": "Trace recorded on 12da5522e6077c266b38ec3b829648ba2ba414acfdeae2e3decd8f0121a4caf7, current is b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+          "severity": "WARNING"
+        },
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Missing governanceReceipt (unsigned trace)",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.627Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778211927664.trace.json",
+      "missionId": "FORENSIC_TEST_1778211927664",
+      "environmentMatch": false,
+      "environmentExpected": "12da5522e6077c266b38ec3b829648ba2ba414acfdeae2e3decd8f0121a4caf7",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 0 invalid eventHash. Calculated: 74964d4d2d1457d9fecf209542ff8de0e776ab349d77441e28d8560c2eb66487, Stored: e0f7c1a55e688a3b180271cb5d04a6edd1fb560d218484632a825d0f14e44cc7",
+          "severity": "FATAL"
+        },
+        {
+          "type": "ENVIRONMENT_DRIFT",
+          "detail": "Trace recorded on 12da5522e6077c266b38ec3b829648ba2ba414acfdeae2e3decd8f0121a4caf7, current is b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+          "severity": "WARNING"
+        },
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Missing governanceReceipt (unsigned trace)",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.630Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778212365753.trace.json",
+      "missionId": "FORENSIC_TEST_1778212365753",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Legacy HMAC receipt detected — symmetric signing does not provide non-repudiation",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.632Z",
+      "verdict": "PASS",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778212720088.trace.json",
+      "missionId": "FORENSIC_TEST_1778212720088",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 1 invalid eventHash. Calculated: faab0680a2353c40336dd2495d3d6bd9acc37704cb8defc37eccd84aebdb7f80, Stored: b9623b6410ef48caf8757323ba242b6ac34c9a4de20dba5b87707ee001f4f7d2",
+          "severity": "FATAL"
+        },
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Legacy HMAC receipt detected — symmetric signing does not provide non-repudiation",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.634Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778212795845.trace.json",
+      "missionId": "FORENSIC_TEST_1778212795845",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 1 invalid eventHash. Calculated: de7a1afbb32e7e02fdc4ba39c89c10d88361dc67c3622741335409d26b375037, Stored: 8158655f9a4ab0becc061677efaee92014b56b6e7157871f93af652df08c016a",
+          "severity": "FATAL"
+        },
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Legacy HMAC receipt detected — symmetric signing does not provide non-repudiation",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.637Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778212913821.trace.json",
+      "missionId": "FORENSIC_TEST_1778212913821",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 1 invalid eventHash. Calculated: 6439f1b5ebcf069feec434d0d3086fea208a61c15600d8dc763640e87012d3a1, Stored: 53e4447b6845d25ba653cb120e2a3f25690b0eaa3a447987b3736acb24d08b6b",
+          "severity": "FATAL"
+        },
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Legacy HMAC receipt detected — symmetric signing does not provide non-repudiation",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.639Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778213000727.trace.json",
+      "missionId": "FORENSIC_TEST_1778213000727",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Legacy HMAC receipt detected — symmetric signing does not provide non-repudiation",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.641Z",
+      "verdict": "PASS",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778213638659.trace.json",
+      "missionId": "FORENSIC_TEST_1778213638659",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 1 invalid eventHash. Calculated: 1dadc2a37a48b23d6341769cd9263a1c0bc17697f2bc8bfb9e4216f43a8a8401, Stored: 31601e5d9c013bc9bba5a908327fa09d4c3241a22564b27cb14be9dd368b48d7",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.645Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778214384925.trace.ndjson",
+      "missionId": "FORENSIC_TEST_1778214384925",
+      "environmentMatch": false,
+      "environmentExpected": "unknown",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 1,
+      "schemaValid": false,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "SCHEMA_INVALID",
+          "detail": "Detached receipt missing for NDJSON trace",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.648Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778214438943.trace.ndjson",
+      "missionId": "FORENSIC_TEST_1778214438943",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 1 invalid eventHash. Calculated: fc1acdff3a6cf99c48d6b191b343f75131acc6b47384674b221756c5ca07c30b, Stored: 21ce86dad880bdccda73ec053bdff0d34ae24788d52322b6cafbd56651a087e0",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.655Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778216026883.trace.ndjson",
+      "missionId": "FORENSIC_TEST_1778216026883",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 1 invalid eventHash. Calculated: 0ecd7b21a37faaf42742e27c3fae6615e1fa11544f26543551d44e4f749773c3, Stored: 058d654bbcf38d32239de03a5dc481b6c0bc888c0d3c095772677c75f8d244ae",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.660Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778216270693.trace.ndjson",
+      "missionId": "FORENSIC_TEST_1778216270693",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 1 invalid eventHash. Calculated: 51e8b12293457518e7ed400fbfad838fa54c07a510405184348b154db8c9d729, Stored: 2e23ea37562b79273ef9a25bc22a19518064dcb115fdaff67829d88d830f8b6a",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.665Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778216843498.trace.ndjson",
+      "missionId": "FORENSIC_TEST_1778216843498",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 1 invalid eventHash. Calculated: f60891b28621596c8cef043942f1f7ba49392b7d43f1cbd4bda309f1e9e496e8, Stored: 8dd9a2a8f46539044d36cc454e044958e0f0f8b204ab563eb9c5283ceed35775",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.670Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778216986502.trace.ndjson",
+      "missionId": "FORENSIC_TEST_1778216986502",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 1 invalid eventHash. Calculated: 348a35fceaf4e4a15df3909174aa748fdc93dbd55ecdd02044629979bf76bbe6, Stored: 502d45f454907eee9d881ecf855f1a9e7427c3ee085add0b936132a05bc52b9b",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.680Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778217113778.trace.ndjson",
+      "missionId": "FORENSIC_TEST_1778217113778",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 1 invalid eventHash. Calculated: 0903d7e437142d9a1c1aea55b1a11f4f8f00bb87dbecf883c425f5289e044e91, Stored: ecab465bae1937be59a3c3872167acdd07c33d7675ac6fea3664170e8792bbc0",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.689Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778217245161.trace.ndjson",
+      "missionId": "FORENSIC_TEST_1778217245161",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 1 invalid eventHash. Calculated: bdcaf3ae119e503533f636fcef3a60e98c7d91268a9a083d49aefc0d15aa9bc8, Stored: 4ee0f2ce1d7c575135a3fb6e658d2d01c558a72304ebe685409eddbaf630457e",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.695Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "FORENSIC_TEST_1778217562573.trace.ndjson",
+      "missionId": "FORENSIC_TEST_1778217562573",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 3,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 1 invalid eventHash. Calculated: 57b27c32f0dec25c41c43ce61597ba5c142ed2e5b2e90ff567ecaaf112239378, Stored: 2c53db7c36e0a219fb6dbc03cfd8378e1802251a78f5b07c9c7c0b6ff659e12a",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.772Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "FORGED_TEST_1778213662961.trace.json",
+      "missionId": "FORGED_TEST_1778213662961",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Invalid Ed25519 signature (Authorship verification failed)",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.779Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "FORGED_TEST_1778214469627.trace.ndjson",
+      "missionId": "FORGED_TEST_1778214469627",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Invalid Ed25519 signature (Authorship verification failed)",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.784Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "FORGED_TEST_1778216087619.trace.ndjson",
+      "missionId": "FORGED_TEST_1778216087619",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Invalid Ed25519 signature (Authorship verification failed)",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.789Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "FORGED_TEST_1778216297648.trace.ndjson",
+      "missionId": "FORGED_TEST_1778216297648",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Invalid Ed25519 signature (Authorship verification failed)",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.794Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "FORGED_TEST_1778216880290.trace.ndjson",
+      "missionId": "FORGED_TEST_1778216880290",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Invalid Ed25519 signature (Authorship verification failed)",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.798Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "FORGED_TEST_1778217005787.trace.ndjson",
+      "missionId": "FORGED_TEST_1778217005787",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Invalid Ed25519 signature (Authorship verification failed)",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.803Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "FORGED_TEST_1778217138661.trace.ndjson",
+      "missionId": "FORGED_TEST_1778217138661",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Invalid Ed25519 signature (Authorship verification failed)",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.808Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "FORGED_TEST_1778217269997.trace.ndjson",
+      "missionId": "FORGED_TEST_1778217269997",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Invalid Ed25519 signature (Authorship verification failed)",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.814Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "FORGED_TEST_1778217577610.trace.ndjson",
+      "missionId": "FORGED_TEST_1778217577610",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Invalid Ed25519 signature (Authorship verification failed)",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:55.818Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218374558_1.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218374558_1",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T13:07:55.824Z",
+      "verdict": "PASS",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218374602_2.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218374602_2",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T13:07:55.832Z",
+      "verdict": "PASS",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218374630_3.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218374630_3",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T13:07:55.837Z",
+      "verdict": "PASS",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218465353_1.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218465353_1",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T13:07:55.843Z",
+      "verdict": "PASS",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218465456_2.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218465456_2",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T13:07:55.850Z",
+      "verdict": "PASS",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218465489_3.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218465489_3",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T13:07:55.855Z",
+      "verdict": "PASS",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218617138_1.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218617138_1",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T13:07:55.860Z",
+      "verdict": "PASS",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218617321_2.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218617321_2",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T13:07:55.866Z",
+      "verdict": "PASS",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218617352_3.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218617352_3",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T13:07:55.880Z",
+      "verdict": "PASS",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218685938_1.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218685938_1",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T13:07:55.888Z",
+      "verdict": "PASS",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218685988_2.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218685988_2",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T13:07:55.895Z",
+      "verdict": "PASS",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218686016_3.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218686016_3",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T13:07:55.900Z",
+      "verdict": "PASS",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218789543_1.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218789543_1",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T13:07:55.905Z",
+      "verdict": "PASS",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218789668_2.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218789668_2",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T13:07:55.911Z",
+      "verdict": "PASS",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218789707_3.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218789707_3",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T13:07:55.916Z",
+      "verdict": "PASS",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218922348_1.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218922348_1",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T13:07:55.928Z",
+      "verdict": "PASS",
+      "tier": 3,
+      "witnessData": {
+        "missionId": "MERKLE_TEST_1778218922348_1",
+        "chainRoot": "8c804155238b81f11f33a54c44733c2af5027911d50950d42dbda06245529b14",
+        "tailHash": "9e88e03b7e8fd46f68c3bf0d1e0c01f2c147d4b02dc47673047650917520908b",
+        "operatorSignerKeyId": "11a6c779ed69cf7006d6282f9c640b3ccd1369fec8de8978abee108dfe364052",
+        "operatorGovernanceReceipt": "q466vbIDyKZERJRSaSGBVpBq7p3Q/tYY7nItzN/9JLxsTAzmQxXDQn7w17PFGg9x2pIiz7DYZmxFazalvPZrCA==",
+        "witnessTimestamp": "2026-05-08T05:42:02.651Z",
+        "witnessSignatureAlgorithm": "ed25519",
+        "witnessKeyId": "8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368",
+        "witnessSignature": "juRgDYS+SXvpM7T9/G33buIs/QFD7WHn0gltCf7OTLQDYrqV4+I/IhQ0hnteg8KncT0aeJB8HF/k5bSkDNoVDA=="
+      }
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218922737_2.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218922737_2",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T13:07:55.937Z",
+      "verdict": "PASS",
+      "tier": 3,
+      "witnessData": {
+        "missionId": "MERKLE_TEST_1778218922737_2",
+        "chainRoot": "f274fc6d81ef409f598f3c0ea0b964cfb30a16d23400463e082477fda8b2aa91",
+        "tailHash": "591ae23fd8fb96bbd4f2b0ea6c5bc031a83b5c97265e1b60e200423ca1fc48eb",
+        "operatorSignerKeyId": "11a6c779ed69cf7006d6282f9c640b3ccd1369fec8de8978abee108dfe364052",
+        "operatorGovernanceReceipt": "xDWMk/5zEYGp2QH6fhgVDTKq/3CJhSFBXj3ztR3+VKPbuViHuAuWFOQQzGbJFoT3cY5FZegN56YOkNZZAKhkAw==",
+        "witnessTimestamp": "2026-05-08T05:42:02.823Z",
+        "witnessSignatureAlgorithm": "ed25519",
+        "witnessKeyId": "8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368",
+        "witnessSignature": "FsNqcGQO12VsfNRn0hqnJCrH/U/xCELzJKJKrtWi5jTt4mNF8x+ZlPinGwgDsZ/CqxWAIKejTNgwrAPh8vffDA=="
+      }
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778218922831_3.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778218922831_3",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T13:07:55.953Z",
+      "verdict": "PASS",
+      "tier": 3,
+      "witnessData": {
+        "missionId": "MERKLE_TEST_1778218922831_3",
+        "chainRoot": "f1a8da3787e80878bcccef7b7325869671aed95d2f534c82bdc375d8769c6653",
+        "tailHash": "d47b0aed01c2708ce122c7919ce7d128c8bb1639d573c96cbef1dce5ca9c55c4",
+        "operatorSignerKeyId": "11a6c779ed69cf7006d6282f9c640b3ccd1369fec8de8978abee108dfe364052",
+        "operatorGovernanceReceipt": "6K7L8Z+7zOvJctf+UOFjcgWYcwwwUIA3oHXYYdQ+z2WonkUe1X45RkFZFrmeEk9L1+1iVlPtXlx3lRFCsWcDCQ==",
+        "witnessTimestamp": "2026-05-08T05:42:02.865Z",
+        "witnessSignatureAlgorithm": "ed25519",
+        "witnessKeyId": "8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368",
+        "witnessSignature": "e6GkcMmISjGh0pSYVdtC38PmAwvlU+oheQemVYeVRk2vx/11nZpfHGgRyLZlveZs9FBfL9MFs/+UWzlmxWLiBg=="
+      }
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778219027433_1.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778219027433_1",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T13:07:55.963Z",
+      "verdict": "PASS",
+      "tier": 3,
+      "witnessData": {
+        "missionId": "MERKLE_TEST_1778219027433_1",
+        "chainRoot": "c447896039802a380f7d8a33e0af0ad6861d67751df67d7239d6802b1ca1bc52",
+        "tailHash": "54d543ecbb85e2fa40675cd09916f7d2918323120e79822e2ffc314bdd0a38b5",
+        "operatorSignerKeyId": "11a6c779ed69cf7006d6282f9c640b3ccd1369fec8de8978abee108dfe364052",
+        "operatorGovernanceReceipt": "FqFlMDFJSZe1r/hU8sYQ8leo2v3M+xCLA1w3M1IlNESxjDjJ97DlKve3tfUmc/OxtkMpmr8wExntbvnwGzXYAA==",
+        "witnessTimestamp": "2026-05-08T05:43:47.773Z",
+        "witnessSignatureAlgorithm": "ed25519",
+        "witnessKeyId": "8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368",
+        "witnessSignature": "kTq/l6LcTWog7RQ3+3v16vX5c8VP/Un2ikveeuQS03yma/MQA+EmEobycm0VAegP3hn5ELCohq588ynGc9g6Dw=="
+      }
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778219027800_2.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778219027800_2",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T13:07:55.979Z",
+      "verdict": "PASS",
+      "tier": 3,
+      "witnessData": {
+        "missionId": "MERKLE_TEST_1778219027800_2",
+        "chainRoot": "f3166ee568345779e6b1514f419bb9a7f878fbf2779eddaa5dbfd0e208d9b860",
+        "tailHash": "8c9b4511eb4e278bb7c3fd8736744a65d3644dca2cd7af2005ec524605f043b0",
+        "operatorSignerKeyId": "11a6c779ed69cf7006d6282f9c640b3ccd1369fec8de8978abee108dfe364052",
+        "operatorGovernanceReceipt": "PGv0uIklC8C2zsPh2BcAbc1JBqR4hKWxzzTAJJr6Oweqy+H3JO0aDuTPSvNKvIdtWENfw2UxCa0pkfl4XAevBw==",
+        "witnessTimestamp": "2026-05-08T05:43:47.844Z",
+        "witnessSignatureAlgorithm": "ed25519",
+        "witnessKeyId": "8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368",
+        "witnessSignature": "Q4ufu3h11svlG1UJ0iloMaQyKVLAnu520Tnnqjl55P/1ZBhDD48upo0B7fQ11y2vV9AWh9AjjOK29fMBE/RLCw=="
+      }
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778219027854_3.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778219027854_3",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T13:07:56.006Z",
+      "verdict": "PASS",
+      "tier": 3,
+      "witnessData": {
+        "missionId": "MERKLE_TEST_1778219027854_3",
+        "chainRoot": "98f19ba30c07a8ee563aaeba77d841ab5cdfd39fde4d17f812d9bfa914e2aa83",
+        "tailHash": "dd5ce1e618eac1076441631fcfadb7b157755cf5b530776bc2d18449ee7be73e",
+        "operatorSignerKeyId": "11a6c779ed69cf7006d6282f9c640b3ccd1369fec8de8978abee108dfe364052",
+        "operatorGovernanceReceipt": "rjjrVMUIXU2Ura8SOa/eOq7D+ZDnCmcdHnk14aMrwN3cqR7GribNmveHL07ogAYK4Utw746qsS5ev/LX+/EqBg==",
+        "witnessTimestamp": "2026-05-08T05:43:47.893Z",
+        "witnessSignatureAlgorithm": "ed25519",
+        "witnessKeyId": "8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368",
+        "witnessSignature": "n8twa/MgbLM3HEB1u6ZTMB8rM+mXhOE8Z+N79JA5Bh9I805K/R5i2Yb4Co4imZX1JK6u4MWyOo85IfK9f6NGAw=="
+      }
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778219388196_1.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778219388196_1",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T13:07:56.015Z",
+      "verdict": "PASS",
+      "tier": 3,
+      "witnessData": {
+        "missionId": "MERKLE_TEST_1778219388196_1",
+        "chainRoot": "cd364547f8db52d3feb16fae9b5c36cd9a156a5000668769d1f921ac6bab64a0",
+        "tailHash": "1a0d5441894dda44d66842e5d6f3593e0aad0fdc2c5941793059cb1b569a98f5",
+        "operatorSignerKeyId": "11a6c779ed69cf7006d6282f9c640b3ccd1369fec8de8978abee108dfe364052",
+        "operatorGovernanceReceipt": "ziovvYxQTTiVqqM2CpPrU4Hxb77U94k/t6o5d4cSSdqTV5voGozszjhEQIwZzqgsyvjqA2JXxt6zguxjNWY7Dg==",
+        "witnessTimestamp": "2026-05-08T05:49:48.538Z",
+        "witnessSignatureAlgorithm": "ed25519",
+        "witnessKeyId": "8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368",
+        "witnessSignature": "8m9PGjhnzRiyz/gRSLONiz7SDN+Khub6YdJPjqgBwhrPiVzXc/aJKwQ+Q2+uF8c00bjXifSpdZZmYjy/kT16Dw=="
+      }
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778219388563_2.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778219388563_2",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T13:07:56.023Z",
+      "verdict": "PASS",
+      "tier": 3,
+      "witnessData": {
+        "missionId": "MERKLE_TEST_1778219388563_2",
+        "chainRoot": "dd7e4381d8230af7d533c6b628c0157f47173227ae613175fabd7f3246d607a2",
+        "tailHash": "b3353cddae73b547e3d657b46f33200fffdc02eed5278348e35b0907fcb96919",
+        "operatorSignerKeyId": "11a6c779ed69cf7006d6282f9c640b3ccd1369fec8de8978abee108dfe364052",
+        "operatorGovernanceReceipt": "bKwiS/0bxYZpPKxybIm5KnCVqsGNDVXnIbgphw/sNxjF6ziYePcDo/6undnw3vLJLbvsJRi9JSQ1ySsMaRMmAg==",
+        "witnessTimestamp": "2026-05-08T05:49:48.619Z",
+        "witnessSignatureAlgorithm": "ed25519",
+        "witnessKeyId": "8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368",
+        "witnessSignature": "U/3L749KMcwkFuyVxchhhqwfBjRaAOP9Y470PQXGBrVmO9yHNCuUieqv4Iq+m1AfhpWrAGbvm28XyG7muNoiCA=="
+      }
+    },
+    {
+      "traceFile": "MERKLE_TEST_1778219388627_3.trace.ndjson",
+      "missionId": "MERKLE_TEST_1778219388627_3",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T13:07:56.104Z",
+      "verdict": "PASS",
+      "tier": 3,
+      "witnessData": {
+        "missionId": "MERKLE_TEST_1778219388627_3",
+        "chainRoot": "f4272e68fd5303ad8575a3cf81a4fde689e2e1fea01fdc29ba79eb7da678396f",
+        "tailHash": "27ded3ccf246186d6e81c299bd7d5f4fd7f846c2abba47ffe344cac6e190a30e",
+        "operatorSignerKeyId": "11a6c779ed69cf7006d6282f9c640b3ccd1369fec8de8978abee108dfe364052",
+        "operatorGovernanceReceipt": "cMmnQPCmXq72xJvKuasnggErkXpf4fVaQHTRcDSOaRQPHOHAnKqx2XO7Sr6Xm0MhL3Bdw9L+aX0ZQCCDcjyJBQ==",
+        "witnessTimestamp": "2026-05-08T05:49:48.658Z",
+        "witnessSignatureAlgorithm": "ed25519",
+        "witnessKeyId": "8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368",
+        "witnessSignature": "c91RXllpK2W7O5yqIpVKN8Dn84RDlLD/5izNwEobidlCHKKzKShQYOlHmH7h/y+S7pNgFLH/ooYAh6SOEUbEDQ=="
+      }
+    },
+    {
+      "traceFile": "PARTIAL_TEST_1778216100063.trace.ndjson",
+      "missionId": "PARTIAL_TEST_1778216100063",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "UNATTESTED_TAIL",
+          "detail": "Truncated partial event at tail: Expected ',' or '}' after property value in JSON at position 46. Recovering remaining chain.",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:56.109Z",
+      "verdict": "PASS",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "PARTIAL_TEST_1778216311349.trace.ndjson",
+      "missionId": "PARTIAL_TEST_1778216311349",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "UNATTESTED_TAIL",
+          "detail": "Truncated partial event at tail: Expected ',' or '}' after property value in JSON at position 46. Recovering remaining chain.",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:56.114Z",
+      "verdict": "PASS",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "PARTIAL_TEST_1778216899799.trace.ndjson",
+      "missionId": "PARTIAL_TEST_1778216899799",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "UNATTESTED_TAIL",
+          "detail": "Truncated partial event at tail: Expected ',' or '}' after property value in JSON at position 46. Recovering remaining chain.",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:56.119Z",
+      "verdict": "PASS",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "PARTIAL_TEST_1778217013583.trace.ndjson",
+      "missionId": "PARTIAL_TEST_1778217013583",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "UNATTESTED_TAIL",
+          "detail": "Truncated partial event at tail: Expected ',' or '}' after property value in JSON at position 46. Recovering remaining chain.",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:56.145Z",
+      "verdict": "PASS",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "PARTIAL_TEST_1778217152777.trace.ndjson",
+      "missionId": "PARTIAL_TEST_1778217152777",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "UNATTESTED_TAIL",
+          "detail": "Truncated partial event at tail: Expected ',' or '}' after property value in JSON at position 46. Recovering remaining chain.",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:56.150Z",
+      "verdict": "PASS",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "PARTIAL_TEST_1778217283547.trace.ndjson",
+      "missionId": "PARTIAL_TEST_1778217283547",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "UNATTESTED_TAIL",
+          "detail": "Truncated partial event at tail: Expected ',' or '}' after property value in JSON at position 46. Recovering remaining chain.",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:56.155Z",
+      "verdict": "PASS",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "PARTIAL_TEST_1778217585772.trace.ndjson",
+      "missionId": "PARTIAL_TEST_1778217585772",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "UNATTESTED_TAIL",
+          "detail": "Truncated partial event at tail: Expected ',' or '}' after property value in JSON at position 46. Recovering remaining chain.",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:56.162Z",
+      "verdict": "PASS",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "TEST_INTEGRITY_1778211140267.trace.json",
+      "missionId": "TEST_INTEGRITY_1778211140267",
+      "environmentMatch": false,
+      "environmentExpected": "3b46c6ae0422313414eea477cfa24f294d8ede105957df99135d7216555e5398",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 1,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 0 invalid previousHash. Expected 0000000000000000000000000000000000000000000000000000000000000000, got undefined",
+          "severity": "FATAL"
+        },
+        {
+          "type": "ENVIRONMENT_DRIFT",
+          "detail": "Trace recorded on 3b46c6ae0422313414eea477cfa24f294d8ede105957df99135d7216555e5398, current is b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+          "severity": "WARNING"
+        },
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Missing governanceReceipt (unsigned trace)",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:56.168Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "TEST_INTEGRITY_1778211181614.trace.json",
+      "missionId": "TEST_INTEGRITY_1778211181614",
+      "environmentMatch": false,
+      "environmentExpected": "3b46c6ae0422313414eea477cfa24f294d8ede105957df99135d7216555e5398",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 1,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 0 invalid previousHash. Expected 0000000000000000000000000000000000000000000000000000000000000000, got undefined",
+          "severity": "FATAL"
+        },
+        {
+          "type": "ENVIRONMENT_DRIFT",
+          "detail": "Trace recorded on 3b46c6ae0422313414eea477cfa24f294d8ede105957df99135d7216555e5398, current is b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+          "severity": "WARNING"
+        },
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Missing governanceReceipt (unsigned trace)",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:56.172Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "TEST_JS_1778211169614.trace.json",
+      "missionId": "TEST_JS_1778211169614",
+      "environmentMatch": false,
+      "environmentExpected": "test-hash",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 1,
+      "schemaValid": false,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "EVENT_MALFORMED",
+          "detail": "Missing required field: timestamp",
+          "severity": "FATAL"
+        },
+        {
+          "type": "EVENT_MALFORMED",
+          "detail": "Missing required field: metadata",
+          "severity": "FATAL"
+        },
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 0 invalid previousHash. Expected 0000000000000000000000000000000000000000000000000000000000000000, got undefined",
+          "severity": "FATAL"
+        },
+        {
+          "type": "ENVIRONMENT_DRIFT",
+          "detail": "Trace recorded on test-hash, current is b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+          "severity": "WARNING"
+        },
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Missing governanceReceipt (unsigned trace)",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:56.176Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "TIER4_TEST_1778244902597.trace.json",
+      "missionId": "TIER4_TEST_1778244902597",
+      "environmentMatch": false,
+      "environmentExpected": "unknown",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": false,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "EVENT_MALFORMED",
+          "detail": "Missing required field: id",
+          "severity": "FATAL"
+        },
+        {
+          "type": "EVENT_MALFORMED",
+          "detail": "Missing required field: payload",
+          "severity": "FATAL"
+        },
+        {
+          "type": "EVENT_MALFORMED",
+          "detail": "Missing required field: metadata",
+          "severity": "FATAL"
+        },
+        {
+          "type": "EVENT_MALFORMED",
+          "detail": "Missing required field: id",
+          "severity": "FATAL"
+        },
+        {
+          "type": "EVENT_MALFORMED",
+          "detail": "Missing required field: payload",
+          "severity": "FATAL"
+        },
+        {
+          "type": "EVENT_MALFORMED",
+          "detail": "Missing required field: metadata",
+          "severity": "FATAL"
+        },
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 0 invalid previousHash. Expected 0000000000000000000000000000000000000000000000000000000000000000, got undefined",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:56.181Z",
+      "verdict": "FAIL",
+      "tier": 4,
+      "witnessData": {
+        "missionId": "TIER4_TEST_1778244902597",
+        "chainRoot": "4813494d137e1631bba301d5acab6e7bb7aa74ce1185d456565ef51d737677b2",
+        "tailHash": "38138891fd85c4ef57475c413f424335751937c5cf5e89e0f10c1f974db75f0d",
+        "operatorSignerKeyId": "test-signer",
+        "operatorGovernanceReceipt": "test-gov",
+        "witnessTimestamp": "2026-05-08T12:55:03.552Z",
+        "witnessSignatureAlgorithm": "ed25519",
+        "witnessKeyId": "8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368",
+        "witnessSignature": "8eL4moujc9ab8q4SD3TTRvGhtYh7N3zvDtKZpYR4+gGpwAqc5Im9KNhldJpbsg9asSUewTPXmluQE1O+5zZlDw==",
+        "merkleRoot": "c77efd4870b5c530c280101179dd26d61fd0c202304568f3045d9bf33b18ee70",
+        "treeSize": 18,
+        "leafIndex": 17,
+        "inclusionProof": [
+          {
+            "position": "left",
+            "hash": "b5500208f750106873481cbe80bd8d2c75f019b49d9dac4153141623c661d9af"
+          },
+          {
+            "position": "left",
+            "hash": "b95c3d5bf0c53c18e574819f2b6278d6df4c0408bc2d32beb307fac3d93a6ba7"
+          }
+        ]
+      }
+    },
+    {
+      "traceFile": "TIER4_TEST_1778244924695.trace.json",
+      "missionId": "TIER4_TEST_1778244924695",
+      "environmentMatch": false,
+      "environmentExpected": "unknown",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": false,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "EVENT_MALFORMED",
+          "detail": "Missing required field: id",
+          "severity": "FATAL"
+        },
+        {
+          "type": "EVENT_MALFORMED",
+          "detail": "Missing required field: payload",
+          "severity": "FATAL"
+        },
+        {
+          "type": "EVENT_MALFORMED",
+          "detail": "Missing required field: metadata",
+          "severity": "FATAL"
+        },
+        {
+          "type": "EVENT_MALFORMED",
+          "detail": "Missing required field: id",
+          "severity": "FATAL"
+        },
+        {
+          "type": "EVENT_MALFORMED",
+          "detail": "Missing required field: payload",
+          "severity": "FATAL"
+        },
+        {
+          "type": "EVENT_MALFORMED",
+          "detail": "Missing required field: metadata",
+          "severity": "FATAL"
+        },
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 0 invalid previousHash. Expected 0000000000000000000000000000000000000000000000000000000000000000, got undefined",
+          "severity": "FATAL"
+        },
+        {
+          "type": "WITNESS_INCONSISTENCY",
+          "detail": "Tree consistency check failed between index 18 and 19. Potential log fork detected!",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:56.185Z",
+      "verdict": "FAIL",
+      "tier": 4,
+      "witnessData": {
+        "missionId": "TIER4_TEST_1778244924695",
+        "chainRoot": "4813494d137e1631bba301d5acab6e7bb7aa74ce1185d456565ef51d737677b2",
+        "tailHash": "2658012eccb68df442e2b1ef669506f6593eb29b4fde391dc339fbe255761189",
+        "operatorSignerKeyId": "test-signer",
+        "operatorGovernanceReceipt": "test-gov",
+        "witnessTimestamp": "2026-05-08T12:55:24.940Z",
+        "witnessSignatureAlgorithm": "ed25519",
+        "witnessKeyId": "8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368",
+        "witnessSignature": "ikfwUnJDIm9iOJrJHfovLKwTbVobgI0LfuCQv3uX8rlbk+mSIY/qtdutk86v3KzOIEcsNvrxm7YtbKUwk9ZmAg==",
+        "merkleRoot": "81c39749dcaee8a1b4f27f431fd3e52069d32eccfef87a6874770cf2184daa4b",
+        "treeSize": 19,
+        "leafIndex": 18,
+        "inclusionProof": [
+          {
+            "position": "left",
+            "hash": "1fb586dca55303cafbc913fc7b192370cbe2563bcf357a816efe6c69d3cf69e5"
+          },
+          {
+            "position": "left",
+            "hash": "b95c3d5bf0c53c18e574819f2b6278d6df4c0408bc2d32beb307fac3d93a6ba7"
+          }
+        ]
+      }
+    },
+    {
+      "traceFile": "UNATTESTED_TEST_1778216112069.trace.ndjson",
+      "missionId": "UNATTESTED_TEST_1778216112069",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 4,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 3 invalid previousHash. Expected 457836f316a7392cd4af4e4eb109d552e07c5de0f5a73ac18f0ee02b463448b0, got 65b2490e5bade8aa0faf0661ac4f45e6567d4b97a8a56ee0a90f0573ae5e658b",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:56.637Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "UNATTESTED_TEST_1778216328543.trace.ndjson",
+      "missionId": "UNATTESTED_TEST_1778216328543",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 4,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 3 invalid previousHash. Expected ab7b8b27d9c7a8311c34937bae0429e7c57514d9b6999b2afebe630081f7145e, got f7e42544d6eb31d03825fd98f3256bfcbba48d3876c851177be5fa587d34459d",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:56.645Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "UNATTESTED_TEST_1778216916796.trace.ndjson",
+      "missionId": "UNATTESTED_TEST_1778216916796",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 4,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 3 invalid previousHash. Expected a23003c029cdb264d9f3985b9aedd09824f808e0f87868460c8bbe58e22e667d, got 41d4cda7a10bc5438103b56a04898ac3436b4a41e7e76ff71238fd2166cd1893",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:56.651Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "UNATTESTED_TEST_1778217024630.trace.ndjson",
+      "missionId": "UNATTESTED_TEST_1778217024630",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 4,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 3 invalid previousHash. Expected 17fb4fcd337254bd9f19ad1749a45cc36d8e9cc986dcd497e6f5fc2efdb92753, got 93cec189ec915fd754bcdaad618927ef2f4887b65250f51966e30ab0bb70a757",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:56.660Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "UNATTESTED_TEST_1778217166773.trace.ndjson",
+      "missionId": "UNATTESTED_TEST_1778217166773",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 4,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 3 invalid previousHash. Expected 4700ba0b61f57738b47d20657cabbd0f8114ea630dd9b4b5782d96f0608bac37, got 050753b0aa54a49479c3ba0184b63228b5a0e492e8a1ec12fead6e24b59d4074",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:56.682Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "UNATTESTED_TEST_1778217295792.trace.ndjson",
+      "missionId": "UNATTESTED_TEST_1778217295792",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 4,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 3 invalid previousHash. Expected 1703b9365c93b66373194b4258dc1e1e4f7724b04fd8fb3d5ed0f140ef826fca, got 7fd7a69a85f0cd2bce2ef48fe04f8539d269dc70c54787884a442ac36fb98efa",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:56.825Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "UNATTESTED_TEST_1778217597659.trace.ndjson",
+      "missionId": "UNATTESTED_TEST_1778217597659",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 4,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 3 invalid previousHash. Expected fe776a2a6eaf03816f592720a9f21451d2dbe026412d52088165607b002e5b67, got d2a4ebefbb232b502c28724787aa713bbd6472f729b964efd431e64fb8f90993",
+          "severity": "FATAL"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:56.830Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "VALID_TRACE_1778211316011.trace.json",
+      "missionId": "VALID_TRACE_1778211316011",
+      "environmentMatch": false,
+      "environmentExpected": "3b46c6ae0422313414eea477cfa24f294d8ede105957df99135d7216555e5398",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 1,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Event index 0 invalid previousHash. Expected 0000000000000000000000000000000000000000000000000000000000000000, got undefined",
+          "severity": "FATAL"
+        },
+        {
+          "type": "ENVIRONMENT_DRIFT",
+          "detail": "Trace recorded on 3b46c6ae0422313414eea477cfa24f294d8ede105957df99135d7216555e5398, current is b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+          "severity": "WARNING"
+        },
+        {
+          "type": "CHAIN_BREACH",
+          "detail": "Missing governanceReceipt (unsigned trace)",
+          "severity": "WARNING"
+        }
+      ],
+      "timestamp": "2026-05-08T13:07:56.832Z",
+      "verdict": "FAIL",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "WITNESS_TEST_1778217179274.trace.ndjson",
+      "missionId": "WITNESS_TEST_1778217179274",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T13:07:56.836Z",
+      "verdict": "PASS",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "WITNESS_TEST_1778217305658.trace.ndjson",
+      "missionId": "WITNESS_TEST_1778217305658",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T13:07:56.841Z",
+      "verdict": "PASS",
+      "tier": 2,
+      "witnessData": null
+    },
+    {
+      "traceFile": "WITNESS_TEST_1778217605966.trace.ndjson",
+      "missionId": "WITNESS_TEST_1778217605966",
+      "environmentMatch": true,
+      "environmentExpected": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "environmentActual": "b056803c3b78d5c6f45062f1eb0fd1b6a420aecfab4938b4559e756b32fc31a8",
+      "eventCount": 2,
+      "schemaValid": true,
+      "parseError": null,
+      "divergences": [],
+      "timestamp": "2026-05-08T13:07:56.848Z",
+      "verdict": "PASS",
+      "tier": 3,
+      "witnessData": {
+        "missionId": "WITNESS_TEST_1778217605966",
+        "chainRoot": "8900ef06718c50fb5c15f46c98750bb4fdeb6d4a70f1ab09acee5cd768f543dd",
+        "tailHash": "a5e7cae85da2238033a623bf279c81eb4b5539aef1fe947148d35a1a787a1d87",
+        "operatorSignerKeyId": "11a6c779ed69cf7006d6282f9c640b3ccd1369fec8de8978abee108dfe364052",
+        "operatorGovernanceReceipt": "6OvyYvx/Ffn21nlx2OP21hhsJQEybl37VaAzNaxuUAlVOYg/uDWhlf2iOFT/0VOHC2cJpfovkSeY+QP8aZUHDw==",
+        "witnessTimestamp": "2026-05-08T05:20:08.310Z",
+        "witnessSignatureAlgorithm": "ed25519",
+        "witnessKeyId": "8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368",
+        "witnessSignature": "yxbzmFOfijydN7hVJUAwI9/FLq1SwdltKMoIFFzRJMgJmQrxtC9KMhxrEWe4Z8TH7HeXtAj+nnTEHHF7XLhAAg=="
+      }
+    }
+  ],
+  "summary": {
+    "total": 90,
+    "passed": 51,
+    "failed": 39,
+    "corrupted": 0,
+    "passRate": 0.5666666666666667
+  }
+}

@@ -1,0 +1,62 @@
+{
+    "states": [
+        "QUIESCENT",
+        "PROPOSING",
+        "RECOVERING",
+        "LOCKED",
+        "HIBERNATING",
+        "EMERGENCY_RECOVERY"
+    ],
+    "actions": [
+        "GOVERNANCE_PROPOSAL",
+        "COUNCIL_UPDATE",
+        "COUNCIL_RESET",
+        "RECOVERY_CHALLENGE",
+        "AUDITOR_SLASH",
+        "STATE_CHECKPOINT",
+        "INSTITUTIONAL_HANDOVER",
+        "CONSTITUTIONAL_MIGRATE",
+        "PROTOCOL_UPGRADE",
+        "GOVERNANCE_SNAPSHOT",
+        "GUARDIAN_REGISTER"
+    ],
+    "transitions": {
+        "QUIESCENT": [
+            "GOVERNANCE_PROPOSAL",
+            "COUNCIL_RESET",
+            "AUDITOR_SLASH",
+            "STATE_CHECKPOINT",
+            "CONSTITUTIONAL_MIGRATE",
+            "PROTOCOL_UPGRADE",
+            "GOVERNANCE_SNAPSHOT",
+            "GUARDIAN_REGISTER",
+            "INSTITUTIONAL_HANDOVER"
+        ],
+        "PROPOSING": [
+            "COUNCIL_UPDATE",
+            "AUDITOR_SLASH",
+            "STATE_CHECKPOINT"
+        ],
+        "RECOVERING": [
+            "RECOVERY_CHALLENGE",
+            "COUNCIL_RESET",
+            "AUDITOR_SLASH"
+        ],
+        "LOCKED": [
+            "COUNCIL_RESET",
+            "AUDITOR_SLASH"
+        ],
+        "HIBERNATING": [
+            "COUNCIL_RESET",
+            "PROTOCOL_UPGRADE"
+        ],
+        "EMERGENCY_RECOVERY": [
+            "COUNCIL_RESET",
+            "PROTOCOL_UPGRADE"
+        ]
+    },
+    "invariants": {
+        "sovereignty": "ACYCLIC_GUARDIAN_GRAPH",
+        "immutability": "CORE_CLAUSE_100_PERCENT_RATIFICATION"
+    }
+}
