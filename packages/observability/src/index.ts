@@ -2,7 +2,8 @@
  * OBSERVABILITY AUTHORITY
  * Centralized structured logging and metrics implementation.
  */
-import pino from 'pino';
+import { pino } from 'pino';
+
 import { Registry, Counter, Histogram, Gauge, collectDefaultMetrics } from 'prom-client';
 
 // ── Structured Logger (Pino) ────────────────────────────────────────────────
@@ -17,7 +18,8 @@ import {
     getExecutionId, 
     getRequestContext, 
     type RequestContext 
-} from "./context";
+} from "./context.js";
+
 
 export { 
     contextStorage, 
@@ -84,14 +86,9 @@ export const getExecutionLogger = (context: {
 };
 
 // ── Metrics Registry (Service Namespaced) ────────────────────────────────────
-const metricPrefix = process.env.METRIC_PREFIX || (serviceName.split('-').pop() + '_');
-export const registry = new Registry();
+import { registry, metricPrefix } from './registry.js';
 
-// Default metrics (CPU, Memory, Event Loop) with service prefix
-collectDefaultMetrics({ 
-    register: registry,
-    prefix: metricPrefix 
-});
+export { registry, metricPrefix };
 
 // Standardized Domain Metrics
 export const apiRequestDurationSeconds = new Histogram({
@@ -231,6 +228,50 @@ export const controlPlaneFailuresTotal = new Counter({
     registers: [registry]
 });
 
+// ── AI Operational Metrics (Phase 1.4 Observability) ─────────────────────────
+
+export const aiMissionTotal = new Counter({
+    name: `${metricPrefix}ai_mission_total`,
+    help: 'Total number of AI missions initiated',
+    labelNames: ['type', 'status'],
+    registers: [registry]
+});
+
+export const aiHallucinationTotal = new Counter({
+    name: `${metricPrefix}ai_hallucination_total`,
+    help: 'Total number of detected AI hallucinations (schema violations/invalid tools)',
+    labelNames: ['agent_type'],
+    registers: [registry]
+});
+
+export const aiToolFailureTotal = new Counter({
+    name: `${metricPrefix}ai_tool_failure_total`,
+    help: 'Total number of tool execution failures by agents',
+    labelNames: ['agent_type', 'tool_name'],
+    registers: [registry]
+});
+
+export const aiCorrectionLoopsTotal = new Counter({
+    name: `${metricPrefix}ai_correction_loops_total`,
+    help: 'Total number of self-correction/repair loops triggered',
+    labelNames: ['agent_type'],
+    registers: [registry]
+});
+
+export const aiTokenConsumptionTotal = new Counter({
+    name: `${metricPrefix}ai_token_consumption_total`,
+    help: 'Total tokens consumed by agents',
+    labelNames: ['agent_type', 'model'],
+    registers: [registry]
+});
+
+export const aiSemanticDriftScore = new Gauge({
+    name: `${metricPrefix}ai_semantic_drift_score`,
+    help: 'Measured semantic drift between requirement and output (0.0-1.0)',
+    labelNames: ['mission_id'],
+    registers: [registry]
+});
+
 /**
  * Compatibility handler for legacy calls.
  * Tracing is now handled by importing '@packages/observability/otel' at entry.
@@ -255,5 +296,7 @@ export const initInstrumentation = () => {};
  */
 export const httpRequestDuration = apiRequestDurationSeconds;
 
-export * from "./otel";
-export * from "./middleware";
+export * from "./otel.js";
+export * from "./middleware.js";
+export * from "./cognitive.js";
+

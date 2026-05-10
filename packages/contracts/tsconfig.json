@@ -1,11 +1,16 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "baseUrl": ".",
+    "ignoreDeprecations": "5.0",
+    "paths": {
+      "@packages/*": ["../../packages/*/dist/index.d.ts"],
+      "@/*": ["./src/*"]
+    },
     "outDir": "dist",
-    "composite": true,
+    "composite": false,
     "declaration": true,
-    "noEmit": false,
-    "baseUrl": "."
+    "noEmit": false
   },
   "include": [
     "src"

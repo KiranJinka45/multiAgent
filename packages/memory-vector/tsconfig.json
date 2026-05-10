@@ -4,31 +4,22 @@
     "dist"
   ],
   "compilerOptions": {
+    "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "outDir": "dist",
     "noEmit": false,
-    "composite": true,
+    "composite": false,
     "declaration": true,
     "declarationMap": true,
-    "baseUrl": ".",
+    
     "paths": {
-      "@packages/utils": [
-        "../utils/src"
-      ],
-      "@packages/memory-core": [
-        "../memory-core/src"
-      ]
+      "@packages/*": ["../../packages/*/dist/index.d.ts"],
+      "@/*": ["./src/*"]
     }
   },
   "include": [
     "src/**/*"
   ],
-  "extends": "../../tsconfig.base.json",
-  "references": [
-    {
-      "path": "../memory-core"
-    },
-    {
-      "path": "../utils"
-    }
-  ]
+  "extends": "../../tsconfig.base.json"
+  
 }

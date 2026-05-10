@@ -13,15 +13,15 @@
     }
   },
   "scripts": {
-    "build": "node ../../node_modules/tsup/dist/cli-default.js src/index.ts --format cjs,esm --no-dts",
-    "dev": "node ../../node_modules/tsup/dist/cli-default.js src/index.ts --format cjs,esm --no-dts --watch"
+    "build": "tsup src/index.ts --no-dts && tsc --emitDeclarationOnly",
+    "dev": "tsup src/index.ts --no-dts --watch"
   },
   "dependencies": {
     "@packages/observability": "workspace:*"
   },
   "devDependencies": {
-    "@types/node": "^25.6.0",
-    "tsup": "^8.0.0",
-    "typescript": "^5.0.0"
+    "@types/node": "25.6.0",
+    "tsup": "8.5.1",
+    "typescript": "5.9.3"
   }
 }

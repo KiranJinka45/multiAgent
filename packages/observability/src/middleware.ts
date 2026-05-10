@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { v4 as uuid } from 'uuid';
-import { contextStorage, RequestContext } from './context';
+import { contextStorage, RequestContext } from './context.js';
+
 
 /**
  * REQUEST CORRELATION MIDDLEWARE

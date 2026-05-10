@@ -6,19 +6,19 @@
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "node ../../node_modules/tsup/dist/cli-default.js src/index.ts --format cjs,esm --no-dts",
-    "dev": "node ../../node_modules/tsup/dist/cli-default.js src/index.ts --format cjs,esm --no-dts --watch"
+    "build": "tsup src/index.ts --no-dts && tsc --emitDeclarationOnly",
+    "dev": "tsup src/index.ts --no-dts --watch"
   },
   "dependencies": {
-    "bullmq": "^5.70.1",
-    "ioredis": "^5.10.1",
+    "bullmq": "5.70.1",
+    "ioredis": "5.10.1",
     "@packages/observability": "workspace:*",
     "@packages/config": "workspace:*",
     "@packages/utils": "workspace:*"
   },
   "devDependencies": {
-    "tsup": "^8.0.0",
-    "typescript": "^5.0.0"
+    "tsup": "8.5.1",
+    "typescript": "5.9.3"
   },
   "exports": {
     ".": {

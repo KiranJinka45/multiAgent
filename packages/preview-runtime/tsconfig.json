@@ -4,46 +4,24 @@
     "dist"
   ],
   "compilerOptions": {
+    "baseUrl": ".",
+    "ignoreDeprecations": "5.0",
     "types": [
       "node"
     ],
     "outDir": "dist",
     "declarationMap": true,
     "declaration": true,
-    "composite": true,
+    "composite": false,
     "noEmit": false,
-    "baseUrl": ".",
     "paths": {
-      "@packages/utils": [
-        "../utils/src"
-      ],
-      "@packages/registry": [
-        "../registry/src"
-      ],
-      "@packages/validator": [
-        "../validator/src"
-      ],
-      "@packages/contracts": [
-        "../contracts/src"
-      ]
+      "@packages/*": ["../../packages/*/dist/index.d.ts"],
+      "@/*": ["./src/*"]
     }
   },
   "include": [
     "src/**/*"
   ],
-  "extends": "../../tsconfig.base.json",
-  "references": [
-    {
-      "path": "../contracts"
-    },
-    {
-      "path": "../registry"
-    },
-    {
-      "path": "../utils"
-    },
-    {
-      "path": "../validator"
-    }
-  ]
+  "extends": "../../tsconfig.base.json"
+  
 }
