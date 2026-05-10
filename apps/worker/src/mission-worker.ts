@@ -82,11 +82,12 @@ export const missionWorker = new Worker(QUEUE_FREE, async (job: Job) => {
         });
         
         await eventBus.stage(executionId, 'previewing', 'completed', 'Sandbox is live!', 100, projectId);
-        await eventBus.complete(executionId, previewUrl, {
+        await eventBus.complete(executionId, {
+            message: `Sandbox is live: ${previewUrl}`,
             taskCount: result.files.length,
             autonomousCycles: 1,
             cost: cost.totalCost
-        });
+        }, projectId);
 
         logger.info({ executionId, projectId, port }, '[MissionWorker] Sandbox deployed successfully');
     } catch (error: any) {

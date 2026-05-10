@@ -128,7 +128,7 @@ let dbErrorCount = 0;
 let dbCircuitOpen = false;
 let dbCircuitOpenUntil = 0;
 
-const protectedUpdateMission = async (id: string, data: any) => {
+const protectedUpdateMission = async (id: string, tenantId: string, data: any) => {
     // Distributed Circuit Breaker Check
     const globalState = await redis.get('circuit:db:global');
     if (globalState === 'OPEN') {
@@ -145,7 +145,7 @@ const protectedUpdateMission = async (id: string, data: any) => {
 
     const start = Date.now();
     try {
-        const res = await missionController.updateMission(id, data);
+        const res = await missionController.updateMission(id, tenantId, data);
         dbErrorCount = Math.max(0, dbErrorCount - 1); // Recover count
         const latency = Date.now() - start;
         if (latency > 500) {
@@ -166,8 +166,9 @@ const protectedUpdateMission = async (id: string, data: any) => {
     }
 };
 
-const executeBuild = async (data: { prompt: string, userId: string, projectId: string, executionId: string, isFastPreview?: boolean }, job?: Job) => {
+const executeBuild = async (data: { prompt: string, userId: string, projectId: string, executionId: string, isFastPreview?: boolean, tenantId?: string }, job?: Job) => {
     const { prompt, userId, projectId, executionId, isFastPreview } = data;
+    const tenantId = data.tenantId || data.userId || 'system';
     const tier = job ? (job.queueName.includes('pro') ? 'pro' : 'free') : 'instant';
 
     // 🔒 Single Job Processing Guard (Shared between Queue & Instant Trigger)
@@ -215,7 +216,7 @@ const executeBuild = async (data: { prompt: string, userId: string, projectId: s
 
     const startTime = Date.now();
     try {
-        await protectedUpdateMission(executionId, { 
+        await protectedUpdateMission(executionId, tenantId, { 
             status: 'planning',
             metadata: { workerId } 
         });
@@ -248,13 +249,13 @@ const executeBuild = async (data: { prompt: string, userId: string, projectId: s
             const cacheRestored = await BuildCacheManager.restore(projectId, sandboxDir);
             if (cacheRestored) {
                 logger.info({ projectId }, '[Worker] Incremental build: Cache restored successfully');
-                await eventBus.stage(executionId, JobStage.PLAN.toLowerCase(), 'completed', 'Incremental build: Restored previous build cache', 20, projectId);
+                await eventBus.stage(executionId, JobStage.PLAN.toLowerCase(), 'completed', 'Incremental build: Restored previous build cache', 20, projectId, tenantId);
                 
                 // --- GRAPH ANALYSIS PHASE ---
                 const affectedNodes = await BuildGraphEngine.getAffectedNodes(sandboxDir);
                 if (affectedNodes.length === 0) {
                     logger.info({ projectId }, '[Worker] Zero affected nodes. Skipping full build.');
-                    await eventBus.stage(executionId, JobStage.PLAN.toLowerCase(), 'completed', 'No changes detected. Reusing existing artifacts.', 30, projectId);
+                    await eventBus.stage(executionId, JobStage.PLAN.toLowerCase(), 'completed', 'No changes detected. Reusing existing artifacts.', 30, projectId, tenantId);
                     // We could return early here if the system supports artifact injection only
                 } else {
                     logger.info({ projectId, count: affectedNodes.length }, '[Worker] Partial changes detected');
@@ -292,7 +293,7 @@ const executeBuild = async (data: { prompt: string, userId: string, projectId: s
             }
 
             // 🛡️ FINAL INTEGRITY WATCHDOG
-            const validationResult = await ArtifactValidator.validate(projectId);
+            const validationResult = await ArtifactValidator.validate(sandboxDir);
             if (!validationResult.valid) {
                 const error = `Build integrity failure: Missing ${validationResult.missingFiles?.join(', ') || 'critical files'}`;
                 logger.error({ projectId, missing: validationResult.missingFiles }, '[Worker] Integrity Check FAILED');
@@ -303,7 +304,7 @@ const executeBuild = async (data: { prompt: string, userId: string, projectId: s
             // --- CACHE SAVE PHASE ---
             await BuildCacheManager.save(projectId, sandboxDir);
 
-            await protectedUpdateMission(executionId, { status: 'completed' as MissionStatus });
+            await protectedUpdateMission(executionId, tenantId, { status: 'completed' as MissionStatus });
 
 
             const durationMs = Date.now() - startTime;
@@ -339,13 +340,13 @@ const executeBuild = async (data: { prompt: string, userId: string, projectId: s
             const durationMs = Date.now() - startTime;
             jobProcessingDurationSeconds.observe({ job_name: 'build', status: 'failed' }, durationMs / 1000);
             await ControlPlaneMetrics.recordJobResult(redis, 'failed');
-            await protectedUpdateMission(executionId, { 
+            await protectedUpdateMission(executionId, tenantId, { 
                 status: 'failed',
                 metadata: { error: msg }
             });
 
-            await eventBus.stage(executionId, JobStage.FAILED.toLowerCase(), 'failed', `Build failed: ${msg}`, 100, projectId);
-            await eventBus.error(executionId, `[BuildWorker] ${msg}`, projectId);
+            await eventBus.stage(executionId, JobStage.FAILED.toLowerCase(), 'failed', `Build failed: ${msg}`, 100, projectId, tenantId);
+            await eventBus.error(executionId, `[BuildWorker] ${msg}`, projectId, tenantId);
             await ReliabilityMonitor.recordFailure();
         } else {
             // Check global retry budget with tenant + tier scope
@@ -365,12 +366,12 @@ const executeBuild = async (data: { prompt: string, userId: string, projectId: s
                 logger.error({ executionId, currentRetryRate, tenantId, tier }, '💥 [Worker] Scoped Retry budget exceeded or Redis unreachable. Dropping job immediately.');
                 jobTotal.inc({ status: 'failed', tier });
                 await ControlPlaneMetrics.recordJobResult(redis, 'failed');
-                await protectedUpdateMission(executionId, { 
+                await protectedUpdateMission(executionId, tenantId, { 
                     status: 'failed',
                     metadata: { error: `Retry budget exceeded. Final Error: ${msg}` }
                 });
-                await eventBus.stage(executionId, JobStage.FAILED.toLowerCase(), 'failed', `Build failed (Retry Storm): ${msg}`, 100, projectId);
-                await eventBus.error(executionId, `[BuildWorker] ${msg} (Retry Storm dropped)`, projectId);
+                await eventBus.stage(executionId, JobStage.FAILED.toLowerCase(), 'failed', `Build failed (Retry Storm): ${msg}`, 100, projectId, tenantId);
+                await eventBus.error(executionId, `[BuildWorker] ${msg} (Retry Storm dropped)`, projectId, tenantId);
                 throw error; // Fail job instead of retry
             }
 
@@ -383,7 +384,7 @@ const executeBuild = async (data: { prompt: string, userId: string, projectId: s
             }
             logger.warn({ executionId, attempt: job?.attemptsMade, maxAttempts: job?.opts.attempts }, 'Execution failed. Retrying via BullMQ...');
             try {
-                await protectedUpdateMission(executionId, { 
+                await protectedUpdateMission(executionId, tenantId, { 
                     metadata: { error: `Attempt ${job?.attemptsMade} failed: ${msg}` } 
                 });
             } catch (err) {

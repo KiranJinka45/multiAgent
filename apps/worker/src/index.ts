@@ -123,6 +123,15 @@ async function bootstrap() {
     await safeImportWorker('Strategy', './strategy-worker');
     await safeImportWorker('Git', './git-worker');
     await safeImportWorker('Evaluation', './evaluation-worker');
+    
+    // 6. Institutional Reliability Aggregation (Priority 1)
+    try {
+        const { startReliabilityWorker } = await import('./reliability-aggregator-worker');
+        startReliabilityWorker(60000); // 1 minute for rapid evidence accumulation in dev
+        logger.info('✅ [Worker] Reliability Aggregator registered');
+    } catch (err) {
+        logger.error({ err }, '❌ [Worker] Failed to register Reliability Aggregator');
+    }
 
     // 5. Register Mission Recorder (Redis Streams Consumer Group)
     try {
