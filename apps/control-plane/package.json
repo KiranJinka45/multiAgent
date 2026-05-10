@@ -1,0 +1,19 @@
+{
+  "name": "@apps/control-plane",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsup --no-dts && tsc --emitDeclarationOnly",
+    "dev": "tsup --no-dts --watch",
+    "start": "node dist/validation-daemon.js"
+  },
+  "dependencies": {
+    "@packages/observability": "workspace:*",
+    "@packages/utils": "workspace:*"
+  },
+  "devDependencies": {
+    "tsup": "8.5.1",
+    "typescript": "5.9.3"
+  }
+}

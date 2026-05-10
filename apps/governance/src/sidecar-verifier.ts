@@ -1,34 +1,7 @@
-import { ThresholdCrypto, KeyShare, PartialSignature } from './crypto-utils';
+import { ThresholdCrypto, KeyShare, PartialSignature, DEFAULT_THRESHOLD, DEFAULT_NODE_IDS } from './crypto-utils';
+import { TelemetryData, SreDecision, TrustAttestation } from './types';
 
 const logger = console;
-
-export interface TelemetryData {
-  nodeId: string;
-  metrics: {
-    cpu: number;
-    memory: number;
-    latency: number;
-    errors: number;
-  };
-}
-
-export interface SreDecision {
-  eventId: string;
-  type: string;
-  targetNode: string;
-  reason: string;
-  timestamp: number;
-}
-
-export interface TrustAttestation {
-  eventId: string;
-  status: 'PASS' | 'FAIL' | 'UNKNOWN';
-  verifierId: string;
-  expectedNode: string;
-  confidence: number;
-  timestamp: number;
-  partialSignature?: PartialSignature; // Cryptographic share
-}
 
 export class SidecarVerifier {
   private readonly verifierId = 'ZTAN-SIDECAR-02';
@@ -78,7 +51,13 @@ export class SidecarVerifier {
     // --- ELITE TIER: CRYPTOGRAPHIC SIGNING ---
     if (this.keyShare) {
       const payload = `${decision.eventId}|${status}|${suspectedNode}`;
-      attestation.partialSignature = ThresholdCrypto.signPartial(payload, this.keyShare.share, this.keyShare.groupPublicKey, this.verifierId);
+      attestation.partialSignature = await ThresholdCrypto.signPartial(
+        payload, 
+        this.keyShare.share, 
+        this.verifierId, 
+        DEFAULT_THRESHOLD, 
+        DEFAULT_NODE_IDS
+      );
     }
 
     return attestation;

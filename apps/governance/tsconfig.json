@@ -3,27 +3,18 @@
   "compilerOptions": {
     "baseUrl": ".",
     "ignoreDeprecations": "6.0",
+    "declaration": true,
     "outDir": "dist",
     "composite": false,
-    "declaration": true,
-    "declarationMap": true,
-    "noEmit": false,
-    "skipLibCheck": true,
     
-    
-    
-    
+    "rootDir": "../..",
     "paths": {
       "@packages/*": ["../../packages/*/dist/index.d.ts"],
       "@/*": ["./src/*"]
     }
   },
   "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
+    "src/**/*",
+    "../../packages/ztan-crypto/src/**/*"
   ]
-  
 }

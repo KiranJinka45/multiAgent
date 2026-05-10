@@ -47,6 +47,8 @@ USER runner
 
 # Copy deployment artifact from installer
 COPY --from=installer --chown=runner:nodejs /app/deploy .
+# Copy prisma directory for migrations
+COPY --from=installer --chown=runner:nodejs /app/packages/db/prisma ./prisma
 
 ENV NODE_ENV=production
 
@@ -55,4 +57,4 @@ HEALTHCHECK --interval=10s --timeout=5s --start-period=15s --retries=5 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT:-3010}/health || exit 1
 
 # Standardized entrypoint (Flattened structure)
-CMD ["node", "dist/index.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/index.js"]

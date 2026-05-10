@@ -4,7 +4,8 @@ import { Command } from 'commander';
 import fs from 'fs';
 import path from 'path';
 import chalk from 'chalk';
-import { ThresholdCrypto, FileReplayGuard } from '@packages/ztan-crypto';
+import { ThresholdCrypto } from '@packages/ztan-crypto';
+import { FileReplayGuard } from '@packages/ztan-crypto/src/node-replay';
 
 const program = new Command();
 

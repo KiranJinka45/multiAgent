@@ -304,7 +304,8 @@ async function bootstrap() {
         new LogStreamingService(io);
         new SreStreamingService(io);
 
-        if (process.env.USE_REAL_SIGNALS === 'true') {
+        const useRealSignals = process.env.USE_REAL_SIGNALS !== 'false'; // 🔥 Reality First: Default to true unless explicitly 'false'
+        if (useRealSignals) {
             logger.info('[Bootstrap] USE_REAL_SIGNALS=true — Starting OTel Receiver (real telemetry pipeline)');
             otelReceiver.start();
         } else {

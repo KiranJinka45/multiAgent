@@ -1,4 +1,4 @@
-import { ThresholdCrypto } from './crypto-utils';
+import { ThresholdCrypto, DEFAULT_THRESHOLD, DEFAULT_NODE_IDS } from './crypto-utils';
 import { StabilityCircuit, ZKProof } from './stability-circuit';
 import { notaryService } from './notary-service';
 
@@ -61,7 +61,9 @@ export class AuditVerifier {
       const isSigValid = await ThresholdCrypto.verifyAggregate(
         _audit.aggregatedSignature,
         payload,
-        groupPublicKey
+        groupPublicKey,
+        DEFAULT_THRESHOLD,
+        DEFAULT_NODE_IDS
       );
 
       if (isSigValid) {

@@ -1,7 +1,8 @@
 import express from 'express';
 import path from 'path';
 import fs from 'fs';
-import { ThresholdCrypto, FileReplayGuard, AuditInput } from '@packages/ztan-crypto';
+import { ThresholdCrypto, AuditInput } from '@packages/ztan-crypto';
+import { FileReplayGuard } from '@packages/ztan-crypto/src/node-replay';
 
 const app = express();
 app.use(express.json());
@@ -42,12 +43,10 @@ app.post('/api/verify', async (req, res) => {
     const anchor = initialResult.finalAnchor!;
 
     // 🔥 STEP 2: SIMULATE MULTI-PARTY CONSENSUS
-    // In a real decentralized system, the client would collect these signatures
-    // or the verifiers would communicate via a P2P consensus layer.
-    const partialSigs = AUTHORITIES.map(id => ({
+    const partialSigs = await Promise.all(AUTHORITIES.map(async (id) => ({
       verifierId: id,
-      signature: ThresholdCrypto.signAnchor(anchor, id)
-    }));
+      signature: await ThresholdCrypto.signAnchor(anchor, id)
+    })));
 
     // 🔥 STEP 3: RE-VERIFY WITH CONSENSUS DATA
     const consensusInput: AuditInput = {
