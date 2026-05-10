@@ -1,0 +1,38 @@
+name: ARCHITECTURE_FREEZE_ENFORCEMENT
+on:
+  pull_request:
+    branches:
+      - main
+      - pilot-mainline
+
+jobs:
+  check-freeze:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect Semantic Changes
+        run: |
+          # Block changes to core governance interfaces and constitutional schemas
+          MODIFIED_CORE_FILES=$(git diff --name-only origin/main | grep -E "packages/ztan-witness/src/(protocol|quorum|trust|power|equilibrium|federation|history|fork|inheritance).ts")
+          if [ ! -z "$MODIFIED_CORE_FILES" ]; then
+            echo "❌ ERROR: Architectural Freeze is ACTIVE. The following core files cannot be modified during the Pilot phase:"
+            echo "$MODIFIED_CORE_FILES"
+            echo "Refer to GOVERNANCE_STABILITY_POLICY.md for exception procedures."
+            exit 1
+          fi
+
+      - name: Detect Schema Expansion
+        run: |
+          # Block additions to GovernanceReceipt or TrustState interfaces
+          git diff origin/main -- packages/ztan-witness/src/protocol.ts | grep -E "^\+.*(interface|type|enum)" && {
+            echo "❌ ERROR: Schema Expansion detected. No new governance semantics allowed during Pilot."
+            exit 1
+          }
+
+      - name: Validate Stability Policy Adherence
+        run: |
+          echo "✅ Stability Policy Check Passed. No unauthorized semantic drift detected."
