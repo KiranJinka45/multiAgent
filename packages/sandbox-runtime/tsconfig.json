@@ -4,7 +4,9 @@
     "dist"
   ],
   "compilerOptions": {
-    "composite": true,
+    "baseUrl": ".",
+    "ignoreDeprecations": "5.0",
+    "composite": false,
     "outDir": "dist",
     "noUnusedLocals": false,
     "noUnusedParameters": false,
@@ -14,38 +16,14 @@
     "types": [
       "node"
     ],
-    "baseUrl": ".",
     "paths": {
-      "@packages/registry": [
-        "../registry/src"
-      ],
-      "@packages/utils": [
-        "../utils/src"
-      ],
-      "@packages/observability": [
-        "../observability/src"
-      ],
-      "@packages/validator": [
-        "../validator/src"
-      ]
+      "@packages/*": ["../../packages/*/dist/index.d.ts"],
+      "@/*": ["./src/*"]
     }
   },
   "include": [
     "src/**/*"
   ],
-  "extends": "../../tsconfig.base.json",
-  "references": [
-    {
-      "path": "../observability"
-    },
-    {
-      "path": "../registry"
-    },
-    {
-      "path": "../utils"
-    },
-    {
-      "path": "../validator"
-    }
-  ]
+  "extends": "../../tsconfig.base.json"
+  
 }

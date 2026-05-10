@@ -1,5 +1,4 @@
 import { ChildProcess } from 'child_process';
-import Bridge from '@packages/utils';
 
 export type ProcessStatus = 'IDLE' | 'STARTING' | 'RUNNING' | 'FAILED' | 'STOPPED';
 
@@ -12,13 +11,19 @@ export interface ManagedProcess {
     process: ChildProcess;
 }
 
-const { ProcessManager: BridgePM } = Bridge as any;
+const getBridgePM = () => {
+    try {
+        const utils = require('@packages/utils');
+        return utils.ProcessManager;
+    } catch (e) {
+        return null;
+    }
+};
 
 /**
  * processManager.ts
  *
  * Proxy implementation that delegates to the centralized Bridge.
- * Restored from .d.ts signature to resolve null-byte corruption.
  */
 export const ProcessManager = {
     async start(
@@ -29,27 +34,38 @@ export const ProcessManager = {
         env?: Partial<NodeJS.ProcessEnv>, 
         timeoutMs?: number
     ): Promise<{ pid: number; cwd: string }> {
-        return BridgePM.start(projectId, cwd, command, args, env, timeoutMs);
+        const pm = getBridgePM();
+        if (!pm) throw new Error('ProcessManager not found in Bridge');
+        return pm.start(projectId, cwd, command, args, env, timeoutMs);
     },
 
     async stopAll(projectId: string): Promise<void> {
-        return BridgePM.stopAll(projectId);
+        const pm = getBridgePM();
+        if (!pm) return;
+        return pm.stopAll(projectId);
     },
 
     getStatus(projectId: string): ProcessStatus {
-        return BridgePM.isRunning(projectId) ? 'RUNNING' : 'STOPPED';
+        const pm = getBridgePM();
+        if (!pm) return 'STOPPED';
+        return pm.isRunning(projectId) ? 'RUNNING' : 'STOPPED';
     },
 
     getPids(projectId: string): number[] {
-        return BridgePM.getPids ? BridgePM.getPids(projectId) : [];
+        const pm = getBridgePM();
+        if (!pm || !pm.getPids) return [];
+        return pm.getPids(projectId);
     },
 
     isRunning(projectId: string): boolean {
-        return BridgePM.isRunning(projectId);
+        const pm = getBridgePM();
+        if (!pm) return false;
+        return pm.isRunning(projectId);
     },
 
     listAll(): { projectId: string; pids: number[]; status: ProcessStatus }[] {
-        return BridgePM.listAll ? BridgePM.listAll() : [];
+        const pm = getBridgePM();
+        if (!pm || !pm.listAll) return [];
+        return pm.listAll();
     }
 };
-

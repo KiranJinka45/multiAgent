@@ -1,25 +1,20 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "types": [
       "node"
     ],
     "outDir": "dist",
-    "composite": true,
+    "composite": false,
     "declaration": true,
     "declarationMap": true,
     "noEmit": false,
-    "baseUrl": ".",
+    
     "paths": {
-      "@packages/utils": [
-        "../utils/src"
-      ],
-      "@packages/registry": [
-        "../registry/src"
-      ],
-      "@packages/validator": [
-        "../validator/src"
-      ]
+      "@packages/*": ["../../packages/*/dist/index.d.ts"],
+      "@/*": ["./src/*"]
     }
   },
   "include": [
@@ -28,16 +23,6 @@
   "exclude": [
     "node_modules",
     "dist"
-  ],
-  "references": [
-    {
-      "path": "../registry"
-    },
-    {
-      "path": "../utils"
-    },
-    {
-      "path": "../validator"
-    }
   ]
+  
 }

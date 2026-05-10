@@ -1,6 +1,7 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
+  external: [/^@packages\/.*/],
   entry: {
     index: "src/index.ts",
     runtime: "src/runtime/index.ts",

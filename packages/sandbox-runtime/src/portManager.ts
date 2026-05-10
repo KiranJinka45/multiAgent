@@ -1,40 +1,67 @@
-import Bridge from '@packages/utils';
-
-const { PortManager: BridgePort } = Bridge as any;
-
 /**
  * portManager.ts
  *
- * Proxy implementation that delegates to the centralized Bridge.
- * Restored from .d.ts signature to resolve broken stub.
+ * Proxy implementation that delegates to the centralized Bridge in @packages/utils.
+ * Uses lazy loading to avoid circular dependency crashes.
  */
+
+const getBridgePort = () => {
+    try {
+        const utils = require('@packages/utils');
+        return utils.PortManager;
+    } catch (e) {
+        // Fallback or early return during initialization
+        return null;
+    }
+};
+
 export const PortManager = {
     async acquirePorts(projectId: string, count?: number): Promise<number[]> {
-        return BridgePort.acquirePorts(projectId, count);
+        const bp = getBridgePort();
+        if (!bp) throw new Error('PortManager not initialized in Bridge');
+        return bp.acquirePorts(projectId, count);
     },
 
     async releasePorts(projectId: string): Promise<void> {
-        return BridgePort.releasePorts(projectId);
+        const bp = getBridgePort();
+        if (!bp) return;
+        return bp.releasePorts(projectId);
     },
 
     async getPorts(projectId: string): Promise<number[]> {
-        return BridgePort.getPorts(projectId);
+        const bp = getBridgePort();
+        if (!bp) return [];
+        return bp.getPorts(projectId);
     },
 
     async renewLease(projectId: string): Promise<void> {
-        return BridgePort.renewLease(projectId);
+        const bp = getBridgePort();
+        if (!bp) return;
+        return bp.renewLease(projectId);
     },
 
     async forceAcquirePorts(projectId: string, ports: number[]): Promise<void> {
-        return BridgePort.forceAcquirePorts(projectId, ports);
+        const bp = getBridgePort();
+        if (!bp) return;
+        return bp.forceAcquirePorts(projectId, ports);
     },
 
     async forceAcquirePort(projectId: string, port: number): Promise<void> {
-        return BridgePort.forceAcquirePorts(projectId, [port]);
+        const bp = getBridgePort();
+        if (!bp) return;
+        return bp.forceAcquirePorts(projectId, [port]);
     },
 
     async isPortFree(port: number): Promise<boolean> {
-        return BridgePort.isPortFree(port);
+        const bp = getBridgePort();
+        if (!bp) return true;
+        return bp.isPortFree(port);
+    },
+
+    async acquireFreePort(projectId: string): Promise<number> {
+        const bp = getBridgePort();
+        if (!bp) return 3000;
+        return bp.acquireFreePort(projectId);
     },
 
     parsePortFromOutput(line: string): number | null {
@@ -48,4 +75,3 @@ export const PortManager = {
         return null;
     }
 };
-

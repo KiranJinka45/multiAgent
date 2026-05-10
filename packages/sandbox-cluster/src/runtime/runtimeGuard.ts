@@ -8,7 +8,11 @@ import crypto from 'crypto';
 import path from 'path';
 import { logger } from '@packages/utils';
 
-const PREVIEW_SECRET = process.env.PREVIEW_SIGNING_SECRET || 'dev-secret-change-in-production';
+const PREVIEW_SECRET = process.env.PREVIEW_SIGNING_SECRET;
+if (!PREVIEW_SECRET) {
+    throw new Error('[RuntimeGuard] PREVIEW_SIGNING_SECRET is not set in environment variables');
+}
+
 const SIGNED_URL_TTL_SECONDS = 3600; // 1 hour
 const INACTIVITY_SHUTDOWN_MS = 30 * 60 * 1000; // 30 minutes
 const ALLOWED_PREVIEW_HOSTS = ['localhost', '127.0.0.1'];

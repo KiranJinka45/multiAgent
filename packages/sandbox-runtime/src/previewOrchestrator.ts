@@ -1,24 +1,20 @@
-import Bridge from '@packages/utils';
-const { 
-    PortManager, 
-    ContainerManager, 
-    ProcessManager, 
-    RuntimeCapacity, 
-    RollingRestart, 
-    RuntimeHeartbeat, 
-    RuntimeMetrics, 
-    RuntimeRecord 
-} = Bridge as any;
-
 /**
  * previewOrchestrator.ts
  *
  * The single entry point for the Runtime Layer.
  */
 
+import { PortManager } from './portManager';
+import { ContainerManager } from './containerManager';
+import { ProcessManager } from './processManager';
+import { RuntimeCapacity } from './runtimeCapacity';
+import { RuntimeHeartbeat } from './runtimeHeartbeat';
+import { RuntimeMetrics } from './runtimeMetrics';
+import { RuntimeEscalation } from './runtimeEscalation';
+import { RollingRestart, redis } from '@packages/utils';
+
 import { PreviewRegistry, RuntimeStatus } from '@packages/registry';
 import { RuntimeGuard } from './runtimeGuard';
-import { redis } from '@packages/utils';
 import path from 'path';
 import fs from 'fs-extra';
 import { logger } from '@packages/observability';
@@ -37,9 +33,9 @@ export const PreviewOrchestrator = {
         logger.info({ projectId, executionId, userId }, '[PreviewOrchestrator] Starting runtime');
 
         // Escalation gate
-        const escalated = await Bridge.RuntimeEscalation.isEscalated(projectId);
+        const escalated = await RuntimeEscalation.isEscalated(projectId);
         if (escalated) {
-            const status = await Bridge.RuntimeEscalation.getStatus(projectId);
+            const status = await RuntimeEscalation.getStatus(projectId);
             const msg = `Auto-restart disabled — ${status.crashesInWindow} crashes in window.`;
             logger.warn({ projectId }, `[PreviewOrchestrator] ${msg}`);
             throw new Error(msg);
@@ -140,7 +136,7 @@ export const PreviewOrchestrator = {
 
     async restart(projectId: string): Promise<string> {
         logger.info({ projectId }, '[PreviewOrchestrator] Restarting runtime');
-        const escalated = await Bridge.RuntimeEscalation.isEscalated(projectId);
+        const escalated = await RuntimeEscalation.isEscalated(projectId);
         if (escalated) {
             const msg = 'Auto-restart disabled due to repeated crashes.';
             logger.error({ projectId }, `[PreviewOrchestrator] ${msg}`);
@@ -228,7 +224,7 @@ export const PreviewOrchestrator = {
                     this.stopHealthMonitor(projectId);
                     await RuntimeMetrics.recordCrash(projectId, 'HEALTH_TIMEOUT');
                     const record = await PreviewRegistry.get(projectId);
-                    const { restartAllowed } = await Bridge.RuntimeEscalation.recordCrash(
+                    const { restartAllowed } = await RuntimeEscalation.recordCrash(
                         projectId,
                         'Health check timeout',
                         record?.pids?.[0] ?? null,
@@ -266,5 +262,3 @@ export const PreviewOrchestrator = {
         }));
     },
 };
-
-

@@ -1,15 +1,3 @@
-import Bridge from '@packages/utils';
-const { 
-    PortManager, 
-    ContainerManager, 
-    ProcessManager, 
-    RuntimeCapacity, 
-    RollingRestart, 
-    RuntimeHeartbeat, 
-    RuntimeMetrics, 
-    RuntimeRecord 
-} = Bridge as any;
-
 /**
  * previewRuntimePool.ts
  */
@@ -26,6 +14,14 @@ export interface ManagedContainer {
     [key: string]: any;
 }
 
+const getUtils = () => {
+    try {
+        return require('@packages/utils');
+    } catch (e) {
+        return null;
+    }
+};
+
 export class PreviewRuntimePool {
     private static pool: ManagedContainer[] = [];
     private static POOL_SIZE = 3;
@@ -39,6 +35,15 @@ export class PreviewRuntimePool {
         this.isWarming = true;
 
         logger.info({ size: this.POOL_SIZE }, '[PreviewRuntimePool] Pre-warming runtime pool...');
+
+        const utils = getUtils();
+        if (!utils) {
+            logger.error('[PreviewRuntimePool] Failed to load utils bridge for pre-warming');
+            this.isWarming = false;
+            return;
+        }
+
+        const { PortManager, ContainerManager } = utils;
 
         for (let i = 0; i < this.POOL_SIZE; i++) {
             try {
@@ -82,6 +87,10 @@ export class PreviewRuntimePool {
      * Assign a project to a warm runtime and inject its code.
      */
     static async assign(projectId: string, projectDir: string, _framework: string): Promise<ManagedContainer> {
+        const utils = getUtils();
+        if (!utils) throw new Error('Utils bridge not available');
+        const { PortManager, ContainerManager } = utils;
+
         const port = await PortManager.acquireFreePort(projectId);
         let container = await this.checkout(projectId, port);
         
@@ -115,5 +124,3 @@ export class PreviewRuntimePool {
         }
     }
 }
-
-

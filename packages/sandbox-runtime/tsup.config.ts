@@ -8,6 +8,7 @@ const entries = fs.readdirSync('src')
   .map(file => `src/${file}`);
 
 export default defineConfig({
+  external: [/^@packages\/.*/],
   ...baseConfig,
   entry: entries,
 });

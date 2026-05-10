@@ -1,15 +1,3 @@
-import Bridge from '@packages/utils';
-const { 
-    PortManager, 
-    ContainerManager, 
-    ProcessManager, 
-    RuntimeCapacity, 
-    RollingRestart, 
-    RuntimeHeartbeat, 
-    RuntimeMetrics, 
-    RuntimeRecord 
-} = Bridge as any;
-
 /**
  * runtimeCleanup.ts
  */
@@ -18,12 +6,21 @@ import { PreviewOrchestrator } from './previewOrchestrator';
 import { PreviewRegistry } from '@packages/registry';
 import { logger } from '@packages/observability';
 import { StaleEvictor } from './cluster/staleEvictor';
+import { RuntimeHeartbeat } from './runtimeHeartbeat';
 
 const RUNTIME_MODE = (process.env.RUNTIME_MODE as 'process' | 'docker') || 'process';
 const CLEANUP_INTERVAL_MS = 5 * 60 * 1000;
 const STALE_STARTING_THRESHOLD_MS = 5 * 60 * 1000;
 
 let cleanupTimer: ReturnType<typeof setInterval> | null = null;
+
+const getUtils = () => {
+    try {
+        return require('@packages/utils');
+    } catch (e) {
+        return null;
+    }
+};
 
 export const RuntimeCleanup = {
     start(): void {
@@ -48,6 +45,14 @@ export const RuntimeCleanup = {
         let zombiesKilled = 0;
         let orphansKilled = 0;
         let staleCleaned = 0;
+
+        const utils = getUtils();
+        if (!utils) {
+            logger.warn('[RuntimeCleanup] Utils bridge not available for cleanup cycle');
+            return;
+        }
+
+        const { ContainerManager, ProcessManager, PortManager, RuntimeCapacity } = utils;
 
         try {
             const allRecords: any[] = await PreviewRegistry.listAll();
@@ -104,7 +109,7 @@ export const RuntimeCleanup = {
             logger.error({ err }, '[RuntimeCleanup] Error during cleanup cycle');
         }
 
-        if (RUNTIME_MODE === 'docker') {
+        if (RUNTIME_MODE === 'docker' && ContainerManager) {
             await ContainerManager.pruneImages();
         }
 
@@ -125,10 +130,9 @@ export const RuntimeCleanup = {
             })
         );
 
-        if (RUNTIME_MODE === 'docker') {
-            await ContainerManager.cleanupAll();
+        const utils = getUtils();
+        if (utils && RUNTIME_MODE === 'docker' && utils.ContainerManager) {
+            await utils.ContainerManager.cleanupAll();
         }
     },
 };
-
-
