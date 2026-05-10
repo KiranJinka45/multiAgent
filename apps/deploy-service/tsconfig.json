@@ -1,29 +1,21 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "outDir": "dist",
-    "composite": true,
+    "composite": false,
     "declaration": true,
     "declarationMap": true,
     "noEmit": false,
     "skipLibCheck": true,
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "target": "ES2020",
-    "baseUrl": ".",
+    
+    
+    
+    
     "paths": {
-      "@packages/db": [
-        "../../packages/db/src"
-      ],
-      "@packages/utils": [
-        "../../packages/utils/src"
-      ],
-      "@packages/observability": [
-        "../../packages/observability/src"
-      ],
-      "@packages/contracts": [
-        "../../packages/contracts/src"
-      ]
+      "@packages/*": ["../../packages/*/dist/index.d.ts"],
+      "@/*": ["./src/*"]
     }
   },
   "include": [
@@ -32,19 +24,6 @@
   "exclude": [
     "node_modules",
     "dist"
-  ],
-  "references": [
-    {
-      "path": "../../packages/contracts"
-    },
-    {
-      "path": "../../packages/db"
-    },
-    {
-      "path": "../../packages/observability"
-    },
-    {
-      "path": "../../packages/utils"
-    }
   ]
+  
 }
