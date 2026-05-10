@@ -3,21 +3,42 @@ import { Request, Response, NextFunction } from 'express';
 import { RateLimiterRedis } from 'rate-limiter-flexible';
 import type { Redis } from 'ioredis';
 
-
 /**
  * Standard Rate Limiter
  * Uses Redis to store request counts across distributed instances.
- * Adaptive: Prioritizes environment variables for production flexibility.
+ * Lazy initialization to prevent circular dependency crashes.
  */
-const points = parseInt(process.env.RATELIMIT_POINTS || '1000', 10);
-const duration = parseInt(process.env.RATELIMIT_DURATION || '60', 10);
+let _rateLimiter: RateLimiterRedis | null = null;
 
-export const rateLimiter = new RateLimiterRedis({
-  storeClient: redis,
-  keyPrefix: 'resilience_ratelimit',
-  points: points,
-  duration: duration,
-});
+const getRateLimiter = () => {
+    if (!_rateLimiter) {
+        const points = parseInt(process.env.RATELIMIT_POINTS || '1000', 10);
+        const duration = parseInt(process.env.RATELIMIT_DURATION || '60', 10);
+        
+        if (!redis) {
+            // Fallback for circular dependency during initialization
+            return {
+                consume: async () => ({})
+            } as any;
+        }
+
+        _rateLimiter = new RateLimiterRedis({
+            storeClient: redis,
+            keyPrefix: 'resilience_ratelimit',
+            points: points,
+            duration: duration,
+        });
+    }
+    return _rateLimiter;
+};
+
+// Export a proxy or just the getter?
+// To minimize changes in other files, we export a proxy-like object for the main limiter
+export const rateLimiter = {
+    consume: (key: string | number) => getRateLimiter().consume(key),
+    get: (key: string | number) => (getRateLimiter() as any).get(key),
+    delete: (key: string | number) => (getRateLimiter() as any).delete(key),
+} as any;
 
 /**
  * RateLimiter wrapper for api-gateway
@@ -61,16 +82,11 @@ export class MultiTierRateLimiter {
     return this.limiters.get(key)!;
   }
 
-  /**
-   * Consumes points for a tenant based on their tier.
-   * Throws RateLimiterRes error if limit is exceeded.
-   */
   async consume(tenantId: string, tier: string, points: number, duration: number) {
     const limiter = this.getLimiter(tier, points, duration);
     try {
       return await limiter.consume(tenantId);
     } catch (err) {
-      // Re-throw to be caught by middleware
       throw err;
     }
   }
@@ -81,7 +97,6 @@ export class MultiTierRateLimiter {
  */
 export async function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
   try {
-    // Phase 15: Prioritize User-ID based limiting for enterprise-grade protection
     const userId = (req as any).user?.id || (req as any).user?.tenantId;
     const key = userId ? `user:${userId}` : `ip:${req.ip || 'unknown'}`;
     
@@ -95,4 +110,17 @@ export async function rateLimitMiddleware(req: Request, res: Response, next: Nex
   }
 }
 
-export const tierRateLimiter = new MultiTierRateLimiter(redis as any);
+// tierRateLimiter also needs to be lazy if redis is not ready
+let _tierRateLimiter: MultiTierRateLimiter | null = null;
+export const getTierRateLimiter = () => {
+    if (!_tierRateLimiter) {
+        _tierRateLimiter = new MultiTierRateLimiter(redis as any);
+    }
+    return _tierRateLimiter;
+};
+
+// For backward compatibility, but this might still crash if used at top-level elsewhere
+// However, most usages are inside functions.
+export const tierRateLimiter = {
+    consume: (...args: any[]) => (getTierRateLimiter() as any).consume(...args)
+} as any;

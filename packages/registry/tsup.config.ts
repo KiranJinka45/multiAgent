@@ -5,5 +5,5 @@ export default {
     splitting: false,
     sourcemap: true,
     clean: true,
-    external: ['@packages/*'],
+    external: [/^@packages\/.*/, '@packages/*'],
 }

@@ -1,20 +1,17 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "composite": true,
+    "baseUrl": ".",
+    "ignoreDeprecations": "5.0",
+    "composite": false,
     "outDir": "dist",
     "declaration": true,
     "declarationMap": true,
     "noEmit": false,
     "skipLibCheck": true,
-    "baseUrl": ".",
     "paths": {
-      "@packages/observability": [
-        "../observability/src"
-      ],
-      "@packages/utils": [
-        "../utils/src"
-      ]
+      "@packages/*": ["../../packages/*/dist/index.d.ts"],
+      "@/*": ["./src/*"]
     }
   },
   "include": [
@@ -23,13 +20,6 @@
   "exclude": [
     "node_modules",
     "dist"
-  ],
-  "references": [
-    {
-      "path": "../observability"
-    },
-    {
-      "path": "../utils"
-    }
   ]
+  
 }

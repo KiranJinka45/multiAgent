@@ -2,7 +2,7 @@ import OpenAI from "openai";
 import { SystemIssue } from "./types";
 
 const client = new OpenAI({ 
-  apiKey: process.env.OPENAI_API_KEY || 'mock-key-for-now' 
+  apiKey: process.env.OPENAI_API_KEY 
 });
 
 export async function proposeFix(issues: SystemIssue[]): Promise<string> {

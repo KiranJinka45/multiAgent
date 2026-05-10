@@ -13,18 +13,18 @@
     }
   },
   "scripts": {
-    "build": "node ../../node_modules/tsup/dist/cli-default.js src/index.ts --format cjs,esm --no-dts",
-    "dev": "node ../../node_modules/tsup/dist/cli-default.js src/index.ts --format cjs,esm --no-dts --watch",
+    "build": "tsup src/index.ts --no-dts && tsc --emitDeclarationOnly",
+    "dev": "tsup src/index.ts --no-dts --watch",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@packages/utils": "workspace:*",
-    "tsup": "^8.0.0",
-    "typescript": "^5.0.0"
+    "tsup": "8.5.1",
+    "typescript": "5.9.3"
   },
   "dependencies": {
     "@packages/observability": "workspace:*",
-    "ioredis": "^5.10.1"
+    "ioredis": "5.10.1"
   }
 }

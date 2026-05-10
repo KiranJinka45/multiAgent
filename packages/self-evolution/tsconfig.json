@@ -1,35 +1,19 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "baseUrl": ".",
+    "ignoreDeprecations": "5.0",
     "outDir": "dist",
-    "composite": true,
+    "composite": false,
     "declaration": true,
     "noEmit": false,
-    "baseUrl": ".",
     "paths": {
-      "@packages/refactor-agent": [
-        "../refactor-agent/src"
-      ],
-      "@packages/db": [
-        "../db/src"
-      ],
-      "@packages/observability": [
-        "../observability/src"
-      ]
+      "@packages/*": ["../../packages/*/dist/index.d.ts"],
+      "@/*": ["./src/*"]
     }
   },
   "include": [
     "src"
-  ],
-  "references": [
-    {
-      "path": "../db"
-    },
-    {
-      "path": "../observability"
-    },
-    {
-      "path": "../refactor-agent"
-    }
   ]
+  
 }
