@@ -55,3 +55,11 @@ system-startup.log
 /.microvms/
 file_list.txt
 k8s/secrets.yaml
+
+# ZTAN runtime and environment artifacts
+.generated-projects/
+.sandbox/
+.ztan*/
+.ztan-transparency/
+.ztan-witness/
+.ztan/
