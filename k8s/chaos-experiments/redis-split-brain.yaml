@@ -1,0 +1,21 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: redis-split-brain
+  namespace: multiagent
+spec:
+  action: partition
+  mode: fixed
+  value: "1" # Isolate 1 replica from the rest
+  selector:
+    labelSelectors:
+      app.kubernetes.io/name: redis
+  direction: both
+  target:
+    mode: all
+    selector:
+      labelSelectors:
+        app.kubernetes.io/name: redis
+  duration: '45s'
+  scheduler:
+    cron: '@every 15m'

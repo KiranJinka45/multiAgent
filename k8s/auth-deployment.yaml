@@ -50,9 +50,19 @@ spec:
         labelSelector:
           matchLabels:
             app: auth-service
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: auth-service
         image: ghcr.io/kiran/multiagent-auth:v1.1.0
+        securityContext:
+          runAsNonRoot: true
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
 
         imagePullPolicy: IfNotPresent
         command: ["node", "dist/index.js"]

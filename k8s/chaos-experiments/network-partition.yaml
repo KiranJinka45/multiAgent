@@ -1,0 +1,20 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: gateway-core-api-partition
+  namespace: multiagent
+spec:
+  action: partition
+  mode: all
+  selector:
+    labelSelectors:
+      app: gateway
+  direction: both
+  target:
+    selector:
+      labelSelectors:
+        app: core-api
+    mode: all
+  duration: '30s'
+  scheduler:
+    cron: '@every 15m'

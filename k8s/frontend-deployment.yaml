@@ -50,9 +50,19 @@ spec:
         labelSelector:
           matchLabels:
             app: frontend
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: frontend
         image: ghcr.io/kiran/multiagent-frontend:v1.1.0
+        securityContext:
+          runAsNonRoot: true
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
 
         imagePullPolicy: IfNotPresent
         command: ["node", "apps/frontend/server.js"]

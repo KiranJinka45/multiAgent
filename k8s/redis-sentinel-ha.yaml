@@ -67,6 +67,17 @@ spec:
             command: ["redis-cli", "ping"]
           initialDelaySeconds: 5
           periodSeconds: 5
+        volumeMounts:
+        - name: redis-data
+          mountPath: /data
+  volumeClaimTemplates:
+  - metadata:
+      name: redis-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 5Gi
 ---
 # ── Redis Sentinel Deployment with Topology Spreading ──────────────────────
 apiVersion: apps/v1

@@ -1,0 +1,15 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: redis-master-kill
+  namespace: multiagent
+spec:
+  action: pod-kill
+  mode: one
+  selector:
+    labelSelectors:
+      app.kubernetes.io/name: redis
+      app.kubernetes.io/component: master
+  duration: '10s'
+  scheduler:
+    cron: '@every 10m'

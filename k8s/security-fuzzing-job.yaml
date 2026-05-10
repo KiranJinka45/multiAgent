@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: security-fuzzing-zap
+  namespace: multiagent
+spec:
+  schedule: "0 2 * * 0" # Weekly on Sunday at 2 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: zap-fuzzer
+            image: ghcr.io/zaproxy/zaproxy:stable
+            command: ["zap-baseline.py", "-t", "http://gateway:3000", "-J", "zap-report.json"]
+            volumeMounts:
+            - name: zap-reports
+              mountPath: /zap/wrk
+          restartPolicy: Never
+          volumes:
+          - name: zap-reports
+            emptyDir: {}

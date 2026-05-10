@@ -48,5 +48,38 @@ metadata:
   name: audit-scripts-cm
 data:
   proven-restore-test.sh: |
-    # (Content is mirrored from scripts/proven-restore-test.sh for cluster execution)
-    # The job uses the version that includes alerting logic.
+    #!/bin/sh
+    set -e
+    
+    echo "================================================="
+    echo "Starting Automated DR Restore Verification"
+    echo "================================================="
+    
+    # 1. Verify Backup Existence
+    LATEST_BACKUP=$(ls -t /backups/*.sql 2>/dev/null | head -n 1)
+    if [ -z "$LATEST_BACKUP" ]; then
+      echo "[ERROR] No backup files found in /backups"
+      # Send slack alert here if webhook is present
+      exit 1
+    fi
+    echo "[PASS] Found latest backup: $LATEST_BACKUP"
+    
+    # 2. Simulate Restore to an Ephemeral DB
+    echo "Creating ephemeral verification database..."
+    PGPASSWORD=$PGPASSWORD psql -h $PGHOST -U $PGUSER -d postgres -c "DROP DATABASE IF EXISTS verification_db;"
+    PGPASSWORD=$PGPASSWORD psql -h $PGHOST -U $PGUSER -d postgres -c "CREATE DATABASE verification_db;"
+    
+    echo "Restoring backup to verification_db..."
+    PGPASSWORD=$PGPASSWORD psql -h $PGHOST -U $PGUSER -d verification_db -f "$LATEST_BACKUP" > /dev/null
+    
+    # 3. Verify Integrity (e.g. table counts, schema presence)
+    TABLE_COUNT=$(PGPASSWORD=$PGPASSWORD psql -h $PGHOST -U $PGUSER -d verification_db -tAc "SELECT count(*) FROM information_schema.tables WHERE table_schema='public';")
+    if [ "$TABLE_COUNT" -eq "0" ]; then
+      echo "[ERROR] Verification failed. Restored database has 0 tables."
+      exit 1
+    fi
+    echo "[PASS] Restore verification succeeded. Found $TABLE_COUNT tables."
+    
+    # 4. Cleanup
+    PGPASSWORD=$PGPASSWORD psql -h $PGHOST -U $PGUSER -d postgres -c "DROP DATABASE verification_db;"
+    echo "DR Verification Complete. Audit Passed."

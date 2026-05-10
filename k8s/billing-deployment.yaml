@@ -23,9 +23,19 @@ spec:
         app: billing-service
         telemetry: "enabled"
     spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: billing-service
         image: ghcr.io/kiran/multiagent-billing:v1.1.0
+        securityContext:
+          runAsNonRoot: true
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         imagePullPolicy: IfNotPresent
         command: ["node", "dist/index.js"]
         env:

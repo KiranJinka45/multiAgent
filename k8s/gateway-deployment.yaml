@@ -49,9 +49,19 @@ spec:
         labelSelector:
           matchLabels:
             app: gateway
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: gateway
         image: ghcr.io/kiran/multiagent-gateway:v1.1.0
+        securityContext:
+          runAsNonRoot: true
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
 
 
         imagePullPolicy: IfNotPresent
