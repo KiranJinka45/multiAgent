@@ -159,7 +159,7 @@ export function createPayloadSanitizerMiddleware(): (req: Request, res: Response
 export function setCsrfToken(res: Response): string {
   const token = randomBytes(32).toString('hex');
   res.cookie('csrf-token', token, {
-    httpOnly: false, // Must be readable by frontend if they don't have an API to get it
+    httpOnly: true, // Increased security: prevents XSS from reading the token
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     path: '/'
