@@ -44,9 +44,14 @@ class EventBus {
     }
 
     async publish(topic: string, data: any) {
+        // 🔥 Trace Continuity Pillar 1: Inject Context
+        const traceContext: Record<string, string> = {};
+        propagation.inject(context.active(), traceContext);
+
         const payload = JSON.stringify({
             ...data,
             _timestamp: new Date().toISOString(),
+            _trace_context: traceContext,
         });
         await this.pub.publish(topic, payload);
     }
@@ -56,7 +61,30 @@ class EventBus {
             this.handlers.set(topic, []);
             await this.sub.subscribe(topic);
         }
-        this.handlers.get(topic)?.push(handler);
+
+        // 🔥 Trace Continuity Pillar 2: Wrap Handler in Span
+        const wrappedHandler = (data: any) => {
+            const parentContext = propagation.extract(context.active(), data._trace_context || {});
+            const tracer = trace.getTracer('event-bus-pubsub');
+
+            tracer.startActiveSpan(`pubsub:${topic}`, {
+                kind: SpanKind.CONSUMER,
+                attributes: { 'messaging.system': 'redis', 'messaging.destination': topic }
+            }, parentContext, (span) => {
+                try {
+                    handler(data);
+                    span.setStatus({ code: SpanStatusCode.OK });
+                } catch (err) {
+                    span.setStatus({ code: SpanStatusCode.ERROR, message: err instanceof Error ? err.message : String(err) });
+                    span.recordException(err as Error);
+                    throw err;
+                } finally {
+                    span.end();
+                }
+            });
+        };
+
+        this.handlers.get(topic)?.push(wrappedHandler);
     }
 
     /**

@@ -1,5 +1,9 @@
-import { AgentResponse, DatabaseAgent, BackendAgent, FrontendAgent, DeploymentAgent, TestingAgent, ValidatorAgent, StrategyConfig } from '@packages/utils';
+import { 
+    AgentResponse, 
+    StrategyConfig 
+} from '@packages/utils';
 import { logger } from '@packages/observability';
+
 // Mock context types
 export interface AgentContext { executionId: string; metadata: Record<string, any>; }
 
@@ -9,6 +13,40 @@ export interface TaskAgent {
 
 export class AgentRegistry {
     private agents: Map<string, TaskAgent> = new Map();
+    private initialized: boolean = false;
+
+    private ensureInitialized() {
+        if (this.initialized) return;
+        this.initialized = true;
+
+        try {
+            // Lazy load agents to break circular dependency:
+            // @packages/agents -> @packages/core-engine -> @packages/utils -> @packages/agents
+            // We use the absolute path to be extremely safe in this environment
+            const agentsModule = require('../../../agents/src/index');
+            
+            // Map legacy/expected names to available specialized agents
+            this.register('DatabaseAgent', new agentsModule.CoderAgent());
+            this.register('BackendAgent', new agentsModule.CoderAgent());
+            this.register('FrontendAgent', new agentsModule.CoderAgent());
+            this.register('DeploymentAgent', new agentsModule.CoderAgent());
+            this.register('TestingAgent', new agentsModule.CoderAgent());
+            this.register('ValidatorAgent', new agentsModule.ValidatorAgent());
+
+            // Register new specialized agents
+            this.register('CoderAgent', new agentsModule.CoderAgent());
+            this.register('PlannerAgent', new agentsModule.PlannerAgent());
+            this.register('SecurityAgent', new agentsModule.SecurityAgent());
+            this.register('AuditorAgent', new agentsModule.AuditorAgent());
+            this.register('HealerAgent', new agentsModule.HealerAgent());
+
+            logger.info('[AgentRegistry] Specialized agents lazily initialized successfully.');
+        } catch (error) {
+            logger.error({ error }, '[AgentRegistry] Failed to lazily initialize agents');
+            // We don't throw here to avoid crashing the whole system if one agent fails to load,
+            // but subsequent getAgent calls will return undefined.
+        }
+    }
 
     /**
      * Registers a specific agent subclass implementation against a common task action.
@@ -18,10 +56,12 @@ export class AgentRegistry {
     }
 
     getAgent(taskType: string): TaskAgent | undefined {
+        this.ensureInitialized();
         return this.agents.get(taskType);
     }
 
     hasAgent(taskType: string): boolean {
+        this.ensureInitialized();
         return this.agents.has(taskType);
     }
 
@@ -52,15 +92,3 @@ export class AgentRegistry {
 
 // Global registry export
 export const agentRegistry = new AgentRegistry();
-
-// Auto-registration of core agents
-agentRegistry.register('DatabaseAgent', new DatabaseAgent());
-agentRegistry.register('BackendAgent', new BackendAgent());
-agentRegistry.register('FrontendAgent', new FrontendAgent());
-agentRegistry.register('DeploymentAgent', new DeploymentAgent());
-agentRegistry.register('TestingAgent', new TestingAgent());
-agentRegistry.register('ValidatorAgent', new ValidatorAgent());
-
-
-
-

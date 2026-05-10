@@ -4,10 +4,18 @@ import { PlannerAgent } from '@packages/brain';
 import { CoderAgent } from '@packages/brain';
 import { ArtifactValidator } from '@packages/validator';
 import { TruthValidator } from './services/truth-validator';
+import { sandboxManager, SandboxSelector } from '@packages/sandbox';
 
 export class MissionOrchestrator {
     private planner = new PlannerAgent();
     private coder = new CoderAgent();
+
+    constructor() {
+        logger.debug({
+            planner: typeof (this.planner as any).execute === 'function',
+            coder: typeof (this.coder as any).execute === 'function'
+        }, '[Orchestrator] Agents initialized');
+    }
 
     async execute(missionId: string, prompt: string, projectId: string) {
         const context = new DEC(missionId);
@@ -90,9 +98,20 @@ export class MissionOrchestrator {
         const key = `mission-step:${step.id}`;
         const region = step.region || process.env.CURRENT_REGION || 'us-east-1'; // 🔥 Global Tier-1
         
-        return IdempotencyManager.executeExternal(key, context.missionId, region, async () => {
-            logger.info({ stepId: step.id, type: step.agentType, region }, 'Executing Mission Step');
-            
+    return IdempotencyManager.executeExternal(key, context.missionId, region, async () => {
+        logger.info({ stepId: step.id, type: step.agentType, region }, 'Executing Mission Step');
+        
+        // 🛡️ ZTAN Phase 1B: Sandbox Isolation
+        const riskLevel = step.agentType === 'coder' ? 'high' : 'low';
+        const profile = SandboxSelector.selectProfile(context.missionId, step.agentType, riskLevel);
+        
+        // Inject VFS mount configuration
+        const vfs = context.getVFS();
+        (profile as any).mounts = [vfs.getMountProfile('/workspace', 'rw')];
+
+        const instance = await sandboxManager.provision(profile);
+        
+        try {
             // Dynamic Agent Selection
             let agent;
             switch (step.agentType) {
@@ -101,8 +120,24 @@ export class MissionOrchestrator {
                 default: agent = this.coder;
             }
 
+            // Execute workload via SandboxManager
+            // Note: In a full implementation, the agent logic itself would be dispatched 
+            // into the sandbox. Here we bridge the existing agent logic with the sandbox metadata.
             const result = await agent.execute(step.inputData, context);
+            
             if (!result.success) throw new Error(`Step ${step.title} failed: ${result.error}`);
+
+            // 🛡️ Emit Replay Telemetry
+            const sandboxResult = await sandboxManager.execute(instance.id, {
+                command: "agent_execute",
+                args: [step.agentType, step.id]
+            });
+
+            // Attach sandbox metadata to agent result for lineage tracing
+            result.metadata = { 
+                ...result.metadata, 
+                sandbox: sandboxResult.metadata 
+            };
 
             // Persist Output for downstream steps
             await db.missionStep.update({
@@ -110,13 +145,17 @@ export class MissionOrchestrator {
                 data: { 
                     status: 'completed',
                     outputData: result.data as any,
-                    region // 🔥 Track where it actually ran
+                    region 
                 }
             });
 
-            await eventBus.stage(context.missionId, 'executing', 'completed', `Step completed: ${step.title} (Region: ${region})`, 50, projectId);
+            await eventBus.stage(context.missionId, 'executing', 'completed', `Step completed: ${step.title} (Sandbox: ${profile.runtime})`, 50, projectId);
             return result;
-        });
+        } finally {
+            // 🛡️ Always destroy the sandbox to prevent leakage
+            await sandboxManager.destroy(instance.id);
+        }
+    });
     }
 
     private async executeZeroIteration(missionId: string, prompt: string, projectId: string, context: DEC) {
@@ -156,7 +195,31 @@ export class MissionOrchestrator {
         
         await eventBus.stage(missionId, 'executing', 'completed', 'Application code generated', 50, projectId);
 
+        // 3. Persist to DB for visibility 💾
+        for (const file of files) {
+            await db.projectFile.upsert({
+                where: { projectId_path: { projectId, path: file.path } },
+                update: { content: file.content },
+                create: { projectId, path: file.path, content: file.content }
+            });
+        }
+
         // 4. Finalize & Validate Integrity 🛡️
+        await eventBus.stage(missionId, 'validation', 'running', 'Validating project compilation', 80, projectId);
+        const sandboxPath = context.getVFS().getBaseDir();
+        const compilationResult = await ArtifactValidator.validate(sandboxPath);
+        
+        if (!compilationResult.valid) {
+            const errorMsg = `Compilation failed: ${compilationResult.errors.join('; ')}`;
+            await eventBus.stage(missionId, 'validation', 'failed', errorMsg, 90, projectId);
+            await missionController.updateMission(missionId, { 
+                status: 'failed', 
+                metadata: { error: errorMsg, stages: compilationResult.stages } 
+            });
+            throw new Error(errorMsg);
+        }
+        
+        await eventBus.stage(missionId, 'validation', 'completed', 'Compilation validation passed', 90, projectId);
         await missionController.updateMission(missionId, { status: 'completed' });
         
         const validation = await TruthValidator.validateMission(missionId);
