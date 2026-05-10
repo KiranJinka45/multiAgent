@@ -4,7 +4,11 @@ import { env } from '../packages/config/src/env';
 import { logger } from '../packages/observability/src/index';
 
 const API_URL = 'http://localhost:8081/api';
-const JWT_SECRET = env.JWT_SECRET || 'your-secret-key';
+const JWT_SECRET = env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error('[SRE] JWT_SECRET is not set in environment variables');
+}
+
 const TEST_DURATION_MS = 1 * 60 * 1000; // 1 Minute for demo
 const INTERVAL_MS = 30000; // Every 30 seconds
 

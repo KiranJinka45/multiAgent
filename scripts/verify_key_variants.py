@@ -3,11 +3,11 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage
 
 # Ambiguous key parts: 0 (zero) vs O (uppercase o)
-# Base key: AIzaSyDtJvLWPngRuzEc68mtfOj0_ZFcgMbxd38 (using zero)
-variants = [
-    "AIzaSyDtJvLWPngRuzEc68mtfOj0_ZFcgMbxd38", # with Zero
-    "AIzaSyDtJvLWPngRuzEc68mtfOjO_ZFcgMbxd38"  # with Uppercase O
-]
+# Base key: [REDACTED]
+
+# HARDENED: Secrets must be provided via environment variables or manual input.
+# Do not hardcode API keys in this script.
+variants = [os.getenv("GOOGLE_API_KEY")] if os.getenv("GOOGLE_API_KEY") else []
 
 print(f"Testing {len(variants)} API key variants...")
 

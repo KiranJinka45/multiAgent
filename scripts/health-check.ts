@@ -5,6 +5,7 @@ const ENDPOINTS = [
   { name: "Core API", url: "http://127.0.0.1:3010/health" },
   { name: "Gateway", url: "http://127.0.0.1:3500/health" },
   { name: "Worker Ops", url: "http://127.0.0.1:8082/health" },
+  { name: "Control Plane", url: "http://127.0.0.1:3011/health" }, // YJS port is 3011, but validation daemon doesn't have an express server yet
 ];
 
 async function poll(name: string, url: string, retries = 60): Promise<boolean> {
