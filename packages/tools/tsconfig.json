@@ -4,12 +4,17 @@
     "dist"
   ],
   "compilerOptions": {
+    "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
+    "paths": {
+      "@packages/*": ["../../packages/*/dist/index.d.ts"],
+      "@/*": ["./src/*"]
+    },
     "outDir": "dist",
     "noEmit": false,
-    "composite": true,
+    "composite": false,
     "declaration": true,
-    "declarationMap": true,
-    "baseUrl": "."
+    "declarationMap": true
   },
   "include": [
     "src/**/*"

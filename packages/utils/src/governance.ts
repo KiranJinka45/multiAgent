@@ -159,9 +159,22 @@ export class QuotaEngine {
         return { allowed: true };
     }
 
-    async checkTokenLimit(userId: string) {
-        // Mocked for now until we have real token tracking
-        return { allowed: true };
+    /**
+     * Check if a tenant has enough monthly token budget remaining.
+     */
+    async checkTokenLimit(tenantId: string): Promise<{ allowed: boolean; remaining?: number }> {
+        const limits = await this.getTenantLimits(tenantId);
+        const usageKey = `governance:token_usage:${tenantId}:${new Date().toISOString().substring(0, 7)}`; // Monthly key: YYYY-MM
+        
+        const currentUsage = parseInt(await redis.get(usageKey) || '0', 10);
+        const remaining = limits.monthlyTokenBudget - currentUsage;
+
+        if (remaining <= 0) {
+            logger.error({ tenantId, currentUsage, limit: limits.monthlyTokenBudget }, '[Governance] Monthly token budget exhausted');
+            return { allowed: false, remaining: 0 };
+        }
+
+        return { allowed: true, remaining };
     }
 
     /**

@@ -3,27 +3,27 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "node ../../node_modules/tsup/dist/cli-default.js src/index.ts --format cjs,esm --no-dts",
-    "dev": "node ../../node_modules/tsup/dist/cli-default.js src/index.ts --format cjs,esm --no-dts --watch",
+    "build": "tsup src/index.ts --no-dts && tsc --emitDeclarationOnly",
+    "dev": "tsup src/index.ts --no-dts --watch",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "clsx": "^2.1.1",
-    "tailwind-merge": "^2.6.1",
-    "class-variance-authority": "^0.7.0"
+    "clsx": "2.1.1",
+    "tailwind-merge": "2.6.1",
+    "class-variance-authority": "0.7.0"
   },
   "devDependencies": {
-    "typescript": "^5.0.0",
-    "tsup": "^8.0.0",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0",
-    "@types/react": "^18.0.0",
-    "@types/react-dom": "^18.0.0"
+    "typescript": "5.9.3",
+    "tsup": "8.5.1",
+    "react": "18.0.0",
+    "react-dom": "18.0.0",
+    "@types/react": "18.0.0",
+    "@types/react-dom": "18.0.0"
   },
   "peerDependencies": {
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "react": "18.0.0",
+    "react-dom": "18.0.0"
   },
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",

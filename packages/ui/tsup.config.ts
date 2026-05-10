@@ -6,5 +6,5 @@ export default defineConfig({
   dts: true,
   clean: true,
   sourcemap: true,
-  external: ["react", "react-dom"],
+  external: [/^@packages\/.*/, "react", "react-dom"],
 });

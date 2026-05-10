@@ -51,7 +51,7 @@ export function createSecurityMiddleware(): Router {
 
     // Run within AsyncLocalStorage context
     contextStorage.run({ requestId }, () => {
-        next();
+        return next();
     });
   });
 
@@ -69,7 +69,7 @@ export function createSecurityMiddleware(): Router {
         requestId: req.headers['x-request-id'],
       }, `[Security] Request Processed`);
     });
-    next();
+    return next();
   });
 
   return router;
@@ -110,7 +110,7 @@ export function createCsrfMiddleware(): (req: Request, res: Response, next: Next
       });
     }
 
-    next();
+    return next();
   };
 }
 
@@ -149,7 +149,7 @@ export function createPayloadSanitizerMiddleware(): (req: Request, res: Response
         }
       }
     }
-    next();
+    return next();
   };
 }
 

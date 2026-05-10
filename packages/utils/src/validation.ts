@@ -37,7 +37,7 @@ export const validateRequest = (schema: z.ZodSchema) => {
     try {
       // Parse and replace body with validated (and potentially coerced/stripped) data
       req.body = await schema.parseAsync(req.body);
-      next();
+      return next();
     } catch (error) {
       if (error instanceof z.ZodError) {
         const issues = (error as any).issues || (error as any).errors || [];
@@ -47,7 +47,7 @@ export const validateRequest = (schema: z.ZodSchema) => {
           details: issues.map((e: any) => ({ path: e.path.join('.'), message: e.message }))
         });
       }
-      next(error);
+      return next(error);
     }
   };
 };
