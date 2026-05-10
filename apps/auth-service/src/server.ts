@@ -20,9 +20,14 @@ export async function startAuthServer() {
     initTelemetry({ serviceName: 'auth-service' });
 
     const app = express();
+    app.disable("x-powered-by");
     const PORT = env.AUTH_SERVICE_PORT;
-    const JWT_SECRET = env.JWT_SECRET || 'dev-secret';
-    const JWT_REFRESH_SECRET = env.JWT_REFRESH_SECRET || 'dev-refresh-secret';
+    const JWT_SECRET = env.JWT_SECRET;
+    const JWT_REFRESH_SECRET = env.JWT_REFRESH_SECRET;
+
+    if (process.env.NODE_ENV === 'production' && (!JWT_SECRET || !JWT_REFRESH_SECRET)) {
+        throw new Error('FATAL: JWT secrets must be set in production');
+    }
 
     const ROTATE_LUA_SCRIPT = `
     local sessionKey = KEYS[1]
@@ -350,7 +355,7 @@ export async function startAuthServer() {
             });
             res.json(users);
         } catch (err: any) {
-            res.status(500).json({ error: err.message });
+            res.status(500).json({ error: 'Service internal error' });
         }
     });
 
@@ -375,7 +380,7 @@ export async function startAuthServer() {
 
             res.json({ success: true, role });
         } catch (err: any) {
-            res.status(500).json({ error: err.message });
+            res.status(500).json({ error: 'Service internal error' });
         }
     });
 

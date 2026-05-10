@@ -7,7 +7,10 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 4002;
-const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET && process.env.NODE_ENV === 'production') {
+    throw new Error('FATAL: JWT_SECRET must be set in production');
+}
 
 app.use(cors());
 app.use(express.json());
@@ -39,7 +42,8 @@ app.post('/login', (req, res) => {
 // --- INTERNAL AUTH MIDDLEWARE ---
 const internalAuth = (req: any, res: any, next: any) => {
     const key = req.headers['x-internal-key'];
-    if (key !== (process.env.INTERNAL_KEY || 'default-internal-secret')) {
+    const internalKey = process.env.INTERNAL_KEY;
+    if (key !== internalKey || !internalKey) {
         return res.status(401).json({ error: 'Unauthorized: Internal access only' });
     }
     next();
