@@ -1,10 +1,12 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const http = require('http');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const { Server } = require('socket.io');
 
 const app = express();
+app.disable('x-powered-by');
 const server = http.createServer(app);
 
 const FRONTEND_ORIGIN = 'http://127.0.0.1:3007';
@@ -14,6 +16,7 @@ const PORTS = {
 };
 
 app.use(express.json());
+app.use(helmet());
 
 app.use(cors({
   origin: FRONTEND_ORIGIN,
