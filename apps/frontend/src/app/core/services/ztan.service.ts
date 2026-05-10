@@ -13,6 +13,14 @@ export interface CeremonyState {
   transcript?: { sequence: number, timestamp: number, nodeId: string, round: string, payloadHash: string }[];
 }
 
+export interface Metrics {
+  activeNodes: number;
+  revokedNodes: number;
+  totalCeremonies: number;
+  successRate: number;
+  status: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -45,9 +53,6 @@ export class ZtanService {
   }
 
   async simulateSign(nodeId: string): Promise<CeremonyState> {
-    // The backend uses /ceremony/sign for real signs, but let's check if there's a simulate endpoint
-    // Actually, I'll use the real one with a signed message or add a simulate endpoint if needed.
-    // For now, I'll point it to a new simulate endpoint I might need to add or just use the logic in audit-verifier.
     return await firstValueFrom(this.api.post<CeremonyState>('/ztan/ceremony/sign', { nodeId, simulate: true }));
   }
 
@@ -55,8 +60,8 @@ export class ZtanService {
     return await firstValueFrom(this.api.post<any>('/ztan/archive', {}));
   }
 
-  async getMetrics(): Promise<any> {
-    return this.api.get<any>('/ztan/metrics');
+  getMetrics(): import('rxjs').Observable<Metrics> {
+    return this.api.get<Metrics>('/ztan/metrics');
   }
 
   async reset(): Promise<void> {

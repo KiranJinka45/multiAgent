@@ -1,90 +1,32 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "outDir": "dist",
-    "composite": true,
+    "composite": false,
     "skipLibCheck": true,
     "noEmit": false,
     "declaration": true,
-    "baseUrl": ".",
+    
+    "rootDir": "../..",
     "paths": {
-      "@packages/auth-internal": [
-        "../../packages/auth-internal/src"
-      ],
-      "@packages/billing": [
-        "../../packages/billing/src"
-      ],
-      "@packages/brain": [
-        "../../packages/brain/src"
-      ],
-      "@packages/config": [
-        "../../packages/config/src"
-      ],
-      "@packages/core-engine": [
-        "../../packages/core-engine/src"
-      ],
-      "@packages/db": [
-        "../../packages/db/src"
-      ],
-      "@packages/events": [
-        "../../packages/events/src"
-      ],
-      "@packages/memory-cache": [
-        "../../packages/memory-cache/src"
-      ],
-      "@packages/observability": [
-        "../../packages/observability/src"
-      ],
-      "@packages/resilience": [
-        "../../packages/resilience/src"
-      ],
-      "@packages/utils": [
-        "../../packages/utils/src"
-      ],
-      "@packages/self-evolution": [
-        "../../packages/self-evolution/src"
-      ]
+      "@packages/*": ["../../packages/*/dist/index.d.ts"],
+      "@/*": ["./src/*"]
     }
   },
   "include": [
-    "src"
-  ],
-  "references": [
-    {
-      "path": "../../packages/auth-internal"
-    },
-    {
-      "path": "../../packages/billing"
-    },
-    {
-      "path": "../../packages/brain"
-    },
-    {
-      "path": "../../packages/config"
-    },
-    {
-      "path": "../../packages/core-engine"
-    },
-    {
-      "path": "../../packages/db"
-    },
-    {
-      "path": "../../packages/events"
-    },
-    {
-      "path": "../../packages/memory-cache"
-    },
-    {
-      "path": "../../packages/observability"
-    },
-    {
-      "path": "../../packages/resilience"
-    },
-    {
-      "path": "../../packages/self-evolution"
-    },
-    {
-      "path": "../../packages/utils"
-    }
+    "src",
+    "../governance/src",
+    "../../packages/ztan-crypto/src",
+    "../../packages/utils/src",
+    "../../packages/events/src",
+    "../../packages/db/src",
+    "../../packages/resilience/src",
+    "../../packages/memory-cache/src",
+    "../../packages/config/src",
+    "../../packages/observability/src",
+    "../../packages/auth-internal/src"
   ]
+  
 }

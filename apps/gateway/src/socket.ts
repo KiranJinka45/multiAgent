@@ -6,11 +6,11 @@ import http from 'http';
 import crypto from 'crypto';
 
 import express from 'express';
-import { sidecarVerifier, consensusEngine, externalVerifier, notaryService } from '../../governance/src';
+import { sidecarVerifier, consensusEngine, externalVerifier, notaryService, ThresholdCrypto, StabilityCircuit, TrustAttestation, SreDecision, DEFAULT_THRESHOLD, DEFAULT_NODE_IDS, ZKProof, NotarizationAnchor } from '../../governance/src';
 
 const elog = pino({ level: 'info' });
 
-export function initSocket(server: http.Server, app?: express.Application) {
+export async function initSocket(server: http.Server, app?: express.Application) {
     const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
     const pubClient = new Redis(REDIS_URL);
     const subClient = pubClient.duplicate();
@@ -86,7 +86,7 @@ export function initSocket(server: http.Server, app?: express.Application) {
 
     // --- ELITE TIER: DISTRIBUTED KEY GENERATION (DKG) ---
     const nodeIds = ['SRE-ENGINE-01', 'ZTAN-SIDECAR-02', 'ZTAN-EXTERNAL-03'];
-    const keyShares = ThresholdCrypto.generateKeyShares(nodeIds);
+    const keyShares = await ThresholdCrypto.performDKG(nodeIds, DEFAULT_THRESHOLD);
     const groupPublicKey = keyShares[0].groupPublicKey;
 
     sidecarVerifier.setKeyShare(keyShares[1]);
@@ -114,7 +114,7 @@ export function initSocket(server: http.Server, app?: express.Application) {
 
                 // 2. Check for SRE Decision and trigger Elite Consensus
                 const decision = state.elite?.multiAgent?.consensus;
-                let zkProof = null;
+                let zkProof: ZKProof | null = null;
 
                 if (decision && decision.action !== 'NO_ACTION') {
                     const sreDecision = {
@@ -132,7 +132,7 @@ export function initSocket(server: http.Server, app?: express.Application) {
                     const lsla = 15000;
                     const threshold = 0.85;
 
-                    zkProof = await StabilityCircuit.generateProof(acc, ldet, lsla, threshold, groupPublicKey);
+                    zkProof = await StabilityCircuit.generateProof(acc, ldet, lsla, threshold);
 
                     // --- ZTAN ELITE: THRESHOLD SIGNING (TSAC) ---
                     const sidecarAttestation = await sidecarVerifier.verifyDecision(sreDecision as any);
@@ -140,14 +140,20 @@ export function initSocket(server: http.Server, app?: express.Application) {
                     
                     // Engine Self-Attestation (with cryptographic share)
                     const enginePayload = `${state.sequenceId}|PASS|node-a`;
-                    const engineAttestation = {
+                    const engineAttestation: TrustAttestation = {
                         eventId: state.sequenceId.toString(),
                         status: 'PASS',
                         verifierId: 'SRE-ENGINE-01',
                         expectedNode: state.elite.rca?.rootCause,
                         confidence: 1.0,
                         timestamp: Date.now(),
-                        partialSignature: ThresholdCrypto.signPartial(enginePayload, keyShares[0].share, keyShares[0].groupPublicKey, 'SRE-ENGINE-01')
+                        partialSignature: await ThresholdCrypto.signPartial(
+                            enginePayload, 
+                            keyShares[0].share, 
+                            'SRE-ENGINE-01', 
+                            DEFAULT_THRESHOLD, 
+                            nodeIds
+                        )
                     };
 
                     await consensusEngine.recordAttestation(engineAttestation as any);
@@ -171,7 +177,7 @@ export function initSocket(server: http.Server, app?: express.Application) {
                     .digest('hex');
                 
                 // --- ZTAN PHASE 3: EXTERNAL NOTARIZATION (TAMPER-PROOF) ---
-                let notarization = null;
+                let notarization: NotarizationAnchor | null = null;
                 if (state.sequenceId % 10 === 0) {
                     notarization = await notaryService.notarize(hash);
                 }
@@ -186,7 +192,7 @@ export function initSocket(server: http.Server, app?: express.Application) {
                         aggregatedSignature: state.governance.aggregatedSignature,
                         zkProof,
                         notarized: !!notarization,
-                        notarySeq: notarization?.sequenceId
+                        notarySeq: (notarization as any)?.sequenceId
                     },
                     _verification_data: zkProof ? { acc: 1.0, ldet: 120, lsla: 15000 } : undefined
                 };

@@ -5,12 +5,17 @@
   "compilerOptions": {
     "outDir": "./out-tsc/app",
     "moduleResolution": "bundler",
-    "types": []
+    "types": ["node"]
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "../../packages/ztan-crypto/src/**/*.ts",
+    "../../packages/utils/src/**/*.ts",
+    "../../packages/contracts/src/**/*.ts",
+    "../../packages/observability/src/**/*.ts"
   ],
   "exclude": [
-    "src/**/*.spec.ts"
+    "src/**/*.spec.ts",
+    "../../packages/ztan-crypto/src/node-replay.ts"
   ]
 }

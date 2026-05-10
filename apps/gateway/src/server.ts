@@ -91,6 +91,7 @@ export async function startGatewayServer() {
 
 
     const app = express();
+    app.disable("x-powered-by");
     
     // --- GUARANTEED HEALTH ENDPOINT ---
     app.get('/health', (_req, res) => res.status(200).json({ 
@@ -145,6 +146,10 @@ export async function startGatewayServer() {
     app.use(cors());
     app.use(cookieParser());
     app.use(express.json());
+    
+    // Enable CSRF protection (Phase 6 Security Remediation)
+    const { createCsrfMiddleware } = await import('@packages/utils');
+    app.use(createCsrfMiddleware());
     const PORT = env.GATEWAY_PORT;
 
     // --- FAILURE INJECTION: CANARY ROLLBACK TEST ---
@@ -876,7 +881,7 @@ export async function startGatewayServer() {
     };
 
     // Initialize Socket.io
-    initSocket(server, app);
+    await initSocket(server, app);
 
     await waitForCore();
 
@@ -890,7 +895,7 @@ export async function startGatewayServer() {
         logger.info({ port: PORT, pid: process.pid }, '[Gateway] Production BFF Worker operational');
 
         // Register Graceful Shutdown Tasks
-        onShutdown('HTTP Server', () => new Promise(resolve => server.close(() => resolve())));
+        onShutdown('HTTP Server', () => new Promise(resolve => server.close(() => resolve(undefined))));
         onShutdown('Kafka Manager', () => kafkaManager.shutdown());
     });
 

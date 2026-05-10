@@ -18,7 +18,7 @@ export default defineConfig({
     '@packages/auth-internal',
     '@packages/brain'
   ],
-  external: [
+  external: [/^@packages\/.*/, 
     '@packages/db',
     '@kubernetes/client-node',
     '@temporalio/client',

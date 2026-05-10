@@ -15,7 +15,7 @@ import { SystemHealthService } from '../../core/services/system-health.service';
       <div class="actions">
         <div class="status-indicator" 
              *ngIf="health.metrics$ | async as metrics"
-             [class]="metrics.mode?.toLowerCase() || 'normal'">
+             [class]="(metrics.mode || 'normal').toLowerCase()">
           <span class="dot" [class.pulse]="metrics.mode === 'NORMAL' || metrics.mode === 'RECOVERING'"></span>
           <span>{{ getStatusLabel(metrics) }}</span>
         </div>

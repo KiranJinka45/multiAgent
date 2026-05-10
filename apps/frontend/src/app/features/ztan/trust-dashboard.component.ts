@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ZtanService } from '../../../core/services/ztan.service';
+import { ZtanService, CeremonyState } from '../../core/services/ztan.service';
 import { interval, Subscription, switchMap, startWith } from 'rxjs';
 
 @Component({

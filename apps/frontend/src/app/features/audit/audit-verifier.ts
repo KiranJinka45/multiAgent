@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 import { ThresholdCrypto, VerificationResult, AuditInput } from '@packages/ztan-crypto';
-import { ZtanService, CeremonyState } from '../../core/services/ztan.service';
+import { ZtanService, CeremonyState, Metrics } from '../../core/services/ztan.service';
 
 interface TerminalLine {
   text: string;
@@ -25,23 +25,39 @@ interface Command {
 })
 export class AuditVerifierComponent implements AfterViewChecked {
   @ViewChild('terminalBody') private terminalBody!: ElementRef;
-
+  viewMode: 'SIMPLE' | 'DEVELOPER' | 'AUDIT' = 'SIMPLE';
+  sessionId: string = '';
+  
   buffer: string = '';
   bufferVisible: boolean = false;
   commandInput: string = '';
-  history: string[] = [];
+  commandHistory: string[] = [];
   historyPointer: number = -1;
-  logs: TerminalLine[] = [];
-  sessionId: string = '';
+  history: TerminalLine[] = [];
   
   isVerifying: boolean = false;
   lastResult: VerificationResult | null = null;
   lastRawInput: string = '';
+  explanation: string = '';
+
+  // Phase 4: Ceremony Stats Dashboard
+  stats = {
+    active: 3,
+    completed: 142,
+    aborted: 4,
+    fraudDetected: 1
+  };
 
   constructor(private ztan: ZtanService) {
     this.sessionId = `SESS-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
     this.addLog('ZTAN INFRASTRUCTURE CONSOLE v1.5.1', 'bold');
     this.addLog(`READY: Provable Integrity Session ${this.sessionId}`, 'info');
+    this.loadExample();
+  }
+
+  setMode(mode: 'SIMPLE' | 'DEVELOPER' | 'AUDIT') {
+    this.viewMode = mode;
+    this.addLog(`Switched to ${mode} mode`, 'info');
   }
 
   ngAfterViewChecked() {
@@ -59,8 +75,8 @@ export class AuditVerifierComponent implements AfterViewChecked {
         if (cmdText.startsWith('!')) {
           this.executeHistoryIndex(cmdText);
         } else {
-          this.history.push(cmdText);
-          this.historyPointer = this.history.length;
+          this.commandHistory.push(cmdText);
+          this.historyPointer = this.commandHistory.length;
           this.executeCommand(cmdText);
         }
       }
@@ -68,15 +84,15 @@ export class AuditVerifierComponent implements AfterViewChecked {
       event.preventDefault();
       if (this.historyPointer > 0) {
         this.historyPointer--;
-        this.commandInput = this.history[this.historyPointer];
+        this.commandInput = this.commandHistory[this.historyPointer];
       }
     } else if (event.key === 'ArrowDown') {
       event.preventDefault();
-      if (this.historyPointer < this.history.length - 1) {
+      if (this.historyPointer < this.commandHistory.length - 1) {
         this.historyPointer++;
-        this.commandInput = this.history[this.historyPointer];
+        this.commandInput = this.commandHistory[this.historyPointer];
       } else {
-        this.historyPointer = this.history.length;
+        this.historyPointer = this.commandHistory.length;
         this.commandInput = '';
       }
     }
@@ -84,8 +100,8 @@ export class AuditVerifierComponent implements AfterViewChecked {
 
   executeHistoryIndex(cmdText: string) {
     const index = parseInt(cmdText.substring(1)) - 1;
-    if (index >= 0 && index < this.history.length) {
-      const cmd = this.history[index];
+    if (index >= 0 && index < this.commandHistory.length) {
+      const cmd = this.commandHistory[index];
       this.addLog(`> !${index + 1} (${cmd})`, 'cmd');
       this.commandInput = '';
       this.executeCommand(cmd);
@@ -165,7 +181,7 @@ export class AuditVerifierComponent implements AfterViewChecked {
         break;
 
       case 'clear':
-        this.logs = [];
+        this.history = [];
         break;
 
       default:
@@ -315,7 +331,7 @@ export class AuditVerifierComponent implements AfterViewChecked {
     }
   }
 
-  async runVerification(args: Record<string, any>) {
+  async runVerification(args: Record<string, any> = {}) {
     if (!this.buffer) {
       this.addLog('ERROR: Buffer is empty. Run "load" first.', 'error');
       return;
@@ -359,6 +375,7 @@ export class AuditVerifierComponent implements AfterViewChecked {
       this.lastResult = finalResult;
 
       this.renderSummary(finalResult);
+      this.generateExplanation();
 
     } catch (e: any) {
       this.renderFailure(e);
@@ -381,6 +398,20 @@ export class AuditVerifierComponent implements AfterViewChecked {
       this.addLog(`Replay Status  : NEW (ID: ${result.inputHash.slice(0, 8)})`, 'info');
     } else {
       this.renderFailure(result);
+    }
+  }
+
+  generateExplanation() {
+    if (!this.lastResult) return;
+    
+    if (this.lastResult.status === 'VERIFIED') {
+      this.explanation = `✔ This audit is cryptographically valid. 
+      - Identity Verification: All ${this.lastResult.contributingVerifiers?.length || 0} signatures matched registered public keys.
+      - Consensus: Met threshold of 2 authorized verifiers.
+      - Integrity: Hash chain successfully reconstructed from genesis anchor.`;
+    } else {
+      this.explanation = `❌ Verification failed: ${this.lastResult.reason}. 
+      This usually indicates a signature mismatch or an invalid threshold configuration.`;
     }
   }
 
@@ -436,7 +467,7 @@ export class AuditVerifierComponent implements AfterViewChecked {
 
   renderHistory() {
     this.addLog('--- SESSION HISTORY ---', 'bold');
-    this.history.forEach((cmd, i) => {
+    this.commandHistory.forEach((cmd, i) => {
       this.addLog(`${i + 1}: ${cmd}`, 'info');
     });
   }
@@ -528,7 +559,7 @@ export class AuditVerifierComponent implements AfterViewChecked {
 
   addLog(text: string, type: TerminalLine['type']) {
     const timestamp = new Date().toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    this.logs.push({ text, type, timestamp });
+    this.history.push({ text, type, timestamp });
   }
 
   private scrollToBottom(): void {

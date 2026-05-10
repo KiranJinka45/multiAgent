@@ -2,27 +2,29 @@
   "extends": "../../tsconfig.base.json",
   "compileOnSave": false,
   "compilerOptions": {
+    "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
+    "outDir": "dist",
     "strict": true,
     "noImplicitOverride": true,
-    "noPropertyAccessFromIndexSignature": true,
+    "noPropertyAccessFromIndexSignature": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
     "isolatedModules": true,
     "experimentalDecorators": true,
     "importHelpers": true,
-    "target": "ES2022",
-    "module": "preserve",
-    "moduleResolution": "bundler",
-    "composite": true,
+    
+    
+    
+    "composite": false,
     "declaration": true,
     "noEmit": false,
-    "baseUrl": ".",
+    
+    "rootDir": "../..",
     "paths": {
-      "@packages/contracts": ["../../packages/contracts/src/index.ts"],
-      "@packages/utils": ["../../packages/utils/src/index.ts"],
-      "@packages/ztan-crypto": ["../../packages/ztan-crypto/src/index.ts"],
-      "@packages/*": ["../../packages/*"]
+      "@packages/*": ["../../packages/*/dist/index.d.ts"],
+      "@/*": ["./src/*"]
     }
   },
   "angularCompilerOptions": {

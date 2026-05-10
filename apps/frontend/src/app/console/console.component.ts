@@ -1,11 +1,12 @@
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { InputPanelComponent } from './input-panel.component';
 import { OutputPanelComponent } from './output-panel.component';
 import { LogConsoleComponent } from './log-console.component';
 import { ThresholdPanelComponent } from './threshold-panel.component';
-import { buildCanonicalPayload, hashPayload, computeSessionHash, ThresholdBls } from '@packages/ztan-crypto';
+import { buildCanonicalPayload, hashPayload, computeSessionHash, ThresholdBls, Frost } from '@packages/ztan-crypto';
 
 @Component({
   selector: 'app-console',
@@ -43,7 +44,7 @@ export class ConsoleComponent implements OnInit {
 
   async syncCeremony() {
     try {
-      const resp: any = await this.http.get('http://localhost:3010/api/v1/ztan/ceremony/active').toPromise();
+      const resp: any = await firstValueFrom(this.http.get('http://localhost:3010/api/v1/ztan/ceremony/active'));
       if (resp?.active) {
         this.ceremonyState = resp.active;
         this.ceremonyActive = true;
@@ -303,10 +304,10 @@ echo "${this.output.hex.slice(2)}" | xxd -r -p | sha256sum
         .filter(p => p.status === 'SIGNED')
         .map(p => p.publicKey);
       
-      const isValid = await (window as any).ThresholdBls.verify(
+      const isValid = await ThresholdBls.verify(
         this.ceremonyState.aggregatedSignature,
         this.ceremonyState.messageHash,
-        signersPks,
+        this.ceremonyState.masterPublicKey,
         this.ceremonyState.ceremonyId,
         this.ceremonyState.threshold,
         eligiblePks
@@ -380,11 +381,11 @@ echo "${this.output.hex.slice(2)}" | xxd -r -p | sha256sum
     this.log("INFO", `[MPC] Initializing Multi-Party Ceremony (t=${params.t}, n=${params.n})`);
 
     try {
-      const state: any = await this.http.post('http://localhost:3010/api/v1/ztan/ceremony/init', {
+      const state: any = await firstValueFrom(this.http.post('http://localhost:3010/api/v1/ztan/ceremony/init', {
         threshold: params.t,
         participants: this.output.sortedNodeIds.slice(0, params.n),
         messageHash: this.output.hash
-      }).toPromise();
+      }));
 
       this.ceremonyState = state;
       this.ceremonyActive = true;
@@ -408,13 +409,12 @@ echo "${this.output.hex.slice(2)}" | xxd -r -p | sha256sum
         
         for (const p of this.ceremonyParticipants) {
           // In a real system, nodes do this themselves. Here we simulate for all.
-          const { Frost } = require('@packages/ztan-crypto');
           const dkg = Frost.generateRound1(this.ceremonyState.threshold, this.ceremonyParticipants.length);
           
-          const state: any = await this.http.post('http://localhost:3010/api/v1/ztan/ceremony/commitments', {
+          const state: any = await firstValueFrom(this.http.post('http://localhost:3010/api/v1/ztan/ceremony/commitments', {
             nodeId: p.nodeId,
             commitments: dkg.commitments
-          }).toPromise();
+          }));
           
           this.ceremonyState = state;
         }
@@ -424,25 +424,13 @@ echo "${this.output.hex.slice(2)}" | xxd -r -p | sha256sum
         this.log("INFO", "Simulating Round 2: Encrypted Secret Share Exchange...");
         
         for (const sender of this.ceremonyParticipants) {
-          const shares: Record<string, string> = {};
-          // In real system, these would be encrypted for each target node
-          for (let i = 0; i < this.ceremonyParticipants.length; i++) {
-             const target = this.ceremonyParticipants[i];
-             const { Frost } = require('@packages/ztan-crypto');
-             // We'd need the sender's polynomial coeffs here. 
-             // For simulation, we'll just generate fresh ones or retrieve from backend if stored.
-             // Actually, I'll just use the Frost primitive to simulate the whole round in one call or mock it.
-          }
-          
-          // To keep it simple and correct, I'll update the backend to handle the full simulation
-          // Or I'll just post dummy shares that the backend accepts since it derives PK from commitments.
           const dummyShares: Record<string, string> = {};
           this.ceremonyParticipants.forEach(p => dummyShares[p.nodeId] = "01".repeat(32));
 
-          const state: any = await this.http.post('http://localhost:3010/api/v1/ztan/ceremony/shares', {
+          const state: any = await firstValueFrom(this.http.post('http://localhost:3010/api/v1/ztan/ceremony/shares', {
             nodeId: sender.nodeId,
             shares: dummyShares
-          }).toPromise();
+          }));
           
           this.ceremonyState = state;
         }
@@ -463,9 +451,9 @@ echo "${this.output.hex.slice(2)}" | xxd -r -p | sha256sum
     this.log("INFO", `[STEP 6] Generating & Verifying Signature Shares for ${nodeIds.length} nodes`);
     try {
       for (const nodeId of nodeIds) {
-        const state: any = await this.http.post('http://localhost:3010/api/v1/ztan/ceremony/simulate-sign', {
+        const state: any = await firstValueFrom(this.http.post('http://localhost:3010/api/v1/ztan/ceremony/simulate-sign', {
           nodeId
-        }).toPromise();
+        }));
 
         this.ceremonyState = state;
         this.ceremonyParticipants = state.participants; // Update status (SIGNED/INVALID)
@@ -530,13 +518,19 @@ echo "${this.output.hex.slice(2)}" | xxd -r -p | sha256sum
         case 'CONTEXT':
           // Sign correctly but with wrong context
           const fakeCtx = "WRONG-CEREMONY-ID";
-          const sig = await ThresholdBls.signShare(this.ceremonyState.messageHash, "01".repeat(32), fakeCtx);
+          const sig = await ThresholdBls.signShare(
+            this.ceremonyState.messageHash, 
+            "01".repeat(32), 
+            fakeCtx,
+            this.ceremonyState.threshold,
+            this.ceremonyParticipants.map(p => p.publicKey)
+          );
           payload.signature = sig;
           break;
         case 'DUPLICATE':
           // We'd need a real signed share first. This simulation relies on backend state.
           // For simplicity, we'll just send a repeat request.
-          await this.http.post('http://localhost:3010/api/v1/ztan/ceremony/simulate-sign', { nodeId }).toPromise();
+          await firstValueFrom(this.http.post('http://localhost:3010/api/v1/ztan/ceremony/simulate-sign', { nodeId }));
           payload.signature = "any-signature"; // Doesn't matter, nodeId is already SIGNED
           break;
         case 'REPLAY':
@@ -552,11 +546,17 @@ echo "${this.output.hex.slice(2)}" | xxd -r -p | sha256sum
         case 'KEY_MISMATCH':
           // Sign with a completely different key
           const attackerSecret = "ff".repeat(32);
-          payload.signature = await ThresholdBls.signShare(this.ceremonyState.messageHash, attackerSecret, ceremonyId);
+          payload.signature = await ThresholdBls.signShare(
+            this.ceremonyState.messageHash, 
+            attackerSecret, 
+            ceremonyId,
+            this.ceremonyState.threshold,
+            this.ceremonyParticipants.map(p => p.publicKey)
+          );
           break;
       }
 
-      const resp: any = await this.http.post('http://localhost:3010/api/v1/ztan/ceremony/sign', payload).toPromise();
+      const resp: any = await firstValueFrom(this.http.post('http://localhost:3010/api/v1/ztan/ceremony/sign', payload));
       return { ...attack, status: 'ACCEPTED', response: resp };
     } catch (err: any) {
       return { ...attack, status: 'REJECTED', error: err.error?.error || err.message };
@@ -566,7 +566,7 @@ echo "${this.output.hex.slice(2)}" | xxd -r -p | sha256sum
   async archiveCeremony() {
     this.log("INFO", "Archiving Ceremony Evidence for Third-Party Audit...");
     try {
-      const result: any = await this.http.post('http://localhost:3010/api/v1/ztan/ceremony/archive', {}).toPromise();
+      const result: any = await firstValueFrom(this.http.post('http://localhost:3010/api/v1/ztan/ceremony/archive', {}));
       this.log("SUCCESS", "Ceremony Archived", undefined, `File: ${result.filename}`);
     } catch (e: any) {
       this.log("ERROR", "Archival Failed", undefined, e.message);
@@ -576,7 +576,7 @@ echo "${this.output.hex.slice(2)}" | xxd -r -p | sha256sum
   async resetCeremony() {
     this.log("INFO", "Resetting Ceremony State...");
     try {
-      await this.http.post('http://localhost:3010/api/v1/ztan/ceremony/reset', {}).toPromise();
+      await firstValueFrom(this.http.post('http://localhost:3010/api/v1/ztan/ceremony/reset', {}));
       this.ceremonyState = null;
       this.ceremonyActive = false;
       this.ceremonyParticipants = [];
