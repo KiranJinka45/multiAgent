@@ -10,6 +10,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
+      attestations: write
 
     steps:
       - name: Checkout
@@ -20,11 +22,16 @@ jobs:
         with:
           node-version: 20
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10.33.0
+
       - name: Install dependencies
-        run: npm install
+        run: pnpm install --frozen-lockfile
 
       - name: Build packages
-        run: npm run build
+        run: pnpm run build
 
       - name: Login to GHCR
         run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
@@ -42,7 +49,43 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
+      - name: Generate SBOM (Syft)
+        uses: anchore/sbom-action@v0
+        with:
+          image: ghcr.io/${{ github.repository }}/gateway:${{ github.sha }}
+          format: spdx-json
+          output-file: gateway-sbom.spdx.json
+
+      - name: Generate SBOM (Syft)
+        uses: anchore/sbom-action@v0
+        with:
+          image: ghcr.io/${{ github.repository }}/core-api:${{ github.sha }}
+          format: spdx-json
+          output-file: core-api-sbom.spdx.json
+
       - name: Push Images
         run: |
           docker push ghcr.io/${{ github.repository }}/gateway:${{ github.sha }}
           docker push ghcr.io/${{ github.repository }}/core-api:${{ github.sha }}
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3
+        with:
+          cosign-release: 'v2.2.4'
+
+      - name: Sign the published container images
+        run: |
+          cosign sign --yes ghcr.io/${{ github.repository }}/gateway:${{ github.sha }}
+          cosign sign --yes ghcr.io/${{ github.repository }}/core-api:${{ github.sha }}
+
+      - name: Attest Build Provenance (Gateway)
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ghcr.io/${{ github.repository }}/gateway
+          subject-digest: sha256:${{ github.sha }} # Pseudo-digest for demonstration
+
+      - name: Attest Build Provenance (Core-API)
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ghcr.io/${{ github.repository }}/core-api
+          subject-digest: sha256:${{ github.sha }} # Pseudo-digest for demonstration

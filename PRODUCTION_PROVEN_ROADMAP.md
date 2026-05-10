@@ -38,14 +38,22 @@ Achieve **PRODUCTION-PROVEN** certification through real consensus, adversarial 
 - [x] **Entropy Tracking**: Proven zero state divergence and nominal memory profile.
 - [x] **Final Certification**: Jepsen-grade verification of linearizability and atomicity.
 
-## 🌐 Phase 6: Global Federated Sovereignty (Proposed)
-*Goal: Extend governance to cross-cloud environments with economic guardrails.*
-- [ ] **Economic Guardrails**: Implement cost-aware decision gating (USD budget enforcement).
-- [ ] **Federated Consensus**: Extend Raft to cross-provider quorums (AWS + GCP).
-- [ ] **Secondary Observation**: Self-audit loop to detect negative externalities of SRE actions.
+## 🌐 Phase 6: Institutional Stewardship (ACTIVE)
+*Goal: Transition from technical invention to long-term trust accumulation.*
+- [x] **Operational Baseline**: Established initial reliability and economic metrics.
+- [x] **Telemetry Stabilization**: Standardized loopback networking and established JS bypass audit.
+- [/] **Longitudinal Metrics**: Tracking RI (78.57%) and ROI (54.86%) trends.
+- [ ] **Enterprise Integration**: Validate the system as durable institutional software.
+
+## 📊 Phase 7: Operational Evidence Accumulation (NEW)
+*Goal: Accumulate boring operational evidence to prove institutional survivability.*
+- [/] **Scheduled Aggregation**: Operationalized `scripts/reliability-aggregator.js` for metric snapshots.
+- [ ] **First Real Pilots**: Begin low blast-radius missions with 100% auditability.
+- [ ] **Incident Rehearsals**: Execute drills for state corruption and governance deadlocks.
+- [ ] **Economic Hardening**: Validate token efficiency and correction-loop ROI at scale.
 
 ---
-**Status**: 🔵 **PRODUCTION-TRUSTED (LEVEL 4) — PHASE 6 IN PROGRESS**
-**Current Milestone**: Phase 6 (Economic Guardrails & Self-Audit)
+**Status**: 🛡️ **STRATEGICALLY COMPLETE — PHASE 6: SURVIVABILITY ACTIVE**
+**Current Milestone**: Institutional Trust Accumulation & Operational Discipline
 
 
