@@ -4,33 +4,23 @@
     "dist"
   ],
   "compilerOptions": {
-    "composite": true,
+    "baseUrl": ".",
+    "ignoreDeprecations": "5.0",
+    "composite": false,
     "outDir": "dist",
     "skipLibCheck": true,
     "noEmit": false,
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
-    "baseUrl": ".",
     "paths": {
-      "@packages/observability": [
-        "../observability/src"
-      ],
-      "@packages/sandbox-runtime": [
-        "../sandbox-runtime/src"
-      ]
+      "@packages/*": ["../../packages/*/dist/index.d.ts"],
+      "@/*": ["./src/*"]
     }
   },
   "include": [
     "src/**/*"
   ],
-  "extends": "../../tsconfig.base.json",
-  "references": [
-    {
-      "path": "../observability"
-    },
-    {
-      "path": "../sandbox-runtime"
-    }
-  ]
+  "extends": "../../tsconfig.base.json"
+  
 }

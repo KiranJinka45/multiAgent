@@ -6,15 +6,21 @@
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "node ../../node_modules/tsup/dist/cli-default.js src/index.ts --format cjs,esm --no-dts",
+    "build": "tsup src/index.ts --no-dts && tsc --emitDeclarationOnly",
     "stress-test": "tsx src/stress-test.ts",
-    "dev": "node ../../node_modules/tsup/dist/cli-default.js src/index.ts --format cjs,esm --no-dts --watch",
+    "dev": "tsup src/index.ts --no-dts --watch",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "@packages/queue": "workspace:*",
+    "@packages/utils": "workspace:*",
+    "dotenv": "17.4.2"
+  },
   "devDependencies": {
-    "typescript": "^5.0.0",
-    "tsup": "^8.0.0"
+    "typescript": "5.9.3",
+    "tsup": "8.5.1",
+    "@types/node": "20.19.39"
   },
   "exports": {
     ".": {

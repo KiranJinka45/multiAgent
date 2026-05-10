@@ -8,6 +8,6 @@ export default defineConfig({
   sourcemap: true,
   minify: false,
   target: 'esnext',
-  external: ['@packages/sandbox-runtime', '@packages/observability'],
+  external: [/^@packages\/.*/, '@packages/sandbox-runtime', '@packages/observability'],
 });
 
