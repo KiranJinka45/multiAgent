@@ -9,7 +9,7 @@ export default defineConfig({
   clean: true,
   minify: false,
   target: 'es2020',
-  external: ['@packages/observability', '@packages/utils'],
+  external: [/^@packages\/.*/, '@packages/observability', '@packages/utils'],
   outExtension({ format }) {
     return format === 'esm' ? { js: '.mjs' } : { js: '.cjs' };
   }

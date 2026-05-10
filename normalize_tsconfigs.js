@@ -45,6 +45,13 @@ configs.forEach(configPath => {
     // Ensure noEmit is false or removed
     updated = updated.replace(/"noEmit":\s*true/g, '"noEmit": false');
 
+    // Enforce outDir to be "dist"
+    if (!updated.includes('"outDir"')) {
+      updated = updated.replace('"compilerOptions": {', '"compilerOptions": {\n    "outDir": "dist",');
+    } else {
+      updated = updated.replace(/"outDir":\s*"[^"]*",?/g, '"outDir": "dist",');
+    }
+
     // Remove incremental if it conflicts (composite implies incremental)
     updated = updated.replace(/"incremental":\s*false/g, '"incremental": true');
 

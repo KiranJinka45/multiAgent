@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import * as crypto from 'crypto';
 import { NextFunction } from 'express';
 import { logger } from '@packages/observability';
 import { env } from '@packages/config';
@@ -14,6 +15,7 @@ export interface UserContext {
     email: string;
     tenantId: string;
     roles: string[];
+    jti?: string; // JWT ID for replay detection
 }
 
 export type Permission = 
@@ -151,7 +153,32 @@ export function signInternalToken(serviceName: string): string {
     if (!secret) {
         throw new Error('JWT_SECRET not configured');
     }
-    return jwt.sign({ svc: serviceName }, secret, { expiresIn: '1h' });
+    return jwt.sign({ 
+        svc: serviceName,
+        jti: crypto.randomUUID() 
+    }, secret, { expiresIn: '1h' });
+}
+
+/**
+ * TOKEN ROTATION & REVOCATION UTILITIES
+ */
+export async function revokeToken(token: string, userId: string, expirySeconds: number = 3600): Promise<void> {
+    if ((redis as any).status === 'ready') {
+        await redis.set(`revoked:${token}`, userId, 'EX', expirySeconds);
+        logger.info({ userId }, '[AuthInternal] Token revoked and blacklisted');
+    }
+}
+
+export async function rotateToken(oldToken: string, user: UserContext): Promise<string> {
+    const secret = env.JWT_SECRET;
+    if (!secret) throw new Error('JWT_SECRET not configured');
+
+    // 1. Revoke old token
+    await revokeToken(oldToken, user.id);
+
+    // 2. Sign new token with new JTI
+    const newContext = { ...user, jti: crypto.randomUUID() };
+    return jwt.sign(newContext, secret, { expiresIn: '15m' });
 }
 
 /**
@@ -211,6 +238,13 @@ export function userAuth(options: { allowDevBypass?: boolean } = {}) {
                 throw new Error('JWT_SECRET not configured');
             }
             const decoded = jwt.verify(token, secret) as unknown as UserContext;
+
+            // Enforce JTI existence for replay detection
+            if (!decoded.jti) {
+                logger.warn({ userId: decoded.id }, '[AuthInternal] REJECTED: Token missing JTI (Replay Risk)');
+                return res.status(401).json({ error: 'Unauthorized: Insecure token format' });
+            }
+
             req.user = decoded;
 
             contextStorage.run({

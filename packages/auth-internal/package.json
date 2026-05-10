@@ -6,8 +6,8 @@
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "node ../../node_modules/tsup/dist/cli-default.js src/index.ts --format cjs,esm --no-dts",
-    "dev": "node ../../node_modules/tsup/dist/cli-default.js src/index.ts --format cjs,esm --no-dts --watch",
+    "build": "tsup src/index.ts --no-dts && tsc --emitDeclarationOnly",
+    "dev": "tsup src/index.ts --no-dts --watch",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "clean": "rimraf dist"
@@ -22,11 +22,11 @@
     "@packages/utils": "workspace:*"
   },
   "devDependencies": {
-    "@types/express": "^5.0.0",
-    "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^22.13.9",
-    "tsup": "^8.5.1",
-    "typescript": "^5.9.3"
+    "@types/express": "5.0.0",
+    "@types/jsonwebtoken": "9.0.10",
+    "@types/node": "22.13.9",
+    "tsup": "8.5.1",
+    "typescript": "5.9.3"
   },
   "exports": {
     ".": {

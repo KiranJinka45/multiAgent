@@ -4,28 +4,18 @@
     "src/**/*"
   ],
   "compilerOptions": {
+    "baseUrl": ".",
+    "ignoreDeprecations": "5.0",
     "outDir": "dist",
     "declarationMap": true,
     "declaration": true,
-    "composite": true,
+    "composite": false,
     "skipLibCheck": true,
     "noEmit": false,
-    "baseUrl": ".",
     "paths": {
-      "@packages/core-engine": [
-        "../core-engine/src"
-      ],
-      "@packages/utils": [
-        "../utils/src"
-      ]
+      "@packages/*": ["../../packages/*/dist/index.d.ts"],
+      "@/*": ["./src/*"]
     }
-  },
-  "references": [
-    {
-      "path": "../core-engine"
-    },
-    {
-      "path": "../utils"
-    }
-  ]
+  }
+  
 }
