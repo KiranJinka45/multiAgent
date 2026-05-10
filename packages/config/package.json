@@ -1,21 +1,22 @@
 {
   "name": "@packages/config",
   "version": "1.0.0",
+  "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "node ../../node_modules/tsup/dist/cli-default.js src/index.ts --format cjs,esm --no-dts",
-    "dev": "node ../../node_modules/tsup/dist/cli-default.js src/index.ts --format cjs,esm --no-dts --watch"
+    "build": "tsup src/index.ts --no-dts && tsc --emitDeclarationOnly",
+    "dev": "tsup src/index.ts --no-dts --watch"
   },
   "dependencies": {
-    "@aws-sdk/client-secrets-manager": "^3.1038.0",
-    "dotenv": "^16.4.5",
-    "zod": "^3.22.4"
+    "@aws-sdk/client-secrets-manager": "3.1038.0",
+    "dotenv": "16.4.5",
+    "zod": "3.22.4"
   },
   "devDependencies": {
-    "tsup": "^8.5.1",
-    "typescript": "^5.0.0"
+    "tsup": "8.5.1",
+    "typescript": "5.9.3"
   },
   "exports": {
     ".": {

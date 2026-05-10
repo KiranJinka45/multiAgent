@@ -64,6 +64,15 @@ export const commonSchema = z.object({
   NEXT_PUBLIC_API_URL: z.string().url().optional(),
   NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional(),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(10).optional(),
+  
+  // AI/LLM Configuration
+  OPENAI_API_KEY: z.string().optional(),
+  OPENROUTER_API_KEY: z.string().optional(),
+  GROQ_API_KEY: z.string().optional(),
+  GEMINI_API_KEY: z.string().optional(),
+  DEFAULT_LLM_MODEL: z.string().default('gpt-4o'),
+  DEFAULT_EMBEDDING_MODEL: z.string().default('text-embedding-3-small'),
+  LLM_PROVIDER: z.enum(['openai', 'openrouter', 'groq', 'sambanova', 'gemini']).default('openai'),
 });
 
 /**
@@ -110,7 +119,8 @@ export const env = envSchema.parse({
 
 export type Env = z.infer<typeof envSchema>;
 
-import { SecretProvider } from './secret-provider';
+import { SecretProvider } from './secret-provider.js';
+
 
 // Run initial validation
 SecretProvider.validate();

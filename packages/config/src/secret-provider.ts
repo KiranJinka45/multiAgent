@@ -1,4 +1,5 @@
-import { getSecrets } from "./aws-secrets"
+import { getSecrets } from "./aws-secrets.js"
+
 
 export class SecretProvider {
   /**
@@ -29,10 +30,15 @@ export class SecretProvider {
   static validate() {
     // Only strictly validate in production if we are not currently in the bootstrap phase
     // For now, we'll just log warnings to avoid blocking the bootstrap process itself
-    const required = ['DATABASE_URL', 'JWT_SECRET'];
+    const required = ['DATABASE_URL', 'JWT_SECRET', 'INTERNAL_SERVICE_TOKEN'];
     for (const key of required) {
       if (!process.env[key]) {
-        console.warn(`[SecretProvider] WARNING: ${key} is missing from process.env`);
+        if (process.env.NODE_ENV === 'production') {
+          console.error(`[SecretProvider] FATAL: ${key} is missing from process.env`);
+          process.exit(1);
+        } else {
+          console.warn(`[SecretProvider] WARNING: ${key} is missing from process.env`);
+        }
       }
     }
   }

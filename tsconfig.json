@@ -138,6 +138,12 @@
     },
     {
       "path": "./packages/validator"
+    },
+    {
+      "path": "./packages/ztan-crypto"
+    },
+    {
+      "path": "./apps/governance"
     }
   ]
 }

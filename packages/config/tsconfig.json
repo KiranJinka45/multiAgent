@@ -3,12 +3,16 @@
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": "src",
-    "composite": true,
-    "noEmit": false,
+    "baseUrl": ".",
+    "composite": false,
+    "incremental": false,
     "declaration": true,
-    "baseUrl": "."
+    "declarationMap": true,
+    "skipLibCheck": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

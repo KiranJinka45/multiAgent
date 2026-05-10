@@ -1,5 +1,6 @@
 import { env } from './env.js';
 
+
 /**
  * Frontend-safe configuration.
  */

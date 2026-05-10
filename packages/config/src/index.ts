@@ -1,10 +1,11 @@
-export * from './frontend';
-export * from './backend';
-export * from './env';
-export { SecretProvider } from './secret-provider';
+export * from './frontend.js';
+export * from './backend.js';
+export * from './env.js';
+export { SecretProvider } from './secret-provider.js';
 
-import { serverConfig } from './backend';
-import { env } from './env';
+import { serverConfig } from './backend.js';
+import { env } from './env.js';
+
 
 /**
  * Standard named exports for convenience.
