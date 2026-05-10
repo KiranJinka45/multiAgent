@@ -1,6 +1,8 @@
 import * as bls from '@noble/bls12-381';
 import { sha256 } from '@noble/hashes/sha256';
 import { Canonical } from './canonical';
+import { Frost } from './frost';
+import { VSS } from './vss';
 
 const DST = 'BLS_SIG_ZTAN_AUDIT_V1';
 
@@ -11,35 +13,54 @@ const DST = 'BLS_SIG_ZTAN_AUDIT_V1';
 export class ThresholdBls {
     public static readonly RFC_VERSION = '1.5.0';
     public static readonly DST = DST;
+
     /**
      * Simulation of a (t, n) Distributed Key Generation (DKG).
+     * Uses Shamir's Secret Sharing (via VSS) for mathematical consistency.
      */
-    static async dkg(t: number, n: number, nodeIds: string[]): Promise<{
+    static async dkg(t: number, n: number, nodeIds: string[], customIndices?: number[]): Promise<{
         masterPublicKey: string;
-        shares: { nodeId: string; secretShare: string; verificationKey: string }[];
+        shares: { nodeId: string; secretShare: string; verificationKey: string; index: number }[];
     }> {
-        // 1. Generate master secret
-        const masterSecret = bls.utils.randomPrivateKey();
-        const masterPublicKey = bls.getPublicKey(masterSecret);
+        const CURVE_ORDER = bls.CURVE.r;
+        
+        // 1. Generate master polynomial f(x) = a0 + a1*x + ...
+        // a0 is the master secret
+        const coeffs: bigint[] = [];
+        for (let i = 0; i < t; i++) {
+            let r: Uint8Array;
+            try {
+                r = bls.utils.randomPrivateKey();
+            } catch (e) {
+                // Fallback for environments where noble-bls random is broken
+                const nodeCrypto = await import('crypto');
+                r = new Uint8Array(nodeCrypto.randomBytes(32));
+            }
+            coeffs.push(BigInt('0x' + Canonical.bytesToHex(r)) % CURVE_ORDER);
+        }
 
-        const shares = [];
+        const masterSecret = coeffs[0];
+        const masterPublicKey = bls.PointG1.BASE.multiply(masterSecret);
+
+        const shares: { nodeId: string; secretShare: string; verificationKey: string; index: number }[] = [];
         for (let i = 0; i < n; i++) {
             const nodeId = nodeIds[i] || `Node-${(i+1).toString().padStart(3, '0')}`;
             
-            // For simulation, we derive a unique share for each node
-            // In real TSS, this is a polynomial evaluation
-            const secretShare = bls.utils.randomPrivateKey(); 
-            const verificationKey = bls.getPublicKey(secretShare);
+            // Share for node index (Default 1-based for Lagrange, but supports custom)
+            const shareIndex = customIndices ? customIndices[i] : i + 1;
+            const secretShare = VSS.evaluatePolynomial(coeffs, shareIndex);
+            const verificationKey = bls.PointG1.BASE.multiply(secretShare);
 
             shares.push({
                 nodeId,
-                secretShare: Canonical.bytesToHex(secretShare),
-                verificationKey: Canonical.bytesToHex(verificationKey)
+                index: shareIndex,
+                secretShare: secretShare.toString(16).padStart(64, '0'),
+                verificationKey: verificationKey.toHex(true)
             });
         }
 
         return {
-            masterPublicKey: Canonical.bytesToHex(masterPublicKey),
+            masterPublicKey: masterPublicKey.toHex(true),
             shares
         };
     }
@@ -55,7 +76,7 @@ export class ThresholdBls {
         threshold: number, 
         eligiblePublicKeys: string[]
     ): Promise<string> {
-        const secretShare = Canonical.hexToBytes(secretShareHex);
+        const secretShare = BigInt('0x' + secretShareHex);
         const msg = Canonical.hexToBytes(messageHash);
         
         // Canonical Context Binding (ZTAN-RFC-001 v1.5)
@@ -71,14 +92,11 @@ export class ThresholdBls {
         ]);
         
         const finalMsg = sha256(bindingPayload);
-        const signature = await bls.sign(finalMsg, secretShare);
+        // noble-bls expects hex string or bytes for secret
+        const signature = await bls.sign(finalMsg, secretShare.toString(16).padStart(64, '0'));
         return Canonical.bytesToHex(signature);
     }
 
-    /**
-     * Aggregate t signatures into a single group signature using Lagrange weighting.
-     * S: Array of participant indices (1-indexed)
-     */
     /**
      * Aggregate t signatures using pre-computed Lagrange weights.
      */
@@ -95,18 +113,20 @@ export class ThresholdBls {
     }
 
     static async aggregate(signatures: string[], S: number[]): Promise<string> {
-        const { Frost } = require('./frost');
+        if (new Set(S).size !== S.length) {
+            throw new Error("[ZTAN] REJECT: Duplicate signer indices detected in subset S.");
+        }
         const lambdas = S.map(i => Frost.computeLagrangeCoefficient(i, S));
         return this.aggregateLagrange(signatures, lambdas);
     }
 
     /**
-     * Verify a signature. If signersPublicKeys.length > 1, it's an aggregated signature.
+     * Verify a signature against the MASTER PUBLIC KEY.
      */
     static async verify(
         signature: string, 
         messageHash: string, 
-        signersPublicKeys: string[], 
+        masterPublicKey: string, 
         ceremonyId: string, 
         threshold: number, 
         eligiblePublicKeys: string[]
@@ -127,7 +147,7 @@ export class ThresholdBls {
         ]);
         
         const finalMsg = sha256(bindingPayload);
-        const groupPk = bls.aggregatePublicKeys(signersPublicKeys.map(pk => Canonical.hexToBytes(pk)));
+        const groupPk = bls.PointG1.fromHex(masterPublicKey);
 
         return await bls.verify(sig, finalMsg, groupPk);
     }

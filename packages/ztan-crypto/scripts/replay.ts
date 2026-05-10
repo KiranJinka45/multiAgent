@@ -49,4 +49,11 @@ if (!arg) {
   process.exit(1);
 }
 
-replaySession(arg);
+// Sanitize and resolve the path to mitigate Path Traversal (CWE-23)
+const safePath = path.resolve(process.cwd(), arg);
+if (!safePath.startsWith(process.cwd())) {
+    console.error('Error: Access denied. Provided path is outside of current working directory.');
+    process.exit(1);
+}
+
+replaySession(safePath);

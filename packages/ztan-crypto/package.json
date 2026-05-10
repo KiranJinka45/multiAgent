@@ -6,18 +6,20 @@
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "node ../../node_modules/tsup/dist/cli-default.js src/index.ts --format cjs,esm --no-dts",
+    "build": "tsup src/index.ts --no-dts && tsc --emitDeclarationOnly",
     "test:audit": "tsx test/audit.ts",
     "test:bls": "tsx test/bls_test.ts",
-    "replay": "tsx scripts/replay.ts"
+    "replay": "tsx scripts/replay.ts",
+    "dev": "tsup src/index.ts --no-dts --watch"
   },
   "dependencies": {
-    "@noble/bls12-381": "^1.4.0",
-    "@noble/hashes": "^1.4.0"
+    "@noble/bls12-381": "1.3.0",
+    "@noble/hashes": "1.3.0"
   },
   "devDependencies": {
-    "tsup": "^8.0.0",
-    "typescript": "^5.0.0"
+    "fast-check": "4.7.0",
+    "tsup": "8.5.1",
+    "typescript": "5.9.3"
   },
   "exports": {
     ".": {

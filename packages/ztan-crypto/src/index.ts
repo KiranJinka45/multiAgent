@@ -2,6 +2,7 @@ import * as bls from '@noble/bls12-381';
 import { sha256 } from '@noble/hashes/sha256';
 import { Canonical } from './canonical';
 
+export * from './frost';
 export * from './ztan-bls';
 
 const DST = 'BLS_SIG_ZTAN_AUDIT_V1';
@@ -385,7 +386,7 @@ export class ThresholdCrypto {
       const chainedHash = sha256(combined);
       const chainedHashHex = this.toHex(chainedHash);
       traceHashChain.push(chainedHashHex);
-      prevHash = chainedHash;
+      prevHash = new Uint8Array(chainedHash);
 
       if (options.onStep) {
         options.onStep(step, chainedHashHex);
@@ -670,34 +671,23 @@ export function hashPayload(payload: { canonicalHashHex: string }): string {
 }
 
 /**
- * PROXIMAL: Persistent File-Based Replay Guard for Local/CI environments
+ * PROXIMAL: Persistent Replay Guard (Interface only in shared package)
+ * Platform-specific implementations should be provided by the consumer.
  */
-export class FileReplayGuard implements ReplayGuard {
-  private filePath: string;
-
-  constructor(filePath: string) {
-    this.filePath = filePath;
-  }
+export class MemoryReplayGuard implements ReplayGuard {
+  private seen = new Map<string, number>();
 
   async isReplay(auditId: string): Promise<boolean> {
-    try {
-      const fs = require('fs');
-      if (!fs.existsSync(this.filePath)) return false;
-      const data = fs.readFileSync(this.filePath, 'utf-8');
-      const seen = JSON.parse(data);
-      return !!seen[auditId];
-    } catch { return false; }
+    const expiry = this.seen.get(auditId);
+    if (!expiry) return false;
+    if (Date.now() > expiry) {
+      this.seen.delete(auditId);
+      return false;
+    }
+    return true;
   }
 
   async markSeen(auditId: string, ttlSeconds: number): Promise<void> {
-    try {
-      const fs = require('fs');
-      let seen: Record<string, number> = {};
-      if (fs.existsSync(this.filePath)) {
-        seen = JSON.parse(fs.readFileSync(this.filePath, 'utf-8'));
-      }
-      seen[auditId] = Date.now() + (ttlSeconds * 1000);
-      fs.writeFileSync(this.filePath, JSON.stringify(seen, null, 2));
-    } catch (e) { console.error('Failed to mark seen:', e); }
+    this.seen.set(auditId, Date.now() + (ttlSeconds * 1000));
   }
 }

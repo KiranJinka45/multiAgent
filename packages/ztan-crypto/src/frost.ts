@@ -1,5 +1,7 @@
 import * as bls from '@noble/bls12-381';
+import { sha256 } from '@noble/hashes/sha256';
 import { VSS } from './vss';
+import { Canonical } from './canonical';
 
 /**
  * ZTAN-FROST: Flexible Round-Optimized Threshold Signatures
@@ -16,10 +18,10 @@ export class Frost {
         coeffs: bigint[];
         commitments: string[];
     } {
-        const coeffs = [];
+        const coeffs: bigint[] = [];
         for (let i = 0; i < t; i++) {
             const secret = bls.utils.randomPrivateKey();
-            coeffs.push(BigInt('0x' + Buffer.from(secret).toString('hex')));
+            coeffs.push(BigInt('0x' + Canonical.bytesToHex(secret)));
         }
         
         return {
@@ -105,12 +107,12 @@ export class Frost {
         const d = bls.utils.randomPrivateKey();
         const e = bls.utils.randomPrivateKey();
         // ZTAN uses G2 for signatures, so nonces are on G2
-        const D = bls.PointG2.BASE.multiply(BigInt('0x' + Buffer.from(d).toString('hex'))).toHex(true);
-        const E = bls.PointG2.BASE.multiply(BigInt('0x' + Buffer.from(e).toString('hex'))).toHex(true);
+        const D = bls.PointG2.BASE.multiply(BigInt('0x' + Canonical.bytesToHex(d))).toHex(true);
+        const E = bls.PointG2.BASE.multiply(BigInt('0x' + Canonical.bytesToHex(e))).toHex(true);
         
         return {
-            d: Buffer.from(d).toString('hex'),
-            e: Buffer.from(e).toString('hex'),
+            d: Canonical.bytesToHex(d),
+            e: Canonical.bytesToHex(e),
             D, E
         };
     }
@@ -161,8 +163,8 @@ export class Frost {
     static computeBindingFactor(i: number, messageHash: string, commitments: { nodeId: number, D: string, E: string }[]): bigint {
         const CURVE_ORDER = bls.CURVE.r;
         const data = JSON.stringify({ i, m: messageHash, c: commitments });
-        const hash = bls.utils.sha256(Buffer.from(data));
-        return BigInt('0x' + Buffer.from(hash).toString('hex')) % CURVE_ORDER;
+        const hash = sha256(new TextEncoder().encode(data));
+        return BigInt('0x' + Canonical.bytesToHex(hash)) % CURVE_ORDER;
     }
 
     /**
@@ -225,6 +227,6 @@ export class Frost {
         
         // Use noble-bls to sign with the derived secret
         const sig = await bls.sign(bindingHash, derivedSk.toString(16).padStart(64, '0'));
-        return Buffer.from(sig).toString('hex');
+        return Canonical.bytesToHex(sig);
     }
 }
