@@ -1,0 +1,11 @@
+[
+  {
+    "timestamp": "2026-05-13T20:13:16.957Z",
+    "success": false,
+    "category": "unknown",
+    "os": "win32 10.0.26200",
+    "node": "v20.20.0",
+    "durationMs": 1472746,
+    "lockfileSize": 666180
+  }
+]
