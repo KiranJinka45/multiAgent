@@ -28,7 +28,7 @@ fi
 
 # 4. Generate Evidence Manifest
 echo "   - Signing evidence bundle..."
-sha256sum "$EVIDENCE_DIR"/* > "$EVIDENCE_DIR/manifest.sha256"
+pnpm exec tsx scripts/generate-manifest.ts "$EVIDENCE_DIR"
 
 echo "------------------------------------"
 echo "✅ EVIDENCE PRESERVED: $EVIDENCE_DIR"
