@@ -1,112 +1,108 @@
-# Nexus ZTAN — Permanent Operational Stewardship Charter
+# Nexus ZTAN — Permanent Operations Mode
 
 ## STATUS
 
-Nexus ZTAN has completed:
-- Architecture Finality
-- Operational Validation
-- Institutional Survivability Certification
-- External Exposure Preparation
-- Recovery Determinism Validation
-- Forensic Integrity Certification
+Nexus ZTAN is operationally complete.
 
-**The platform is now considered operationally complete.**
-No further architectural roadmap phases shall be created unless triggered by real-world operational necessity.
+The platform has:
 
----
+* completed architectural finality,
+* passed recovery determinism validation,
+* achieved institutional survivability certification,
+* normalized operational language,
+* completed external exposure preparation,
+* and entered Permanent Operational Stewardship.
 
-# PRIMARY DIRECTIVE
-
-The platform must now be treated as production infrastructure, not an active research project.
-
-**Success is measured by:**
-- Operational stability
-- Recovery predictability
-- Operator independence
-- Low support burden
-- Long-duration survivability
-
-**NOT by:**
-- New abstractions
-- New governance layers
-- New telemetry systems
-- New architectural sophistication
+No further roadmap expansion is authorized.
 
 ---
 
-# ALLOWED WORK
+# CURRENT MISSION
 
-## 1. Incident Response
-- Production issue remediation
-- Root-cause analysis
-- Operational recovery
-- Forensic preservation
+Operate the platform as real production infrastructure.
 
-## 2. Security Maintenance
-- CVE remediation
-- Dependency lifecycle updates
-- Runtime compatibility fixes
-- Cryptographic patching
+Focus exclusively on:
 
-## 3. Ecosystem Compatibility
-- Node.js LTS transitions
-- TypeScript compatibility
-- Prisma/BullMQ ecosystem updates
-- CI/CD maintenance
-
-## 4. Documentation Freshness
-- Onboarding clarification
-- Operational runbook updates
-- Friction reduction
-- Stale procedure removal
-
-## 5. Recovery Verification
-- Quarterly OCR drills
-- Annual survivability rehearsals
-- Clean-room rebuild validation
-- Operator independence testing
+* uptime,
+* recovery,
+* maintenance,
+* compatibility,
+* security,
+* and operator independence.
 
 ---
 
-# PROHIBITED WORK
-Unless justified by real operational evidence:
-- No new governance engines.
-- No new telemetry abstractions.
-- No new scoring systems.
-- No new archaeology frameworks.
-- No speculative platformization.
-- No “Phase 43+” expansion.
-- No conceptual operational mythology.
-- No ceremonial infrastructure complexity.
+# AUTHORIZED ACTIVITIES
+
+## Security Maintenance
+
+* patch CVEs,
+* rotate credentials,
+* maintain dependency health,
+* validate cryptographic integrity.
+
+## Ecosystem Compatibility
+
+* Node.js LTS transitions,
+* TypeScript compatibility,
+* Prisma/BullMQ/runtime updates,
+* CI/CD maintenance.
+
+## Operational Verification
+
+* quarterly OCR drills,
+* annual survivability rehearsals,
+* clean-room rebuilds,
+* onboarding validation.
+
+## Documentation Maintenance
+
+* remove stale procedures,
+* simplify onboarding,
+* reduce operator ambiguity,
+* eliminate tribal knowledge.
+
+## Incident Response
+
+* preserve evidence,
+* restore service,
+* perform RCA,
+* improve recovery clarity.
 
 ---
 
-# OPERATIONAL DISCIPLINE
-Every change must answer:
-1. Does this solve a real operational problem?
-2. Was the problem observed in production reality?
-3. Does this reduce operational burden?
-4. Does this improve recovery or survivability?
-5. Can this be understood by an external SRE without founder context?
+# OPERATIONAL RESTRAINT
 
-**If the answer is “no”: the change should not exist.**
+Every proposed change must justify itself using real operational evidence.
+
+The following are prohibited unless triggered by a verified production need:
+
+* new governance frameworks,
+* new telemetry abstractions,
+* new archaeology systems,
+* new scoring mechanisms,
+* speculative platform expansion,
+* ceremonial operational complexity.
 
 ---
 
-# LONG-DURATION SUCCESS METRICS
-The platform is considered healthy if:
-- Recovery drills continue succeeding
-- Onboarding remains independent
-- Incidents remain understandable
-- Documentation remains current
-- Support burden stays low
-- Operators rarely need founder intervention
+# SUCCESS METRICS
 
-**The ideal end-state is operational quietness: the platform becomes boring, predictable, and institutionally invisible.**
+The platform is successful if:
+
+* recovery remains deterministic,
+* onboarding remains independent,
+* incidents remain understandable,
+* support burden stays low,
+* and operators rarely require founder involvement.
+
+The ideal state is operational invisibility:
+the platform becomes boring enough that nobody thinks about it.
 
 ---
 
 # FINAL PRINCIPLE
 
-The strongest infrastructure eventually stops evolving theatrically.
-It survives quietly.
+Infrastructure maturity is achieved when the system stops trying to prove its sophistication.
+
+It simply continues working.

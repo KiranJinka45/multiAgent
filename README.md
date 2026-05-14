@@ -1,30 +1,54 @@
-# ZTAN: Replayable Autonomous Software Operations (v1.1.0-PROD) 🛡️
+# Nexus ZTAN: Governed Autonomous Execution Infrastructure
 
-**Status**: STRATEGICALLY FINALIZED | INSTITUTIONAL SURVIVABILITY | v1.1.0-PROD
-
-Nexus ZTAN is **Replayable Autonomous Software Operations with Enterprise Governance, Bounded Cognition, and Isolated Execution.** It is architected for **Institutional Survivability** through operational discipline, economic rationality, and long-term trust accumulation.
-
-## 1. Final Strategic Posture
-- **Operational Trust**: The primary moat is no longer technical sophistication, but the accumulated trust of deterministic, governable execution over time.
-- **Institutional Finality**: The architecture, governance, and conceptual phases are complete. The platform now succeeds based on its operational reliability in real-world environments.
-- **Existential Constraint**: No new core abstractions are permitted without repeated real-world evidence that existing systems cannot solve the problem.
-- **Operational Boringness**: We prioritize stability, auditability, and predictability over "Visionary" expansion.
-
-## 2. Institutional Framework
-- [**Enterprise Trust Stack**](file:///c:/multiagentic_project/multiAgent-main/docs/governance/ENTERPRISE_TRUST_STACK.md): The technical and governance assets required for institutional adoption.
-- [**Survivability Metrics**](file:///c:/multiagentic_project/multiAgent-main/docs/operations/SURVIVABILITY_METRICS.md): The longitudinal success signals (Replay, Drama, Friction, Economics).
-- [**Stewardship Doctrine**](file:///c:/multiagentic_project/multiAgent-main/docs/STEWARDSHIP_DOCTRINE.md): The long-term maintenance philosophy (Vigilance over Dogma).
-- [**Stability Policy**](file:///c:/multiagentic_project/multiAgent-main/docs/GOVERNANCE_STABILITY_POLICY.md): Rules for restraint, authorship ceilings, and utility audits.
-- [**Failure Registry**](file:///c:/multiagentic_project/multiAgent-main/docs/STEWARDSHIP_FAILURE_REGISTRY.md): Catalog of sociological decay patterns and indifferent adoption failures.
-- [**Incident Playbooks**](file:///c:/multiagentic_project/multiAgent-main/docs/operations/INCIDENT_PLAYBOOKS.md): Procedures for handling cognitive drift and operational failures.
-
-## 3. Maintenance Rhythms
-- **Authorship Audit**: 180 Days (Enforcing the 30% Ceiling against priesthood formation).
-- **Simplification Review**: 365 Days (Disciplined subtraction without Dogma).
-- **Utility Audit**: 3 Years (Preventing "Zombie Survival").
-- **Decommissioning Drill**: 2 Years (Verifying graceful sunset).
+> **STATUS**: **OPERATIONALLY COMPLETE** 🛡️
+>
+> Nexus ZTAN has completed architectural finality, passed recovery validation, and entered Permanent Operational Stewardship.
 
 ---
 
-**Certified**: ZTAN Stewardship Board (Terminal Release) 🛡️
-**Verdict**: Technically stable and governance-aware. Long-horizon survivability depends on future incentives, stewardship quality, and continued strategic relevance.
+## 🏛️ Permanent Operations Mode
+
+**CURRENT MISSION**: Operate the platform as real production infrastructure. Focus exclusively on uptime, recovery, maintenance, compatibility, security, and operator independence.
+
+### Authorized Activities
+- **Security Maintenance**: Patch CVEs, rotate credentials, maintain dependency health.
+- **Ecosystem Compatibility**: Node.js LTS transitions, TypeScript compatibility, runtime updates.
+- **Operational Verification**: Quarterly OCR drills, annual survivability rehearsals.
+- **Documentation Maintenance**: Remove stale procedures, simplify onboarding.
+- **Incident Response**: Preserve evidence, restore service, perform RCA.
+
+### Operational Restraint
+Every proposed change must justify itself using real operational evidence. The following are prohibited unless triggered by a verified production need:
+- No new governance frameworks or telemetry abstractions.
+- No new archaeology systems or scoring mechanisms.
+- No speculative platform expansion or ceremonial complexity.
+
+**Success Condition**: The platform becomes boring enough that nobody thinks about it.
+
+---
+
+## 🚀 Getting Started
+
+Nexus ZTAN is designed for institutional operators and enterprise developers.
+
+- **For Operators**: See the [Operator Training Playbook](file:///c:/multiagentic_project/multiAgent-main/GETTING_STARTED_OPERATORS.md) and [Maintenance Runbook](file:///c:/multiagentic_project/multiAgent-main/RUNBOOK.md).
+- **For Developers**: Explore the [ZTAN SDK](file:///c:/multiagentic_project/multiAgent-main/packages/sdk/README.md) and [API Reference](file:///c:/multiagentic_project/multiAgent-main/docs/API.md).
+- **For Auditors**: Review the [Finality Declaration](file:///c:/multiagentic_project/multiAgent-main/FINALITY_DECLARATION.md) and [Constitutional Freeze](file:///c:/multiagentic_project/multiAgent-main/CONSTITUTION_FREEZE.md).
+
+## 🛠️ One-Command Recovery (OCR)
+
+To restore the platform from a clean state (New Machine/Disaster Recovery):
+
+1.  **Prerequisites**: Install `docker`, `pnpm`, and `node` (v20+).
+2.  **Clone**: `git clone <repo-url>`
+3.  **Restore**: `npx tsx scripts/one-command-recovery.ts`
+
+This script automates environment bootstrapping, infrastructure orchestration, database migrations, and runtime smoke tests.
+
+
+## 🛡️ Governance & Stability
+
+ZTAN is protected by the **Stability Charter** and the **Stewardship Registry**. No architectural mutations are permitted without formal witness ratification and TLA+ proof validation.
+
+---
+**Governed by Nexus ZTAN Sovereignty.**
