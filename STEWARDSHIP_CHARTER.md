@@ -1,28 +1,112 @@
-# ZTAN Stewardship & Custodial Charter (Phase ∞)
+# Nexus ZTAN — Permanent Operational Stewardship Charter
 
-Objective: This charter formalizes the transition from an active development project into a permanent constitutional archive. It defines the duties of the Institutional Custodian to ensure the long-term interpretability, legitimacy, and survivability of the ZTAN protocol.
+## STATUS
 
-## 1. Prohibited Mutations
-The following actions are strictly prohibited to ensure constitutional stability and prevent jurisprudential drift:
-- **Topology Expansion**: No new states or transition edges shall be added to the State Matrix.
-- **Glossary Mutation**: The core semantic definitions in the Sovereign Glossary are immutable.
-- **Fallback Introduction**: No implicit or undocumented fallback behaviors shall be introduced.
-- **Sovereignty Delegation**: Institutional legitimacy shall never be delegated to non-deterministic or interpretive external systems (e.g., AI models).
+Nexus ZTAN has completed:
+- Architecture Finality
+- Operational Validation
+- Institutional Survivability Certification
+- External Exposure Preparation
+- Recovery Determinism Validation
+- Forensic Integrity Certification
 
-## 2. Custodial Duties
-The Institutional Custodian SHALL perform the following recurring duties:
-- **Archival Integrity Audits**: Monthly verification of lineage continuity and archival bit-rot absence.
-- **Proof Maintenance**: Regeneration and verification of formal TLA+ proofs against current lineage.
-- **Interpreter Succession**: Certification of new, heterogeneous interpreters against the Rosetta Stone corpus.
-- **Cold Resurrection Drills**: Annual "Cold Reconstruction" exercises to prove institutional resurrection remains possible from archives alone.
+**The platform is now considered operationally complete.**
+No further architectural roadmap phases shall be created unless triggered by real-world operational necessity.
 
-## 3. Institutional Continuity
-- **Interpreter Parity**: No institutional action is valid unless it produces identical legality outcomes across all certified interpreters.
-- **Archival Hardening**: Custodians must assume the future obsolescence of GitHub, Node.js, and current cryptographic standards. Maintenance of the **Minimal Survival Package** is a primary mandate.
+---
 
-## 4. Conditions for Hibernation & Extinction
-- **Hibernation**: Triggered by unresolved epistemic conflict between auditors.
-- **Extinction**: Finalized upon the loss of the ability to prove the unique entropy of Genesis or the corruption of the lineage Merkle chain.
+# PRIMARY DIRECTIVE
 
-> **Mandate**: Stewardship over Innovation. Preservation over Capability.
-> **Ratified**: 2026-05-09
+The platform must now be treated as production infrastructure, not an active research project.
+
+**Success is measured by:**
+- Operational stability
+- Recovery predictability
+- Operator independence
+- Low support burden
+- Long-duration survivability
+
+**NOT by:**
+- New abstractions
+- New governance layers
+- New telemetry systems
+- New architectural sophistication
+
+---
+
+# ALLOWED WORK
+
+## 1. Incident Response
+- Production issue remediation
+- Root-cause analysis
+- Operational recovery
+- Forensic preservation
+
+## 2. Security Maintenance
+- CVE remediation
+- Dependency lifecycle updates
+- Runtime compatibility fixes
+- Cryptographic patching
+
+## 3. Ecosystem Compatibility
+- Node.js LTS transitions
+- TypeScript compatibility
+- Prisma/BullMQ ecosystem updates
+- CI/CD maintenance
+
+## 4. Documentation Freshness
+- Onboarding clarification
+- Operational runbook updates
+- Friction reduction
+- Stale procedure removal
+
+## 5. Recovery Verification
+- Quarterly OCR drills
+- Annual survivability rehearsals
+- Clean-room rebuild validation
+- Operator independence testing
+
+---
+
+# PROHIBITED WORK
+Unless justified by real operational evidence:
+- No new governance engines.
+- No new telemetry abstractions.
+- No new scoring systems.
+- No new archaeology frameworks.
+- No speculative platformization.
+- No “Phase 43+” expansion.
+- No conceptual operational mythology.
+- No ceremonial infrastructure complexity.
+
+---
+
+# OPERATIONAL DISCIPLINE
+Every change must answer:
+1. Does this solve a real operational problem?
+2. Was the problem observed in production reality?
+3. Does this reduce operational burden?
+4. Does this improve recovery or survivability?
+5. Can this be understood by an external SRE without founder context?
+
+**If the answer is “no”: the change should not exist.**
+
+---
+
+# LONG-DURATION SUCCESS METRICS
+The platform is considered healthy if:
+- Recovery drills continue succeeding
+- Onboarding remains independent
+- Incidents remain understandable
+- Documentation remains current
+- Support burden stays low
+- Operators rarely need founder intervention
+
+**The ideal end-state is operational quietness: the platform becomes boring, predictable, and institutionally invisible.**
+
+---
+
+# FINAL PRINCIPLE
+
+The strongest infrastructure eventually stops evolving theatrically.
+It survives quietly.

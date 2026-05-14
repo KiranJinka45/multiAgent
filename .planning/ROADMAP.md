@@ -33,10 +33,18 @@ The platform prioritizes longitudinal operational resilience and ecosystem survi
 
 | Phase | Description | Status |
 | :--- | :--- | :--- |
-| **35** | **Infrastructure Reliability Stewardship** | **Complete** |
-| **40** | **External Production Validation** | **Complete** |
-| **41** | **Real-World Operational Exposure** | **Complete** |
-| **42** | **Institutional Survivability Certification** | **Complete** |
+| **35-42** | **Operational Maturity & Certification** | **Complete** |
+| **FUTURE** | **Permanent Operational Stewardship** | **Active** |
+
+### Permanent Stewardship Era
+The platform is now in Permanent Operational Stewardship. No further phases are planned. All work is restricted to:
+1. Incident Response
+2. Security Maintenance
+3. Ecosystem Compatibility
+4. Documentation Freshness
+5. Recovery Verification
+
+Refer to [STEWARDSHIP_CHARTER.md](../STEWARDSHIP_CHARTER.md) for the primary directive.
 
 ### Phase 41: Real-World Operational Exposure
 **Goal:** Validate the platform against reality through external operator trials and real deployment telemetry.

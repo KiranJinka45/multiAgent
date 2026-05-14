@@ -41,23 +41,19 @@ Nexus ZTAN is an auditable production platform designed for long-term operationa
 - ✓ **Live Stewardship** — Durable operational reality achieved over 90-day window. (Phase 34)
 - ✓ **Operational Calmness** — Platform normalized and architecture frozen. (Phase 39)
 - ✓ **External Validation** — Independent operator verification and real usage. (Phase 40)
-- [ ] **Real-World Operational Exposure** — Validating platform against reality. (Phase 41)
+- ✓ **Real-World Operational Exposure** — Validating platform against reality. (Phase 41)
+- ✓ **Institutional Survivability** — Certification of platform readiness. (Phase 42)
 
-### Active
+### Status: Operationally Complete
 
-<!-- Current scope: MILESTONE 35 — MAINTENANCE ERA & REAL PRODUCTION STEWARDSHIP -->
-
-- [ ] **Long-Term Production Stewardship** — Enforcing operational consistency and reproducible onboarding.
-- [ ] **Real Incident & Failure Governance** — Treating failures as permanent operational learning records.
-- [ ] **Infrastructure Sustainability** — Validating dependency aging, portability, and backup recoverability.
-- [ ] **Simplicity Preservation** — Actively removing telemetry noise and unnecessary abstractions.
-- [ ] **External Reproducibility & Auditability** — Maintaining legally defensible lineage integrity.
+The platform has achieved its final architectural and operational baseline. All future work is governed by the [STEWARDSHIP_CHARTER.md](../STEWARDSHIP_CHARTER.md).
 
 ### Governing Principle
-The platform is successful when it rarely surprises operators, maintenance remains predictable, and recovery is deterministic. The goal is operational longevity through simplicity.
+The platform is successful when it rarely surprises operators, maintenance remains predictable, and recovery is deterministic. Success is **Operational Quietness**.
 
-> [!CAUTION]
-> NO NEW ARCHITECTURAL LAYERS. NO ROADMAP INFLATION. NO INSTITUTIONAL MYTHOLOGY. SUCCESS IS SURVIVABILITY.
+> [!IMPORTANT]
+> **PERMANENT STEWARDSHIP ACTIVE.** 
+> All work must now strictly adhere to the [Permanent Operational Stewardship Charter](../STEWARDSHIP_CHARTER.md).
 
 ### Out of Scope
 
