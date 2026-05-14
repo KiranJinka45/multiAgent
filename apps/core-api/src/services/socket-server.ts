@@ -1,11 +1,11 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import { redis, registry } from '@packages/utils';
-import { logger } from '@packages/observability';
+import { redis } from '@packages/utils';
+import { logger, registry, initTelemetry } from '@packages/observability';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import { initTelemetry } from '@packages/observability';
+
 
 dotenv.config({ path: '.env.local' });
 
@@ -14,6 +14,7 @@ initTelemetry('multiagent-core-api');
 const INTERNAL_KEY = process.env.INTERNAL_KEY || 'local-secret-key';
 
 const app = express();
+app.disable('x-powered-by');
 app.use(cors());
 
 // --- INTERNAL SECURITY ---

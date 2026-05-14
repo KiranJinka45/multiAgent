@@ -2,10 +2,14 @@ import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { logger } from '@packages/observability';
 
-const SERVICE_SECRET = process.env.SERVICE_SECRET;
-if (!SERVICE_SECRET && process.env.NODE_ENV === 'production') {
+import { randomBytes } from 'node:crypto';
+
+const RAW_SECRET = process.env.SERVICE_SECRET;
+if (!RAW_SECRET && process.env.NODE_ENV === 'production') {
   throw new Error('FATAL: SERVICE_SECRET is not defined in production environment.');
 }
+// Generate a transient, secure random fallback if not provided in dev
+const SERVICE_SECRET = RAW_SECRET || randomBytes(32).toString('hex');
 
 /**
  * Sign a short-lived token for service-to-service communication

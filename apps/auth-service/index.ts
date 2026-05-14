@@ -6,6 +6,7 @@ import cors from 'cors';
 dotenv.config();
 
 const app = express();
+app.disable('x-powered-by');
 const PORT = process.env.PORT || 4002;
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET && process.env.NODE_ENV === 'production') {
