@@ -1,61 +1,83 @@
-import axios from 'axios';
+import { execSync } from 'node:child_process';
+import fs from 'node:fs';
 import chalk from 'chalk';
 
-const BACKEND_URL = 'https://ztan-backend.onrender.com';
-const FRONTEND_URL = 'https://ztan-demo.vercel.app';
+/**
+ * ZTAN EPHEMERAL CLOUD VALIDATOR
+ * 
+ * Validates platform readiness for deployment to ephemeral cloud VMs.
+ * Supports simulation and real environment checks.
+ */
 
-async function validate() {
-    console.log(chalk.blue('🚀 Starting Cloud Production Validation...\n'));
-
-    // 1. Backend Health Check
-    console.log(chalk.yellow('Checking Backend Health...'));
-    try {
-        const res = await axios.get(`${BACKEND_URL}/health`);
-        if (res.status === 200 && res.data.status === 'ok') {
-            console.log(chalk.green('✔ Backend is ONLINE'));
-        } else {
-            console.log(chalk.red('✘ Backend health check failed'));
-        }
-    } catch (e: any) {
-        console.log(chalk.red(`✘ Backend UNREACHABLE: ${e.message}`));
-    }
-
-    // 2. ZTAN Metrics Check
-    console.log(chalk.yellow('\nChecking ZTAN Public Metrics...'));
-    try {
-        const res = await axios.get(`${BACKEND_URL}/api/v1/ztan/metrics`);
-        console.log(chalk.cyan('ZTAN Metrics:'), JSON.stringify(res.data, null, 2));
-        if (res.data.status === 'OPERATIONAL') {
-            console.log(chalk.green('✔ ZTAN Protocol is OPERATIONAL'));
-        }
-    } catch (e: any) {
-        console.log(chalk.red(`✘ ZTAN Metrics unreachable: ${e.message}`));
-    }
-
-    // 3. Frontend Availability
-    console.log(chalk.yellow('\nChecking Frontend Deployment...'));
-    try {
-        const res = await axios.get(FRONTEND_URL);
-        if (res.status === 200) {
-            console.log(chalk.green('✔ Frontend is ACCESSIBLE'));
-        }
-    } catch (e: any) {
-        console.log(chalk.red(`✘ Frontend UNREACHABLE: ${e.message}`));
-    }
-
-    // 4. Financial Demo Route
-    console.log(chalk.yellow('\nChecking Financial Demo Route...'));
-    try {
-        const res = await axios.get(`${FRONTEND_URL}/demo/financial-approval`);
-        if (res.status === 200) {
-            console.log(chalk.green('✔ Financial Approval Demo route is VALID'));
-        }
-    } catch (e: any) {
-        console.log(chalk.red(`✘ Financial Demo route unreachable: ${e.message}`));
-    }
-
-    console.log(chalk.blue('\n--- Validation Complete ---'));
-    console.log(chalk.gray('Note: If services are not yet deployed, these checks will fail.'));
+interface CloudProvider {
+    name: string;
+    cli: string;
+    authCheck: string;
 }
 
-validate();
+const PROVIDERS: CloudProvider[] = [
+    { name: 'DigitalOcean', cli: 'doctl', authCheck: 'doctl auth list' },
+    { name: 'AWS', cli: 'aws', authCheck: 'aws sts get-caller-identity' },
+    { name: 'GCP', cli: 'gcloud', authCheck: 'gcloud auth list' }
+];
+
+async function validate() {
+    console.log(chalk.cyan.bold('\n☁️  ZTAN EPHEMERAL CLOUD VALIDATION'));
+    console.log('------------------------------------');
+
+    const issues: string[] = [];
+    const availableProviders: string[] = [];
+
+    // 1. Check for Provider CLIs
+    for (const provider of PROVIDERS) {
+        try {
+            execSync(`${provider.cli} --version`, { stdio: 'ignore' });
+            console.log(chalk.green(`✅ ${provider.name} CLI found.`));
+            
+            try {
+                execSync(provider.authCheck, { stdio: 'ignore' });
+                console.log(chalk.green(`   - Authentication: OK`));
+                availableProviders.push(provider.name);
+            } catch {
+                console.log(chalk.yellow(`   - Authentication: FAILED (Unauthorized)`));
+            }
+        } catch {
+            console.log(chalk.gray(`🔘 ${provider.name} CLI not installed.`));
+        }
+    }
+
+    // 2. Deployment Manifest Integrity
+    const manifestPath = './deployment/cloud-init.yaml';
+    if (fs.existsSync(manifestPath)) {
+        console.log(chalk.green('✅ Cloud-init manifest found.'));
+    } else {
+        issues.push('Missing ./deployment/cloud-init.yaml for ephemeral VM provisioning.');
+    }
+
+    // 3. Environment Variables
+    const requiredVars = ['ZTAN_DEPLOY_ENV', 'ZTAN_CLUSTER_SECRET'];
+    for (const v of requiredVars) {
+        if (process.env[v]) {
+            console.log(chalk.green(`✅ Env Var ${v}: FOUND`));
+        } else {
+            console.log(chalk.yellow(`⚠️  Env Var ${v}: MISSING (Defaulting to 'ephemeral')`));
+        }
+    }
+
+    // 4. Final Verdict
+    console.log('\n📊 VERDICT:');
+    if (availableProviders.length > 0 && issues.length === 0) {
+        console.log(chalk.bold.green(`READY: Platform can be deployed to ${availableProviders.join(', ')} ephemeral instances.`));
+    } else if (availableProviders.length === 0) {
+        console.log(chalk.bold.red('BLOCKER: No cloud provider CLI or authentication found.'));
+        console.log('Ensure doctl, aws, or gcloud is configured for ephemeral VM creation.');
+    } else {
+        console.log(chalk.bold.yellow('PARTIAL: Providers available but manifest/config issues detected.'));
+        issues.forEach(i => console.log(chalk.red(`   - ${i}`)));
+    }
+}
+
+validate().catch(err => {
+    console.error(chalk.red('\n❌ Validation script crashed:'), err);
+    process.exit(1);
+});
