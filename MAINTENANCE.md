@@ -30,26 +30,36 @@ Use the automation script to schedule these tasks in your environment:
 ./scripts/schedule-drills.ps1
 ```
 
-## 3. Incident Response Protocol
+## 3. Operational Rituals & Tooling
 
-1.  **Detection**: All alerts are routed to the `Stability Index` dashboard.
-2.  **Isolation**: Use `ztanctl isolate <node-id>` to prevent contagion.
-3.  **Analysis**: Use `ztanctl audit-log <mission-id>` to identify the root cause.
-4.  **Recovery**: Follow the guided workflow in `ztanctl recover`.
-5.  **Forensics**: After every incident, a post-mortem must be added to `docs/incidents/` and any documentation friction points must be remediated.
+### 3.1 Forensic Evidence Preservation
+After any production incident or security breach, operators must trigger the evidence preservation script to ensure undeniable auditing:
+```bash
+bash scripts/preserve-incident.sh <path-to-logs>
+```
+To verify the integrity of an evidence bundle:
+```bash
+pnpm tsx scripts/verify-bundle.ts <bundle-directory>
+```
 
----
+### 3.2 Adversarial Survivability
+To validate platform determinism under resource pressure (CPU/IO), run the simulation script during monthly recovery drills:
+```bash
+bash scripts/simulate-adversity.sh <duration-in-seconds>
+```
+Log all recovery times in `docs/stewardship/RECOVERY_LOG.md` to monitor timing variance.
 
-## 4. Operator Certification
+## 4. Incident Response Protocol
 
-External operators must be "Certified" every 12 months.
-*   **Certification Process**: Successful completion of a supervised `Cold-Start Recovery` drill.
-*   **Audit Readiness**: The environment must pass `scripts/clean-room-audit.ts` with 100% compliance.
-
----
+1.  **Isolation**: Use `ztanctl isolate <node-id>` to prevent contagion.
+2.  **Forensics**: Run `scripts/preserve-incident.sh`.
+3.  **Analysis**: Review `docs/friction/` for operator cognitive burden points.
+4.  **Recovery**: Execute deterministic OCR workflow.
+5.  **Audit**: Update `SRE_HANDBOOK.md` with new failure modes.
 
 ## 5. Security & Build Integrity
 
+*   **Permanent Charter**: All maintenance must adhere to the [STEWARDSHIP_CHARTER.md](./STEWARDSHIP_CHARTER.md).
 *   **Snyk Security Scanning**: Mandatory `snyk_code_scan` for every production patch.
 *   **Build Determinism**: Any change that breaks `tsc -b --force` is a critical failure.
 *   **Node.js Baseline**: Min Version v20.x (LTS).

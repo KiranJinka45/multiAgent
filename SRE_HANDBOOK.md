@@ -30,7 +30,7 @@ This protects against cases where the system acts on a "Systemic Monitoring Fail
 
 ## 🛡️ Real Incident Governance
 
-In Phase 41 (Operational Exposure), all production incidents must be treated as forensic opportunities.
+The platform has been formally certified for **Institutional Survivability (Phase 42)**. All production incidents must be treated as forensic opportunities with cryptographically signed evidence.
 
 ### 1. Evidence Preservation
 Immediately upon detection of a critical divergence, the operator must execute the preservation script:
@@ -43,9 +43,10 @@ This script bundles logs, state snapshots, and friction reports into a cryptogra
 - **Friction Audit**: Every incident must be cross-referenced with `ztanctl friction` logs from the same period.
 - **Burden Analysis**: If the incident was caused by operator confusion, the offending dashboard or command MUST be prioritized for removal or simplification.
 
-**Operational Status**: Transitioning to **Phase 41: Real-World Operational Exposure**. All architectural expansion is frozen. Success is now measured by operator independence and evidence-backed survivability.
+**Operational Status**: **Permanent Operational Stewardship**. The platform is operationally complete. All architectural expansion is prohibited. Success is measured by **Operational Quietness**, operator independence, and evidence-backed survivability.
 
 ---
 *Created by Antigravity Stewardship Agent*
-*Date: 2026-05-13*
+*Date: 2026-05-14*
+*Governing Document: [STEWARDSHIP_CHARTER.md](./STEWARDSHIP_CHARTER.md)*
 
