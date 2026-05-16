@@ -11,7 +11,7 @@ Measure operator hesitation, replay confusion frequency, onboarding friction, wo
 
 ## 3. Onboarding & Usability Metrics
 - **Mean Time to Onboard (MTTO)**: ~2 Hours (Junior SREs).
-- **Onboarding Success Rate**: 100% (Independent execution of routine drills).
+- **Onboarding Success Rate**: High (Consistently Observed during routine drills).
 
 ## 4. Workflow Inefficiencies
 - **Identified Latency**: Multi-hop auth verification for routine maintenance.

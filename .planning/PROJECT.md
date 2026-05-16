@@ -14,7 +14,7 @@ Nexus ZTAN is an auditable production platform designed for long-term operationa
 ### Validated
 
 - ✓ **Distributed Consensus** — Raft-based linearizability across regions. (Phases 1-5)
-- ✓ **Institutional Stewardship** — Operational baseline and telemetry established. (Phases 6-7)
+- ✓ **Operational Stewardship** — Operational baseline and telemetry established. (Phases 6-7)
 - ✓ **Enterprise Validation** — Audited, low-blast-radius production pilots. (Phase 8)
 - ✓ **Market Validation** — Economic sustainability and governance efficiency certified. (Phase 9)
 - ✓ **Institutional Handoff** — Mature, operator-led institutional system. (Phase 10)
@@ -51,9 +51,8 @@ The platform has achieved its final architectural and operational baseline. All 
 ### Governing Principle
 The platform is successful when it rarely surprises operators, maintenance remains predictable, and recovery is deterministic. Success is **Operational Quietness**.
 
-> [!IMPORTANT]
-> **PERMANENT STEWARDSHIP ACTIVE.** 
-> All work must now strictly adhere to the [Permanent Operational Stewardship Charter](../STEWARDSHIP_CHARTER.md).
+> **LONG-TERM STEWARDSHIP ACTIVE.** 
+> All work must now strictly adhere to the [Long-Term Operational Stewardship Charter](../STEWARDSHIP_CHARTER.md).
 
 ### Out of Scope
 
@@ -63,20 +62,20 @@ The platform is successful when it rarely surprises operators, maintenance remai
 - **New Cognition Engines** — Prevents reintroduction of instability.
 
 ## Context
-The platform has reached **Core Architectural Finality**. The focus has shifted from technical invention to operational stewardship. Success is now defined by the measurable history of reliable operation and stable infrastructure. ZTAN is a stable production platform for the long-term execution of governed missions.
+The platform has reached **Core Architectural Stability**. The focus has shifted from technical invention to operational stewardship. Success is now defined by the measurable history of reliable operation and stable infrastructure. ZTAN is a stable production platform for the long-term execution of governed missions.
 
 ## Constraints
 
 - **Strategic**: NO ARCHITECTURAL EXPANSION. Only operational stewardship.
-- **Safety**: 99.9% replay determinism and mission convergence.
-- **Audit**: 100% forensic non-repudiability across decadal timelines.
+- **Safety**: High-confidence replay determinism and mission convergence.
+- **Audit**: High-confidence forensic non-repudiability across decadal timelines.
 - **Tech Stack**: Frozen monorepo architecture with stable, versioned APIs.
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Core Architectural Finality | Ensure long-term stability and prevent complexity drift. | ✓ Finalized |
+| Core Architectural Stability | Ensure long-term stability and prevent complexity drift. | ✓ Finalized |
 | Operational Stewardship | Prioritize reliability, adoption, and supportability. | ✓ Active |
 | Primitive Freeze | Stabilize foundational building blocks for the ecosystem. | ✓ Effective |
 

@@ -36,10 +36,8 @@ The platform prioritizes longitudinal operational resilience and ecosystem survi
 | **35-42** | **Operational Maturity & Certification** | **Complete** |
 | **43** | **Real-Time Institutional Validation & Production Reality Audit** | **Complete** |
 | **44** | **Continuous Operational Reality Testing & Failure Hardening** | **Complete** |
-| **STEWARD** | **Permanent Operational Stewardship & Discipline** | **Active** |
-
-### Permanent Stewardship Era
-The platform is now in Permanent Operational Stewardship. No further phases are planned. All work is restricted to:
+### Long-Term Stewardship Era
+The platform is now in Long-Term Operational Stewardship. No further phases are planned. All work is restricted to:
 1. Incident Response
 2. Security Maintenance
 3. Ecosystem Compatibility
@@ -53,12 +51,12 @@ Refer to [STEWARDSHIP_CHARTER.md](../STEWARDSHIP_CHARTER.md) for the primary dir
 **Status**: Complete (2026-05-14)
 **Evidence**: `trials/REGISTRY.md`, `scripts/process-friction.ts`, archived subsystems.
 
-### Phase 42: Institutional Survivability Certification
-**Goal:** Formally certify the platform for institutional use through high-stakes adversarial drills and independent auditing.
+### Phase 42: Operational Survivability Observation
+**Goal:** Formally observe the platform's survivability through high-stakes adversarial drills and independent auditing.
 **Status**: Complete (2026-05-14)
 **Evidence**: `INSTITUTIONAL_CERTIFICATION_REPORT.md`, `scripts/verify-bundle.ts`, `scripts/simulate-adversity.sh`.
 
-### Phase 43: Real-Time Institutional Validation & Production Reality Audit
+### Phase 43: Real-Time Operational Validation & Production Reality Audit
 **Goal:** Perform a REAL end-to-end operational validation of the entire Nexus ZTAN platform against live infrastructure and workflows.
 **Status**: Complete (2026-05-15)
 **Evidence**: `VALIDATION_REPORT.md`, `DASHBOARD.html`, `archive/recovery_replays/`.
@@ -68,7 +66,7 @@ Refer to [STEWARDSHIP_CHARTER.md](../STEWARDSHIP_CHARTER.md) for the primary dir
 **Status**: Complete (2026-05-15)
 **Evidence**: `FAILURE_HARDENING_REPORT.md`, `DASHBOARD.html`, `scripts/continuous-validation-engine.ts`.
 
-### Permanent Operational Stewardship & Discipline
+### Long-Term Operational Stewardship & Discipline
 **Goal:** Maintain ZTAN as a continuously validated, trustworthy infrastructure system through disciplined stewardship, simplification, and long-term reliability engineering.
 **Status**: Active (2026-05-16)
 **Evidence**: `STEWARDSHIP_CHARTER.md`, continuous reliability reports, and operational calmness metrics.

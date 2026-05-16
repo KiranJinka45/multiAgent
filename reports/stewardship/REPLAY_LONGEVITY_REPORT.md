@@ -4,7 +4,7 @@
 Validate timeline readability, causality preservation, rollback explainability, reconstruction durability, and long-history navigation usability.
 
 ## 2. Timeline Readability & Determinism
-- **Replay Ledger Integrity**: Verified (100% hash consistency).
+- **Replay Ledger Integrity**: Consistent hash integrity observed.
 - **Long-History Performance**: Sub-second navigation for history spanning 180+ days.
 
 ## 3. Causality Preservation
@@ -17,4 +17,4 @@ Rollback logic remains deterministic. Operators can explain *why* a rollback occ
 
 ## 5. Reconstruction Durability
 Replay evidence survives environment migrations and infrastructure restarts. 
-- **Durability Status**: Verified (Independent of live substrate state).
+- **Durability Status**: High Confidence (Observed across independent substrate states).
