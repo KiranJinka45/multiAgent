@@ -9,6 +9,8 @@ export interface VirtualFile {
     lastModified?: string;
 }
 
+export type Snapshot = [string, VirtualFile][];
+
 export class VirtualFileSystem {
     private tree: Map<string, VirtualFile> = new Map();
     

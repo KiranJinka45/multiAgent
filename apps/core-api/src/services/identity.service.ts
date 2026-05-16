@@ -34,7 +34,7 @@ export class IdentityService {
 
   /**
    * Revoke an identity (Critical for audit compliance).
-   * Prevents node from participating in any future ceremonies.
+   * Prevents node from participating in any future Signing Sessions.
    */
   public static async revoke(nodeId: string): Promise<void> {
     try {

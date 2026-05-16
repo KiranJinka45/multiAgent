@@ -67,7 +67,7 @@ export class PricingTableComponent {
         'Unlimited Missions',
         'Dedicated Worker Pool',
         'Custom ROI Reports',
-        'Advanced Governance / Audit',
+        'Advanced Operational Control / Audit',
         'Priority SLA Support'
       ],
       cta: 'Contact Sales',

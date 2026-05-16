@@ -54,7 +54,7 @@ jobs:
     
     strategy:
       matrix:
-        service: [auth-service, gateway, worker, api, core-api, billing-service]
+        service: [auth-service, billing-service, control-plane, core-api, frontend, gateway, operational-protocol, reliability-dashboard, worker]
 
     steps:
       - name: Checkout Code

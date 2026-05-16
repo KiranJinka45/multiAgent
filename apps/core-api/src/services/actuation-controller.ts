@@ -1,7 +1,7 @@
 import { logger } from '@packages/observability';
 import { sloManager } from './slo-manager';
-import { ProgressiveCanary } from './governance/progressive-canary';
-import { globalSafetyGuard, SafetyContext } from './governance/safety-guard';
+import { ProgressiveCanary } from './operational-control/progressive-canary';
+import { globalSafetyGuard, SafetyContext } from './operational-control/safety-guard';
 import { kubernetesActuator } from './kubernetes-actuator';
 
 export interface ActuationTask {
@@ -17,7 +17,7 @@ export interface SreAction {
     type: string;
     target: string;
     confidence: number;
-    systemTrust: 'LOW' | 'MEDIUM' | 'HIGH';
+    systemReliability: 'LOW' | 'MEDIUM' | 'HIGH';
     replicas?: number;
 }
 

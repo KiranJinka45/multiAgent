@@ -1,7 +1,9 @@
 import { eventBus } from '@packages/events';
 import { db } from '@packages/db';
 import { logger } from '@packages/observability';
+import { contextStorage, AuditLogger } from '@packages/utils';
 import * as os from 'os';
+import crypto from 'crypto';
 
 /**
  * MISSION RECORDER
@@ -37,7 +39,6 @@ async function startRecorderForShard(streamKey: string) {
 
         // Subscribe using the consumer group
         eventBus.subscribeGroup(streamKey, groupName, consumerName, async (event: any, id: string, deliveryCount: number) => {
-            const { contextStorage } = require('@packages/utils');
             const { executionId, type, message, stage, status, totalProgress, timestamp, agent } = event;
             const tenantId = (event as any).tenantId || (event.payload as any)?.tenantId || 'platform-admin';
 
@@ -76,7 +77,7 @@ async function startRecorderForShard(streamKey: string) {
                     // 2. Generate an integrity hash (Tamper Detection)
                     // Chaining: hash = sha256(executionId | stage | status | message | eventId | prevHash)
                     const hashData = `${executionId}|${stage || type}|${status || 'info'}|${message || ''}|${id}|${prevHash}`;
-                    const hash = require('crypto').createHash('sha256').update(hashData).digest('hex');
+                    const hash = crypto.createHash('sha256').update(hashData).digest('hex');
 
                     // 3. Strong Consistency: Write to DB (ExecutionLog)
                     await db.executionLog.create({
@@ -94,7 +95,6 @@ async function startRecorderForShard(streamKey: string) {
                     });
 
                     // 4. Record to Global Audit Ledger (System-wide Chain)
-                    const { AuditLogger } = require('@packages/utils');
                     await AuditLogger.log({
                         action: 'MISSION_EVENT_RECORDED',
                         resource: `mission:${executionId}`,

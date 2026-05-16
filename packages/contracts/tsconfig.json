@@ -3,14 +3,12 @@
   "compilerOptions": {
     "baseUrl": ".",
     "ignoreDeprecations": "5.0",
-    "paths": {
-      "@packages/*": ["../../packages/*/dist/index.d.ts"],
-      "@/*": ["./src/*"]
-    },
     "outDir": "dist",
-    "composite": false,
+    "composite": true,
     "declaration": true,
-    "noEmit": false
+    "noEmit": false,
+    "incremental": true,
+    "rootDir": "src"
   },
   "include": [
     "src"

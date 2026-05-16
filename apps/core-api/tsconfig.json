@@ -2,21 +2,47 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "ignoreDeprecations": "6.0",
+    "ignoreDeprecations": "5.0",
     "outDir": "dist",
-    "composite": false,
+    "composite": true,
     "declaration": true,
     "declarationMap": true,
     "noEmit": false,
     "skipLibCheck": true,
-    
-    
-    
-    
     "paths": {
-      "@packages/*": ["../../packages/*/dist/index.d.ts"],
-      "@/*": ["./src/*"]
-    }
+      "@packages/auth-internal": [
+        "../../packages/auth-internal/src"
+      ],
+      "@packages/business": [
+        "../../packages/business/src"
+      ],
+      "@packages/db": [
+        "../../packages/db/src"
+      ],
+      "@packages/memory": [
+        "../../packages/memory/src"
+      ],
+      "@packages/observability": [
+        "../../packages/observability/src"
+      ],
+      "@packages/shared-services": [
+        "../../packages/shared-services/src"
+      ],
+      "@packages/supabase": [
+        "../../packages/supabase/src"
+      ],
+      "@packages/utils": [
+        "../../packages/utils/src"
+      ],
+      "@packages/ztan-crypto": [
+        "../../packages/ztan-crypto/src"
+      ],
+      "@packages/contracts": [
+        "../../packages/contracts/src"
+      ]
+    },
+    "incremental": true,
+    "rootDir": "src"
   },
   "include": [
     "src/**/*"
@@ -24,6 +50,22 @@
   "exclude": [
     "node_modules",
     "dist"
+  ],
+  "references": [
+    {
+      "path": "../../packages/auth-internal"
+    },
+    {
+      "path": "../../packages/db"
+    },
+    {
+      "path": "../../packages/observability"
+    },
+    {
+      "path": "../../packages/utils"
+    },
+    {
+      "path": "../../packages/contracts"
+    }
   ]
-  
 }

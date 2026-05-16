@@ -1,6 +1,6 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { WebsocketService } from './websocket.service';
-import { SREUpdate, SRETuningParams } from '@packages/contracts';
+import { SREUpdate, SRETuningParams } from '@packages/frontend-shared';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +14,7 @@ export class SreDataService {
   // Derived Signals for Components
   public intent = computed(() => this.state()?.intent);
   public perception = computed(() => this.state()?.perception);
-  public governance = computed(() => this.state()?.governance);
+  public operationalControl = computed(() => this.state()?.operationalControl);
   public observers = computed(() => this.state()?.observers || []);
   public events = computed(() => this.state()?.events || []);
   public lastAction = computed(() => this.state()?.lastAction);
@@ -23,7 +23,7 @@ export class SreDataService {
   public elite = computed(() => (this.state() as any)?.elite);
   public soak = computed(() => (this.state() as any)?.soak);
   public audit = computed(() => (this.state() as any)?.audit || []);
-  public trust = computed(() => this.state()?.trust);
+  public stability = computed(() => this.state()?.stability);
   public topology = computed(() => this.state()?.topology || { nodes: [], edges: [] });
   private lastZScore = 0;
 
@@ -44,33 +44,34 @@ export class SreDataService {
     return 'HIGH';
   });
 
-  // v1.2 Adaptive Trust Synthesis
-  public systemTrust = computed(() => {
-    const t = this.trust();
+  // v1.2 Adaptive Stability Synthesis
+
+  public systemStability = computed(() => {
+    const s = this.stability();
     const p = this.perception();
-    const g = this.governance();
+    const c = this.operationalControl();
     
     // Safety Guard: No data or warming up = INITIALIZING
-    if (!p || !g || !t || (p.anomalyHypothesis?.support || 0) < 10) return 'INITIALIZING';
+    if (!p || !c || !s || (p.anomalyHypothesis?.support || 0) < 10) return 'INITIALIZING';
 
-    // Safety Guard: If signal is critical, trust is lost regardless of confidence
-    if (g.mode === 'HALTED' || p.signalIntegrityState === 'CRITICAL') return 'UNTRUSTED';
+    // Safety Guard: If signal is critical, stability is lost regardless of confidence
+    if (c.mode === 'HALTED' || p.signalIntegrityState === 'CRITICAL') return 'UNSTABLE';
     
-    if (t.score < 0.4) return 'LOW';
-    if (t.score < 0.7) return 'GUARDED';
+    if (s.score < 0.4) return 'LOW';
+    if (s.score < 0.7) return 'GUARDED';
     
     return 'HIGH';
   });
 
-  public trustScore = computed(() => this.trust()?.score || 0);
-  public trustBreakdown = computed(() => this.trust()?.breakdown);
+  public stabilityScore = computed(() => this.stability()?.score || 0);
+  public stabilityBreakdown = computed(() => this.stability()?.breakdown);
 
   public stabilityConfidence = computed(() => {
     const p = this.perception();
-    const trust = this.systemTrust();
+    const stability = this.systemStability();
 
-    // Safety Guard: No fake confidence if system is not trusted or still initializing
-    if (!p || trust === 'INITIALIZING' || trust === 'UNTRUSTED') return 0;
+    // Safety Guard: No fake confidence if system is not stable or still initializing
+    if (!p || stability === 'INITIALIZING' || stability === 'UNSTABLE') return 0;
 
     // Heuristic: Confidence grows as velocity stays low and decay is stable
     const base = 1 - Math.min(p.tuningVelocity * 5, 0.5);
@@ -79,10 +80,10 @@ export class SreDataService {
   });
 
   public rankedBlockers = computed(() => {
-    const g = this.governance();
-    if (!g || g.mode !== 'STABLE') return [];
+    const c = this.operationalControl();
+    if (!c || c.mode !== 'STABLE') return [];
     
-    const decomp = g.reasoningDecomposition;
+    const decomp = (c as any).reasoningDecomposition;
     const blockers = [
       { reason: 'QUORUM_GAP', impact: 1 - decomp.quorumContribution },
       { reason: 'DIVERSITY_GAP', impact: Math.max(0, 1 - decomp.diversityFactor) },
@@ -93,9 +94,9 @@ export class SreDataService {
   });
 
   public nextActionEta = computed(() => {
-    const g = this.governance();
-    if (!g || g.mode !== 'HEALING') return null;
-    return Math.max(0, (g.holdTimeMs || 0) / 1000);
+    const c = this.operationalControl();
+    if (!c || c.mode !== 'HEALING') return null;
+    return Math.max(0, (c.holdTimeMs || 0) / 1000);
   });
 
   constructor() {
@@ -132,8 +133,8 @@ export class SreDataService {
             ...current,
             ...update,
             perception: { ...current.perception, ...(update.perception || {}) },
-            governance: { ...current.governance, ...(update.governance || {}) },
-            trust: { ...current.trust, ...(update.trust || {}) },
+            operationalControl: { ...current.operationalControl, ...(update.operationalControl || {}) },
+            stability: { ...current.stability, ...(update.stability || {}) },
             validation: { ...((current as any).validation || {}), ...(update as any).validation },
             elite: { ...((current as any).elite || {}), ...(update as any).elite },
             business: { ...((current as any).business || {}), ...(update as any).business },

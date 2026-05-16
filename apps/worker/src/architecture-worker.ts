@@ -1,5 +1,6 @@
 import { Worker, Job } from '@packages/utils';
-import { redis, logger } from '@packages/utils';
+import { redis } from '@packages/utils';
+import { logger } from '@packages/observability';
 import { 
     runWithTracing, 
     missionController, 

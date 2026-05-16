@@ -1,0 +1,32 @@
+---
+- name: Provision ZTAN Institutional Node
+  hosts: ztan_nodes
+  become: yes
+  vars:
+    ztan_version: "2.5.0-final"
+    tpm_required: true
+
+  tasks:
+    - name: Ensure baseline security hardening
+      ansible.builtin.shell:
+        cmd: "ztanctl simplify freeze --module os-kernel"
+      register: hardening_result
+
+    - name: Initialize Hardware Root-of-Trust (TPM)
+      when: tpm_required
+      ansible.builtin.shell:
+        cmd: "ztanctl hardware attest --nonce {{ ansible_date_time.epoch }}"
+      register: tpm_result
+
+    - name: Deploy ZTAN Runtime Execution Cell
+      ansible.builtin.shell:
+        cmd: "ztanctl dev onboard --partner {{ pilot_id }}"
+      
+    - name: Verify Identity Plane connectivity
+      ansible.builtin.shell:
+        cmd: "ztanctl secure identity --service witness-node"
+      register: identity_result
+
+    - name: Report Node Readiness to Governance Root
+      ansible.builtin.debug:
+        msg: "Node {{ inventory_hostname }} is now CRYPTOGRAPHICALLY FINAL and ready for institutional traffic."

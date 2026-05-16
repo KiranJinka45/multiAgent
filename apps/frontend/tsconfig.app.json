@@ -1,21 +1,39 @@
-/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
-/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
+// {
+//   "extends": "./tsconfig.json",
+//   "compilerOptions": {
+//     "outDir": "./out-tsc/app",
+//     "types": [
+//       "node"
+//     ]
+//   },
+//   "files": [
+//     "src/main.ts"
+//   ],
+//   "include": [
+//     "src/**/*.d.ts",
+//     "src/**/*.ts"
+//   ],
+//   "exclude": [
+//     "src/**/*.spec.ts",
+//     "../../packages/**/*",
+//     "../../apps/**/*",
+//     "../../node_modules/**/*"
+//   ]
+// }
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "./out-tsc/app",
-    "moduleResolution": "bundler",
-    "types": ["node"]
+    "outDir": "../../out-tsc/app",
+    "types": []
   },
+  "files": [
+    "src/main.ts"
+  ],
   "include": [
-    "src/**/*.ts",
-    "../../packages/ztan-crypto/src/**/*.ts",
-    "../../packages/utils/src/**/*.ts",
-    "../../packages/contracts/src/**/*.ts",
-    "../../packages/observability/src/**/*.ts"
+    "src/**/*.ts"
   ],
   "exclude": [
     "src/**/*.spec.ts",
-    "../../packages/ztan-crypto/src/node-replay.ts"
+    "src/test.ts"
   ]
 }

@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitest/config';
+import path from 'path';
 
 export default defineConfig({
   test: {
@@ -15,6 +16,13 @@ export default defineConfig({
         'vitest.config.ts',
         'vitest.workspace.ts',
       ],
+    },
+  },
+  resolve: {
+    alias: {
+      '@packages/utils': path.resolve(__dirname, './packages/utils/src'),
+      '@packages/ecosystem-governance': path.resolve(__dirname, './packages/ecosystem-governance/src'),
+      '@packages/observability': path.resolve(__dirname, './packages/observability/src'),
     },
   },
 });

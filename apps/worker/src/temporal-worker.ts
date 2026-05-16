@@ -1,24 +1,26 @@
 // @ts-nocheck
 import { Worker } from '@temporalio/worker';
-import * as activities from '@packages/orchestrator/activities/agentActivities';
+import { createActivities } from '@packages/utils';
 import path from 'path';
 
 // --- AGENT REGISTRATION ---
-import { agentRegistry } from '@packages/utils';
-import { DatabaseAgent } from '@packages/agents';
-import { BackendAgent } from '@packages/agents';
-import { FrontendAgent } from '@packages/agents';
-import { DeploymentAgent } from '@packages/agents';
-import { SecurityAgent } from '@packages/agents';
-import { MonitoringAgent } from '@packages/agents';
-import { SaaSMonetizationAgent } from '@packages/agents';
-import { PlannerAgent } from '@packages/agents';
-import { ResearchAgent } from '@packages/agents';
-import { DebugAgent } from '@packages/agents';
-import { ArchitectureAgent } from '@packages/agents';
-import { RankingAgent } from '@packages/agents';
-import { RepairAgent } from '@packages/agents';
-import { CriticAgent } from '@packages/agents';
+import { 
+    agentRegistry,
+    DatabaseAgent,
+    BackendAgent,
+    FrontendAgent,
+    DeploymentAgent,
+    SecurityAgent,
+    MonitoringAgent,
+    SaaSMonetizationAgent,
+    PlannerAgent,
+    ResearchAgent,
+    DebugAgent,
+    ArchitectureAgent,
+    RankingAgent,
+    RepairAgent,
+    CriticAgent
+} from '@packages/utils';
 
 // Register with standardized lowercase keys
 agentRegistry.register('database', new DatabaseAgent());
@@ -43,7 +45,7 @@ async function run() {
 
     const worker = await Worker.create({
         workflowsPath: path.resolve(__dirname, '../orchestrator/workflows'),
-        activities: activities.createActivities('system-worker'),
+        activities: createActivities('system-worker'),
         taskQueue: 'app-builder',
     });
 

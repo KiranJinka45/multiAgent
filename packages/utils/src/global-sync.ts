@@ -1,4 +1,4 @@
-import { redis } from "./server";
+import { redis } from "./server.js";
 import { logger } from "@packages/observability";
 
 /**

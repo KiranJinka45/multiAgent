@@ -1,8 +1,7 @@
 // @ts-nocheck
 import { Worker, Job, Queue } from '@packages/utils';
 import { logger } from '@packages/observability';
-import { redis, QUEUE_SUPERVISOR, supervisorQueue, supervisorService, DistributedExecutionContext } from '@packages/utils';
-import { PreviewWatchdog } from '@packages/runtime';
+import { redis, QUEUE_SUPERVISOR, supervisorQueue, supervisorService, DistributedExecutionContext, PreviewWatchdog } from '@packages/utils';
 
 if (!QUEUE_SUPERVISOR) throw new Error("FATAL: QUEUE_SUPERVISOR name must be provided");
 

@@ -3,6 +3,8 @@ import path from 'path';
 import fs from 'fs';
 import { Groq } from 'groq-sdk';
 import util from 'util';
+import crypto from 'node:crypto';
+import { ThresholdCrypto, PatchIntent } from '@packages/ztan-crypto';
 
 const execAsync = util.promisify(exec);
 
@@ -94,12 +96,63 @@ export class DevinAutoHealer {
             );
 
             if (response.success && response.data?.patches?.length > 0) {
+                console.log(`[AutoHealer] ${response.data.patches.length} potential patches identified.`);
+                
                 for (const patch of response.data.patches) {
-                    const filePath = path.join(dir, patch.path.startsWith('/') ? patch.path.slice(1) : patch.path);
-                    const patchDir = path.dirname(filePath);
-                    if (!fs.existsSync(patchDir)) fs.mkdirSync(patchDir, { recursive: true });
-                    fs.writeFileSync(filePath, patch.content, 'utf8');
-                    console.log(`[AutoHealer] Autonomous surgical patch applied onto: ${patch.path}`);
+                    // --- SECURITY: Path Traversal Validation (Priority 0) ---
+                    const ALLOWED_ROOT = path.resolve(dir);
+                    const resolvedPath = path.resolve(ALLOWED_ROOT, patch.path.startsWith('/') ? patch.path.slice(1) : patch.path);
+
+                    if (!resolvedPath.startsWith(ALLOWED_ROOT)) {
+                        console.error(`[AutoHealer] SECURITY ALERT: Path traversal attempt blocked: ${patch.path}`);
+                        continue;
+                    }
+
+                    // --- SECURITY: Symlink Escape Validation ---
+                    try {
+                        const realPath = fs.realpathSync(resolvedPath);
+                        if (!realPath.startsWith(ALLOWED_ROOT)) {
+                            console.error(`[AutoHealer] SECURITY ALERT: Symlink escape detected and blocked: ${patch.path} -> ${realPath}`);
+                            continue;
+                        }
+                    } catch (e) {
+                        // If file doesn't exist yet, we check the directory
+                        const parentDir = path.dirname(resolvedPath);
+                        if (fs.existsSync(parentDir)) {
+                            const realParent = fs.realpathSync(parentDir);
+                            if (!realParent.startsWith(ALLOWED_ROOT)) {
+                                console.error(`[AutoHealer] SECURITY ALERT: Parent directory symlink escape: ${parentDir}`);
+                                continue;
+                            }
+                        }
+                    }
+
+                    // --- SECURITY: Extension Allowlist ---
+                    const ext = path.extname(resolvedPath).toLowerCase();
+                    const ALLOWED_EXTENSIONS = ['.ts', '.tsx', '.js', '.json', '.yaml', '.yml', '.md'];
+                    if (!ALLOWED_EXTENSIONS.includes(ext)) {
+                        console.error(`[AutoHealer] SECURITY ALERT: Blocked patch for unauthorized extension: ${ext}`);
+                        continue;
+                    }
+
+                    // --- SECURITY: Dry-Run Mode (Freeze Unsafe Mutation Paths) ---
+                    console.log(`[AutoHealer] [DRY-RUN] Would apply surgical patch onto: ${patch.path}`);
+                    
+                    try { 
+                        // ACTUAL WRITE DISABLED UNTIL OPERATOR APPROVAL SYSTEM IS IMPLEMENTED
+                        // --- SECURITY: Patch Provenance & Intent Verification ---
+                        const isApproved = await this.verifyPatchIntent(patch);
+                        if (!isApproved && process.env.NODE_ENV === 'production') {
+                            console.error(`[AutoHealer] SECURITY ALERT: Unsigned patch rejected in production: ${patch.path}`);
+                            continue;
+                        }
+
+                        // --- DRY RUN: Finalized Execution ---
+                        console.log(`[AutoHealer] [DRY-RUN] Would apply patch to ${patch.path} with hash ${this.calculateHash(patch.content)}`);
+                        // fs.writeFileSync(resolvedPath, patch.content);
+                    } catch (err) {
+                        console.error(`[AutoHealer] Error processing patch for ${patch.path}:`, err);
+                    }
                 }
                 return true;
             } else if (response.error) {
@@ -124,6 +177,37 @@ export class DevinAutoHealer {
                 out.push({ path: relPath, content: fs.readFileSync(path.join(base, relPath), 'utf8') });
             }
         }
+    }
+
+    /**
+     * Verifies that a patch has been explicitly approved by a human operator.
+     * Required for Phase B: Trust Provenance.
+     */
+    private async verifyPatchIntent(patch: any): Promise<boolean> {
+        const intent = patch.intent as PatchIntent;
+        if (!intent) {
+            console.warn(`[AutoHealer] Missing PatchIntent for ${patch.path}`);
+            return false;
+        }
+
+        try {
+            const isValid = await ThresholdCrypto.verifyPatchIntent(intent);
+            if (isValid) {
+                console.log(`[AutoHealer] Verified context-bound operator signature for patch: ${patch.path}`);
+                console.log(`- Epoch: ${intent.trustEpoch}`);
+                console.log(`- Environment: ${intent.environment}`);
+                console.log(`- Operator: ${intent.operatorId}`);
+                return true;
+            }
+        } catch (e: any) {
+            console.error(`[AutoHealer] Patch verification failed for ${patch.path}: ${e.message}`);
+        }
+        
+        return false;
+    }
+
+    private calculateHash(content: string): string {
+        return crypto.createHash('sha256').update(content).digest('hex');
     }
 }
 

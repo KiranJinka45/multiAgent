@@ -1,4 +1,5 @@
-import { GovernanceReceipt, CouncilState, InstitutionalRole, GovernanceAction } from './governance.js';
+import { InstitutionalRole } from './governance.js';
+import type { GovernanceReceipt, CouncilState, GovernanceAction } from './governance.js';
 
 
 /**

@@ -1,4 +1,4 @@
-import { redis } from "./server";
+import { redis } from "./server.js";
 
 export interface CertificationState {
     status: 'CERTIFIED' | 'DEGRADED' | 'UNSAFE' | 'UNKNOWN';

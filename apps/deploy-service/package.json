@@ -1,6 +1,7 @@
 {
   "name": "@apps/deploy-service",
   "version": "0.1.0",
+  "type": "module",
   "private": true,
   "scripts": {
     "build": "tsup src/index.ts --no-dts && tsc --emitDeclarationOnly",
@@ -11,24 +12,22 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@packages/db": "workspace:*",
-    "@packages/utils": "workspace:*",
-    "@packages/observability": "workspace:*",
     "@packages/contracts": "workspace:*",
+    "@packages/db": "workspace:*",
+    "@packages/observability": "workspace:*",
+    "@packages/utils": "workspace:*",
     "bullmq": "5.71.0",
-    "dotenv": "17.3.1",
+    "dotenv": "17.4.2",
     "fs-extra": "11.3.4",
     "ioredis": "5.10.1",
     "pino": "10.3.1",
-    "vercel": "37.8.0"
+    "vercel": "52.2.0"
   },
   "devDependencies": {
-    "@types/node": "^20",
     "@types/fs-extra": "11.0.4",
-    "tsup": "8.5.1",
+    "@types/node": "22.13.9",
     "tsconfig-paths": "4.2.0",
-    "tsx": "4.21.0",
-    "typescript": "^5",
-    "prisma": "5.10.0"
+    "tsup": "8.5.1",
+    "tsx": "4.21.0"
   }
 }

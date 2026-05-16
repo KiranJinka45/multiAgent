@@ -28,7 +28,7 @@ import { SreDataService } from '../../../core/services/sre-data.service';
         <div class="pipeline-status">
           <label>LAST PIPELINE RUN</label>
           <div class="pipeline-time">2026-05-01 10:45:12 UTC</div>
-          <div class="pipeline-commit">feat: hardened governance loop (sha: 7f3a1b2)</div>
+          <div class="pipeline-commit">feat: hardened operational loop (sha: 7f3a1b2)</div>
         </div>
       </div>
     </div>

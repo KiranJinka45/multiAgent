@@ -3,12 +3,13 @@ import { createServer } from 'http';
 import https from 'https';
 import fs from 'fs';
 import { Server } from 'socket.io';
-import { redis, apiRequestDurationSeconds, registry } from '@packages/utils';
+import { redis } from '@packages/utils';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import { env } from '@packages/config';
 import path from 'path';
-import { logger, initTelemetry } from '@packages/observability';
+import { logger, initTelemetry, apiRequestDurationSeconds, registry } from '@packages/observability';
+import { validateStartupSecrets } from '@packages/utils';
 import { SecretProvider } from '@packages/config';
 import { startCollaborationServer } from './yjs-server';
 import { projectService } from './project-service';
@@ -34,6 +35,7 @@ import { IdentityService } from './identity.service';
 const replayCache = new Set<string>();
 
 const app = express();
+app.disable('x-powered-by');
 app.use(cors());
 
 export const registerRoutes = (app: any) => {
@@ -181,7 +183,7 @@ app.post('/api/v1/ztan/verify', express.json(), async (req, res) => {
     }
 });
 
-app.use(internalAuth());
+app.use((internalAuth as any)());
 
 // Traceability Middleware
 app.use((req, res, next) => {
@@ -266,6 +268,21 @@ async function bootstrap() {
     console.log("🚀 [CoreAPI] Bootstrap started");
 
     try {
+        // --- SECURITY: Mandatory Startup Enforcement ---
+        if (process.env.NODE_ENV === 'production') {
+            validateStartupSecrets(['INTERNAL_SERVICE_TOKEN', 'ZTAN_KMS_SALT']);
+        }
+
+        const certPath = '/etc/tls/tls.crt';
+        const keyPath = '/etc/tls/tls.key';
+        const useHttps = fs.existsSync(certPath) && fs.existsSync(keyPath);
+
+        if (process.env.NODE_ENV === 'production' && !useHttps) {
+            const errorMsg = '[FATAL] SECURITY ENFORCEMENT: TLS is mandatory in production for core-api';
+            logger.error(errorMsg);
+            process.exit(1);
+        }
+
         console.log("➡️ [CoreAPI] initTelemetry");
         initTelemetry('multiagent-api-orchestrator');
         
@@ -284,8 +301,14 @@ async function bootstrap() {
         const PORT = process.env.PORT || 3010;
         const YJS_PORT = 3011;
 
-        console.log("➡️ [CoreAPI] Creating HTTP server...");
-        const server = createServer(app);
+        console.log("➡️ [CoreAPI] Creating Server...");
+        const server = useHttps
+            ? https.createServer({
+                cert: fs.readFileSync(certPath),
+                key: fs.readFileSync(keyPath),
+                rejectUnauthorized: process.env.NODE_ENV === 'production'
+            }, app)
+            : createServer(app);
         
         console.log("➡️ [CoreAPI] Initializing Socket.io");
         const io = new Server(server, { 

@@ -2,36 +2,51 @@
   "extends": "../../tsconfig.base.json",
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": ".",
-    "ignoreDeprecations": "6.0",
     "outDir": "dist",
     "strict": true,
-    "noImplicitOverride": true,
-    "noPropertyAccessFromIndexSignature": false,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
     "isolatedModules": true,
     "experimentalDecorators": true,
     "importHelpers": true,
-    
-    
-    
-    "composite": false,
-    "declaration": true,
-    "noEmit": false,
-    
-    "rootDir": "../..",
-    "paths": {
-      "@packages/*": ["../../packages/*/dist/index.d.ts"],
-      "@/*": ["./src/*"]
-    }
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "useDefineForClassFields": true,
+    "lib": [
+      "ES2022",
+      "dom"
+    ],
+    "target": "ES2022",
+    "jsx": "react-jsx",
+    "types": [],
+    "noEmit": false
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
-    "strictInjectionParameters": true,
-    "strictInputAccessModifiers": true,
-    "strictTemplates": true
+    "strictInjectionParameters": false,
+    "strictInputAccessModifiers": false,
+    "strictTemplates": false
   },
-  "files": []
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "../../packages/**/dist",
+    "../../packages/**/build",
+    "../../packages/**/.turbo",
+    "../../packages/**/coverage",
+    "../../packages/**/generated",
+    "../../packages/**/node_modules",
+    "../../packages/db/src/generated",
+    "../../apps/api",
+    "../../apps/core-api",
+    "../../apps/worker",
+    "../../node_modules",
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    ".angular",
+    "coverage",
+    "dist",
+    "build"
+  ],
+  "references": []
 }

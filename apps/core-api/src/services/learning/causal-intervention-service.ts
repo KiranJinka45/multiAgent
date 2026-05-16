@@ -1,29 +1,21 @@
 import { logger } from '@packages/observability';
-import { sreEngine } from '../sre-engine';
-import { CausalityMapper } from './causality-mapper';
+import { sreEngine } from '../sre-engine.js';
+import { CausalityMapper } from './causality-mapper.js';
 
 export class CausalInterventionService {
-  private static INTERVENTION_EVENT = 'SYNTHETIC_CAUSAL_INTERVENTION';
-
   /**
-   * Periodically injects safe synthetic disorder to prove causality.
+   * Applies a causal intervention (Do-calculus) to a specific node in the topology.
+   * This overrides the normal data flow to observe downstream effects.
    */
-  public static async runIntervention() {
-    logger.warn('[SRE] Starting Synthetic Causal Intervention - injecting controlled noise');
-    
-    // 1. Inject a 50ms synthetic latency spike (disorder)
-    const syntheticDisorderedCount = 10;
-    sreEngine.reportNetworkDisorder(syntheticDisorderedCount);
-    
-    // 2. Track if this precedes a change in perception
-    CausalityMapper.recordEvent(this.INTERVENTION_EVENT);
+  public static async applyIntervention(nodeId: string, interventionValue: number) {
+    logger.warn({ nodeId, interventionValue }, '[CAUSALITY] Applying manual causal intervention');
 
-    // 3. Mark the link as "Intervention Backed" if correlation holds
-    setTimeout(async () => {
-      const confidence = await CausalityMapper.getCausalConfidence(this.INTERVENTION_EVENT, 'SIGNAL_INTEGRITY_PENALTY');
-      if (confidence > 0.7) {
-        logger.info({ confidence }, '[SRE] Causal intervention successful. Directionality verified.');
-      }
-    }, 5000);
+    // 1. Lock perception for the target node
+    sreEngine.overridePerception(nodeId, interventionValue);
+
+    // 2. Map causality
+    await CausalityMapper.map(nodeId, interventionValue);
+
+    logger.info({ nodeId }, '[CAUSALITY] Intervention applied. Monitoring for structural recovery.');
   }
 }

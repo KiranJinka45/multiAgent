@@ -1,38 +1,23 @@
 {
   "name": "@packages/auth-internal",
-  "version": "1.0.0",
-  "description": "MultiAgent Internal Security Authority",
-  "main": "dist/index.cjs",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsup src/index.ts --no-dts && tsc --emitDeclarationOnly",
     "dev": "tsup src/index.ts --no-dts --watch",
-    "lint": "eslint .",
-    "typecheck": "tsc --noEmit",
-    "clean": "rimraf dist"
+    "typecheck": "tsc --noEmit"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "packageManager": "pnpm@10.33.0",
   "dependencies": {
-    "@packages/config": "workspace:*",
-    "@packages/observability": "workspace:*",
-    "@packages/utils": "workspace:*"
+    "express": "5.2.1",
+    "jsonwebtoken": "9.0.2",
+    "@packages/config": "workspace:*"
   },
   "devDependencies": {
-    "@types/express": "5.0.0",
-    "@types/jsonwebtoken": "9.0.10",
-    "@types/node": "22.13.9",
     "tsup": "8.5.1",
-    "typescript": "5.9.3"
-  },
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.mjs"
-    }
+    "typescript": "5.5.4",
+    "@types/express": "5.0.0"
   }
 }

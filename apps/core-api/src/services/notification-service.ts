@@ -28,15 +28,15 @@ export class NotificationService {
     return true;
   }
 
-  public static async notifyApprovalRequired(requestId: string, action: string, trustScore: number) {
+  public static async notifyApprovalRequired(requestId: string, action: string, reliabilityScore: number) {
     await this.notify({
       title: 'SRE INTERVENTION REQUIRED',
-      message: `Action [${action}] is gated due to low trust score (${(trustScore * 100).toFixed(1)}%).`,
+      message: `Action [${action}] is gated due to low reliability score (${(reliabilityScore * 100).toFixed(1)}%).`,
       severity: 'CRITICAL',
       metadata: {
         requestId,
         action,
-        trustScore,
+        reliabilityScore,
         dashboardUrl: `http://localhost:4200/sre/approvals/${requestId}`
       }
     });

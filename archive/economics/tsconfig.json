@@ -21,12 +21,5 @@
   "include": [
     "src"
   ],
-  "references": [
-    {
-      "path": "../observability"
-    },
-    {
-      "path": "../utils"
-    }
-  ]
+  "references": []
 }

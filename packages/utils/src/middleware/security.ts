@@ -1,10 +1,11 @@
-import express, { Request, Response, NextFunction, Router } from 'express';
+import express, { Router } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import { v4 as uuidv4 } from 'uuid';
 import { randomBytes } from 'crypto';
 import { logger } from '@packages/observability';
-import { contextStorage } from '../context';
+import { contextStorage } from '../context.js';
 
 
 /**

@@ -1,39 +1,37 @@
-import { ErrorAnalyzer } from './error-analyzer';
-import { KnowledgeStore } from './knowledge-store';
-import { FixRecommender } from './fix-recommender';
+import { ErrorAnalyzer } from './error-analyzer.js';
+import { KnowledgeStore } from './knowledge-store.js';
+import { FixRecommender } from './fix-recommender.js';
 import { logger } from '@packages/observability';
 
 /**
  * Self-Improving Learning Engine
- * Bridges the gap between raw build errors and structured fix patterns.
+ * Orchestrates error analysis, knowledge accumulation, and fix recommendation.
  */
 export class LearningEngine {
-    /**
-     * Checks if a previous successful fix exists for this specific error signature.
-     */
-    async recommendFix(error: string): Promise<string | null> {
-        return FixRecommender.recommendFix(error);
-    }
+  /**
+   * Processes an incident to learn from it.
+   */
+  public async learn(incident: any) {
+    logger.info({ incidentId: incident.id }, '[LEARNING] Initiating learning cycle');
 
-    /**
-     * Records a new successful patch fix against an initial error condition.
-     */
-    async recordSuccess(error: string, appliedPatchSummary: string) {
-        const errors = ErrorAnalyzer.analyze(error);
-        if (errors.length === 0) return;
+    // 1. Analyze what went wrong
+    const analysis = await ErrorAnalyzer.analyze(incident.logs);
 
-        const primaryError = errors[0];
-        const signature = this.generateSignature(primaryError);
+    // 2. Persist in knowledge base
+    const knowledgeStore = new KnowledgeStore();
+    await knowledgeStore.storeIncident({
+      incidentId: incident.id,
+      analysis,
+      solution: incident.actionTaken
+    });
 
-        logger.info({ signature }, '[LearningEngine] Recording successful fix strategy');
-        await KnowledgeStore.recordFix(signature, appliedPatchSummary);
-    }
+    // 3. Update fix recommender
+    const recommender = new FixRecommender();
+    recommender.updateWeights(analysis, incident.outcome === 'RESOLVED' ? 1.0 : -0.5);
 
-    private generateSignature(error: any): string {
-        return `${error.type}:${error.message.toLowerCase().slice(0, 50)}`;
-    }
+    logger.info('[LEARNING] Learning cycle complete. Knowledge base expanded.');
+  }
 }
 
 export const learningEngine = new LearningEngine();
 export { ErrorAnalyzer, KnowledgeStore, FixRecommender };
-

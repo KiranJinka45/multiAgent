@@ -1,4 +1,4 @@
-import { logger } from './server';
+import { logger } from './server.js';
 
 export interface GovernancePolicy {
     id: string;
@@ -177,11 +177,30 @@ export class ExternalProofValidator {
 }
 
 /**
+ * 🛡️ Phase 10.1: RFC 3161 Timestamp Service (Mock)
+ */
+export class Rfc3161TimestampService {
+    static async getTimestampToken(hash: string): Promise<string> {
+        return `TSR_${hash}_${Date.now()}`;
+    }
+}
+
+/**
+ * 🛡️ Phase 8.1: External Trust Anchor (Mock)
+ */
+export class ExternalTrustAnchor {
+    static verifyAnchor(hash: string, anchorId: string): boolean {
+        return !!anchorId && anchorId.startsWith('TSR_');
+    }
+}
+
+/**
  * 🛡️ Phase 13.3: External Policy Authority
  */
 export class ExternalPolicyAuthority {
     private static lastHash: string = '0'.repeat(64);
     private static anchoredTsrs: Record<string, string> = {}; 
+    private static auditLog: any[] = [];
     
     static async evaluateMission(mission: any, userRole: string = 'developer'): Promise<any> {
         // ... (RBAC/Policy checks)
@@ -215,7 +234,7 @@ export class ExternalPolicyAuthority {
             if (this.auditLog[i].prevHash !== this.auditLog[i - 1].currentHash) return false;
             
             // 🛡️ Phase 8.1: External Verification
-            const anchorId = this.anchoredRoots[this.auditLog[i].currentHash];
+            const anchorId = this.anchoredTsrs[this.auditLog[i].currentHash];
             if (!ExternalTrustAnchor.verifyAnchor(this.auditLog[i].currentHash, anchorId)) return false;
         }
         return true;

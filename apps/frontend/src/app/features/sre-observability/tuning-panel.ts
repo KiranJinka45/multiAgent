@@ -12,7 +12,7 @@ import { SreDataService } from '../../core/services/sre-data.service';
       <div class="card-header">
         <div class="title-group">
           <span class="icon">🛠️</span>
-          <label>DYNAMIC GOVERNANCE TUNING</label>
+          <label>DYNAMIC OPERATIONAL TUNING</label>
         </div>
         <div class="status-pill" [class.active]="isTuning()">TUNING ACTIVE</div>
       </div>

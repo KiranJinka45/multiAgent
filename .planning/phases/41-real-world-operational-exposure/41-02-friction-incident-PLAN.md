@@ -14,10 +14,10 @@ Focus on capturing and processing real-world feedback.
 
 ## Tasks
 
-## Task 1: Implement Friction Harvesting Dashboard
+### 1. Implement Friction Harvesting Dashboard
 - Create `scripts/process-friction.ts` to aggregate `docs/friction/*.json`.
 - Create `OPERATOR_FRICTION_REPORT.md` to summarize operator confusion points.
 
-## Task 2: Formalize Incident Evidence Preservation
+### 2. Formalize Incident Evidence Preservation
 - Create `scripts/preserve-incident.sh` to bundle logs and state snapshots.
 - Update `SRE_HANDBOOK.md` with the "Real Incident Governance" protocol.

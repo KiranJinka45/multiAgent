@@ -378,3 +378,24 @@ export function validateGovernanceFields(receipt: GovernanceReceipt): string | n
 
     return null;
 }
+
+// ─── Governance Services (Stubs) ───────────────────────────────────────────
+
+export const CostGovernanceService = {
+    decrementActiveJobs: async (tenantId: string) => {
+        // console.log(`[CostGovernance] Decrementing active jobs for ${tenantId}`);
+    },
+    getTenantLimits: async (tenantId: string) => {
+        return { plan: 'free' };
+    }
+};
+
+export const regionalGovernance = {
+    getRegionConfig: async (region: string) => ({})
+};
+
+export const quotaEngine = {
+    getTenantLimits: async (tenantId: string) => {
+        return { plan: 'free' };
+    }
+};

@@ -7,7 +7,8 @@ import {
     DistributedExecutionContext, 
     usageService, 
     TenantService, 
-    SLOService 
+    SLOService,
+    contextStorage
 } from '@packages/utils';
 import { DEFAULT_RETRY_OPTIONS, DEAD_LETTER_QUEUE_NAME, createBreaker } from '@packages/resilience';
 
@@ -37,7 +38,6 @@ export abstract class BaseWorker {
         });
 
         this.worker = new Worker(queueName, async (job: Job) => {
-            const { contextStorage } = require('@packages/utils');
             
             if (!job.id) return this.breaker.fire(job);
             

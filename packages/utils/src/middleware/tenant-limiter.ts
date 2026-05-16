@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import { redis } from '../server.js';
 import { logger } from '@packages/observability';
 

@@ -1,0 +1,19 @@
+{
+  "name": "@packages/production-pilot",
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts",
+    "test": "vitest run src/registry.test.ts"
+  },
+  "dependencies": {
+    "@packages/observability": "workspace:*"
+  },
+  "devDependencies": {
+    "tsup": "8.5.1",
+    "vitest": "^1.6.0"
+  }
+}

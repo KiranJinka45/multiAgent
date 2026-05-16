@@ -1,31 +1,33 @@
-import { WebSocketServer } from 'ws';
-// @ts-expect-error - y-websocket doesn't have official types for bin/utils
-import { setupWSConnection } from 'y-websocket/bin/utils';
-import { collaborationPersistence } from './collaboration-persistence';
+import { Server } from 'socket.io';
 import { logger } from '@packages/observability';
-import url from 'url';
+import * as Y from 'yjs';
+import { collaborationPersistence } from './collaboration-persistence.js';
 
-/**
- * Production-ready Collaboration server with LevelDB persistence.
- */
-export function startCollaborationServer(port: number = 3011) {
-    const wss = new WebSocketServer({ port, host: '0.0.0.0' });
+export class YjsServer {
+  private io: Server;
+  private docs: Map<string, Y.Doc> = new Map();
 
-    wss.on('connection', (conn, req) => {
-        const parsedUrl = url.parse(req.url || '/', true);
-        const docName = parsedUrl.pathname?.slice(1) || 'default';
+  constructor(io: Server) {
+    this.io = io;
+    this.setupHandlers();
+  }
+
+  private setupHandlers() {
+    this.io.on('connection', (socket) => {
+      socket.on('sync', async ({ docId, update }: { docId: string, update: Uint8Array }) => {
+        let doc = this.docs.get(docId);
+        if (!doc) {
+          doc = new Y.Doc();
+          const persisted = await collaborationPersistence.load(docId);
+          if (persisted) Y.applyUpdate(doc, persisted);
+          this.docs.set(docId, doc);
+        }
+
+        Y.applyUpdate(doc, update);
+        await collaborationPersistence.save(docId, Y.encodeStateAsUpdate(doc));
         
-        logger.info({ docName, remoteAddress: req.socket.remoteAddress }, '[YJS] Connection established');
-        
-        setupWSConnection(conn, req, {
-            docName,
-            gc: true,
-            persistence: collaborationPersistence
-        });
+        socket.broadcast.emit('sync', { docId, update });
+      });
     });
-
-    logger.info({ port }, '[YJS] Collaboration Server running with Postgres persistence');
-    
-    return wss;
+  }
 }
-

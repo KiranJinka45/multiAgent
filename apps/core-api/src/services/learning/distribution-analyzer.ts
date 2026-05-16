@@ -50,6 +50,17 @@ export class DistributionAnalyzer {
     return profile;
   }
 
+  /**
+   * Analyzes current distribution against baseline.
+   */
+  public static async analyze() {
+    const profile = await this.generateProfile();
+    return {
+      entropy: profile?.divergenceKL || 0,
+      distance: profile?.wassersteinDistance || 0
+    };
+  }
+
   private static async calculateWassersteinDistance(currentSet: number[]): Promise<number> {
     // Earth Mover's Distance between current and baseline distributions
     const baselineJson = await redis.get('sre:baseline:snapshots:original');

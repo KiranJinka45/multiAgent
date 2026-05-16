@@ -1,0 +1,16 @@
+{
+  "profile": "university-research",
+  "retention": "PROJECT_DURATION",
+  "topology": "FEDERATED_OPEN",
+  "compliance": "ACADEMIC_INTEGRITY",
+  "witnessQuorum": "PLURALISTIC_MAJORITY",
+  "archivalDefaults": {
+    "frequency": "WEEKLY",
+    "location": "OPEN_RESEARCH_REPO"
+  },
+  "security": {
+    "pqc": "ENABLED",
+    "tpm": "OPTIONAL",
+    "transparencyPublic": true
+  }
+}

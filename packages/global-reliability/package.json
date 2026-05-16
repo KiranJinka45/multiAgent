@@ -1,0 +1,9 @@
+{
+  "name": "@packages/global-reliability",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "dependencies": {
+    "@packages/utils": "workspace:*"
+  }
+}

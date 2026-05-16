@@ -6,7 +6,6 @@ import { routes } from './app.routes';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { LucideAngularModule, Activity, Gauge, TrendingUp, Sliders, Zap } from 'lucide-angular';
 import { importProvidersFrom } from '@angular/core';
-import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -16,6 +15,5 @@ export const appConfig: ApplicationConfig = {
       withInterceptors([errorInterceptor])
     ),
     importProvidersFrom(LucideAngularModule.pick({ Activity, Gauge, TrendingUp, Sliders, Zap })),
-    provideCharts(withDefaultRegisterables())
   ]
 };

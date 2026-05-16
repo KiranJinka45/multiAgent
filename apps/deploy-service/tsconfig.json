@@ -2,21 +2,29 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "ignoreDeprecations": "6.0",
+    "ignoreDeprecations": "5.0",
     "outDir": "dist",
-    "composite": false,
+    "composite": true,
     "declaration": true,
     "declarationMap": true,
     "noEmit": false,
     "skipLibCheck": true,
-    
-    
-    
-    
     "paths": {
-      "@packages/*": ["../../packages/*/dist/index.d.ts"],
-      "@/*": ["./src/*"]
-    }
+      "@packages/db": [
+        "../../packages/db/src"
+      ],
+      "@packages/utils": [
+        "../../packages/utils/src"
+      ],
+      "@packages/observability": [
+        "../../packages/observability/src"
+      ],
+      "@packages/contracts": [
+        "../../packages/contracts/src"
+      ]
+    },
+    "incremental": true,
+    "rootDir": "src"
   },
   "include": [
     "src/**/*"
@@ -24,6 +32,19 @@
   "exclude": [
     "node_modules",
     "dist"
+  ],
+  "references": [
+    {
+      "path": "../../packages/contracts"
+    },
+    {
+      "path": "../../packages/db"
+    },
+    {
+      "path": "../../packages/observability"
+    },
+    {
+      "path": "../../packages/utils"
+    }
   ]
-  
 }

@@ -5,17 +5,15 @@
   ],
   "compilerOptions": {
     "baseUrl": ".",
-    "ignoreDeprecations": "6.0",
-    "paths": {
-      "@packages/*": ["../../packages/*/dist/index.d.ts"],
-      "@/*": ["./src/*"]
-    },
+    "ignoreDeprecations": "5.0",
     "outDir": "dist",
     "declarationMap": true,
     "declaration": true,
-    "composite": false,
+    "composite": true,
     "noEmit": false,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "incremental": true,
+    "rootDir": "src"
   },
   "include": [
     "src/**/*"

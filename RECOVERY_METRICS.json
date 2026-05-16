@@ -1,0 +1,117 @@
+[
+  {
+    "timestamp": "2026-05-13T13:11:01.624Z",
+    "type": "OCR_DRILL",
+    "success": true,
+    "durationMs": 45000,
+    "purgedArtifacts": [
+      "node_modules",
+      "dist"
+    ]
+  },
+  {
+    "timestamp": "2026-05-13T13:24:56.302Z",
+    "type": "OCR_DRILL",
+    "success": true,
+    "durationMs": 42000,
+    "purgedArtifacts": [
+      "node_modules",
+      "dist"
+    ]
+  },
+  {
+    "timestamp": "2026-05-13T18:14:30.512Z",
+    "type": "NUCLEAR_CLEAN",
+    "success": false,
+    "durationMs": 5072,
+    "failureReason": "EPERM: operation not permitted, unlink 'C:\\multiagentic_project\\multiAgent-main\\node_modules\\@angular\\build\\node_modules\\esbuild\\node_modules\\@esbuild\\win32-x64\\esbuild.exe'",
+    "purgedArtifacts": []
+  },
+  {
+    "timestamp": "2026-05-13T18:56:28.595Z",
+    "type": "NUCLEAR_CLEAN",
+    "success": true,
+    "durationMs": 1000846,
+    "purgedArtifacts": [
+      "node_modules",
+      "packages/db/node_modules",
+      "apps/worker/dist",
+      "pnpm-lock.yaml"
+    ]
+  },
+  {
+    "timestamp": "2026-05-13T18:58:57.649Z",
+    "type": "NUCLEAR_CLEAN",
+    "success": false,
+    "durationMs": 59225,
+    "failureReason": "Failed to remove C:\\multiagentic_project\\multiAgent-main\\node_modules after 5 retries.",
+    "purgedArtifacts": []
+  },
+  {
+    "timestamp": "2026-05-13T19:18:17.771Z",
+    "type": "NUCLEAR_CLEAN",
+    "success": false,
+    "durationMs": 620348,
+    "failureReason": "ENOTEMPTY: directory not empty, rmdir 'C:\\multiagentic_project\\multiAgent-main\\node_modules'",
+    "purgedArtifacts": []
+  },
+  {
+    "timestamp": "2026-05-13T19:48:47.050Z",
+    "type": "NUCLEAR_CLEAN",
+    "success": false,
+    "durationMs": 897469,
+    "failureReason": "pnpm install failed: Command failed: pnpm install",
+    "purgedArtifacts": [
+      "all node_modules",
+      "all dist",
+      "all .tsbuildinfo",
+      "all pnpm-lock.yaml"
+    ]
+  },
+  {
+    "timestamp": "2026-05-13T19:53:45.545Z",
+    "type": "NUCLEAR_CLEAN",
+    "success": false,
+    "durationMs": 819762,
+    "failureReason": "pnpm install failed: Command failed: pnpm install",
+    "failureCategory": "dependency_drift",
+    "purgedArtifacts": [
+      "all node_modules",
+      "all dist",
+      "all .tsbuildinfo",
+      "all pnpm-lock.yaml"
+    ],
+    "stepTimings": {
+      "purgeMs": 2637,
+      "reinstallMs": 814472,
+      "ocrMs": 0
+    }
+  },
+  {
+    "timestamp": "2026-05-13T20:13:16.957Z",
+    "type": "NUCLEAR_CLEAN",
+    "success": false,
+    "durationMs": 1472746,
+    "failureReason": "OCR execution failed: Command failed: pnpm exec tsx scripts/one-command-recovery.ts",
+    "failureCategory": "unknown",
+    "purgedArtifacts": [
+      "all node_modules",
+      "all dist",
+      "all .tsbuildinfo",
+      "all pnpm-lock.yaml"
+    ],
+    "stepTimings": {
+      "purgeMs": 656902,
+      "reinstallMs": 672648,
+      "ocrMs": 137473
+    },
+    "envFingerprint": {
+      "os": "win32 10.0.26200",
+      "node": "v20.20.0",
+      "pnpm": "10.33.0",
+      "arch": "x64",
+      "cpuCount": 12,
+      "totalMemoryGb": 32
+    }
+  }
+]

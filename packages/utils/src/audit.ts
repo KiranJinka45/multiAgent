@@ -57,6 +57,7 @@ export const AuditLogger = {
           metadata: refinedMetadata,
           ipAddress: event.ipAddress,
           hash,
+          createdAt: timestamp,
         },
       });
 

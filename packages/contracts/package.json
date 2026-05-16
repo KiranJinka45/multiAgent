@@ -4,6 +4,7 @@
   "description": "MultiAgent Shared Interface & Protocol Definitions",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
+  "type": "module",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsup src/index.ts --no-dts && tsc --emitDeclarationOnly",
@@ -13,8 +14,7 @@
     "zod": "3.22.0"
   },
   "devDependencies": {
-    "tsup": "8.5.1",
-    "typescript": "5.9.3"
+    "tsup": "8.5.1"
   },
   "exports": {
     ".": {

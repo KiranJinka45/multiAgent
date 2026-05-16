@@ -5,7 +5,7 @@ import { SRETuningParams } from '@packages/contracts';
 import { chaosOrchestrator, ChaosScenario } from './chaos-orchestrator';
 import { validationEngine } from './validation-engine';
 import { soakTester } from './soak-tester';
-import { SreAnalyticsService } from './governance/sre-analytics';
+import { SreAnalyticsService } from './operational-control/sre-analytics';
 
 export class SreStreamingService {
     private io: Server;
@@ -152,14 +152,14 @@ export class SreStreamingService {
 
     private hasSignificantChange(current: any): boolean {
         if (!this.lastBroadcastState) return true;
-        if (current.governance.mode !== this.lastBroadcastState.governance.mode) return true;
-        if (current.governance.reasonType !== this.lastBroadcastState.governance.reasonType) return true;
+        if (current.operationalControl.mode !== this.lastBroadcastState.operationalControl.mode) return true;
+        if (current.operationalControl.reasonType !== this.lastBroadcastState.operationalControl.reasonType) return true;
         
         const consensusDelta = Math.abs(current.perception.consensus - this.lastBroadcastState.perception.consensus);
         if (consensusDelta > 0.05) return true;
 
-        const trustDelta = Math.abs((current.trust?.score || 0) - (this.lastBroadcastState.trust?.score || 0));
-        if (trustDelta > 0.05) return true;
+        const stabilityDelta = Math.abs((current.stability?.score || 0) - (this.lastBroadcastState.stability?.score || 0));
+        if (stabilityDelta > 0.05) return true;
 
         return false;
     }
@@ -169,14 +169,14 @@ export class SreStreamingService {
             sequenceId: current.sequenceId,
             timestamp: current.timestamp,
             isDelta: true,
-            governance: {
-                mode: current.governance.mode,
-                reasonType: current.governance.reasonType,
-                reason: current.governance.reason,
-                reasoningDecomposition: current.governance.reasoningDecomposition,
-                approvalRequestId: current.governance.approvalRequestId
+            operationalControl: {
+                mode: current.operationalControl.mode,
+                reasonType: current.operationalControl.reasonType,
+                reason: current.operationalControl.reason,
+                reasoningDecomposition: current.operationalControl.reasoningDecomposition,
+                approvalRequestId: current.operationalControl.approvalRequestId
             },
-            trust: current.trust,
+            stability: current.stability,
             elite: (current as any).elite,
             perception: {
                 consensus: current.perception.consensus,

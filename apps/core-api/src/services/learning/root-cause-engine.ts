@@ -1,10 +1,10 @@
-import { topologyManager } from './causal-topology';
+import { topologyManager } from './causal-topology.js';
 import { logger } from '@packages/observability';
 import { 
   ProbabilisticCausalEngine, 
   RootSelector, 
   TemporalConsistencyFilter 
-} from './probabilistic-causal-engine';
+} from './probabilistic-causal-engine.js';
 
 export interface NodeSignal {
   nodeId: string;
@@ -39,7 +39,7 @@ export class RootCauseEngine {
     const candidates = RootSelector.select(probabilities, 0.15);
 
     // 4. Apply Temporal Filter
-    const validCandidates = candidates.filter(([nodeId]) => 
+    const validCandidates = candidates.filter(([nodeId]: [string, number]) => 
       TemporalConsistencyFilter.validate(nodeId, signals, causalGraph.edges)
     );
 
@@ -51,14 +51,14 @@ export class RootCauseEngine {
     }
 
     const [primaryNode, primaryConf] = validCandidates[0];
-    const additionalRoots = validCandidates.slice(1).map(([nodeId, confidence]) => ({ nodeId, confidence }));
+    const additionalRoots = validCandidates.slice(1).map(([nodeId, confidence]: [string, number]) => ({ nodeId, confidence }));
 
     console.log('[RCA-DEBUG] Signals:', JSON.stringify(signals));
     logger.info({ 
       primaryNode, 
       confidence: primaryConf.toFixed(2), 
       additionalRoots: additionalRoots.length,
-      candidates: validCandidates.map(([id, p]) => `${id}(${(p*100).toFixed(0)}%)`).join(', ')
+      candidates: validCandidates.map(([id, p]: [string, number]) => `${id}(${(p*100).toFixed(0)}%)`).join(', ')
     }, '[RCA] Probabilistic multi-root attribution complete');
 
     return { 

@@ -1,13 +1,14 @@
 import 'dotenv/config';
-import { env } from '@packages/config';
+import { serverConfig as config } from '@packages/config';
 import express from 'express';
+import type { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import cors from 'cors';
 import bcrypt from 'bcryptjs';
 import cookieParser from 'cookie-parser';
 import { logger, initTelemetry } from '@packages/observability';
-import { onShutdown, createHealthRouter, createSecurityMiddleware, redis } from '@packages/utils';
+import { onShutdown, createHealthRouter, createSecurityMiddleware, createCsrfMiddleware, setCsrfToken, redis } from '@packages/utils';
 import { db } from '@packages/db';
 import { internalAuth, userAuth } from '@packages/auth-internal';
 import { AuditLogger, registry } from '@packages/utils';
@@ -17,16 +18,31 @@ import fs from 'fs';
 import path from 'path';
 
 export async function startAuthServer() {
-    initTelemetry({ serviceName: 'auth-service' });
+    initTelemetry('auth-service');
+
+    // --- SECURITY: Mandatory Startup Enforcement ---
+    if (process.env.NODE_ENV === 'production') {
+        validateStartupSecrets(['JWT_SECRET', 'JWT_REFRESH_SECRET']);
+    }
 
     const app = express();
     app.disable("x-powered-by");
-    const PORT = env.AUTH_SERVICE_PORT;
-    const JWT_SECRET = env.JWT_SECRET;
-    const JWT_REFRESH_SECRET = env.JWT_REFRESH_SECRET;
+    const PORT = config.AUTH_SERVICE_PORT;
+    let JWT_SECRET = config.JWT_SECRET;
+    let JWT_REFRESH_SECRET = config.JWT_REFRESH_SECRET;
 
-    if (process.env.NODE_ENV === 'production' && (!JWT_SECRET || !JWT_REFRESH_SECRET)) {
-        throw new Error('FATAL: JWT secrets must be set in production');
+    if (!JWT_SECRET || !JWT_REFRESH_SECRET) {
+        if (process.env.NODE_ENV === 'production') {
+            // Already handled by validateStartupSecrets, but extra safety check
+            throw new Error('FATAL: JWT secrets must be set in production');
+        }
+
+        // Use ephemeral keys in development to avoid hardcoded secrets
+        // Ensure they are long enough (64 bytes)
+        JWT_SECRET = JWT_SECRET || crypto.randomBytes(64).toString('hex');
+        JWT_REFRESH_SECRET = JWT_REFRESH_SECRET || crypto.randomBytes(64).toString('hex');
+
+        logger.warn('JWT secrets are not set in .env. Generated ephemeral keys for this session.');
     }
 
     const ROTATE_LUA_SCRIPT = `
@@ -61,7 +77,7 @@ export async function startAuthServer() {
         };
 
         const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '15m' });
-        
+
         // Unique JTI ensures hash differentiation
         const jti = crypto.randomUUID();
         const refreshToken = jwt.sign(
@@ -86,12 +102,29 @@ export async function startAuthServer() {
         name: z.string().optional()
     });
 
-    app.use(createSecurityMiddleware());
     app.use(express.json());
     app.use(cookieParser());
+    app.use(createCsrfMiddleware());
+    app.use(createSecurityMiddleware());
+
+    // --- SECURITY: TLS Runtime Observability ---
+    app.use((req, res, next) => {
+        if (!req.secure && process.env.NODE_ENV === 'production') {
+            logger.error({
+                ip: req.ip,
+                url: req.originalUrl,
+                method: req.method,
+                userAgent: req.headers['user-agent']
+            }, '[SECURITY] CRITICAL: Plaintext connection attempt detected and blocked in production');
+            
+            // Increment security violation counter (if telemetry supported)
+            res.status(403).json({ error: 'Operational Invariant Violated: TLS Mandatory' });
+            return;
+        }
+        next();
+    });
 
     app.get('/csrf', (req, res) => {
-        const { setCsrfToken } = require('@packages/utils');
         const token = setCsrfToken(res);
         res.json({ csrfToken: token });
     });
@@ -99,7 +132,8 @@ export async function startAuthServer() {
     app.post('/login', async (req, res) => {
         const result = LoginSchema.safeParse(req.body);
         if (!result.success) {
-            return res.status(400).json({ error: 'Invalid input', details: result.error.format() });
+            res.status(400).json({ error: 'Invalid input', details: result.error.format() });
+            return;
         }
 
         const { email, password } = result.data;
@@ -111,14 +145,16 @@ export async function startAuthServer() {
 
             if (!user) {
                 await AuditLogger.logSecurity('LOGIN_ATTEMPT', 'FAILURE', { email, reason: 'user_not_found' });
-                return res.status(401).json({ error: 'Invalid credentials' });
+                res.status(401).json({ error: 'Invalid credentials' });
+                return;
             }
 
             const isMatch = await bcrypt.compare(password, user.password || '');
 
             if (!isMatch) {
                 await AuditLogger.logSecurity('LOGIN_ATTEMPT', 'FAILURE', { email, userId: user.id, reason: 'bad_password' });
-                return res.status(401).json({ error: 'Invalid credentials' });
+                res.status(401).json({ error: 'Invalid credentials' });
+                return;
             }
 
             await AuditLogger.logSecurity('LOGIN_ATTEMPT', 'SUCCESS', { email, userId: user.id });
@@ -165,7 +201,8 @@ export async function startAuthServer() {
     app.post('/refresh', async (req, res) => {
         const refreshToken = req.cookies?.refreshToken;
         if (!refreshToken) {
-            return res.status(401).json({ error: 'Missing refresh token' });
+            res.status(401).json({ error: 'Missing refresh token' });
+            return;
         }
 
         try {
@@ -193,14 +230,16 @@ export async function startAuthServer() {
 
             if (result === 'NOT_FOUND') {
                 await AuditLogger.logSecurity('TOKEN_REUSE_DETECTED', 'FAILURE', { userId });
-                return res.status(401).json({ error: 'Session invalid or expired' });
+                res.status(401).json({ error: 'Session invalid or expired' });
+                return;
             }
 
             if (result === 'REUSE') {
                 await AuditLogger.logSecurity('TOKEN_REUSE_ATTEMPT_LOCKED', 'FAILURE', { userId });
                 res.clearCookie('token');
                 res.clearCookie('refreshToken', { path: '/api/auth/refresh' });
-                return res.status(401).json({ error: 'Session highly compromised. Account locked out from active state.' });
+                res.status(401).json({ error: 'Session highly compromised. Account locked out from active state.' });
+                return;
             }
 
             res.cookie('token', token, {
@@ -223,7 +262,8 @@ export async function startAuthServer() {
             logger.error({ err }, '[REFRESH] Error');
             res.clearCookie('token');
             res.clearCookie('refreshToken', { path: '/api/auth/refresh' });
-            return res.status(401).json({ error: 'Invalid or expired refresh token' });
+            res.status(401).json({ error: 'Invalid or expired refresh token' });
+            return;
         }
     });
 
@@ -239,7 +279,7 @@ export async function startAuthServer() {
                 logger.warn({ err: e.message }, 'Failed to write token revoke');
             }
         }
-        
+
         res.clearCookie('token', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict' });
         res.json({ success: true, message: 'Logout successful' });
     });
@@ -247,7 +287,8 @@ export async function startAuthServer() {
     app.post('/signup', async (req, res) => {
         const result = SignupSchema.safeParse(req.body);
         if (!result.success) {
-            return res.status(400).json({ error: 'Invalid input', details: result.error.format() });
+            res.status(400).json({ error: 'Invalid input', details: result.error.format() });
+            return;
         }
 
         const { email, password, name } = result.data;
@@ -255,7 +296,8 @@ export async function startAuthServer() {
         try {
             const existing = await db.user.findUnique({ where: { email } });
             if (existing) {
-                return res.status(400).json({ error: 'User already exists' });
+                res.status(400).json({ error: 'User already exists' });
+                return;
             }
 
             const salt = await bcrypt.genSalt(10);
@@ -333,7 +375,7 @@ export async function startAuthServer() {
 
     // Internal Key is now handled by @packages/auth-internal Zero-Trust layer
 
-    app.get('/metrics', internalAuth(['gateway']), async (_req: express.Request, res: express.Response) => {
+    app.get('/metrics', internalAuth(['gateway']), async (_req: Request, res: Response) => {
         res.set('Content-Type', registry.contentType);
         res.end(await (registry as any).metrics());
     });
@@ -365,7 +407,8 @@ export async function startAuthServer() {
         const tenantId = (req as any).user.tenantId;
 
         if (!['admin', 'agent', 'viewer'].includes(role)) {
-            return res.status(400).json({ error: 'Invalid role' });
+            res.status(400).json({ error: 'Invalid role' });
+            return;
         }
 
         try {
@@ -375,7 +418,8 @@ export async function startAuthServer() {
             });
 
             if (user.count === 0) {
-                return res.status(404).json({ error: 'User not found in this tenant' });
+                res.status(404).json({ error: 'User not found in this tenant' });
+                return;
             }
 
             res.json({ success: true, role });
@@ -402,7 +446,8 @@ export async function startAuthServer() {
                 });
 
                 console.log(`[AuthService] Upgrade requested for User ${userId} to ${plan || 'PRO'}`);
-                return res.json({ success: true });
+                res.json({ success: true });
+                return;
             }
 
             res.status(404).json({ error: 'User not found' });
@@ -426,25 +471,60 @@ export async function startAuthServer() {
 
     const certPath = '/etc/tls/tls.crt';
     const keyPath = '/etc/tls/tls.key';
+    const caPath = '/etc/tls/ca.crt';
     const useHttps = fs.existsSync(certPath) && fs.existsSync(keyPath);
 
+    if (process.env.NODE_ENV === 'production' && !useHttps) {
+        const errorMsg = '[FATAL] SECURITY ENFORCEMENT: TLS is mandatory in production but certificates are missing at /etc/tls/';
+        logger.error(errorMsg);
+        process.exit(1);
+    }
+
+    let server: any;
     const clientCallback = () => {
-        logger.info({ 
-            port: PORT, 
+        logger.info({
+            port: PORT,
             pid: process.pid,
-            protocol: useHttps ? 'https' : 'http' 
+            protocol: useHttps ? 'https' : 'http'
         }, `[AuthService] Operational Worker node active`);
 
         // Register Graceful Shutdown
-        onShutdown('Auth Server', () => new Promise(resolve => server.close(() => resolve())));
+        onShutdown('Auth Server', () => new Promise<void>(resolve => server.close(() => resolve())));
         onShutdown('Database', () => db.$disconnect());
     };
 
-    const server = useHttps 
-        ? https.createServer({
+    if (useHttps) {
+        const httpsOptions: https.ServerOptions = {
             cert: fs.readFileSync(certPath),
             key: fs.readFileSync(keyPath),
-            rejectUnauthorized: false,
-          }, app).listen(PORT, clientCallback)
-        : app.listen(PORT, clientCallback);
+            rejectUnauthorized: process.env.NODE_ENV === 'production',
+        };
+
+        if (fs.existsSync(caPath)) {
+            httpsOptions.ca = fs.readFileSync(caPath);
+        }
+
+        // --- SECURITY: Continuous Runtime TLS Monitoring ---
+        setInterval(() => {
+            try {
+                const stats = fs.statSync(certPath);
+                const now = new Date();
+                const cert = fs.readFileSync(certPath);
+                
+                // Log periodic health
+                logger.debug({
+                    lastModified: stats.mtime,
+                    certSize: cert.length
+                }, '[Security] Certificate runtime integrity verified');
+
+            } catch (e: any) {
+                logger.error({ err: e.message }, '[FATAL] SECURITY FAILURE: TLS Certificate missing or corrupted during runtime');
+                process.exit(1);
+            }
+        }, 300000); // Every 5 minutes
+
+        server = https.createServer(httpsOptions, app).listen(PORT, clientCallback);
+    } else {
+        server = app.listen(PORT, clientCallback);
+    }
 }

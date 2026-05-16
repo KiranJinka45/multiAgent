@@ -8,8 +8,8 @@ import {
   SRETuningParams, 
   SREEvent,
   SREPerception,
-  SREGovernance,
-  SRETrust
+  SREOperationalControl,
+  SREReliability
 } from '@packages/contracts';
 import { CausalityMapper } from './learning/causality-mapper';
 import { ConvergenceMonitor } from './learning/convergence-monitor';
@@ -21,37 +21,37 @@ import { validationEngine } from './validation-engine';
 import { sloManager } from './slo-manager';
 import { decisionEngine } from './decision-engine';
 import { kubernetesActuator } from './kubernetes-actuator';
-import { decisionAudit } from './governance/decision-audit';
-import { shadowExecutor } from './governance/shadow-executor';
-import { causalCanary } from './governance/causal-canary';
+import { decisionAudit } from './operational-control/decision-audit';
+import { shadowExecutor } from './operational-control/shadow-executor';
+import { causalCanary } from './operational-control/causal-canary';
 import { topologyManager } from './learning/causal-topology';
 
 import { NotificationService } from './notification-service';
-import { SreAnalyticsService } from './governance/sre-analytics';
-import { GlobalCoordinator } from './governance/global-coordinator';
+import { SreAnalyticsService } from './operational-control/sre-analytics';
+import { GlobalCoordinator } from './operational-control/global-coordinator';
 import { rootCauseEngine, NodeSignal, RCAResult } from './learning/root-cause-engine';
-import { verificationCoordinator } from './governance/verification-coordinator';
+import { verificationCoordinator } from './operational-control/verification-coordinator';
 import { actionEvaluator } from './learning/action-evaluator';
 import { qLearningAgent, RLState } from './learning/q-learning-agent';
 import { driftDetector } from './learning/drift-detector';
-import { adaptiveTrustManager } from './learning/adaptive-trust';
+import { adaptiveReliabilityManager } from './learning/adaptive-reliability';
 import { modelRegistry } from './learning/model-registry';
-import { IncidentReplayService } from './governance/incident-replay';
-import { businessMetrics, valueModel } from './governance/business-intelligence';
-import { businessOptimizer } from './governance/business-optimizer';
-import { governanceAudit } from './governance/audit-engine';
-import { governanceWatchdog } from './governance/watchdog';
+import { IncidentReplayService } from './operational-control/incident-replay';
+import { businessMetrics, valueModel } from './operational-control/business-intelligence';
+import { businessOptimizer } from './operational-control/business-optimizer';
+import { operationalAudit } from './operational-control/audit-engine';
+import { operationalWatchdog } from './operational-control/watchdog';
 import { policyEngine } from './policy-engine';
-import { policyOptimizer } from './governance/policy-optimizer';
-import { postMortemService } from './governance/post-mortem-service';
+import { policyOptimizer } from './operational-control/policy-optimizer';
+import { postMortemService } from './operational-control/post-mortem-service';
 import { 
   ReliabilityAgent, 
   CostAgent, 
   LatencyAgent 
 } from './learning/multi-agent-intelligence/specialized-agents';
 import { coordinationEngine } from './learning/multi-agent-intelligence/coordination-engine';
-import { TrustEngine } from './trust-engine';
 import { StabilityEngine } from './stability-engine';
+import { OperationalControlEngine } from './operational-control-engine';
 import { ApprovalService } from './approval-service';
 
 const SAFE_BOUNDS = {
@@ -59,7 +59,8 @@ const SAFE_BOUNDS = {
   MAX_TTAC: 60000,
   MIN_DIVERSITY: 2,
   CONFIDENCE_SAFE_FLOOR: 0.5,
-  MAX_TRUST_DECAY: 0.2
+  MAX_RELIABILITY_DECAY: 0.2,
+  MAX_STABILITY_DECAY: 0.2
 };
 
 export class SreEngine extends EventEmitter {
@@ -77,7 +78,7 @@ export class SreEngine extends EventEmitter {
   private tuning: SRETuningParams = {
     expectedTTAC: 15000,
     confidenceThreshold: 0.8,
-    trustDecayRate: 0.05,
+    stabilityDecayRate: 0.05,
     minDiversity: 1
   };
 
@@ -219,8 +220,8 @@ export class SreEngine extends EventEmitter {
     const newState = await this.processEpistemicState();
     
     // Check for transition-aware updates (Jitter detection)
-    if (newState.governance.mode !== this.lastMode) {
-      this.lastMode = newState.governance.mode;
+    if (newState.operationalControl.mode !== this.lastMode) {
+      this.lastMode = newState.operationalControl.mode;
       this.emit('stateChange', newState);
     }
   }
@@ -291,30 +292,29 @@ export class SreEngine extends EventEmitter {
       }
     });
 
-    // 8. Multi-Agent Negotiation (Governance)
+    // 8. Multi-Agent Negotiation (Operational Control)
     const agentDecisions = this.agents.map(a => a.evaluate({
-      anomalyScore: perception.anomalyHypothesis.confidence,
       burnRate,
       latencyP95: 200 + (perception.anomalyHypothesis.confidence * 1000),
       errorRate,
-      trustScore: 1.0 // Initial guess or previous trust
+      stabilityScore: 1.0 // Initial guess or previous stability
     }));
     const consensus_result = coordinationEngine.decide(agentDecisions);
 
-    // 5. Trust Calibration (Calibrated after consensus is reached)
+    // 5. Reliability Calibration (Calibrated after consensus is reached)
     const consensusFactor = consensus_result.confidence;
     const dataQuality = {
       eventsPerSec: this.globalSequence / ( (Date.now() - this.lastTuningTime) / 1000 || 1),
       disorder: this.networkDisorderScore
     };
-    const trust = await TrustEngine.evaluate(perception.anomalyHypothesis.confidence, consensusFactor, dataQuality);
+    const stability = await OperationalControlEngine.evaluate(perception.anomalyHypothesis.confidence, consensusFactor, dataQuality);
     
-    // Record Trust Analytics
+    // Record Stability Analytics
     await SreAnalyticsService.recordEvent({
-      type: 'TRUST',
+      type: 'STABILITY',
       payload: {
-        trust: trust.score,
-        breakdown: trust.breakdown
+        stability: stability.score,
+        breakdown: stability.breakdown
       }
     });
 
@@ -324,7 +324,7 @@ export class SreEngine extends EventEmitter {
       burnRate,
       latencyP95: 200 + (perception.anomalyHypothesis.confidence * 1000), // Simulated latency
       errorRate,
-      trustScore: trust.score
+      reliabilityScore: stability.score
     };
 
     // 7. Counterfactual Simulation (Outcomes for potential actions)
@@ -336,7 +336,7 @@ export class SreEngine extends EventEmitter {
       actions
     );
     
-    // Derived governance mode
+    // Derived operational control mode
     // (Moved to Step 9.1 for HITL integration)
 
     // 9. RL Feedback Loop (Update based on previous action)
@@ -344,14 +344,14 @@ export class SreEngine extends EventEmitter {
       const biz = await businessMetrics.getMetrics();
       let currentRoiAccuracy: number | undefined;
 
-      // --- GOVERNANCE AUDIT: Verify ROI Accuracy (Certified Pipeline) ---
+      // --- OPERATIONAL AUDIT: Verify ROI Accuracy (Certified Pipeline) ---
       const currentTelemetry = {
         latencyMs: rlState.latencyP95,
         errorRate: rawErrorRate,
         rps: biz.activeUsers / 10
       };
 
-      await verificationCoordinator.process(currentTelemetry, trust.score);
+      await verificationCoordinator.process(currentTelemetry, stability.score);
 
 
       const reward = qLearningAgent.computeReward({
@@ -418,18 +418,18 @@ export class SreEngine extends EventEmitter {
     this.lastPredictedRoi = predictedSavings;
 
 
-    // 9.1 Governance Watchdog Enforcement
-    let governance = this.determineGovernance(perception);
+    // 9.1 Operational Control Watchdog Enforcement
+    let operationalControl = this.determineOperationalControl(perception);
     let approvalRequestId: string | undefined;
 
-    const watchdogStatus = await governanceWatchdog.evaluateHealth();
+    const watchdogStatus = await operationalWatchdog.evaluateHealth();
     if (watchdogStatus.action === 'FORCE_SAFE_MODE') {
       decision = 'OBSERVE';
-      governance.mode = 'SAFE_MODE';
-      governance.reason = 'Watchdog triggered safe mode: ' + watchdogStatus.status;
+      operationalControl.mode = 'SAFE_MODE';
+      operationalControl.reason = 'Watchdog triggered safe mode: ' + watchdogStatus.status;
       logger.error({ watchdogStatus }, '[SRE] FORCE SAFE MODE ACTIVATED BY WATCHDOG');
     } else if (watchdogStatus.action === 'INCREASE_HITL_GATING' && decision === 'ACT') {
-      trust.score = Math.min(trust.score, 0.3); // Force HITL gate by lowering perceived trust
+      stability.score = Math.min(stability.score, 0.3); // Force HITL gate by lowering perceived stability
     }
 
     if (decision === 'ACT' && !this.shadowMode) {
@@ -448,12 +448,12 @@ export class SreEngine extends EventEmitter {
           } else if (req?.status === 'REJECTED') {
             logger.warn({ requestId: this.pendingApprovalId }, '[SRE] Action REJECTED by human. Halting.');
             decision = 'OBSERVE';
-            governance.mode = 'HALTED';
-            governance.reason = 'Action rejected by operator';
+            operationalControl.mode = 'HALTED';
+            operationalControl.reason = 'Action rejected by operator';
           } else if (req?.status === 'PENDING') {
             logger.info({ requestId: this.pendingApprovalId }, '[SRE] Waiting for human approval...');
             decision = 'OBSERVE';
-            governance.mode = 'AWAITING_APPROVAL';
+            operationalControl.mode = 'AWAITING_APPROVAL';
             approvalRequestId = this.pendingApprovalId;
           } else {
             // Expired or missing
@@ -461,24 +461,24 @@ export class SreEngine extends EventEmitter {
           }
         }
 
-        // Create new approval if trust is low and no pending request
+        // Create new approval if stability is low and no pending request
         // --- ADAPTIVE INTELLIGENCE: Policy Refinement ---
-        const stats = governanceAudit.getStats();
+        const stats = operationalAudit.getStats();
         const refinedPolicy = await policyOptimizer.optimize(stats.avgRegret || 0, stats.avgBrier || 0);
         const policy = policyOptimizer.getPolicy();
 
         const isApprovedInThisCycle = this.approvedActions.has(actionKey) && (this.approvedActions.get(actionKey) || 0) > Date.now();
-        if (decision === 'ACT' && trust.score < policy.trustThreshold && !this.pendingApprovalId && !isApprovedInThisCycle) {
+        if (decision === 'ACT' && stability.score < policy.stabilityThreshold && !this.pendingApprovalId && !isApprovedInThisCycle) {
           const req = await ApprovalService.createRequest({
             expiresAt: Date.now() + 120000, // 2-minute TTL
             risk: 'HIGH',
-            trustScore: trust.score,
+            reliabilityScore: stability.score,
             proposedAction: { type: finalAction, target: this.rcaResult?.rootCause },
             predictedImpact: this.lastImprovement,
             rootCauses: this.rcaResult ? [{ nodeId: this.rcaResult.rootCause, confidence: this.rcaResult.confidence }] : [],
             blastRadius: 5, // Simulated
             targetServices: [this.rcaResult?.rootCause || 'api-service'],
-            reasoning: `Low trust (${trust.score.toFixed(2)}) requires manual oversight. Rationale: ${perception.explainability.rationale}`
+            reasoning: `Low stability (${stability.score.toFixed(2)}) requires manual oversight. Rationale: ${perception.explainability.rationale}`
           });
           this.pendingApprovalId = req.id;
           
@@ -489,16 +489,16 @@ export class SreEngine extends EventEmitter {
               requestId: req.id,
               status: 'PENDING',
               risk: req.risk,
-              trust: trust.score
+              reliability: stability.score
             }
           });
 
           decision = 'OBSERVE';
-          governance.mode = 'AWAITING_APPROVAL';
+          operationalControl.mode = 'AWAITING_APPROVAL';
           approvalRequestId = req.id;
 
           // Dispatch external alert for human intervention
-          NotificationService.notifyApprovalRequired(req.id, req.proposedAction.type, trust.score);
+          NotificationService.notifyApprovalRequired(req.id, req.proposedAction.type, stability.score);
         }
       }
     }
@@ -536,11 +536,11 @@ export class SreEngine extends EventEmitter {
       region: this.region,
       intent: 'GLOBAL_SYNC', 
       perception,
-      governance: {
-        ...governance,
+      operationalControl: {
+        ...operationalControl,
         approvalRequestId
       },
-      trust,
+      stability,
       observers: observerList,
       lastAction: this.lastAction,
       events: this.events.slice(-10),
@@ -549,7 +549,7 @@ export class SreEngine extends EventEmitter {
       validation: validationEngine.getStats(),
       drift: {
         dataDrift: 0.05, // Mocked for this cycle
-        conceptDrift: Math.max(0, trust.score - 0.85),
+        conceptDrift: Math.max(0, stability.score - 0.85),
         policyDrift: 0.01,
         overallScore: 0.06,
         status: 'NOMINAL'
@@ -569,13 +569,13 @@ export class SreEngine extends EventEmitter {
         },
         proposals: [] // Will be populated by async optimizer
       },
-      governanceAudit: {
-        avgBrier: governanceAudit.getStats().avgBrier || 0,
-        avgRegret: governanceAudit.getStats().avgRegret || 0,
-        avgRoiAccuracy: governanceAudit.getStats().avgRoiAccuracy || 0,
-        count: governanceAudit.getStats().count || 0,
-        status: (await governanceWatchdog.evaluateHealth()).status,
-        intervention: (await governanceWatchdog.evaluateHealth()).action,
+      operationalAudit: {
+        avgBrier: operationalAudit.getStats().avgBrier || 0,
+        avgRegret: operationalAudit.getStats().avgRegret || 0,
+        avgRoiAccuracy: operationalAudit.getStats().avgRoiAccuracy || 0,
+        count: operationalAudit.getStats().count || 0,
+        status: (await operationalWatchdog.evaluateHealth()).status,
+        intervention: (await operationalWatchdog.evaluateHealth()).action,
         policy: policyOptimizer.getPolicy(),
         multiCluster: {
           globalDecisionConsistency: true, // Derived from globalCoordinator
@@ -615,13 +615,13 @@ export class SreEngine extends EventEmitter {
     await redis.publish('sre:telemetry:update', JSON.stringify(update));
 
     // 8. Multi-Stage Canary Actuation (Gated by Shadow Mode & Causal Redirection)
-    logger.info({ decision, governanceMode: governance.mode, shadowMode: this.shadowMode }, '[SreEngine] Evaluating actuation condition');
-    if (decision === 'ACT' && governance.mode !== 'HALTED') {
+    logger.info({ decision, controlMode: operationalControl.mode, shadowMode: this.shadowMode }, '[SreEngine] Evaluating actuation condition');
+    if (decision === 'ACT' && operationalControl.mode !== 'HALTED') {
       const isRcaRedirection = this.rcaResult && this.rcaResult.rootCause !== 'api-service' && this.rcaResult.confidence > 0.7;
       const targetService = isRcaRedirection ? this.rcaResult!.rootCause : 'api-service';
       const taskType = perception.anomalyHypothesis.zScore > 5 ? 'RESTART' : 'SCALE_UP';
 
-      // --- GOVERNANCE AUDIT: Initiate Baseline for Verified ROI ---
+      // --- OPERATIONAL AUDIT: Initiate Baseline for Verified ROI ---
       const interventionId = `act-${targetService}`;
       const scope = causalCanary.decideActionScope(interventionId);
 
@@ -645,7 +645,7 @@ export class SreEngine extends EventEmitter {
         };
 
         // --- ADAPTIVE INTELLIGENCE: Automated Post-Mortem ---
-        const stats = governanceAudit.getStats();
+        const stats = operationalAudit.getStats();
         const refinedPolicy = await policyOptimizer.optimize(stats.avgRegret || 0, stats.avgBrier || 0);
 
         await postMortemService.generate({
@@ -666,7 +666,7 @@ export class SreEngine extends EventEmitter {
             action: taskType,
             target: targetService,
             shadow: true,
-            trust: trust.score,
+            stability: stability.score,
             scope
           }
         });
@@ -712,7 +712,7 @@ export class SreEngine extends EventEmitter {
             action: taskType,
             target: targetService,
             shadow: false,
-            trust: trust.score,
+            stability: stability.score,
             scope
           }
         });
@@ -751,7 +751,7 @@ export class SreEngine extends EventEmitter {
       this.networkDisorderScore = 0.5;
     } else if (type === 'REGIONAL_FAILOVER') {
       this.reportNodeAnomaly('global-gateway', 1.0);
-    } else if (type === 'GOVERNANCE_DRIFT') {
+    } else if (type === 'CONTROL_DRIFT') {
        // This will be handled in the next processEpistemicState cycle via a temp flag if needed, 
        // but for now we just log it and trigger an anomaly.
        this.reportNodeAnomaly('api-service', 0.9);
@@ -947,10 +947,10 @@ export class SreEngine extends EventEmitter {
     } as any;
   }
 
-  private determineGovernance(perception: SREPerception): SREGovernance {
+  private determineOperationalControl(perception: SREPerception): SREOperationalControl {
     let mode: 'STABLE' | 'HEALING' | 'HALTED' | 'CHAOS_TEST' | 'AWAITING_APPROVAL' | 'SAFE_MODE' = 'STABLE';
     let reason = 'System nominal';
-    let reasonType: SREGovernance['reasonType'] = 'NONE';
+    let reasonType: SREOperationalControl['reasonType'] = 'NONE';
 
     if (perception.signalIntegrityState === 'CRITICAL') {
       mode = 'HEALING';
@@ -1023,10 +1023,10 @@ export class SreEngine extends EventEmitter {
     (state as any).validation = validationEngine.getStats();
     (state as any).audit = decisionAudit.getRecent(10);
     
-    // Enrich governanceAudit with Watchdog health status and Multi-Cluster view
-    const health = await governanceWatchdog.evaluateHealth();
-    (state as any).governanceAudit = {
-      ...governanceAudit.getStats(),
+    // Enrich operationalAudit with Watchdog health status and Multi-Cluster view
+    const health = await operationalWatchdog.evaluateHealth();
+    (state as any).operationalAudit = {
+      ...operationalAudit.getStats(),
       status: health.status,
       action: health.action,
       multiCluster: {
@@ -1046,39 +1046,39 @@ export class SreEngine extends EventEmitter {
   private getLastSnapshot(): SREUpdate {
     if (this.lastSnapshot) return this.lastSnapshot;
 
-    const perception: SREPerception = {
-        consensus: 0,
-        diversity: { providers: 0, required: this.tuning.minDiversity, groups: [], satisfied: false },
-        weightedConfidence: 0,
-        decomposition: { quorum: 0, diversity: 0, stability: 0 },
-        explainability: { rationale: 'Cached state snapshot', impacts: [] },
-        expectedVariance: 0.05,
-        anomalyHypothesis: { detected: false, zScore: 0, confidence: 0 },
-        brierScore: 0,
-        calibrationBuffer: 0,
-        signalQuality: 1,
-        signalIntegrityState: 'NOMINAL',
-        causalCertainty: 0,
-        wassersteinDistance: 0,
-        tuningVelocity: 0,
-        velocityDecay: 0
-    };
-
     return {
       sequenceId: this.globalSequence,
       timestamp: Date.now(),
-      intent: 'STATE_SNAPSHOT',
-      observers: Array.from(this.observers.values()),
-      perception,
-      governance: { 
+      clusterId: this.clusterId,
+      region: this.region,
+      intent: 'INITIALIZING',
+      perception: {
+          consensus: 0,
+          diversity: { providers: 0, required: this.tuning.minDiversity, groups: [], satisfied: false },
+          weightedConfidence: 0,
+          decomposition: { quorum: 0, diversity: 0, stability: 0 },
+          explainability: { rationale: 'Warming up', impacts: [] },
+          expectedVariance: 0.1,
+          anomalyHypothesis: { detected: false, zScore: 0, confidence: 0, type: 'NONE', support: 0 },
+          brierScore: 0,
+          calibrationBuffer: 0,
+          signalQuality: 1.0,
+          signalIntegrityState: 'NOMINAL',
+          causalCertainty: 0,
+          wassersteinDistance: 0,
+          tuningVelocity: 0,
+          velocityDecay: 0
+      },
+      operationalControl: { 
           mode: 'STABLE', 
-          reason: 'State Snapshot', 
+          reason: 'Initializing', 
           reasonType: 'NONE',
           holdTimeMs: 0,
           expectedTTAC: this.tuning.expectedTTAC,
           slidingP95TTAC: this.tuning.expectedTTAC,
-          reasoningDecomposition: { quorumContribution: 0, diversityFactor: 0, safetyBuffer: 0, causalTrigger: '' }
+          reasoningDecomposition: { quorumContribution: 0, diversityFactor: 0, safetyBuffer: 0, causalTrigger: null }
       },
+      reliability: { score: 1.0, breakdown: { confidence: 1.0, calibration: 1.0, stability: 1.0, consensus: 1.0, dataQuality: 1.0 } },
       lastAction: this.lastAction,
       events: this.events.slice(-10),
       topology: { nodes: [], edges: [] }
@@ -1127,7 +1127,7 @@ export class SreEngine extends EventEmitter {
 
   public reset() {
     this.nodeAnomalyRegistry.clear();
-    governanceAudit.reset();
+    operationalAudit.reset();
     roiPipeline.reset();
     policyOptimizer.reset();
     this.addEvent('SYSTEM_RESET', 'SRE Control Plane reset to initial state', 'INFO');

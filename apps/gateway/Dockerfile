@@ -4,6 +4,8 @@ WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@10.33.0 --activate
 COPY . .
 RUN npx turbo prune @apps/gateway --docker --out-dir=out
+# Ensure root config files are in the out directory if missing
+COPY turbo.json tsconfig.base.json tsup.config.base.ts ./out/full/
 
 # ── Stage 2: Installer ───────────────────────────────────────────────────────
 FROM node:20-alpine AS installer
@@ -22,11 +24,12 @@ RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # Now copy the pruned source
 COPY --from=pruner /app/out/full/ .
-COPY turbo.json tsconfig*.json tsup.config.base.ts ./
+# Root config files are already available in full context if built from root
 
 # Generate Prisma Client (Crucial for @packages/db resolution)
 # With our new schema config, this will output to packages/db/src/generated/client
-RUN pnpm prisma generate --schema=packages/db/prisma/schema.prisma
+# Generate Prisma client using the monorepo's installer context
+RUN pnpm --filter=@packages/db exec prisma generate
 
 # Build the app and its workspace dependencies
 RUN pnpm turbo build --filter=@apps/gateway...

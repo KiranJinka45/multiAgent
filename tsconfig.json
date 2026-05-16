@@ -4,146 +4,43 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@packages/*": ["packages/*/src"]
+      "@packages/*": [
+        "packages/*/src"
+      ]
     }
   },
   "files": [],
   "include": [],
   "references": [
-    {
-      "path": "./apps/api"
-    },
-    {
-      "path": "./apps/auth-service"
-    },
-    {
-      "path": "./apps/billing-service"
-    },
-    {
-      "path": "./apps/core-api"
-    },
-    {
-      "path": "./apps/deploy-service"
-    },
-    {
-      "path": "./apps/frontend"
-    },
-    {
-      "path": "./apps/gateway"
-    },
-    {
-      "path": "./apps/worker"
-    },
-    {
-      "path": "./packages/agents"
-    },
-    {
-      "path": "./packages/ai"
-    },
-    {
-      "path": "./packages/auth-internal"
-    },
-    {
-      "path": "./packages/autonomous-agent"
-    },
-    {
-      "path": "./packages/billing"
-    },
-    {
-      "path": "./packages/brain"
-    },
-    {
-      "path": "./packages/build-engine"
-    },
-    {
-      "path": "./packages/config"
-    },
-    {
-      "path": "./packages/contracts"
-    },
-    {
-      "path": "./packages/core-engine"
-    },
-    {
-      "path": "./packages/db"
-    },
-    {
-      "path": "./packages/events"
-    },
-    {
-      "path": "./packages/memory"
-    },
-    {
-      "path": "./packages/memory-cache"
-    },
-    {
-      "path": "./packages/memory-core"
-    },
-    {
-      "path": "./packages/memory-vector"
-    },
-    {
-      "path": "./packages/observability"
-    },
-    {
-      "path": "./packages/preview-runtime"
-    },
-    {
-      "path": "./packages/queue"
-    },
-    {
-      "path": "./packages/refactor-agent"
-    },
-    {
-      "path": "./packages/registry"
-    },
-    {
-      "path": "./packages/resilience"
-    },
-    {
-      "path": "./packages/runtime"
-    },
-    {
-      "path": "./packages/sandbox"
-    },
-    {
-      "path": "./packages/sandbox-cluster"
-    },
-    {
-      "path": "./packages/sandbox-runtime"
-    },
-    {
-      "path": "./packages/sdk"
-    },
-    {
-      "path": "./packages/self-evolution"
-    },
-    {
-      "path": "./packages/shared-services"
-    },
-    {
-      "path": "./packages/supabase"
-    },
-    {
-      "path": "./packages/templates"
-    },
-    {
-      "path": "./packages/tools"
-    },
-    {
-      "path": "./packages/ui"
-    },
-    {
-      "path": "./packages/utils"
-    },
-    {
-      "path": "./packages/validator"
-    },
-    {
-      "path": "./packages/ztan-crypto"
-    },
-    {
-      "path": "./apps/governance"
-    }
+    { "path": "./apps/auth-service" },
+    { "path": "./apps/control-plane" },
+    { "path": "./apps/core-api" },
+    { "path": "./apps/deploy-service" },
+    { "path": "./apps/frontend" },
+    { "path": "./apps/gateway" },
+    { "path": "./apps/incidents" },
+    { "path": "./apps/operational-protocol" },
+    { "path": "./apps/reliability-dashboard" },
+    { "path": "./apps/worker" },
+    { "path": "./packages/auth-internal" },
+    { "path": "./packages/autonomous-ops" },
+    { "path": "./packages/config" },
+    { "path": "./packages/contracts" },
+    { "path": "./packages/db" },
+    { "path": "./packages/governance-core" },
+    { "path": "./packages/infra-graph" },
+    { "path": "./packages/memory-core" },
+    { "path": "./packages/observability" },
+    { "path": "./packages/production-pilot" },
+    { "path": "./packages/production-validation" },
+    { "path": "./packages/reliability-intelligence" },
+    { "path": "./packages/runtime-core" },
+    { "path": "./packages/tools" },
+    { "path": "./packages/ui" },
+    { "path": "./packages/core-engine" },
+    { "path": "./packages/memory-cache" },
+    { "path": "./packages/utils" },
+    { "path": "./packages/validator" },
+    { "path": "./packages/ztanctl" }
   ]
 }

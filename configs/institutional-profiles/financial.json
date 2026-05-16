@@ -1,0 +1,15 @@
+{
+    "profileName": "Financial Institution",
+    "description": "Optimized for regulated financial entities requiring high stability and auditability.",
+    "policies": {
+        "MAX_SLASH_RATE_PER_EPOCH": 0.05,
+        "CASCADE_THRESHOLD": 0.15,
+        "SURGE_THRESHOLD": 0.20,
+        "UNBONDING_PERIOD_DAYS": 21
+    },
+    "governance": {
+        "requiredAuthorityForRestore": "CONSTITUTIONAL_ANCHOR",
+        "slowdownFactor": 1.5,
+        "mandatoryDualQuorum": true
+    }
+}

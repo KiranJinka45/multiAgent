@@ -1,5 +1,6 @@
-import { GovernanceReceipt, GovernanceAction, CouncilMember, verifyGovernanceReceiptMultiSig } from './governance.js';
-import { ISigner } from './signer.js';
+import { verifyGovernanceReceiptMultiSig } from './governance.js';
+import type { GovernanceReceipt, GovernanceAction, CouncilMember } from './governance.js';
+import type { ISigner } from './signer.js';
 
 
 /**

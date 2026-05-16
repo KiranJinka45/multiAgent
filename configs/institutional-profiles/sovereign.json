@@ -1,0 +1,16 @@
+{
+    "profileName": "Sovereign Federation",
+    "description": "Optimized for national or multi-state actors requiring absolute survivability and cryptographic sovereignty.",
+    "policies": {
+        "MAX_SLASH_RATE_PER_EPOCH": 0.02,
+        "CASCADE_THRESHOLD": 0.10,
+        "SURGE_THRESHOLD": 0.15,
+        "UNBONDING_PERIOD_DAYS": 45
+    },
+    "governance": {
+        "requiredAuthorityForRestore": "CONSTITUTIONAL_ANCHOR",
+        "slowdownFactor": 2.0,
+        "mandatoryDualQuorum": true,
+        "sovereignOverridesEnabled": true
+    }
+}

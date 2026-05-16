@@ -1,5 +1,5 @@
-import { SREAgent, AgentDecision } from './agent.interface';
-import { RLState } from '../q-learning-agent';
+import { type SREAgent, type AgentDecision } from './agent.interface.js';
+import { type RLState } from '../q-learning-agent.js';
 
 /**
  * ReliabilityAgent: Protects the SLO and error budget.

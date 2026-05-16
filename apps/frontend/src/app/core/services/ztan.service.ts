@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { ApiService } from './api.service';
 import { firstValueFrom } from 'rxjs';
 
-export interface CeremonyState {
-  ceremonyId: string;
+export interface SessionState {
+  sessionId: string;
   masterPublicKey: string;
   threshold: number;
   participants: { nodeId: string, status: string, publicKey?: string }[];
@@ -16,7 +16,7 @@ export interface CeremonyState {
 export interface Metrics {
   activeNodes: number;
   revokedNodes: number;
-  totalCeremonies: number;
+  totalSessions: number;
   successRate: number;
   status: string;
 }
@@ -27,33 +27,33 @@ export interface Metrics {
 export class ZtanService {
   constructor(private api: ApiService) {}
 
-  async getActiveCeremony(): Promise<CeremonyState | null> {
+  async getActiveSession(): Promise<SessionState | null> {
     try {
-      const res = await firstValueFrom(this.api.get<{ active: CeremonyState }>('/ztan/ceremony/active'));
+      const res = await firstValueFrom(this.api.get<{ active: SessionState }>('/ztan/session/active'));
       return res.active;
     } catch (e) {
       return null;
     }
   }
 
-  async initCeremony(threshold: number, participants: string[], messageHash: string): Promise<CeremonyState> {
-    return await firstValueFrom(this.api.post<CeremonyState>('/ztan/ceremony/init', { threshold, participants, messageHash }));
+  async initSession(threshold: number, participants: string[], messageHash: string): Promise<SessionState> {
+    return await firstValueFrom(this.api.post<SessionState>('/ztan/session/init', { threshold, participants, messageHash }));
   }
 
-  async submitCommitments(msg: any): Promise<CeremonyState> {
-    return await firstValueFrom(this.api.post<CeremonyState>('/ztan/ceremony/commitments', msg));
+  async submitCommitments(msg: any): Promise<SessionState> {
+    return await firstValueFrom(this.api.post<SessionState>('/ztan/session/commitments', msg));
   }
 
-  async submitShares(msg: any): Promise<CeremonyState> {
-    return await firstValueFrom(this.api.post<CeremonyState>('/ztan/ceremony/shares', msg));
+  async submitShares(msg: any): Promise<SessionState> {
+    return await firstValueFrom(this.api.post<SessionState>('/ztan/session/shares', msg));
   }
 
-  async submitSignature(msg: any): Promise<CeremonyState> {
-    return await firstValueFrom(this.api.post<CeremonyState>('/ztan/ceremony/sign', msg));
+  async submitSignature(msg: any): Promise<SessionState> {
+    return await firstValueFrom(this.api.post<SessionState>('/ztan/session/sign', msg));
   }
 
-  async simulateSign(nodeId: string): Promise<CeremonyState> {
-    return await firstValueFrom(this.api.post<CeremonyState>('/ztan/ceremony/sign', { nodeId, simulate: true }));
+  async simulateSign(nodeId: string): Promise<SessionState> {
+    return await firstValueFrom(this.api.post<SessionState>('/ztan/session/sign', { nodeId, simulate: true }));
   }
 
   async archive(): Promise<any> {

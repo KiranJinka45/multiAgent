@@ -24,6 +24,10 @@ export class IsolationForestService {
     return Math.min(1, dist / 4.0); // Calibrated to 4-sigma
   }
 
+  public async predict(metrics: any): Promise<number> {
+    return this.score(metrics.latency || 0);
+  }
+
   private ingest(value: number) {
     this.window.push(value);
     if (this.window.length > this.maxSize) {
@@ -44,7 +48,7 @@ export class IsolationForestService {
     
     const sum = this.window.reduce((a, b) => a + b, 0);
     const mean = sum / this.window.length;
-    const std = Math.sqrt(this.window.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / this.window.length) || 1e-6;
+    const std = Math.sqrt(this.window.reduce((a, b) => Math.pow(b - mean, 2), 0) / this.window.length) || 1e-6;
     
     this.baseline = { mean, std };
     logger.info({ mean, std, windowSize: this.window.length }, '[ML] Isolation Forest Retrained (Online Adaptation)');

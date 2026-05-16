@@ -9,20 +9,22 @@
  * 
  * This is the "brain" that makes the system self-protecting.
  */
-import { logger } from '@packages/observability';
+import { 
+    logger,
+    jobTotal as jobTotalImport,
+    jobRetriesTotal as jobRetriesTotalImport,
+    queueDepth as queueDepthImport,
+    activeWorkers as activeWorkersImport,
+    controlPlaneEvaluationLatency as controlPlaneEvaluationLatencyImport,
+    controlPlaneModeChangesTotal as controlPlaneModeChangesTotalImport,
+    controlPlaneFailuresTotal as controlPlaneFailuresTotalImport
+} from '@packages/observability';
 
-// Defensive metric imports — gracefully degrade if observability hasn't compiled new exports
-let jobTotal: any = null;
-let jobRetriesTotal: any = null;
-let queueDepth: any = null;
-let activeWorkers: any = null;
-try {
-    const obs = require('@packages/observability');
-    jobTotal = obs.jobTotal;
-    jobRetriesTotal = obs.jobRetriesTotal;
-    queueDepth = obs.queueDepth;
-    activeWorkers = obs.activeWorkers;
-} catch { /* metrics unavailable — non-fatal */ }
+// Defensive metric assignments — use imported values
+let jobTotal: any = jobTotalImport;
+let jobRetriesTotal: any = jobRetriesTotalImport;
+let queueDepth: any = queueDepthImport;
+let activeWorkers: any = activeWorkersImport;
 
 // ── System Modes ─────────────────────────────────────────────────────────────
 export type SystemMode = 'NORMAL' | 'DEGRADED' | 'PROTECT' | 'EMERGENCY';
@@ -144,13 +146,10 @@ export class ControlPlane {
     constructor(redisClient: any) {
         this.redis = redisClient;
         
-        // Try to load control plane metrics
-        try {
-            const obs = require('@packages/observability');
-            if (obs.controlPlaneEvaluationLatency) this.controlPlaneEvaluationLatency = obs.controlPlaneEvaluationLatency;
-            if (obs.controlPlaneModeChangesTotal) this.controlPlaneModeChangesTotal = obs.controlPlaneModeChangesTotal;
-            if (obs.controlPlaneFailuresTotal) this.controlPlaneFailuresTotal = obs.controlPlaneFailuresTotal;
-        } catch { /* metrics unavailable — non-fatal */ }
+        // Use imported control plane metrics
+        if (controlPlaneEvaluationLatencyImport) this.controlPlaneEvaluationLatency = controlPlaneEvaluationLatencyImport;
+        if (controlPlaneModeChangesTotalImport) this.controlPlaneModeChangesTotal = controlPlaneModeChangesTotalImport;
+        if (controlPlaneFailuresTotalImport) this.controlPlaneFailuresTotal = controlPlaneFailuresTotalImport;
     }
 
     // ── Metrics Adapter: Read Real-Time State ───────────────────────────────

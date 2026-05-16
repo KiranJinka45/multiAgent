@@ -1,4 +1,4 @@
-import { AgentDecision } from './agent.interface';
+import { type AgentDecision } from './agent.interface.js';
 
 export class CoordinationEngine {
   /**

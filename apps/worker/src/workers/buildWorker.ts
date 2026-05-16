@@ -1,6 +1,4 @@
-import { Worker, Job } from '@packages/utils';
-import { runPipeline, updatePipeline, deployPipeline } from '@packages/core-engine';
-import { connection } from '@packages/queue';
+import { Worker, Job, runPipeline, updatePipeline, deployPipeline, connection } from '@packages/utils';
 import { logger } from '@packages/observability';
 
 export const buildWorker = new Worker(

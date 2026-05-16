@@ -1,15 +1,5 @@
 import { Component, inject, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HesitationMonitorComponent } from './hesitation-monitor';
-import { ConsensusPanelComponent } from './consensus-panel';
-import { PostActionPanelComponent } from './post-action-panel';
-import { TuningPanelComponent } from './tuning-panel';
-import { StabilityStateWidget } from './widgets/stability-state-widget';
-import { ConvergenceGraph } from './widgets/convergence-graph';
-import { DriftRadar } from './widgets/drift-radar';
-import { DriftTrend } from './widgets/drift-trend';
-import { CalibrationPanel } from './widgets/calibration-panel';
-import { OperatorActions } from './widgets/operator-actions';
 import { SreDataService } from '../../core/services/sre-data.service';
 import { CausalGraphComponent } from './components/causal-graph';
 import { SreAnalyticsDashboardComponent } from './sre-analytics-dashboard';
@@ -21,19 +11,9 @@ import { ValidationPanelComponent } from './widgets/validation-panel';
   standalone: true,
   imports: [
     CommonModule, 
-    HesitationMonitorComponent, 
-    ConsensusPanelComponent, 
-    PostActionPanelComponent, 
-    TuningPanelComponent,
-    StabilityStateWidget,
-    ConvergenceGraph,
-    DriftRadar,
-    DriftTrend,
-    CalibrationPanel,
-    OperatorActions,
-    CausalGraphComponent,
-    SreAnalyticsDashboardComponent,
-    SreCertificationComponent,
+    CausalGraphComponent, 
+    SreAnalyticsDashboardComponent, 
+    SreCertificationComponent, 
     ValidationPanelComponent
   ],
   template: `
@@ -42,15 +22,15 @@ import { ValidationPanelComponent } from './widgets/validation-panel';
       <!-- 1. Header & Global Status -->
       <header class="stats-row">
         <div class="stat-card">
-          <label>SYSTEM STATUS</label>
+          <label>CONTROL STATUS</label>
           <div class="value" [class.success]="data.healthStatus() === 'HEALTHY'" [class.danger]="data.healthStatus() === 'CRITICAL'">
-            CONDITIONALLY AUTONOMOUS
+            AUTOMATED CONTROL ACTIVE
           </div>
         </div>
         <div class="stat-card">
-          <label>AUTONOMY TRUST</label>
-          <div class="value" [class.success]="data.trustScore() > 0.8" [class.warning]="data.trustScore() < 0.5">
-            {{ (data.trustScore() * 100) | number:'1.0-0' }}%
+          <label>RELIABILITY FIDELITY</label>
+          <div class="value" [class.success]="data.stabilityScore() > 0.8" [class.warning]="data.stabilityScore() < 0.5">
+            {{ (data.stabilityScore() * 100) | number:'1.0-0' }}%
           </div>
         </div>
         <div class="stat-card">
@@ -59,7 +39,7 @@ import { ValidationPanelComponent } from './widgets/validation-panel';
         </div>
         <div class="stat-card">
           <label>CALIBRATION (BRIER)</label>
-          <div class="value">{{ data.perception()?.governanceAudit?.avgBrier | number:'1.3-3' }}</div>
+          <div class="value">{{ data.perception()?.operationalAudit?.avgBrier | number:'1.3-3' }}</div>
         </div>
       </header>
 
@@ -68,7 +48,7 @@ import { ValidationPanelComponent } from './widgets/validation-panel';
         <button (click)="activeTab.set('DASHBOARD')" 
                 [class.active]="activeTab() === 'DASHBOARD'"
                 class="tab-btn px-6 py-3 font-bold text-xs uppercase tracking-widest transition-all">
-          COMMAND DECK
+          OPERATIONAL DASHBOARD
         </button>
         <button (click)="activeTab.set('CERTIFICATION')" 
                 [class.active]="activeTab() === 'CERTIFICATION'"
@@ -85,7 +65,7 @@ import { ValidationPanelComponent } from './widgets/validation-panel';
             <div class="panel-header">
               <h3>CAUSAL TOPOLOGY & RCA</h3>
               <div class="actions">
-                <button class="btn-minimal" (click)="runDigitalTwin()">SIMULATE TWIN</button>
+                <button class="btn-minimal" (click)="runDigitalTwin()">RUN PREDICTIVE SIMULATION</button>
                 <button class="btn-minimal danger" (click)="injectChaos('MULTI_REGION_FAILURE')">INJECT CHAOS</button>
               </div>
             </div>
@@ -101,7 +81,7 @@ import { ValidationPanelComponent } from './widgets/validation-panel';
 
           <div class="panel">
             <div class="panel-header">
-              <h3>ELITE DECISION AUDIT</h3>
+              <h3>OPERATIONAL AUDIT LOG</h3>
               <button class="btn-minimal" (click)="downloadReport()">DOWNLOAD REPORT</button>
             </div>
             <div class="panel-body">
@@ -112,7 +92,7 @@ import { ValidationPanelComponent } from './widgets/validation-panel';
                     <th>DECISION</th>
                     <th>RATIONALE</th>
                     <th>OUTCOME</th>
-                    <th>TRUST</th>
+                    <th>STABILITY</th>
                     <th>ACTIONS</th>
                   </tr>
                 </thead>
@@ -136,7 +116,7 @@ import { ValidationPanelComponent } from './widgets/validation-panel';
 
         <div class="sidebar">
           <div class="panel">
-            <div class="panel-header"><h3>STRATEGIC PROPOSALS</h3></div>
+            <div class="panel-header"><h3>INFRASTRUCTURE OPTIMIZATIONS</h3></div>
             <div class="panel-body">
               <div *ngFor="let p of data.perception()?.business?.proposals" class="proposal-card">
                 <div class="proposal-type">{{ p.type }}</div>
@@ -148,21 +128,21 @@ import { ValidationPanelComponent } from './widgets/validation-panel';
           </div>
 
           <div class="panel">
-            <div class="panel-header"><h3>GOVERNANCE STATUS</h3></div>
+            <div class="panel-header"><h3>RELIABILITY STATUS</h3></div>
             <div class="panel-body">
-              <div class="gov-metric">
+              <div class="reliability-metric">
                 <label>WATCHDOG STATUS</label>
-                <div class="val" [class.success]="data.perception()?.governanceAudit?.status === 'HEALTHY'">
-                  {{ data.perception()?.governanceAudit?.status || 'HEALTHY' }}
+                <div class="val" [class.success]="data.perception()?.operationalAudit?.status === 'HEALTHY'">
+                  {{ data.perception()?.operationalAudit?.status || 'HEALTHY' }}
                 </div>
               </div>
-              <div class="gov-metric">
+              <div class="reliability-metric">
                 <label>ROI ACCURACY</label>
-                <div class="val">{{ (data.perception()?.governanceAudit?.avgRoiAccuracy || 0) * 100 | number:'1.0-0' }}%</div>
+                <div class="val">{{ (data.perception()?.operationalAudit?.avgRoiAccuracy || 0) * 100 | number:'1.0-0' }}%</div>
               </div>
-              <div class="gov-metric">
+              <div class="reliability-metric">
                 <label>DECISION REGRET</label>
-                <div class="val">{{ data.perception()?.governanceAudit?.avgRegret | number:'1.3-3' }}</div>
+                <div class="val">{{ data.perception()?.operationalAudit?.avgRegret | number:'1.3-3' }}</div>
               </div>
             </div>
           </div>
@@ -244,8 +224,8 @@ import { ValidationPanelComponent } from './widgets/validation-panel';
     .proposal-action { font-size: 13px; font-weight: 600; margin: 4px 0; }
     .proposal-roi { font-size: 11px; color: var(--success); font-weight: 700; margin-bottom: 8px; }
 
-    /* Gov/Learning Metrics */
-    .gov-metric, .learning-metric { margin-bottom: 12px; label { font-size: 9px; color: var(--text-dim); font-weight: 700; display: block; margin-bottom: 4px; } .val { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; &.success { color: var(--success); } } }
+    /* Reliability/Learning Metrics */
+    .reliability-metric, .learning-metric { margin-bottom: 12px; label { font-size: 9px; color: var(--text-dim); font-weight: 700; display: block; margin-bottom: 4px; } .val { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; &.success { color: var(--success); } } }
     .version-info { font-size: 9px; font-weight: 800; opacity: 0.4; border-top: 1px solid var(--border); padding-top: 8px; margin-top: 8px; }
 
     /* Causal Graph Area */
@@ -322,7 +302,7 @@ export class SreObservabilityComponent {
   }
 
   public downloadReport() {
-    alert('Generating High-Fidelity Enterprise Decision Intelligence Report...\nROI verified. Strategy audit signed.');
+    alert('Generating Infrastructure Reliability Report...\nFidelity verified. Reliability audit signed.');
   }
 
   public approveStrategy(proposal: any) {
@@ -331,7 +311,7 @@ export class SreObservabilityComponent {
   }
 
   public approve() {
-    const requestId = this.data.governance()?.approvalRequestId;
+    const requestId = this.data.operationalControl()?.approvalRequestId;
     if (requestId) {
       this.data.approveRequest(requestId, this.approvalRationale() || 'Manual override approved by operator');
       this.approvalRationale.set('');
@@ -339,7 +319,7 @@ export class SreObservabilityComponent {
   }
 
   public reject() {
-    const requestId = this.data.governance()?.approvalRequestId;
+    const requestId = this.data.operationalControl()?.approvalRequestId;
     if (requestId) {
       this.data.rejectRequest(requestId, this.approvalRationale() || 'Operator rejected autonomous action');
       this.approvalRationale.set('');

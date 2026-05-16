@@ -1,6 +1,5 @@
-import { runChaosCycle } from "@packages/resilience";
+import { runChaosCycle, redis } from "@packages/utils";
 import { logger } from "@packages/observability";
-import { redis } from "@packages/utils";
 import express from 'express';
 
 /**
@@ -12,8 +11,10 @@ async function startValidationLoop() {
     logger.info('[ValidationDaemon] Starting Continuous Validation Loop');
 
     // Start Health Check Server
-    const app = express();
-    app.get('/health', (req, res) => res.json({ status: 'ok', service: 'control-plane' }));
+    const app: express.Application = express();
+    app.get('/health', (req: express.Request, res: express.Response) => {
+        res.json({ status: 'ok', service: 'control-plane' });
+    });
     app.listen(3011, '0.0.0.0', () => {
         logger.info('[ValidationDaemon] Health server running on port 3011');
     });
@@ -54,7 +55,9 @@ async function startValidationLoop() {
 }
 
 // Start if executed directly
-if (require.main === module) {
+import { fileURLToPath } from 'url';
+const isMain = process.argv[1] === fileURLToPath(import.meta.url);
+if (isMain) {
     startValidationLoop();
 }
 

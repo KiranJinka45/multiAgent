@@ -1,0 +1,18 @@
+{
+    "name": "Regulated Fintech Sandbox",
+    "type": "SANDBOX",
+    "description": "High-assurance environment for regulated fintech pilots and compliance validation.",
+    "isolationLevel": "MAXIMUM",
+    "auditFrequency": "CONTINUOUS",
+    "resourceLimits": {
+        "cpu": "8 vCPU",
+        "memory": "16GB",
+        "storage": "500GB"
+    },
+    "complianceMarkers": [
+        "FINRA_COMPATIBLE",
+        "GDPR_SOVEREIGN_ISOLATION",
+        "SOC2_CONTINUOUS_PROOF"
+    ],
+    "economicPolicy": "STAKED_GOVERNANCE_ENFORCED"
+}

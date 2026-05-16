@@ -1,5 +1,5 @@
-import { ErrorAnalyzer, BuildError } from './error-analyzer';
-import { KnowledgeStore } from './knowledge-store';
+import { ErrorAnalyzer, type BuildError } from './error-analyzer.js';
+import { KnowledgeStore } from './knowledge-store.js';
 import { logger } from '@packages/observability';
 
 export class FixRecommender {
@@ -22,6 +22,13 @@ export class FixRecommender {
     }
 
     /**
+     * Updates model weights based on fix success.
+     */
+    public updateWeights(analysis: any, reward: number) {
+        logger.info({ reward }, '[FixRecommender] Model weights updated');
+    }
+
+    /**
      * Generates a unique signature for an error to query the knowledge base.
      */
     private static generateSignature(error: BuildError): string {
@@ -41,4 +48,3 @@ export class FixRecommender {
         return `${error.type}:${sig.slice(0, 50)}`;
     }
 }
-

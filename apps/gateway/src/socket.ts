@@ -6,7 +6,7 @@ import http from 'http';
 import crypto from 'crypto';
 
 import express from 'express';
-import { sidecarVerifier, consensusEngine, externalVerifier, notaryService, ThresholdCrypto, StabilityCircuit, TrustAttestation, SreDecision, DEFAULT_THRESHOLD, DEFAULT_NODE_IDS, ZKProof, NotarizationAnchor } from '../../governance/src';
+import { sidecarVerifier, consensusEngine, externalVerifier, notaryService, ThresholdCrypto, StabilityCircuit, TrustAttestation, SreDecision, DEFAULT_THRESHOLD, DEFAULT_NODE_IDS, ZKProof, NotarizationAnchor } from '@packages/governance-core';
 
 const elog = pino({ level: 'info' });
 

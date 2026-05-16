@@ -1,6 +1,6 @@
 resource "aws_elasticache_replication_group" "redis" {
   replication_group_id          = "multiagent-redis"
-  replication_group_description = "Redis cluster for MultiAgent queueing"
+  description                   = "Redis cluster for MultiAgent queueing"
   node_type                     = "cache.t3.micro"
   num_cache_clusters            = 2 # 1 primary, 1 replica
   port                          = 6379

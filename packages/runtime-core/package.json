@@ -1,28 +1,17 @@
 {
   "name": "@packages/runtime-core",
-  "version": "1.0.0",
+  "version": "0.1.0",
+  "private": true,
   "type": "module",
-  "description": "ZTAN Distributed Execution Context and Runtime Core Types",
-  "main": "dist/index.cjs",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsup src/index.ts --no-dts && tsc --emitDeclarationOnly",
-    "dev": "tsup src/index.ts --no-dts --watch"
-  },
-  "dependencies": {
-    "@packages/vfs": "workspace:*",
-    "@packages/utils": "workspace:*"
+    "dev": "tsup src/index.ts --no-dts --watch",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "tsup": "8.5.1",
-    "typescript": "5.9.3"
-  },
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.mjs"
-    }
+    "typescript": "5.5.4"
   }
 }

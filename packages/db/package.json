@@ -2,33 +2,13 @@
   "name": "@packages/db",
   "version": "1.0.0",
   "type": "module",
-  "main": "dist/index.cjs",
-  "module": "dist/index.mjs",
+  "private": true,
+  "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": [
-    "dist",
-    "src/generated/client",
-    "prisma"
-  ],
   "scripts": {
-    "build": "tsup src/index.ts --no-dts && tsc --emitDeclarationOnly",
-    "dev": "tsup src/index.ts --no-dts --watch"
+    "build": "tsc"
   },
   "dependencies": {
-    "@packages/config": "workspace:*",
-    "@packages/observability": "workspace:*",
     "@prisma/client": "5.22.0"
-  },
-  "devDependencies": {
-    "prisma": "5.22.0",
-    "tsup": "8.5.1",
-    "typescript": "5.9.3"
-  },
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.mjs"
-    }
   }
 }

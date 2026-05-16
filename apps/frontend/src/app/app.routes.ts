@@ -38,7 +38,7 @@ export const routes: Routes = [
         loadComponent: () => import('./features/demo/financial-approval-demo.component').then(m => m.FinancialApprovalDemoComponent)
       },
       {
-        path: 'ztan/trust',
+        path: 'ztan/stability',
         loadComponent: () => import('./features/ztan/trust-dashboard.component').then(m => m.ZtanTrustDashboardComponent)
       },
       {

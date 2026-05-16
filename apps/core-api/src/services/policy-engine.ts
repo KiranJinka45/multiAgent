@@ -28,12 +28,12 @@ export class PolicyEngine {
 
     private registerDefaultRules() {
         this.registerRule({
-            id: 'BlockActionOnLowTrust',
-            description: 'Rejects non-HALT actions if systemTrust is LOW',
+            id: 'BlockActionOnLowReliability',
+            description: 'Rejects non-HALT actions if systemReliability is LOW',
             enabled: true,
             evaluate: (action) => {
-                if (action.systemTrust === 'LOW' && action.type !== 'HALT') {
-                    return { allowed: false, reason: 'System trust is LOW; only HALT actions are permitted.' };
+                if (action.systemReliability === 'LOW' && action.type !== 'HALT') {
+                    return { allowed: false, reason: 'System reliability is LOW; only HALT actions are permitted.' };
                 }
                 return { allowed: true };
             }

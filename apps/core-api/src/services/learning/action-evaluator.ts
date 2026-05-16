@@ -1,5 +1,5 @@
-import { SCMNode } from './scm.types';
-import { CounterfactualEngine } from './counterfactual-engine';
+import type { SCMNode } from './scm.types.js';
+import { CounterfactualEngine } from './counterfactual-engine.js';
 
 export interface Action {
   name: string;
@@ -25,7 +25,7 @@ export class ActionEvaluator {
       {
         id: 'api-service',
         parents: ['db-primary', 'redis-cache'],
-        fn: (inputs) => {
+        fn: (inputs: Record<string, number>) => {
           // API latency/anomaly is a weighted combination of its dependencies
           return (0.7 * (inputs['db-primary'] || 0)) + (0.3 * (inputs['redis-cache'] || 0));
         }
@@ -33,7 +33,7 @@ export class ActionEvaluator {
       {
         id: 'web-frontend',
         parents: ['api-service'],
-        fn: (inputs) => (inputs['api-service'] || 0) * 0.9
+        fn: (inputs: Record<string, number>) => (inputs['api-service'] || 0) * 0.9
       }
     ];
 

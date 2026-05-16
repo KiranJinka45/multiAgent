@@ -1,4 +1,4 @@
-import { SignedCheckpoint } from './gossip-registry.js';
+import type { SignedCheckpoint } from './gossip-registry.js';
 import { MerkleTree } from './merkle.js';
 
 

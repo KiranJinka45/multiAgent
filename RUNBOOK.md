@@ -1,9 +1,9 @@
-# MultiAgent Operational Runbook (Beta v1.0) 📖
+# Nexus ZTAN Institutional Runbook (Stewardship Era) 🏛️
 
-This document provides the necessary protocols for managing the MultiAgent platform during its Beta phase.
+This document provides the necessary protocols for managing the Nexus ZTAN platform during its post-finality stewardship era.
 
-## 🚀 1. Provisioning New Users
-Beta access is strictly invitation-only to ensure system stability.
+## 🚀 1. Provisioning Institutional Operators
+Access is strictly governed to ensure institutional stability.
 
 **Protocol:**
 1. Collect tester email and full name.
@@ -16,43 +16,19 @@ Beta access is strictly invitation-only to ensure system stability.
 
 ---
 
-## 💎 2. Commercial Tier Management
-The platform supports three tiers: `Free`, `Pro`, and `Enterprise`.
-
-**Changing a Tier manually:**
-If a user needs more quota or an upgrade:
-1. Identify their `tenantId` or `userId`.
-2. Connect to the database and update the `Tenant` record:
-   ```sql
-   UPDATE "Tenant" SET "dailyQuota" = 100, "metadata" = jsonb_set("metadata", '{tier}', '"pro"') WHERE "id" = 'tnt_target_id';
-   ```
-
----
-
-## 🏥 3. Incident Response: Quota Exhaustion
-If a user reports "Quota Exhausted" prematurely:
-1. **Check Audit Logs**: Verify if missions were genuinely consumed or if there was a retry loop.
-2. **Temporary Override**: Use the `TenantRateLimiter` override (see below) if the mission is critical.
-3. **Reset Quota**: Quotas reset automatically at midnight UTC.
-
----
-
-## 🛡️ 4. Abuse & Security
+## 🛡️ 2. Abuse & Security
 **Protocol for Malicious Activity:**
-1. **Tier-Aware Rate Limiting**: The system automatically enforces API constraints based on the plan:
-   - **Free**: 10 req/min
-   - **Pro**: 100 req/min
-   - **Enterprise**: 1000 req/min
-2. **Kill Switch**: If a tenant is identified as abusive, use the `Commercial Cockpit` (Admin UI) to set their status to `suspended`.
-3. **Rate Limit Hardening**: Update `RATELIMIT_POINTS` environment variable to tighten global constraints.
+1. **Kill Switch**: If a tenant is identified as abusive, use the SRE Dashboard to set their status to `suspended`.
+2. **Rate Limit Hardening**: Update `RATELIMIT_POINTS` environment variable to tighten global constraints.
 
 ---
 
-## 📈 5. Beta SLIs (Service Level Indicators)
-Monitor these metrics in the Commercial Cockpit daily:
-- **Mission Success Rate**: Goal > 95%.
-- **Average Margin**: Goal > 20% (Value-based billing sanity check).
-- **Enforcement Violation Rate**: Tracks if pricing tiers are too restrictive.
+## 📈 5. Operational SLIs (Service Level Indicators)
+Monitor these metrics in the SRE dashboard to ensure system reliability:
+- **Recovery Determinism**: Goal 100% successful OCR drills.
+- **Stability Index**: Goal > 90% system stability.
+- **Approval Quality**: Goal 0% rubber-stamp detection.
+- **Freshness Score**: Goal > 90% runbook alignment.
 
 ---
 

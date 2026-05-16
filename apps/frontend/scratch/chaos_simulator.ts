@@ -35,7 +35,7 @@ window.ChaosSimulator = {
             signalIntegrityState: 'NOMINAL',
             diversity: { satisfied: true, providers: 4, required: 3 }
           },
-          governance: {
+          stewardship: {
             mode: 'STABLE',
             reason: 'Equilibrium reached',
             reasoningDecomposition: { quorumContribution: 0.95, diversityFactor: 0.8, safetyBuffer: 0.05 }
@@ -64,7 +64,7 @@ window.ChaosSimulator = {
           signalIntegrityState: 'NOMINAL',
           diversity: { satisfied: false, providers: 1, required: 3 }
         },
-        governance: {
+        stewardship: {
           mode: 'HEALING',
           reason: 'Diversity deficit: Single provider seen',
           reasoningDecomposition: { quorumContribution: 1.0, diversityFactor: 0.3, safetyBuffer: 0.0 }
@@ -96,7 +96,7 @@ window.ChaosSimulator = {
             signalIntegrityState: 'NOMINAL',
             diversity: { satisfied: true, providers: 4, required: 3 }
           },
-          governance: {
+          stewardship: {
             mode: drift > 0.05 ? 'HEALING' : 'STABLE',
             reason: drift > 0.05 ? 'CRITICAL_DRIFT' : 'Nominal drift',
             reasoningDecomposition: { quorumContribution: 0.9, diversityFactor: 0.8, safetyBuffer: 0.05 }
@@ -126,13 +126,15 @@ window.ChaosSimulator = {
           signalIntegrityState: 'DEGRADED',
           anomalyHypothesis: { type: 'NOISE', confidence: 0.98, precision: 0.4, recall: 0.3, f1: 0.35 }
         },
-        governance: {
+        stewardship: {
           mode: 'STABLE',
           reason: 'Trust synthesis pending',
           reasoningDecomposition: { quorumContribution: 0.95, diversityFactor: 0.9, safetyBuffer: 0.05 }
         }
-      }));
-    },
+      }
+    }));
+  },
+
   /**
    * Scenario 5: Reality Soak (Uncontrolled Entropy)
    * Simulates bursty telemetry, variable jitter, and sequence gaps.
@@ -161,7 +163,7 @@ window.ChaosSimulator = {
             signalIntegrityState: Math.random() > 0.98 ? 'DEGRADED' : 'NOMINAL',
             diversity: { satisfied: true, providers: 4, required: 3 }
           },
-          governance: {
+          stewardship: {
             mode: 'STABLE',
             reason: 'Equilibrium maintained',
             reasoningDecomposition: { quorumContribution: 0.9, diversityFactor: 0.8, safetyBuffer: 0.1 }
@@ -173,6 +175,7 @@ window.ChaosSimulator = {
     };
     tick();
   },
+
   /**
    * Scenario 6: Multi-Operator Conflict
    * Simulates two operators tuning the system simultaneously.

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import { logger } from '@packages/observability';
 
 /**
@@ -51,3 +51,42 @@ export const validateRequest = (schema: z.ZodSchema) => {
     }
   };
 };
+/**
+ * Mandatory Startup Secret Validation
+ * Prevents system launch with insecure, default, or weak cryptographic secrets.
+ */
+export function validateStartupSecrets(requiredSecrets: string[]): void {
+    const defaultValues = ['changeme', 'example', '12345678', 'password', 'secret', 'undefined', 'null'];
+    const missing = [];
+    const weak = [];
+
+    for (const key of requiredSecrets) {
+        const val = process.env[key];
+        
+        if (!val) {
+            missing.push(key);
+            continue;
+        }
+
+        const normalizedVal = val.toLowerCase();
+        const isDefault = defaultValues.some(d => normalizedVal.includes(d));
+        
+        // Institutional Requirement: Minimum 32 characters for HMAC/JWT/KMS keys
+        if (val.length < 32 || isDefault) {
+            weak.push(key);
+        }
+    }
+
+    if (missing.length > 0) {
+        console.error(`[FATAL] MISSION REJECTED: Mandatory security secrets missing: ${missing.join(', ')}`);
+        process.exit(1);
+    }
+
+    if (weak.length > 0) {
+        console.error(`[FATAL] SECURITY VIOLATION: Weak or default secrets detected: ${weak.join(', ')}`);
+        console.error(`[FATAL] Ensure all secrets are > 32 chars and not using default strings.`);
+        process.exit(1);
+    }
+
+    logger.info('[Security] Startup secret entropy verified.');
+}

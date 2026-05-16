@@ -4,15 +4,15 @@ import { ZtanService, CeremonyState } from '../../core/services/ztan.service';
 import { interval, Subscription, switchMap, startWith } from 'rxjs';
 
 @Component({
-  selector: 'app-ztan-trust-dashboard',
+  selector: 'app-ztan-stability-dashboard',
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="trust-container">
+    <div class="stability-container">
       <div class="header">
         <div class="title-group">
           <span class="badge">LIVE AUDIT NETWORK</span>
-          <h1>ZTAN Public Trust Dashboard</h1>
+          <h1>ZTAN Public Stability Dashboard</h1>
           <p>Real-time cryptographic proof of system integrity and financial oversight.</p>
         </div>
         <div class="network-status" [class.online]="metrics?.status === 'OPERATIONAL'">
@@ -23,19 +23,19 @@ import { interval, Subscription, switchMap, startWith } from 'rxjs';
 
       <div class="metrics-grid">
         <div class="metric-card glass">
-          <label>Total Verified Proofs</label>
-          <div class="value">{{ metrics?.totalProofs || 0 }}</div>
-          <div class="sub-label">Immutable Audit Trail</div>
+          <label>Total Verified Sessions</label>
+          <div class="value">{{ metrics?.totalSessions || 0 }}</div>
+          <div class="sub-label">Immutable Operational Log</div>
         </div>
         <div class="metric-card glass">
-          <label>Active Ceremonies</label>
-          <div class="value">{{ metrics?.activeCeremonies || 0 }}</div>
+          <label>Active Sessions</label>
+          <div class="value">{{ metrics?.activeSessions || 0 }}</div>
           <div class="sub-label">MPC Consensus in Progress</div>
         </div>
         <div class="metric-card glass">
           <label>Validator Nodes</label>
           <div class="value">{{ metrics?.totalNodes || 0 }}</div>
-          <div class="sub-label">Decentralized Trust Root</div>
+          <div class="sub-label">Decentralized Stability Root</div>
         </div>
         <div class="metric-card glass">
           <label>Protocol Version</label>
@@ -45,8 +45,8 @@ import { interval, Subscription, switchMap, startWith } from 'rxjs';
       </div>
 
       <div class="main-content">
-        <div class="ceremony-feed glass">
-          <h3>Live Proof Registry</h3>
+        <div class="session-feed glass">
+          <h3>Live Session Registry</h3>
           <div class="proof-list">
             <div class="proof-item" *ngFor="let proof of metrics?.recentProofs">
               <div class="proof-header">
@@ -78,16 +78,16 @@ import { interval, Subscription, switchMap, startWith } from 'rxjs';
               <div class="node-status-dot"></div>
             </div>
           </div>
-          <div class="trust-disclaimer">
+          <div class="stability-disclaimer">
             <span class="icon">ℹ️</span>
-            All signing ceremonies require a 2/3 threshold consensus.
+            All signing sessions require a 2/3 threshold consensus.
           </div>
         </div>
       </div>
     </div>
   `,
   styles: [`
-    .trust-container {
+    .stability-container {
       padding: 40px;
       max-width: 1400px;
       margin: 0 auto;
@@ -313,7 +313,7 @@ import { interval, Subscription, switchMap, startWith } from 'rxjs';
       box-shadow: 0 0 8px #10b981;
     }
 
-    .trust-disclaimer {
+    .stability-disclaimer {
       margin-top: 24px;
       font-size: 0.75rem;
       color: #64748b;
@@ -336,7 +336,7 @@ import { interval, Subscription, switchMap, startWith } from 'rxjs';
     }
   `]
 })
-export class ZtanTrustDashboardComponent implements OnInit, OnDestroy {
+export class ZtanStabilityDashboardComponent implements OnInit, OnDestroy {
   metrics: any = null;
   private sub: Subscription | null = null;
 
@@ -348,7 +348,7 @@ export class ZtanTrustDashboardComponent implements OnInit, OnDestroy {
       switchMap(() => this.ztan.getMetrics())
     ).subscribe({
       next: (data) => this.metrics = data,
-      error: (err) => console.error('Trust Dashboard Error:', err)
+      error: (err) => console.error('Stability Dashboard Error:', err)
     });
   }
 

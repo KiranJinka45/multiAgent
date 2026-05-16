@@ -41,9 +41,9 @@ import { RouterModule } from '@angular/router';
         </li>
         <li class="nav-divider"></li>
         <li>
-          <a routerLink="/ztan/trust" routerLinkActive="active">
-            <span class="icon">🛡️</span>
-            <span class="label">Trust Dashboard</span>
+          <a routerLink="/ztan/stability" routerLinkActive="active">
+            <span class="icon">📈</span>
+            <span class="label">Stability Dashboard</span>
           </a>
         </li>
         <li>
@@ -72,7 +72,7 @@ import { RouterModule } from '@angular/router';
           </a>
         </li>
         <li>
-          <a href="mailto:support@multiagent.io?subject=Beta%20Feedback">
+          <a href="mailto:support&#64;multiagent.io?subject=Beta%20Feedback">
             <span class="icon">💬</span>
             <span class="label">Feedback</span>
           </a>

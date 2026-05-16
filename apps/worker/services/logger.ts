@@ -1,4 +1,4 @@
-import { logger } from '@packages/utils';
+import { logger } from '@packages/observability';
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 const redis = new Redis(REDIS_URL);

@@ -1,0 +1,10 @@
+{
+  "version": "1.0",
+  "policies": {
+    "MAX_SLASH_RATE_PER_EPOCH": 0.10,
+    "SURGE_THRESHOLD": 0.30,
+    "CASCADE_THRESHOLD": 0.25,
+    "CAPTURE_SLOWDOWN_FACTOR": 2,
+    "STABILIZATION_WINDOW_MS": 3600000
+  }
+}

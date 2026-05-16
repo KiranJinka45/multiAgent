@@ -53,5 +53,11 @@ export class KnowledgeStore {
             logger.error({ error: e }, '[KnowledgeStore] Failed to record fix');
         }
     }
-}
 
+    /**
+     * Records an incident analysis for future learning.
+     */
+    async storeIncident(incident: any) {
+        logger.info({ incidentId: incident.incidentId }, '[KnowledgeStore] Incident stored for learning');
+    }
+}

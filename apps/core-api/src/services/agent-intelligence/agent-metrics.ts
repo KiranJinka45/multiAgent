@@ -47,5 +47,15 @@ export class AgentMetrics {
         if (error) return null;
         return data;
     }
-}
 
+    public static async getLatest() {
+        const { data, error } = await supabaseAdmin
+            .from('agent_performance')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(10);
+        
+        if (error) return [];
+        return data || [];
+    }
+}

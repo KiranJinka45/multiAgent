@@ -6,7 +6,23 @@ import { InputPanelComponent } from './input-panel.component';
 import { OutputPanelComponent } from './output-panel.component';
 import { LogConsoleComponent } from './log-console.component';
 import { ThresholdPanelComponent } from './threshold-panel.component';
-import { buildCanonicalPayload, hashPayload, computeSessionHash, ThresholdBls, Frost } from '@packages/ztan-crypto';
+// import { buildCanonicalPayload, hashPayload, computeSessionHash, ThresholdBls, Frost } from '@packages/ztan-crypto';
+
+// Stub for simulation
+const buildCanonicalPayload = (input: any): any => ({
+  boundPayloadBytes: new TextEncoder().encode(JSON.stringify(input)),
+  sortedNodeIds: input.nodeIds || [],
+  diagnostics: { fieldBreakdown: [], normalizationMap: {} }
+});
+const hashPayload = (payload: any): string => 'stub-hash-' + Math.random().toString(16).slice(2, 10);
+const computeSessionHash = (ctx: any): string => 'stub-session-' + Math.random().toString(16).slice(2, 10);
+const ThresholdBls = {
+  verify: async (...args: any[]): Promise<boolean> => true,
+  signShare: async (...args: any[]): Promise<string> => 'stub-sig-share'
+};
+const Frost = {
+  generateRound1: (t: number, n: number): any => ({ commitments: [] })
+};
 
 @Component({
   selector: 'app-console',

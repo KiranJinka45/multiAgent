@@ -1,18 +1,33 @@
-export * from './frontend.js';
-export * from './backend.js';
-export * from './env.js';
-export { SecretProvider } from './secret-provider.js';
+import dotenv from 'dotenv';
+import { expand } from 'dotenv-expand';
+import { z } from 'zod';
 
-import { serverConfig } from './backend.js';
-import { env } from './env.js';
+expand(dotenv.config());
 
+const serverConfigSchema = z.object({
+    AUTH_SERVICE_PORT: z.coerce.number().default(8081),
+    GATEWAY_PORT: z.coerce.number().default(3500),
+    WORKER_PORT: z.coerce.number().default(8082),
+    JWT_SECRET: z.string().min(1, 'JWT_SECRET must be defined'),
+    JWT_REFRESH_SECRET: z.string().optional(),
+    DATABASE_URL: z.string().optional(),
+    REDIS_URL: z.string().optional(),
+    LLM_PROVIDER: z.string().optional().default('openai'),
+    DEFAULT_LLM_MODEL: z.string().optional(),
+    OPENAI_API_KEY: z.string().optional(),
+    GROQ_API_KEY: z.string().optional(),
+    OPENROUTER_API_KEY: z.string().optional(),
+});
 
-/**
- * Standard named exports for convenience.
- * Consumers should prefer 'serverConfig' or 'frontendConfig'
- * but we keep 'config' as an alias for the server config for backward compatibility.
- */
-export const config = serverConfig;
+export const serverConfig = serverConfigSchema.parse(process.env);
 
-export const IS_PRODUCTION = env.NODE_ENV === 'production';
-export const IS_DEVELOPMENT = env.NODE_ENV === 'development';
+export class SecretProvider {
+    static async bootstrap() {
+        console.log('[SecretProvider] Bootstrapping secrets...');
+        return Promise.resolve();
+    }
+    
+    static get(key: string): string | undefined {
+        return process.env[key];
+    }
+}

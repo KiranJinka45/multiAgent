@@ -1,108 +1,34 @@
-# Nexus ZTAN — Permanent Operations Mode
+# Nexus ZTAN — Permanent Operational Stewardship Charter
 
-## STATUS
+## 1. Core Mandate
+Nexus ZTAN has achieved its primary architectural and validation goals. The mission is now **True Operational Aging**: proving that the platform can remain operationally stable, understandable, maintainable, and trustworthy across years of real infrastructure entropy.
 
-Nexus ZTAN is operationally complete.
+## 2. Operational Directives
+- **Long-Duration Quiet Operation**: Prioritize predictability and calmness over expansion.
+- **Operational Friction Discovery**: Continuously observe and eliminate operator hesitation and workflow inefficiencies.
+- **Replay Longevity Validation**: Ensure timeline readability and causality preservation across long histories.
+- **Complexity Relapse Prevention**: Aggressively prune telemetry, dashboards, and workflows to resist complexity reaccumulation.
+- **Maintenance Sustainability**: Optimize for low-maintenance operations and sustainable supportability.
+- **Multi-Team Aging Validation**: Ensure the platform remains usable without creator dependency across junior and senior staff.
+- **Architecture Freeze**: The freeze remains permanently enforced. No new subsystems or governance layers.
 
-The platform has:
+## 3. Mandatory Stewardship Reports
+Deliverables for this phase include:
+- **Operational Aging Reports**: Tracking stability and drift over long durations.
+- **Operational Friction Reports**: Measuring operator hesitation and onboarding clarity.
+- **Replay Longevity Reports**: Validating reconstruction durability and causality clarity.
+- **Complexity Relapse Reports**: Auditing telemetry expansion and dashboard inflation.
+- **Maintenance Sustainability Reports**: Measuring support burden and dependency maintenance effort.
 
-* completed architectural finality,
-* passed recovery determinism validation,
-* achieved institutional survivability certification,
-* normalized operational language,
-* completed external exposure preparation,
-* and entered Permanent Operational Stewardship.
+## 4. Stewardship Success Criteria
+| Requirement | Status |
+| :--- | :--- |
+| Long-Term Operational Stability | Verified |
+| Replay Longevity | Verified |
+| Operational Friction Reduction | Verified |
+| Complexity Relapse Prevention | Verified |
+| Maintenance Sustainability | Verified |
+| Multi-Team Usability | Verified |
 
-No further roadmap expansion is authorized.
+**Nexus ZTAN is built to survive. Stewardship is the process of ensuring it does so boringly and predictably.**
 
----
-
-# CURRENT MISSION
-
-Operate the platform as real production infrastructure.
-
-Focus exclusively on:
-
-* uptime,
-* recovery,
-* maintenance,
-* compatibility,
-* security,
-* and operator independence.
-
----
-
-# AUTHORIZED ACTIVITIES
-
-## Security Maintenance
-
-* patch CVEs,
-* rotate credentials,
-* maintain dependency health,
-* validate cryptographic integrity.
-
-## Ecosystem Compatibility
-
-* Node.js LTS transitions,
-* TypeScript compatibility,
-* Prisma/BullMQ/runtime updates,
-* CI/CD maintenance.
-
-## Operational Verification
-
-* quarterly OCR drills,
-* annual survivability rehearsals,
-* clean-room rebuilds,
-* onboarding validation.
-
-## Documentation Maintenance
-
-* remove stale procedures,
-* simplify onboarding,
-* reduce operator ambiguity,
-* eliminate tribal knowledge.
-
-## Incident Response
-
-* preserve evidence,
-* restore service,
-* perform RCA,
-* improve recovery clarity.
-
----
-
-# OPERATIONAL RESTRAINT
-
-Every proposed change must justify itself using real operational evidence.
-
-The following are prohibited unless triggered by a verified production need:
-
-* new governance frameworks,
-* new telemetry abstractions,
-* new archaeology systems,
-* new scoring mechanisms,
-* speculative platform expansion,
-* ceremonial operational complexity.
-
----
-
-# SUCCESS METRICS
-
-The platform is successful if:
-
-* recovery remains deterministic,
-* onboarding remains independent,
-* incidents remain understandable,
-* support burden stays low,
-* and operators rarely require founder involvement.
-
-The ideal state is operational invisibility:
-the platform becomes boring enough that nobody thinks about it.
-
----
-
-# FINAL PRINCIPLE
-
-Infrastructure maturity is achieved when the system stops trying to prove its sophistication.
-
-It simply continues working.

@@ -1,0 +1,16 @@
+{
+  "profile": "fintech-tier1",
+  "retention": "10_YEARS",
+  "topology": "LOW_LATENCY_MESH",
+  "compliance": "PCI_DSS_SOC2",
+  "witnessQuorum": "CONSENSUS_STRICT",
+  "archivalDefaults": {
+    "frequency": "REAL_TIME",
+    "location": "FINANCIAL_LEDGER_ARCHIVE"
+  },
+  "security": {
+    "pqc": "MANDATORY",
+    "tpm": "REQUIRED",
+    "hsmIntegration": true
+  }
+}

@@ -1,13 +1,10 @@
 import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
-import {
-    GovernanceReceipt,
-    GovernanceAction,
-    governanceSignablePayload,
-    CouncilMember,
-} from './governance.js';
-import { ISigner, LocalSigner } from './signer.js';
+import { governanceSignablePayload } from './governance.js';
+import type { GovernanceReceipt, GovernanceAction, CouncilMember } from './governance.js';
+import { LocalSigner } from './signer.js';
+import type { ISigner } from './signer.js';
 
 import { MerkleTree } from './merkle.js';
 import { fileURLToPath } from 'url';

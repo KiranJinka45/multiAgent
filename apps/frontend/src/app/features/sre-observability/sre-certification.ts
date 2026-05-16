@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SreDataService } from '../../core/services/sre-data.service';
 
@@ -9,10 +9,10 @@ import { SreDataService } from '../../core/services/sre-data.service';
   template: `
     <div class="certification-container glass-panel">
       <div class="cert-header">
-        <h1>LEVEL 5.0 GOVERNED AUTONOMOUS SRE SYSTEM</h1>
-        <div class="status-subtitle">Continuously Validated for Production Readiness</div>
+        <h1>RELIABILITY & COMPLIANCE CERTIFICATION</h1>
+        <div class="status-subtitle">Continuously Audited for Infrastructure Reliability</div>
         <div class="status-badge" [class.certified]="evidence().isCertified">
-          {{ evidence().isCertified ? 'FULLY CERTIFIED' : 'CERTIFICATION IN PROGRESS' }}
+          {{ evidence().isCertified ? 'FULLY AUDITED' : 'AUDIT IN PROGRESS' }}
         </div>
       </div>
 
@@ -27,14 +27,14 @@ import { SreDataService } from '../../core/services/sre-data.service';
 
       <div class="evidence-grid">
         <div class="evidence-card">
-          <h3>TRUST CALIBRATION</h3>
+          <h3>PREDICTION ACCURACY</h3>
           <div class="metric">Brier Score: {{ evidence().avgBrier | number:'1.3-3' }}</div>
           <div class="badge" [class.pass]="evidence().avgBrier < 0.2">CALIBRATED</div>
         </div>
         <div class="evidence-card">
-          <h3>GOVERNANCE</h3>
+          <h3>CONTROL PLANE HEALTH</h3>
           <div class="metric">Watchdog: OPERATIONAL</div>
-          <div class="badge pass">SAFE_MODE ACTIVE</div>
+          <div class="badge pass">AUTO_CONTROL ACTIVE</div>
         </div>
         <div class="evidence-card">
           <h3>AUDIT INTEGRITY</h3>
@@ -67,7 +67,7 @@ import { SreDataService } from '../../core/services/sre-data.service';
 export class SreCertificationComponent {
   public data = inject(SreDataService);
   public evidence = computed(() => {
-    const audit = this.data.perception()?.governanceAudit;
+    const audit = this.data.perception()?.operationalAudit;
     return {
       isCertified: audit?.status === 'HEALTHY',
       avgBrier: audit?.avgBrier || 0.185,
@@ -76,6 +76,6 @@ export class SreCertificationComponent {
   });
 
   public downloadReport() {
-    alert('Generating Enterprise Certification Report (Audit-Grade MD + PDF Evidence)...');
+    alert('Generating Reliability Audit Report (Audit-Grade MD + PDF Evidence)...');
   }
 }

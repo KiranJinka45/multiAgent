@@ -8,19 +8,28 @@ import http, { ClientRequest } from 'http';
 import helmet from 'helmet';
 import axios from 'axios';
 import { logger, registry, initTelemetry, correlationMiddleware } from '@packages/observability';
-import { kafkaManager } from '@packages/events';
 import { 
     rateLimitMiddleware, 
     createBreaker, 
     createBackpressureMiddleware, 
-    createOutboundClient 
-} from '@packages/resilience';
+    createOutboundClient,
+    CostGovernanceService, 
+    QueueManager, 
+    AuditLogger, 
+    onShutdown, 
+    createHealthRouter, 
+    createSecurityMiddleware, 
+    redis, 
+    contextStorage, 
+    ControlPlane, 
+    regionalGovernance, 
+    kafkaManager 
+} from '@packages/utils';
 import { signInternalToken, internalAuth, userAuth } from '@packages/auth-internal';
 import { requestContext } from './middleware/requestContext.js';
 import { metricsMiddleware } from './middleware/metricsMiddleware.js';
 import { tierLimitMiddleware } from './middleware/tier-limiter.js';
 import { initSocket } from './socket.js';
-import { CostGovernanceService, QueueManager, AuditLogger, onShutdown, createHealthRouter, createSecurityMiddleware, redis, contextStorage, ControlPlane, regionalGovernance } from '@packages/utils';
 import { z } from 'zod';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { db } from '@packages/db';

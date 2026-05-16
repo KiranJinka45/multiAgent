@@ -4,17 +4,54 @@
     "baseUrl": ".",
     "ignoreDeprecations": "5.0",
     "outDir": "dist",
-    "rootDir": "src",
-    "composite": false,
-    "incremental": false,
+    "composite": true,
+    "incremental": true,
     "declaration": true,
     "skipLibCheck": true,
     "paths": {
-      "@packages/*": ["../../packages/*/dist/index.d.ts"],
-      "@/*": ["./src/*"]
-    }
+      "@packages/config": [
+        "../config/src"
+      ],
+      "@packages/db": [
+        "../db/src"
+      ],
+      "@packages/events": [
+        "../events/src"
+      ],
+      "@packages/observability": [
+        "../observability/src"
+      ],
+      "@packages/vfs": [
+        "../vfs/src"
+      ],
+      "@packages/validator": [
+        "../validator/src"
+      ],
+      "@packages/ai": [
+        "../ai/src"
+      ],
+      "@packages/supabase": [
+        "../supabase/src"
+      ]
+    },
+    "noEmit": false,
+    "rootDir": "src"
   },
   "include": [
     "src"
+  ],
+  "references": [
+    {
+      "path": "../config"
+    },
+    {
+      "path": "../db"
+    },
+    {
+      "path": "../observability"
+    },
+    {
+      "path": "../validator"
+    }
   ]
 }

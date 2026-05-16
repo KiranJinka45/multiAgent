@@ -1,0 +1,24 @@
+{
+  "totalTests": 3,
+  "successfulRecoveries": 3,
+  "failedRecoveries": 0,
+  "lastTestTimestamp": "2026-05-15T18:23:45.455Z",
+  "trustScore": 1,
+  "history": [
+    {
+      "timestamp": "2026-05-15T18:21:43.723Z",
+      "success": true,
+      "type": "pod_crash"
+    },
+    {
+      "timestamp": "2026-05-15T18:22:44.879Z",
+      "success": true,
+      "type": "pod_crash"
+    },
+    {
+      "timestamp": "2026-05-15T18:23:45.455Z",
+      "success": true,
+      "type": "rollout_failure"
+    }
+  ]
+}

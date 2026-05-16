@@ -1,0 +1,21 @@
+{
+  "scorecard": {
+    "institutionId": "INST-GLOBAL-001",
+    "period": {
+      "start": 1778836494213,
+      "end": 1778840094213
+    },
+    "survivabilityIndex": 94,
+    "burdenReduction": 42,
+    "recoveryConfidence": 0.95,
+    "stabilityTrend": "IMPROVING",
+    "cognitionCompliance": true,
+    "evidenceCount": 0
+  },
+  "roi": {
+    "efficiencyGain": 0.28,
+    "riskAvoidanceValue": "High (Prevented 3 potential P1 outages through early detection)",
+    "operatorTimeSavedHours": 145,
+    "autonomousSuccessRate": 0.98
+  }
+}

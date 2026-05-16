@@ -1,8 +1,8 @@
-import { VirtualFileSystem, VirtualFile } from './virtual-fs';
+import { VirtualFileSystem, type Snapshot } from './virtual-fs.js';
 import { logger } from '@packages/observability';
 
 export class RollbackManager {
-    private snapshots: Map<string, [string, VirtualFile][]> = new Map();
+    private snapshots: Map<string, Snapshot> = new Map();
 
     /**
      * Saves a named snapshot of the current VFS state.

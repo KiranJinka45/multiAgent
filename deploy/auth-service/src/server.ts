@@ -7,7 +7,7 @@ import cors from 'cors';
 import bcrypt from 'bcryptjs';
 import cookieParser from 'cookie-parser';
 import { logger, initTelemetry } from '@packages/observability';
-import { onShutdown, createHealthRouter, createSecurityMiddleware, redis } from '@packages/utils';
+import { onShutdown, createHealthRouter, createSecurityMiddleware, redis, setCsrfToken } from '@packages/utils';
 import { db } from '@packages/db';
 import { internalAuth, userAuth } from '@packages/auth-internal';
 import { AuditLogger } from '@packages/utils';
@@ -86,7 +86,6 @@ export async function startAuthServer() {
     app.use(cookieParser());
 
     app.get('/csrf', (req, res) => {
-        const { setCsrfToken } = require('@packages/utils');
         const token = setCsrfToken(res);
         res.json({ csrfToken: token });
     });

@@ -14,10 +14,10 @@ Focus on subtractive engineering and long-term rituals.
 
 ## Tasks
 
-## Task 1: Aggressive Subsystem Pruning
+### 1. Aggressive Subsystem Pruning
 - Audit `apps/` and `packages/` for low-usage components.
 - Archive or remove ceremonial telemetry and redundant dashboards.
 
-## Task 2: Institutionalize Survivability Discipline
+### 2. Institutionalize Survivability Discipline
 - Update `MAINTENANCE.md` with the Quarterly Survivability Calendar.
 - Create `scripts/schedule-drills.ps1` for automation.

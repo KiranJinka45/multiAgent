@@ -20,7 +20,7 @@ export class StabilityEngine {
 
   /**
    * Calculate stability score based on decaying flip rate (EWMA).
-   * Recent flips have a higher impact on trust degradation.
+   * Recent flips have a higher impact on reliability degradation.
    */
   public static async calculateStabilityScore(): Promise<number> {
     const historyJson = await redis.get(this.STORAGE_KEY);

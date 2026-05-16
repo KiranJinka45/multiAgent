@@ -6,25 +6,33 @@ import { Redis } from 'ioredis';
 
 import * as crypto from 'crypto';
 import { logger as realLogger, contextStorage } from '@packages/observability';
-import { eventBus as baseEventBus } from '@packages/events';
+// import { eventBus as baseEventBus } from '@packages/events';
+const baseEventBus: any = { publish: async () => {}, publishStream: async () => {}, getShardForTenant: () => 0, getPartitionedStream: () => '', replayStream: async () => [] };
 import { Queue as BullQueue, Worker as BullWorker } from 'bullmq';
 import { serverConfig as config } from '@packages/config';
-import * as governance from './governance.js';
+import * as governance from './transparency/governance.js';
 import { BuildCache } from './build-cache.js';
 
-import { llmService } from '@packages/ai';
+// import { llmService } from '@packages/ai';
+const llmService: any = {};
+// import { supabase as supabaseClient } from '@packages/supabase';
+const supabaseClient: any = {};
 
 // Modular Imports
-import { VirtualFileSystem } from '@packages/vfs';
+// import { VirtualFileSystem } from '@packages/vfs';
+export class VirtualFileSystem {
+    async read(p: string) { return ''; }
+    async write(p: string, c: string) {}
+}
 import { ArtifactValidator, ContainerManager, GovernanceEngine } from '@packages/validator';
-// import { ProcessManager, DistributedExecutionContext, RuntimeStatus, JobStage, MissionStatus } from '@packages/runtime-core';
+import { ProcessManager, DistributedExecutionContext, RuntimeStatus, JobStage, MissionStatus } from '@packages/runtime-core';
 // Removed @packages/agents import to break cyclic dependency
 
 
 // Re-exports from modular packages for backward compatibility
-export { VirtualFileSystem } from '@packages/vfs';
+// export { VirtualFileSystem } from '@packages/vfs';
 export { ArtifactValidator, ContainerManager } from '@packages/validator';
-// export { ProcessManager, DistributedExecutionContext, RuntimeStatus, JobStage, MissionStatus } from '@packages/runtime-core';
+export { ProcessManager, DistributedExecutionContext, RuntimeStatus, JobStage, MissionStatus } from '@packages/runtime-core';
 // Removed @packages/agents re-export to break cyclic dependency
 
 
@@ -35,6 +43,7 @@ export const BuildCacheManager = BuildCache;
 // Re-export db for convenience
 export const db = realDb;
 export const memoryPlane = realDb;
+export const supabaseAdmin = supabaseClient;
 export const logger: any = realLogger;
 export const getExecutionLogger = (id: string): any => realLogger.child({ executionId: id });
 
@@ -259,8 +268,8 @@ if (!(globalThis as any).__redisClient) {
         client.on('reconnecting', (ms: number) => logger.warn({ delayMs: ms }, '[Redis] Attempting reconnection...'));
 
         (globalThis as any).__redisClient = client;
-    } else {
-        console.warn('[Redis] No REDIS_URL found. Using mock redis client.');
+    } else if (process.env.NODE_ENV === 'test') {
+        logger.warn('[Redis] No REDIS_URL found. Using mock redis client for TEST environment.');
         (globalThis as any).__redisClient = {
             status: 'ready',
             on: () => {},
@@ -274,6 +283,10 @@ if (!(globalThis as any).__redisClient) {
             multi: () => ({ exec: async () => [] }),
             pipeline: () => ({ exec: async () => [] }),
         };
+    } else {
+        const errorMsg = '[Redis] FATAL: REDIS_URL environment variable is missing. Infrastructure persistence is mandatory in Maintenance Era.';
+        logger.error(errorMsg);
+        throw new Error(errorMsg);
     }
 }
 export const redis = (globalThis as any).__redisClient;

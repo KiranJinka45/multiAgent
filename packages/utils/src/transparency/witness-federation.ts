@@ -3,16 +3,19 @@ import { MerkleTree } from './merkle.js';
 import { InstitutionalConstitution, SovereigntyHierarchy } from './constitutional.js';
 
 import {
-    GovernanceReceipt,
-    CouncilMember,
-    CouncilState,
     verifyGovernanceReceiptMultiSig,
     governanceSignablePayload,
     InstitutionalRole,
+    InstitutionalState,
+} from './governance.js';
+
+import type {
+    GovernanceReceipt,
+    CouncilMember,
+    CouncilState,
     GovernanceProposal,
     AuditorMember,
     AuditorState,
-    InstitutionalState,
     WitnessMember,
 } from './governance.js';
 

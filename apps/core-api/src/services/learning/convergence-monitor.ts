@@ -77,4 +77,12 @@ export class ConvergenceMonitor {
       isStable: state === 'FORMALLY_STABLE' || state === 'CONVERGING'
     };
   }
+
+  /**
+   * Checks if the system is formally stable based on tuning velocity.
+   */
+  public static async checkStability(): Promise<boolean> {
+    const stats = await this.getStats('dampingFactor');
+    return stats.isStable;
+  }
 }

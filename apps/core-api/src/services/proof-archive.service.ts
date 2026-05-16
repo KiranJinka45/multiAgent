@@ -16,7 +16,7 @@ export class ProofArchiveService {
    * In production, this would write to S3 with Object Lock or a dedicated audit DB.
    */
   public static async archive(bundle: ProofBundle): Promise<string> {
-    const archiveId = `ZTAN-PROOF-${bundle.ceremonyId}-${Date.now()}`;
+    const archiveId = `ZTAN-PROOF-${bundle.sessionId}-${Date.now()}`;
     
     // Phase 5: Enforce immutability (Simulated by preventing overwrite)
     const exists = await redis.exists(`${ARCHIVE_KEY}:${archiveId}`);
@@ -27,7 +27,7 @@ export class ProofArchiveService {
     // Persist with 1-year retention (simulated)
     await redis.set(`${ARCHIVE_KEY}:${archiveId}`, JSON.stringify(bundle));
     
-    logger.info({ archiveId, ceremonyId: bundle.ceremonyId }, '[ARCHIVE] Proof bundle successfully committed to long-term storage');
+    logger.info({ archiveId, sessionId: bundle.sessionId }, '[ARCHIVE] Proof bundle successfully committed to long-term storage');
     return archiveId;
   }
 

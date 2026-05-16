@@ -12,9 +12,20 @@ This document establishes the formal maintenance requirements for Nexus ZTAN pos
 
 ---
 
+## 2. Controlled Operational Evolution
+
+The architecture freeze is permanent. Changes are only permitted when justified by:
+*   **Operational Pain**: Frequent incident recurrence or high MTTR.
+*   **Maintenance Burden**: Unsustainable manual toil or dependency churn.
+*   **Reliability Issues**: Documented failure of existing recovery mechanisms.
+*   **Replay Usability Gaps**: Inability to reconstruct incidents from ledger data.
+*   **Customer/Operator Demand**: Validated institutional requirements for survivability.
+
+**Forbidden Drivers**: Speculative architecture, conceptual elegance, AI trend alignment, or institutional mythology expansion. Every change MUST improve operational reliability more than it increases complexity.
+
 ---
 
-## 2. Quarterly Survivability Calendar
+## 3. Quarterly Survivability Calendar
 
 | Month | Activity | Target |
 |---|---|---|
@@ -30,7 +41,7 @@ Use the automation script to schedule these tasks in your environment:
 ./scripts/schedule-drills.ps1
 ```
 
-## 3. Operational Rituals & Tooling
+## 4. Operational Rituals & Tooling
 
 ### 3.1 Forensic Evidence Preservation
 After any production incident or security breach, operators must trigger the evidence preservation script to ensure undeniable auditing:
@@ -49,7 +60,7 @@ bash scripts/simulate-adversity.sh <duration-in-seconds>
 ```
 Log all recovery times in `docs/stewardship/RECOVERY_LOG.md` to monitor timing variance.
 
-## 4. Incident Response Protocol
+## 5. Incident Response Protocol
 
 1.  **Isolation**: Use `ztanctl isolate <node-id>` to prevent contagion.
 2.  **Forensics**: Run `scripts/preserve-incident.sh`.
@@ -57,7 +68,7 @@ Log all recovery times in `docs/stewardship/RECOVERY_LOG.md` to monitor timing v
 4.  **Recovery**: Execute deterministic OCR workflow.
 5.  **Audit**: Update `SRE_HANDBOOK.md` with new failure modes.
 
-## 5. Security & Build Integrity
+## 6. Security & Build Integrity
 
 *   **Permanent Charter**: All maintenance must adhere to the [STEWARDSHIP_CHARTER.md](./STEWARDSHIP_CHARTER.md).
 *   **Snyk Security Scanning**: Mandatory `snyk_code_scan` for every production patch.

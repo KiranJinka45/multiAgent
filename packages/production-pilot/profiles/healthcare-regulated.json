@@ -1,0 +1,16 @@
+{
+  "profile": "healthcare-regulated",
+  "retention": "7_YEARS",
+  "topology": "REGIONAL_ISOLATED",
+  "compliance": "HIPAA_GDPR",
+  "witnessQuorum": "WEIGHTED_INSTITUTIONAL",
+  "archivalDefaults": {
+    "frequency": "DAILY",
+    "location": "ENCRYPTED_CLOUD_STORAGE"
+  },
+  "security": {
+    "pqc": "ENABLED",
+    "tpm": "REQUIRED",
+    "anonymizationRequired": true
+  }
+}

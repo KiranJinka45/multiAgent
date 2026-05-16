@@ -35,23 +35,31 @@ export class CollaborationPersistence {
         }
     }
 
+    public async load(docName: string): Promise<Uint8Array | null> {
+        const doc = await prisma.collaborativeDoc.findUnique({
+            where: { name: docName }
+        });
+        return doc?.updates ? new Uint8Array(doc.updates) : null;
+    }
+
+    public async save(docName: string, update: Uint8Array): Promise<void> {
+        await prisma.collaborativeDoc.upsert({
+            where: { name: docName },
+            update: { updates: Buffer.from(update) },
+            create: { 
+                name: docName, 
+                updates: Buffer.from(update) 
+            }
+        });
+    }
+
     /**
      * Merges current document state and persists to Postgres.
-     * Uses a debounce/throttle mechanism in a real-world scenario, 
-     * but here we use direct updates for simplicity in the demo.
      */
     private async storeUpdate(docName: string, ydoc: Y.Doc) {
         try {
             const state = Y.encodeStateAsUpdate(ydoc);
-            
-            await prisma.collaborativeDoc.upsert({
-                where: { name: docName },
-                update: { updates: Buffer.from(state) },
-                create: { 
-                    name: docName, 
-                    updates: Buffer.from(state) 
-                }
-            });
+            await this.save(docName, state);
         } catch (err) {
             logger.error({ docName, err }, '[YJS:Persistence] Failed to store document update');
         }
@@ -59,4 +67,3 @@ export class CollaborationPersistence {
 }
 
 export const collaborationPersistence = new CollaborationPersistence();
-

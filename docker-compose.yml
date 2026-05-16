@@ -5,9 +5,9 @@ services:
   postgres:
     image: postgres:15-alpine
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: multiagent
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-multiagent}
     ports:
       - "54399:5432"
     healthcheck:
@@ -47,8 +47,8 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3010
-      - DATABASE_URL=postgresql://postgres:password@postgres:5432/multiagent
-      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:password@postgres:5432/multiagent}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
     depends_on:
       postgres:
         condition: service_healthy
@@ -72,8 +72,8 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=4005
-      - DATABASE_URL=postgresql://postgres:password@postgres:5432/multiagent
-      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:password@postgres:5432/multiagent}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
     depends_on:
       core-api:
         condition: service_healthy
@@ -92,8 +92,8 @@ services:
     container_name: worker
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=postgresql://postgres:password@postgres:5432/multiagent
-      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:password@postgres:5432/multiagent}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
     depends_on:
       auth-service:
         condition: service_healthy

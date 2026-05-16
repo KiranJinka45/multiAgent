@@ -1,4 +1,4 @@
-import { SCMNode, SimulationResult } from './scm.types';
+import type { SCMNode, SimulationResult } from './scm.types.js';
 
 export class CounterfactualEngine {
   constructor(private nodes: SCMNode[]) {}

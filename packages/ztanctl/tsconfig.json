@@ -1,0 +1,39 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "composite": true,
+    "declaration": true,
+    "noEmit": false,
+    "baseUrl": ".",
+    "paths": {
+      "@packages/core-engine": [
+        "../core-engine/src"
+      ],
+      "@packages/observability": [
+        "../observability/src"
+      ],
+      "@packages/settlement-layer": [
+        "../settlement-layer/src"
+      ],
+      "@packages/staking-core": [
+        "../staking-core/src"
+      ],
+      "@packages/economics": [
+        "../economics/src"
+      ]
+    },
+    "incremental": true,
+    "rootDir": "src"
+  },
+  "include": [
+    "src*"
+  ],
+  "references": [
+    {
+      "path": "../observability"
+    }
+  ]
+}

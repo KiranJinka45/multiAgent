@@ -2,18 +2,52 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "ignoreDeprecations": "6.0",
+    "ignoreDeprecations": "5.0",
     "outDir": "dist",
-    "composite": false,
+    "composite": true,
     "skipLibCheck": true,
     "noEmit": false,
     "declaration": true,
-    
-    "rootDir": "../..",
     "paths": {
-      "@packages/*": ["../../packages/*/dist/index.d.ts"],
-      "@/*": ["./src/*"]
-    }
+      "@packages/auth-internal": [
+        "../../packages/auth-internal/src"
+      ],
+      "@packages/billing": [
+        "../../packages/billing/src"
+      ],
+      "@packages/brain": [
+        "../../packages/brain/src"
+      ],
+      "@packages/config": [
+        "../../packages/config/src"
+      ],
+      "@packages/core-engine": [
+        "../../packages/core-engine/src"
+      ],
+      "@packages/db": [
+        "../../packages/db/src"
+      ],
+      "@packages/events": [
+        "../../packages/events/src"
+      ],
+      "@packages/memory-cache": [
+        "../../packages/memory-cache/src"
+      ],
+      "@packages/observability": [
+        "../../packages/observability/src"
+      ],
+      "@packages/resilience": [
+        "../../packages/resilience/src"
+      ],
+      "@packages/utils": [
+        "../../packages/utils/src"
+      ],
+      "@packages/self-evolution": [
+        "../../packages/self-evolution/src"
+      ]
+    },
+    "incremental": true,
+    "rootDir": "src"
   },
   "include": [
     "src",
@@ -27,6 +61,22 @@
     "../../packages/config/src",
     "../../packages/observability/src",
     "../../packages/auth-internal/src"
+  ],
+  "references": [
+    {
+      "path": "../../packages/auth-internal"
+    },
+    {
+      "path": "../../packages/config"
+    },
+    {
+      "path": "../../packages/db"
+    },
+    {
+      "path": "../../packages/observability"
+    },
+    {
+      "path": "../../packages/utils"
+    }
   ]
-  
 }

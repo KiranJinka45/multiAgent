@@ -11,3 +11,4 @@ export interface IMemoryService {
     getRecentFixes(errorPattern: string, tenantId: string): Promise<unknown[]>;
 }
 
+export * from './longevity.js';

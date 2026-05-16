@@ -1,13 +1,9 @@
 import { safeInitTelemetry } from '@packages/observability';
-safeInitTelemetry({ serviceName: 'multiagent-deploy-service' });
+safeInitTelemetry('multiagent-deploy-service');
 
 import { Worker, Job } from 'bullmq';
-import { 
-    redis, 
-    QUEUE_DEPLOY, 
-    logger, 
-    ReliabilityMonitor 
-} from '@packages/utils';
+import { redis, QUEUE_DEPLOY, ReliabilityMonitor } from '@packages/utils';
+import { logger } from '@packages/observability';
 import { db as prisma } from '@packages/db';
 import { VercelDeployer } from './deployer.js';
 
@@ -82,4 +78,3 @@ worker.on('failed', (job, err) => {
 });
 
 logger.info('[DeployService] Worker started, listening on QUEUE_DEPLOY');
-

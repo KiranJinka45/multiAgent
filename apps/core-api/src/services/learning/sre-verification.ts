@@ -1,6 +1,6 @@
 import { logger } from '@packages/observability';
-import { CalibrationEngine } from '../calibration-engine';
-import { sreEngine } from '../sre-engine';
+import { CalibrationEngine } from '../calibration-engine.js';
+import { sreEngine } from '../sre-engine.js';
 
 export class SreVerificationService {
   /**

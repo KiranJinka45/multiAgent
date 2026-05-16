@@ -1,5 +1,5 @@
 import { logger } from '@packages/observability';
-import { redis } from './server';
+import { redis } from './server.js';
 
 /**
  * ZTAN Chaos Engine
@@ -40,5 +40,18 @@ export const ChaosEngine = {
             logger.warn({ durationMs }, '[ChaosEngine] Injecting Container Hang...');
             await new Promise(r => setTimeout(r, durationMs));
         }
+    },
+
+    /**
+     * Runs a full chaos cycle.
+     */
+    async runChaosCycle() {
+        logger.info('[ChaosEngine] Starting Automated Chaos Cycle');
+        await this.simulateRedisOutage(2000);
+        this.injectWorkerCrash(0.01);
+        await this.injectContainerHang(0.01, 5000);
+        return { success: true, timestamp: Date.now() };
     }
 };
+
+export const runChaosCycle = ChaosEngine.runChaosCycle.bind(ChaosEngine);

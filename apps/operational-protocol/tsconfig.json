@@ -1,0 +1,23 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "ignoreDeprecations": "5.0",
+    "declaration": true,
+    "outDir": "dist",
+    "composite": true,
+    "paths": {
+      "@packages/ztan-crypto": [
+        "../../packages/ztan-crypto/src"
+      ]
+    },
+    "noEmit": false,
+    "incremental": true,
+    "rootDir": "src"
+  },
+  "include": [
+    "src/**/*",
+    "../../packages/ztan-crypto/src/**/*"
+  ],
+  "references": []
+}

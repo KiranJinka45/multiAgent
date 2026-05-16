@@ -10,7 +10,7 @@ export interface ApprovalRequest {
   createdAt: number;
   expiresAt: number;
   risk: 'LOW' | 'MEDIUM' | 'HIGH';
-  trustScore: number;
+  reliabilityScore: number;
   
   // Decision Context
   proposedAction: any;
@@ -45,10 +45,10 @@ export class ApprovalService {
     await redis.set(`${this.KEY_PREFIX}${id}`, JSON.stringify(req), 'PX', params.expiresAt - Date.now());
     await redis.lpush(this.LIST_KEY, id);
     
-    logger.info({ requestId: id, proposedAction: params.proposedAction.type, trustScore: params.trustScore }, '[APPROVAL] New request created');
+    logger.info({ requestId: id, proposedAction: params.proposedAction.type, reliabilityScore: params.reliabilityScore }, '[APPROVAL] New request created');
     
     // Trigger External Notification
-    await NotificationService.notifyApprovalRequired(id, params.proposedAction.type, params.trustScore);
+    await NotificationService.notifyApprovalRequired(id, params.proposedAction.type, params.reliabilityScore);
     
     return req;
   }

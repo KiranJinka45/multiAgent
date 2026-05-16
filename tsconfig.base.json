@@ -9,9 +9,16 @@
     "declaration": true,
     "declarationMap": true,
     "incremental": true,
+    "verbatimModuleSyntax": true,
 
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "types": ["node"]
+    "types": ["node"],
+    "baseUrl": ".",
+    "paths": {
+      "@packages/frontend-shared": ["packages/frontend-shared/src/index.ts"],
+      "@packages/ztan-crypto": ["packages/ztan-crypto/src/index.ts"],
+      "@packages/utils": ["packages/utils/src/index.ts"]
+    }
   }
 }

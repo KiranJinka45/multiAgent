@@ -1,0 +1,17 @@
+{
+  "profile": "airgapped-defense",
+  "retention": "PERPETUAL",
+  "topology": "DISCONNECTED_ENCLAVE",
+  "compliance": "MIL_SPEC_810",
+  "witnessQuorum": "UNANIMOUS_LOCAL",
+  "archivalDefaults": {
+    "frequency": "IMMEDIATE",
+    "location": "PHYSICAL_SECURE_MEDIA"
+  },
+  "security": {
+    "pqc": "MANDATORY",
+    "tpm": "REQUIRED",
+    "airgapReady": true,
+    "physicalTamperDetection": true
+  }
+}

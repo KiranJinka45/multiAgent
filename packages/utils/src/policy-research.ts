@@ -1,4 +1,4 @@
-import { logger } from './server';
+import { logger } from './server.js';
 
 /**
  * 🧪 ZTAN Research Layer: Institutional Sociology & Speculative Governance

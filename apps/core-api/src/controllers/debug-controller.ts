@@ -59,7 +59,7 @@ debugRouter.get('/failover', (req: Request, res: Response) => {
 });
 
 /**
- * Tests the integrity of the Governance Watchdog.
+ * Tests the integrity of the Operational Watchdog.
  */
 debugRouter.get('/watchdog-test', (req: Request, res: Response) => {
   try {
@@ -71,7 +71,7 @@ debugRouter.get('/watchdog-test', (req: Request, res: Response) => {
     if (mode === 'FALSE_POSITIVE') {
       sreEngine.reportNodeAnomaly('api-service', 0.1); // Nominal score
     } else {
-      (sreEngine as any).injectChaos('GOVERNANCE_DRIFT', 'critical');
+      (sreEngine as any).injectChaos('STABILITY_DRIFT', 'critical');
     }
     
     res.json({ status: 'TRIGGERED', mode });
@@ -114,8 +114,8 @@ debugRouter.post('/reset', (req: Request, res: Response) => {
     // Multi-Layer Reset for Certification Purity
     sreEngine.reset();
     
-    import('../services/governance/audit-engine').then(({ governanceAudit }) => governanceAudit.reset());
-    import('../services/governance/policy-optimizer').then(({ policyOptimizer }) => policyOptimizer.reset());
+    import('../services/operational-control/audit-engine').then(({ operationalAudit }) => operationalAudit.reset());
+    import('../services/operational-control/policy-optimizer').then(({ policyOptimizer }) => policyOptimizer.reset());
     import('@packages/business').then(({ roiPipeline }) => roiPipeline.reset());
     import('../services/telemetry-simulator').then(({ telemetrySimulator }) => {
         // Stop any active healing

@@ -6,7 +6,7 @@ export interface RLState {
   burnRate: number;
   latencyP95: number;
   errorRate: number;
-  trustScore: number;
+  reliabilityScore: number;
 }
 
 export class QLearningAgent {
@@ -39,9 +39,9 @@ export class QLearningAgent {
     const anomalyIdx = Math.floor(state.anomalyScore * 5); // 0-4
     const burnIdx = Math.floor(Math.min(state.burnRate, 10) / 2); // 0-5
     const latencyIdx = Math.floor(Math.min(state.latencyP95, 2000) / 400); // 0-5
-    const trustIdx = Math.floor(state.trustScore * 4); // 0-3 (Low, Med, High, Critical)
+    const reliabilityIdx = Math.floor(state.reliabilityScore * 4); // 0-3 (Low, Med, High, Critical)
     
-    return `a${anomalyIdx}:b${burnIdx}:l${latencyIdx}:t${trustIdx}`;
+    return `a${anomalyIdx}:b${burnIdx}:l${latencyIdx}:r${reliabilityIdx}`;
   }
 
   public chooseAction(state: RLState, actions: string[]): string {

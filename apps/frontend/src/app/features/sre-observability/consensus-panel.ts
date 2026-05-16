@@ -28,8 +28,8 @@ interface Observer {
             LEVEL 5.0 CERTIFIED
           </div>
         </div>
-        <div class="state-pill" [class]="governance?.mode?.toLowerCase()">
-          {{ governance?.mode || 'STABLE' }}
+        <div class="state-pill" [class]="operationalControl?.mode?.toLowerCase()">
+          {{ operationalControl?.mode || 'STABLE' }}
         </div>
         <div class="diversity-status" [class.active]="diversityMet">
           <span class="diversity-label">{{ diversityMet ? 'PROVIDER DIVERSITY MET' : 'DIVERSITY GAP' }}</span>
@@ -123,18 +123,18 @@ interface Observer {
       </div>
 
       <!-- Decision Narrative Panel (v3) -->
-      <div class="narrative-panel glass-panel" *ngIf="governance">
-        <div class="narrative-header">
-          <span>DECISION NARRATIVE & CAUSAL PROOF</span>
-          <div class="causal-badge" *ngIf="governance?.reasoningDecomposition?.causalTrigger">
-            {{ governance.reasoningDecomposition.causalTrigger }}
+      <div class="narrative-panel glass-panel" *ngIf="operationalControl">
+        <div class="header">
+          <label>REASONING DECOMPOSITION</label>
+          <div class="causal-badge" *ngIf="operationalControl?.reasoningDecomposition?.causalTrigger">
+            {{ operationalControl.reasoningDecomposition.causalTrigger }}
           </div>
         </div>
         
         <div class="narrative-content">
           <div class="primary-reason">
             <div class="icon">🔍</div>
-            <p>{{ governance.reason }}</p>
+            <p>{{ operationalControl.reason }}</p>
           </div>
 
           <!-- Counterfactual Insight: Ranked Blockers (v1.1) -->
@@ -154,11 +154,11 @@ interface Observer {
             <div class="profile-grid">
               <div class="p-item">
                 <label>QUORUM</label>
-                <div class="dot" [class.high]="(governance?.reasoningDecomposition?.quorumContribution || 0) < 0.7"></div>
+                <div class="dot" [class.high]="(operationalControl?.reasoningDecomposition?.quorumContribution || 0) < 0.7"></div>
               </div>
-              <div class="p-item">
+              <div class="metric">
                 <label>DIVERSITY</label>
-                <div class="dot" [class.high]="(governance?.reasoningDecomposition?.diversityFactor || 0) < 0.5"></div>
+                <div class="dot" [class.high]="(operationalControl?.reasoningDecomposition?.diversityFactor || 0) < 0.5"></div>
               </div>
               <div class="p-item">
                 <label>SIGNAL</label>
@@ -169,7 +169,7 @@ interface Observer {
 
           <div class="buffer-indicator">
             <span class="buffer-label">EPISTEMIC SAFETY BUFFER:</span>
-            <span class="buffer-val text-warning">+{{ ((governance?.reasoningDecomposition?.safetyBuffer || 0) * 100).toFixed(1) }}%</span>
+            <span class="buffer-val text-warning">+{{ ((operationalControl?.reasoningDecomposition?.safetyBuffer || 0) * 100).toFixed(1) }}%</span>
             <span class="buffer-desc"> (Brier-Derived Uplift)</span>
           </div>
         </div>
@@ -536,7 +536,7 @@ export class ConsensusPanelComponent {
   @Input() divergenceScore = 0;
   @Input() tuningMode: 'LOCKED' | 'ANALYSIS' | 'TUNING' | 'CALIBRATED' = 'LOCKED';
   @Input() convergenceState?: 'INITIALIZING' | 'CONVERGING' | 'OSCILLATING' | 'FORMALLY_STABLE';
-  @Input() governance?: any;
+  @Input() operationalControl?: any;
   @Input() rankedBlockers: { reason: string, impact: number }[] = [];
   @Input() isChaosMode = false;
   

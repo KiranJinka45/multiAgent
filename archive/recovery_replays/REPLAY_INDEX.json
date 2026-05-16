@@ -7,5 +7,14 @@
     "node": "v20.20.0",
     "durationMs": 1472746,
     "lockfileSize": 666180
+  },
+  {
+    "timestamp": "2026-05-15T13:18:31.533Z",
+    "success": true,
+    "category": "SCHEDULED_CHECKPOINT",
+    "os": "linux",
+    "node": "v20.20.0",
+    "durationMs": 450,
+    "lockfileSize": 15
   }
 ]

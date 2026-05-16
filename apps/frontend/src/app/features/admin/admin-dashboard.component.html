@@ -66,10 +66,9 @@
         <h3>Return on Intelligence</h3>
       </div>
       <div class="gauge-container">
-        <canvas baseChart
-                [data]="roiChartData"
-                [type]="'doughnut'">
-        </canvas>
+        <div class="gauge-placeholder">
+          <div class="placeholder-ring"></div>
+        </div>
         <div class="gauge-value" *ngIf="roiMetrics$ | async as metrics">
           <span class="number">{{ metrics.efficiencyGain }}%</span>
           <span class="label">Efficiency Gain</span>
@@ -94,11 +93,9 @@
         <h3>Scaling Timeline</h3>
       </div>
       <div class="chart-container">
-        <canvas baseChart
-                [data]="timelineChartData"
-                [options]="timelineChartOptions"
-                [type]="'line'">
-        </canvas>
+        <div class="timeline-placeholder">
+          <div class="placeholder-line"></div>
+        </div>
       </div>
       <div class="timeline-meta">
         <span>Last 50 Scaling Decisions</span>

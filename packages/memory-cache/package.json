@@ -1,28 +1,11 @@
 {
   "name": "@packages/memory-cache",
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "type": "module",
   "private": true,
-  "main": "dist/index.cjs",
-  "module": "dist/index.mjs",
+  "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsup src/index.ts --no-dts && tsc --emitDeclarationOnly",
-    "dev": "tsup src/index.ts --no-dts --watch"
-  },
-  "dependencies": {
-    "lru-cache": "11.0.1",
-    "@packages/utils": "workspace:*",
-    "@packages/observability": "workspace:*"
-  },
-  "devDependencies": {
-    "typescript": "5.9.3",
-    "tsup": "8.5.1"
-  },
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.mjs"
-    }
+    "build": "tsc"
   }
 }

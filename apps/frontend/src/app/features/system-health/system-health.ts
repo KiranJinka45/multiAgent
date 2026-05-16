@@ -223,7 +223,7 @@ import { Subscription } from 'rxjs';
                 </ng-template>
               </div>
               <div class="policy-list" *ngIf="metrics.intelligence?.activePolicies?.length">
-                <label>Active Governance Policies</label>
+                <label>Active Operational Policies</label>
                 <div class="policy-item" *ngFor="let policy of metrics.intelligence?.activePolicies || []">
                   <span class="shield">🛡️</span> {{ policy }}
                 </div>
@@ -264,9 +264,9 @@ import { Subscription } from 'rxjs';
               (drain)="onDrainWorkers()">
             </app-action-panel>
 
-            <!-- System Governance -->
-            <div class="governance-card card">
-              <h3>System Governance</h3>
+            <!-- Operational Control -->
+            <div class="control-card card">
+              <h3>Operational Control</h3>
               <div class="gov-item">
                 <label>Trace Persistence</label>
                 <span class="status-indicator" [class.syncing]="true">DURABLE SYNC ACTIVE</span>
@@ -502,8 +502,8 @@ import { Subscription } from 'rxjs';
     .worker-id { font-family: monospace; font-size: 0.8rem; color: #94a3b8; }
     .worker-status { font-size: 0.7rem; font-weight: 700; color: #10b981; }
 
-    .governance-card { border-left: 4px solid #10b981; }
-    .governance-card h3 { margin: 0 0 16px 0; font-size: 1rem; }
+    .control-card { border-left: 4px solid #10b981; }
+    .control-card h3 { margin: 0 0 16px 0; font-size: 1rem; }
     .gov-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
     .gov-item label { font-size: 0.75rem; color: #94a3b8; }
     .status-indicator { font-size: 0.65rem; font-weight: 800; color: #10b981; }

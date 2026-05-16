@@ -58,7 +58,7 @@ export interface SREPerception {
   wassersteinHistory?: number[];
 }
 
-export interface SRETrust {
+export interface SREReliability {
   score: number;
   breakdown: {
     confidence: number;
@@ -69,7 +69,7 @@ export interface SRETrust {
   };
 }
 
-export interface SREGovernance {
+export interface SREOperationalControl {
   mode: 'STABLE' | 'HEALING' | 'HALTED' | 'CHAOS_TEST' | 'AWAITING_APPROVAL' | 'SAFE_MODE';
   reason: string;
   reasonType: 'NO_QUORUM' | 'NO_DIVERSITY' | 'UNSTABLE_QUORUM' | 'LOW_CONFIDENCE' | 'POST_ACTION_DIVERGENCE' | 'SIGNAL_INTEGRITY_FAILURE' | 'NONE';
@@ -98,11 +98,11 @@ export interface SREUpdate {
   timestamp: number; // Unix ms
   intent: string;
   perception?: SREPerception | any;
-  governance?: SREGovernance | any;
+  operationalControl?: SREOperationalControl | any;
   observers?: SREObserver[] | any[];
   lastAction?: any;
   events?: SREEvent[] | any[];
-  trust?: SRETrust | any;
+  reliability?: SREReliability | any;
   topology?: {
     nodes: any[];
     edges: any[];
@@ -132,18 +132,21 @@ export interface SREUpdate {
     };
     proposals: any[];
   };
-  governanceAudit?: {
+  operationalAudit?: {
     avgBrier: number;
     avgRegret: number;
     avgRoiAccuracy: number;
     status: string;
     intervention: string;
   };
+  stability?: {
+    score: number;
+  } | any;
 }
 
 export interface SRETuningParams {
   expectedTTAC: number;
   confidenceThreshold: number;
-  trustDecayRate: number;
+  reliabilityDecayRate: number;
   minDiversity: number;
 }

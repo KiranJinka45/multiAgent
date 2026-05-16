@@ -1,15 +1,14 @@
-import { db } from './server';
-import { eventBus } from '@packages/events';
-import { logger } from '@packages/observability';
+import { db } from './server.js';
+import { eventBus } from './server.js';
+import { 
+    logger,
+    idempotencyCollisionsTotal as idempotencyCollisionsTotalImport,
+    staleLockRecoveriesTotal as staleLockRecoveriesTotalImport
+} from '@packages/observability';
 
-// Defensive metric imports — gracefully degrade if observability hasn't compiled new exports
-let idempotencyCollisionsTotal: { inc: (labels?: any) => void } = { inc: () => {} };
-let staleLockRecoveriesTotal: { inc: () => void } = { inc: () => {} };
-try {
-    const obs = require('@packages/observability');
-    if (obs.idempotencyCollisionsTotal) idempotencyCollisionsTotal = obs.idempotencyCollisionsTotal;
-    if (obs.staleLockRecoveriesTotal) staleLockRecoveriesTotal = obs.staleLockRecoveriesTotal;
-} catch { /* metrics unavailable — non-fatal */ }
+// Defensive metric assignments — use imported values
+let idempotencyCollisionsTotal: { inc: (labels?: any) => void } = idempotencyCollisionsTotalImport || { inc: () => {} };
+let staleLockRecoveriesTotal: { inc: () => void } = staleLockRecoveriesTotalImport || { inc: () => {} };
 
 const LOCK_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
 
@@ -46,7 +45,7 @@ export class IdempotencyManager {
                 }
 
                 if (existing.status === 'started') {
-                    const isStale = Date.now() - existing.lockedAt.getTime() > LOCK_TIMEOUT_MS;
+                    const isStale = Date.now() - existing.lockedAt!.getTime() > LOCK_TIMEOUT_MS;
                     if (isStale) {
                         logger.warn(`[Idempotency] Recovering stale lock for key: ${key} (previous region: ${existing.region}, current: ${region})`);
                         staleLockRecoveriesTotal.inc();
@@ -124,7 +123,7 @@ export class IdempotencyManager {
         }
         
         if (existing?.status === 'started') {
-            const isStale = Date.now() - existing.lockedAt.getTime() > LOCK_TIMEOUT_MS;
+            const isStale = Date.now() - existing.lockedAt!.getTime() > LOCK_TIMEOUT_MS;
             if (!isStale) {
                 throw new Error(`[Idempotency] Operation '${key}' is actively processing by region: ${existing.region}.`);
             }
@@ -133,7 +132,7 @@ export class IdempotencyManager {
 
         try {
             // Transaction boundary guarantees atomicity
-            return await db.$transaction(async (tx) => {
+            return await db.$transaction(async (tx: any) => {
                 // Upsert to take the lock atomically inside the transaction
                 await tx.idempotencyRecord.upsert({
                     where: { key },

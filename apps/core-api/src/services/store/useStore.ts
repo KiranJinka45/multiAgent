@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import { AgentResult, ExecutionContextType } from '@packages/utils';
-import { ProjectFile } from '@packages/contracts';
+import type { AgentResult, ExecutionContextType } from '@packages/utils';
+import type { ProjectFile } from '@packages/contracts';
 
 interface AppState {
     currentProjectId: string | null;

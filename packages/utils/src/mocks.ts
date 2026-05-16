@@ -41,18 +41,26 @@ export interface RuntimeRecord {
     port?: number;
     pid?: number;
 }
+export type AgentResult = any;
+export type ExecutionContextType = any;
 
-export enum RuntimeStatus {
-    IDLE = 'idle',
-    RUNNING = 'running',
-    FAILED = 'failed'
-}
-
-export interface RuntimeSnapshot {
-    id: string;
+export interface ManagedContainer {
+    containerId: string;
     projectId: string;
-    timestamp: string;
+    port: number;
+    status: string;
+    startedAt: string;
 }
+
+import { 
+    RuntimeStatus, 
+    JobStage, 
+    MissionStatus, 
+    DistributedExecutionContext as RealContext 
+} from '@packages/runtime-core';
+
+export { RuntimeStatus, JobStage, MissionStatus };
+export class DistributedExecutionContext extends RealContext {}
 
 export const redis: any = {
     get: async (key: string) => null,
@@ -74,26 +82,6 @@ export const subscriber: any = {
     psubscribe: (pattern: string, cb: any) => cb(null),
     on: (event: string, cb: any) => {},
 };
-
-export class DistributedExecutionContext {
-    id: string;
-    constructor(id: string) { this.id = id; }
-    async init(...args: any[]) {}
-    setAgentResult(...args: any[]) {}
-    async get(): Promise<any> { return { 
-        status: 'in-progress', 
-        agentResults: {}, 
-        metrics: { startTime: new Date().toISOString() },
-        projectId: 'mock-project',
-        executionId: this.id,
-        prompt: 'Mock prompt',
-        userId: 'mock-user',
-        currentStage: 'planner'
-    }; }
-    async atomicUpdate(cb: any) { await cb({}); }
-    static async getActiveExecutions() { return []; }
-    async transition(to: string) {}
-}
 
 export class ResumeAgent {
     async execute(...args: any[]) { return { data: { score: 95 } }; }
@@ -142,8 +130,39 @@ export const ArtifactValidator: any = {
 };
 
 export const PreviewServerManager: any = { start: async () => {}, stop: async () => {} };
+export const PreviewWatchdog: any = { start: async () => {}, stop: async () => {} };
+export class BaseAgent {
+    constructor(public name: string = 'base') {}
+    async run() { return { success: true }; }
+    async execute() { return { success: true }; }
+}
+export class DatabaseAgent extends BaseAgent { constructor() { super('database'); } }
+export class BackendAgent extends BaseAgent { constructor() { super('backend'); } }
+export class FrontendAgent extends BaseAgent { constructor() { super('frontend'); } }
+export class DeploymentAgent extends BaseAgent { constructor() { super('deployment'); } }
+export class SecurityAgent extends BaseAgent { constructor() { super('security'); } }
+export class MonitoringAgent extends BaseAgent { constructor() { super('monitoring'); } }
+export class SaaSMonetizationAgent extends BaseAgent { constructor() { super('billing'); } }
+export class PlannerAgent extends BaseAgent { constructor() { super('planner'); } }
+export class ResearchAgent extends BaseAgent { constructor() { super('research'); } }
+export class DebugAgent extends BaseAgent { constructor() { super('debug'); } }
+export class ArchitectureAgent extends BaseAgent { constructor() { super('architecture'); } }
+export class RankingAgent extends BaseAgent { constructor() { super('ranking'); } }
+export class RepairAgent extends BaseAgent { constructor() { super('repair'); } }
+export class CriticAgent extends BaseAgent { constructor() { super('critic'); } }
+
 export const previewManager: any = { start: async () => {}, stop: async () => {} };
-export const PortManager: any = { start: async () => {}, stop: async () => {} };
+export const PortManager: any = { 
+    start: async () => {}, 
+    stop: async () => {},
+    acquirePorts: async () => [3000],
+    releasePorts: async () => {},
+    getPorts: async () => [3000],
+    renewLease: async () => {},
+    forceAcquirePorts: async () => {},
+    isPortFree: async () => true,
+    acquireFreePort: async () => 3000
+};
 export const ContainerManager: any = { 
     start: async () => ({ containerId: 'mock-container', containerName: 'mock-name' }), 
     stop: async () => {}, 
@@ -152,7 +171,8 @@ export const ContainerManager: any = {
     isRunning: (id: string) => false,
     listAll: () => [],
     ensureNetwork: () => {},
-    buildImage: async () => {}
+    buildImage: async () => {},
+    hotInject: async () => {}
 };
 export const ProcessManager: any = {
     start: async () => {},
@@ -171,9 +191,11 @@ export const FailoverManager: any = { start: () => {}, stop: () => {} };
 export const WorkerClusterManager: any = { heartbeat: async () => {}, deregister: async () => {} };
 export const BuildGraphEngine: any = { getAffectedNodes: async () => [] };
 export const EvolutionManager: any = { evolve: async () => false };
+export const RuntimeCapacity: any = { check: async () => ({ allowed: true }), reserve: async () => {}, release: async () => {} };
+export const RuntimeHeartbeat: any = { startLoop: async () => {} };
+export const RuntimeMetrics: any = { record: async () => {} };
 
-export enum JobStage { PLAN = 'PLAN', FAILED = 'FAILED' }
-export enum MissionStatus { PLANNING = 'planning', COMPLETED = 'completed', FAILED = 'failed' }
+
 
 export const runtimeStartupDuration: any = { observe: () => {} };
 export const runtimeCrashesTotal: any = { inc: () => {} };
@@ -184,6 +206,7 @@ export const nodeMemoryUsage: any = { set: () => {}, observe: () => {} };
 export const nodeCpuUsage: any = { set: () => {}, observe: () => {} };
 export const queueWaitTimeSeconds: any = { observe: () => {} };
 export const stuckBuildsTotal: any = { inc: () => {} };
+export const getSafeEnv = (overrides: any = {}) => ({ ...process.env, ...overrides });
 export const env: any = { WORKER_CONCURRENCY_FREE: 5, WORKER_CONCURRENCY_PRO: 10 };
 
 export const runWithTracing = async (id: string, cb: any) => await cb();
@@ -227,3 +250,42 @@ export const architectureQueue: any = new Queue('arch');
 export const validatorQueue: any = new Queue('val');
 export const QUEUE_REPAIR = 'repair';
 export const QUEUE_ROLLBACK = 'rollback';
+
+export const activities: any = {
+    createActivities: (name: string) => ({})
+};
+export const createActivities = activities.createActivities;
+
+export const connection = redis;
+
+export const runPipeline = async (id: string, prompt: string) => ({ success: true, missionId: id });
+export const updatePipeline = async (id: string, prompt: string) => ({ success: true, missionId: id });
+export const deployPipeline = async (id: string, ip: string) => ({ success: true, missionId: id });
+
+export const rateLimitMiddleware = (req: any, res: any, next: any) => next();
+export const createBreaker = (fn: any, opts: any) => ({
+    fire: (...args: any[]) => fn(...args),
+    opened: false
+});
+export const createBackpressureMiddleware = (opts: any) => (req: any, res: any, next: any) => next();
+export const createOutboundClient = (opts: any) => ({});
+
+export const kafkaManager: any = {
+    publish: async (...args: any[]) => {},
+    subscribe: async (...args: any[]) => {},
+    on: (...args: any[]) => {}
+};
+
+export const ThresholdBls: any = {
+    dkg: async (threshold: number, count: number, nodeIds: string[]) => ({
+        shares: nodeIds.map(id => ({ nodeId: id, secretShare: 'deadbeef' })),
+        masterPublicKey: 'beefdead'
+    }),
+    signShare: async (...args: any[]) => 'signature',
+    aggregate: async (...args: any[]) => 'aggregate',
+    verify: async (...args: any[]) => true
+};
+
+export const Canonical: any = {
+    hash: (data: any) => 'hashed'
+};

@@ -1,5 +1,6 @@
-import { GovernanceReceipt, GovernanceSignature, CouncilMember, governanceSignablePayload, WitnessMember } from './governance.js';
-import { ISigner } from './signer.js';
+import { governanceSignablePayload } from './governance.js';
+import type { GovernanceReceipt, GovernanceSignature, CouncilMember, WitnessMember } from './governance.js';
+import type { ISigner } from './signer.js';
 import { MerkleTree } from './merkle.js';
 
 

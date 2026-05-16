@@ -1,6 +1,6 @@
-export * from './virtual-fs';
-export * from './patch-engine';
-export * from './commit-manager';
-export * from './rollback-manager';
-export * from './file-tree';
+export * from './virtual-fs.js';
+export * from './patch-engine.js';
+export * from './commit-manager.js';
+export * from './rollback-manager.js';
+export * from './file-tree.js';
 

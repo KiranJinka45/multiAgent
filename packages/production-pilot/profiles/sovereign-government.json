@@ -1,0 +1,16 @@
+{
+  "profile": "sovereign-government",
+  "retention": "PERMANENT",
+  "topology": "GEOGRAPHICALLY_DISTRIBUTED",
+  "compliance": "REGULATED_SOVEREIGN",
+  "witnessQuorum": "STRICT_MAJORITY",
+  "archivalDefaults": {
+    "frequency": "HOURLY",
+    "location": "SOVEREIGN_VAULT"
+  },
+  "security": {
+    "pqc": "MANDATORY",
+    "tpm": "REQUIRED",
+    "airgapReady": false
+  }
+}

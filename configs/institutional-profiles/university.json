@@ -1,0 +1,18 @@
+{
+    "name": "University Research Pilot",
+    "type": "UNIVERSITY",
+    "description": "Tailored for academic research environments with high transparency requirements.",
+    "isolationLevel": "MEDIUM",
+    "auditFrequency": "WEEKLY",
+    "resourceLimits": {
+        "cpu": "4 vCPU",
+        "memory": "8GB",
+        "storage": "100GB"
+    },
+    "transparencyFlags": [
+        "PUBLIC_MERKLE_ROOT",
+        "DETAILED_REPLAY_LOGS",
+        "ACADEMIC_PEER_REVIEW_ACCESS"
+    ],
+    "economicPolicy": "GRANT_BASED_QUOTA"
+}

@@ -2,34 +2,15 @@
   "name": "@packages/observability",
   "version": "1.0.0",
   "type": "module",
-  "description": "MultiAgent High-Availability Observability Layer",
-  "main": "dist/index.cjs",
-  "module": "dist/index.mjs",
+  "private": true,
+  "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsup src/index.ts --no-dts && tsc --emitDeclarationOnly",
-    "dev": "tsup src/index.ts --no-dts --watch"
+    "build": "tsc"
   },
   "dependencies": {
-    "pino": "9.0.0",
-    "prom-client": "15.1.0",
-    "@opentelemetry/api": "1.7.0",
-    "@opentelemetry/sdk-node": "0.49.1",
-    "@opentelemetry/auto-instrumentations-node": "0.43.0",
-    "@opentelemetry/exporter-trace-otlp-grpc": "0.49.1",
-    "@opentelemetry/resources": "1.22.0",
-    "@opentelemetry/semantic-conventions": "1.22.0",
-    "@opentelemetry/core": "1.22.0"
-  },
-  "devDependencies": {
-    "tsup": "8.5.1",
-    "typescript": "5.9.3"
-  },
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.mjs"
-    }
+    "@opentelemetry/api": "1.8.0",
+    "pino": "10.3.1",
+    "prom-client": "15.1.3"
   }
 }

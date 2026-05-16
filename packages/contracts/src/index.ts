@@ -5,8 +5,9 @@
  * This is the SOURCE OF TRUTH for cross-service communication.
  */
 
-export * from './api';
-export * from './sre';
+export * from './api.js';
+export * from './sre.js';
+export * from './archaeology.js';
 
 export enum MissionStatus {
     PENDING = 'PENDING',

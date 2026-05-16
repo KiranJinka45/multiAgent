@@ -3,14 +3,33 @@
   "compilerOptions": {
     "baseUrl": ".",
     "outDir": "dist",
-    "rootDir": "src",
-    "composite": false,
-    "incremental": false,
+    "composite": true,
+    "incremental": true,
     "skipLibCheck": true,
     "paths": {
-      "@packages/*": ["../../packages/*/dist/index.d.ts"],
-      "@/*": ["./src/*"]
-    }
+      "@packages/observability": [
+        "../../packages/observability/src"
+      ],
+      "@packages/utils": [
+        "../../packages/utils/src"
+      ],
+      "@packages/resilience": [
+        "../../packages/resilience/src/index.ts"
+      ]
+    },
+    "declaration": true,
+    "noEmit": false,
+    "rootDir": "src"
   },
-  "include": ["src"]
+  "include": [
+    "src"
+  ],
+  "references": [
+    {
+      "path": "../../packages/observability"
+    },
+    {
+      "path": "../../packages/utils"
+    }
+  ]
 }

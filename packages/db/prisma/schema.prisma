@@ -5,22 +5,18 @@ datasource db {
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/client"
 }
 
-
 model User {
-  id             String        @id @default(uuid())
-  email          String        @unique
-  name           String?
-  role           String        @default("viewer") // admin, agent, viewer
-  password       String?
-  tenantId       String?
-  tenant         Tenant?       @relation(fields: [tenantId], references: [id])
-  organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id])
-  sessions       UserSession[]
-  createdAt      DateTime      @default(now())
+  id        String        @id @default(uuid())
+  email     String        @unique
+  name      String?
+  role      String        @default("viewer") // admin, agent, viewer
+  password  String?
+  tenantId  String?
+  tenant    Tenant?       @relation(fields: [tenantId], references: [id])
+  sessions  UserSession[]
+  createdAt DateTime      @default(now())
 }
 
 model UserSession {
@@ -36,42 +32,31 @@ model UserSession {
   @@index([userId])
 }
 
-model Organization {
-  id        String   @id @default(uuid())
-  name      String
-  ownerId   String?
-  status    String   @default("active") // active, suspended
-  tenants   Tenant[]
-  users     User[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 model Tenant {
-  id             String        @id @default(uuid())
-  name           String
-  organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id])
-  users          User[]
-  missions       Mission[]
-  agents         Agent[]
-  projects       Project[]
-  dailyQuota     Int           @default(10)
-  metadata       Json?
-  createdAt      DateTime      @default(now())
+  id          String    @id @default(uuid())
+  name        String
+  dailyQuota  Int       @default(10)
+  metadata    Json?
+  users       User[]
+  missions  Mission[]
+  agents    Agent[]
+  projects  Project[]
+  createdAt DateTime  @default(now())
 }
 
 model Project {
-  id          String   @id @default(uuid())
+  id          String        @id @default(uuid())
   name        String
   description String?
-  status      String   @default("draft") // draft, active, archived
+  status      String        @default("draft") // draft, active, archived
   tenantId    String?
-  tenant      Tenant?  @relation(fields: [tenantId], references: [id])
+  tenant      Tenant?       @relation(fields: [tenantId], references: [id])
   files       ProjectFile[]
   metrics     BuildMetric[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([tenantId])
 }
 
 model ProjectFile {
@@ -94,114 +79,70 @@ model Mission {
   progress    Int      @default(0)
   type        String   @default("exploration")
   description String?
+  margin      Float?   @default(0)
   tenantId    String?
   tenant      Tenant?  @relation(fields: [tenantId], references: [id])
+  metadata    Json?
+  assignedRegion String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  metadata    Json?
-  
-  assignedRegion String @default("us-east-1") // 🔥 Global Tier-1: Multi-region ownership
-  
-  // DAG Orchestration
-  steps       MissionStep[]
-
-  // Billing & Performance Metrics
-  queueWaitMs              Int      @default(0)
-  computeDurationMs        Int      @default(0)
-  totalCostUsd             Float    @default(0) // Effective Revenue (Billable)
-  internalOptimizationCost Float    @default(0) // System Cost
-  margin                   Float    @default(0) // totalCostUsd - internalOptimizationCost
-  scalingImpact            Float    @default(0) // 0-1 multiplier for scaling overhead
-}
-
-model MissionStep {
-  id              String   @id @default(uuid())
-  missionId       String
-  mission         Mission  @relation(fields: [missionId], references: [id], onDelete: Cascade)
-  title           String
-  stepKey         String   @default("default") // 🔥 Global Tier-1: Deterministic key for idempotency
-  description     String?
-  status          String   @default("pending") // pending, in-progress, completed, failed, skipped
-  agentType       String   // scout, architect, etc.
-  inputData       Json?
-  outputData      Json?
-  region          String   @default("us-east-1") // 🔥 Global Tier-1: Execution region tracking
-  
-  // DAG Dependencies
-  dependsOn       MissionStep[] @relation("StepDependencies")
-  dependedBy      MissionStep[] @relation("StepDependencies")
-  
-  order           Int      @default(0)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  @@index([missionId])
-  @@unique([missionId, stepKey]) // 🔥 Global Tier-1: EXACTLY-ONCE GUARD
 }
 
 model Agent {
-  id          String   @id @default(uuid())
-  name        String
-  type        String   // scout, guardian, architect
-  status      String   @default("standby") // standby, busy, offline
-  health      Int      @default(100)
-  tenantId    String?
-  tenant      Tenant?  @relation(fields: [tenantId], references: [id])
-  lastActive  DateTime @default(now())
+  id         String   @id @default(uuid())
+  name       String
+  type       String // scout, guardian, architect
+  status     String   @default("standby") // standby, busy, offline
+  health     Int      @default(100)
+  tenantId   String?
+  tenant     Tenant?  @relation(fields: [tenantId], references: [id])
+  lastActive DateTime @default(now())
 }
 
 model AuditLog {
-  id          String   @id @default(uuid())
-  tenantId    String   @default("platform-admin")
-  userId      String?
-  action      String
-  resource    String
-  targetId    String?
-  metadata    Json?
-  status      String?  @default("success")
-  ipAddress   String?
-  hash        String?
-  createdAt   DateTime @default(now())
+  id        String   @id @default(uuid())
+  tenantId  String   @default("platform-admin")
+  userId    String?
+  action    String
+  resource  String
+  metadata  Json?
+  status    String?
+  ipAddress String?
+  hash      String?
+  createdAt DateTime @default(now())
 
   @@index([userId])
   @@index([tenantId])
-  @@index([action])
-  @@index([createdAt])
 }
 
 model ProposedChange {
-  id             String   @id @default(uuid())
-  agentId        String
-  tenantId       String   @default("platform-admin")
-  targetPath     String
-  changeType     String
-  reason         String
-  patch          String
-  expectedImpact Json?
+  id              String   @id @default(uuid())
+  agentId         String
+  targetPath      String
+  changeType      String
+  reason          String
+  patch           String
+  expectedImpact  Json?
   validationScore Float?
-  status         String   @default("proposed") // proposed, validated, promoted, rejected
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  @@index([tenantId])
+  status          String   @default("proposed") // proposed, validated, promoted, rejected
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model ExecutionLog {
   id          String   @id @default(uuid())
   executionId String
-  tenantId    String?
   stage       String
   status      String
   message     String?
   progress    Int      @default(0)
   metadata    Json?
+  tenantId    String?
   eventId     String?  @unique
-  hash        String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   @@index([executionId])
-  @@index([tenantId])
 }
 
 model Event {
@@ -276,130 +217,54 @@ model Pattern {
 }
 
 model BuildMetric {
-  id          String   @id @default(uuid())
-  projectId   String
-  tenantId    String?
-  project     Project  @relation(fields: [projectId], references: [id])
-  tokensUsed  Int      @default(0)
-  durationMs  Int      @default(0)
-  costUsd     Float    @default(0)
-  status      String   @default("completed")
-  createdAt   DateTime @default(now())
+  id         String   @id @default(uuid())
+  projectId  String
+  project    Project  @relation(fields: [projectId], references: [id])
+  tokensUsed Int      @default(0)
+  durationMs Int      @default(0)
+  costUsd    Float    @default(0)
+  status     String   @default("completed")
+  createdAt  DateTime @default(now())
 
-  @@index([tenantId])
+  @@index([projectId])
 }
 
-model IntelligenceROI {
-  id              String   @id @default(uuid())
-  tenantId        String   @default("platform-admin")
-  period          String   // e.g., "daily", "monthly", "all-time"
-  optimizations   Int      @default(0)
-  failureRate     Float    @default(0)
-  estimatedSavings Float    @default(0) // In USD or Dev-Hours
-  efficiencyGain  Float    @default(0) // Percentage improvement
-  metadata        Json?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  @@index([tenantId, period])
+model IdempotencyRecord {
+  id          String    @id @default(uuid())
+  key         String    @unique
+  response    Json?
+  status      String    @default("completed")
+  executionId String?
+  region      String?
+  lockedAt    DateTime?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model IntelligencePolicy {
   id                String   @id @default(uuid())
-  tenantId          String   @default("platform-admin")
   name              String   @unique
-  costWeight        Float    @default(0.33)
-  performanceWeight Float    @default(0.33)
-  reliabilityWeight Float    @default(0.34)
+  tenantId          String?
   isActive          Boolean  @default(true)
-  metadata          Json?
+  costWeight        Float
+  performanceWeight Float
+  reliabilityWeight Float
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+}
 
+model IntelligenceROI {
+  id               String   @id @default(uuid())
+  tenantId         String
+  period           String   @default("all-time")
+  optimizations    Int      @default(0)
+  failureRate      Float    @default(0)
+  estimatedSavings Float    @default(0)
+  efficiencyGain   Float    @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([id])
   @@index([tenantId])
-}
-
-
-model ScalingDecision {
-  id              String   @id @default(uuid())
-  type            String   // UP, DOWN
-  strategy        String   // CONSERVATIVE, BALANCED, AGGRESSIVE
-  reason          String?
-  roi             Float?   // Calculated after the event
-  improvementPct  Float?
-  metrics         Json?    // Snapshot of metrics at time of decision
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  @@index([createdAt])
-}
-
-model BetaFeedback {
-  id        String   @id @default(uuid())
-  tenantId  String
-  userId    String
-  type      String   // ISSUE, IMPROVEMENT
-  content   String
-  status    String   @default("pending") // pending, reviewed, triaged, implemented
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([tenantId])
-}
-
-model IdempotencyRecord {
-  id          String   @id @default(uuid())
-  key         String   @unique
-  executionId String?
-  status      String   @default("started") // started, completed, failed
-  response    Json?
-  region      String   @default("us-east-1") // 🔥 Global Tier-1: Region-aware locking
-  lockedAt    DateTime @default(now())
-  completedAt DateTime?
-  
-  @@index([executionId])
-}
-
-// ZTAN Audit Infrastructure Models
-model ZtanIdentity {
-  id        String   @id @default(uuid())
-  nodeId    String   @unique
-  publicKey String   // 48 bytes compressed G1 hex
-  status    String   @default("ACTIVE") // ACTIVE, REVOKED
-  updatedAt DateTime @updatedAt
-  createdAt DateTime @default(now())
-
-  @@index([nodeId])
-}
-
-model ZtanProof {
-  id              String   @id @default(uuid())
-  inputHash       String   @unique
-  bundle          Json
-  canonicalHash   String
-  finalAnchor     String
-  status          String   @default("VERIFIED")
-  createdAt       DateTime @default(now())
-
-  @@index([inputHash])
-}
-
-model OperationalSnapshot {
-  id                String   @id @default(uuid())
-  timestamp         DateTime @default(now())
-  epochId           String
-  healthStatus      String
-  quorumEntropy     Float
-  activeWitnesses   Int
-  priesthoodRisk    Float
-  silenceRisk       Float
-  infrastructureHealth Float
-  legitimacyHealth  Float
-  sloAdherence      Json
-  operatorMetrics   Json
-  tier              String
-  hash              String?
-
-  @@index([epochId])
-  @@index([timestamp])
 }

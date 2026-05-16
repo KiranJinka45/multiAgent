@@ -11,7 +11,11 @@
       { "type": "lib", "pattern": "packages/*" },
       { "type": "memory-core", "pattern": "packages/memory-core/*" },
       { "type": "memory-vector", "pattern": "packages/memory-vector/*" },
-      { "type": "memory-cache", "pattern": "packages/memory-cache/*" }
+      { "type": "memory-cache", "pattern": "packages/memory-cache/*" },
+      { "type": "frontend", "pattern": "apps/frontend/**" },
+      { "type": "backend-app", "pattern": "apps/(api|core-api|auth-service|worker|deploy-service|billing-service|gateway|governance)/**" },
+      { "type": "shared-lib", "pattern": "packages/frontend-shared/**" },
+      { "type": "backend-lib", "pattern": "packages/(?!frontend-shared).**" }
     ]
   },
   "rules": {
@@ -36,6 +40,16 @@
         {
           "from": "memory-cache",
           "allow": ["memory-core", "lib"]
+        },
+        {
+          "from": "frontend",
+          "disallow": ["backend-app", "backend-lib"],
+          "message": "Frontend cannot import from backend apps or backend libraries directly. Use shared-lib instead."
+        },
+        {
+          "from": "shared-lib",
+          "disallow": ["backend-app", "backend-lib", "frontend"],
+          "message": "Shared libraries must remain pure and cannot depend on apps or backend-only libraries."
         }
       ]
     }],

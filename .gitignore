@@ -63,3 +63,17 @@ k8s/secrets.yaml
 .ztan-transparency/
 .ztan-witness/
 .ztan/
+
+# Terraform
+.terraform/
+**/.terraform/
+.terraform.lock.hcl
+**/.terraform.lock.hcl
+
+# Archives
+archive/recovery_replays/
+archive/scripts/
+soak-data/
+logs/
+*.log
+**/logs/
