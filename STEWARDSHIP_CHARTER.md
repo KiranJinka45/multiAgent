@@ -1,6 +1,8 @@
 # Nexus ZTAN — Long-Term Operational Stewardship Charter
 
 ## 1. Core Mandate
+> **"A replayable infrastructure reliability platform focused on deterministic recovery, replay durability, operational clarity, and sustainable long-term maintenance."**
+
 Nexus ZTAN has transitioned to a state of **Long-Term Reliability Stewardship**: proving that the platform can remain operationally stable, understandable, maintainable, and trustworthy across years of real infrastructure entropy.
 
 ## 2. Operational Directives
@@ -13,7 +15,7 @@ Nexus ZTAN has transitioned to a state of **Long-Term Reliability Stewardship**:
 - **Architecture Freeze**: The freeze remains enforced. Focus is on stability and maintenance.
 
 ## 3. Mandatory Stewardship Reports
-Deliverables for this phase include:
+Deliverables for this period include:
 - **Operational Aging Reports**: Tracking stability and managed drift over long durations.
 - **Operational Friction Reports**: Measuring operator hesitation and onboarding clarity.
 - **Replay Longevity Reports**: Validating reconstruction durability and causality clarity.
@@ -32,3 +34,5 @@ Deliverables for this phase include:
 
 **Nexus ZTAN is built to survive. Stewardship is the process of ensuring it does so boringly and predictably.**
 
+---
+*Last updated: 2026-05-16 — Long-Term Reliability Stewardship Active*

@@ -4,7 +4,7 @@
 > This document is a live record of the operational longevity and stewardship of the Nexus ZTAN platform. It is maintained with disciplined, low-entropy accuracy to ensure long-term survivability and auditability.
 
 ## 1. Long-Term Uptime History
-- **Operational Epoch**: Maintenance Era (Started 2026-05-13)
+- **Operational Epoch**: Stewardship Observation Cycle (Started 2026-05-13)
 - **Current Status**: Operationally Stable
 - **Recovery Reliability**: High Confidence
 
@@ -26,7 +26,7 @@
 | 2026-05-16 | Passive Operational Observation | Initiated longitudinal observation (210 days history) and selective reliability refinement. | Active |
 | 2026-05-16 | Dashboard Simplification | Removed raw pod metrics to reduce cognitive load; prioritized high-level status for junior SREs. | Successful |
 | 2026-05-16 | Reporting Infrastructure | Deployed scripts for Refinement, Diversity, and Sustainability reports. | Successful |
-| 2026-05-16 | True Operational Aging Transition | Formally adopted the Long-Term Reliability Stewardship framework. | Successful |
+| 2026-05-16 | Stewardship Transition | Formally adopted the Long-Term Reliability Stewardship framework. | Successful |
 
 ## 3. Incident & Failure Governance
 ### [INC-20260513-001] Angular Compiler Internal Error
@@ -67,16 +67,15 @@
 - **Last Audit**: 2026-05-12 (Milestone 34 Final Audit)
 - **Reproducibility**: Observed across 3 independent environments.
 
-## 7. Entropy & Complexity Trends
-- **Operational Simplicity Index (OSI)**: 98/100 (Improved via metric pruning).
-- **Telemetry Noise Level**: OPTIMAL (Symbolic/Cognitive metrics decommissioned).
+## 7. Operational Maintenance Surface
+- **Telemetry Volume**: -15% (Managed via pruning).
 - **Complexity Drift**: Negligible.
 
 ## 8. Operational Burden Metrics
 - **Operator Rotation**: Stable
 - **Onboarding Time**: ~2 hours
 - **New Operator Success Rate**: High Confidence
-- **Alert Fatigue Score**: 1.2/10 (High actionability).
+- **Alert Fatigue**: LOW (High actionability).
 
 ## 9. Governance Consistency Observations
 - **Constitutional Adherence**: Consistent alignment
