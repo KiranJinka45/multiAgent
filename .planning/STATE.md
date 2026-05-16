@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: True Operational Aging — Long-Term Reliability Stewardship
-stopped_at: Transitioned to True Operational Aging framework for long-term infrastructure stability.
+status: Long-Term Reliability Stewardship
+stopped_at: Transitioned to Long-Term Reliability Stewardship framework for infrastructure stability.
 last_updated: "2026-05-16T12:13:50.000Z"
 last_activity: 2026-05-16
 progress:
@@ -73,7 +73,11 @@ Progress: [██████████] 100% (Operationally Stable)
 
 - [ ] Initialize Milestone 35 Operational Dossier.
 - [ ] Schedule Q3 Infrastructure Sustainability Drill.
-- [ ] Review Operational Simplicity Index for Q2.
+- [ ] Review Operational Maintenance Surface for Q2.
+
+## 7. Operational Maintenance Surface
+- **Telemetry Volume**: -15% (Managed via pruning).
+- **Complexity Drift**: Negligible.
 
 ### Blockers/Concerns
 

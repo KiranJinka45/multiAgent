@@ -71,10 +71,10 @@ Refer to [STEWARDSHIP_CHARTER.md](../STEWARDSHIP_CHARTER.md) for the primary dir
 **Status**: Active (2026-05-16)
 **Evidence**: `STEWARDSHIP_CHARTER.md`, continuous reliability reports, and operational calmness metrics.
 
-### Phase 45: Nexus ZTAN — True Operational Aging & Long-Term Reliability Stewardship
+### Phase 45: Nexus ZTAN — Long-Term Reliability Stewardship
 
 **Goal:** Proving that Nexus ZTAN can remain operationally stable, understandable, maintainable, and trustworthy across years of real infrastructure entropy.
-**Objective:** Transition Nexus ZTAN into true operational aging through long-duration quiet operation, passive infrastructure observation, and strict complexity relapse prevention.
+**Objective:** Transition Nexus ZTAN into long-term reliability stewardship through long-duration quiet operation, passive infrastructure observation, and strict complexity relapse prevention.
 **Scope:**
 - Passive Operational Observation (Longitudinal)
 - Operational Friction Discovery

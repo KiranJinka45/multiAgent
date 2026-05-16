@@ -1,7 +1,7 @@
 # Nexus ZTAN — Long-Term Operational Stewardship Charter
 
 ## 1. Core Mandate
-Nexus ZTAN has transitioned to a state of **True Operational Aging**: proving that the platform can remain operationally stable, understandable, maintainable, and trustworthy across years of real infrastructure entropy.
+Nexus ZTAN has transitioned to a state of **Long-Term Reliability Stewardship**: proving that the platform can remain operationally stable, understandable, maintainable, and trustworthy across years of real infrastructure entropy.
 
 ## 2. Operational Directives
 - **Long-Duration Quiet Operation**: Prioritize predictability and calmness over expansion.

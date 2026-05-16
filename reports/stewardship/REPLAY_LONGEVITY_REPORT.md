@@ -13,7 +13,7 @@ Causality links between infrastructure changes and service health are preserved 
 
 ## 4. Rollback Explainability
 Rollback logic remains deterministic. Operators can explain *why* a rollback occurred based solely on replay evidence.
-- **Explainability Score**: High (Verified via SRE exit interviews post-drill).
+- **Explainability**: High Confidence (Verified via SRE exit interviews post-drill).
 
 ## 5. Reconstruction Durability
 Replay evidence survives environment migrations and infrastructure restarts. 
