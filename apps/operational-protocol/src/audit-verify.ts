@@ -1,6 +1,7 @@
-import { ThresholdCrypto, DEFAULT_THRESHOLD, DEFAULT_NODE_IDS } from './crypto-utils';
-import { StabilityCircuit, ZKProof } from './stability-circuit';
-import { notaryService } from './notary-service';
+import { ThresholdCrypto, DEFAULT_THRESHOLD, DEFAULT_NODE_IDS } from './crypto-utils.js';
+import { StabilityCircuit, type ZKProof } from './stability-circuit.js';
+import { notaryService } from './notary-service.js';
+import type { VerificationNarrative, TrustLevel } from './types.js';
 
 const logger = console;
 
@@ -28,7 +29,6 @@ export interface AuditEntry {
     notarized?: boolean;
     notarySeq?: number;
   };
-  // Telemetry used for ZK verification (in real audit, these are provided separately or reconstructed)
   _verification_data?: {
     acc: number;
     ldet: number;
@@ -38,26 +38,28 @@ export interface AuditEntry {
 
 export class AuditVerifier {
   /**
-   * Verifies a single audit entry for Elite Tier compliance.
+   * Verifies a single audit entry and generates a human-intelligible narrative.
    */
-  public static async verifyEntry(entry: AuditEntry, groupPublicKey: string): Promise<boolean> {
-    const { sequenceId, _audit, governance, elite, _verification_data } = entry;
-    logger.info(`\n🔍 VERIFYING ENTRY [Seq: ${sequenceId}]`);
+  public static async verifyEntry(entry: AuditEntry, groupPublicKey: string): Promise<VerificationNarrative> {
+    const { sequenceId, _audit, governance, _verification_data } = entry;
+    
+    const findings: string[] = [];
+    const evidence = {
+      hashChainValid: true,
+      quorumMet: false,
+      zkProofValid: false,
+      externalAnchorValid: false
+    };
 
-    // 1. Verify Hash Chain Continuity
-    // (In full verify, this checks against prev entry)
+    // 1. Hash Chain Continuity
     if (!_audit.hash) {
-      logger.error('❌ FAILED: Missing audit hash.');
-      return false;
+      evidence.hashChainValid = false;
+      findings.push('CRITICAL: Audit hash is missing; causal lineage is broken.');
     }
 
-    // 2. Verify Threshold Signature (TSAC)
+    // 2. Threshold Signature (Quorum)
     if (_audit.ztan_consensus && _audit.aggregatedSignature) {
-      const payload = `${sequenceId}|PASS|${entry.elite?.multiAgent?.consensus.action === 'NO_ACTION' ? 'UNKNOWN' : 'node-a'}`; // Simplified payload match
-      const participants = governance.attestations
-        .filter(a => a.status === 'PASS')
-        .map(a => a.verifierId);
-
+      const payload = `${sequenceId}|PASS|${entry.elite?.multiAgent?.consensus.action === 'NO_ACTION' ? 'UNKNOWN' : 'node-a'}`;
       const isSigValid = await ThresholdCrypto.verifyAggregate(
         _audit.aggregatedSignature,
         payload,
@@ -65,16 +67,16 @@ export class AuditVerifier {
         DEFAULT_THRESHOLD,
         DEFAULT_NODE_IDS
       );
-
+      
+      evidence.quorumMet = isSigValid;
       if (isSigValid) {
-        logger.info('✅ TSAC: Threshold signature is cryptographically valid.');
+        findings.push('TRUST: Threshold quorum verified via cryptographic attestation.');
       } else {
-        logger.error('❌ TSAC: Threshold signature FORGERY or INVALID quorum detected!');
-        return false;
+        findings.push('CAUTION: Threshold signature failed; quorum validity is unproven.');
       }
     }
 
-    // 3. Verify ZK Proof (ZKAV)
+    // 3. ZK Proof
     if (_audit.zkProof && _verification_data) {
       const isZkValid = await StabilityCircuit.verifyProof(
         _audit.zkProof,
@@ -82,27 +84,56 @@ export class AuditVerifier {
         _verification_data.ldet,
         _verification_data.lsla
       );
-
+      evidence.zkProofValid = isZkValid;
       if (isZkValid) {
-        logger.info('✅ ZKAV: Stability proof is mathematically correct.');
+        findings.push('INTEGRITY: Zero-knowledge stability proof is mathematically valid.');
       } else {
-        logger.error('❌ ZKAV: Stability proof calculation mismatch or invalid.');
-        return false;
+        findings.push('CRITICAL: ZK-Stability proof mismatch; state calculation is untrusted.');
       }
     }
 
-    // 4. Verify External Notarization (Phase 3)
+    // 4. External Notarization
     if (_audit.notarized && _audit.notarySeq) {
       const isNotaryValid = await notaryService.verify(_audit.hash, _audit.notarySeq);
+      evidence.externalAnchorValid = isNotaryValid;
       if (isNotaryValid) {
-        logger.info('✅ NOTARY: External anchor verified in immutable ledger.');
+        findings.push('ANCHOR: Evidence verified against external notarized ledger.');
       } else {
-        logger.error('❌ NOTARY: Local head hash mismatch with external notarized anchor!');
-        return false;
+        findings.push('WARNING: External notarization mismatch; evidence might be isolated.');
       }
     }
 
-    logger.info(`🟢 ENTRY [Seq: ${sequenceId}] CERTIFIED AS AUDIT-GRADE.`);
-    return true;
+    // Determine Trust Level
+    let trustLevel: TrustLevel = 'UNTRUSTED';
+    let confidence = 0.0;
+
+    if (evidence.hashChainValid && evidence.quorumMet && evidence.zkProofValid && evidence.externalAnchorValid) {
+      trustLevel = 'FULL';
+      confidence = 1.0;
+    } else if (evidence.hashChainValid && (evidence.quorumMet || evidence.zkProofValid)) {
+      trustLevel = 'DEGRADED';
+      confidence = 0.6;
+    } else if (evidence.hashChainValid) {
+      trustLevel = 'CONDITIONAL';
+      confidence = 0.3;
+    }
+
+    const summary = trustLevel === 'FULL' 
+      ? `Entry ${sequenceId} is fully certified and cryptographically anchored.`
+      : `Entry ${sequenceId} is operating under ${trustLevel} trust constraints.`;
+
+    const recommedation = trustLevel === 'FULL'
+      ? 'No operator action required; system is in deterministic steady state.'
+      : 'Operator intervention recommended: verify manual quorum and check network partition status.';
+
+    return {
+      sequenceId,
+      trustLevel,
+      confidence,
+      summary,
+      findings,
+      forensicEvidence: evidence,
+      recommedation
+    };
   }
 }

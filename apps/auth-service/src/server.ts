@@ -8,7 +8,7 @@ import cors from 'cors';
 import bcrypt from 'bcryptjs';
 import cookieParser from 'cookie-parser';
 import { logger, initTelemetry } from '@packages/observability';
-import { onShutdown, createHealthRouter, createSecurityMiddleware, createCsrfMiddleware, setCsrfToken, redis } from '@packages/utils';
+import { onShutdown, createHealthRouter, createSecurityMiddleware, createCsrfMiddleware, setCsrfToken, redis, validateStartupSecrets } from '@packages/utils';
 import { db } from '@packages/db';
 import { internalAuth, userAuth } from '@packages/auth-internal';
 import { AuditLogger, registry } from '@packages/utils';
@@ -76,13 +76,13 @@ export async function startAuthServer() {
             tenantId: user.tenantId
         };
 
-        const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '15m' });
+        const token = jwt.sign(payload, JWT_SECRET as string, { expiresIn: '15m' });
 
         // Unique JTI ensures hash differentiation
         const jti = crypto.randomUUID();
         const refreshToken = jwt.sign(
             { id: user.id, jti },
-            JWT_REFRESH_SECRET,
+            JWT_REFRESH_SECRET as string,
             { expiresIn: '7d' }
         );
 
@@ -104,7 +104,6 @@ export async function startAuthServer() {
 
     app.use(express.json());
     app.use(cookieParser());
-    app.use(createCsrfMiddleware());
     app.use(createSecurityMiddleware());
 
     // --- SECURITY: TLS Runtime Observability ---
@@ -116,7 +115,7 @@ export async function startAuthServer() {
                 method: req.method,
                 userAgent: req.headers['user-agent']
             }, '[SECURITY] CRITICAL: Plaintext connection attempt detected and blocked in production');
-            
+
             // Increment security violation counter (if telemetry supported)
             res.status(403).json({ error: 'Operational Invariant Violated: TLS Mandatory' });
             return;
@@ -129,7 +128,7 @@ export async function startAuthServer() {
         res.json({ csrfToken: token });
     });
 
-    app.post('/login', async (req, res) => {
+    app.post('/login', async (req: Request, res: Response): Promise<void> => {
         const result = LoginSchema.safeParse(req.body);
         if (!result.success) {
             res.status(400).json({ error: 'Invalid input', details: result.error.format() });
@@ -198,7 +197,7 @@ export async function startAuthServer() {
         res.json((req as any).user);
     });
 
-    app.post('/refresh', async (req, res) => {
+    app.post('/refresh', async (req: Request, res: Response): Promise<void> => {
         const refreshToken = req.cookies?.refreshToken;
         if (!refreshToken) {
             res.status(401).json({ error: 'Missing refresh token' });
@@ -267,7 +266,7 @@ export async function startAuthServer() {
         }
     });
 
-    app.post('/logout', async (req, res) => {
+    app.post('/logout', async (req: Request, res: Response): Promise<void> => {
         const authHeader = req.headers.authorization;
         const cookieToken = req.cookies?.token;
         const token = cookieToken || (authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null);
@@ -284,7 +283,7 @@ export async function startAuthServer() {
         res.json({ success: true, message: 'Logout successful' });
     });
 
-    app.post('/signup', async (req, res) => {
+    app.post('/signup', async (req: Request, res: Response): Promise<void> => {
         const result = SignupSchema.safeParse(req.body);
         if (!result.success) {
             res.status(400).json({ error: 'Invalid input', details: result.error.format() });
@@ -510,7 +509,7 @@ export async function startAuthServer() {
                 const stats = fs.statSync(certPath);
                 const now = new Date();
                 const cert = fs.readFileSync(certPath);
-                
+
                 // Log periodic health
                 logger.debug({
                     lastModified: stats.mtime,

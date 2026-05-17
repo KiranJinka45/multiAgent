@@ -4,6 +4,13 @@
   "main": "dist/index.js",
   "type": "module",
   "dependencies": {
-    "@packages/utils": "workspace:*"
+    "@packages/utils": "workspace:*",
+    "@apps/operational-protocol": "workspace:*"
+  },
+  "scripts": {
+    "drill:phase-a": "npx cross-env NODE_ENV=test tsx src/phase-a-replay-drill.ts",
+    "drill:phase-b": "npx cross-env NODE_ENV=test tsx src/phase-b-cognitive-drill.ts",
+    "drill:phase-c": "npx cross-env NODE_ENV=test tsx src/phase-c-governance-drill.ts",
+    "drill:phase-d": "npx cross-env NODE_ENV=test tsx src/phase-d-adversarial-drill.ts"
   }
 }

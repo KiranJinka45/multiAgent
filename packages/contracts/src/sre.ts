@@ -91,6 +91,7 @@ export interface SREEvent {
   type: string;
   desc: string;
   severity: 'INFO' | 'WARNING' | 'CRITICAL';
+  evidenceId?: string; // Pointer to Evidence Ledger Entry
 }
 
 export interface SREUpdate {
@@ -142,6 +143,12 @@ export interface SREUpdate {
   stability?: {
     score: number;
   } | any;
+  
+  /**
+   * Evidence Ledger Linkage
+   * Connects this telemetry update to a verifiable forensic chain.
+   */
+  evidenceChainId?: string; // Correlation ID for the Evidence Ledger
 }
 
 export interface SRETuningParams {

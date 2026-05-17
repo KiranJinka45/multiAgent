@@ -1,0 +1,16 @@
+[
+  {
+    "sequenceId": 1004,
+    "type": "REPLAY_POISONING",
+    "timestamp": 1715856240000,
+    "payload": "CRITICAL: Causal rewrite attempt detected.",
+    "evidence": {
+      "hash": "0xPOISON",
+      "prevHash": "0xFAKE",
+      "signature": "sig|100|1004|FORGED",
+      "epoch": 100,
+      "trustLevel": "UNTRUSTED",
+      "verdict": "UNTRUSTED"
+    }
+  }
+]

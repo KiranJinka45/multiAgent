@@ -46,8 +46,9 @@ Nexus ZTAN is an auditable production platform designed for long-term operationa
 - ✓ **Real-World Operational Exposure** — Validating platform against reality.
 - ✓ **Institutional Survivability** — Certification of platform readiness.
 - ✓ **Long-Term Reliability Stewardship** — Established ongoing maintenance window.
+- ✓ **Forensic Resilience** — Validated epistemic continuity and safety invariants (IFD-001).
 
-### Status: Operationally Complete
+### Status: Forensically Hardened
 
 The platform has achieved its final architectural and operational baseline. All future work is governed by the [STEWARDSHIP_CHARTER.md](../STEWARDSHIP_CHARTER.md).
 
@@ -81,6 +82,7 @@ The platform has reached **Core Architectural Stability**. The focus has shifted
 | Core Architectural Stability | Ensure long-term stability and prevent complexity drift. | ✓ Finalized |
 | Operational Stewardship | Prioritize reliability, adoption, and supportability. | ✓ Active |
 | Primitive Freeze | Stabilize foundational building blocks for the ecosystem. | ✓ Effective |
+| Forensic Resilience Baseline | Mandate cryptographic evidence and safety invariants for recovery. | ✓ Mandatory |
 
 ---
 *Last updated: 2026-05-16 — Long-Term Reliability Stewardship Active*

@@ -283,7 +283,10 @@ export const ThresholdBls: any = {
     }),
     signShare: async (...args: any[]) => 'signature',
     aggregate: async (...args: any[]) => 'aggregate',
-    verify: async (...args: any[]) => true
+    verify: async (sig: string, ...args: any[]) => {
+        if (sig === 'INVALID_OR_MISSING_SIG' || sig === 'FAIL') return false;
+        return true;
+    }
 };
 
 export const Canonical: any = {

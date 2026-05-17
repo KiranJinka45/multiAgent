@@ -36,11 +36,14 @@ export function createSecurityMiddleware(): Router {
 
   // 2. CORS configuration (Production Ready)
   router.use(cors({
-    origin: process.env.ALLOWED_ORIGINS?.split(',') || '*',
+    origin: (process.env.ALLOWED_ORIGINS?.split(',') || ['*']),
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-Request-ID', 'X-Internal-Token', 'x-internal-token'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-Request-ID', 'X-Internal-Token', 'x-internal-token', 'X-XSRF-TOKEN', 'x-xsrf-token'],
     credentials: true,
   }));
+
+  // 3. CSRF Protection (Institutional Stewardship Era)
+  router.use(createCsrfMiddleware());
 
   // 3. Request ID middleware for tracing (AsyncLocalStorage Integrated)
   router.use((req: Request, res: Response, next: NextFunction) => {
@@ -77,7 +80,7 @@ export function createSecurityMiddleware(): Router {
 }
 
 /**
- * Double-Submit Cookie CSRF Protection
+ * Double-Submit Cookie CSRF Protection (Angular Compatible)
  */
 export function createCsrfMiddleware(): (req: Request, res: Response, next: NextFunction) => void {
   return (req: Request, res: Response, next: NextFunction) => {
@@ -86,15 +89,16 @@ export function createCsrfMiddleware(): (req: Request, res: Response, next: Next
       return next();
     }
 
-    // 2. Skip for internal service-to-service requests
+    // 2. Skip for internal service-to-service requests (Stewardship Era Bypass)
     const internalToken = req.headers['x-internal-token'];
     if (internalToken && internalToken === process.env.INTERNAL_SERVICE_TOKEN) {
       return next();
     }
 
     // 3. Validate Double-Submit Token
-    const csrfCookie = req.cookies?.['csrf-token'];
-    const csrfHeader = req.headers['x-csrf-token'];
+    // We look for 'XSRF-TOKEN' cookie and 'X-XSRF-TOKEN' header (Angular defaults)
+    const csrfCookie = req.cookies?.['XSRF-TOKEN'];
+    const csrfHeader = req.headers['x-xsrf-token'];
 
     if (!csrfCookie || !csrfHeader || csrfCookie !== csrfHeader) {
       logger.warn({
@@ -102,8 +106,9 @@ export function createCsrfMiddleware(): (req: Request, res: Response, next: Next
         url: req.url,
         hasCookie: !!csrfCookie,
         hasHeader: !!csrfHeader,
-        match: csrfCookie === csrfHeader
-      }, '[SECURITY] CSRF Validation Failed');
+        match: csrfCookie === csrfHeader,
+        requestId: req.headers['x-request-id']
+      }, '[SECURITY] CSRF Validation Failed - Blocking Request');
       
       return res.status(403).json({ 
         error: 'Forbidden', 
@@ -159,8 +164,8 @@ export function createPayloadSanitizerMiddleware(): (req: Request, res: Response
  */
 export function setCsrfToken(res: Response): string {
   const token = randomBytes(32).toString('hex');
-  res.cookie('csrf-token', token, {
-    httpOnly: true, // Increased security: prevents XSS from reading the token
+  res.cookie('XSRF-TOKEN', token, {
+    httpOnly: false, // REQUIRED for Angular to read the cookie and set X-XSRF-TOKEN header
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     path: '/'

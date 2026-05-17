@@ -25,20 +25,22 @@ See: [.planning/PROJECT.md](./PROJECT.md) (updated 2026-05-13)
 
     - [x] **Phase 41: Real-World Operational Exposure**
     - [x] **Phase 42: Institutional Survivability Certification**
-    - [ ] **Phase 43: Real-Time Institutional Validation & Production Reality Audit**
+    - [x] **Phase 43: Real-Time Institutional Validation & Production Reality Audit**
+    - [x] **Phase 44: Continuous Operational Reality Testing**
+    - [x] **Phase 45: Forensic Resilience Hardening (IFD-001)**
 
-Status: Long-Term Operational Stewardship — Stewardship Observation Cycle Active
+Status: Long-Term Operational Stewardship — Forensic Integrity Verified
 Last activity: 2026-05-16
 
-Progress: [██████████] 100% (Operationally Stable)
+Progress: [██████████] 100% (Forensically Hardened)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total milestones completed: 44
-- Platform Stability: Operationally Stable
-- Core Invariant Adherence: High Confidence
+- Total milestones completed: 45
+- Platform Stability: Forensically Hardened
+- Core Invariant Adherence: High Confidence (Verified via IFD-001)
 
 **By Focus Area:**
 
@@ -46,12 +48,13 @@ Progress: [██████████] 100% (Operationally Stable)
 |-------|-------|----------|
 | Architecture | Frozen | FINALITY_DECLARATION.md |
 | Governance | Finalized | CONSTITUTION_FREEZE.md |
+| Forensic Trust | Hardened | IFD-001 Audit Report |
 | Operations | Active | Stewardship Observation Cycle |
 
 **Recent Trend:**
 
-- Strategy: From "Invention" to "Stewardship"
-- Trend: Decadal Stability Target
+- Strategy: From "Reliability" to "Resilience"
+- Trend: Institutional Operational Stewardship
 
 *Updated after each phase transition*
 
@@ -59,19 +62,20 @@ Progress: [██████████] 100% (Operationally Stable)
 
 ### Decisions
 
+- [2026-05-16]: Forensic Resilience Baseline — Cryptographic evidence and safety invariants are mandatory for recovery.
 - [2026-05-12]: Core Architectural Stability — Core substrates and APIs are frozen.
-- [2026-05-12]: Operational Stewardship Mode — Focus shifted to reliability and maintenance discipline.
 
 ### Roadmap Evolution
 
-- [2026-05-16]: Initiated Stewardship Observation Cycle (2026-Q2).
+- [2026-05-16]: Completed IFD-001 (Institutional Failure Drill). Validated epistemic continuity and safety invariants.
+- [2026-05-16]: Hardened Forensic Resilience Infrastructure (Evidence Ledger, Trust Rail, Invariant Engine).
 - [2026-05-14]: Phase 44 completed: Continuous Operational Reality Testing.
 
 ### Pending Todos
 
 - [ ] Initialize Milestone 35 Operational Dossier.
-- [ ] Schedule Q3 Infrastructure Sustainability Drill.
-- [ ] Review Operational Maintenance Surface for Q2.
+- [ ] Review Q3 Infrastructure Sustainability Plan.
+- [ ] Audit Operational Ledger Performance for Q2.
 
 ## 7. Operational Maintenance Surface
 - **Telemetry Volume**: -15% (Managed via pruning).

@@ -1,12 +1,12 @@
 import * as crypto from 'crypto';
-import { ThresholdCrypto, PartialSignature } from './crypto-utils';
-import { 
+import { ThresholdCrypto, type PartialSignature } from './crypto-utils.js';
+import type { 
   GovernanceMode, 
   ConsensusResult, 
   TrustAttestation, 
   CeremonyStatus, 
   CeremonyEvent 
-} from './types';
+} from './types.js';
 
 const logger = console;
 

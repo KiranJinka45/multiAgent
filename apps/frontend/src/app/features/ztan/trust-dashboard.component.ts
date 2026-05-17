@@ -1,354 +1,264 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ZtanService, CeremonyState } from '../../core/services/ztan.service';
+import { ZtanService } from '../../core/services/ztan.service';
 import { interval, Subscription, switchMap, startWith } from 'rxjs';
+import { 
+  ShieldCheck, 
+  Server, 
+  Lock, 
+  Clock, 
+  Activity,
+  UserCheck,
+  CheckCircle2,
+  HardDrive
+} from 'lucide-angular';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
-  selector: 'app-ztan-stability-dashboard',
+  selector: 'app-stewardship-hub',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LucideAngularModule],
   template: `
-    <div class="stability-container">
-      <div class="header">
+    <div class="stewardship-container" *ngIf="metrics">
+      <!-- Institutional Header -->
+      <div class="steward-header">
         <div class="title-group">
-          <span class="badge">LIVE AUDIT NETWORK</span>
-          <h1>ZTAN Public Stability Dashboard</h1>
-          <p>Real-time cryptographic proof of system integrity and financial oversight.</p>
+          <h1>STEWARDSHIP HUB</h1>
+          <p class="subtitle">Architecture State: <span class="state-freeze">FROZEN (2026-LTS.1)</span></p>
         </div>
-        <div class="network-status" [class.online]="metrics?.status === 'OPERATIONAL'">
-          <span class="pulse"></span>
-          {{ metrics?.status || 'CONNECTING...' }}
-        </div>
-      </div>
-
-      <div class="metrics-grid">
-        <div class="metric-card glass">
-          <label>Total Verified Sessions</label>
-          <div class="value">{{ metrics?.totalSessions || 0 }}</div>
-          <div class="sub-label">Immutable Operational Log</div>
-        </div>
-        <div class="metric-card glass">
-          <label>Active Sessions</label>
-          <div class="value">{{ metrics?.activeSessions || 0 }}</div>
-          <div class="sub-label">MPC Consensus in Progress</div>
-        </div>
-        <div class="metric-card glass">
-          <label>Validator Nodes</label>
-          <div class="value">{{ metrics?.totalNodes || 0 }}</div>
-          <div class="sub-label">Decentralized Stability Root</div>
-        </div>
-        <div class="metric-card glass">
-          <label>Protocol Version</label>
-          <div class="value">v1.4</div>
-          <div class="sub-label">RFC-001 Hardened</div>
+        <div class="operational-mode">
+          <lucide-icon [name]="ShieldCheck" class="mode-icon"></lucide-icon>
+          <span>OPERATIONAL STABILITY MODE ACTIVE</span>
         </div>
       </div>
 
-      <div class="main-content">
-        <div class="session-feed glass">
-          <h3>Live Session Registry</h3>
-          <div class="proof-list">
-            <div class="proof-item" *ngFor="let proof of metrics?.recentProofs">
-              <div class="proof-header">
-                <span class="proof-id">{{ proof.id.substring(0, 12) }}...</span>
-                <span class="proof-time">{{ proof.timestamp | date:'shortTime' }}</span>
-              </div>
-              <div class="proof-body">
-                <div class="proof-type">{{ proof.type }}</div>
-                <div class="proof-status verified">VERIFIED</div>
-              </div>
-              <div class="proof-hash">{{ proof.hash.substring(0, 48) }}...</div>
+      <!-- Core Stability Pillars -->
+      <div class="pillars-grid">
+        <div class="op-card pillar">
+          <div class="pillar-header">
+            <lucide-icon [name]="Lock" class="pillar-icon"></lucide-icon>
+            <h3>Cryptographic Integrity</h3>
+          </div>
+          <div class="pillar-stat">
+            <span class="value">100%</span>
+            <span class="label">Proof Verification Rate</span>
+          </div>
+          <div class="pillar-footer">
+            <span class="status healthy">NOMINAL</span>
+          </div>
+        </div>
+
+        <div class="op-card pillar">
+          <div class="pillar-header">
+            <lucide-icon [name]="UserCheck" class="pillar-icon"></lucide-icon>
+            <h3>Governance Consensus</h3>
+          </div>
+          <div class="pillar-stat">
+            <span class="value">2/3</span>
+            <span class="label">Signing Threshold (m/n)</span>
+          </div>
+          <div class="pillar-footer">
+            <span class="status healthy">THRESHOLD INTACT</span>
+          </div>
+        </div>
+
+        <div class="op-card pillar">
+          <div class="pillar-header">
+            <lucide-icon [name]="HardDrive" class="pillar-icon"></lucide-icon>
+            <h3>Infrastructure Aging</h3>
+          </div>
+          <div class="pillar-stat">
+            <span class="value">184d</span>
+            <span class="label">Median Component Age</span>
+          </div>
+          <div class="pillar-footer">
+            <span class="status warning">DURABILITY WATCH</span>
+          </div>
+        </div>
+
+        <div class="op-card pillar">
+          <div class="pillar-header">
+            <lucide-icon [name]="Activity" class="pillar-icon"></lucide-icon>
+            <h3>Recovery Reliability</h3>
+          </div>
+          <div class="pillar-stat">
+            <span class="value">99.8%</span>
+            <span class="label">Auto-Heal Success</span>
+          </div>
+          <div class="pillar-footer">
+            <span class="status healthy">RELIABLE</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hub-layout">
+        <!-- Validator Network Registry -->
+        <div class="op-card validator-registry">
+          <div class="card-header">
+            <div class="header-left">
+              <lucide-icon [name]="Server" class="header-icon"></lucide-icon>
+              <h2>Validator Network Registry</h2>
             </div>
-            <div class="empty-state" *ngIf="!metrics?.recentProofs?.length">
-              <span class="icon">🔍</span>
-              Waiting for cryptographic events...
+            <span class="count-tag">{{ metrics.totalNodes }} Nodes</span>
+          </div>
+          <div class="validator-list">
+            <div class="validator-item" *ngFor="let node of metrics.nodes">
+              <div class="node-main">
+                <span class="node-name">{{ node.name }}</span>
+                <span class="node-id mono">{{ node.id }}</span>
+              </div>
+              <div class="node-meta">
+                <span class="node-version mono">v1.4.2</span>
+                <span class="node-status" [class.online]="node.status === 'ONLINE'">
+                  {{ node.status }}
+                </span>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="node-registry glass">
-          <h3>Validator Network</h3>
-          <div class="node-grid">
-            <div class="node-item" *ngFor="let node of metrics?.nodes" [class.active]="node.status === 'ONLINE'">
-              <div class="node-icon">🛡️</div>
-              <div class="node-info">
-                <div class="node-name">{{ node.name }}</div>
-                <div class="node-id">{{ node.id }}</div>
-              </div>
-              <div class="node-status-dot"></div>
+        <!-- Governance Protocols -->
+        <div class="op-card protocols-panel">
+          <div class="card-header">
+            <div class="header-left">
+              <lucide-icon [name]="CheckCircle2" class="header-icon"></lucide-icon>
+              <h2>Governance Protocols</h2>
             </div>
           </div>
-          <div class="stability-disclaimer">
-            <span class="icon">ℹ️</span>
-            All signing sessions require a 2/3 threshold consensus.
+          <div class="protocol-list">
+            <div class="protocol-item">
+              <span class="p-title">Institutional Replayability</span>
+              <p>All operational mutations are captured in a cryptographically linked ledger with 180-day mandatory retention.</p>
+            </div>
+            <div class="protocol-item">
+              <span class="p-title">Determinism Enforcement</span>
+              <p>System state convergence must be verified by at least 2 independent validator nodes before finality.</p>
+            </div>
+            <div class="protocol-item">
+              <span class="p-title">Maintenance Windowing</span>
+              <p>Strict architecture freeze in effect. Refinements limited to security remediation and durability fixes.</p>
+            </div>
           </div>
         </div>
       </div>
     </div>
   `,
   styles: [`
-    .stability-container {
-      padding: 40px;
-      max-width: 1400px;
-      margin: 0 auto;
-      color: #f8fafc;
-      font-family: 'Inter', sans-serif;
+    .stewardship-container {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
     }
-
-    .header {
+    .steward-header {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 48px;
+      align-items: flex-end;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid hsl(var(--border-muted));
     }
+    .title-group h1 { margin: 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .subtitle { margin: 0.25rem 0 0; font-size: 0.8125rem; color: hsl(var(--text-dim)); font-weight: 700; }
+    .state-freeze { color: hsl(var(--status-recovering)); }
 
-    .badge {
-      background: rgba(167, 139, 250, 0.1);
-      color: #a78bfa;
-      padding: 4px 12px;
-      border-radius: 4px;
-      font-size: 0.7rem;
-      font-weight: 800;
-      letter-spacing: 1px;
-      margin-bottom: 12px;
-      display: inline-block;
-      border: 1px solid rgba(167, 139, 250, 0.3);
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      font-weight: 800;
-      margin: 0 0 8px 0;
-      letter-spacing: -1px;
-      background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .network-status {
+    .operational-mode {
       display: flex;
       align-items: center;
-      gap: 12px;
-      background: rgba(0,0,0,0.3);
-      padding: 8px 16px;
-      border-radius: 20px;
+      gap: 0.75rem;
+      padding: 0.5rem 1rem;
+      background: hsl(var(--bg-elevated));
+      border: 1px solid hsl(var(--status-healthy) / 0.3);
+      border-radius: 4px;
       font-size: 0.75rem;
-      font-weight: 700;
-      color: #94a3b8;
-      border: 1px solid rgba(255,255,255,0.05);
+      font-weight: 800;
+      color: hsl(var(--status-healthy));
     }
+    .mode-icon { width: 16px; height: 16px; }
 
-    .network-status.online {
-      color: #10b981;
-      border-color: rgba(16, 185, 129, 0.2);
-    }
-
-    .pulse {
-      width: 8px; height: 8px;
-      background: #475569;
-      border-radius: 50%;
-    }
-
-    .online .pulse {
-      background: #10b981;
-      box-shadow: 0 0 10px #10b981;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(0.95); opacity: 1; }
-      50% { transform: scale(1.2); opacity: 0.7; }
-      100% { transform: scale(0.95); opacity: 1; }
-    }
-
-    .metrics-grid {
+    .pillars-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 24px;
-      margin-bottom: 48px;
+      gap: 1.5rem;
     }
+    .pillar { display: flex; flex-direction: column; gap: 1.5rem; }
+    .pillar-header { display: flex; align-items: center; gap: 0.75rem; color: hsl(var(--text-muted)); }
+    .pillar-icon { width: 18px; height: 18px; }
+    .pillar-header h3 { margin: 0; font-size: 0.875rem; font-weight: 700; }
+    
+    .pillar-stat { display: flex; flex-direction: column; gap: 0.25rem; }
+    .pillar-stat .value { font-size: 2rem; font-weight: 800; color: hsl(var(--text-main)); }
+    .pillar-stat .label { font-size: 0.65rem; font-weight: 700; color: hsl(var(--text-dim)); text-transform: uppercase; }
 
-    .glass {
-      background: rgba(30, 41, 59, 0.4);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 16px;
-      padding: 24px;
-      transition: transform 0.3s ease, border-color 0.3s ease;
-    }
-
-    .glass:hover {
-      transform: translateY(-4px);
-      border-color: rgba(167, 139, 250, 0.3);
-    }
-
-    .metric-card label {
-      font-size: 0.75rem;
-      color: #94a3b8;
-      text-transform: uppercase;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-    }
-
-    .metric-card .value {
-      font-size: 2.5rem;
+    .pillar-footer .status {
+      font-size: 0.65rem;
       font-weight: 800;
-      margin: 8px 0;
-      color: #f8fafc;
+      padding: 0.125rem 0.5rem;
+      border-radius: 2px;
+      background: hsl(var(--bg-elevated));
     }
+    .status.healthy { color: hsl(var(--status-healthy)); background: hsl(var(--status-healthy) / 0.1); }
+    .status.warning { color: hsl(var(--status-warning)); background: hsl(var(--status-warning) / 0.1); }
 
-    .metric-card .sub-label {
-      font-size: 0.7rem;
-      color: #64748b;
-    }
-
-    .main-content {
+    .hub-layout {
       display: grid;
       grid-template-columns: 1fr 400px;
-      gap: 32px;
+      gap: 2rem;
     }
 
-    h3 {
-      font-size: 1.1rem;
-      margin: 0 0 24px 0;
-      color: #e2e8f0;
-      font-weight: 700;
-    }
-
-    .proof-list {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .proof-item {
-      padding: 16px;
-      background: rgba(0,0,0,0.2);
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.03);
-    }
-
-    .proof-header {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-
-    .proof-id {
-      font-family: 'Roboto Mono', monospace;
-      font-size: 0.75rem;
-      color: #a78bfa;
-    }
-
-    .proof-time {
-      font-size: 0.7rem;
-      color: #64748b;
-    }
-
-    .proof-body {
+    .card-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 8px;
+      margin-bottom: 1.5rem;
     }
+    .header-left { display: flex; align-items: center; gap: 0.75rem; }
+    .header-icon { width: 20px; height: 20px; color: hsl(var(--text-dim)); }
+    .card-header h2 { margin: 0; font-size: 1rem; font-weight: 700; }
+    .count-tag { font-size: 0.65rem; font-weight: 700; color: hsl(var(--text-dim)); background: hsl(var(--bg-elevated)); padding: 0.25rem 0.5rem; border-radius: 2px; }
 
-    .proof-type {
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
-
-    .proof-status.verified {
-      font-size: 0.65rem;
-      font-weight: 800;
-      color: #10b981;
-      background: rgba(16, 185, 129, 0.1);
-      padding: 2px 8px;
+    .validator-list { display: flex; flex-direction: column; gap: 0.75rem; }
+    .validator-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 1rem;
+      background: hsl(var(--bg-elevated) / 0.3);
       border-radius: 4px;
+      border: 1px solid hsl(var(--border-muted));
     }
+    .node-main { display: flex; flex-direction: column; gap: 0.25rem; }
+    .node-name { font-size: 0.875rem; font-weight: 700; color: hsl(var(--text-main)); }
+    .node-id { font-size: 0.75rem; color: hsl(var(--text-dim)); }
+    
+    .node-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 0.25rem; }
+    .node-version { font-size: 0.65rem; color: hsl(var(--text-muted)); }
+    .node-status { font-size: 0.65rem; font-weight: 800; color: hsl(var(--text-dim)); }
+    .node-status.online { color: hsl(var(--status-healthy)); }
 
-    .proof-hash {
-      font-family: 'Roboto Mono', monospace;
-      font-size: 0.65rem;
-      color: #475569;
-      word-break: break-all;
-    }
-
-    .node-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .node-item {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 12px;
-      background: rgba(0,0,0,0.2);
-      border-radius: 10px;
-      opacity: 0.5;
-      transition: opacity 0.3s ease;
-    }
-
-    .node-item.active {
-      opacity: 1;
-      background: rgba(16, 185, 129, 0.05);
-      border: 1px solid rgba(16, 185, 129, 0.1);
-    }
-
-    .node-icon { font-size: 1.25rem; }
-
-    .node-info { flex: 1; }
-    .node-name { font-size: 0.85rem; font-weight: 700; color: #f1f5f9; }
-    .node-id { font-size: 0.7rem; color: #64748b; font-family: monospace; }
-
-    .node-status-dot {
-      width: 6px; height: 6px;
-      background: #475569;
-      border-radius: 50%;
-    }
-
-    .active .node-status-dot {
-      background: #10b981;
-      box-shadow: 0 0 8px #10b981;
-    }
-
-    .stability-disclaimer {
-      margin-top: 24px;
-      font-size: 0.75rem;
-      color: #64748b;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-style: italic;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 48px 0;
-      color: #475569;
-    }
-
-    .empty-state .icon {
-      font-size: 2rem;
-      display: block;
-      margin-bottom: 12px;
-    }
+    .protocol-list { display: flex; flex-direction: column; gap: 1.5rem; }
+    .protocol-item .p-title { display: block; font-size: 0.8125rem; font-weight: 800; color: hsl(var(--text-main)); margin-bottom: 0.5rem; }
+    .protocol-item p { margin: 0; font-size: 0.8125rem; color: hsl(var(--text-muted)); line-height: 1.5; }
   `]
 })
-export class ZtanStabilityDashboardComponent implements OnInit, OnDestroy {
+export class StewardshipHubComponent implements OnInit, OnDestroy {
+  ztan = inject(ZtanService);
   metrics: any = null;
   private sub: Subscription | null = null;
 
-  constructor(private ztan: ZtanService) {}
+  readonly ShieldCheck = ShieldCheck;
+  readonly Server = Server;
+  readonly Lock = Lock;
+  readonly Clock = Clock;
+  readonly Activity = Activity;
+  readonly UserCheck = UserCheck;
+  readonly CheckCircle2 = CheckCircle2;
+  readonly HardDrive = HardDrive;
 
   ngOnInit() {
-    this.sub = interval(5000).pipe(
+    this.sub = interval(10000).pipe(
       startWith(0),
       switchMap(() => this.ztan.getMetrics())
     ).subscribe({
       next: (data) => this.metrics = data,
-      error: (err) => console.error('Stability Dashboard Error:', err)
+      error: (err) => console.error('Stewardship Hub Error:', err)
     });
   }
 

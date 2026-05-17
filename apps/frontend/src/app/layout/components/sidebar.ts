@@ -1,130 +1,247 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { 
+  LayoutDashboard, 
+  AlertCircle, 
+  History, 
+  RotateCcw, 
+  ShieldCheck, 
+  Wrench,
+  ChevronRight,
+  Shield,
+  Bell,
+  Settings,
+  BookOpen
+} from 'lucide-angular';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, LucideAngularModule],
   template: `
-    <aside class="sidebar">
-      <ul class="nav-links">
-        <li>
-          <a routerLink="/missions" routerLinkActive="active">
-            <span class="icon">🚀</span>
-            <span class="label">Missions</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/timeline" routerLinkActive="active">
-            <span class="icon">🕒</span>
-            <span class="label">Timeline</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/health" routerLinkActive="active">
-            <span class="icon">🏥</span>
-            <span class="label">System Health</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/usage" routerLinkActive="active">
-            <span class="icon">📊</span>
-            <span class="label">Usage</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/pricing" routerLinkActive="active">
-            <span class="icon">💎</span>
-            <span class="label">Pricing</span>
-          </a>
-        </li>
-        <li class="nav-divider"></li>
-        <li>
-          <a routerLink="/ztan/stability" routerLinkActive="active">
-            <span class="icon">📈</span>
-            <span class="label">Stability Dashboard</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/audit" routerLinkActive="active">
-            <span class="icon">🔍</span>
-            <span class="label">Audit Verifier</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/demo/financial-approval" routerLinkActive="active">
-            <span class="icon">💰</span>
-            <span class="label">Finance Demo</span>
-          </a>
-        </li>
-        <li class="nav-divider"></li>
-        <li>
-          <a routerLink="/admin" routerLinkActive="active">
-            <span class="icon">🕹️</span>
-            <span class="label">Cockpit</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/console" routerLinkActive="active">
-            <span class="icon">💻</span>
-            <span class="label">Dev Console</span>
-          </a>
-        </li>
-        <li>
-          <a href="mailto:support&#64;multiagent.io?subject=Beta%20Feedback">
-            <span class="icon">💬</span>
-            <span class="label">Feedback</span>
-          </a>
-        </li>
-      </ul>
+    <aside class="sidebar op-panel">
+      <div class="sidebar-header">
+        <div class="brand-box">
+          <lucide-icon [name]="Shield" class="brand-icon"></lucide-icon>
+          <div class="brand-text">
+            <span class="brand-name">NEXUS ZTAN</span>
+            <span class="brand-sub">2026-LTS.1</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="nav-container">
+        <ul class="nav-links">
+          <li>
+            <a routerLink="/console" routerLinkActive="active">
+              <lucide-icon [name]="LayoutDashboard" class="icon"></lucide-icon>
+              <span class="label">Console Home</span>
+            </a>
+          </li>
+
+          <li class="nav-section">Detection & Triage</li>
+          <li>
+            <a routerLink="/incidents" routerLinkActive="active">
+              <lucide-icon [name]="AlertCircle" class="icon"></lucide-icon>
+              <span class="label">Incident Center</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/alerts" routerLinkActive="active">
+              <lucide-icon [name]="Bell" class="icon"></lucide-icon>
+              <span class="label">Alerts & Blast Radius</span>
+            </a>
+          </li>
+
+          <li class="nav-section">Recovery & Replay</li>
+          <li>
+            <a routerLink="/replay" routerLinkActive="active">
+              <lucide-icon [name]="History" class="icon"></lucide-icon>
+              <span class="label">Replay Explorer</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/recovery" routerLinkActive="active">
+              <lucide-icon [name]="RotateCcw" class="icon"></lucide-icon>
+              <span class="label">Recovery Console</span>
+            </a>
+          </li>
+
+          <li class="nav-section">Stewardship</li>
+          <li>
+            <a routerLink="/stewardship" routerLinkActive="active">
+              <lucide-icon [name]="Wrench" class="icon"></lucide-icon>
+              <span class="label">Stewardship Hub</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/audit" routerLinkActive="active">
+              <lucide-icon [name]="ShieldCheck" class="icon"></lucide-icon>
+              <span class="label">Audit & Governance</span>
+            </a>
+          </li>
+
+          <li class="nav-section">System Admin</li>
+          <li>
+            <a routerLink="/config" routerLinkActive="active">
+              <lucide-icon [name]="Settings" class="icon"></lucide-icon>
+              <span class="label">Configuration</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/docs" routerLinkActive="active">
+              <lucide-icon [name]="BookOpen" class="icon"></lucide-icon>
+              <span class="label">Documentation</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="operator-id">
+          <div class="avatar">AO</div>
+          <div class="details">
+            <span class="name">Senior SRE</span>
+            <span class="status">Live • UTC</span>
+          </div>
+        </div>
+      </div>
     </aside>
   `,
   styles: [`
     .sidebar {
-      width: 240px;
-      height: calc(100vh - 64px);
-      background: rgba(255, 255, 255, 0.02);
-      border-right: 1px solid rgba(255, 255, 255, 0.05);
-      padding: 24px 0;
+      display: flex;
+      flex-direction: column;
+      width: 260px;
+      height: 100vh;
+    }
+    .sidebar-header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid hsl(var(--border-muted));
+    }
+    .brand-box {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .brand-icon {
+      width: 24px;
+      height: 24px;
+      color: hsl(var(--primary));
+    }
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+    .brand-name {
+      font-size: 0.8125rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      color: hsl(var(--text-main));
+    }
+    .brand-sub {
+      font-size: 0.625rem;
+      font-weight: 600;
+      color: hsl(var(--text-dim));
+      letter-spacing: 0.05em;
+    }
+    .nav-container {
+      flex: 1;
+      overflow-y: auto;
     }
     .nav-links {
       list-style: none;
-      padding: 0;
+      padding: 1rem 0;
       margin: 0;
     }
-    .nav-links li {
-      margin-bottom: 4px;
+    .nav-section {
+      padding: 1.25rem 1.5rem 0.5rem;
+      font-size: 0.625rem;
+      font-weight: 700;
+      color: hsl(var(--text-dim));
+      text-transform: uppercase;
+      letter-spacing: 0.075em;
     }
-    .nav-divider {
-      height: 1px;
-      background: rgba(255, 255, 255, 0.05);
-      margin: 12px 24px !important;
-    }
-    .nav-links a {
+    .nav-links li a {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 12px 24px;
-      color: rgba(255, 255, 255, 0.6);
+      gap: 0.875rem;
+      padding: 0.75rem 1.5rem;
+      color: hsl(var(--text-muted));
       text-decoration: none;
       font-size: 0.875rem;
       font-weight: 500;
-      transition: all 0.2s ease;
-      border-left: 3px solid transparent;
+      border-left: 2px solid transparent;
+      transition: all 0.1s ease;
     }
-    .nav-links a:hover {
-      color: #fff;
-      background: rgba(255, 255, 255, 0.05);
+    .nav-links li a:hover {
+      color: hsl(var(--text-main));
+      background: hsl(var(--bg-elevated) / 0.5);
     }
-    .nav-links a.active {
-      color: #60a5fa;
-      background: rgba(96, 165, 250, 0.1);
-      border-left-color: #60a5fa;
+    .nav-links li a.active {
+      color: hsl(var(--primary));
+      background: hsl(var(--primary) / 0.05);
+      border-left-color: hsl(var(--primary));
     }
     .icon {
-      font-size: 1.1rem;
+      width: 18px;
+      height: 18px;
+      opacity: 0.7;
+    }
+    .active .icon {
+      opacity: 1;
+    }
+    .sidebar-footer {
+      padding: 1rem;
+      border-top: 1px solid hsl(var(--border-muted));
+    }
+    .operator-id {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem;
+      background: hsl(var(--bg-elevated) / 0.3);
+      border-radius: 4px;
+    }
+    .avatar {
+      width: 32px;
+      height: 32px;
+      background: hsl(var(--border-strong));
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: hsl(var(--text-muted));
+    }
+    .details {
+      display: flex;
+      flex-direction: column;
+    }
+    .name {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: hsl(var(--text-main));
+    }
+    .status {
+      font-size: 0.6875rem;
+      color: hsl(var(--status-healthy));
     }
   `]
 })
-export class SidebarComponent {}
+export class SidebarComponent {
+  readonly LayoutDashboard = LayoutDashboard;
+  readonly AlertCircle = AlertCircle;
+  readonly History = History;
+  readonly RotateCcw = RotateCcw;
+  readonly ShieldCheck = ShieldCheck;
+  readonly Wrench = Wrench;
+  readonly Shield = Shield;
+  readonly Bell = Bell;
+  readonly Settings = Settings;
+  readonly BookOpen = BookOpen;
+}
+

@@ -72,6 +72,19 @@ export async function initSocket(server: http.Server, app?: express.Application)
             socket.join('sre:telemetry');
         });
 
+        // --- NEW: REPLAY EXPLORER HANDLERS ---
+        socket.on('sre:archaeology:load_chain', async (data: { incidentId: string }) => {
+            try {
+                const { EvidenceLedgerService } = await import('@packages/ztan-witness');
+                const chain = await EvidenceLedgerService.getChain(data.incidentId);
+                socket.emit('sre:archaeology:chain_loaded', chain);
+                elog.info({ socketId: socket.id, incidentId: data.incidentId }, '[Socket] Forensic chain loaded and sent to operator');
+            } catch (err) {
+                elog.error({ err }, '[Socket] Failed to load forensic chain');
+                socket.emit('sre:error', { message: 'Forensic retrieval failure' });
+            }
+        });
+
         socket.on('disconnect', () => {
             connectedSockets.delete(socket);
             elog.info({ socketId: socket.id }, '[Socket] User disconnected');
@@ -98,127 +111,37 @@ export async function initSocket(server: http.Server, app?: express.Application)
         if (channel === 'sre:telemetry:update') {
             try {
                 const state = JSON.parse(message);
+                const { EvidenceLedgerService } = await import('@packages/ztan-witness');
+                const { EventCategory } = await import('@packages/contracts');
                 
-                // --- ZTAN PHASE 2: MULTI-NODE HETEROGENEOUS CONSENSUS (N=3) ---
-                const telemetrySnapshot = state.observers?.map((o: any) => ({
-                    nodeId: o.id || 'unknown',
-                    metrics: {
-                        cpu: o.cpu || 0,
-                        memory: o.memory || 0,
-                        latency: o.latency || 0,
-                        errors: o.errors || 0
-                    }
-                })) || [];
+                // --- PILLAR 3: CENTRALIZED EVIDENCE LEDGER INGESTION ---
+                // We use the sequenceId/correlationId from telemetry as the primary anchor
+                const evidenceEntry = await EvidenceLedgerService.append({
+                    category: EventCategory.OBSERVATION,
+                    source: { service: 'gateway', node: 'ztan-gateway-01', version: '2026-LTS.1' },
+                    payload: state,
+                    correlationId: state.evidenceChainId || 'default-operational-stream',
+                    parentEventId: state.lastAction?.id,
+                    signerId: 'ztan-gateway-01' // Attributing to the gateway node
+                });
 
-                telemetrySnapshot.forEach((data: any) => sidecarVerifier.processTelemetry(data));
-
-                // 2. Check for SRE Decision and trigger Elite Consensus
-                const decision = state.elite?.multiAgent?.consensus;
-                let zkProof: ZKProof | null = null;
-
-                if (decision && decision.action !== 'NO_ACTION') {
-                    const sreDecision = {
-                        eventId: state.sequenceId.toString(),
-                        type: decision.action,
-                        targetNode: state.elite.rca?.rootCause || 'unknown',
-                        reason: state.perception?.explainability?.rationale || 'Autonomous action',
-                        timestamp: Date.now()
-                    };
-
-                    // --- ZTAN ELITE: ZK-PROOF GENERATION (ZKAV) ---
-                    // Mock metrics for proof (in real system, these come from ValidationEngine)
-                    const acc = 1.0; 
-                    const ldet = 120;
-                    const lsla = 15000;
-                    const threshold = 0.85;
-
-                    zkProof = await StabilityCircuit.generateProof(acc, ldet, lsla, threshold);
-
-                    // --- ZTAN ELITE: THRESHOLD SIGNING (TSAC) ---
-                    const sidecarAttestation = await sidecarVerifier.verifyDecision(sreDecision as any);
-                    const externalAttestation = await externalVerifier.verifyDecision(sreDecision as any, telemetrySnapshot);
-                    
-                    // Engine Self-Attestation (with cryptographic share)
-                    const enginePayload = `${state.sequenceId}|PASS|node-a`;
-                    const engineAttestation: TrustAttestation = {
-                        eventId: state.sequenceId.toString(),
-                        status: 'PASS',
-                        verifierId: 'SRE-ENGINE-01',
-                        expectedNode: state.elite.rca?.rootCause,
-                        confidence: 1.0,
-                        timestamp: Date.now(),
-                        partialSignature: await ThresholdCrypto.signPartial(
-                            enginePayload, 
-                            keyShares[0].share, 
-                            'SRE-ENGINE-01', 
-                            DEFAULT_THRESHOLD, 
-                            nodeIds
-                        )
-                    };
-
-                    await consensusEngine.recordAttestation(engineAttestation as any);
-                    await consensusEngine.recordAttestation(sidecarAttestation as any);
-                    const finalResult = await consensusEngine.recordAttestation(externalAttestation as any);
-
-                    if (finalResult) {
-                        state.governance.mode = finalResult.governanceMode;
-                        state.governance.isCertified = finalResult.isTrusted;
-                        state.governance.attestations = finalResult.attestations;
-                        state.governance.aggregatedSignature = finalResult.aggregatedSignature;
-                    }
-                }
-
+                // Attach forensic metadata back to the state for the UI
+                state.evidenceChainId = evidenceEntry.correlationId;
+                state.evidenceId = evidenceEntry.id;
+                
                 latestState = state;
-                const updatedMessage = JSON.stringify(state);
-                
-                // --- PILLAR 3: CRYPTOGRAPHIC HASH-CHAINING (AUDIT INTEGRITY) ---
-                const hash = crypto.createHash('sha256')
-                    .update(lastHash + updatedMessage)
-                    .digest('hex');
-                
-                // --- ZTAN PHASE 3: EXTERNAL NOTARIZATION (TAMPER-PROOF) ---
-                let notarization: NotarizationAnchor | null = null;
-                if (state.sequenceId % 10 === 0) {
-                    notarization = await notaryService.notarize(hash);
-                }
-
-                const auditEntry = {
-                    ...latestState,
-                    _audit: {
-                        hash,
-                        prevHash: lastHash,
-                        ts: Date.now(),
-                        ztan_consensus: state.governance.isCertified || false,
-                        aggregatedSignature: state.governance.aggregatedSignature,
-                        zkProof,
-                        notarized: !!notarization,
-                        notarySeq: (notarization as any)?.sequenceId
-                    },
-                    _verification_data: zkProof ? { acc: 1.0, ldet: 120, lsla: 15000 } : undefined
-                };
-                
-                lastHash = hash;
-                const auditMessage = JSON.stringify(auditEntry);
-
-                // --- PILLAR 4: IMMUTABLE AUDIT ANCHORING (WORM COMPLIANCE) ---
-                const anchorKey = `audit/anchor/${Date.now()}`;
-                await pubClient.set(anchorKey, hash, 'EX', 31536000); 
-                await pubClient.set('sre:audit:latest_anchor', hash); 
-                
-                // Persist to Redis circular buffer
-                await pubClient.lpush(REDIS_AUDIT_KEY, auditMessage);
-                await pubClient.ltrim(REDIS_AUDIT_KEY, 0, MAX_AUDIT_LOG - 1);
                 
                 elog.info({ 
-                    hash, 
-                    certified: state.governance.isCertified, 
-                    notarized: !!notarization 
-                }, '[Socket] Audit head locked with N=3 consensus and external notarization proof');
+                    evidenceId: evidenceEntry.id, 
+                    sequence: evidenceEntry.sequence,
+                    hash: evidenceEntry.integrity.hash
+                }, '[Socket] Forensic evidence anchored and chained');
             } catch (err) {
                 elog.error({ err }, '[Socket] Telemetry parse/persist error');
             }
         }
     });
+
 
 
     // Controlled broadcast loop (Backpressure management)

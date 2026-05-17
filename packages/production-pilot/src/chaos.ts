@@ -3,7 +3,7 @@ import { TerraformDriver } from '../../autonomous-ops/src/drivers/terraform.js';
 
 export interface ChaosEvent {
     id: string;
-    type: 'K8S_FAILURE' | 'TF_FAILURE' | 'NETWORK_FAILURE' | 'REPLAY_DIVERGENCE';
+    type: 'K8S_FAILURE' | 'TF_FAILURE' | 'NETWORK_FAILURE' | 'REPLAY_DIVERGENCE' | 'NETWORK_PARTITION' | 'CAUSAL_ORDER_FAILURE' | 'EVIDENCE_DUPLICATION' | 'CLOCK_SKEW';
     scenario: string;
     timestamp: number;
     outcome: 'RESOLVED' | 'FAILED' | 'PARTIAL';
@@ -47,6 +47,26 @@ export class ChaosEngine {
                 // Simulate bit-flip in evidence
                 console.log(`  - Injecting Replay Divergence in audit logs`);
                 outcome = 'FAILED'; // Should be detected as a security violation
+                break;
+            case 'NETWORK_PARTITION':
+                // Simulate split-brain quorum failure
+                console.log(`  - Simulating Network Partition for nodes: ${target}`);
+                outcome = 'PARTIAL'; // System should enter degraded mode
+                break;
+            case 'CAUSAL_ORDER_FAILURE':
+                // Simulate out-of-order evidence arrival
+                console.log(`  - Injecting Causal Order Failure for stream: ${target}`);
+                outcome = 'RESOLVED'; // Should be resolved by causal indexing
+                break;
+            case 'EVIDENCE_DUPLICATION':
+                // Simulate replay attacks or duplicate delivery
+                console.log(`  - Simulating Evidence Duplication for audit: ${target}`);
+                outcome = 'RESOLVED'; // Should be caught by ReplayGuard
+                break;
+            case 'CLOCK_SKEW':
+                // Simulate non-synchronized clocks
+                console.log(`  - Injecting Clock Skew (+30s) for node: ${target}`);
+                outcome = 'RESOLVED'; // Should be handled by epoch anchoring
                 break;
         }
 

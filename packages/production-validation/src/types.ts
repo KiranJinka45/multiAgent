@@ -18,6 +18,8 @@ export interface ProductionScorecard {
     institutionId: string;
     period: { start: number; end: number };
     survivabilityIndex: number; // 0-100
+    distributedResilience: number; // 0-100 (Phase A Metric)
+    epistemicConfidence: number; // 0-100 (Phase B Metric)
     burdenReduction: number; // Percentage
     recoveryConfidence: number; // 0.1 - 1.0
     stabilityTrend: 'IMPROVING' | 'STABLE' | 'DEGRADING';

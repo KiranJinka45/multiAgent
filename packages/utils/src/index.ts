@@ -82,6 +82,9 @@ export type { RuntimeRecord, ManagedContainer, AgentResult, ExecutionContextType
 export const QUEUE_DEPLOY = 'deploy-queue';
 
 
+export { HSMVault, HSMErrorCode } from './hsm-vault.ts';
+export type { HSMAttestation, HSMState } from './hsm-vault.ts';
+
 import bridge from './server.js';
 
 

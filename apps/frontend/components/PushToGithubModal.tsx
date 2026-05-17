@@ -12,6 +12,12 @@ interface PushToGithubModalProps {
     defaultRepoName: string;
 }
 
+const sanitizeUrl = (url: string | null): string => {
+    if (!url) return 'about:blank';
+    const pattern = /^https?:\/\//i;
+    return pattern.test(url) ? url : 'about:blank';
+};
+
 export default function PushToGithubModal({ isOpen, onClose, projectId, defaultRepoName }: PushToGithubModalProps) {
     const [repoName, setRepoName] = useState(defaultRepoName.replace(/\s+/g, '-').toLowerCase());
     const [isPrivate, setIsPrivate] = useState(true);
@@ -94,7 +100,7 @@ export default function PushToGithubModal({ isOpen, onClose, projectId, defaultR
                                 <h3 className="text-lg font-bold text-white uppercase tracking-widest">Commit Successful</h3>
                                 <p className="text-sm text-white/50 mb-4">Your repository is now live on GitHub.</p>
                                 <a
-                                    href={successUrl}
+                                    href={sanitizeUrl(successUrl)}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="px-6 py-3 bg-white text-black font-black uppercase text-xs tracking-widest rounded-xl hover:bg-white/90 transition-all shadow-xl"

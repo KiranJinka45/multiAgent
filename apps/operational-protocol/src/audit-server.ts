@@ -1,7 +1,9 @@
 import express from 'express';
 import path from 'path';
 import fs from 'fs';
-import { ThresholdCrypto, AuditInput, FileReplayGuard } from '@packages/ztan-crypto';
+import { ThresholdCrypto, type AuditInput, FileReplayGuard } from '@packages/ztan-crypto';
+import { DEFAULT_THRESHOLD, DEFAULT_NODE_IDS } from './crypto-utils.js';
+import { AuditVerifier } from './audit-verify.js';
 
 const app = express();
 app.disable('x-powered-by');
@@ -49,7 +51,8 @@ app.post('/api/verify', async (req, res) => {
           }
         });
       }
-      return res.json(initialResult);
+      res.json(initialResult);
+      return;
     }
 
     const anchor = initialResult.finalAnchor!;

@@ -8,6 +8,8 @@
 export * from './api.js';
 export * from './sre.js';
 export * from './archaeology.js';
+export * from './evidence-ledger.js';
+export * from './rollback-invariants.js';
 
 export enum MissionStatus {
     PENDING = 'PENDING',

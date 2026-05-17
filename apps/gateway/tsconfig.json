@@ -50,33 +50,17 @@
     "rootDir": "src"
   },
   "include": [
-    "src",
-    "../governance/src",
-    "../../packages/ztan-crypto/src",
-    "../../packages/utils/src",
-    "../../packages/events/src",
-    "../../packages/db/src",
-    "../../packages/resilience/src",
-    "../../packages/memory-cache/src",
-    "../../packages/config/src",
-    "../../packages/observability/src",
-    "../../packages/auth-internal/src"
+    "src"
   ],
   "references": [
-    {
-      "path": "../../packages/auth-internal"
-    },
-    {
-      "path": "../../packages/config"
-    },
-    {
-      "path": "../../packages/db"
-    },
-    {
-      "path": "../../packages/observability"
-    },
-    {
-      "path": "../../packages/utils"
-    }
+    { "path": "../../packages/auth-internal" },
+    { "path": "../../packages/config" },
+    { "path": "../../packages/db" },
+    { "path": "../../packages/events" },
+    { "path": "../../packages/memory-cache" },
+    { "path": "../../packages/observability" },
+    { "path": "../../packages/resilience" },
+    { "path": "../../packages/utils" },
+    { "path": "../../packages/ztan-crypto" }
   ]
 }

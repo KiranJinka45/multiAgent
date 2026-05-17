@@ -47,14 +47,8 @@ export const supabaseAdmin = supabaseClient;
 export const logger: any = realLogger;
 export const getExecutionLogger = (id: string): any => realLogger.child({ executionId: id });
 
-// Pipeline Stubs (To be moved to specific agents/services later)
-export const planner = async (...args: any[]) => ({ projectName: 'Mock Project', template: 'Next.js', [Symbol.iterator]: function* () { } });
-export const uiAgent = async (...args: any[]) => ({ 'index.html': '<h1>Mock</h1>' });
-export const logicAgent = async (...args: any[]) => ({ 'api.ts': 'export const run = () => {}' });
-
-export const healer = async (errors: any[], files: any) => files;
-export const validator = async (files: any) => ({ valid: true, isValid: true, errors: [], missingFiles: [] });
-export const run = async (id: string, files: any) => 'http://localhost:3000/mock';
+// Pipeline interfaces are now managed via the @packages/agents and @packages/runtime-core abstractions.
+// Legacy stubs removed to preserve architectural honesty.
 
 // Messaging & State
 const safePublish = async (channel: string, payload: string) => {
@@ -268,21 +262,6 @@ if (!(globalThis as any).__redisClient) {
         client.on('reconnecting', (ms: number) => logger.warn({ delayMs: ms }, '[Redis] Attempting reconnection...'));
 
         (globalThis as any).__redisClient = client;
-    } else if (process.env.NODE_ENV === 'test') {
-        logger.warn('[Redis] No REDIS_URL found. Using mock redis client for TEST environment.');
-        (globalThis as any).__redisClient = {
-            status: 'ready',
-            on: () => {},
-            get: async () => null,
-            set: async () => 'OK',
-            del: async () => 1,
-            publish: async () => 0,
-            subscribe: async () => {},
-            psubscribe: async () => {},
-            quit: async () => 'OK',
-            multi: () => ({ exec: async () => [] }),
-            pipeline: () => ({ exec: async () => [] }),
-        };
     } else {
         const errorMsg = '[Redis] FATAL: REDIS_URL environment variable is missing. Infrastructure persistence is mandatory in Maintenance Era.';
         logger.error(errorMsg);

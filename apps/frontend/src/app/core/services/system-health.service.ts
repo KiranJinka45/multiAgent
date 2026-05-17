@@ -85,6 +85,13 @@ export class SystemHealthService {
   private actionStateSubject = new BehaviorSubject<Record<string, 'IDLE' | 'DISPATCHED' | 'SUCCESS' | 'ERROR'>>({});
   public actionStates$ = this.actionStateSubject.asObservable();
 
+  public currentTime$ = timer(0, 1000).pipe(
+    map(() => {
+      const now = new Date();
+      return now.toISOString().replace('T', ' ').split('.')[0] + ' UTC';
+    })
+  );
+
   private eventLog: SystemEvent[] = [];
   private activeIncident: Incident | null = null;
   private lastMode: string = 'NORMAL';

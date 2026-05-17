@@ -1,0 +1,63 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "stewardship-console": {
+      "projectType": "application",
+      "schematics": {},
+      "root": "apps/stewardship-console",
+      "sourceRoot": "apps/stewardship-console/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/stewardship-console",
+            "index": "apps/stewardship-console/src/index.html",
+            "main": "apps/stewardship-console/src/main.ts",
+            "polyfills": ["zone.js"],
+            "tsConfig": "apps/stewardship-console/tsconfig.app.json",
+            "assets": ["apps/stewardship-console/src/assets"],
+            "styles": ["apps/stewardship-console/src/styles.css"],
+            "scripts": [],
+            "sourceMap": false
+          },
+          "configurations": {
+            "production": {
+              "budgets": [{ "type": "initial", "maximumWarning": "500kb", "maximumError": "1mb" }],
+              "outputHashing": "all"
+            },
+            "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": false,
+              "namedChunks": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "buildTarget": "stewardship-console:build"
+          },
+          "configurations": {
+            "production": {
+              "buildTarget": "stewardship-console:build:production"
+            },
+            "development": {
+              "buildTarget": "stewardship-console:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        }
+      }
+    }
+  },
+  "cli": {
+    "analytics": "9acf9224-c156-4fcf-9f99-284b6d023582"
+  }
+}

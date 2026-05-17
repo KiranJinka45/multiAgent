@@ -16,7 +16,12 @@ import { OfflineBannerComponent } from '../../shared/components/offline-banner';
       <div class="main-container">
         <app-sidebar></app-sidebar>
         <main class="content">
-          <router-outlet></router-outlet>
+          <div class="view-header">
+            <router-outlet name="header"></router-outlet>
+          </div>
+          <div class="view-body">
+            <router-outlet></router-outlet>
+          </div>
         </main>
       </div>
     </div>
@@ -26,7 +31,8 @@ import { OfflineBannerComponent } from '../../shared/components/offline-banner';
       display: flex;
       flex-direction: column;
       height: 100vh;
-      background: #0f172a;
+      background: hsl(var(--bg-app));
+      color: hsl(var(--text-main));
       overflow: hidden;
     }
     .main-container {
@@ -36,11 +42,18 @@ import { OfflineBannerComponent } from '../../shared/components/offline-banner';
     }
     .content {
       flex: 1;
-      padding: 32px;
+      display: flex;
+      flex-direction: column;
       overflow-y: auto;
-      background: radial-gradient(circle at top right, rgba(96, 165, 250, 0.05), transparent 40%),
-                  radial-gradient(circle at bottom left, rgba(167, 139, 250, 0.05), transparent 40%);
+      background: hsl(var(--bg-app));
+    }
+    .view-body {
+      padding: 2rem;
+      max-width: 1600px;
+      width: 100%;
+      margin: 0 auto;
     }
   `]
 })
 export class ShellComponent {}
+

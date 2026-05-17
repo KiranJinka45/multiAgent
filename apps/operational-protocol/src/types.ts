@@ -1,4 +1,4 @@
-import { PartialSignature } from './crypto-utils';
+import type { PartialSignature } from './crypto-utils.js';
 
 export interface TelemetryData {
   nodeId: string;
@@ -57,4 +57,21 @@ export interface ConsensusResult {
   timestamp: number;
   aggregatedSignature?: string;
   events?: CeremonyEvent[]; // Added event trace
+}
+
+export type TrustLevel = 'FULL' | 'DEGRADED' | 'CONDITIONAL' | 'UNTRUSTED';
+
+export interface VerificationNarrative {
+  sequenceId: number;
+  trustLevel: TrustLevel;
+  confidence: number; // 0.0 - 1.0
+  summary: string;
+  findings: string[];
+  forensicEvidence: {
+    hashChainValid: boolean;
+    quorumMet: boolean;
+    zkProofValid: boolean;
+    externalAnchorValid: boolean;
+  };
+  recommedation: string;
 }

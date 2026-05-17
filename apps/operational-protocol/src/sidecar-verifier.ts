@@ -1,5 +1,5 @@
-import { ThresholdCrypto, KeyShare, PartialSignature, DEFAULT_THRESHOLD, DEFAULT_NODE_IDS } from './crypto-utils';
-import { TelemetryData, SreDecision, TrustAttestation } from './types';
+import { ThresholdCrypto, DEFAULT_THRESHOLD, DEFAULT_NODE_IDS, type KeyShare, type PartialSignature } from './crypto-utils.js';
+import type { TelemetryData, SreDecision, TrustAttestation } from './types.js';
 
 const logger = console;
 

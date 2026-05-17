@@ -1,0 +1,16 @@
+[
+  {
+    "sequenceId": 1003,
+    "type": "AUTH_DEGRADATION",
+    "timestamp": 1715856180000,
+    "payload": "Signer node-c revoked by governance.",
+    "evidence": {
+      "hash": "0x1003",
+      "prevHash": "0x1002",
+      "signature": "sig|100|1003|REVOKE",
+      "epoch": 100,
+      "trustLevel": "DEGRADED",
+      "verdict": "DEGRADED"
+    }
+  }
+]

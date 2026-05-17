@@ -6,18 +6,16 @@
     "declaration": true,
     "outDir": "dist",
     "composite": true,
-    "paths": {
-      "@packages/ztan-crypto": [
-        "../../packages/ztan-crypto/src"
-      ]
-    },
     "noEmit": false,
     "incremental": true,
     "rootDir": "src"
   },
   "include": [
-    "src/**/*",
-    "../../packages/ztan-crypto/src/**/*"
+    "src/**/*"
   ],
-  "references": []
+  "references": [
+    { "path": "../../packages/contracts" },
+    { "path": "../../packages/utils" },
+    { "path": "../../packages/ztan-crypto" }
+  ]
 }

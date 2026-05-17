@@ -1,0 +1,21 @@
+{
+  "name": "@packages/ztan-crypto",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "private": true,
+  "scripts": {
+    "build": "tsup src/index.ts --format esm",
+    "dev": "tsup src/index.ts --format esm --watch"
+  },
+  "dependencies": {
+    "@packages/utils": "workspace:*",
+    "@noble/bls12-381": "1.4.0",
+    "uuid": "11.0.3"
+  },
+  "devDependencies": {
+    "tsup": "8.5.1",
+    "typescript": "5.5.4"
+  }
+}

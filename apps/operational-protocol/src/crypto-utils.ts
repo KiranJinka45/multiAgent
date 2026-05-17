@@ -96,6 +96,11 @@ export class ThresholdCrypto {
     return await ThresholdBls.verify(aggregateHex, payload, groupPublicKeyHex, 'ceremony-gov', threshold, pks);
   }
 
+  public static async generateGroupPublicKey(threshold: number, nodeIds: string[]): Promise<string> {
+    const dkg = await ThresholdBls.dkg(threshold, nodeIds.length, nodeIds);
+    return dkg.masterPublicKey;
+  }
+
   private static async getEligiblePublicKeys(nodeIds: string[]): Promise<string[]> {
     // In a real system, this would fetch from a registry.
     // For the simulation, we use deterministic derivation matching the test environment.

@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, type OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { ApiService } from './core/services/api.service';
 
 @Component({
   selector: 'app-root',
@@ -52,4 +53,14 @@ import { RouterOutlet } from '@angular/router';
     }
   `]
 })
-export class App {}
+export class App implements OnInit {
+  constructor(private api: ApiService) { }
+
+  ngOnInit() {
+    // Initialize CSRF protection on startup
+    this.api.get('/csrf').subscribe({
+      next: () => console.debug('[App] CSRF Token Initialized'),
+      error: (err) => console.error('[App] Failed to initialize CSRF token', err)
+    });
+  }
+}

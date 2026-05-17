@@ -6,6 +6,9 @@
     "paths": {
       "@packages/*": [
         "packages/*/src"
+      ],
+      "@apps/*": [
+        "apps/*/src"
       ]
     }
   },
@@ -41,6 +44,8 @@
     { "path": "./packages/memory-cache" },
     { "path": "./packages/utils" },
     { "path": "./packages/validator" },
+    { "path": "./packages/ztan-crypto" },
+    { "path": "./packages/ztan-witness" },
     { "path": "./packages/ztanctl" }
   ]
 }
