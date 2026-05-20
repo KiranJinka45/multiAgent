@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import { db } from '@packages/db';
 
 export async function eventTracker(req: Request, res: Response, next: NextFunction) {

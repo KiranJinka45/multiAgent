@@ -1,4 +1,5 @@
-import { Request, Response, Router } from 'express';
+import { Router } from 'express';
+import type { Request, Response } from 'express';
 import { logger } from '@packages/observability';
 import { sreEngine } from '../services/sre-engine';
 

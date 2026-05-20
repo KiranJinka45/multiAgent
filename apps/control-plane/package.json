@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsup --no-dts && tsc --emitDeclarationOnly",
-    "dev": "tsup --no-dts --watch",
+    "build": "tsup src/validation-daemon.ts --no-dts && tsc --emitDeclarationOnly -p tsconfig.json --declarationDir ./dist",
+    "dev": "tsup src/validation-daemon.ts --no-dts --watch",
     "start": "node dist/validation-daemon.js"
   },
   "dependencies": {

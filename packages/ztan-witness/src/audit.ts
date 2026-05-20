@@ -1,5 +1,4 @@
-import { EvidenceChain, ForensicResilienceMetrics, VerificationState } from '@packages/contracts';
-import { RollbackImpactAssessment } from '@packages/contracts/src/rollback-invariants';
+import { type EvidenceChain, type ForensicResilienceMetrics, VerificationState } from '@packages/contracts';
 import { redis } from '@packages/utils';
 import { logger } from '@packages/observability';
 
@@ -30,8 +29,8 @@ export class ForensicAuditService {
         
         // Final Assessment
         const violations = chain.entries
-            .filter(e => e.category === 'HEAL')
-            .flatMap(e => (e as any).violations || []);
+            .filter((e: any) => e.category === 'HEAL')
+            .flatMap((e: any) => (e as any).violations || []);
 
         const report: ForensicAuditReport = {
             id: reportId,

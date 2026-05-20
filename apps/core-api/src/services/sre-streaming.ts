@@ -1,8 +1,9 @@
 import { Server, Socket } from 'socket.io';
 import { logger } from '@packages/observability';
 import { sreEngine } from './sre-engine';
-import { SRETuningParams } from '@packages/contracts';
-import { chaosOrchestrator, ChaosScenario } from './chaos-orchestrator';
+import type { SRETuningParams } from '@packages/contracts';
+import { chaosOrchestrator } from './chaos-orchestrator';
+import type { ChaosScenario } from './chaos-orchestrator';
 import { validationEngine } from './validation-engine';
 import { soakTester } from './soak-tester';
 import { SreAnalyticsService } from './operational-control/sre-analytics';

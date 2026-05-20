@@ -1,4 +1,5 @@
-import { ThresholdBls, AuthenticatedMessage, ThresholdCrypto } from '@packages/ztan-crypto';
+import { ThresholdBls, ThresholdCrypto } from '@packages/ztan-crypto';
+import type { AuthenticatedMessage } from '@packages/ztan-crypto';
 import { logger } from '@packages/observability';
 import { redis } from '@packages/utils';
 import fs from 'fs-extra';

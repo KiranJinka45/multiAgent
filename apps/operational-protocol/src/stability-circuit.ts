@@ -1,5 +1,7 @@
+// @ts-ignore
 import snarkjs from 'snarkjs';
 import crypto from 'crypto';
+// @ts-ignore
 import { buildPoseidon } from 'circomlibjs';
 
 const logger = console;

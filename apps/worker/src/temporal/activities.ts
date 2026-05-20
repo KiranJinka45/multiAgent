@@ -1,11 +1,11 @@
-import { 
+import type { 
   ActivityInput, 
   BuildActivityResult, 
   DeployActivityResult 
 } from '@packages/contracts';
 import { eventBus } from '@packages/utils';
 import { logger } from '@packages/observability';
-import { SandboxRunner } from '../sandbox-runner';
+import { SandboxRunner } from '../sandbox-runner.js';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 

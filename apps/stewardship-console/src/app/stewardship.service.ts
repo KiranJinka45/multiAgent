@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, interval, Subscription } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+
 
 export interface EvidenceEntry {
   sequenceId: number;
@@ -85,12 +87,20 @@ export interface StewardshipState {
     description: string;
     timestamp: Date;
   }>;
+  isOfflineMode?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
 export class StewardshipService {
   private evidenceSubject = new BehaviorSubject<EvidenceEntry[]>([]);
-  private stateSubject = new BehaviorSubject<StewardshipState>({
+  private stateSubject = new class extends BehaviorSubject<StewardshipState> {
+    override next(value: StewardshipState) {
+      if (value && value.isOfflineMode === undefined) {
+        value.isOfflineMode = this.value ? this.value.isOfflineMode : false;
+      }
+      super.next(value);
+    }
+  }({
     epoch: 102,
     trustLevel: 'VERIFIED',
     isSafeMode: false,
@@ -129,7 +139,8 @@ export class StewardshipService {
       { id: 'FREEZE_PRESSURE', name: 'Institutional Freeze Pressure', status: 'INACTIVE', lastRun: '30d ago', description: 'Flood governance queues with capability expansions to test restraint.' },
       { id: 'TOTAL_QUORUM_FAILURE', name: 'Total Quorum Failure', status: 'INACTIVE', lastRun: 'Never', description: 'Simulate physical HSM failure requiring high-friction manual override ceremony.' }
     ],
-    activeIncidents: []
+    activeIncidents: [],
+    isOfflineMode: false
   });
 
   evidence$ = this.evidenceSubject.asObservable();
@@ -138,9 +149,52 @@ export class StewardshipService {
   private clockSubscription: Subscription | null = null;
   private rawEvidenceBackup: EvidenceEntry[] = [];
 
-  constructor() {
+  private apiUrl = 'http://localhost:3010/api/v1/ztan/governance';
+
+  constructor(private http: HttpClient) {
     this.initializeLedger();
     this.startLatencyTracker();
+    this.syncState();
+    this.syncLedger();
+  }
+
+  private syncState() {
+    this.http.get<StewardshipState>(`${this.apiUrl}/state`).subscribe({
+      next: (state) => {
+        this.stateSubject.next({ ...state, isOfflineMode: false });
+      },
+      error: (err) => {
+        console.warn('[StewardshipService] Failed to sync state with backend, using local state.', err);
+        const current = this.stateSubject.value;
+        this.stateSubject.next({ ...current, isOfflineMode: true });
+      }
+    });
+  }
+
+  private syncLedger() {
+    this.http.get<{ entries: any[] }>(`${this.apiUrl}/ledger`).subscribe({
+      next: (res) => {
+        if (res && res.entries) {
+          const mapped: EvidenceEntry[] = res.entries.map((e: any) => ({
+            sequenceId: e.sequenceId || e.id,
+            timestamp: new Date(e.timestamp),
+            type: e.type,
+            payload: e.payload,
+            evidence: {
+              hash: e.hash || '',
+              prevHash: e.prevHash || '',
+              signature: e.signature || '',
+              epoch: e.epoch || '',
+              verdict: e.verdict || 'VERIFIED'
+            }
+          }));
+          this.evidenceSubject.next(mapped);
+        }
+      },
+      error: (err) => {
+        console.warn('[StewardshipService] Failed to sync ledger with backend, using local ledger.', err);
+      }
+    });
   }
 
   private initializeLedger() {
@@ -148,7 +202,7 @@ export class StewardshipService {
       this.generateEntry(1000, 'VERIFIED', 'Epoch 100 Initialized: Multi-signature Quorum verified successfully.', 'GOVERNANCE'),
       this.generateEntry(1001, 'VERIFIED', 'Authority Node A Registered: Public key bound to HSM hardware anchor.', 'IDENTITY'),
       this.generateEntry(1002, 'VERIFIED', 'Inbound Policy Sync Complete: Blast-radius rule enforced globally.', 'POLICY'),
-      this.generateEntry(1003, 'VERIFIED', 'Ledger Integrity Heartbeat: Merkle path verified (0x92f1...).', 'REPLAY'),
+      this.generateEntry(1003, 'VERIFIED', 'Ledger Integrity Heartbeat: Hash Chain path verified (0x92f1...).', 'REPLAY'),
       this.generateEntry(1004, 'VERIFIED', 'Stewardship Telemetry Stream Online: Clock synced to UTC.', 'TELEMETRY')
     ];
     this.rawEvidenceBackup = [...initial];
@@ -170,21 +224,92 @@ export class StewardshipService {
   }
 
   triggerDrill(id: string) {
+    this.http.post<StewardshipState>(`${this.apiUrl}/drill/trigger`, { id }).subscribe({
+      next: (state) => {
+        this.stateSubject.next({ ...state, isOfflineMode: false });
+        this.syncLedger();
+      },
+      error: (err) => {
+        console.warn('Failed to trigger drill on backend, using local simulation fallback', err);
+        const current = this.stateSubject.value;
+        this.stateSubject.next({ ...current, isOfflineMode: true });
+        this.localTriggerDrill(id);
+      }
+    });
+  }
+
+  resolveDrill(id: string, actionsTaken: string) {
+    const operatorSignature = 'ZTAN_SIG_' + Math.random().toString(16).substring(2, 8).toUpperCase();
+    this.http.post<StewardshipState>(`${this.apiUrl}/drill/resolve`, { id, actionsTaken, operatorSignature }).subscribe({
+      next: (state) => {
+        this.stateSubject.next({ ...state, isOfflineMode: false });
+        this.syncLedger();
+      },
+      error: (err) => {
+        console.warn('Failed to resolve drill on backend, using local simulation fallback', err);
+        const current = this.stateSubject.value;
+        this.stateSubject.next({ ...current, isOfflineMode: true });
+        this.localResolveDrill(id, actionsTaken);
+      }
+    });
+  }
+
+  resolveProposal(proposalId: string, action: 'REJECT' | 'PRUNE' | 'APPROVE', justification: string) {
+    this.http.post<StewardshipState>(`${this.apiUrl}/proposal/resolve`, { proposalId, action, justification }).subscribe({
+      next: (state) => {
+        this.stateSubject.next({ ...state, isOfflineMode: false });
+        this.syncLedger();
+      },
+      error: (err) => {
+        console.warn('Failed to resolve proposal on backend, using local simulation fallback', err);
+        const current = this.stateSubject.value;
+        this.stateSubject.next({ ...current, isOfflineMode: true });
+        this.localResolveProposal(proposalId, action, justification);
+      }
+    });
+  }
+
+  simulateAging(days: number) {
+    this.http.post<StewardshipState>(`${this.apiUrl}/aging`, { days }).subscribe({
+      next: (state) => {
+        this.stateSubject.next({ ...state, isOfflineMode: false });
+        this.syncLedger();
+      },
+      error: (err) => {
+        console.warn('Failed to simulate aging on backend, using local simulation fallback', err);
+        const current = this.stateSubject.value;
+        this.stateSubject.next({ ...current, isOfflineMode: true });
+        this.localSimulateAging(days);
+      }
+    });
+  }
+
+  resetState() {
+    this.http.post<StewardshipState>(`${this.apiUrl}/reset`, {}).subscribe({
+      next: (state) => {
+        this.stateSubject.next({ ...state, isOfflineMode: false });
+        this.syncLedger();
+      },
+      error: (err) => {
+        console.warn('Failed to reset state on backend, using local simulation fallback', err);
+        const current = this.stateSubject.value;
+        this.stateSubject.next({ ...current, isOfflineMode: true });
+        this.localResetState();
+      }
+    });
+  }
+
+  // --- LOCAL FALLBACK METHODS FOR COMPILATION & SELF-HEALING SURVIVABILITY ---
+
+  private localTriggerDrill(id: string) {
     const current = this.stateSubject.value;
-    
-    // Set drill as active
     const drills = current.drills.map((d: SociotechnicalDrill) => 
       d.id === id ? { ...d, status: 'ACTIVE' as const } : d
     );
-
     const drillStartTime = Date.now();
-
-    // Start with existing ledger base
     let evidence = [...this.evidenceSubject.value];
 
-    // Handle state transitions based on drill
     if (id === 'IFD-001') {
-      // 1. Replay Poisoning
       const poisonEntry = this.generateEntry(1005, 'UNTRUSTED', 'ADVERSARIAL REPLAY: Found replay signature mismatch at index 1004. Forged payload injected.', 'REPLAY');
       evidence = [poisonEntry, ...evidence];
 
@@ -199,7 +324,7 @@ export class StewardshipService {
         currentRunningLatency: 0,
         recoveryInvariants: {
           ...current.recoveryInvariants,
-          causalContinuity: { status: false, label: 'Chain fracture: Forged Merkle proof injected' }
+          causalContinuity: { status: false, label: 'Chain fracture: Forged signature payload injected' }
         },
         activeIncidents: [
           {
@@ -207,18 +332,14 @@ export class StewardshipService {
             type: 'REPLAY_POISONING',
             severity: 'CRITICAL',
             title: 'Critical Chain Fracture Detected',
-            description: 'A forged signature payload was detected, poisoning the replay log and fracturing Merkle verification continuity.',
+            description: 'A forged signature payload was detected, poisoning the replay log and fracturing hash-chain integrity verification.',
             timestamp: new Date()
           }
         ]
       });
       this.evidenceSubject.next(evidence);
-
     } else if (id === 'IFD-002') {
-      // 2. Telemetry Erosion
-      // Physically remove timeline entries (simulate chronology gaps)
       const erodedEvidence = evidence.filter((_, idx) => idx % 2 === 0);
-      
       this.stateSubject.next({
         ...current,
         drills,
@@ -245,9 +366,7 @@ export class StewardshipService {
         ]
       });
       this.evidenceSubject.next(erodedEvidence);
-
     } else if (id === 'IFD-003') {
-      // 3. Governance Collapse
       const collapseEntry = this.generateEntry(1006, 'DEGRADED', 'GOVERNANCE COLLAPSE: Epoch Quorum lost due to authority divergence.', 'GOVERNANCE');
       evidence = [collapseEntry, ...evidence];
 
@@ -282,9 +401,7 @@ export class StewardshipService {
         ]
       });
       this.evidenceSubject.next(evidence);
-
     } else if (id === 'RITUAL_DECAY') {
-      // 4. Ritual Decay
       this.stateSubject.next({
         ...current,
         drills,
@@ -309,9 +426,7 @@ export class StewardshipService {
           }
         ]
       });
-
     } else if (id === 'FREEZE_PRESSURE') {
-      // 5. Freeze Pressure
       const proposals: GovernanceProposal[] = [
         { id: 'GP-01', title: 'Add Autonomous AI Remediation Assistant to Root', riskLevel: 'CRITICAL', status: 'PENDING' },
         { id: 'GP-02', title: 'Automate Ceremony Approvals Using Predictive Scoring', riskLevel: 'HIGH', status: 'PENDING' },
@@ -338,9 +453,7 @@ export class StewardshipService {
           }
         ]
       });
-
     } else if (id === 'TOTAL_QUORUM_FAILURE') {
-      // 6. Total Quorum Failure
       const crashEntry = this.generateEntry(1007, 'UNTRUSTED', 'QUORUM CRASH: Complete physical HSM authority rotation failure. Automated recovery path deadlocked.', 'GOVERNANCE');
       evidence = [crashEntry, ...evidence];
 
@@ -375,8 +488,7 @@ export class StewardshipService {
     }
   }
 
-  // Resolve a specific drill, calculating reaction latency
-  resolveDrill(id: string, actionsTaken: string) {
+  private localResolveDrill(id: string, actionsTaken: string) {
     const current = this.stateSubject.value;
     if (current.activeDrill !== id) return;
 
@@ -388,7 +500,6 @@ export class StewardshipService {
       d.id === id ? { ...d, status: 'PASSED' as const, lastRun: `Passed (${reactionTime}s)` } : d
     );
 
-    // Create a mitigation ledger entry
     const seq = this.evidenceSubject.value.length ? this.evidenceSubject.value[0].sequenceId + 1 : 1010;
     const resolutionEntry = this.generateEntry(
       seq, 
@@ -398,11 +509,8 @@ export class StewardshipService {
     );
 
     const updatedEvidence = [resolutionEntry, ...this.evidenceSubject.value];
-
-    // Clear incidents related to the drill
     const incidents = current.activeIncidents.filter(inc => !inc.id.includes(id) && !inc.id.includes('INC-TOTAL-FAIL'));
 
-    // Revert governance epochs back to healthy if IFD-003 was active
     const history = current.governanceHistory.map((g: GovernanceEpoch) => 
       g.status === 'FAILED' ? { ...g, status: 'ACTIVE' as const, desc: 'Epoch 102: Reconstructed and Verified' } : g
     );
@@ -436,7 +544,6 @@ export class StewardshipService {
       activeIncidents: incidents
     });
 
-    // If telemetry was eroded, restore complete history
     if (current.telemetryEroded) {
       this.evidenceSubject.next([resolutionEntry, ...this.rawEvidenceBackup]);
     } else {
@@ -444,8 +551,7 @@ export class StewardshipService {
     }
   }
 
-  // Handle proposal actions for Freeze Pressure
-  resolveProposal(proposalId: string, action: 'REJECT' | 'PRUNE' | 'APPROVE', justification: string) {
+  private localResolveProposal(proposalId: string, action: 'REJECT' | 'PRUNE' | 'APPROVE', justification: string) {
     const current = this.stateSubject.value;
     const proposals = current.governanceProposals.map(p => 
       p.id === proposalId ? { ...p, status: (action === 'REJECT' ? 'REJECTED' : action === 'PRUNE' ? 'PRUNED' : 'APPROVED') as any, justification } : p
@@ -459,13 +565,11 @@ export class StewardshipService {
       habituationRisk: Math.max(12, current.habituationRisk - 15)
     });
 
-    // If all proposals are pruned or rejected, we successfully pass the Freeze Pressure drill!
     if (allResolved) {
       const rejectsAndPrunes = proposals.every(p => p.status === 'REJECTED' || p.status === 'PRUNED');
       if (rejectsAndPrunes) {
-        this.resolveDrill('FREEZE_PRESSURE', 'Defended capability expansion. Rejected automatic agents.');
+        this.localResolveDrill('FREEZE_PRESSURE', 'Defended capability expansion. Rejected automatic agents.');
       } else {
-        // Operator approved something bad! Trigger a trust failure instead of resolving!
         const alertEntry = this.generateEntry(
           this.evidenceSubject.value[0].sequenceId + 1, 
           'UNTRUSTED', 
@@ -482,8 +586,7 @@ export class StewardshipService {
     }
   }
 
-  // Simulate Longitudinal Aging
-  simulateAging(days: number) {
+  private localSimulateAging(days: number) {
     const current = this.stateSubject.value;
     const epochIncrease = Math.round(days / 6.4);
     const newEpoch = current.epoch + epochIncrease;
@@ -492,7 +595,6 @@ export class StewardshipService {
     const habituationIncrease = Math.round(days * 0.25);
     const newHabitRisk = Math.min(95, current.habituationRisk + habituationIncrease);
 
-    // Expand the ledger: insert a set of randomized historical entries
     let updatedEvidence = [...this.evidenceSubject.value];
     let startSeq = updatedEvidence.length ? updatedEvidence[0].sequenceId + 1 : 1010;
     
@@ -502,7 +604,7 @@ export class StewardshipService {
       'Authority public key rotated.',
       'Tenant isolation context verified.',
       'Clock synchronization drift check: ok.',
-      'Merkle root anchor anchored to ledger.'
+      'State hash anchor anchored to ledger.'
     ];
 
     for (let i = 0; i < Math.round(days / 10); i++) {
@@ -512,7 +614,6 @@ export class StewardshipService {
       updatedEvidence = [entry, ...updatedEvidence];
     }
 
-    // Append to history list
     const addedHistory: GovernanceEpoch[] = [];
     for (let i = 0; i < epochIncrease; i++) {
       const ep = current.epoch + i + 1;
@@ -524,7 +625,6 @@ export class StewardshipService {
       });
     }
 
-    // Modify primary history entry
     const activeHist: GovernanceEpoch = {
       id: newEpoch,
       status: 'ACTIVE',
@@ -548,13 +648,10 @@ export class StewardshipService {
     });
 
     this.evidenceSubject.next(updatedEvidence);
-
-    // Save backing
     this.rawEvidenceBackup = [...updatedEvidence];
   }
 
-  // Global reset state
-  resetState() {
+  private localResetState() {
     this.stateSubject.next({
       epoch: 102,
       trustLevel: 'VERIFIED',
@@ -615,3 +712,7 @@ export class StewardshipService {
     };
   }
 }
+
+
+
+

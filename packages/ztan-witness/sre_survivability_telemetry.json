@@ -1,0 +1,55 @@
+{
+    "storm": {
+        "concurrentWorkers": 4,
+        "totalAppends": 160,
+        "failedAppends": 0,
+        "stormDurationMs": 54811.7617,
+        "avgLatencyMs": 1354.34616375,
+        "p50LatencyMs": 921.4873999999982,
+        "p90LatencyMs": 4281.3979,
+        "p99LatencyMs": 6504.1173999999955,
+        "verificationState": "verified",
+        "sequenceMonotonic": true,
+        "hashesLinked": true
+    },
+    "components": {
+        "queueDepth": {
+            "avg": 3,
+            "max": 3
+        },
+        "lockRetries": {
+            "avg": 0,
+            "max": 0
+        },
+        "queueWaitMs": {
+            "avg": 1353.874046875,
+            "p50": 921.1898000000001,
+            "p90": 4281.041499999999,
+            "p99": 6503.784399999997
+        },
+        "lockAcquireMs": {
+            "avg": 247.303295,
+            "p50": 91.58959999999206,
+            "p90": 224.66679999999906,
+            "p99": 4804.767200000002
+        },
+        "dbTransactionMs": {
+            "avg": 807.1550024999999,
+            "p50": 652.6360000000059,
+            "p90": 1508.774400000002,
+            "p99": 4126.125399999997
+        },
+        "redisCacheMs": {
+            "avg": 49.9115749999999,
+            "p50": 42.19079999999667,
+            "p90": 94.39190000000235,
+            "p99": 266.2057000000059
+        },
+        "lockReleaseMs": {
+            "avg": 0,
+            "p50": 0,
+            "p90": 0,
+            "p99": 0
+        }
+    }
+}

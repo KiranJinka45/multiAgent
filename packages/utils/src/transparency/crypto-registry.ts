@@ -59,11 +59,80 @@ export class CryptoRegistry {
 
     private static verifyECDSA(publicKey: string, signature: Buffer, data: Buffer): boolean {
         try {
+            // Strict pre-flight DER/ASN.1 and Low-S verification
+            this.validateAndParseDEREcdsa(signature);
+            
             const pubKey = crypto.createPublicKey(publicKey);
             return crypto.verify('sha256', data, pubKey, signature);
         } catch (e) {
             return false;
         }
+    }
+
+    public static validateAndParseDEREcdsa(sig: Buffer): { r: bigint; s: bigint } {
+        if (sig.length < 8) {
+            throw new Error("[DER] Signature too short to be a valid DER sequence");
+        }
+        if (sig[0] !== 0x30) {
+            throw new Error("[DER] Invalid sequence tag (must be 0x30)");
+        }
+        const totalLen = sig[1];
+        if (sig.length !== totalLen + 2) {
+            throw new Error("[DER] Trailing bytes or mismatched total length in DER payload");
+        }
+
+        let idx = 2;
+
+        // Parse R
+        if (sig[idx] !== 0x02) {
+            throw new Error("[DER] Invalid tag for R (must be 0x02)");
+        }
+        const lenR = sig[idx + 1];
+        if (lenR <= 0 || idx + 2 + lenR > sig.length) {
+            throw new Error("[DER] Malformed length for R integer");
+        }
+        const rBytes = sig.subarray(idx + 2, idx + 2 + lenR);
+        
+        // DER integer padding rules
+        if (rBytes[0] === 0x00 && rBytes.length > 1 && (rBytes[1] & 0x80) === 0) {
+            throw new Error("[DER] Overlong integer padding in R");
+        }
+        if ((rBytes[0] & 0x80) !== 0) {
+            throw new Error("[DER] Negative integers not allowed in DER signature R");
+        }
+        idx += 2 + lenR;
+
+        // Parse S
+        if (idx >= sig.length || sig[idx] !== 0x02) {
+            throw new Error("[DER] Invalid tag for S (must be 0x02)");
+        }
+        const lenS = sig[idx + 1];
+        if (lenS <= 0 || idx + 2 + lenS !== sig.length) {
+            throw new Error("[DER] Malformed length or trailing bytes after S integer");
+        }
+        const sBytes = sig.subarray(idx + 2, idx + 2 + lenS);
+        
+        // DER integer padding rules
+        if (sBytes[0] === 0x00 && sBytes.length > 1 && (sBytes[1] & 0x80) === 0) {
+            throw new Error("[DER] Overlong integer padding in S");
+        }
+        if ((sBytes[0] & 0x80) !== 0) {
+            throw new Error("[DER] Negative integers not allowed in DER signature S");
+        }
+
+        // Convert to BigInts
+        const r = BigInt("0x" + rBytes.toString("hex"));
+        const s = BigInt("0x" + sBytes.toString("hex"));
+
+        // Strict Low-S check for secp256r1/P-256
+        const P256_N = BigInt("0xffffffff00000000ffffffffffffffffbce6fa148f9dc941655f8cef3f39803f");
+        const P256_HALF_N = P256_N / 2n;
+
+        if (s > P256_HALF_N) {
+            throw new Error("[DER] High-S signature rejected to prevent signature malleability");
+        }
+
+        return { r, s };
     }
 }
 

@@ -25,6 +25,31 @@ export class ProcessManager {
 }
 
 export class DistributedExecutionContext {
+    private static store = new Map<string, any>();
+    private id: string;
+
+    constructor(id: string) {
+        this.id = id;
+        if (!DistributedExecutionContext.store.has(id)) {
+            DistributedExecutionContext.store.set(id, {
+                id,
+                status: 'pending',
+                finalFiles: [],
+                agentResults: {}
+            });
+        }
+    }
+
+    async get() {
+        return DistributedExecutionContext.store.get(this.id);
+    }
+
+    async atomicUpdate(fn: (ctx: any) => void) {
+        const ctx = DistributedExecutionContext.store.get(this.id) || { id: this.id };
+        fn(ctx);
+        DistributedExecutionContext.store.set(this.id, ctx);
+    }
+
     static async get() {
         return { id: 'default-context' };
     }

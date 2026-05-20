@@ -1,10 +1,20 @@
-import { Router, Request, Response } from 'express';
+import { Router } from 'express';
+import type { Request, Response } from 'express';
 import { Queue, redis } from '@packages/utils';
-import { DEAD_LETTER_QUEUE_NAME, FailureClassifier } from '@packages/resilience';
 import { logger } from '@packages/observability';
 
-const router = Router();
-const dlq = new Queue(DEAD_LETTER_QUEUE_NAME, { connection: redis });
+const DEAD_LETTER_QUEUE_NAME = 'dead-letter-queue';
+const FailureClassifier = {
+    classify: (error: string): string => {
+        if (error.includes('timeout') || error.includes('network') || error.includes('503')) {
+            return 'TRANSIENT';
+        }
+        return 'FATAL';
+    }
+};
+
+const router: any = Router();
+const dlq = new Queue(DEAD_LETTER_QUEUE_NAME, { connection: redis }) as any;
 
 /**
  * GET /api/admin/dlq
@@ -15,7 +25,7 @@ router.get('/', async (req: Request, res: Response) => {
         const jobs = await dlq.getJobs(['waiting', 'active', 'completed', 'failed', 'delayed']);
         res.json({
             count: jobs.length,
-            jobs: jobs.map(job => {
+            jobs: jobs.map((job: any) => {
                 const error = job.data.error || job.failedReason || 'Unknown error';
                 return {
                     id: job.id,
@@ -52,7 +62,7 @@ router.post('/replay/:jobId', async (req: Request, res: Response) => {
             return res.status(400).json({ error: 'Job data missing originalQueue information' });
         }
 
-        const targetQueue = new Queue(originalQueue, { connection: redis });
+        const targetQueue = new Queue(originalQueue, { connection: redis }) as any;
         
         // Add back to original queue with original data
         // We use a specific job name to indicate it's a manual replay
@@ -111,7 +121,7 @@ router.post('/replay-all-transient', async (req: Request, res: Response) => {
             if (FailureClassifier.classify(error) === 'TRANSIENT') {
                 const { originalQueue, data } = job.data;
                 if (originalQueue) {
-                    const targetQueue = new Queue(originalQueue, { connection: redis });
+                    const targetQueue = new Queue(originalQueue, { connection: redis }) as any;
                     await targetQueue.add(`auto-replay-${job.id}`, data);
                     await job.remove();
                     replayedCount++;

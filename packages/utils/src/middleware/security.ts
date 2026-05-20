@@ -14,7 +14,10 @@ import { contextStorage } from '../context.js';
 export function createSecurityMiddleware(): Router {
   const router = Router();
 
-  // 1. Request Body Limits (Production Safety Phase 8)
+  // 1. Raw Stream size validator (Priority 2) - Enforces raw TCP/HTTP limit before body parser
+  router.use(validateRawPayloadSizeLimit());
+
+  // 2. Request Body Limits (Production Safety Phase 8)
   router.use(express.json({ limit: '1mb' }));
   router.use(express.urlencoded({ limit: '1mb', extended: true }));
 
@@ -172,3 +175,38 @@ export function setCsrfToken(res: Response): string {
   });
   return token;
 }
+
+/**
+ * Zero-dependency, stream-level raw payload size validator (Priority 2).
+ * Rejects payloads exceeding ZTAN 1MB ceiling before JSON parsing or tokenization executes.
+ * Integrates socket termination to mitigate Content-Length spoofing attacks.
+ */
+export function validateRawPayloadSizeLimit(): (req: Request, res: Response, next: NextFunction) => void {
+  return (req: Request, res: Response, next: NextFunction) => {
+    // 1. Inspect Content-Length header
+    const contentLength = req.headers['content-length'];
+    if (contentLength) {
+      const parsedLength = parseInt(contentLength, 10);
+      if (!isNaN(parsedLength) && parsedLength > 1000000) {
+        logger.warn({ contentLength: parsedLength }, '[SECURITY] Content-Length limit exceeded (1MB maximum)');
+        return res.status(413).json({
+          error: 'Payload Too Large',
+          message: 'Payload exceeds the strict ZTAN 1MB byte limit before parsing.'
+        });
+      }
+    }
+
+    // 2. Track real streaming bytes received to block socket spoofing
+    let bytesReceived = 0;
+    req.on('data', (chunk: Buffer) => {
+      bytesReceived += chunk.length;
+      if (bytesReceived > 1000000) {
+        logger.warn({ bytesReceived }, '[SECURITY] Real stream bytes limit exceeded (1MB maximum)');
+        req.destroy(); // Instantly destroy connection to block DoS
+      }
+    });
+
+    return next();
+  };
+}
+

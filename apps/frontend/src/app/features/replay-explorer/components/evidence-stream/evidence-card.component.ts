@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { EvidenceEntry } from '@packages/contracts';
+import { EvidenceEntry, EventCategory } from '@packages/contracts';
 
 @Component({
   selector: 'app-evidence-card',
@@ -202,10 +202,10 @@ export class EvidenceCardComponent {
 
   getSummary() {
     // Dynamic summary based on category
-    if (this.entry.category === 'HEAL') {
+    if (this.entry.category === EventCategory.HEAL) {
       return `Recovery initiated: ${this.entry.payload['action'] || 'Unknown Remediation'}`;
     }
-    if (this.entry.category === 'DECISION') {
+    if (this.entry.category === EventCategory.DECISION) {
       return `Governance decision: ${this.entry.payload['decision'] || 'System Consensus'}`;
     }
     return this.entry.payload['summary'] || 'Standard operational observation recorded.';

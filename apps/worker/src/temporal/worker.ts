@@ -1,6 +1,6 @@
 import { Worker } from '@temporalio/worker';
 import { logger } from '@packages/observability';
-import * as activities from './activities';
+import * as activities from './activities.js';
 import path from 'path';
 // In CommonJS, __filename and __dirname are available globally.
 // This file is built to CJS because it is part of the worker fleet.

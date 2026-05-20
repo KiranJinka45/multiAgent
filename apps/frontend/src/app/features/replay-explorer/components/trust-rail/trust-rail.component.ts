@@ -1,5 +1,6 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { SreDataService } from '../../../../core/services/sre-data.service';
 
 @Component({
   selector: 'app-trust-rail',

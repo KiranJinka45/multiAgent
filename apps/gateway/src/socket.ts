@@ -10,7 +10,7 @@ import { sidecarVerifier, consensusEngine, externalVerifier, notaryService, Thre
 
 const elog = pino({ level: 'info' });
 
-export async function initSocket(server: http.Server, app?: express.Application) {
+export async function initSocket(server: http.Server, app?: express.Application): Promise<any> {
     const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
     const pubClient = new Redis(REDIS_URL);
     const subClient = pubClient.duplicate();

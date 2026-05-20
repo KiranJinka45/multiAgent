@@ -28,25 +28,36 @@ This protects against cases where the system acts on a "Systemic Monitoring Fail
 
 ---
 
-## 🛡️ Real Incident Governance
+## 🛡️ Real Incident Governance & Verification Posture
 
-The platform has been formally certified for **Institutional Survivability (Phase 42)**. All production incidents must be treated as forensic opportunities with cryptographically signed evidence.
+The platform has been formally certified for **Institutional Survivability (v2026.LTS.1)**. Under our strict **Architecture Freeze**, SRE processes are strictly oriented toward evidence-backed preservation and operational explainability.
 
-### 1. Evidence Preservation
-Immediately upon detection of a critical divergence, the operator must execute the preservation script:
+### 1. Invariant Validation Posture
+Because distributed failures are combinatorial and infinite in scope, orchestrated test suites cannot prove absolute correctness. SRE teams adopt the following standard verification claim:
+> **"No invariant violations were observed under the currently executed coordination, fencing, partition, and failover drills."**
+
+### 2. Existential Oracle Governance
+ZTAN operates as a **strongly coordinated centralized authority with fail-closed semantics (CP-oriented)**, utilizing PostgreSQL as its existential coordination oracle. Consequently:
+- Any network partition or database lag will result in active nodes **failing closed** to preserve state consistency over write availability.
+- Standby replica lag and primary promotion races are handled by strict monotonic fencing checks on both filesystem and database epoch generators.
+
+### 3. Forensic Parity Audits & Evidence Preservation
+Immediately upon detection of an alert drift or transaction anomaly, SREs must run the forensic verification utility:
+```bash
+npx tsx scripts/forensic-verifier.ts
+```
+This tool performs a block-by-block cryptographic chain-hash audit comparing local JSON ledger records against PostgreSQL consensus database records, saving a certified JSON report at `.planning/telemetry/forensic-audit-latest.json`.
+
+For critical incident isolation, operators must preserve full logs and state snapshots using the preservation utility:
 ```bash
 ./scripts/preserve-incident.sh
 ```
-This script bundles logs, state snapshots, and friction reports into a cryptographically hashed evidence package.
 
-### 2. Incident Debrief Ritual
-- **Friction Audit**: Every incident must be cross-referenced with `ztanctl friction` logs from the same period.
-- **Burden Analysis**: If the incident was caused by operator confusion, the offending dashboard or command MUST be prioritized for removal or simplification.
-
-**Operational Status**: **Permanent Operational Stewardship**. The platform is operationally complete. All architectural expansion is prohibited. Success is measured by **Operational Quietness**, operator independence, and evidence-backed survivability.
+**Operational Status**: **Permanent Operational Stewardship**. The platform is operationally complete. All architectural expansion is prohibited. Success is measured by **Operational Quietness**, evidence-backed survivability, and proactive drift analysis.
 
 ---
 *Created by Antigravity Stewardship Agent*
-*Date: 2026-05-14*
+*Date: 2026-05-18*
 *Governing Document: [STEWARDSHIP_CHARTER.md](./STEWARDSHIP_CHARTER.md)*
+
 

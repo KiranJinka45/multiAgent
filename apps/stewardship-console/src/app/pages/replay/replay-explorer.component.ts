@@ -110,7 +110,7 @@ import { StewardshipService } from '../../stewardship.service';
             <div class="form-group">
               <label>RECOVERY METHODOLOGY</label>
               <select [(ngModel)]="selectedMethod">
-                <option value="rebuild">Rebuild Merkle proofs and enforce causal continuity</option>
+                <option value="rebuild">Verify key signatures and enforce causal continuity</option>
                 <option value="secondary">Sync ledger with cold-storage secondary offline node</option>
                 <option value="baseline">Rotate epoch baseline keys and verify block hashes</option>
               </select>

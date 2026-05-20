@@ -1,6 +1,6 @@
 console.log('[DEBUG] Loading project-service.ts...');
 import { db } from '@packages/db';
-import { Project, ProjectFile } from '@packages/contracts';
+import type { Project, ProjectFile } from '@packages/contracts';
 
 /**
  * PROJECT SERVICE

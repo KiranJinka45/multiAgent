@@ -1,0 +1,59 @@
+{
+  "timestamp": "2026-05-18T14:08:29.814Z",
+  "successCount": 3,
+  "failureCount": 6,
+  "totalCount": 9,
+  "results": [
+    {
+      "name": "test-lease-fencing.ts",
+      "success": false,
+      "durationMs": 79174,
+      "error": "Command failed: npx tsx \"C:\\multiagentic_project\\multiAgent-main\\packages\\utils\\src\\transparency\\test-lease-fencing.ts\""
+    },
+    {
+      "name": "test-failure-semantics.ts",
+      "success": false,
+      "durationMs": 51018,
+      "error": "Command failed: npx tsx \"C:\\multiagentic_project\\multiAgent-main\\packages\\utils\\src\\transparency\\test-failure-semantics.ts\""
+    },
+    {
+      "name": "test-outbox-self-healing.ts",
+      "success": true,
+      "durationMs": 28384
+    },
+    {
+      "name": "test-outbox-resilience.ts",
+      "success": false,
+      "durationMs": 27279,
+      "error": "Command failed: npx tsx \"C:\\multiagentic_project\\multiAgent-main\\packages\\utils\\src\\transparency\\test-outbox-resilience.ts\""
+    },
+    {
+      "name": "test-ledger-compaction.ts",
+      "success": false,
+      "durationMs": 21442,
+      "error": "Command failed: npx tsx \"C:\\multiagentic_project\\multiAgent-main\\packages\\utils\\src\\transparency\\test-ledger-compaction.ts\""
+    },
+    {
+      "name": "test-multi-writer.ts",
+      "success": false,
+      "durationMs": 53134,
+      "error": "Command failed: npx tsx \"C:\\multiagentic_project\\multiAgent-main\\packages\\utils\\src\\transparency\\test-multi-writer.ts\""
+    },
+    {
+      "name": "test-byzantine-drift.ts",
+      "success": true,
+      "durationMs": 31334
+    },
+    {
+      "name": "test-hsm-ceremony.ts",
+      "success": true,
+      "durationMs": 20607
+    },
+    {
+      "name": "test-replicated-consensus.ts",
+      "success": false,
+      "durationMs": 50669,
+      "error": "Command failed: npx tsx \"C:\\multiagentic_project\\multiAgent-main\\packages\\utils\\src\\transparency\\test-replicated-consensus.ts\""
+    }
+  ]
+}

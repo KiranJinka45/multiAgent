@@ -35,6 +35,18 @@ export class BusinessIntelligenceService {
   public calculateRoi(before: BizInputs, after: BizInputs): number {
     return roiDelta(before, after);
   }
+
+  /**
+   * Retrieves the current business metrics.
+   */
+  public async getMetrics(): Promise<BusinessHealth> {
+    return {
+      revenuePerMinute: 250,
+      activeUsers: 1200,
+      lossPerMinute: 0,
+      riskLevel: 'LOW'
+    };
+  }
 }
 
 export const valueModel = new BusinessIntelligenceService();

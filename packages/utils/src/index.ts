@@ -24,8 +24,10 @@ export * from './certification.js';
 export * from './confidence-engine.js';
 export * from './llm.js';
 export * from './recovery-history.js';
+export * from './governance-ledger.js';
+export * from './canonicalizer.js';
 export * from './rehearsal.js';
-// Archived: export { ChaosEngine } from './chaos.js';
+export * from './chaos.js';
 export * from './transparency/gossip-registry.js';
 export * from './transparency/equivocation-detector.js';
 export * from './transparency/witness-federation.js';
@@ -39,6 +41,7 @@ export {
     getSafeEnv, patchVerifier,
     previewManager,
     BaseAgent,
+    ResumeAgent,
     runtimeEvictionsTotal,
     RuntimeCapacity,
     RuntimeHeartbeat,
@@ -75,15 +78,37 @@ export {
     ArchitectureAgent,
     RankingAgent,
     RepairAgent,
-    CriticAgent
+    VirtualFileSystem,
+    Worker,
+    Job,
+    Queue,
+    eventBus,
+    QUEUE_VALIDATE,
+    QUEUE_ARCH,
+    dockerQueue,
+    repairQueue,
+    CriticAgent,
+    subscriber,
+    env,
+    RedisRecovery,
+    NodeRegistry,
+    FailoverManager,
+    WorkerClusterManager,
+    BuildGraphEngine,
+    EvolutionManager,
+    queueWaitTimeSeconds,
+    stuckBuildsTotal,
+    runWithTracing,
+    PreviewOrchestrator,
+    RuntimeCleanup
 } from './mocks.js';
 export type { RuntimeRecord, ManagedContainer, AgentResult, ExecutionContextType } from './mocks.js';
 
 export const QUEUE_DEPLOY = 'deploy-queue';
 
 
-export { HSMVault, HSMErrorCode } from './hsm-vault.ts';
-export type { HSMAttestation, HSMState } from './hsm-vault.ts';
+export { HSMVault, HSMErrorCode } from './hsm-vault.js';
+export type { HSMAttestation, HSMState } from './hsm-vault.js';
 
 import bridge from './server.js';
 

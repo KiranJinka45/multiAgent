@@ -7,31 +7,35 @@
     "composite": true,
     "incremental": true,
     "declaration": true,
+    "declarationDir": "dist",
     "skipLibCheck": true,
     "paths": {
       "@packages/config": [
-        "../config/src"
+        "../config/src/index.ts"
       ],
       "@packages/db": [
-        "../db/src"
+        "../db/src/index.ts"
       ],
       "@packages/events": [
-        "../events/src"
+        "../events/src/index.ts"
       ],
       "@packages/observability": [
-        "../observability/src"
+        "../observability/src/index.ts"
+      ],
+      "@packages/runtime-core": [
+        "../runtime-core/src/index.ts"
       ],
       "@packages/vfs": [
-        "../vfs/src"
+        "../vfs/src/index.ts"
       ],
       "@packages/validator": [
-        "../validator/src"
+        "../validator/src/index.ts"
       ],
       "@packages/ai": [
-        "../ai/src"
+        "../ai/src/index.ts"
       ],
       "@packages/supabase": [
-        "../supabase/src"
+        "../supabase/src/index.ts"
       ]
     },
     "noEmit": false,
@@ -49,6 +53,9 @@
     },
     {
       "path": "../observability"
+    },
+    {
+      "path": "../runtime-core"
     },
     {
       "path": "../validator"

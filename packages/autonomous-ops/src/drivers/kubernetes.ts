@@ -29,19 +29,11 @@ export class KubernetesDriver {
             }
         ];
 
-        const options = { headers: { 'Content-Type': 'application/json-patch+json' } };
-        
-        await this.appsApi.patchNamespacedDeployment(
+        await this.appsApi.patchNamespacedDeployment({
             name,
             namespace,
-            patch,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            options
-        );
+            body: patch
+        });
         
         logger.info({ namespace, name }, '[K8sDriver] Rollout initiated.');
     }
@@ -51,7 +43,11 @@ export class KubernetesDriver {
      */
     public async reconcile(namespace: string, name: string, spec: any): Promise<void> {
         logger.info({ namespace, name }, '[K8sDriver] Reconciling deployment state...');
-        await this.appsApi.replaceNamespacedDeployment(name, namespace, spec);
+        await this.appsApi.replaceNamespacedDeployment({
+            name,
+            namespace,
+            body: spec
+        });
     }
 
     /**
@@ -69,6 +65,10 @@ export class KubernetesDriver {
                 }
             }
         };
-        await this.appsApi.patchNamespacedDeployment(name, namespace, patch);
+        await this.appsApi.patchNamespacedDeployment({
+            name,
+            namespace,
+            body: patch
+        });
     }
 }

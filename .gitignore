@@ -74,6 +74,7 @@ k8s/secrets.yaml
 archive/recovery_replays/
 archive/scripts/
 soak-data/
-logs/
-*.log
 **/logs/
+.angular/
+brain/
+test-results/

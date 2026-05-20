@@ -4,7 +4,7 @@
  */
 import { redis, subscriber } from '@packages/utils';
 import { logger } from '@packages/observability';
-import { GitService } from './services/git';
+import { GitService } from './services/git.js';
 import path from 'path';
 import fs from 'fs-extra';
 

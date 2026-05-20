@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@packages/db": "workspace:*",
+    "@packages/infra-graph": "workspace:*",
     "@packages/observability": "workspace:*",
     "@packages/utils": "workspace:*"
   }

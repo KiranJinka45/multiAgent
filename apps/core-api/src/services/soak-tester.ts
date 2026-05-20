@@ -1,5 +1,6 @@
 import { logger } from '@packages/observability';
-import { chaosOrchestrator, ChaosScenario } from './chaos-orchestrator';
+import { chaosOrchestrator } from './chaos-orchestrator';
+import type { ChaosScenario } from './chaos-orchestrator';
 import { validationEngine } from './validation-engine';
 
 /**

@@ -1,5 +1,5 @@
-import { AutonomousActionManifest, ActionSafetyReport } from './types.js';
-import { InfraGraphEngine } from '../../infra-graph/src/engine.js';
+import type { AutonomousActionManifest, ActionSafetyReport } from './types.js';
+import { InfraGraphEngine } from '@packages/infra-graph';
 import { KubernetesDriver } from './drivers/kubernetes.js';
 import { TerraformDriver } from './drivers/terraform.js';
 import { logger } from '@packages/observability';
@@ -28,10 +28,10 @@ export class AutonomousOpsEngine {
         const blastRadius = this.graphEngine.computeBlastRadius(targetId);
         
         let safeToExecute = true;
-        let reasoning = `Blast radius for ${targetId} is ${blastRadius.score.toFixed(2)}.`;
+        let reasoning = `Blast radius for ${targetId} affects ${blastRadius.totalImpactCount} dependent nodes.`;
         let requiredApproverTier: 1 | 2 | 3 = 1;
 
-        if (blastRadius.score > 0.4) {
+        if (blastRadius.totalImpactCount > 3) {
             safeToExecute = false;
             reasoning += ' High blast radius detected. Institutional approval required.';
             requiredApproverTier = 2;
@@ -69,30 +69,33 @@ export class AutonomousOpsEngine {
 
             // 3. Driver Execution
             switch (manifest.type) {
-                case 'K8S_ROLLOUT':
+                case 'K8S_ROLLOUT': {
                     const [ns, name] = manifest.targetId.split('/');
-                    await this.k8sDriver.rolloutDeployment(ns, name, manifest.metadata.image);
+                    await this.k8sDriver.rolloutDeployment(ns || 'default', name || '', manifest.metadata.image || '');
                     break;
+                }
                 
                 case 'INFRA_APPLY':
-                    await this.tfDriver.apply(manifest.metadata.workingDir, manifest.metadata.vars);
+                    await this.tfDriver.apply(manifest.metadata.workingDir || '', manifest.metadata.vars || {});
                     break;
 
-                case 'ROLLBACK':
+                case 'ROLLBACK': {
                     if (manifest.targetId.includes('/')) {
                         // K8s Rollback (Restoring previous image from metadata or last stable)
                         const [ns, name] = manifest.targetId.split('/');
-                        await this.k8sDriver.rolloutDeployment(ns, name, manifest.metadata.previousImage);
+                        await this.k8sDriver.rolloutDeployment(ns || 'default', name || '', manifest.metadata.previousImage || '');
                     } else {
                         // Terraform Rollback
-                        await this.tfDriver.rollback(manifest.metadata.workingDir);
+                        await this.tfDriver.rollback(manifest.metadata.workingDir || '');
                     }
                     break;
+                }
 
-                case 'RECONCILE':
+                case 'RECONCILE': {
                     const [dns, dname] = manifest.targetId.split('/');
-                    await this.k8sDriver.reconcile(dns, dname, manifest.metadata.spec);
+                    await this.k8sDriver.reconcile(dns || 'default', dname || '', manifest.metadata.spec || {});
                     break;
+                }
 
                 default:
                     throw new Error(`Unsupported mutation type: ${manifest.type}`);

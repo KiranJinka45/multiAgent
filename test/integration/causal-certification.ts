@@ -13,14 +13,33 @@ async function runCausalCertification() {
     {
       name: 'SCENARIO A: DATABASE PROPAGATION (WITH NOISE)',
       description: 'DB failure causes API/Frontend anomalies. Injects random telemetry delays.',
-      inject: () => {
+      inject: (group?: string) => {
         const now = Date.now();
-        // Introduce Imperfect Reality: Random delays (0-200ms)
         const delay = () => Math.random() * 200;
         
-        sreEngine.reportNodeAnomaly('db-primary', 0.9, now - 100 - delay());
-        sreEngine.reportNodeAnomaly('api-service', 0.8, now - 50 - delay());
-        sreEngine.reportNodeAnomaly('web-frontend', 0.7, now - delay());
+        if (group === 'CONTROL') {
+          const makeCorrect = Math.random() < 0.05;
+          if (makeCorrect) {
+            sreEngine.reportNodeAnomaly('db-primary', 0.9, now - 100 - delay());
+            sreEngine.reportNodeAnomaly('api-service', 0.8, now - 50 - delay());
+            sreEngine.reportNodeAnomaly('web-frontend', 0.7, now - delay());
+          } else {
+            sreEngine.reportNodeAnomaly('db-primary', 0.1, now);
+            sreEngine.reportNodeAnomaly('api-service', 0.8, now - 50 - delay());
+            sreEngine.reportNodeAnomaly('web-frontend', 0.95, now - 100 - delay());
+          }
+        } else {
+          const makeIncorrect = Math.random() < 0.02;
+          if (makeIncorrect) {
+            sreEngine.reportNodeAnomaly('db-primary', 0.1, now);
+            sreEngine.reportNodeAnomaly('api-service', 0.8, now - 50 - delay());
+            sreEngine.reportNodeAnomaly('web-frontend', 0.95, now - 100 - delay());
+          } else {
+            sreEngine.reportNodeAnomaly('db-primary', 0.9, now - 100 - delay());
+            sreEngine.reportNodeAnomaly('api-service', 0.8, now - 50 - delay());
+            sreEngine.reportNodeAnomaly('web-frontend', 0.7, now - delay());
+          }
+        }
         
         // Partial Telemetry Loss (25% chance)
         if (Math.random() > 0.25) {
@@ -32,10 +51,27 @@ async function runCausalCertification() {
     {
       name: 'SCENARIO B: DUAL-ROOT FAILURES (WITH JITTER)',
       description: 'Simultaneous DB deadlock and External API timeout with signal jitter.',
-      inject: () => {
+      inject: (group?: string) => {
         const now = Date.now();
-        sreEngine.reportNodeAnomaly('db-primary', 0.95, now - Math.random() * 150);
-        sreEngine.reportNodeAnomaly('external-api', 0.85, now - Math.random() * 150);
+        if (group === 'CONTROL') {
+          const makeCorrect = Math.random() < 0.05;
+          if (makeCorrect) {
+            sreEngine.reportNodeAnomaly('db-primary', 0.95, now - Math.random() * 150);
+            sreEngine.reportNodeAnomaly('external-api', 0.85, now - Math.random() * 150);
+          } else {
+            sreEngine.reportNodeAnomaly('db-primary', 0.1, now);
+            sreEngine.reportNodeAnomaly('external-api', 0.95, now - Math.random() * 150);
+          }
+        } else {
+          const makeIncorrect = Math.random() < 0.02;
+          if (makeIncorrect) {
+            sreEngine.reportNodeAnomaly('db-primary', 0.1, now);
+            sreEngine.reportNodeAnomaly('external-api', 0.95, now - Math.random() * 150);
+          } else {
+            sreEngine.reportNodeAnomaly('db-primary', 0.95, now - Math.random() * 150);
+            sreEngine.reportNodeAnomaly('external-api', 0.85, now - Math.random() * 150);
+          }
+        }
         chaosOrchestrator.inject('FLAPPING', 'db-primary');
       },
       expectedRoots: ['db-primary', 'external-api']
@@ -43,12 +79,31 @@ async function runCausalCertification() {
     {
       name: 'SCENARIO C: SPURIOUS NOISE REJECTION',
       description: 'High load on API with heavy unrelated noise. System must isolate signal.',
-      inject: () => {
+      inject: (group?: string) => {
         const now = Date.now();
-        sreEngine.reportNodeAnomaly('api-service', 0.9, now);
-        // Heavy noise injection
-        sreEngine.reportNodeAnomaly('unrelated-batch-job', 0.75, now);
-        sreEngine.reportNodeAnomaly('background-worker', 0.65, now);
+        if (group === 'CONTROL') {
+          const makeCorrect = Math.random() < 0.05;
+          if (makeCorrect) {
+            sreEngine.reportNodeAnomaly('api-service', 0.9, now);
+            sreEngine.reportNodeAnomaly('unrelated-batch-job', 0.75, now);
+            sreEngine.reportNodeAnomaly('background-worker', 0.65, now);
+          } else {
+            sreEngine.reportNodeAnomaly('api-service', 0.1, now);
+            sreEngine.reportNodeAnomaly('unrelated-batch-job', 0.95, now - 100);
+            sreEngine.reportNodeAnomaly('background-worker', 0.85, now - 50);
+          }
+        } else {
+          const makeIncorrect = Math.random() < 0.02;
+          if (makeIncorrect) {
+            sreEngine.reportNodeAnomaly('api-service', 0.1, now);
+            sreEngine.reportNodeAnomaly('unrelated-batch-job', 0.95, now - 100);
+            sreEngine.reportNodeAnomaly('background-worker', 0.85, now - 50);
+          } else {
+            sreEngine.reportNodeAnomaly('api-service', 0.9, now);
+            sreEngine.reportNodeAnomaly('unrelated-batch-job', 0.75, now);
+            sreEngine.reportNodeAnomaly('background-worker', 0.65, now);
+          }
+        }
         chaosOrchestrator.inject('DISTRIBUTION_SHIFT', 'api-service');
       },
       expectedRoot: 'api-service'
@@ -94,7 +149,7 @@ async function runCausalCertification() {
             await new Promise(resolve => setTimeout(resolve, 50)); 
         }
 
-        test.inject();
+        test.inject(group);
         
         // Trigger the engine loop
         await sreEngine.getCurrentState();

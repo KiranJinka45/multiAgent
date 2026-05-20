@@ -3,18 +3,16 @@ import { createServer } from 'http';
 import https from 'https';
 import fs from 'fs';
 import { Server } from 'socket.io';
-import { redis } from '@packages/utils';
+import { redis, validateStartupSecrets, validateRawPayloadSizeLimit } from '@packages/utils';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import { env } from '@packages/config';
+
 import path from 'path';
 import { logger, initTelemetry, apiRequestDurationSeconds, registry } from '@packages/observability';
-import { validateStartupSecrets } from '@packages/utils';
-import { SecretProvider } from '@packages/config';
-import { startCollaborationServer } from './yjs-server';
+import { YjsServer } from './yjs-server';
 import { projectService } from './project-service';
 import { stateReconciler } from './state-reconciler';
-import { internalAuth, userAuth, requirePermission } from '@packages/auth-internal';
+import { internalAuth, userAuth } from '@packages/auth-internal';
 import { LogStreamingService } from './log-streaming';
 import { SreStreamingService } from './sre-streaming';
 import { v4 as uuid } from 'uuid';
@@ -28,14 +26,65 @@ import whoamiRouter from '../routes/whoami';
 import { sreEngine } from './sre-engine';
 import { buildCanonicalPayload, hashPayload } from '@packages/ztan-crypto';
 import ztanRouter from '../routes/ztan';
-import { TssCeremonyService } from './tss-ceremony.service';
+import ztanGovRouter from '../routes/ztan-governance';
 import { IdentityService } from './identity.service';
 
-// ZTAN Replay Tracking (Option B: Audit-Flag)
-const replayCache = new Set<string>();
+// ZTAN Replay Tracking - Rolling Sliding-Window TTL Cache (Remediation)
+class SlidingWindowTTLReplayCache {
+  private cache = new Map<string, number>(); // key -> expiry timestamp
+  private readonly ttlMs: number;
+  private readonly maxSize: number;
+
+  constructor(ttlMs = 10 * 60 * 1000, maxSize = 10000) { // 10 minutes TTL, max 10,000 entries
+    this.ttlMs = ttlMs;
+    this.maxSize = maxSize;
+  }
+
+  has(key: string): boolean {
+    this.prune();
+    const expiry = this.cache.get(key);
+    if (!expiry) return false;
+    if (Date.now() > expiry) {
+      this.cache.delete(key);
+      return false;
+    }
+    return true;
+  }
+
+  add(key: string): void {
+    this.prune();
+    if (this.cache.size >= this.maxSize) {
+      const oldestKey = this.cache.keys().next().value;
+      if (oldestKey !== undefined) {
+        this.cache.delete(oldestKey);
+      }
+    }
+    this.cache.set(key, Date.now() + this.ttlMs);
+  }
+
+  private prune(): void {
+    const now = Date.now();
+    for (const [key, expiry] of this.cache.entries()) {
+      if (now > expiry) {
+        this.cache.delete(key);
+      } else {
+        // Chronological insertion allows breaking early on first non-expired entry
+        break;
+      }
+    }
+  }
+
+  get size(): number {
+    return this.cache.size;
+  }
+}
+
+const replayCache = new SlidingWindowTTLReplayCache();
 
 const app = express();
 app.disable('x-powered-by');
+// Enforce ZTAN 1MB Byte Limit at raw stream boundary (Priority 2)
+app.use(validateRawPayloadSizeLimit());
 app.use(cors());
 
 export const registerRoutes = (app: any) => {
@@ -44,9 +93,11 @@ export const registerRoutes = (app: any) => {
   app.use('/api/v1/ztan', ztanRouter);
 };
 
+
 // Debug/Chaos Endpoints
 app.use('/debug', debugRouter);
 app.use('/api/v1/ztan', ztanRouter);
+app.use('/api/v1/ztan/governance', express.json(), ztanGovRouter);
 
 // Health Check (Deep) - MUST come before global auth
 app.get('/api/v1/system-health', async (req, res) => {
@@ -147,7 +198,7 @@ app.post('/api/v1/ztan/verify', express.json(), async (req, res) => {
         const { hex, boundPayloadBytes, sortedNodeIds } = buildCanonicalPayload(body);
         const hash = hashPayload({ boundPayloadBytes });
 
-        // 2. Replay Detection (Option B: Audit-Flag)
+        // 2. Replay Detection (Option B: Audit-Flag with Sliding-Window TTL)
         const replayTuple = `${body.auditId}:${body.payloadHash}:${body.timestamp}`;
         let isReplay = false;
         if (replayCache.has(replayTuple)) {
@@ -155,8 +206,6 @@ app.post('/api/v1/ztan/verify', express.json(), async (req, res) => {
             logger.warn({ auditId: body.auditId }, '[ZTAN] Replay detected for payload tuple');
         } else {
             replayCache.add(replayTuple);
-            // Optional: Limit cache size in production
-            if (replayCache.size > 10000) replayCache.clear();
         }
 
         // 3. Serialization Integrity Check
@@ -322,7 +371,7 @@ async function bootstrap() {
         });
 
         console.log("➡️ [CoreAPI] Starting subsidiary services");
-        startCollaborationServer(YJS_PORT);
+        new YjsServer(io);
         stateReconciler.connect();
         new LogStreamingService(io);
         new SreStreamingService(io);

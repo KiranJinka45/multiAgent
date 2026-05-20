@@ -2,7 +2,43 @@ import { Component, ElementRef, ViewChild, AfterViewChecked } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
-import type { VerificationResult, AuditInput } from '@packages/frontend-shared';
+
+export interface VerificationResult {
+  status: 'VERIFIED' | 'FAILED';
+  inputHash: string;
+  formattedHash?: string;
+  canonicalHash?: string;
+  finalAnchor?: string;
+  contributingVerifiers?: string[];
+  signatureMetadata?: any;
+  reason?: string;
+  checks: {
+    canonicalEncoding: boolean;
+    signerSetConsistent: boolean;
+    thresholdMet: boolean;
+    signatureValid: boolean;
+    zkValid: boolean;
+    anchorValid: boolean;
+    replayProtection: boolean;
+    nonRepudiation: boolean;
+    consensusReached: boolean;
+    isSimulatedConsensus?: boolean;
+    replaySource?: string;
+  };
+  trace: string[];
+  traceHashChain: string[];
+}
+
+export interface AuditInput {
+  version: string;
+  auditId: string;
+  timestamp: number;
+  payloadHash: string;
+  threshold: number;
+  nodeIds: string[];
+  partialAnchorSignatures?: { verifierId: string; signature: string }[];
+  consensusThreshold?: number;
+}
 
 // Stub for ThresholdCrypto until architecture is cleaned up
 const ThresholdCrypto = {

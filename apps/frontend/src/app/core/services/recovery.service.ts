@@ -1,14 +1,42 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { ApiService } from './api.service';
 import { Observable, tap } from 'rxjs';
-import { 
-    RecoveryIndex, 
-    RecoverySnapshot, 
-    EnvironmentStats, 
-    StabilityForecast,
-    RehearsalRequest,
-    RehearsalResponse
-} from '@packages/frontend-shared';
+export interface RecoveryIndex {
+  recoveredCount: number;
+  totalIncidents: number;
+  rehearsalCount: number;
+  untrustedCount: number;
+  status: string;
+}
+
+export interface RecoverySnapshot {
+  id: string;
+  incidentId: string;
+  timestamp: number;
+  status: string;
+  payload?: any;
+}
+
+export interface EnvironmentStats {
+  nodesCount: number;
+  servicesCount: number;
+  uptime: number;
+}
+
+export interface StabilityForecast {
+  predictedState: string;
+  confidence: number;
+}
+
+export interface RehearsalRequest {
+  scenarioId: string;
+  durationMs?: number;
+}
+
+export interface RehearsalResponse {
+  success: boolean;
+  logTrace: string[];
+}
 
 @Injectable({
   providedIn: 'root'

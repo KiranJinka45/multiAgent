@@ -189,9 +189,9 @@ export class SystemHealthService {
         timestamp: Date.now()
       } : null,
       activePolicies: [
-        'Predictive Load Shedding',
+        'Static Load Protection Policy',
         'Region Affinity Enforcement',
-        'Atomic Lock Stealing'
+        'Stale Lease Recovery'
       ]
     };
 

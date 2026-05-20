@@ -2,7 +2,7 @@ import { redis } from '@packages/utils';
 import { roiDelta, roiPipeline } from '@packages/business';
 import { logger } from '@packages/observability';
 import { EventEmitter } from 'events';
-import { 
+import type { 
   SREUpdate, 
   SREObserver, 
   SRETuningParams, 
@@ -29,10 +29,12 @@ import { topologyManager } from './learning/causal-topology';
 import { NotificationService } from './notification-service';
 import { SreAnalyticsService } from './operational-control/sre-analytics';
 import { GlobalCoordinator } from './operational-control/global-coordinator';
-import { rootCauseEngine, NodeSignal, RCAResult } from './learning/root-cause-engine';
+import { rootCauseEngine } from './learning/root-cause-engine';
+import type { NodeSignal, RCAResult } from './learning/root-cause-engine';
 import { verificationCoordinator } from './operational-control/verification-coordinator';
 import { actionEvaluator } from './learning/action-evaluator';
-import { qLearningAgent, RLState } from './learning/q-learning-agent';
+import { qLearningAgent } from './learning/q-learning-agent';
+import type { RLState } from './learning/q-learning-agent';
 import { driftDetector } from './learning/drift-detector';
 import { adaptiveReliabilityManager } from './learning/adaptive-reliability';
 import { modelRegistry } from './learning/model-registry';

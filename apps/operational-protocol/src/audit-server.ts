@@ -1,13 +1,48 @@
 import express from 'express';
 import path from 'path';
 import fs from 'fs';
-import { ThresholdCrypto, type AuditInput, FileReplayGuard } from '@packages/ztan-crypto';
+import { ThresholdCrypto, type AuditInput, type ReplayGuard } from '@packages/ztan-crypto';
 import { DEFAULT_THRESHOLD, DEFAULT_NODE_IDS } from './crypto-utils.js';
 import { AuditVerifier } from './audit-verify.js';
 
 const app = express();
 app.disable('x-powered-by');
 app.use(express.json());
+
+export class FileReplayGuard implements ReplayGuard {
+  private filePath: string;
+
+  constructor(filePath: string) {
+    this.filePath = filePath;
+  }
+
+  async isReplay(auditId: string): Promise<boolean> {
+    try {
+      if (!fs.existsSync(this.filePath)) return false;
+      const data = fs.readFileSync(this.filePath, 'utf-8');
+      const seen = JSON.parse(data);
+      const expiry = seen[auditId];
+      if (!expiry) return false;
+      if (Date.now() > expiry) {
+        delete seen[auditId];
+        fs.writeFileSync(this.filePath, JSON.stringify(seen, null, 2));
+        return false;
+      }
+      return true;
+    } catch { return false; }
+  }
+
+  async markSeen(auditId: string, ttlSeconds: number): Promise<void> {
+    try {
+      let seen: Record<string, number> = {};
+      if (fs.existsSync(this.filePath)) {
+        seen = JSON.parse(fs.readFileSync(this.filePath, 'utf-8'));
+      }
+      seen[auditId] = Date.now() + (ttlSeconds * 1000);
+      fs.writeFileSync(this.filePath, JSON.stringify(seen, null, 2));
+    } catch (e) { console.error('Failed to mark seen:', e); }
+  }
+}
 
 // Persistent guard for the server
 const REPLAY_DB = path.join(process.cwd(), '.ztan_server_replay_db.json');
@@ -40,15 +75,16 @@ app.post('/api/verify', async (req, res) => {
     
     if (initialResult.status === 'FAILED') {
       if (initialResult.errorType === 'REPLAY_DETECTED') {
-        const { ArchaeologyEngine } = await import('@packages/utils');
-        await ArchaeologyEngine.recordReplay({
+        const { RecoveryHistoryEngine } = await import('@packages/utils');
+        await RecoveryHistoryEngine.recordReplay({
           id: inputData.auditId,
           service: 'audit-server',
           failureType: 'REPLAY_ATTEMPT',
           correlations: { 
             anchor: initialResult.finalAnchor,
             clientHash: inputData.payloadHash
-          }
+          },
+          tags: ['replay', 'audit']
         });
       }
       res.json(initialResult);
