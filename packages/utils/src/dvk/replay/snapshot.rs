@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
+pub const SNAPSHOT_SCHEMA_VERSION: u16 = 1;
+
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub enum ParserState {
     Normal,
@@ -37,8 +39,10 @@ impl ParserSnapshot {
     pub fn semantic_hash(&self) -> String {
         // We use a deterministic delimited serialization format to prevent
         // field-boundary ambiguity (e.g., offset 12 and field "34" vs offset 1 and field "234").
+        // Excludes all heap addresses, allocation counts, and environment noise.
         let canonical_repr = format!(
-            "{:?}|{:?}|{}|{}|{}|{}|{}|{}",
+            "v{}|{:?}|{:?}|{}|{}|{}|{}|{}|{}",
+            SNAPSHOT_SCHEMA_VERSION,
             self.parser_state,
             self.utf8_state,
             self.current_offset,
@@ -59,6 +63,7 @@ impl ParserSnapshot {
 /// This acts as a reproducible scientific record of a fuzzing divergence.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ReplayArtifact {
+    pub schema_version: u16,
     pub runtime: String,
     pub seed: String,
     pub chunks: Vec<String>,
