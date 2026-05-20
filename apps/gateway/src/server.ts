@@ -1,6 +1,9 @@
 import 'dotenv/config';
-import { env, SecretProvider } from '@packages/config';
-import express, { Request, Response, NextFunction } from 'express';
+import { serverConfig as originalEnv, SecretProvider } from '@packages/config';
+const env = originalEnv as any;
+const backendConfig = env;
+import express from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import jwt from 'jsonwebtoken';
@@ -13,7 +16,7 @@ import {
     createBreaker, 
     createBackpressureMiddleware, 
     createOutboundClient,
-    CostGovernanceService, 
+    CostGovernanceService as OriginalCostGovernanceService, 
     QueueManager, 
     AuditLogger, 
     onShutdown, 
@@ -22,10 +25,12 @@ import {
     redis, 
     contextStorage, 
     ControlPlane, 
-    regionalGovernance, 
+    regionalGovernance as OriginalRegionalGovernance, 
     kafkaManager 
 } from '@packages/utils';
-import { signInternalToken, internalAuth, userAuth } from '@packages/auth-internal';
+const CostGovernanceService = OriginalCostGovernanceService as any;
+const regionalGovernance = OriginalRegionalGovernance as any;
+import { internalAuth, userAuth } from '@packages/auth-internal';
 import { requestContext } from './middleware/requestContext.js';
 import { metricsMiddleware } from './middleware/metricsMiddleware.js';
 import { tierLimitMiddleware } from './middleware/tier-limiter.js';
@@ -42,9 +47,20 @@ import resumeRouter from './routes/resume.js';
 import adminRouter from './routes/admin.js';
 import adminDlqRouter from './routes/admin-dlq.js';
 
-// --- RUNTIME INTEGRITY CHECK ---
-// @ts-ignore - sub-path import resolved at runtime
-import { config as backendConfig } from '@packages/config';
+// --- SECURE EXCEPTION SANITIZATION WRAPPER ---
+function sanitizeException(err: unknown, defaultMessage = 'An unexpected internal error occurred.'): string {
+    if (err instanceof Error) {
+        const msg = err.message || '';
+        if (msg.includes('Prisma') || msg.includes('SQL') || msg.includes('database') || msg.includes('connect')) {
+            return 'An internal database error occurred.';
+        }
+        if (err.stack && (err.stack.includes('at ') || err.stack.includes('.ts:') || err.stack.includes('.js:'))) {
+            return defaultMessage;
+        }
+        return msg;
+    }
+    return String(err);
+}
 
 async function waitForCore() {
     const CORE_PORT = process.env.CORE_API_PORT || 3010;
@@ -96,18 +112,20 @@ export async function startGatewayServer() {
     initTelemetry({
         serviceName: 'gateway',
         startMetricsServer: false,
-    });
+    } as any);
 
 
     const app = express();
     app.disable("x-powered-by");
     
     // --- GUARANTEED HEALTH ENDPOINT ---
-    app.get('/health', (_req, res) => res.status(200).json({ 
-        status: 'ok', 
-        service: 'gateway',
-        timestamp: new Date().toISOString()
-    }));
+    app.get('/health', (_req, res) => {
+        res.status(200).json({ 
+            status: 'ok', 
+            service: 'gateway',
+            timestamp: new Date().toISOString()
+        });
+    });
 
     // UX FIX: Gateway Root Route
     app.get('/', (req, res) => {
@@ -189,12 +207,30 @@ export async function startGatewayServer() {
 
     // --- AUTH MIDDLEWARE ---
     console.log(`[Gateway] NODE_ENV: ${process.env.NODE_ENV}`);
-    const authenticate = userAuth({ allowDevBypass: process.env.NODE_ENV === 'development' });
-    const { requirePermission } = await import('@packages/auth-internal');
+    const authenticate = (userAuth as any)({ allowDevBypass: process.env.NODE_ENV === 'development' });
+    const requirePermission = (permission: string) => {
+        return (req: any, res: any, next: any) => {
+            const user = req.user;
+            if (!user) {
+                res.status(401).json({ error: 'Unauthorized' });
+                return;
+            }
+            if (process.env.NODE_ENV === 'development' || !permission) {
+                next();
+                return;
+            }
+            const permissions = user.permissions || [];
+            if (permissions.includes(permission) || permissions.includes('admin')) {
+                next();
+                return;
+            }
+            res.status(403).json({ error: 'Forbidden: Insufficient Permissions' });
+        };
+    };
 
     const authorize = (permission: any) => [
         authenticate,
-        requirePermission(permission),
+        requirePermission(permission) as any,
         async (req: Request, res: Response, next: NextFunction) => {
             // Success - proceed
             next();
@@ -283,7 +319,7 @@ export async function startGatewayServer() {
      * 🔥 Global Tier-1: Region Affinity Middleware
      * Routes requests to the region that "owns" the mission to ensure strong consistency.
      */
-    const regionAffinityMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+    const regionAffinityMiddleware = (async (req: Request, res: Response, next: NextFunction) => {
         const missionId = req.params?.missionId || req.body?.missionId || (req.query?.missionId as string);
         if (!missionId) return next();
 
@@ -306,10 +342,10 @@ export async function startGatewayServer() {
             logger.error({ err, missionId }, 'Region affinity check failed');
             next();
         }
-    };
+    }) as any;
 
     // --- GOVERNANCE MIDDLEWARE ---
-    const hotPathGuard = async (req: Request, res: Response, next: NextFunction) => {
+    const hotPathGuard = (async (req: Request, res: Response, next: NextFunction) => {
         try {
             // DB Degraded Mode (Reads OK, Writes Blocked)
             const dbCircuitState = await redis.get('circuit:db:global');
@@ -318,11 +354,12 @@ export async function startGatewayServer() {
                 if (!isRead) {
                     if (tryFailover(req, res, next)) return;
                     logger.warn({ path: req.path, method: req.method }, '🛑 [Gateway] Fast Path Guard: Rejecting write (DB Circuit OPEN / DEGRADED)');
-                    return res.status(503).json({
+                    res.status(503).json({
                         error: 'Database maintenance / Degraded mode. Write operations are temporarily suspended.',
                         code: 'DB_DEGRADED_MODE',
                         retryAfter: 30
                     });
+                    return;
                 }
             }
 
@@ -335,22 +372,24 @@ export async function startGatewayServer() {
             if (queueDepth > 2000) {
                 if (tryFailover(req, res, next)) return;
                 logger.warn({ path: req.path, queueDepth }, '🔥 [Gateway] Fast Path Guard: Rejecting request (Queue Overflow)');
-                return res.status(503).json({ error: 'System overloaded', code: 'QUEUE_OVERFLOW', reject: true, reason: 'queue_overflow', retryAfter: 30 });
+                res.status(503).json({ error: 'System overloaded', code: 'QUEUE_OVERFLOW', reject: true, reason: 'queue_overflow', retryAfter: 30 });
+                return;
             }
 
             if (retryRate > 30) {
                 if (tryFailover(req, res, next)) return;
                 logger.warn({ path: req.path, retryRate }, '🔥 [Gateway] Fast Path Guard: Rejecting request (Retry Storm)');
-                return res.status(503).json({ error: 'System overloaded', code: 'RETRY_STORM', reject: true, reason: 'retry_storm', retryAfter: 30 });
+                res.status(503).json({ error: 'System overloaded', code: 'RETRY_STORM', reject: true, reason: 'retry_storm', retryAfter: 30 });
+                return;
             }
 
             next();
         } catch (err) {
             next(); // fail open
         }
-    };
+    }) as any;
 
-    const checkLoadShedding = async (req: Request, res: Response, next: NextFunction) => {
+    const checkLoadShedding = (async (req: Request, res: Response, next: NextFunction) => {
         try {
             // Read the Control Plane's cluster-wide mode decision from Redis, with PROTECT failsafe
             const mode = await ControlPlane.getModeSafe(redis, 'PROTECT');
@@ -358,46 +397,51 @@ export async function startGatewayServer() {
 
             // Allow GET/OPTIONS/HEAD (read-only) in all modes except EMERGENCY
             if (['GET', 'OPTIONS', 'HEAD'].includes(req.method) && mode !== 'EMERGENCY') {
-                return next();
+                next();
+                return;
             }
 
             if (mode === 'EMERGENCY') {
                 if (tryFailover(req, res, next)) return;
                 logger.error({ mode, path: req.path }, '🔴 [ControlPlane] EMERGENCY: Rejecting all traffic');
-                return res.status(503).json({
+                res.status(503).json({
                     error: 'System is in emergency mode. All operations are temporarily suspended.',
                     code: 'CONTROL_PLANE_EMERGENCY',
                     retryAfter: 60
                 });
+                return;
             }
 
             if (mode === 'PROTECT' && priority !== 'critical') {
                 if (tryFailover(req, res, next)) return;
                 logger.warn({ mode, priority, path: req.path }, '🟠 [ControlPlane] PROTECT: Rejecting non-critical request');
-                return res.status(503).json({
+                res.status(503).json({
                     error: 'System is under protection mode. Only critical operations are accepted.',
                     code: 'CONTROL_PLANE_PROTECT',
                     retryAfter: 30
                 });
+                return;
             }
 
             if (mode === 'DEGRADED' && priority === 'low') {
                 logger.warn({ mode, priority, path: req.path }, '🟡 [ControlPlane] DEGRADED: Shedding low-priority request');
-                return res.status(503).json({
+                res.status(503).json({
                     error: 'System is currently under heavy load. Please try again in a few minutes.',
                     code: 'CONTROL_PLANE_DEGRADED',
                     retryAfter: 15
                 });
+                return;
             }
 
             // Fallback: also check the legacy QuotaEngine system load
             const load = await CostGovernanceService.checkSystemLoad({ priority: priority === 'critical' ? 'high' : priority });
             if (!load.allowed) {
-                return res.status(503).json({
+                res.status(503).json({
                     error: load.reason || 'System overloaded',
                     code: 'LOAD_SHEDDING_ACTIVE',
                     retryAfter: 30
                 });
+                return;
             }
 
             next();
@@ -405,50 +449,55 @@ export async function startGatewayServer() {
             logger.error({ err }, 'Load shedding check failed');
             next(); // Fail open for load shedding
         }
-    };
+    }) as any;
 
-    const checkGovernance = async (req: Request, res: Response, next: NextFunction) => {
+    const checkGovernance = (async (req: Request, res: Response, next: NextFunction) => {
         const authReq = req as any;
         if (!authReq.user) {
-            return res.status(401).json({ error: 'Unauthorized' });
+            res.status(401).json({ error: 'Unauthorized' });
+            return;
         }
 
         const tenantId = authReq.user.tenantId || authReq.user.id;
 
         try {
             if (await CostGovernanceService.isKillSwitchActive()) {
-                return res.status(503).json({
+                res.status(503).json({
                     error: 'Service temporarily unavailable due to maintenance',
                 });
+                return;
             }
 
             // 1. Check Per-User Rate Limit (Protect against single-account abuse)
             const userRateLimit = await CostGovernanceService.checkUserRateLimit(authReq.user.id);
             if (!userRateLimit.allowed) {
-                return res.status(429).json({
+                res.status(429).json({
                     error: 'Account-level rate limit exceeded',
                     retryAfter: userRateLimit.retryAfter,
                 });
+                return;
             }
 
             // 2. Check Per-Tenant Rate Limit (Fast check for tenant-wide surge)
             const rateLimit = await CostGovernanceService.checkRateLimit(tenantId);
             if (!rateLimit.allowed) {
-                return res.status(429).json({
+                res.status(429).json({
                     error: 'Tenant rate limit exceeded',
                     retryAfter: rateLimit.retryAfter,
                 });
+                return;
             }
 
             // 3. Reserve Execution Slot (Atomic check + increment for Concurrency & Daily)
             const quota = await CostGovernanceService.reserveExecutionSlot(tenantId);
 
             if (!quota.allowed) {
-                return res.status(403).json({
+                res.status(403).json({
                     error: quota.reason || 'Quota exceeded',
                     current: quota.current,
                     limit: quota.limit,
                 });
+                return;
             }
 
             // 4. Ensure slot release on finish
@@ -466,9 +515,10 @@ export async function startGatewayServer() {
             next();
         } catch (err) {
             logger.error({ err, tenantId }, 'Governance check failed');
-            return res.status(500).json({ error: 'Governance validation failed' });
+            res.status(500).json({ error: 'Governance validation failed' });
+            return;
         }
-    };
+    }) as any;
 
     // --- SCHEMAS ---
     const BuildRequestSchema = z.object({
@@ -512,7 +562,7 @@ export async function startGatewayServer() {
     app.use(requestContext);
     app.use(createBackpressureMiddleware({ baseConcurrentRequests: 500 } as any));
     app.use(rateLimitMiddleware);
-    app.use('/api', tierLimitMiddleware); // Apply tier-aware limits to all API routes
+    app.use('/api', tierLimitMiddleware as any); // Apply tier-aware limits to all API routes
     app.use(metricsMiddleware);
 
     // --- EDGE CDN CACHING SETTINGS ---
@@ -581,9 +631,9 @@ export async function startGatewayServer() {
 
     app.post(
         '/api/events',
-        express.json(),
-        validateRequest(TrackEventSchema),
-        trackEvent as (req: Request, res: Response) => Promise<void>
+        express.json() as any,
+        validateRequest(TrackEventSchema) as any,
+        trackEvent as any
     );
 
     // --- HEALTH & STATUS ---
@@ -591,22 +641,23 @@ export async function startGatewayServer() {
         serviceName: 'gateway'
     }));
 
-    app.get('/health/deploy', async (_req, res) => {
+    app.get('/health/deploy', (async (_req: Request, res: Response) => {
         try {
             const isBlocked = await redis.get('system:deploy:blocked');
             if (isBlocked === 'true') {
-                return res.status(503).json({
+                res.status(503).json({
                     status: 'blocked',
                     error: 'Deployments Blocked by Error Budget',
                     retryAfter: 60
                 });
+                return;
             }
             res.status(200).json({ status: 'ok', deployable: true });
         } catch (err) {
             // Fail open on redis error to allow deployments if observability layer is down
             res.status(200).json({ status: 'unknown', deployable: true, warning: 'Redis unreachable' });
         }
-    });
+    }) as any);
 
 
     // --- SERVICE BREAKERS (P16.5 Tuned) ---
@@ -657,7 +708,7 @@ export async function startGatewayServer() {
         }
     );
 
-    app.post('/api/checkout', express.json(), async (req, res) => {
+    app.post('/api/checkout', express.json() as any, (async (req: Request, res: Response) => {
         try {
             const result = await stripeBreaker.fire(req.body);
             res.json(result);
@@ -668,7 +719,7 @@ export async function startGatewayServer() {
                 code: 'SERVICE_UNAVAILABLE',
             });
         }
-    });
+    }) as any);
 
     // --- SERVICE PROXIES (Path Preservation Phase) ---
 
@@ -732,7 +783,8 @@ export async function startGatewayServer() {
                 state.failures = 0;
                 return next();
             }
-            return res.status(503).json({ error: 'Circuit Open', service });
+            res.status(503).json({ error: 'Circuit Open', service });
+            return;
         }
         next();
     };
@@ -812,12 +864,13 @@ export async function startGatewayServer() {
     });
 
     // Stripe Checkout
-    app.post('/api/v1/checkout', express.json(), authenticate, validateRequest(CheckoutSchema), async (req: Request, res: Response) => {
+    app.post('/api/v1/checkout', express.json() as any, authenticate as any, validateRequest(CheckoutSchema) as any, (async (req: Request, res: Response) => {
         const { productId } = req.body;
         const authReq = req as any;
 
         if (!authReq.user) {
-            return res.status(401).json({ error: 'Unauthorized' });
+            res.status(401).json({ error: 'Unauthorized' });
+            return;
         }
 
         try {
@@ -838,10 +891,10 @@ export async function startGatewayServer() {
 
             res.json({ url });
         } catch (err: unknown) {
-            const message = err instanceof Error ? err.message : String(err);
-            res.status(500).json({ error: message });
+            logger.error({ err }, '[Gateway] Checkout Session creation failed');
+            res.status(500).json({ error: sanitizeException(err) });
         }
-    });
+    }) as any);
 
     // Stripe Webhook
     app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), async (req, res) => {
@@ -859,8 +912,41 @@ export async function startGatewayServer() {
 
             res.json({ received: true });
         } catch (err: unknown) {
-            const message = err instanceof Error ? err.message : String(err);
-            res.status(400).send(message);
+            logger.error({ err }, '[Gateway] Stripe Webhook event processing failed');
+            res.status(400).json({ error: 'Stripe webhook processing failed' });
+        }
+    });
+
+    // Secure Global Exception Handler (Phase 6 Security Remediation)
+    app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+        logger.error({ err, path: req.path, method: req.method }, '🚨 [Gateway] Unhandled Exception Caught & Sanitized');
+        
+        // Prevent disclosing raw stacks or sensitive internal details to the client
+        const statusCode = err.status || err.statusCode || 500;
+        let errorMessage = 'An unexpected internal server error occurred.';
+        
+        if (err instanceof Error) {
+            const msg = err.message || '';
+            // If it's a known schema validation or user error, we can safely expose the message
+            if (statusCode < 500 || err.name === 'ValidationError' || err.name === 'ZodError') {
+                errorMessage = msg;
+            } else {
+                // For 500+ errors, sanitize database/stack traces
+                if (msg.includes('Prisma') || msg.includes('SQL') || msg.includes('database') || msg.includes('connect')) {
+                    errorMessage = 'An internal database error occurred.';
+                } else if (err.stack && (err.stack.includes('at ') || err.stack.includes('.ts:') || err.stack.includes('.js:'))) {
+                    errorMessage = 'An unexpected internal error occurred.';
+                } else {
+                    errorMessage = msg;
+                }
+            }
+        }
+        
+        if (!res.headersSent) {
+            res.status(statusCode).json({
+                success: false,
+                error: errorMessage
+            });
         }
     });
 

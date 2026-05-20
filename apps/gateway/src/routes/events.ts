@@ -1,7 +1,7 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import { db } from '@packages/db';
 
-export const trackEvent = async (req: Request, res: Response) => {
+export const trackEvent = async (req: Request, res: Response): Promise<void> => {
   const { type, metadata } = req.body;
   const authReq = req as Request & { user?: { id: string; tenantId: string } };
   const userId = authReq.user?.id || null;

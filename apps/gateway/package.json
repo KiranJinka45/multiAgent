@@ -2,9 +2,10 @@
   "name": "@apps/gateway",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "tsup src/index.ts --no-dts --watch",
-    "build": "tsup src/index.ts --no-dts && tsc --emitDeclarationOnly",
+    "build": "tsup src/index.ts --no-dts && tsc --emitDeclarationOnly -p tsconfig.json --declarationDir ./dist",
     "start": "tsx -r tsconfig-paths/register src/index.ts",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
@@ -14,6 +15,8 @@
     "@opentelemetry/api": "latest",
     "@packages/auth-internal": "workspace:*",
     "@packages/config": "workspace:*",
+    "@packages/contracts": "workspace:*",
+    "@packages/ztan-witness": "workspace:*",
     "@packages/db": "workspace:*",
     "@packages/observability": "workspace:*",
     "@packages/utils": "workspace:*",

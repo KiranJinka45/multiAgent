@@ -7,6 +7,7 @@
     "composite": true,
     "noEmit": false,
     "declaration": true,
+    "declarationDir": "dist",
     "paths": {
       "@packages/auth-internal": [
         "../../packages/auth-internal/src"
@@ -14,9 +15,7 @@
       "@packages/config": [
         "../../packages/config/src"
       ],
-      "@packages/events": [
-        "../../packages/events/src"
-      ],
+
       "@packages/billing": [
         "../../packages/billing/src"
       ],
@@ -26,8 +25,8 @@
       "@packages/ai": [
         "../../packages/ai/src"
       ],
-      "@packages/autonomous-agent": [
-        "../../packages/autonomous-agent/src"
+      "@packages/autonomous-ops": [
+        "../../packages/autonomous-ops/src"
       ],
       "@packages/brain": [
         "../../packages/brain/src"
@@ -58,9 +57,6 @@
       ],
       "@packages/resilience": [
         "../../packages/resilience/src"
-      ],
-      "@packages/sandbox-runtime": [
-        "../../packages/sandbox-runtime/src"
       ],
       "@packages/self-evolution": [
         "../../packages/self-evolution/src"
@@ -94,6 +90,7 @@
     {
       "path": "../../packages/contracts"
     },
+
     {
       "path": "../../packages/db"
     },
@@ -101,7 +98,16 @@
       "path": "../../packages/observability"
     },
     {
+      "path": "../../packages/resilience"
+    },
+    {
       "path": "../../packages/utils"
+    },
+    {
+      "path": "../../packages/autonomous-ops"
+    },
+    {
+      "path": "../../packages/core-engine"
     },
     {
       "path": "../../packages/validator"

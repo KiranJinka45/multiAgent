@@ -2,8 +2,9 @@
   "name": "@apps/worker",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "build": "tsup src/index.ts --no-dts && tsc --emitDeclarationOnly",
+    "build": "tsup src/index.ts --no-dts && tsc --emitDeclarationOnly -p tsconfig.json --declarationDir ./dist",
     "dev": "tsup src/index.ts --no-dts --watch",
     "crsi:init": "tsx src/crsi-init.ts",
     "start": "tsx -r tsconfig-paths/register src/index.ts",
@@ -13,10 +14,14 @@
   "dependencies": {
     "@kubernetes/client-node": "1.0.0",
     "@packages/auth-internal": "workspace:*",
+    "@packages/autonomous-ops": "workspace:*",
     "@packages/config": "workspace:*",
+    "@packages/core-engine": "workspace:*",
     "@packages/contracts": "workspace:*",
+
     "@packages/db": "workspace:*",
     "@packages/observability": "workspace:*",
+    "@packages/resilience": "workspace:*",
     "@packages/utils": "workspace:*",
     "@packages/validator": "workspace:*",
     "@supabase/supabase-js": "2.43.2",

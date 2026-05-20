@@ -7,6 +7,7 @@
     "composite": true,
     "noEmit": false,
     "declaration": true,
+    "declarationDir": "dist",
     "paths": {
       "@packages/auth-internal": [
         "../../packages/auth-internal/src"

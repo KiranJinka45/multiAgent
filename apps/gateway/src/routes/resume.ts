@@ -1,8 +1,7 @@
 import { Router } from 'express';
 import { db } from '@packages/db';
-import { ResumeAgent } from '@packages/utils';
+import { ResumeAgent, DistributedExecutionContext } from '@packages/utils';
 import { logger } from '@packages/observability';
-import { DistributedExecutionContext } from '@packages/core-engine';
 
 const router: Router = Router();
 const resumeAgent = new ResumeAgent();
@@ -24,7 +23,7 @@ router.post('/optimize', async (req, res) => {
 
         // 2. Invoke Agent
         const executionId = `resume-${Date.now()}`;
-        const context = new DistributedExecutionContext(executionId);
+        const context: any = new DistributedExecutionContext(executionId);
         await context.init(
             userId || 'anonymous', 
             'resume-optimization', 

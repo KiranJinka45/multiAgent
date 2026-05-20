@@ -18,6 +18,7 @@
       ]
     },
     "declaration": true,
+    "declarationDir": "dist",
     "noEmit": false,
     "rootDir": "src"
   },

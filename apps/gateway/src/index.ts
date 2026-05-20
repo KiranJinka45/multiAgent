@@ -1,6 +1,6 @@
 import path from 'node:path';
 import dotenv from 'dotenv';
-dotenv.config({ path: path.join(__dirname, '../../../.env') });
+dotenv.config({ path: path.join(import.meta.dirname, '../../../.env') });
 import cluster from 'node:cluster';
 cluster.schedulingPolicy = cluster.SCHED_RR;
 
@@ -20,7 +20,7 @@ if (cluster.isPrimary && process.env.NO_CLUSTER !== 'true') {
         const cp = new ControlPlane(redis);
         cp.start();
         logger.info('🚀 [ControlPlane] Autonomous governance engine started in Primary Process');
-    }).catch(err => {
+    }).catch((err: any) => {
         logger.error({ err }, '❌ [ControlPlane] Failed to start governance engine');
     });
 
@@ -56,12 +56,12 @@ if (cluster.isPrimary && process.env.NO_CLUSTER !== 'true') {
         }
         await SecretProvider.bootstrap();
         
-        const { startGatewayServer } = await import('./server');
-        startGatewayServer().catch(err => {
+        const { startGatewayServer } = await import('./server.js');
+        startGatewayServer().catch((err: any) => {
             logger.error({ err }, '[Gateway] Failed to start server');
             process.exit(1);
         });
-    }).catch(err => {
+    }).catch((err: any) => {
         console.error('[Gateway] Failed to load config/server:', err);
         process.exit(1);
     });

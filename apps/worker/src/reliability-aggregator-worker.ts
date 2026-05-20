@@ -33,8 +33,8 @@ export async function runReliabilityAggregation() {
             select: { totalCostUsd: true, internalOptimizationCost: true }
         });
 
-        const totalRevenue = missionsWithMetadata.reduce((acc, m) => acc + (m.totalCostUsd || 0), 0);
-        const totalCost = missionsWithMetadata.reduce((acc, m) => acc + (m.internalOptimizationCost || 0), 0);
+        const totalRevenue = missionsWithMetadata.reduce((acc: number, m: any) => acc + (m.totalCostUsd || 0), 0);
+        const totalCost = missionsWithMetadata.reduce((acc: number, m: any) => acc + (m.internalOptimizationCost || 0), 0);
         const roi = totalCost > 0 ? ((totalRevenue - totalCost) / totalCost) * 100 : 0;
 
         // 3. Store in IntelligenceROI (Longitudinal Evidence)

@@ -1,16 +1,13 @@
 import '@packages/observability';
 import 'dotenv/config';
-import { env, SecretProvider } from '@packages/config';
+import { SecretProvider } from '@packages/config';
 import { logger, initTelemetry, registry } from '@packages/observability';
-import { onShutdown, createHealthRouter, redis, ChaosEngine } from '@packages/utils';
+import { onShutdown, createHealthRouter, redis, ChaosEngine, eventBus } from '@packages/utils';
 import express from 'express';
 import { internalAuth } from '@packages/auth-internal';
 
 // Initialize telemetry as early as possible
-initTelemetry({
-    serviceName: 'worker-fleet',
-    enableTracing: true,
-});
+initTelemetry('worker-fleet');
 
 const opsApp = express();
 opsApp.disable('x-powered-by');
@@ -71,7 +68,6 @@ async function safeImportWorker(name: string, path: string) {
 
 
 // ── Bootstrap ────────────────────────────────────────────────────────────────
-import { eventBus } from '@packages/events';
 import { db } from '@packages/db';
 
 async function bootstrap() {
@@ -126,7 +122,7 @@ async function bootstrap() {
     
     // 6. Institutional Reliability Aggregation (Priority 1)
     try {
-        const { startReliabilityWorker } = await import('./reliability-aggregator-worker');
+        const { startReliabilityWorker } = await import('./reliability-aggregator-worker.js');
         startReliabilityWorker(60000); // 1 minute for rapid evidence accumulation in dev
         logger.info('✅ [Worker] Reliability Aggregator registered');
     } catch (err) {
@@ -135,7 +131,7 @@ async function bootstrap() {
 
     // 5. Register Mission Recorder (Redis Streams Consumer Group)
     try {
-        const { setupMissionRecorder } = await import('./mission-recorder');
+        const { setupMissionRecorder } = await import('./mission-recorder.js');
         await setupMissionRecorder();
         logger.info('✅ [Worker] Mission Recorder registered');
     } catch (err) {
@@ -144,7 +140,7 @@ async function bootstrap() {
 
     // 5. Register specialized workers from packages
     try {
-        const autonomousAgent = await import('@packages/autonomous-agent');
+        const autonomousAgent = await import('@packages/autonomous-ops');
         await (autonomousAgent as any).setupAutonomousWorker();
         logger.info('✅ [Worker] Autonomous service registered');
     } catch (err) {
@@ -156,7 +152,7 @@ async function bootstrap() {
     // Heartbeat for production visibility and Control Plane tracking
     setInterval(async () => {
         // 🛡️ Phase 25: Chaos Injection (Simulate random worker crash)
-        ChaosEngine.maybeCrashWorker();
+        ChaosEngine.injectWorkerCrash();
 
         const workerId = process.env.HOSTNAME || `worker-${process.pid}`;
         await redis.set(`worker:heartbeat:${workerId}`, 'active', 'EX', 30);

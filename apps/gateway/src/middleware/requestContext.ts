@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid';
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 
 /**
  * Request Context Middleware

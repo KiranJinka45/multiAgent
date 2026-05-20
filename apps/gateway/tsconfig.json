@@ -8,6 +8,7 @@
     "skipLibCheck": true,
     "noEmit": false,
     "declaration": true,
+    "declarationDir": "dist",
     "paths": {
       "@packages/auth-internal": [
         "../../packages/auth-internal/src"
@@ -20,6 +21,12 @@
       ],
       "@packages/config": [
         "../../packages/config/src"
+      ],
+      "@packages/contracts": [
+        "../../packages/contracts/src"
+      ],
+      "@packages/ztan-witness": [
+        "../../packages/ztan-witness/src"
       ],
       "@packages/core-engine": [
         "../../packages/core-engine/src"
@@ -55,8 +62,9 @@
   "references": [
     { "path": "../../packages/auth-internal" },
     { "path": "../../packages/config" },
+    { "path": "../../packages/contracts" },
+    { "path": "../../packages/ztan-witness" },
     { "path": "../../packages/db" },
-    { "path": "../../packages/events" },
     { "path": "../../packages/memory-cache" },
     { "path": "../../packages/observability" },
     { "path": "../../packages/resilience" },

@@ -1,6 +1,6 @@
 import 'dotenv/config';
 
-import { initInstrumentation } from './instrumentation';
+import { initInstrumentation } from './instrumentation.js';
 
 import fs from 'fs-extra';
 import path from 'path';
@@ -30,9 +30,10 @@ import {
     NodeRegistry,
     EvolutionManager,
     ControlPlane,
-    ControlPlaneMetrics
+    ControlPlaneMetrics,
+    PreviewOrchestrator,
+    RuntimeCleanup
 } from '@packages/utils';
-import { PreviewOrchestrator, RuntimeCleanup } from '@packages/sandbox-runtime';
 
 import os from 'os';
 
@@ -249,13 +250,13 @@ const executeBuild = async (data: { prompt: string, userId: string, projectId: s
             const cacheRestored = await BuildCacheManager.restore(projectId, sandboxDir);
             if (cacheRestored) {
                 logger.info({ projectId }, '[Worker] Incremental build: Cache restored successfully');
-                await eventBus.stage(executionId, JobStage.PLAN.toLowerCase(), 'completed', 'Incremental build: Restored previous build cache', 20, projectId, tenantId);
+                await eventBus.stage(executionId, 'planning', 'completed', 'Incremental build: Restored previous build cache', 20, projectId, tenantId);
                 
                 // --- GRAPH ANALYSIS PHASE ---
                 const affectedNodes = await BuildGraphEngine.getAffectedNodes(sandboxDir);
                 if (affectedNodes.length === 0) {
                     logger.info({ projectId }, '[Worker] Zero affected nodes. Skipping full build.');
-                    await eventBus.stage(executionId, JobStage.PLAN.toLowerCase(), 'completed', 'No changes detected. Reusing existing artifacts.', 30, projectId, tenantId);
+                    await eventBus.stage(executionId, 'planning', 'completed', 'No changes detected. Reusing existing artifacts.', 30, projectId, tenantId);
                     // We could return early here if the system supports artifact injection only
                 } else {
                     logger.info({ projectId, count: affectedNodes.length }, '[Worker] Partial changes detected');
@@ -310,7 +311,7 @@ const executeBuild = async (data: { prompt: string, userId: string, projectId: s
             const durationMs = Date.now() - startTime;
             const durationSec = durationMs / 1000;
             rollingLatencyMs = (rollingLatencyMs * (1 - LATENCY_ALPHA)) + (durationMs * LATENCY_ALPHA);
-            jobTotal.inc({ status: 'success', tier });
+            jobTotal.inc({ status: 'success', queue: tier });
             jobProcessingDurationSeconds.observe({ job_name: 'build', status: 'success' }, durationSec);
             await ControlPlaneMetrics.recordJobResult(redis, 'success');
             await ControlPlaneMetrics.recordLatencyP95(redis, durationMs);
@@ -336,7 +337,7 @@ const executeBuild = async (data: { prompt: string, userId: string, projectId: s
         const isLastAttempt = job ? (job.attemptsMade + 1 >= (job.opts.attempts || 1)) : true;
 
         if (isLastAttempt) {
-            jobTotal.inc({ status: 'failed', tier });
+            jobTotal.inc({ status: 'failed', queue: tier });
             const durationMs = Date.now() - startTime;
             jobProcessingDurationSeconds.observe({ job_name: 'build', status: 'failed' }, durationMs / 1000);
             await ControlPlaneMetrics.recordJobResult(redis, 'failed');
@@ -345,7 +346,7 @@ const executeBuild = async (data: { prompt: string, userId: string, projectId: s
                 metadata: { error: msg }
             });
 
-            await eventBus.stage(executionId, JobStage.FAILED.toLowerCase(), 'failed', `Build failed: ${msg}`, 100, projectId, tenantId);
+            await eventBus.stage(executionId, 'failed', 'failed', `Build failed: ${msg}`, 100, projectId, tenantId);
             await eventBus.error(executionId, `[BuildWorker] ${msg}`, projectId, tenantId);
             await ReliabilityMonitor.recordFailure();
         } else {
@@ -364,18 +365,18 @@ const executeBuild = async (data: { prompt: string, userId: string, projectId: s
             
             if (currentRetryRate > maxRetryRate) {
                 logger.error({ executionId, currentRetryRate, tenantId, tier }, '💥 [Worker] Scoped Retry budget exceeded or Redis unreachable. Dropping job immediately.');
-                jobTotal.inc({ status: 'failed', tier });
+                jobTotal.inc({ status: 'failed', queue: tier });
                 await ControlPlaneMetrics.recordJobResult(redis, 'failed');
                 await protectedUpdateMission(executionId, tenantId, { 
                     status: 'failed',
                     metadata: { error: `Retry budget exceeded. Final Error: ${msg}` }
                 });
-                await eventBus.stage(executionId, JobStage.FAILED.toLowerCase(), 'failed', `Build failed (Retry Storm): ${msg}`, 100, projectId, tenantId);
+                await eventBus.stage(executionId, 'failed', 'failed', `Build failed (Retry Storm): ${msg}`, 100, projectId, tenantId);
                 await eventBus.error(executionId, `[BuildWorker] ${msg} (Retry Storm dropped)`, projectId, tenantId);
                 throw error; // Fail job instead of retry
             }
 
-            jobRetriesTotal.inc({ tier });
+            jobRetriesTotal.inc({ queue: tier });
             try {
                 await ControlPlaneMetrics.recordRetry(redis);
                 await ControlPlaneMetrics.incrementRetryRate(redis, tenantId, tier);

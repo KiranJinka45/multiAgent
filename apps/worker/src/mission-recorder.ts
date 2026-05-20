@@ -1,4 +1,4 @@
-import { eventBus } from '@packages/events';
+import { eventBus } from '@packages/utils';
 import { db } from '@packages/db';
 import { logger } from '@packages/observability';
 import { contextStorage, AuditLogger } from '@packages/utils';
