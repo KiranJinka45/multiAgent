@@ -2,12 +2,31 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "dist",
-    "rootDir": "src"
+    "rootDir": "src",
+    "declaration": true,
+    "declarationDir": "dist",
+    "baseUrl": ".",
+    "paths": {
+      "@packages/contracts": [
+        "../contracts/src/index.ts"
+      ],
+      "@packages/observability": [
+        "../observability/src/index.ts"
+      ],
+      "@packages/utils": [
+        "../utils/src/index.ts"
+      ],
+      "@packages/db": [
+        "../db/src/index.ts"
+      ]
+    }
   },
   "include": ["src/**/*"],
+  "exclude": ["src/**/*.test.ts", "src/run-tests.ts"],
   "references": [
     { "path": "../contracts" },
     { "path": "../observability" },
-    { "path": "../utils" }
+    { "path": "../utils" },
+    { "path": "../db" }
   ]
 }

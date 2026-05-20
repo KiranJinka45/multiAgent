@@ -6,12 +6,13 @@
   "types": "./dist/index.d.ts",
   "private": true,
   "scripts": {
-    "build": "tsup src/index.ts --format esm --dts",
-    "dev": "tsup src/index.ts --format esm --watch --dts",
+    "build": "tsup src/index.ts --format esm --no-dts && tsc --emitDeclarationOnly -p tsconfig.json --declarationDir ./dist",
+    "dev": "tsup src/index.ts --format esm --watch",
     "test": "vitest run"
   },
   "dependencies": {
     "@packages/contracts": "workspace:*",
+    "@packages/db": "workspace:*",
     "@packages/observability": "workspace:*",
     "@packages/utils": "workspace:*",
     "ioredis": "5.4.1",

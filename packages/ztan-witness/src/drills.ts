@@ -1,6 +1,6 @@
-import { EvidenceLedgerService } from './index';
-import { ForensicResilienceEngine } from './resilience-engine';
-import { ForensicAuditService } from './audit';
+import { EvidenceLedgerService } from './index.js';
+import { ForensicResilienceEngine } from './resilience-engine.js';
+import { ForensicAuditService } from './audit.js';
 import { logger } from '@packages/observability';
 import { EventCategory, VerificationState } from '@packages/contracts';
 import { redis } from '@packages/utils';
@@ -52,9 +52,6 @@ export class InstitutionalDrillOrchestrator {
 
         logger.info('--- PHASE 1 COMPLETE: INSTITUTIONAL ANCHOR SECURE ---');
     }
-    static prepareBaseline(correlationId: string) {
-        throw new Error('Method not implemented.');
-    }
 
     private static async injectRecoveryCandidate(correlationId: string): Promise<string> {
         // Record the rollback target
@@ -78,10 +75,7 @@ export class InstitutionalDrillOrchestrator {
             },
             correlationId,
             signerId: 'ztan-gateway-01',
-            causality: {
-                parentEventId: targetId,
-                linkType: 'remediation'
-            }
+            parentEventId: targetId
         });
 
         return targetId;
@@ -119,8 +113,10 @@ export class InstitutionalDrillOrchestrator {
 
         logger.info('--- PHASE 5 COMPLETE: MONITOR UI FOR "PROHIBITED" RESTORATION STATE ---');
     }
-    * Injects signer revocation and authority degradation.
-    */
+
+    /**
+     * Injects signer revocation and authority degradation.
+     */
     static async triggerCompromise(correlationId: string) {
     logger.warn({ correlationId }, '--- TRIGGERING IFD-001 PHASE 3: GOVERNANCE COMPROMISE ---');
 
