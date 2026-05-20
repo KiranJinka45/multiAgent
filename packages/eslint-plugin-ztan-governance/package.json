@@ -1,0 +1,9 @@
+{
+  "name": "eslint-plugin-ztan-governance",
+  "version": "1.0.0",
+  "description": "ESLint plugin enforcing ZTAN institutional architecture freeze directives.",
+  "main": "index.js",
+  "dependencies": {
+    "eslint": ">=8.0.0"
+  }
+}

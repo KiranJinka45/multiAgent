@@ -1,4 +1,5 @@
-import { ConstitutionalRule, INSTITUTIONAL_CONSTITUTION } from './constitution.js';
+import { INSTITUTIONAL_CONSTITUTION } from './constitution.js';
+import type { ConstitutionalRule } from './constitution.js';
 
 export interface GovernanceAuditReport {
     timestamp: number;
