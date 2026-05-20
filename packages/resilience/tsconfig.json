@@ -4,8 +4,9 @@
     "baseUrl": ".",
     "ignoreDeprecations": "5.0",
     "outDir": "dist",
-    "composite": false,
+    "composite": true,
     "declaration": true,
+    "declarationDir": "dist",
     "noEmit": false,
     "paths": {
       "@packages/*": ["../../packages/*/dist/index.d.ts"],

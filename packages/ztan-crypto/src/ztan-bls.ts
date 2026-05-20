@@ -1,8 +1,8 @@
 import * as bls from '@noble/bls12-381';
 import { sha256 } from '@noble/hashes/sha256';
-import { Canonical } from './canonical';
-import { Frost } from './frost';
-import { VSS } from './vss';
+import { Canonical } from './canonical.js';
+import { Frost } from './frost.js';
+import { VSS } from './vss.js';
 
 const DST = 'BLS_SIG_ZTAN_AUDIT_V1';
 
@@ -82,7 +82,7 @@ export class ThresholdBls {
         // Canonical Context Binding (ZTAN-RFC-001 v1.5)
         const ctxBytes = Canonical.safeEncode(ceremonyId);
         const sortedKeys = Canonical.sortPublicKeys(eligiblePublicKeys);
-        const keysBytes = Canonical.concat(sortedKeys.map(pk => Canonical.hexToBytes(pk)));
+        const keysBytes = Canonical.concat(sortedKeys.map((pk: string) => Canonical.hexToBytes(pk)));
 
         const bindingPayload = Canonical.concat([
             Canonical.encodeField(ctxBytes),
@@ -137,7 +137,7 @@ export class ThresholdBls {
         // Canonical Context Binding (ZTAN-RFC-001 v1.5)
         const ctxBytes = Canonical.safeEncode(ceremonyId);
         const sortedKeys = Canonical.sortPublicKeys(eligiblePublicKeys);
-        const keysBytes = Canonical.concat(sortedKeys.map(pk => Canonical.hexToBytes(pk)));
+        const keysBytes = Canonical.concat(sortedKeys.map((pk: string) => Canonical.hexToBytes(pk)));
 
         const bindingPayload = Canonical.concat([
             Canonical.encodeField(ctxBytes),

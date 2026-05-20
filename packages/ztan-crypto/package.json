@@ -6,8 +6,8 @@
   "types": "./dist/index.d.ts",
   "private": true,
   "scripts": {
-    "build": "tsup src/index.ts --format esm",
-    "dev": "tsup src/index.ts --format esm --watch"
+    "build": "tsup src/index.ts --format esm --no-dts && tsc --emitDeclarationOnly -p tsconfig.json --declarationDir ./dist",
+    "dev": "tsup src/index.ts --format esm --no-dts --watch"
   },
   "dependencies": {
     "@packages/utils": "workspace:*",

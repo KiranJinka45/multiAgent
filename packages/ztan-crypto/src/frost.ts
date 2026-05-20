@@ -1,7 +1,7 @@
 import * as bls from '@noble/bls12-381';
 import { sha256 } from '@noble/hashes/sha256';
-import { VSS } from './vss';
-import { Canonical } from './canonical';
+import { VSS } from './vss.js';
+import { Canonical } from './canonical.js';
 
 /**
  * ZTAN-FROST: Flexible Round-Optimized Threshold Signatures

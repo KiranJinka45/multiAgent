@@ -1,9 +1,9 @@
 import * as bls from '@noble/bls12-381';
 import { sha256 } from '@noble/hashes/sha256';
-import { Canonical } from './canonical';
+import { Canonical } from './canonical.js';
 
-export * from './frost';
-export * from './ztan-bls';
+export * from './frost.js';
+export * from './ztan-bls.js';
 
 const DST = 'BLS_SIG_ZTAN_AUDIT_V1';
 

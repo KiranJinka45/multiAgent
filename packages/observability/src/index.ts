@@ -1,6 +1,8 @@
 import pino from 'pino';
 import { Registry, Counter, Histogram, Gauge } from 'prom-client';
 import { AsyncLocalStorage } from 'async_hooks';
+import * as http from 'http';
+
 
 export const logger = pino();
 
@@ -36,6 +38,13 @@ export const jobRetriesTotal = new Counter({
     name: 'job_retries_total',
     help: 'Total number of job retries',
     labelNames: ['queue'],
+    registers: [registry]
+});
+
+export const jobProcessingDurationSeconds = new Histogram({
+    name: 'job_processing_duration_seconds',
+    help: 'Duration of jobs processed in seconds',
+    labelNames: ['job_name', 'status'],
     registers: [registry]
 });
 
@@ -85,6 +94,90 @@ export const retryAttemptsTotal = new Counter({
     registers: [registry]
 });
 
+// ZTAN Distributed Coordination & Fencing Telemetry
+export const leaseFencingRevocationsTotal = new Counter({
+    name: 'lease_fencing_revocations_total',
+    help: 'Total number of lease fencing revocations',
+    labelNames: ['node_id', 'reason'],
+    registers: [registry]
+});
+
+export const postgresWalReplayLagBytes = new Gauge({
+    name: 'postgres_wal_replay_lag_bytes',
+    help: 'PostgreSQL WAL replication/replay lag in bytes',
+    registers: [registry]
+});
+
+export const replayAuditDriftsTotal = new Counter({
+    name: 'replay_audit_drifts_total',
+    help: 'Total number of replay audit drifts detected',
+    labelNames: ['service', 'severity'],
+    registers: [registry]
+});
+
+export const heartbeatDriftSeconds = new Histogram({
+    name: 'heartbeat_drift_seconds',
+    help: 'Drift histogram for lease heartbeat arrivals',
+    buckets: [0.01, 0.05, 0.1, 0.5, 1, 2, 5, 10],
+    registers: [registry]
+});
+
+export const activeLeaseGeneration = new Gauge({
+    name: 'active_lease_generation',
+    help: 'Active lease generation epoch number',
+    labelNames: ['node_id'],
+    registers: [registry]
+});
+
+export const operatorActionsTotal = new Counter({
+    name: 'operator_actions_total',
+    help: 'Total number of operator interventions and HSM overrides',
+    labelNames: ['operator_id', 'action_type'],
+    registers: [registry]
+});
+
+export const invariantBreachesTotal = new Counter({
+    name: 'invariant_breaches_total',
+    help: 'Total number of core invariant breaches detected',
+    labelNames: ['invariant_id', 'severity'],
+    registers: [registry]
+});
+
+// ZTAN Witness Recorder & Replay Engine Telemetry
+export const ztanWitnessAppendDuration = new Histogram({
+    name: 'ztan_witness_append_duration_seconds',
+    help: 'Latency of appending new evidence ledger entries',
+    labelNames: ['category', 'service'],
+    registers: [registry]
+});
+
+export const ztanWitnessReplayDuration = new Histogram({
+    name: 'ztan_witness_replay_duration_seconds',
+    help: 'Duration of rebuilding and verifying evidence chains',
+    labelNames: ['incident_id', 'state'],
+    registers: [registry]
+});
+
+export const ztanWitnessQueueBacklog = new Gauge({
+    name: 'ztan_witness_queue_backlog_total',
+    help: 'Current queue backlog for the asynchronous ledger recorder',
+    registers: [registry]
+});
+
+export const ztanWitnessSignatureFailures = new Counter({
+    name: 'ztan_witness_signature_failures_total',
+    help: 'Total number of signature validation failures in the evidence ledger',
+    labelNames: ['signer_id', 'algorithm'],
+    registers: [registry]
+});
+
+export const ztanWitnessIngestionRejections = new Counter({
+    name: 'ztan_witness_ingestion_rejections_total',
+    help: 'Total number of ingestion rejections due to invariant violations or corrupt metadata',
+    labelNames: ['service', 'reason'],
+    registers: [registry]
+});
+
 export const initTelemetry = (serviceName: string) => {
     logger.info({ serviceName }, 'Telemetry initialized');
 };
@@ -105,3 +198,56 @@ export const contextStorage = new AsyncLocalStorage<RequestContext>();
 
 export const getRequestId = () => contextStorage.getStore()?.requestId;
 export const getTenantId = () => contextStorage.getStore()?.tenantId;
+
+/**
+ * Starts a standalone lightweight HTTP server to export Prometheus registry metrics
+ * to external scrapers (e.g. Prometheus Server) on a dedicated port.
+ */
+export const startMetricsServer = (port: number): Promise<http.Server> => {
+    return new Promise((resolve) => {
+        const server = http.createServer(async (req, res) => {
+            if (req.url === '/metrics') {
+                try {
+                    res.writeHead(200, { 'Content-Type': registry.contentType });
+                    res.end(await registry.metrics());
+                } catch (err) {
+                    res.writeHead(500, { 'Content-Type': 'text/plain' });
+                    res.end(String(err));
+                }
+            } else {
+                res.writeHead(404, { 'Content-Type': 'text/plain' });
+                res.end('Not Found');
+            }
+        });
+        server.listen(port, () => {
+            logger.info({ port }, 'Prometheus metrics exporter server listening');
+            resolve(server);
+        });
+    });
+};
+
+import * as crypto from 'crypto';
+
+export const httpRequestDuration = new Histogram({
+    name: 'http_request_duration_seconds',
+    help: 'Duration of HTTP requests in seconds',
+    labelNames: ['method', 'route', 'status_code'],
+    registers: [registry]
+});
+
+export const correlationMiddleware = (req: any, res: any, next: any) => {
+    const requestId = req.headers['x-request-id'] || req.headers['X-Request-ID'] || crypto.randomUUID();
+    req.headers['x-request-id'] = requestId;
+    if (res.setHeader) {
+        res.setHeader('X-Request-ID', requestId as string);
+    }
+    const store: RequestContext = {
+        requestId: requestId as string,
+        tenantId: (req.headers['x-tenant-id'] || req.headers['X-Tenant-ID']) as string,
+        userId: (req.headers['x-user-id'] || req.headers['X-User-ID']) as string,
+    };
+    contextStorage.run(store, () => {
+        next();
+    });
+};
+

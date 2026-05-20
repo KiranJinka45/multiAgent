@@ -5,7 +5,9 @@
     "rootDir": "./src",
     "composite": true,
     "declaration": true,
-    "incremental": true
+    "declarationDir": "./dist",
+    "incremental": true,
+    "noEmit": false
   },
   "include": ["src/**/*"]
 }

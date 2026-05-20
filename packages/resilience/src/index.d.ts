@@ -8,7 +8,6 @@ export * from "./classifier.js";
 export * from "./chaos.js";
 export * from "./retry.js";
 export * from "./saga.js";
-
-// 🛡️ Enterprise Platformization (Phase 3 & 4)
 export * from "./isolation/TenantExecutionController.js";
 export * from "./governance/ExecutionEconomicsEngine.js";
+//# sourceMappingURL=index.d.ts.map

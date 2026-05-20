@@ -1,28 +1,26 @@
-import type { InfraNode, InfraEdge, TopologyEvent, BlastRadiusReport, RecoverySequence } from './types.js';
-
+import { InfraNode, InfraEdge, TopologyEvent, BlastRadiusReport, RecoverySequence } from './types.js';
 /**
  * Infrastructure Knowledge Graph Engine
- * 
- * Provides a deterministic, replayable cognition substrate for 
+ *
+ * Provides a deterministic, replayable cognition substrate for
  * infrastructure topology and dependency analysis.
  */
 export class InfraGraphEngine {
-    private nodes: Map<string, InfraNode> = new Map();
-    private edges: Map<string, InfraEdge> = new Map();
-    private adjacencyList: Map<string, string[]> = new Map(); // from -> [to]
-    private inverseAdjacencyList: Map<string, string[]> = new Map(); // to -> [from] (for blast radius)
-
+    nodes = new Map();
+    edges = new Map();
+    adjacencyList = new Map(); // from -> [to]
+    inverseAdjacencyList = new Map(); // to -> [from] (for blast radius)
     /**
      * Process a signed topology event to update the graph state.
      */
-    public applyEvent(event: TopologyEvent): void {
+    applyEvent(event) {
         switch (event.type) {
             case 'ENTITY_CREATE':
-                const node = event.payload as InfraNode;
+                const node = event.payload;
                 this.nodes.set(node.id, node);
                 break;
             case 'LINK_CREATE':
-                const edge = event.payload as InfraEdge;
+                const edge = event.payload;
                 this.edges.set(edge.id, edge);
                 this.addAdjacency(edge.from, edge.to);
                 break;
@@ -47,16 +45,15 @@ export class InfraGraphEngine {
                 break;
         }
     }
-
-    private addAdjacency(from: string, to: string) {
-        if (!this.adjacencyList.has(from)) this.adjacencyList.set(from, []);
-        this.adjacencyList.get(from)!.push(to);
-
-        if (!this.inverseAdjacencyList.has(to)) this.inverseAdjacencyList.set(to, []);
-        this.inverseAdjacencyList.get(to)!.push(from);
+    addAdjacency(from, to) {
+        if (!this.adjacencyList.has(from))
+            this.adjacencyList.set(from, []);
+        this.adjacencyList.get(from).push(to);
+        if (!this.inverseAdjacencyList.has(to))
+            this.inverseAdjacencyList.set(to, []);
+        this.inverseAdjacencyList.get(to).push(from);
     }
-
-    private removeAdjacency(from: string, to: string) {
+    removeAdjacency(from, to) {
         const list = this.adjacencyList.get(from);
         if (list) {
             this.adjacencyList.set(from, list.filter(id => id !== to));
@@ -66,21 +63,19 @@ export class InfraGraphEngine {
             this.inverseAdjacencyList.set(to, invList.filter(id => id !== from));
         }
     }
-
     /**
      * Computes the Blast Radius of a failed node.
      * Identifies all downstream entities that 'DEPEND_ON' or 'RUN_ON' the target.
      */
-    public computeBlastRadius(nodeId: string): BlastRadiusReport {
-        const affected = new Set<string>();
+    computeBlastRadius(nodeId) {
+        const affected = new Set();
         const queue = [nodeId];
-        const visited = new Set<string>();
-
+        const visited = new Set();
         while (queue.length > 0) {
-            const current = queue.shift()!;
-            if (visited.has(current)) continue;
+            const current = queue.shift();
+            if (visited.has(current))
+                continue;
             visited.add(current);
-
             // Downstream nodes (nodes that depend on current)
             // This is found in the inverseAdjacencyList
             const downstream = this.inverseAdjacencyList.get(current) || [];
@@ -89,7 +84,6 @@ export class InfraGraphEngine {
                 queue.push(neighbor);
             }
         }
-
         return {
             targetId: nodeId,
             totalImpactCount: affected.size,
@@ -98,45 +92,38 @@ export class InfraGraphEngine {
             resourceStarvationRisk: []
         };
     }
-
     /**
      * Generates a deterministic recovery sequence via topological sort.
      * Higher tiers and lower dependency counts are prioritized.
      */
-    public generateRecoverySequence(): RecoverySequence {
-        const layers: string[][] = [];
-        const inDegree = new Map<string, number>();
-
+    generateRecoverySequence() {
+        const layers = [];
+        const inDegree = new Map();
         // Initialize in-degrees for all nodes
         for (const nodeId of this.nodes.keys()) {
             inDegree.set(nodeId, 0);
         }
-
         // Calculate in-degrees based on 'DEPENDS_ON' edges
         for (const edge of this.edges.values()) {
             if (edge.type === 'DEPENDS_ON') {
                 inDegree.set(edge.to, (inDegree.get(edge.to) || 0) + 1);
             }
         }
-
         // Standard Kahn's algorithm for topological sort
         let currentQueue = Array.from(inDegree.entries())
             .filter(([_, degree]) => degree === 0)
             .map(([id, _]) => id);
-
         while (currentQueue.length > 0) {
             layers.push([...currentQueue]);
-            const nextQueue: string[] = [];
-
+            const nextQueue = [];
             for (const node of currentQueue) {
                 const neighbors = this.adjacencyList.get(node) || [];
                 for (const neighbor of neighbors) {
                     // Only count DEPENDS_ON edges for sorting
                     const relevantEdge = Array.from(this.edges.values())
                         .find(e => e.from === node && e.to === neighbor && e.type === 'DEPENDS_ON');
-                    
                     if (relevantEdge) {
-                        const newDegree = inDegree.get(neighbor)! - 1;
+                        const newDegree = inDegree.get(neighbor) - 1;
                         inDegree.set(neighbor, newDegree);
                         if (newDegree === 0) {
                             nextQueue.push(neighbor);
@@ -146,19 +133,16 @@ export class InfraGraphEngine {
             }
             currentQueue = nextQueue;
         }
-
         return {
             layers,
             circularDependencies: [], // Placeholder
             estimatedRestorationTime: layers.length * 300 // Heuristic: 5 mins per layer
         };
     }
-
-    public getNodes(): InfraNode[] {
+    getNodes() {
         return Array.from(this.nodes.values());
     }
-
-    public getEdges(): InfraEdge[] {
+    getEdges() {
         return Array.from(this.edges.values());
     }
 }

@@ -1,5 +1,5 @@
 import { redis } from '@packages/utils';
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import { RateLimiterRedis } from 'rate-limiter-flexible';
 import type { Redis } from 'ioredis';
 
