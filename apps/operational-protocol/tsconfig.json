@@ -4,6 +4,7 @@
     "baseUrl": ".",
     "ignoreDeprecations": "5.0",
     "declaration": true,
+    "declarationDir": "dist",
     "outDir": "dist",
     "composite": true,
     "noEmit": false,
