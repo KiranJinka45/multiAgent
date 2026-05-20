@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-05-18T03:05:48.271Z",
+  "verdict": "VERIFIED",
+  "chainParity": "SYNCHRONIZED",
+  "localOutcome": {
+    "valid": true,
+    "durationMs": 33
+  },
+  "dbOutcome": {
+    "valid": true,
+    "count": 3,
+    "outboxLength": 0,
+    "synchronized": true,
+    "durationMs": 3792
+  },
+  "discrepancies": [],
+  "authoritativeLedgerLength": 3
+}

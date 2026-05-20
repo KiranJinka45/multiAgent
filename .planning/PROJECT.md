@@ -5,7 +5,7 @@
 ## Overview
 > **"A replayable infrastructure reliability platform focused on deterministic recovery, replay durability, operational clarity, and sustainable long-term maintenance."**
 
-Nexus ZTAN is an auditable production platform designed for long-term operational stability. It provides a cryptographically verifiable, multi-tenant environment for secure task execution and reliable system operation.
+Nexus ZTAN is an auditable production platform designed for long-term operational stability. It provides a tenant-partitioned operational coordination platform with cryptographic lineage validation for secure task execution and reliable system operation.
 
 ## Core Value
 **STABILITY AND SURVIVABILITY.** The system prioritizes predictable operation, reliable recovery, and maintenance simplicity.
@@ -13,50 +13,31 @@ Nexus ZTAN is an auditable production platform designed for long-term operationa
 
 ## Requirements
 
-### Validated
+### Validated Operational Baseline
 
-- ✓ **Distributed Consensus** — Raft-based linearizability across regions.
-- ✓ **Operational Stewardship** — Operational baseline and telemetry established.
-- ✓ **Enterprise Validation** — Audited, low-blast-radius production pilots.
-- ✓ **Market Validation** — Economic sustainability and governance efficiency certified.
-- ✓ **Institutional Handoff** — Mature, operator-led institutional system.
-- ✓ **Federated Scaling** — Multi-federation institutional network (V2.0).
-- ✓ **Network Sovereignty** — Decentralized network-wide governance (V2.1).
-- ✓ **Economic Finality** — Staked institutional governance and global settlement (V3.0).
-- ✓ **Adoption & Trust** — Externally trusted institutional infrastructure (V4.0).
-- ✓ **Trust Accumulation** — Longitudinal institutional trust persistence (V3.5).
-- ✓ **Adaptive Evolution** — Bounded constitutional mutation and adaptation (V2.3).
-- ✓ **Archaeology & Compression** — Forensic epoch reconstruction and lineage (V2.4).
-- ✓ **Semantic Convergence** — Civilizational semantic alignment (V2.5).
-- ✓ **Pluralistic Resilience** — Safe constitutional diversity and disagreement (V2.6).
-- ✓ **Operational Maturity** — Adversarial stress testing and pilot consolidation (V3.0).
-- ✓ **Civilization Hardening** — Operational hardening and evidence lifecycle (V4.0).
-- ✓ **Ecosystem Adoption** — Real institutional pilot network and trust history (V5.0).
-- ✓ **Adversarial Legitimacy** — Empirical legitimacy through external exposure (V6.0).
-- ✓ **Entropy Resistance** — Institutional fatigue detection and ritual integrity (V7.0).
-- ✓ **Unified Command** — Constitutionally truthful operational interface (V8.0).
-- ✓ **Production Economics** — Long-term TCO and sustainability finality.
-- ✓ **API Finality** — Stable, cryptographically secured public APIs and SDKs.
-- ✓ **Platformization** — Global observability, SRE finality, and scalability.
-- ✓ **Autonomous Ops** — AI-assisted SRE, regulatory compliance, and hardware trust.
-- ✓ **Simplification & Freeze** — Platform simplification, interop, and API freeze.
-- ✓ **Live Stewardship** — Durable operational reality achieved over 90-day window.
-- ✓ **Operational Calmness** — Platform normalized and architecture frozen.
-- ✓ **External Validation** — Independent operator verification and real usage.
-- ✓ **Real-World Operational Exposure** — Validating platform against reality.
-- ✓ **Institutional Survivability** — Certification of platform readiness.
-- ✓ **Long-Term Reliability Stewardship** — Established ongoing maintenance window.
-- ✓ **Forensic Resilience** — Validated epistemic continuity and safety invariants (IFD-001).
+- ✓ **PostgreSQL-Authoritative Coordination** — Authoritative fencing, epoch management, and transaction-locked deduplication.
+- ✓ **Cryptographic Replay Lineage Validation** — NIST P-256 asymmetric cryptographic witness ledger.
+- ✓ **Transactional Decoupling** — Durable outbox-based queueing for database synchronization.
+- ✓ **Deterministic Invariant Modeling** — Finite state space verified by TLA+ safety proofs.
+- ✓ **Physical Chaos Resilience** — 10-drill PostgreSQL pathology failover suite certified.
+- ✓ **Stewardship Observability** — High-fidelity telemetry and operational telemetry dashboards.
 
-### Status: Forensically Hardened
+## Current Milestone: Milestone 36 — Stewardship Engineering Era (v1.6.0-LTS)
 
-The platform has achieved its final architectural and operational baseline. All future work is governed by the [STEWARDSHIP_CHARTER.md](../STEWARDSHIP_CHARTER.md).
+**Goal:** Establish and validate longitudinal production durability, telemetry fidelity, invariant correctness, and threat resilience of the frozen coordination protocol.
 
-### Governing Principle
-The platform is successful when it rarely surprises operators, maintenance remains predictable, and recovery is deterministic. Success is **Operational Quietness**.
+**Target Waves:**
+* **Wave 1 — Operational Soak & Stewardship Validation**: Long-duration stability, memory patterns, WAL growth, replica lag, autovacuum containment, and compaction correctness.
+* **Wave 2 — Observability & Operational Intelligence**: Forensic-grade event lineage tracing, replay causality graphs, lease timelines, and partition dashboards.
+* **Wave 3 — Governance Hardening**: Invariant CI validation (TLA+ checkpoints), structural freeze via `CODEOWNERS`, and institutional consensus bypass controls.
+* **Wave 4 — Real PostgreSQL Pathology Testing**: Resiliency under WAL corruption, replica rewind, autovacuum freeze, checkpoint starvation, and disk saturation.
+* **Wave 5 — Performance Envelope Mapping**: Mapping empirical curves for replay throughput, recovery latencies, and fencing contention.
+* **Wave 6 — Threat Modeling & Adversarial Review**: Simulating HSM override abuse, replay poisoning, stale replica recovery, and epoch desynchronization.
 
-> **LONG-TERM STEWARDSHIP ACTIVE.** 
-> All work must now strictly adhere to the [Long-Term Operational Stewardship Charter](../STEWARDSHIP_CHARTER.md).
+### Status: Active (Stewardship Waves 1-6 Running)
+
+The platform operates on its current bounded architectural baseline. All future modifications are governed by the [INVARIANT_GOVERNANCE_CHARTER.md](../INVARIANT_GOVERNANCE_CHARTER.md) constraints.
+
 
 ### Out of Scope
 
@@ -66,12 +47,12 @@ The platform is successful when it rarely surprises operators, maintenance remai
 - **New Cognition Engines** — Prevents reintroduction of instability.
 
 ## Context
-The platform has reached **Core Architectural Stability**. The focus has shifted from technical invention to operational stewardship. Success is now defined by the measurable history of reliable operation and stable infrastructure. ZTAN is a stable production platform for the long-term execution of governed missions.
+The platform has reached **Core Architectural Stability**. The focus has shifted from technical invention to operational stewardship. Success is now defined by the measurable history of reliable operation and stable infrastructure. ZTAN is a stable production platform for the long-term execution of governed infrastructure coordination tasks.
 
 ## Constraints
 
 - **Strategic**: NO ARCHITECTURAL EXPANSION. Only operational stewardship.
-- **Safety**: High-confidence replay determinism and mission convergence.
+- **Safety**: High-confidence replay determinism and workflow convergence.
 - **Audit**: High-confidence forensic non-repudiability across decadal timelines.
 - **Tech Stack**: Frozen monorepo architecture with stable, versioned APIs.
 

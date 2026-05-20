@@ -1,0 +1,89 @@
+version: '3.9'
+
+services:
+  pg-primary:
+    image: bitnami/postgresql:15
+    container_name: pg-primary
+    environment:
+      - POSTGRESQL_REPLICATION_MODE=master
+      - POSTGRESQL_REPLICATION_USER=repl_user
+      - POSTGRESQL_REPLICATION_PASSWORD=repl_password
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_PASSWORD=password
+      - POSTGRESQL_DATABASE=multiagent
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "multiagent"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - ztan-replica-network
+
+  pg-replica-1:
+    image: bitnami/postgresql:15
+    container_name: pg-replica-1
+    environment:
+      - POSTGRESQL_REPLICATION_MODE=slave
+      - POSTGRESQL_MASTER_HOST=pg-primary
+      - POSTGRESQL_MASTER_PORT_NUMBER=5432
+      - POSTGRESQL_REPLICATION_USER=repl_user
+      - POSTQL_REPLICATION_PASSWORD=repl_password
+      - POSTGRESQL_PASSWORD=password
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - "5433:5432"
+    depends_on:
+      pg-primary:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - ztan-replica-network
+
+  pg-replica-2:
+    image: bitnami/postgresql:15
+    container_name: pg-replica-2
+    environment:
+      - POSTGRESQL_REPLICATION_MODE=slave
+      - POSTGRESQL_MASTER_HOST=pg-primary
+      - POSTGRESQL_MASTER_PORT_NUMBER=5432
+      - POSTGRESQL_REPLICATION_USER=repl_user
+      - POSTGRESQL_REPLICATION_PASSWORD=repl_password
+      - POSTGRESQL_PASSWORD=password
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - "5434:5432"
+    depends_on:
+      pg-primary:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - ztan-replica-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: ztan-redis
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - ztan-replica-network
+
+networks:
+  ztan-replica-network:
+    driver: bridge

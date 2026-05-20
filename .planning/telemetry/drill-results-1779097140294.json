@@ -1,0 +1,53 @@
+{
+  "timestamp": "2026-05-18T09:39:00.292Z",
+  "successCount": 9,
+  "failureCount": 0,
+  "totalCount": 9,
+  "results": [
+    {
+      "name": "test-lease-fencing.ts",
+      "success": true,
+      "durationMs": 18886
+    },
+    {
+      "name": "test-failure-semantics.ts",
+      "success": true,
+      "durationMs": 67243
+    },
+    {
+      "name": "test-outbox-self-healing.ts",
+      "success": true,
+      "durationMs": 19504
+    },
+    {
+      "name": "test-outbox-resilience.ts",
+      "success": true,
+      "durationMs": 18578
+    },
+    {
+      "name": "test-ledger-compaction.ts",
+      "success": true,
+      "durationMs": 23462
+    },
+    {
+      "name": "test-multi-writer.ts",
+      "success": true,
+      "durationMs": 23174
+    },
+    {
+      "name": "test-byzantine-drift.ts",
+      "success": true,
+      "durationMs": 8326
+    },
+    {
+      "name": "test-hsm-ceremony.ts",
+      "success": true,
+      "durationMs": 4983
+    },
+    {
+      "name": "test-replicated-consensus.ts",
+      "success": true,
+      "durationMs": 20506
+    }
+  ]
+}

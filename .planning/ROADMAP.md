@@ -26,72 +26,52 @@ The platform has transitioned from development to long-term operational infrastr
 - [ ] **Simplification** — Continuous removal of unused code, configs, and metrics.
 - [ ] **Evidence Collection** — Tracking actual uptime, MTTR, and maintenance burden.
 
-## Milestone 35: Infrastructure Reliability Stewardship
-The platform prioritizes longitudinal operational resilience and ecosystem survivability.
+## Milestone 36: Stewardship Engineering Era (v1.6.0-LTS)
+The platform prioritizes longitudinal operational resilience, observability, and absolute governance boundaries over feature expansion.
 
 ### Active Phases
 
 | Phase | Description | Status |
 | :--- | :--- | :--- |
-| **35-42** | **Operational Maturity & Certification** | **Complete** |
-| **43** | **Real-Time Institutional Validation & Production Reality Audit** | **Complete** |
-| **44** | **Continuous Operational Reality Testing & Failure Hardening** | **Complete** |
-### Long-Term Stewardship Era
-The platform is now in Long-Term Operational Stewardship. No further phases are planned. All work is restricted to:
-1. Incident Response
-2. Security Maintenance
-3. Ecosystem Compatibility
-4. Documentation Freshness
-5. Recovery Verification
+| **35-44** | **Infrastructure Reliability Stewardship** | **Complete** |
+| **47** | **Wave 1 — Operational Soak & Stewardship Validation** | **Active** |
+| **48** | **Wave 2 — Observability & Operational Intelligence** | **Active** |
+| **49** | **Wave 3 — Governance Hardening** | **Active** |
+| **50** | **Wave 4 — Real PostgreSQL Pathology Testing** | **Active** |
+| **51** | **Wave 5 — Performance Envelope Mapping** | **Active** |
+| **52** | **Wave 6 — Threat Modeling & Adversarial Review** | **Active** |
 
-Refer to [STEWARDSHIP_CHARTER.md](../STEWARDSHIP_CHARTER.md) for the primary directive.
+### Stewardship Engineering Waves Details
 
-### Phase 41: Real-World Operational Exposure
-**Goal:** Validate the platform against reality through external operator trials and real deployment telemetry.
-**Status**: Complete (2026-05-14)
-**Evidence**: `trials/REGISTRY.md`, `scripts/process-friction.ts`, archived subsystems.
+### Phase 47: Wave 1 — Operational Soak & Stewardship Validation
+* **Goal:** Verify long-duration stability under continuous heavy transaction loads. Monitor memory consumption patterns, WAL growth/pruning, read-replica lag, autovacuum constraints, and transactional outbox behavior during prolonged database partitions.
+* **Status:** Active
+* **Evidence:** `STEWARDSHIP_ENGINEERING_REPORT.md` (Wave 1 section), `packages/production-validation/src/stewardship-engineering-suite.ts`.
 
-### Phase 42: Operational Survivability Observation
-**Goal:** Formally observe the platform's survivability through high-stakes adversarial drills and independent auditing.
-**Status**: Complete (2026-05-14)
-**Evidence**: `INSTITUTIONAL_CERTIFICATION_REPORT.md`, `scripts/verify-bundle.ts`, `scripts/simulate-adversity.sh`.
+### Phase 48: Wave 2 — Observability & Operational Intelligence
+* **Goal:** Realize high-fidelity event lineage tracing and replay causality graphing. Establish telemetry for lease timelines, partition health metrics, lost-ACK retries, and fencing reject events.
+* **Status:** Active
+* **Evidence:** `STEWARDSHIP_ENGINEERING_REPORT.md` (Wave 2 section), observability dashboard metrics.
 
-### Phase 43: Real-Time Operational Validation & Production Reality Audit
-**Goal:** Perform a REAL end-to-end operational validation of the entire Nexus ZTAN platform against live infrastructure and workflows.
-**Status**: Complete (2026-05-15)
-**Evidence**: `VALIDATION_REPORT.md`, `DASHBOARD.html`, `archive/recovery_replays/`.
+### Phase 49: Wave 3 — Governance Hardening
+* **Goal:** Harden operational and socio-technical boundaries. Set up mandatory invariant checking, reject unauthorized state machine transitions, and constitutionalize `INVARIANT_GOVERNANCE_CHARTER.md` under automated CI verification rules.
+* **Status:** Active
+* **Evidence:** `STEWARDSHIP_ENGINEERING_REPORT.md` (Wave 3 section), TLA+ validation checkpoints.
 
-### Phase 44: Continuous Operational Reality Testing & Failure Hardening
-**Goal:** Transform ZTAN into a continuously validated operational system through repeated failure injection and longitudinal trust accumulation.
-**Status**: Complete (2026-05-15)
-**Evidence**: `FAILURE_HARDENING_REPORT.md`, `DASHBOARD.html`, `scripts/continuous-validation-engine.ts`.
+### Phase 50: Wave 4 — Real PostgreSQL Pathology Testing
+* **Goal:** Harden ZTAN against catastrophic database level failures. Inject WAL corruption, simulated replica rewinds, failover under autovacuum freeze, checkpoint starvation, and fsync stalling.
+* **Status:** Active
+* **Evidence:** `STEWARDSHIP_ENGINEERING_REPORT.md` (Wave 4 section).
 
-### Long-Term Operational Stewardship & Discipline
-**Goal:** Maintain ZTAN as a continuously validated, trustworthy infrastructure system through disciplined stewardship, simplification, and long-term reliability engineering.
-**Status**: Active (2026-05-16)
-**Evidence**: `STEWARDSHIP_CHARTER.md`, continuous reliability reports, and operational calmness metrics.
+### Phase 51: Wave 5 — Performance Envelope Mapping
+* **Goal:** Map the absolute empirical capacity boundaries. Identify throughput thresholds for recovery replay, log compaction latency under high memory saturation, and lease acquisition contention limits.
+* **Status:** Active
+* **Evidence:** `STEWARDSHIP_ENGINEERING_REPORT.md` (Wave 5 section).
 
-### Long-Term Reliability Stewardship Window (Active)
-
-**Goal:** Proving that Nexus ZTAN can remain operationally stable, understandable, maintainable, and trustworthy across years of real infrastructure entropy.
-**Objective:** Transition Nexus ZTAN into long-term reliability stewardship through long-duration quiet operation, passive infrastructure observation, and strict complexity relapse prevention.
-**Scope:**
-- Passive Operational Observation (Longitudinal)
-- Operational Friction Discovery
-- Replay Longevity Validation
-- Complexity Relapse Prevention
-- Maintenance Sustainability
-- Multi-Team Aging Validation
-
-**Status**: Active (2026-05-16)
-**Evidence**: `reports/stewardship/`, `PRODUCTION_STEWARDSHIP_RECORD.md`.
-### Stewardship Observation & Refinement Cycle (2026-Q2)
-The current focus is on passive observation and evidence-driven refinements to ensure decadal sustainability.
-
-Plans:
-- [x] Longitudinal Reliability Observation (High-Confidence)
-- [x] Dashboard Simplification for Operator Clarity
-- [x] Incremental Refinement Reporting (Evidence-Triggered)
+### Phase 52: Wave 6 — Threat Modeling & Adversarial Review
+* **Goal:** Simulate and prevent sophisticated security drift or credential override attacks, covering lease desynchronization, stale replica recovery, quarantine bypass, and replay poisoning.
+* **Status:** Active
+* **Evidence:** `STEWARDSHIP_ENGINEERING_REPORT.md` (Wave 6 section).
 
 ---
 ## Historical Milestones
