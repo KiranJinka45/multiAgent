@@ -268,3 +268,43 @@ model IntelligenceROI {
   @@unique([id])
   @@index([tenantId])
 }
+
+model ZtanLedgerBlock {
+  id        Int      @id @default(autoincrement())
+  blockId   String   @unique
+  prevHash  String
+  hash      String
+  type      String
+  payload   String   // Stores alphabetically normalized JCS string
+  operator  String
+  signature String   // Base64 NIST P-256 signature
+  status    String   // VERIFIED, UNVERIFIED, CONFLICT
+  epoch     String
+  createdAt DateTime @default(now())
+
+  @@index([epoch])
+  @@index([status])
+}
+
+model ZtanWalLog {
+  id        Int      @id @default(autoincrement())
+  seq       Int      @unique
+  type      String
+  payload   String   // Event payload body
+  status    String   // PENDING, COMMITTED
+  createdAt DateTime @default(now())
+
+  @@index([seq])
+  @@index([status])
+}
+
+model ZtanSnapshot {
+  id        String   @id @default(uuid())
+  epoch     Int      @unique
+  lastSeq   Int
+  lastHash  String
+  stateData String   // JSON-stringified state Representation
+  createdAt DateTime @default(now())
+
+  @@index([epoch])
+}
