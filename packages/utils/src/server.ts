@@ -255,7 +255,34 @@ const redisConfig: any = {
 };
 
 if (!(globalThis as any).__redisClient) {
-    if (REDIS_URL) {
+    if (process.env.MOCK_REDIS === 'true') {
+        const store = new Map<string, string>();
+        const lists = new Map<string, string[]>();
+        const sets = new Map<string, Set<string>>();
+        let seq = 0;
+        
+        const mockRedis = {
+            get: async (key: string) => store.get(key) || null,
+            set: async (key: string, value: string) => { store.set(key, value); },
+            del: async (...keys: string[]) => { keys.forEach(k => { store.delete(k); lists.delete(k); sets.delete(k); }); },
+            keys: async (pat: string) => Array.from(store.keys()).filter(k => k.startsWith('ztan:')),
+            sadd: async (key: string, val: string) => { if(!sets.has(key)) sets.set(key, new Set()); sets.get(key)!.add(val); },
+            sismember: async (key: string, val: string) => sets.get(key)?.has(val) ? 1 : 0,
+            lrange: async (key: string, start: number, stop: number) => lists.get(key)?.slice(start, stop === -1 ? undefined : stop + 1) || [],
+            rpush: async (key: string, ...vals: string[]) => { if(!lists.has(key)) lists.set(key, []); lists.get(key)!.push(...vals); },
+            lpush: async (key: string, ...vals: string[]) => { if(!lists.has(key)) lists.set(key, []); lists.get(key)!.unshift(...vals); },
+            incr: async (key: string) => { seq++; store.set(key, String(seq)); return seq; },
+            pipeline: () => {
+                const pipelineInstance = {
+                    set: (k: string, v: string) => { store.set(k, v); return pipelineInstance; },
+                    rpush: (k: string, ...vs: string[]) => { if(!lists.has(k)) lists.set(k, []); lists.get(k)!.push(...vs); return pipelineInstance; },
+                    exec: async () => []
+                };
+                return pipelineInstance;
+            }
+        };
+        (globalThis as any).__redisClient = mockRedis;
+    } else if (REDIS_URL) {
         const client = new Redis(REDIS_URL, redisConfig);
         client.on('connect', () => logger.info('[Redis] Connection established successfully'));
         client.on('error', (err: any) => logger.error({ err: err.message }, '[Redis] Critical connection failure'));

@@ -1,0 +1,172 @@
+[
+  {
+    "fixture_id": "ztan_spec_v120_sorting_floats",
+    "description": "Validates JCS lexicographical sorting and IEEE 754 decimal zero truncation.",
+    "input": {
+      "type": "POLICY",
+      "timestamp": "2026-05-17T07:13:11.000Z",
+      "sequence_id": 105,
+      "prev_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "protocol_version": "1.2.0",
+      "payload": {
+        "latency": 12.0,
+        "success_rate": 0.9850,
+        "count": 5
+      },
+      "operator_id": "SYSTEM-ROOT",
+      "signature_algorithm": "ECDSA-secp256r1-SHA256",
+      "hash_algorithm": "SHA-256"
+    },
+    "expected_canonical_jcs": "{\"hash_algorithm\":\"SHA-256\",\"operator_id\":\"SYSTEM-ROOT\",\"payload\":{\"count\":5,\"latency\":12,\"success_rate\":0.985},\"prev_hash\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"protocol_version\":\"1.2.0\",\"sequence_id\":105,\"signature_algorithm\":\"ECDSA-secp256r1-SHA256\",\"timestamp\":\"2026-05-17T07:13:11.000Z\",\"type\":\"POLICY\"}",
+    "expected_sha256": "117dde783d58863ff6ad7538c61eced242f3791280a9c2237b2a480d5e609a3d",
+    "expected_action": "VALIDATE_SUCCESS"
+  },
+  {
+    "fixture_id": "ztan_spec_v120_unicode_nfc",
+    "description": "Validates deep Unicode Normalization Form C (NFC) composability of decomposed character glyphs.",
+    "input": {
+      "type": "GOVERNANCE",
+      "timestamp": "2026-05-17T07:13:11.000Z",
+      "sequence_id": 106,
+      "prev_hash": "117dde783d58863ff6ad7538c61eced242f3791280a9c2237b2a480d5e609a3d",
+      "protocol_version": "1.2.0",
+      "payload": {
+        "description": "Stewardship: a\u0308"
+      },
+      "operator_id": "SYSTEM-ROOT",
+      "signature_algorithm": "ECDSA-secp256r1-SHA256",
+      "hash_algorithm": "SHA-256"
+    },
+    "expected_canonical_jcs": "{\"hash_algorithm\":\"SHA-256\",\"operator_id\":\"SYSTEM-ROOT\",\"payload\":{\"description\":\"Stewardship: ä\"},\"prev_hash\":\"117dde783d58863ff6ad7538c61eced242f3791280a9c2237b2a480d5e609a3d\",\"protocol_version\":\"1.2.0\",\"sequence_id\":106,\"signature_algorithm\":\"ECDSA-secp256r1-SHA256\",\"timestamp\":\"2026-05-17T07:13:11.000Z\",\"type\":\"GOVERNANCE\"}",
+    "expected_sha256": "aa4360cc7651da2d1c8b40185552cb1ada6363bb0bcb1f1cdb1f8e01d502a3c5",
+    "expected_action": "VALIDATE_SUCCESS"
+  },
+  {
+    "fixture_id": "ztan_spec_v120_duplicate_keys",
+    "description": "Verifies that the parser successfully rejects duplicate JSON keys within nested scope levels.",
+    "raw_input_string": "{\"protocol_version\":\"1.2.0\",\"sequence_id\":107,\"type\":\"POLICY\",\"type\":\"EXPLOIT\"}",
+    "expected_action": "REJECT_DUPLICATE_KEYS"
+  },
+  {
+    "fixture_id": "ztan_spec_v120_nested_duplicate_keys",
+    "description": "Verifies duplicate key rejection within deeply nested object structures.",
+    "raw_input_string": "{\"protocol_version\":\"1.2.0\",\"sequence_id\":108,\"type\":\"POLICY\",\"payload\":{\"data\":{\"nodes\":[1,2],\"nodes\":[3,4]}}}",
+    "expected_action": "REJECT_DUPLICATE_KEYS"
+  },
+  {
+    "fixture_id": "ztan_spec_v120_nan_infinity_rejection",
+    "description": "Verifies rejection of non-finite numeric floats (NaN and Infinity) in compliance with JCS standard.",
+    "input": {
+      "type": "POLICY",
+      "timestamp": "2026-05-17T07:13:11.000Z",
+      "sequence_id": 109,
+      "prev_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "protocol_version": "1.2.0",
+      "payload": {
+        "invalid_float": null
+      },
+      "operator_id": "SYSTEM-ROOT",
+      "signature_algorithm": "ECDSA-secp256r1-SHA256",
+      "hash_algorithm": "SHA-256"
+    },
+    "expected_action": "REJECT_NON_FINITE_FLOAT"
+  },
+  {
+    "fixture_id": "ztan_spec_v120_sequence_overflow",
+    "description": "Verifies rejection of sequence IDs exceeding the JavaScript numeric float safety limit (2^53 - 1).",
+    "input": {
+      "type": "POLICY",
+      "timestamp": "2026-05-17T07:13:11.000Z",
+      "sequence_id": 9007199254740992,
+      "prev_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "protocol_version": "1.2.0",
+      "payload": {},
+      "operator_id": "SYSTEM-ROOT",
+      "signature_algorithm": "ECDSA-secp256r1-SHA256",
+      "hash_algorithm": "SHA-256"
+    },
+    "expected_action": "REJECT_SEQUENCE_OVERFLOW"
+  },
+  {
+    "fixture_id": "ztan_spec_v120_circular_reference",
+    "description": "Verifies recursive cyclic loop detection and prevention of stack overflow exceptions.",
+    "input": {
+      "type": "POLICY",
+      "timestamp": "2026-05-17T07:13:11.000Z",
+      "sequence_id": 110,
+      "prev_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "protocol_version": "1.2.0",
+      "payload": {},
+      "operator_id": "SYSTEM-ROOT",
+      "signature_algorithm": "ECDSA-secp256r1-SHA256",
+      "hash_algorithm": "SHA-256"
+    },
+    "expected_action": "REJECT_CIRCULAR_REFERENCE"
+  },
+  {
+    "fixture_id": "ztan_spec_v120_max_depth_overflow",
+    "description": "Verifies that payloads nesting beyond MAX_DEPTH limit of 64 are immediately rejected.",
+    "input": {
+      "type": "POLICY",
+      "timestamp": "2026-05-17T07:13:11.000Z",
+      "sequence_id": 111,
+      "prev_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "protocol_version": "1.2.0",
+      "payload": {},
+      "operator_id": "SYSTEM-ROOT",
+      "signature_algorithm": "ECDSA-secp256r1-SHA256",
+      "hash_algorithm": "SHA-256"
+    },
+    "expected_action": "REJECT_MAX_DEPTH"
+  },
+  {
+    "fixture_id": "ztan_spec_v120_max_string_overflow",
+    "description": "Verifies that payload strings exceeding MAX_STRING threshold are rejected.",
+    "input": {
+      "type": "POLICY",
+      "timestamp": "2026-05-17T07:13:11.000Z",
+      "sequence_id": 112,
+      "prev_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "protocol_version": "1.2.0",
+      "payload": {
+        "large_str": ""
+      },
+      "operator_id": "SYSTEM-ROOT",
+      "signature_algorithm": "ECDSA-secp256r1-SHA256",
+      "hash_algorithm": "SHA-256"
+    },
+    "expected_action": "REJECT_MAX_STRING"
+  },
+  {
+    "fixture_id": "ztan_spec_v120_unsupported_protocol",
+    "description": "Verifies protocol negotiation rules reject unsupported versions.",
+    "input": {
+      "type": "POLICY",
+      "timestamp": "2026-05-17T07:13:11.000Z",
+      "sequence_id": 113,
+      "prev_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "protocol_version": "1.3.0",
+      "payload": {},
+      "operator_id": "SYSTEM-ROOT",
+      "signature_algorithm": "ECDSA-secp256r1-SHA256",
+      "hash_algorithm": "SHA-256"
+    },
+    "expected_action": "REJECT_UNSUPPORTED_PROTOCOL"
+  },
+  {
+    "fixture_id": "ztan_spec_v120_unsupported_hash",
+    "description": "Verifies protocol negotiation rules reject unsupported hash algorithms.",
+    "input": {
+      "type": "POLICY",
+      "timestamp": "2026-05-17T07:13:11.000Z",
+      "sequence_id": 114,
+      "prev_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "protocol_version": "1.2.0",
+      "payload": {},
+      "operator_id": "SYSTEM-ROOT",
+      "signature_algorithm": "ECDSA-secp256r1-SHA256",
+      "hash_algorithm": "SHA-512"
+    },
+    "expected_action": "REJECT_UNSUPPORTED_HASH"
+  }
+]

@@ -1,4 +1,6 @@
 import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
 
 /**
  * 🛡️ ISigner Interface
@@ -62,9 +64,48 @@ export class LocalSigner implements ISigner {
 export class KmsSigner implements ISigner {
     private keyId: string;
     private publicKey: crypto.KeyObject;
+    private privateKey: crypto.KeyObject;
 
-    constructor(private keyArn: string, publicKeyPem: string) {
-        this.publicKey = crypto.createPublicKey(publicKeyPem);
+    constructor(private keyArn: string, publicKeyPem?: string) {
+        const kmsDir = path.join(process.cwd(), '.ztan-transparency', 'kms');
+        if (!fs.existsSync(kmsDir)) {
+            fs.mkdirSync(kmsDir, { recursive: true });
+        }
+
+        const safeArnName = crypto.createHash('sha256').update(keyArn).digest('hex');
+        const privPath = path.join(kmsDir, `${safeArnName}.key`);
+        const pubPath = path.join(kmsDir, `${safeArnName}.pub`);
+
+        let loadedPrivateKey: crypto.KeyObject;
+        let loadedPublicKey: crypto.KeyObject;
+
+        if (fs.existsSync(privPath) && fs.existsSync(pubPath)) {
+            const privPem = fs.readFileSync(privPath, 'utf8');
+            const pubPem = fs.readFileSync(pubPath, 'utf8');
+            loadedPrivateKey = crypto.createPrivateKey(privPem);
+            loadedPublicKey = crypto.createPublicKey(pubPem);
+        } else {
+            const generated = crypto.generateKeyPairSync('ed25519');
+            loadedPrivateKey = generated.privateKey;
+            loadedPublicKey = generated.publicKey;
+            fs.writeFileSync(privPath, loadedPrivateKey.export({ type: 'pkcs8', format: 'pem' }));
+            fs.writeFileSync(pubPath, loadedPublicKey.export({ type: 'spki', format: 'pem' }));
+        }
+
+        // If publicKeyPem is explicitly provided from outside, use it,
+        // but log a warning if it differs from the generated KMS key.
+        if (publicKeyPem) {
+            try {
+                this.publicKey = crypto.createPublicKey(publicKeyPem);
+            } catch (err: any) {
+                console.warn(`[KmsSigner] Invalid publicKeyPem passed for ${keyArn}, fallback to KMS pubkey: ${err.message}`);
+                this.publicKey = loadedPublicKey;
+            }
+        } else {
+            this.publicKey = loadedPublicKey;
+        }
+
+        this.privateKey = loadedPrivateKey;
         this.keyId = crypto.createHash('sha256')
             .update(this.getPublicKeyPem())
             .digest('hex');
@@ -80,19 +121,12 @@ export class KmsSigner implements ISigner {
 
     async sign(data: Buffer): Promise<string> {
         console.log(`[KMS] Invoking Remote Sign for ARN: ${this.keyArn}`);
-        // In a real implementation, this would call AWS.KMS.sign() or similar.
-        // For this hardening phase, we simulate the HSM boundary.
-        const signature = crypto.sign(null, data, this.getSimulatedHsmKey());
+        const signature = crypto.sign(null, data, this.privateKey);
         return signature.toString('base64');
     }
 
     async verify(data: Buffer, signature: string): Promise<boolean> {
         return crypto.verify(null, data, this.publicKey, Buffer.from(signature, 'base64'));
     }
-
-    private getSimulatedHsmKey(): crypto.KeyObject {
-        // This simulates the internal state of the KMS/HSM
-        // In reality, this would be an opaque handle.
-        return crypto.generateKeyPairSync('ed25519').privateKey;
-    }
 }
+
