@@ -9,12 +9,45 @@ export enum ParserState {
     Reject = 'Reject',
 }
 
+function getParserStateGrammar(state: ParserState): string {
+    return `STATE:${state}`;
+}
+
 export type Utf8DecoderState = 
     | { type: 'Complete' }
     | { type: 'AwaitingContinuation', pendingBytes: number }
     | { type: 'Invalid' };
 
+/**
+ * Normalizes the Utf8DecoderState into a strictly canonical string representation
+ * matching the Rust DVK exactly: "UTF8:Complete", "UTF8:AwaitingContinuation:1", "UTF8:Invalid".
+ */
+function getUtf8StateGrammar(state: Utf8DecoderState): string {
+    switch (state.type) {
+        case 'Complete':
+            return 'UTF8:Complete';
+        case 'Invalid':
+            return 'UTF8:Invalid';
+        case 'AwaitingContinuation':
+            return `UTF8:AwaitingContinuation:${state.pendingBytes}`;
+    }
+}
+
+export enum TransitionReason {
+    ChunkIngress = 'ChunkIngress',
+    Utf8ContinuationEnter = 'Utf8ContinuationEnter',
+    Utf8ContinuationExit = 'Utf8ContinuationExit',
+    EscapeEnter = 'EscapeEnter',
+    EscapeExit = 'EscapeExit',
+    FsmReject = 'FsmReject',
+}
+
+function getReasonGrammar(reason: TransitionReason): string {
+    return `REASON:${reason}`;
+}
+
 export interface ParserSnapshot {
+    reason: TransitionReason;
     parser_state: ParserState;
     utf8_state: Utf8DecoderState;
     current_offset: number;
@@ -33,21 +66,7 @@ export interface ReplayArtifact {
     snapshots: ParserSnapshot[];
     final_state: ParserState;
     result: string;
-}
-
-/**
- * Normalizes the Utf8DecoderState into a strictly canonical string representation
- * matching the Rust DVK exactly: "Complete", "AwaitingContinuation(N)", "Invalid".
- */
-function canonicalizeUtf8State(state: Utf8DecoderState): string {
-    switch (state.type) {
-        case 'Complete':
-            return 'Complete';
-        case 'Invalid':
-            return 'Invalid';
-        case 'AwaitingContinuation':
-            return `AwaitingContinuation(${state.pendingBytes})`;
-    }
+    first_divergence_snapshot_index?: number;
 }
 
 /**
@@ -57,8 +76,8 @@ function canonicalizeUtf8State(state: Utf8DecoderState): string {
 export function generateSemanticHash(snapshot: ParserSnapshot): string {
     // We use a deterministic delimited serialization format.
     // Excludes all heap addresses, allocation counts, and environment noise.
-    // The format string explicitly aligns with the Rust macro: "v1|Normal|Complete|0|||false|0|0"
-    const canonicalRepr = `v${SNAPSHOT_SCHEMA_VERSION}|${snapshot.parser_state}|${canonicalizeUtf8State(snapshot.utf8_state)}|${snapshot.current_offset}|${snapshot.current_field}|${snapshot.current_token}|${snapshot.escape_active}|${snapshot.bytes_processed}|${snapshot.chunk_index}`;
+    // The format string explicitly aligns with the Rust macro exactly.
+    const canonicalRepr = `v${SNAPSHOT_SCHEMA_VERSION}|${getReasonGrammar(snapshot.reason)}|${getParserStateGrammar(snapshot.parser_state)}|${getUtf8StateGrammar(snapshot.utf8_state)}|${snapshot.current_offset}|${snapshot.current_field}|${snapshot.current_token}|${snapshot.escape_active}|${snapshot.bytes_processed}|${snapshot.chunk_index}`;
 
     return createHash('sha256').update(canonicalRepr).digest('hex');
 }

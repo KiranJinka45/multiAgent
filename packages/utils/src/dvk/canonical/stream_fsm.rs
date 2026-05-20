@@ -1,4 +1,4 @@
-use crate::dvk::replay::snapshot::{ParserSnapshot, ParserState, Utf8DecoderState};
+use crate::dvk::replay::snapshot::{ParserSnapshot, ParserState, TransitionReason, Utf8DecoderState};
 
 /// Defines hard resource limits for replay observability telemetry
 /// to prevent memory amplification during pathological fuzz paths.
@@ -36,13 +36,14 @@ impl StreamFsm {
     }
 
     #[cfg(feature = "snapshot-observability")]
-    fn emit_snapshot(&mut self) {
+    fn emit_snapshot(&mut self, reason: TransitionReason) {
         if self.snapshots.len() >= MAX_SNAPSHOTS_PER_PARSE {
             // Hard budget limit reached.
             return;
         }
 
         let snapshot = ParserSnapshot {
+            reason,
             parser_state: self.parser_state.clone(),
             utf8_state: self.utf8_state.clone(),
             current_offset: self.current_offset,
@@ -57,12 +58,12 @@ impl StreamFsm {
 
     #[cfg(not(feature = "snapshot-observability"))]
     #[inline(always)]
-    fn emit_snapshot(&mut self) {}
+    fn emit_snapshot(&mut self, _reason: TransitionReason) {}
 
     pub fn process_chunk(&mut self, chunk: &[u8]) {
         // HOOK: Chunk Ingress
         self.chunk_index += 1;
-        self.emit_snapshot();
+        self.emit_snapshot(TransitionReason::ChunkIngress);
 
         for &byte in chunk {
             self.bytes_processed += 1;
@@ -78,11 +79,11 @@ impl StreamFsm {
                     if self.escape_active {
                         // HOOK: Escape-state exit
                         self.escape_active = false;
-                        self.emit_snapshot();
+                        self.emit_snapshot(TransitionReason::EscapeExit);
                     } else if byte == b'\\' {
                         // HOOK: Escape-state entry
                         self.escape_active = true;
-                        self.emit_snapshot();
+                        self.emit_snapshot(TransitionReason::EscapeEnter);
                     } else if byte == b'"' {
                         self.parser_state = ParserState::Normal;
                     } else {
@@ -91,10 +92,10 @@ impl StreamFsm {
                         if byte >= 0x80 {
                             if self.utf8_state == Utf8DecoderState::Complete {
                                 self.utf8_state = Utf8DecoderState::AwaitingContinuation(1);
-                                self.emit_snapshot();
+                                self.emit_snapshot(TransitionReason::Utf8ContinuationEnter);
                             } else {
                                 self.utf8_state = Utf8DecoderState::Complete;
-                                self.emit_snapshot();
+                                self.emit_snapshot(TransitionReason::Utf8ContinuationExit);
                             }
                         }
                     }
