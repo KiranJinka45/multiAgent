@@ -18,7 +18,16 @@
     "paths": {
       "@packages/frontend-shared": ["packages/frontend-shared/src/index.ts"],
       "@packages/ztan-crypto": ["packages/ztan-crypto/src/index.ts"],
-      "@packages/utils": ["packages/utils/src/index.ts"]
+      "@packages/utils": ["packages/utils/src/index.ts"],
+      "@packages/contracts": ["packages/contracts/src/index.ts"],
+      "@packages/observability": ["packages/observability/dist/index.d.ts"],
+      "@packages/config": ["packages/config/dist/index.d.ts"],
+      "@packages/business": ["packages/business/src/index.ts"],
+      "@packages/auth-internal": ["packages/auth-internal/src/index.ts"],
+      "@packages/db": ["packages/db/src/index.ts"],
+      "@packages/infra-graph": ["packages/infra-graph/src/index.ts"],
+      "@packages/autonomous-ops": ["packages/autonomous-ops/src/index.ts"],
+      "@packages/resilience": ["packages/resilience/src/index.ts"]
     }
   }
 }
