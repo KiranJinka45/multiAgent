@@ -58,15 +58,34 @@ export interface ParserSnapshot {
     chunk_index: number;
 }
 
+export enum ReplayClassification {
+    FullParity = 'FullParity',
+    SemanticDivergence = 'SemanticDivergence',
+    CadenceDivergence = 'CadenceDivergence',
+    TransitionDivergence = 'TransitionDivergence',
+    RejectOrderDivergence = 'RejectOrderDivergence',
+    ResourceProfileDivergence = 'ResourceProfileDivergence',
+}
+
 export interface ReplayArtifact {
     schema_version: number;
     runtime: string;
     seed: string;
     chunks: string[];
     snapshots: ParserSnapshot[];
+    trace_digest: string;
     final_state: ParserState;
     result: string;
     first_divergence_snapshot_index?: number;
+    classification: ReplayClassification;
+}
+
+export function computeTraceDigest(snapshots: ParserSnapshot[]): string {
+    const hasher = createHash('sha256');
+    for (const snap of snapshots) {
+        hasher.update(generateSemanticHash(snap));
+    }
+    return hasher.digest('hex');
 }
 
 /**

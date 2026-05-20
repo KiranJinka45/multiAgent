@@ -105,6 +105,16 @@ impl ParserSnapshot {
     }
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+pub enum ReplayClassification {
+    FullParity,
+    SemanticDivergence,
+    CadenceDivergence,
+    TransitionDivergence,
+    RejectOrderDivergence,
+    ResourceProfileDivergence,
+}
+
 /// The standard determinist replay artifact.
 /// This acts as a reproducible scientific record of a fuzzing divergence.
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -114,6 +124,19 @@ pub struct ReplayArtifact {
     pub seed: String,
     pub chunks: Vec<String>,
     pub snapshots: Vec<ParserSnapshot>,
+    pub trace_digest: String,
     pub final_state: ParserState,
     pub result: String,
+    pub first_divergence_snapshot_index: Option<usize>,
+    pub classification: ReplayClassification,
+}
+
+impl ReplayArtifact {
+    pub fn compute_trace_digest(&self) -> String {
+        let mut hasher = Sha256::new();
+        for snap in &self.snapshots {
+            hasher.update(snap.semantic_hash().as_bytes());
+        }
+        format!("{:x}", hasher.finalize())
+    }
 }
