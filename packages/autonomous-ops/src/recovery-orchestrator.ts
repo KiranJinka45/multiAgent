@@ -1,6 +1,4 @@
-import { StructuredLogger } from '@packages/observability/src/structured-logger.js';
-
-const logger = new StructuredLogger('recovery-orchestrator');
+import { logger } from '@packages/observability';
 
 /**
  * RecoveryOrchestrator
@@ -8,7 +6,7 @@ const logger = new StructuredLogger('recovery-orchestrator');
  */
 export class RecoveryOrchestrator {
     static async executeRemediation(planId: string, action: string, target: string): Promise<boolean> {
-        logger.info(`Executing autonomous remediation: ${action} on ${target}`, { planId });
+        logger.info({ planId }, `Executing autonomous remediation: ${action} on ${target}`);
         
         // Mock: Execution logic
         switch (action) {

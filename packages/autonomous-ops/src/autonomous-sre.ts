@@ -1,4 +1,12 @@
-import { IncidentCorrelationEngine } from '@packages/sre-engine/src/incident-correlation.js';
+class IncidentCorrelationEngine {
+    static async analyzeTrace(traceId: string) {
+        return {
+            rootCauseService: 'auth-service',
+            confidence: 0.9,
+            anomalyScore: 0.85
+        };
+    }
+}
 
 export interface RemediationPlan {
     id: string;

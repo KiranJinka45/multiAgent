@@ -7,25 +7,28 @@
     "noEmit": false,
     "baseUrl": ".",
     "paths": {
-      "@packages/sre-engine": [
-        "../sre-engine/src"
+      "@packages/observability": [
+        "../observability/src/index.ts"
       ],
-      "@packages/resilience": [
-        "../resilience/src"
+      "@packages/infra-graph": [
+        "../infra-graph/src/index.ts"
       ],
-      "@packages/utils": [
-        "../utils/src"
+      "@packages/db": [
+        "../db/src/index.ts"
       ]
     },
     "incremental": true,
     "rootDir": "src"
   },
   "include": [
-    "src*"
+    "src"
   ],
   "references": [
     {
       "path": "../utils"
+    },
+    {
+      "path": "../infra-graph"
     }
   ]
 }
