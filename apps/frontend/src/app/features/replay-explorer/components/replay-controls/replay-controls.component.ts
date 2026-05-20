@@ -1,6 +1,6 @@
 import { Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SreDataService } from '../../core/services/sre-data.service';
+import { SreDataService } from '../../../../core/services/sre-data.service';
 import { RollbackImpactPanelComponent } from '../rollback-impact-panel/rollback-impact-panel.component';
 import { RollbackImpactAssessment } from '@packages/contracts';
 

@@ -41,7 +41,7 @@ export const routes: Routes = [
       },
       {
         path: 'stewardship',
-        loadComponent: () => import('./features/ztan/trust-dashboard.component').then(m => m.ZtanTrustDashboardComponent)
+        loadComponent: () => import('./features/ztan/trust-dashboard.component').then(m => m.StewardshipHubComponent)
       },
       {
         path: 'audit',
@@ -59,7 +59,7 @@ export const routes: Routes = [
       },
       {
         path: 'ztan/stability',
-        loadComponent: () => import('./features/ztan/trust-dashboard.component').then(m => m.ZtanTrustDashboardComponent)
+        loadComponent: () => import('./features/ztan/trust-dashboard.component').then(m => m.StewardshipHubComponent)
       }
     ]
   }

@@ -14,7 +14,13 @@
     "experimentalDecorators": true,
     "useDefineForClassFields": true,
     "types": [],
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@packages/contracts": ["../../packages/contracts/src/index.ts"],
+      "@packages/observability": ["../../packages/observability/src/index.ts"],
+      "rxjs": ["node_modules/rxjs"],
+      "rxjs/*": ["node_modules/rxjs/*"]
+    }
   },
   "angularCompilerOptions": {
     "strictTemplates": false
@@ -27,7 +33,6 @@
   ],
   "exclude": [
     "**/*.spec.ts",
-    "../../packages",
     "../../apps/api",
     "../../apps/core-api",
     "../../apps/worker",

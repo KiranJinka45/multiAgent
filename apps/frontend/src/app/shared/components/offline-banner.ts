@@ -9,7 +9,7 @@ import { WebsocketService } from '../../core/services/websocket.service';
   template: `
     <div class="offline-banner" *ngIf="!(isConnected$ | async)">
       <span class="icon">⚠️</span>
-      <span class="message">Connection to control plane lost. Reconnecting...</span>
+      <span class="message">AUTHORITATIVE BACKEND UNREACHABLE — READ-ONLY LOCAL CACHE MODE</span>
     </div>
   `,
   styles: [`

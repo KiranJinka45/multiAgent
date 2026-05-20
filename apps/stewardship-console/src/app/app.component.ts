@@ -57,6 +57,11 @@ import { StewardshipService } from './stewardship.service';
         </div>
       </header>
 
+      <div class="degraded-authority-banner" *ngIf="(state$ | async)?.isOfflineMode">
+        <span class="banner-icon">⚠️</span>
+        <span class="banner-text"><strong>DEGRADED AUTHORITY / OFFLINE SIMULATION ACTIVE</strong> — Epistemic state is running locally. Connection to the authoritative backend ZTAN ledger has eroded.</span>
+      </div>
+
       <div class="main-body">
         <!-- LEFT OPERATIONAL NAVIGATION -->
         <nav class="side-nav">
@@ -201,9 +206,34 @@ import { StewardshipService } from './stewardship.service';
 
     .module-surface { flex: 1; overflow: hidden; background: var(--bg-surface); }
 
+    .degraded-authority-banner {
+      background: linear-gradient(90deg, #78350f 0%, #451a03 100%);
+      border-bottom: 1px solid #b45309;
+      color: #fef3c7;
+      padding: 0.5rem 1.5rem;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      animation: alertPulse 2s infinite alternate;
+      font-family: 'JetBrains Mono', monospace;
+      flex-shrink: 0;
+    }
+    .banner-icon {
+      font-size: 0.95rem;
+    }
+    .banner-text strong {
+      color: #fbbf24;
+      letter-spacing: 0.05em;
+    }
+
     @keyframes flash {
       from { opacity: 0.4; }
       to { opacity: 1; }
+    }
+    @keyframes alertPulse {
+      from { background: linear-gradient(90deg, #78350f 0%, #451a03 100%); }
+      to { background: linear-gradient(90deg, #92400e 0%, #78350f 100%); }
     }
   `]
 })

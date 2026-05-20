@@ -10,6 +10,7 @@
     "jsx": "react-jsx",
     "declarationMap": true,
     "declaration": true,
+    "declarationDir": "dist",
     "composite": true,
     "noEmit": false,
     "skipLibCheck": true,

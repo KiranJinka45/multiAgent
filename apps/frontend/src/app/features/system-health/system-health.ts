@@ -56,12 +56,12 @@ import { Subscription } from 'rxjs';
 
         <div class="sre-dashboard">
           <div class="main-column">
-            <!-- Control Plane Status -->
+            <!-- Coordination System Status -->
             <div class="control-plane-card card" [class.incident]="metrics.mode === 'INCIDENT'" [class.recovering]="metrics.mode === 'RECOVERING'">
               <div class="cp-header">
                 <div class="cp-title">
                   <span class="icon">{{ metrics.mode === 'INCIDENT' ? '🚨' : (metrics.mode === 'RECOVERING' ? '⏳' : '🛡️') }}</span>
-                  <h3>Autonomous Control Plane</h3>
+                  <h3>Authoritative Coordination Engine</h3>
                 </div>
                 <div class="mode-badge" [class]="metrics.mode?.toLowerCase() || 'normal'">
                   {{ metrics.mode || 'NORMAL' }} MODE
@@ -198,11 +198,11 @@ import { Subscription } from 'rxjs';
           </div>
 
           <div class="sidebar-column">
-            <!-- AI Intelligence Control -->
+            <!-- SRE Telemetry Signals -->
             <div class="intelligence-card card" [class.anomaly]="metrics.intelligence?.lastAnomaly">
               <div class="intel-header">
                 <span class="icon">🧠</span>
-                <h3>AI SRE Intelligence</h3>
+                <h3>SRE Telemetry Signals</h3>
               </div>
               <div class="intel-body">
                 <div class="anomaly-display" *ngIf="metrics.intelligence?.lastAnomaly; else noAnomaly">
@@ -282,11 +282,11 @@ import { Subscription } from 'rxjs';
               </div>
             </div>
 
-            <!-- AI Policy Evolution -->
+            <!-- SRE Protection Policy -->
             <div class="evolution-card card" *ngIf="metrics.intelligence?.evolution">
               <div class="card-header">
-                <h3>AI Policy Evolution</h3>
-                <span class="cycle-tag">CYCLE {{ metrics.intelligence?.evolution?.cycle || 0 }}</span>
+                <h3>Static Guardrail Configuration</h3>
+                <span class="cycle-tag">VERSION {{ metrics.intelligence?.evolution?.cycle || 0 }}</span>
               </div>
               <div class="evolution-stats">
                 <div class="stat-main">
@@ -305,7 +305,7 @@ import { Subscription } from 'rxjs';
               </div>
               <div class="evolution-status">
                 <span class="pulse-icon"></span>
-                Self-Training Active in Digital Twin
+                Static Rules Loaded in Digital Twin
               </div>
             </div>
 
@@ -321,7 +321,7 @@ import { Subscription } from 'rxjs';
         <div class="modal-header">
           <div class="header-main">
             <span class="icon">🔬</span>
-            <h2>AI Diagnostic Trace: {{ activePostMortem.incidentId }}</h2>
+            <h2>Diagnostic Trace: {{ activePostMortem.incidentId }}</h2>
           </div>
           <button class="btn-close" (click)="activePostMortem = null">×</button>
         </div>
@@ -548,7 +548,7 @@ import { Subscription } from 'rxjs';
     .worker-item.placeholder { opacity: 0.4; border-style: dashed; border-color: rgba(255,255,255,0.1); }
     .worker-status.offline { color: #64748b; }
 
-    /* AI Intelligence & Global Topology Styles */
+    /* SRE Telemetry & Global Topology Styles */
     .intelligence-card.anomaly { border-color: #f59e0b; background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(15, 23, 42, 0.95) 100%); }
     .intel-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
     .intel-header h3 { margin: 0; font-size: 1rem; color: #e2e8f0; }
@@ -802,7 +802,7 @@ export class SystemHealthComponent {
       case 'PROTECT': return 'Only critical tenant missions are accepted. Low-priority traffic is shed.';
       case 'DEGRADED': return 'System is experiencing stress. Retries are throttled and batching is increased.';
       case 'DOWN': return 'System is currently unavailable. No API or WebSocket connection.';
-      case 'UNAUTHORIZED': return 'CRITICAL: Authentication failed between control plane services.';
+      case 'UNAUTHORIZED': return 'CRITICAL: Authentication failed between authoritative coordination services.';
       default: return 'System is healthy and operating within nominal SLO parameters.';
     }
   }

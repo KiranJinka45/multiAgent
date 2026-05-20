@@ -6,7 +6,6 @@ import {
   EvidenceChain, 
   EvidenceEntry 
 } from '@packages/contracts';
-import { logger } from '@packages/observability';
 
 @Injectable({
   providedIn: 'root'
@@ -242,7 +241,7 @@ export class SreDataService {
    * REPLAY EXPLORER: Forensic Data Retrieval
    */
   public loadEvidenceChain(incidentId: string) {
-    logger.info({ incidentId }, '[SRE-FRONTEND] Requesting forensic evidence chain');
+    console.info('[SRE-FRONTEND] Requesting forensic evidence chain', { incidentId });
     this.ws.emit('sre:archaeology:load_chain', { incidentId });
     
     this.ws.onEvent<EvidenceChain>('sre:archaeology:chain_loaded').subscribe(chain => {

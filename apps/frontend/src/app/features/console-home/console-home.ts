@@ -33,7 +33,7 @@ import { RouterModule } from '@angular/router';
         </div>
         <div class="hero-right">
           <div class="intervention-status" *ngIf="metrics.mode !== 'NORMAL'">
-            <span class="pulse-label">AUTO-HEALER ACTIVE</span>
+            <span class="pulse-label">AUTOMATED SAFETY FENCING ACTIVE</span>
             <div class="progress-bar"><div class="progress-fill"></div></div>
           </div>
           <button class="op-button primary" [routerLink]="['/incidents']">
@@ -107,13 +107,13 @@ import { RouterModule } from '@angular/router';
           </div>
         </div>
 
-        <!-- Right Column: Intelligence & Topology -->
+        <!-- Right Column: Telemetry & Topology -->
         <div class="dashboard-col side-col">
-          <!-- Global Intelligence -->
+          <!-- System Telemetry -->
           <div class="op-card intelligence-card">
             <div class="card-header">
               <lucide-icon [name]="Cpu" class="header-icon"></lucide-icon>
-              <h2>GLOBAL INTELLIGENCE</h2>
+              <h2>OPERATIONAL SIGNALS</h2>
             </div>
             <div class="intel-content">
               <div class="anomaly-block" *ngIf="metrics.intelligence?.lastAnomaly as anomaly; else noAnomaly">
@@ -130,7 +130,7 @@ import { RouterModule } from '@angular/router';
               <ng-template #noAnomaly>
                 <div class="intel-nominal">
                   <lucide-icon [name]="ShieldCheck" class="nominal-icon"></lucide-icon>
-                  <p>All intelligence signals are nominal. No active deviations predicted.</p>
+                  <p>All telemetry signals are nominal. No active deviations detected.</p>
                 </div>
               </ng-template>
 

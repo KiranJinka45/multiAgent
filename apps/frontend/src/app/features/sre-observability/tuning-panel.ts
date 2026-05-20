@@ -35,7 +35,7 @@ import { SreDataService } from '../../core/services/sre-data.service';
           </div>
           <input type="range" min="0.5" max="0.99" step="0.05" 
                  [(ngModel)]="confidenceThreshold" (change)="apply()">
-          <p class="help">Minimum weighted confidence required for autonomous actions.</p>
+          <p class="help">Minimum weighted confidence required for automated safety fencing actions.</p>
         </div>
 
         <div class="tuning-item">

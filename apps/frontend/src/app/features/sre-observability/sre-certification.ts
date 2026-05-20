@@ -32,9 +32,9 @@ import { SreDataService } from '../../core/services/sre-data.service';
           <div class="badge" [class.pass]="evidence().avgBrier < 0.2">CALIBRATED</div>
         </div>
         <div class="evidence-card">
-          <h3>CONTROL PLANE HEALTH</h3>
+          <h3>COORDINATION SYSTEM HEALTH</h3>
           <div class="metric">Watchdog: OPERATIONAL</div>
-          <div class="badge pass">AUTO_CONTROL ACTIVE</div>
+          <div class="badge pass">AUTOMATED_SAFETY ACTIVE</div>
         </div>
         <div class="evidence-card">
           <h3>AUDIT INTEGRITY</h3>

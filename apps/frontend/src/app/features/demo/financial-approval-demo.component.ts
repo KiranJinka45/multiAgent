@@ -69,7 +69,7 @@ export class FinancialApprovalDemoComponent implements OnInit {
 
     // Sync role statuses based on ceremony participants
     this.roles.forEach(role => {
-      const p = this.ceremonyState?.participants.find(p => p.nodeId === role.id);
+      const p = this.ceremonyState?.participants.find((p: any) => p.nodeId === role.id);
       if (p && p.status === 'SIGNED') {
         role.status = 'APPROVED';
       }
