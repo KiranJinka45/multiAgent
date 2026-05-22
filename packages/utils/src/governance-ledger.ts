@@ -30,6 +30,16 @@ interface LockMetadata {
 }
 
 let reconciliationInterval: NodeJS.Timeout | null = null;
+let eventLoopLag = 0;
+let lastLagSample = Date.now();
+const lagSampler = setInterval(() => {
+  const now = Date.now();
+  eventLoopLag = Math.max(0, now - lastLagSample - 100);
+  lastLagSample = now;
+}, 100);
+if (lagSampler && typeof lagSampler.unref === 'function') {
+  lagSampler.unref();
+}
 
 function getOrCreateOperatorKeys(): { privateKey: crypto.KeyObject; publicKey: crypto.KeyObject } {
   if (!fs.existsSync(KEYS_DIR)) {
@@ -70,11 +80,110 @@ export interface GovernanceLedgerEntry {
 
 export type ZtanState = 'ACTIVE' | 'DEGRADED' | 'FENCED' | 'QUARANTINED' | 'REBUILDING' | 'REPLAYING' | 'READ_ONLY';
 
+export function parseCorrelationAndPayload(payload: string, timestamp: string, operatorId: string) {
+  const match = payload.match(/\[CorrelationTrace:\s*requestUuid=([a-fA-F0-9-]+),\s*auditUuid=([a-fA-F0-9-]+),\s*outboxUuid=([a-fA-F0-9-]+),\s*ledgerBlockUuid=([a-fA-F0-9-]+)\]/);
+  if (!match) return null;
+
+  const requestUuid = match[1];
+  const auditUuid = match[2];
+  const outboxUuid = match[3];
+  const ledgerBlockUuid = match[4];
+
+  // Check if it's a resolution/mitigation
+  const resolveMatch = payload.match(/MITIGATION SUCCESSFUL:\s*Drill\s+(\S+)\s+resolved\.\s*Actions:\s*(.*?)\.\s*Reaction Time:\s*(\d+(?:\.\d+)?)s\.\s*Signature:\s*(\S+)/);
+  if (resolveMatch) {
+    const drillId = resolveMatch[1];
+    const actionsTaken = resolveMatch[2];
+    const reactionTime = parseFloat(resolveMatch[3]);
+    const signature = resolveMatch[4];
+    return {
+      auditUuid,
+      action: `DRILL_RESOLVED:${drillId}`,
+      resource: 'ZTAN_GOVERNANCE',
+      userId: signature || operatorId,
+      metadata: {
+        reactionTime,
+        actionsTaken,
+        signature,
+        requestUuid,
+        auditUuid,
+        outboxUuid,
+        ledgerBlockUuid
+      }
+    };
+  }
+
+  // Custom FREEZE_PRESSURE resolution
+  if (payload.includes('MITIGATION SUCCESSFUL') && payload.toLowerCase().includes('freeze pressure')) {
+    return {
+      auditUuid,
+      action: 'DRILL_RESOLVED:FREEZE_PRESSURE',
+      resource: 'ZTAN_GOVERNANCE',
+      userId: operatorId,
+      metadata: {
+        reactionTime: 0,
+        actionsTaken: 'Rejected automated capability expansions under freeze pressure',
+        signature: 'SYSTEM',
+        requestUuid,
+        auditUuid,
+        outboxUuid,
+        ledgerBlockUuid
+      }
+    };
+  }
+
+  // Custom FREEZE_PRESSURE failure/escalation
+  if (payload.includes('TRUST FAILURE') && payload.toLowerCase().includes('freeze pressure')) {
+    return {
+      auditUuid,
+      action: 'DRILL_FAILED:FREEZE_PRESSURE',
+      resource: 'ZTAN_GOVERNANCE',
+      userId: operatorId,
+      metadata: {
+        actionsTaken: 'Operator authorized capability expansion under freeze pressure',
+        requestUuid,
+        auditUuid,
+        outboxUuid,
+        ledgerBlockUuid
+      }
+    };
+  }
+
+  // Check if it's a trigger
+  let drillId = '';
+  if (payload.includes('ADVERSARIAL REPLAY')) drillId = 'IFD-001';
+  else if (payload.includes('TELEMETRY EROSION')) drillId = 'IFD-002';
+  else if (payload.includes('GOVERNANCE COLLAPSE')) drillId = 'IFD-003';
+  else if (payload.includes('RITUAL DECAY')) drillId = 'RITUAL_DECAY';
+  else if (payload.includes('FREEZE PRESSURE') || payload.includes('FREEZE_PRESSURE')) drillId = 'FREEZE_PRESSURE';
+  else if (payload.includes('QUORUM CRASH')) drillId = 'TOTAL_QUORUM_FAILURE';
+
+  if (drillId) {
+    return {
+      auditUuid,
+      action: `DRILL_TRIGGERED:${drillId}`,
+      resource: 'ZTAN_GOVERNANCE',
+      userId: operatorId,
+      metadata: {
+        activeDrill: drillId,
+        timestamp,
+        requestUuid,
+        auditUuid,
+        outboxUuid,
+        ledgerBlockUuid
+      }
+    };
+  }
+
+  return null;
+}
+
 export const GovernanceLedger = {
   states: new Map<number, ZtanState>(),
   activeLockGenerations: new Map<number, number>(),
   activeDbGenerations: new Map<number, number>(),
   heartbeatIntervals: new Map<number, NodeJS.Timeout>(),
+  livenessIntervals: new Map<number, NodeJS.Timeout>(),
   lastSuccessfulHeartbeats: new Map<number, number>(),
 
   getState(partition: number): ZtanState {
@@ -272,6 +381,16 @@ export const GovernanceLedger = {
   },
 
   async acquireDbLease(partition: number = 0): Promise<void> {
+    const isWriter = process.env.SERVICE_NAME === 'core-api' || 
+                     process.env.PORT === '4022' || 
+                     process.env.IS_GOVERNANCE_WRITER === 'true' || 
+                     process.env.ZTAN_TEST_WRITER === 'true' ||
+                     !process.env.PORT;
+    if (!isWriter) {
+      logger.info(`[GovernanceLedger] Skipping lease acquisition for non-writer process (PID: ${process.pid}, PORT: ${process.env.PORT})`);
+      return;
+    }
+
     await this.bootstrapDatabaseLeaseTable();
     const hostname = os.hostname();
     const pid = process.pid;
@@ -302,6 +421,13 @@ export const GovernanceLedger = {
             const isExpired = timeSinceHeartbeat > LOCK_TIMEOUT_MS;
             const isMe = row.ownerHost === hostname && Number(row.ownerPid) === pid;
 
+            const localGen = this.activeDbGenerations.get(partition) ?? null;
+            if (!isMe && localGen !== null) {
+              throw new Error(
+                `[GovernanceLedger] Fencing Distributed Lease Violation: Database lease stolen by another host/process for partition ${partition}. Current Owner: Host: ${row.ownerHost}, PID: ${row.ownerPid}, Gen: ${row.generation} (Local Owner: Host: ${hostname}, PID: ${pid}, Gen: ${localGen})`
+              );
+            }
+
             if (!isExpired && !isMe) {
               throw new Error(`Lease held by other host for partition ${partition}: Host: ${row.ownerHost}, PID: ${row.ownerPid}, Age: ${timeSinceHeartbeat}ms`);
             }
@@ -321,6 +447,9 @@ export const GovernanceLedger = {
         this.startHeartbeatDaemon(partition);
         return;
       } catch (err: any) {
+        if (err.message && err.message.includes('Fencing Distributed Lease Violation')) {
+          throw err;
+        }
         if (Date.now() - startTime > LOCK_TIMEOUT_MS) {
           throw new Error(`[GovernanceLedger] Distributed database lease acquisition timed out for partition ${partition}: ${err.message || err}`);
         }
@@ -329,11 +458,48 @@ export const GovernanceLedger = {
     }
   },
 
+  startLivenessTick(partition: number): void {
+    const hostname = os.hostname();
+    const pid = process.pid;
+    const interval = setInterval(() => {
+      const activeDbGen = this.activeDbGenerations.get(partition) ?? null;
+      if (activeDbGen === null) return;
+      try {
+        if (!fs.existsSync(LEDGER_DIR)) {
+          fs.mkdirSync(LEDGER_DIR, { recursive: true });
+        }
+        const livenessFile = path.join(LEDGER_DIR, `liveness_partition_${partition}.json`);
+        const livenessData = {
+          pid,
+          hostname,
+          generation: activeDbGen,
+          timestamp: new Date().toISOString(),
+          eventLoopLagMs: Math.round(eventLoopLag),
+          partition
+        };
+        fs.writeFileSync(livenessFile, JSON.stringify(livenessData), 'utf8');
+        if (partition === 0) {
+          fs.writeFileSync(path.join(LEDGER_DIR, 'liveness.json'), JSON.stringify(livenessData), 'utf8');
+        }
+      } catch (livenessErr) {
+        // ignore
+      }
+    }, 500);
+
+    this.livenessIntervals.set(partition, interval);
+
+    if (interval && typeof interval.unref === 'function') {
+      interval.unref();
+    }
+  },
+
   startHeartbeatDaemon(partition: number): void {
     this.stopHeartbeatDaemon(partition);
     const hostname = os.hostname();
     const pid = process.pid;
     this.lastSuccessfulHeartbeats.set(partition, Date.now());
+
+    this.startLivenessTick(partition);
 
     const interval = setInterval(async () => {
       const activeDbGen = this.activeDbGenerations.get(partition) ?? null;
@@ -390,12 +556,24 @@ export const GovernanceLedger = {
       clearInterval(interval);
       this.heartbeatIntervals.delete(partition);
     }
+    const livenessInterval = this.livenessIntervals.get(partition);
+    if (livenessInterval) {
+      clearInterval(livenessInterval);
+      this.livenessIntervals.delete(partition);
+    }
   },
 
   stopBackgroundTasks(): void {
     for (const partition of this.heartbeatIntervals.keys()) {
       this.stopHeartbeatDaemon(partition);
     }
+    for (const partition of this.livenessIntervals.keys()) {
+      const livenessInterval = this.livenessIntervals.get(partition);
+      if (livenessInterval) {
+        clearInterval(livenessInterval);
+      }
+    }
+    this.livenessIntervals.clear();
     if (reconciliationInterval) {
       clearInterval(reconciliationInterval);
       reconciliationInterval = null;
@@ -504,6 +682,9 @@ export const GovernanceLedger = {
           await this.acquireDbLease(partition);
         } catch (dbErr: any) {
           this.releaseLock(partition);
+          if (dbErr.message && dbErr.message.includes('Fencing Distributed Lease Violation')) {
+            throw dbErr;
+          }
           throw new Error(`[GovernanceLedger] Strict Cluster Fencing Violation: Failed to acquire distributed database lease for partition ${partition}: ${dbErr.message || dbErr}`);
         }
 
@@ -718,6 +899,15 @@ export const GovernanceLedger = {
   },
 
   async triggerOutboxSelfHealing(partition?: number): Promise<void> {
+    const isWriter = process.env.SERVICE_NAME === 'core-api' || 
+                     process.env.PORT === '4022' || 
+                     process.env.IS_GOVERNANCE_WRITER === 'true' || 
+                     process.env.ZTAN_TEST_WRITER === 'true' ||
+                     !process.env.PORT;
+    if (!isWriter) {
+      return;
+    }
+
     if (partition === undefined) {
       const count = this.getPartitionCount();
       for (let p = 0; p < count; p++) {
@@ -768,6 +958,15 @@ export const GovernanceLedger = {
   },
 
   async processOutbox(partition?: number): Promise<void> {
+    const isWriter = process.env.SERVICE_NAME === 'core-api' || 
+                     process.env.PORT === '4022' || 
+                     process.env.IS_GOVERNANCE_WRITER === 'true' || 
+                     process.env.ZTAN_TEST_WRITER === 'true' ||
+                     !process.env.PORT;
+    if (!isWriter) {
+      return;
+    }
+
     if (partition === undefined) {
       const count = this.getPartitionCount();
       for (let p = 0; p < count; p++) {
@@ -817,23 +1016,75 @@ export const GovernanceLedger = {
             }
             logger.info({ sequenceId: seq }, `[GovernanceLedger] Block already exists in DB with perfect hash parity on partition ${partition}. Deduplicating.`);
           } else {
-            await db.ztanLedgerBlock.create({
-              data: {
-                blockId: blockIdStr,
-                prevHash: entry.prevHash,
-                hash: entry.hash,
-                type: entry.type,
-                payload: entry.payload,
-                operator: entry.operatorId,
-                signature: entry.signature,
-                status: entry.verdict,
-                epoch: entry.epoch,
-                createdAt: new Date(entry.timestamp)
+            await db.$transaction(async (tx: any) => {
+              // Transaction-bound Epoch Fencing Check
+              const expectedGen = this.activeDbGenerations.get(partition) ?? null;
+              if (expectedGen !== null) {
+                const leaseId = `singleton-lease-partition-${partition}`;
+                const rows = (await tx.$queryRawUnsafe(`
+                  SELECT generation, owner_pid as "ownerPid", owner_host as "ownerHost"
+                  FROM "ZtanActiveLease"
+                  WHERE id = $1
+                  FOR UPDATE
+                `, leaseId)) as any[];
+                if (rows.length > 0) {
+                  const row = rows[0];
+                  const hostname = os.hostname();
+                  const pid = process.pid;
+                  if (row.ownerHost !== hostname || Number(row.ownerPid) !== pid || Number(row.generation) !== expectedGen) {
+                    throw new Error(
+                      `[GovernanceLedger] Fencing Distributed Lease Violation: Database lease stolen by another host/process for partition ${partition}. Current Owner: Host: ${row.ownerHost}, PID: ${row.ownerPid}, Gen: ${row.generation} (Local Owner: Host: ${hostname}, PID: ${pid}, Gen: ${expectedGen})`
+                    );
+                  }
+                } else {
+                  throw new Error(`[GovernanceLedger] Fencing Distributed Lease Violation: Database lease has been deleted for partition ${partition}.`);
+                }
+              } else {
+                throw new Error(`[GovernanceLedger] Fencing Distributed Lease Violation: No local active database generation found for partition ${partition}.`);
+              }
+
+              await tx.ztanLedgerBlock.create({
+                data: {
+                  blockId: blockIdStr,
+                  prevHash: entry.prevHash,
+                  hash: entry.hash,
+                  type: entry.type,
+                  payload: entry.payload,
+                  operator: entry.operatorId,
+                  signature: entry.signature,
+                  status: entry.verdict,
+                  epoch: entry.epoch,
+                  createdAt: new Date(entry.timestamp)
+                }
+              });
+              logger.info({ sequenceId: seq }, `[GovernanceLedger] Outbox worker successfully synced block to PostgreSQL on partition ${partition}`);
+              await tx.$executeRawUnsafe(`NOTIFY ztan_ledger_update, '${blockIdStr}';`).catch(() => {});
+
+              // Self-heal/reconcile AuditLog if it has correlation trace in payload
+              const auditInfo = parseCorrelationAndPayload(entry.payload, entry.timestamp, entry.operatorId);
+              if (auditInfo) {
+                const existingAudit = await tx.auditLog.findUnique({
+                  where: { id: auditInfo.auditUuid }
+                });
+                if (!existingAudit) {
+                  await tx.auditLog.create({
+                    data: {
+                      id: auditInfo.auditUuid,
+                      action: auditInfo.action,
+                      resource: auditInfo.resource,
+                      userId: auditInfo.userId,
+                      tenantId: 'platform-admin',
+                      status: 'SUCCESS',
+                      metadata: auditInfo.metadata,
+                      createdAt: new Date(entry.timestamp)
+                    }
+                  });
+                  logger.info({ auditUuid: auditInfo.auditUuid }, `[GovernanceLedger] Outbox worker successfully recovered missing AuditLog entry during sync`);
+                }
               }
             });
-            logger.info({ sequenceId: seq }, `[GovernanceLedger] Outbox worker successfully synced block to PostgreSQL on partition ${partition}`);
-            await db.$executeRawUnsafe(`NOTIFY ztan_ledger_update, '${blockIdStr}';`).catch(() => {});
           }
+
           successful.push(seq);
         } catch (dbErr: any) {
           if (dbErr.message && dbErr.message.includes('Byzantine Timeline Fracture')) {
@@ -859,6 +1110,16 @@ export const GovernanceLedger = {
   },
 
   async initDbSync(partition?: number): Promise<void> {
+    const isWriter = process.env.SERVICE_NAME === 'core-api' || 
+                     process.env.PORT === '4022' || 
+                     process.env.IS_GOVERNANCE_WRITER === 'true' || 
+                     process.env.ZTAN_TEST_WRITER === 'true' ||
+                     !process.env.PORT;
+    if (!isWriter) {
+      logger.info(`[GovernanceLedger] Skipping database sync for non-writer process (PID: ${process.pid}, PORT: ${process.env.PORT})`);
+      return;
+    }
+
     if (partition === undefined) {
       const count = this.getPartitionCount();
       for (let p = 0; p < count; p++) {
@@ -874,16 +1135,45 @@ export const GovernanceLedger = {
       const ledger = this.loadLedger(partition);
       queue = this.loadOutbox(partition);
 
-      // 1. Reconcile local -> DB (outbox queue enrichment)
+      // 1. Reconcile local -> DB (outbox queue enrichment and AuditLog reconciliation)
       for (const entry of ledger) {
         const blockIdStr = entry.sequenceId.toString();
         const existing = await db.ztanLedgerBlock.findUnique({
           where: { blockId: blockIdStr }
         });
 
-        if (!existing && !queue.includes(entry.sequenceId)) {
-          queue.push(entry.sequenceId);
-          modified = true;
+        if (!existing) {
+          if (!queue.includes(entry.sequenceId)) {
+            queue.push(entry.sequenceId);
+            modified = true;
+          }
+        } else {
+          // Self-heal/reconcile AuditLog if it is missing in the database
+          const auditInfo = parseCorrelationAndPayload(entry.payload, entry.timestamp, entry.operatorId);
+          if (auditInfo) {
+            try {
+              const existingAudit = await db.auditLog.findUnique({
+                where: { id: auditInfo.auditUuid }
+              });
+              if (!existingAudit) {
+                await db.auditLog.create({
+                  data: {
+                    id: auditInfo.auditUuid,
+                    action: auditInfo.action,
+                    resource: auditInfo.resource,
+                    userId: auditInfo.userId,
+                    tenantId: 'platform-admin',
+                    status: 'SUCCESS',
+                    metadata: auditInfo.metadata,
+                    createdAt: new Date(entry.timestamp)
+                  }
+                });
+                logger.info({ auditUuid: auditInfo.auditUuid }, `[GovernanceLedger] initDbSync successfully restored missing AuditLog entry`);
+              }
+            } catch (auditErr: any) {
+              logger.warn(`[GovernanceLedger] initDbSync failed to verify/restore AuditLog for entry ${entry.sequenceId}: ${auditErr.message || auditErr}`);
+            }
+          }
         }
       }
 
@@ -1059,7 +1349,13 @@ export const GovernanceLedger = {
     operatorId: string,
     verdict: GovernanceLedgerEntry['verdict'],
     epoch: string = '102',
-    correlationId?: string
+    correlationId?: string,
+    correlationMetadata?: {
+      requestUuid: string;
+      auditUuid: string;
+      outboxUuid: string;
+      ledgerBlockUuid: string;
+    }
   ): Promise<GovernanceLedgerEntry> {
     const partition = this.getPartition(payload, correlationId);
     const state = this.getState(partition);
@@ -1067,22 +1363,142 @@ export const GovernanceLedger = {
       throw new Error(`[GovernanceLedger] Strict State Machine Violation: Cannot append entry to partition ${partition} while in ${state} state.`);
     }
 
+    // Compute natural compound idempotency key
+    // Include requestUuid in the hash input when available to prevent semantic collision
+    // ambiguity: two logically distinct operations with identical payloads (e.g. triggering
+    // the same drill twice) must produce different natural keys, while retries of the same
+    // operation (same requestUuid) still deduplicate correctly.
+    const hashInput = correlationMetadata?.requestUuid
+      ? `${payload}::${correlationMetadata.requestUuid}`
+      : payload;
+    const payloadHash = crypto.createHash('sha256').update(hashInput).digest('hex');
+    const naturalKey = `ztan-natural-${payloadHash}`;
+
+    // 1. Idempotency Retry Check (Fast Path) - requestUuid
+    if (correlationMetadata && correlationMetadata.requestUuid) {
+      const ledger = this.loadLedger(partition);
+      const existingLocal = ledger.find(e => e.payload.includes(`requestUuid=${correlationMetadata.requestUuid}`));
+      if (existingLocal) {
+        logger.info({ requestUuid: correlationMetadata.requestUuid, sequenceId: existingLocal.sequenceId }, `[GovernanceLedger] Idempotent retry hit in local ledger. Returning existing entry.`);
+        return existingLocal;
+      }
+
+      try {
+        const dbBlock = await db.ztanLedgerBlock.findFirst({
+          where: {
+            payload: {
+              contains: `requestUuid=${correlationMetadata.requestUuid}`
+            }
+          }
+        });
+        if (dbBlock) {
+          logger.info({ requestUuid: correlationMetadata.requestUuid, blockId: dbBlock.blockId }, `[GovernanceLedger] Idempotent retry hit in database consensus store. Returning existing entry.`);
+          return {
+            sequenceId: parseInt(dbBlock.blockId, 10),
+            timestamp: dbBlock.createdAt.toISOString(),
+            type: dbBlock.type as any,
+            payload: dbBlock.payload,
+            operatorId: dbBlock.operator,
+            signature: dbBlock.signature,
+            prevHash: dbBlock.prevHash,
+            hash: dbBlock.hash,
+            epoch: dbBlock.epoch,
+            verdict: dbBlock.status as any
+          };
+        }
+      } catch (dbErr) {
+        // Ignore DB query errors in case DB is offline/partitioned
+      }
+    }
+
+    // 2. Idempotency Retry Check (Fast Path) - naturalKey
+    try {
+      const naturalRecord = await db.idempotencyRecord.findUnique({
+        where: { key: naturalKey }
+      });
+      if (naturalRecord && naturalRecord.response) {
+        const seq = (naturalRecord.response as any).sequenceId;
+        if (seq) {
+          logger.info({ naturalKey, sequenceId: seq }, `[GovernanceLedger] Natural key idempotency hit in DB. Returning existing entry.`);
+          const ledger = this.loadLedger(partition);
+          const existingLocal = ledger.find(e => e.sequenceId === seq);
+          if (existingLocal) {
+            return existingLocal;
+          }
+          const dbBlock = await db.ztanLedgerBlock.findUnique({
+            where: { blockId: seq.toString() }
+          });
+          if (dbBlock) {
+            return {
+              sequenceId: seq,
+              timestamp: dbBlock.createdAt.toISOString(),
+              type: dbBlock.type as any,
+              payload: dbBlock.payload,
+              operatorId: dbBlock.operator,
+              signature: dbBlock.signature,
+              prevHash: dbBlock.prevHash,
+              hash: dbBlock.hash,
+              epoch: dbBlock.epoch,
+              verdict: dbBlock.status as any
+            };
+          }
+        }
+      }
+    } catch (err) {
+      // Ignore in case DB is offline/partitioned
+    }
+
     await this.acquireLockAsync(partition);
     try {
       await this.assertLockFencingAsync(partition);
       const ledger = this.loadLedger(partition);
+
+      // Post-Lock Check to prevent duplicate local ledger appends under concurrent retry storms
+      if (correlationMetadata && correlationMetadata.requestUuid) {
+        const existingLocal = ledger.find(e => e.payload.includes(`requestUuid=${correlationMetadata.requestUuid}`));
+        if (existingLocal) {
+          logger.info({ requestUuid: correlationMetadata.requestUuid, sequenceId: existingLocal.sequenceId }, `[GovernanceLedger] Idempotent retry hit in local ledger post-lock. Returning existing entry.`);
+          return existingLocal;
+        }
+      }
+
+      // Post-Lock Check by naturalKey
+      try {
+        const naturalRecord = await db.idempotencyRecord.findUnique({
+          where: { key: naturalKey }
+        });
+        if (naturalRecord && naturalRecord.response) {
+          const seq = (naturalRecord.response as any).sequenceId;
+          if (seq) {
+            logger.info({ naturalKey, sequenceId: seq }, `[GovernanceLedger] Natural key idempotency hit in DB post-lock. Returning existing entry.`);
+            const existingLocal = ledger.find(e => e.sequenceId === seq);
+            if (existingLocal) {
+              return existingLocal;
+            }
+          }
+        }
+      } catch (err) {
+        // Ignore
+      }
+
       const lastEntry = ledger[ledger.length - 1];
 
       const sequenceId = lastEntry ? lastEntry.sequenceId + 1 : (partition * 1000000) + 1001;
       const prevHash = lastEntry ? lastEntry.hash : '0x0000000000000000000000000000000000000000000000000000000000000000';
       const timestamp = new Date().toISOString();
-      const signature = this.signPayload(payload);
+
+      let enrichedPayload = payload;
+      if (correlationMetadata) {
+        enrichedPayload = `${payload} [CorrelationTrace: requestUuid=${correlationMetadata.requestUuid}, auditUuid=${correlationMetadata.auditUuid}, outboxUuid=${correlationMetadata.outboxUuid}, ledgerBlockUuid=${correlationMetadata.ledgerBlockUuid}]`;
+      }
+
+      const signature = this.signPayload(enrichedPayload);
 
       const entryData: Omit<GovernanceLedgerEntry, 'hash'> = {
         sequenceId,
         timestamp,
         type,
-        payload,
+        payload: enrichedPayload,
         operatorId,
         signature,
         prevHash,
@@ -1100,6 +1516,54 @@ export const GovernanceLedger = {
             logger.warn('[GovernanceLedger] Simulated crash triggered: BEFORE_DB_COMMIT');
             process.exit(138);
           }
+
+          // Transaction-bound Epoch Fencing Check
+          const expectedGen = this.activeDbGenerations.get(partition) ?? null;
+          if (expectedGen !== null) {
+            const leaseId = `singleton-lease-partition-${partition}`;
+            const rows = (await tx.$queryRawUnsafe(`
+              SELECT generation, owner_pid as "ownerPid", owner_host as "ownerHost"
+              FROM "ZtanActiveLease"
+              WHERE id = $1
+              FOR UPDATE
+            `, leaseId)) as any[];
+            if (rows.length > 0) {
+              const row = rows[0];
+              const hostname = os.hostname();
+              const pid = process.pid;
+              if (row.ownerHost !== hostname || Number(row.ownerPid) !== pid || Number(row.generation) !== expectedGen) {
+                leaseFencingRevocationsTotal.inc({ node_id: hostname, reason: `lease_stolen_p${partition}` });
+                throw new Error(
+                  `[GovernanceLedger] Fencing Distributed Lease Violation: Database lease stolen by another host/process for partition ${partition}. Current Owner: Host: ${row.ownerHost}, PID: ${row.ownerPid}, Gen: ${row.generation} (Local Owner: Host: ${hostname}, PID: ${pid}, Gen: ${expectedGen})`
+                );
+              }
+            } else {
+              leaseFencingRevocationsTotal.inc({ node_id: os.hostname(), reason: `lease_deleted_p${partition}` });
+              throw new Error(`[GovernanceLedger] Fencing Distributed Lease Violation: Database lease has been deleted for partition ${partition}.`);
+            }
+          } else {
+            throw new Error(`[GovernanceLedger] Fencing Distributed Lease Violation: No local active database generation found for partition ${partition}.`);
+          }
+
+          // Prevent concurrent replay races by creating a unique idempotency record
+          if (correlationMetadata && correlationMetadata.requestUuid) {
+            await tx.idempotencyRecord.create({
+              data: {
+                key: `ztan-request-${correlationMetadata.requestUuid}`,
+                status: 'completed',
+                response: { sequenceId }
+              }
+            });
+          }
+
+          // Create the natural key idempotency record
+          await tx.idempotencyRecord.create({
+            data: {
+              key: naturalKey,
+              status: 'completed',
+              response: { sequenceId }
+            }
+          });
 
           const wal = await tx.ztanWalLog.create({
             data: {
@@ -1125,6 +1589,23 @@ export const GovernanceLedger = {
             }
           });
 
+          // Atomic transaction write of the corresponding AuditLog row
+          const auditInfo = parseCorrelationAndPayload(entry.payload, entry.timestamp, entry.operatorId);
+          if (auditInfo) {
+            await tx.auditLog.create({
+              data: {
+                id: auditInfo.auditUuid,
+                action: auditInfo.action,
+                resource: auditInfo.resource,
+                userId: auditInfo.userId,
+                tenantId: 'platform-admin',
+                status: 'SUCCESS',
+                metadata: auditInfo.metadata,
+                createdAt: new Date(entry.timestamp)
+              }
+            });
+          }
+
           await tx.ztanWalLog.update({
             where: { id: wal.id },
             data: { status: 'COMMITTED' }
@@ -1143,6 +1624,90 @@ export const GovernanceLedger = {
         } catch {}
         logger.info({ sequenceId, type, hash, partition }, `[GovernanceLedger] Successfully appended to PostgreSQL for partition ${partition} with WAL transaction`);
       } catch (dbErr: any) {
+        if (dbErr.code === 'P2002') {
+          logger.info({ requestUuid: correlationMetadata?.requestUuid, naturalKey }, `[GovernanceLedger] Database write failed with P2002. Checking for existing block.`);
+          
+          // 1. Try finding by requestUuid (local or DB)
+          if (correlationMetadata && correlationMetadata.requestUuid) {
+            const ledgerCopy = this.loadLedger(partition);
+            const existingLocal = ledgerCopy.find(e => e.payload.includes(`requestUuid=${correlationMetadata.requestUuid}`));
+            if (existingLocal) {
+              return existingLocal;
+            }
+            try {
+              const dbBlock = await db.ztanLedgerBlock.findFirst({
+                where: {
+                  payload: {
+                    contains: `requestUuid=${correlationMetadata.requestUuid}`
+                  }
+                }
+              });
+              if (dbBlock) {
+                const returnedEntry: GovernanceLedgerEntry = {
+                  sequenceId: parseInt(dbBlock.blockId, 10),
+                  timestamp: dbBlock.createdAt.toISOString(),
+                  type: dbBlock.type as any,
+                  payload: dbBlock.payload,
+                  operatorId: dbBlock.operator,
+                  signature: dbBlock.signature,
+                  prevHash: dbBlock.prevHash,
+                  hash: dbBlock.hash,
+                  epoch: dbBlock.epoch,
+                  verdict: dbBlock.status as any
+                };
+                if (!ledgerCopy.some(e => e.sequenceId === returnedEntry.sequenceId)) {
+                  ledgerCopy.push(returnedEntry);
+                  this.saveLedger(ledgerCopy, partition);
+                }
+                return returnedEntry;
+              }
+            } catch (dbReadErr) {
+              logger.error({ err: dbReadErr }, '[GovernanceLedger] Failed to fetch existing block by requestUuid on P2002 error.');
+            }
+          }
+
+          // 2. Try finding by naturalKey
+          try {
+            const naturalRecord = await db.idempotencyRecord.findUnique({
+              where: { key: naturalKey }
+            });
+            if (naturalRecord && naturalRecord.response) {
+              const seq = (naturalRecord.response as any).sequenceId;
+              if (seq) {
+                const ledgerCopy = this.loadLedger(partition);
+                const existingLocal = ledgerCopy.find(e => e.sequenceId === seq);
+                if (existingLocal) {
+                  return existingLocal;
+                }
+                const dbBlock = await db.ztanLedgerBlock.findUnique({
+                  where: { blockId: seq.toString() }
+                });
+                if (dbBlock) {
+                  const returnedEntry: GovernanceLedgerEntry = {
+                    sequenceId: seq,
+                    timestamp: dbBlock.createdAt.toISOString(),
+                    type: dbBlock.type as any,
+                    payload: dbBlock.payload,
+                    operatorId: dbBlock.operator,
+                    signature: dbBlock.signature,
+                    prevHash: dbBlock.prevHash,
+                    hash: dbBlock.hash,
+                    epoch: dbBlock.epoch,
+                    verdict: dbBlock.status as any
+                  };
+                  if (!ledgerCopy.some(e => e.sequenceId === returnedEntry.sequenceId)) {
+                    ledgerCopy.push(returnedEntry);
+                    this.saveLedger(ledgerCopy, partition);
+                  }
+                  return returnedEntry;
+                }
+              }
+            }
+          } catch (dbReadErr) {
+            logger.error({ err: dbReadErr }, '[GovernanceLedger] Failed to fetch existing block by naturalKey on P2002 error.');
+          }
+        }
+
         try {
           this.transitionTo(partition, 'DEGRADED', `Postgres transaction write failed: ${dbErr.message || dbErr}`);
         } catch {}
@@ -1229,19 +1794,47 @@ export const GovernanceLedger = {
 
       try {
         const epochVal = parseInt(ledger[anchorIndex].epoch, 10) || 100;
-        await db.ztanSnapshot.upsert({
-          where: { epoch: epochVal },
-          create: {
-            epoch: epochVal,
-            lastSeq: anchorSequenceId,
-            lastHash: ledger[anchorIndex].hash,
-            stateData: JSON.stringify(compacted)
-          },
-          update: {
-            lastSeq: anchorSequenceId,
-            lastHash: ledger[anchorIndex].hash,
-            stateData: JSON.stringify(compacted)
+        await db.$transaction(async (tx: any) => {
+          // Transaction-bound Epoch Fencing Check
+          const expectedGen = this.activeDbGenerations.get(partition) ?? null;
+          if (expectedGen !== null) {
+            const leaseId = `singleton-lease-partition-${partition}`;
+            const rows = (await tx.$queryRawUnsafe(`
+              SELECT generation, owner_pid as "ownerPid", owner_host as "ownerHost"
+              FROM "ZtanActiveLease"
+              WHERE id = $1
+              FOR UPDATE
+            `, leaseId)) as any[];
+            if (rows.length > 0) {
+              const row = rows[0];
+              const hostname = os.hostname();
+              const pid = process.pid;
+              if (row.ownerHost !== hostname || Number(row.ownerPid) !== pid || Number(row.generation) !== expectedGen) {
+                throw new Error(
+                  `[GovernanceLedger] Fencing Distributed Lease Violation: Database lease stolen by another host/process for partition ${partition}. Current Owner: Host: ${row.ownerHost}, PID: ${row.ownerPid}, Gen: ${row.generation} (Local Owner: Host: ${hostname}, PID: ${pid}, Gen: ${expectedGen})`
+                );
+              }
+            } else {
+              throw new Error(`[GovernanceLedger] Fencing Distributed Lease Violation: Database lease has been deleted for partition ${partition}.`);
+            }
+          } else {
+            throw new Error(`[GovernanceLedger] Fencing Distributed Lease Violation: No local active database generation found for partition ${partition}.`);
           }
+
+          await tx.ztanSnapshot.upsert({
+            where: { epoch: epochVal },
+            create: {
+              epoch: epochVal,
+              lastSeq: anchorSequenceId,
+              lastHash: ledger[anchorIndex].hash,
+              stateData: JSON.stringify(compacted)
+            },
+            update: {
+              lastSeq: anchorSequenceId,
+              lastHash: ledger[anchorIndex].hash,
+              stateData: JSON.stringify(compacted)
+            }
+          });
         });
         logger.info({ anchorSequenceId, epoch: epochVal }, `[GovernanceLedger] PostgreSQL snapshot created/updated during compaction for partition ${partition}`);
       } catch (snapErr: any) {
