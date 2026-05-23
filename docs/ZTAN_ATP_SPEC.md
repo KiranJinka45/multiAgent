@@ -12,6 +12,12 @@ ZTAN-ATP shifts autonomous safety boundaries from a platform-centric API depende
 
 This document represents an active standards proposal under rigorous operational testing and developer review. It is NOT a finalized standard, and its features are subject to revision based on cross-runtime conformance and fuzzing benchmarks.
 
+> [!NOTE]
+> **EPISTEMIC BOUNDARY: DRAFT CONFORMANCE TARGETS VS. ACTIVE SIMULATION**
+> - The RFC-style normative keywords (MUST, SHOULD, REQUIRED) used in this specification represent **conformance targets for a proposed draft standard** rather than finalized or production-proven ecosystem guarantees.
+> - The underlying system contains evolving and partially simulated distributed components (such as mock gossip routing and simulated threshold key DKG planes).
+> - Readers must distinguish between **specification intent** (conformance definitions for future interoperability) and the **validated operational behavior** currently observed in this research-grade environment.
+
 ### Normative Language
 The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **SHOULD**, **SHOULD NOT**, **RECOMMENDED**, **MAY**, and **OPTIONAL** in this document are to be interpreted as described in RFC 2119.
 
@@ -160,7 +166,7 @@ All SDK implementations MUST wrap raw P-256 SEC1 public key coordinate points in
 ZTAN-ATP establishes a strict **sliding-window monotonic validation framework** designed to prevent duplicate execution attacks while maintaining operational safety across partitioned validator clusters.
 
 ### 5.1 The Sequence Counter Invariant
-1.  **Actor-Tenant Scope:** The `replayId` is defined strictly as an **Actor-Scoped Monotonic Counter**. Every individual actor URI (e.g., `spiffe://domain/agent/7`) MUST maintain a strictly increasing execution counter.
+1.  **Actor-Tenant Scope:** The `replayId` is defined strictly as an **Actor-Scoped Monotonic Counter**. Every individual actor URI (e.g., `spiffe://domain/agent/7`) is expected to maintain monotonically increasing execution counters under compliant implementations.
 2.  **Stateful Verification:** Verifier nodes MUST persist the last verified sequence number ($C_{\text{last}}$) for each active actor.
 3.  **Monotonic Check:** A newly submitted envelope with sequence number $C_{\text{new}}$ is valid if and only if $C_{\text{new}} > C_{\text{last}}$. If $C_{\text{new}} \le C_{\text{last}}$, the action MUST be immediately rejected.
 

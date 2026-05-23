@@ -26,7 +26,7 @@ const LOCK_RETRY_INTERVAL_MS = 50;
 interface LockMetadata {
   pid: number;
   timestamp: string;
-  generation: number; // Monotonically strictly increasing fencing token
+  generation: number; // Monotonically increasing fencing token under compliant storage configurations
 }
 
 let reconciliationInterval: NodeJS.Timeout | null = null;
