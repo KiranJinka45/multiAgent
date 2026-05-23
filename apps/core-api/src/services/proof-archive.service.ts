@@ -1,6 +1,6 @@
 import { logger } from '@packages/observability';
-import { ProofBundle } from '@packages/ztan-crypto';
-import { redis } from '../services/redis'; // Assuming redis is available
+import type { ProofBundle } from '@packages/ztan-crypto';
+import { redis } from '@packages/utils';
 
 const ARCHIVE_KEY = 'ztan:archive:proofs';
 

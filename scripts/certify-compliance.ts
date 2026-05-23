@@ -34,7 +34,8 @@ async function certifyCompliance() {
     console.log('\n📈 OPERATIONAL EFFICIENCY AUDIT');
     console.log('------------------------------');
     console.log(`- Complexity Factor: ${trend.complexityFactor.toFixed(2)}`);
-    console.log(`- Efficiency Index: ${trend.governanceEfficiencyIndex.toFixed(1)}/100`);
+    const efficiencyVerdict = trend.governanceEfficiencyIndex >= 90 ? 'NOMINAL' : trend.governanceEfficiencyIndex >= 75 ? 'WARNING' : 'BREACH';
+    console.log(`- Efficiency Verdict: ${efficiencyVerdict}`);
     console.log(`- Status: ${trend.status === 'BORING' ? '✅ OPTIMIZED' : '⚠️ INEFFICIENT'}`);
 
     // 3. Verify Operational Compliance

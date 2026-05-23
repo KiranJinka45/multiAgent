@@ -18,19 +18,29 @@ export class QLearningAgent {
   private epsilon = 0.1; // Exploration rate
 
   constructor() {
-    this.load().catch(err => logger.error({ err }, '[RL] Failed to load Q-Table'));
+    this.load();
   }
 
   private async load() {
-    const saved = await redis.get(QLearningAgent.Q_TABLE_KEY);
-    if (saved) {
-      this.qTable = JSON.parse(saved);
+    try {
+      const saved = await redis.get(QLearningAgent.Q_TABLE_KEY);
+      if (saved) {
+        this.qTable = JSON.parse(saved);
+      }
+    } catch (err: any) {
+      logger.warn({ err }, '[RL] Failed to load Q-Table from Redis due to connection/command error');
     }
   }
 
   private async save() {
-    await redis.set(QLearningAgent.Q_TABLE_KEY, JSON.stringify(this.qTable));
+    try {
+      await redis.set(QLearningAgent.Q_TABLE_KEY, JSON.stringify(this.qTable));
+    } catch (err: any) {
+      logger.warn({ err }, '[RL] Failed to save Q-Table to Redis due to connection/command error');
+    }
   }
+
+
 
   /**
    * Discretizes the continuous state into a string key for the Q-table.

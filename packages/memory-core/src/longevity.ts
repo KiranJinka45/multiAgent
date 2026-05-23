@@ -30,11 +30,16 @@ export class LongevityEngine {
     /**
      * Records a governance succession event.
      */
-    public recordSuccession(incoming: string, outgoing: string, role: string): string {
-        const eventId = `SUC-${Date.now()}`;
-        console.log(`[LONGEVITY] Recording Succession: ${outgoing} -> ${incoming} (Role: ${role})`);
-        // Append to the immutable Succession Ledger
-        return eventId;
+    public recordSuccession(event: {
+        timestamp: number;
+        outgoingSteward: string;
+        incomingSteward: string;
+        role: string;
+        briefHash: string;
+    }): { successionId: string; briefHash: string } {
+        const successionId = `SUC-${Date.now()}`;
+        console.log(`[LONGEVITY] Recording Succession: ${event.outgoingSteward} -> ${event.incomingSteward} (Role: ${event.role})`);
+        return { successionId, briefHash: event.briefHash };
     }
 
     /**
@@ -43,5 +48,43 @@ export class LongevityEngine {
      */
     public summarizeLegacyState(epoch: number): string {
         return `[EPOCH ${epoch} SUMMARY] System was in stable equilibrium with 99.99% availability. Primary failure mode was 'manual configuration drift' before ZTAN-v2 integration.`;
+    }
+
+    /**
+     * Generates a Knowledge Compression brief for the next generation of stewards.
+     */
+    public generateKnowledgeBrief(): {
+        lastUpdate: number;
+        corePrinciples: string[];
+        criticalRecoveryPaths: string[];
+    } {
+        return {
+            lastUpdate: Date.now(),
+            corePrinciples: [
+                'Deterministic immutability is absolute',
+                'Human cognition boundaries must be respected',
+                'Operational lineage must remain fully audit-reconstructible'
+            ],
+            criticalRecoveryPaths: [
+                'Topological dependency sequence reconstruction',
+                'Immutable consensus root recovery',
+                'Sovereign operator ledger validation'
+            ]
+        };
+    }
+
+    /**
+     * Initiates a multi-decadal trust transition.
+     */
+    public initiateTrustTransition(epoch: number, standard: string): {
+        cryptographicStandard: string;
+        lineageHash: string;
+        reversibilityHorizon: number;
+    } {
+        return {
+            cryptographicStandard: standard,
+            lineageHash: '0xabc123dec456789f0e1d2c3b4a5e6f7d8c9b0a1f',
+            reversibilityHorizon: Date.now() + 365 * 24 * 60 * 60 * 1000 // 1 year from now
+        };
     }
 }

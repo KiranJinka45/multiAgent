@@ -46,6 +46,10 @@
     { "path": "./packages/validator" },
     { "path": "./packages/ztan-crypto" },
     { "path": "./packages/ztan-witness" },
-    { "path": "./packages/ztanctl" }
+    { "path": "./packages/ztanctl" },
+    { "path": "./packages/operator-compression" },
+    { "path": "./packages/deployment-hardening" },
+    { "path": "./packages/evidence-lifecycle" },
+    { "path": "./packages/institutional-dashboard" }
   ]
 }

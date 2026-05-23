@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsup src/index.ts --no-dts && tsc --emitDeclarationOnly -p tsconfig.json --declarationDir ./dist",
+    "build": "tsup src/index.ts --no-dts && del /q tsconfig.tsbuildinfo 2>nul & tsc --emitDeclarationOnly -p tsconfig.json --declarationDir ./dist",
     "dev": "tsup src/index.ts --no-dts --watch",
     "start": "node dist/index.js",
     "start:dev": "tsx -r tsconfig-paths/register src/index.ts",
@@ -13,6 +13,11 @@
   },
   "dependencies": {
     "@kubernetes/client-node": "1.0.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.76.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.218.0",
+    "@opentelemetry/resources": "^2.7.1",
+    "@opentelemetry/sdk-node": "^0.218.0",
+    "@opentelemetry/semantic-conventions": "^1.41.1",
     "@packages/auth-internal": "workspace:*",
     "@packages/business": "workspace:*",
     "@packages/config": "workspace:*",
@@ -20,6 +25,8 @@
     "@packages/db": "workspace:*",
     "@packages/memory-core": "workspace:*",
     "@packages/observability": "workspace:*",
+    "@packages/queue": "workspace:*",
+    "@packages/supabase": "workspace:*",
     "@packages/utils": "workspace:*",
     "@packages/ztan-crypto": "workspace:*",
     "@supabase/supabase-js": "2.43.2",
@@ -48,7 +55,8 @@
     "y-leveldb": "0.1.2",
     "y-websocket": "2.0.4",
     "yjs": "13.6.18",
-    "zod": "3.23.3"
+    "zod": "3.23.3",
+    "zustand": "4.5.2"
   },
   "devDependencies": {
     "@types/express": "5.0.0",

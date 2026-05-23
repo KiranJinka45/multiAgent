@@ -4,7 +4,7 @@ import { chaosOrchestrator } from '../../apps/core-api/src/services/chaos-orches
 import { logger } from '@packages/observability';
 
 async function runCausalCertification() {
-  console.log('🚀 INITIATING LEVEL 5+ SCIENTIFIC CERTIFICATION SUITE');
+  console.log('🚀 INITIATING LEVEL 5+ SCIENTIFIC VALIDATION SUITE');
   console.log('--------------------------------------------------');
 
   validationEngine.reset();
@@ -167,7 +167,7 @@ async function runCausalCertification() {
   const causalStats = validationEngine.getCausalStats();
 
   console.log('\n--------------------------------------------------');
-  console.log('🔬 LEVEL 5+ SCIENTIFIC CERTIFICATION REPORT');
+  console.log('🔬 LEVEL 5+ SCIENTIFIC VALIDATION REPORT');
   console.log('--------------------------------------------------');
   console.log(`Accuracy (Mean): ${(sciStats.accuracy * 100).toFixed(2)}%`);
   console.log(`95% Conf. Interval: [${(sciStats.ci95[0] * 100).toFixed(2)}%, ${(sciStats.ci95[1] * 100).toFixed(2)}%]`);
@@ -177,7 +177,7 @@ async function runCausalCertification() {
   console.log(`Independence (ACF Lag2): ${sciStats.autocorrelation.lag2.toFixed(3)}`);
   console.log(`Independence (Max ACF Lag1-10): ${sciStats.autocorrelation.lag10Max.toFixed(3)}`);
   console.log('--------------------------------------------------');
-  console.log('⚖️ CAUSAL SIGNIFICANCE (A/B PROOF)');
+  console.log('⚖️ COMPARATIVE SIGNIFICANCE (A/B COMPARISON)');
   console.log(`Control Mean: ${causalStats.controlMean.toFixed(3)}`);
   console.log(`Treatment Mean: ${causalStats.treatmentMean.toFixed(3)}`);
   console.log(`Uplift: ${(causalStats.uplift * 100).toFixed(1)}%`);
@@ -196,13 +196,13 @@ async function runCausalCertification() {
   console.log('External Anchor: ⚠️ SIMULATED (Requires S3 Object Lock for Full Audit-Grade)');
   console.log('Tamper-Evident: ✅ YES (Within Trusted Boundary)');
   console.log('--------------------------------------------------');
-  console.log('🧪 REPRODUCIBILITY ARTIFACT');
+  console.log('🧪 REPEATABILITY ARTIFACT');
   console.log(`Fixed Seed: CERT-2026-05-02-V5`);
   console.log('Replay Context: Deterministic under controlled runtime');
   console.log('--------------------------------------------------');
   const isCertified = causalStats.isSignificant && sciStats.accuracy > 0.85 && sciStats.variance > 0;
   console.log(`SLA Status: ✅ P99 COMPLIANT | ⚠️ P99.9 DEGRADATION`);
-  console.log(`Verdict: ${isCertified ? 'LEVEL 5+ RESEARCH-GRADE CERTIFIED' : 'PENDING STABILITY'}`);
+  console.log(`Verdict: ${isCertified ? 'LEVEL 5+ VALIDATED UNDER TESTED CONDITIONS' : 'PENDING STABILITY'}`);
   console.log('--------------------------------------------------');
 }
 

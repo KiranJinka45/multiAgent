@@ -4,8 +4,62 @@ import * as path from 'node:path';
 import { logger } from '@packages/observability';
 import { GovernanceLedger, type GovernanceLedgerEntry } from '@packages/utils';
 import { db } from '@packages/db';
+import * as crypto from 'node:crypto';
 
 const router = express.Router();
+
+async function getProcessedRequestDetails(requestUuid: string) {
+  // 1. Check local ledger partitions
+  const count = GovernanceLedger.getPartitionCount();
+  for (let p = 0; p < count; p++) {
+    try {
+      const ledger = GovernanceLedger.loadLedger(p);
+      const match = ledger.find(e => e.payload.includes(`requestUuid=${requestUuid}`));
+      if (match) {
+        const correlation = parseCorrelationFromPayload(match.payload);
+        if (correlation) {
+          return {
+            auditUuid: correlation.auditUuid,
+            ledgerBlockUuid: correlation.ledgerBlockUuid
+          };
+        }
+      }
+    } catch {}
+  }
+
+  // 2. Check Database ztanLedgerBlock
+  try {
+    const dbBlock = await db.ztanLedgerBlock.findFirst({
+      where: {
+        payload: {
+          contains: `requestUuid=${requestUuid}`
+        }
+      }
+    });
+    if (dbBlock) {
+      const correlation = parseCorrelationFromPayload(dbBlock.payload);
+      if (correlation) {
+        return {
+          auditUuid: correlation.auditUuid,
+          ledgerBlockUuid: correlation.ledgerBlockUuid
+        };
+      }
+    }
+  } catch {}
+
+  return null;
+}
+
+function parseCorrelationFromPayload(payload: string) {
+  const match = payload.match(/\[CorrelationTrace:\s*requestUuid=([a-fA-F0-9-]+),\s*auditUuid=([a-fA-F0-9-]+),\s*outboxUuid=([a-fA-F0-9-]+),\s*ledgerBlockUuid=([a-fA-F0-9-]+)\]/);
+  if (!match) return null;
+  return {
+    requestUuid: match[1],
+    auditUuid: match[2],
+    outboxUuid: match[3],
+    ledgerBlockUuid: match[4]
+  };
+}
 
 const STATE_DIR = path.join(process.cwd(), 'data');
 const STATE_FILE = path.join(STATE_DIR, 'ztan_governance_state.json');
@@ -160,6 +214,20 @@ router.post('/drill/trigger', async (req, res) => {
   const { id } = req.body;
   const state = loadState();
 
+  const requestUuid = (req.headers['x-request-uuid'] || req.headers['X-Request-UUID'] || req.body.requestUuid || crypto.randomUUID()) as string;
+  const auditUuid = (req.headers['x-audit-uuid'] || req.headers['X-Audit-UUID'] || req.body.auditUuid || crypto.randomUUID()) as string;
+  const outboxUuid = (req.headers['x-outbox-uuid'] || req.headers['X-Outbox-UUID'] || req.body.outboxUuid || crypto.randomUUID()) as string;
+  const ledgerBlockUuid = (req.headers['x-ledger-block-uuid'] || req.headers['X-Ledger-Block-UUID'] || req.body.ledgerBlockUuid || crypto.randomUUID()) as string;
+
+  const processed = await getProcessedRequestDetails(requestUuid);
+  if (processed) {
+    res.setHeader('X-Request-UUID', requestUuid);
+    res.setHeader('X-Audit-UUID', processed.auditUuid);
+    res.setHeader('X-Ledger-Block-UUID', processed.ledgerBlockUuid);
+    res.json(state);
+    return;
+  }
+
   if (state.activeDrill !== 'NONE') {
     res.status(400).json({ error: `Drill ${state.activeDrill} is already active.` });
     return;
@@ -173,11 +241,17 @@ router.post('/drill/trigger', async (req, res) => {
   state.currentRunningLatency = 0;
 
   const epochStr = state.epoch.toString();
+  const correlationMetadata = {
+    requestUuid,
+    auditUuid,
+    outboxUuid,
+    ledgerBlockUuid
+  };
 
   if (id === 'IFD-001') {
     // 1. Replay Poisoning
     const msg = 'ADVERSARIAL REPLAY: Found replay signature mismatch at index 1004. Forged payload injected.';
-    const entry = GovernanceLedger.appendEntry('REPLAY', msg, 'ZTAN-OPERATOR-01', 'UNTRUSTED', epochStr);
+    const entry = await GovernanceLedger.appendEntry('REPLAY', msg, 'ZTAN-OPERATOR-01', 'UNTRUSTED', epochStr, undefined, correlationMetadata);
 
     state.trustLevel = 'UNTRUSTED';
     state.replayIntegrity = 15;
@@ -197,7 +271,7 @@ router.post('/drill/trigger', async (req, res) => {
   } else if (id === 'IFD-002') {
     // 2. Telemetry Erosion
     const msg = 'TELEMETRY EROSION: SRE logs deleted. Log chronological continuity lost.';
-    GovernanceLedger.appendEntry('TELEMETRY', msg, 'ZTAN-OPERATOR-01', 'DEGRADED', epochStr);
+    await GovernanceLedger.appendEntry('TELEMETRY', msg, 'ZTAN-OPERATOR-01', 'DEGRADED', epochStr, undefined, correlationMetadata);
 
     state.telemetryEroded = true;
     state.chronologyGaps = true;
@@ -218,7 +292,7 @@ router.post('/drill/trigger', async (req, res) => {
   } else if (id === 'IFD-003') {
     // 3. Governance Collapse
     const msg = 'GOVERNANCE COLLAPSE: Epoch Quorum lost due to authority divergence.';
-    GovernanceLedger.appendEntry('GOVERNANCE', msg, 'ZTAN-SUPERVISOR', 'DEGRADED', epochStr);
+    await GovernanceLedger.appendEntry('GOVERNANCE', msg, 'ZTAN-SUPERVISOR', 'DEGRADED', epochStr, undefined, correlationMetadata);
 
     state.trustLevel = 'DEGRADED';
     state.isSafeMode = true;
@@ -242,7 +316,7 @@ router.post('/drill/trigger', async (req, res) => {
   } else if (id === 'RITUAL_DECAY') {
     // 4. Ritual Decay
     const msg = 'RITUAL DECAY: Automated rubber-stamping detected on authorization requests.';
-    GovernanceLedger.appendEntry('POLICY', msg, 'ZTAN-OPERATOR-01', 'DEGRADED', epochStr);
+    await GovernanceLedger.appendEntry('POLICY', msg, 'ZTAN-OPERATOR-01', 'DEGRADED', epochStr, undefined, correlationMetadata);
 
     state.ritualDecayed = true;
     state.ritualIntegrity = 24;
@@ -262,7 +336,7 @@ router.post('/drill/trigger', async (req, res) => {
   } else if (id === 'FREEZE_PRESSURE') {
     // 5. Freeze Pressure
     const msg = 'FREEZE PRESSURE: Queue flooded with automated capability expansion proposals.';
-    GovernanceLedger.appendEntry('GOVERNANCE', msg, 'ZTAN-OPERATOR-01', 'VERIFIED', epochStr);
+    await GovernanceLedger.appendEntry('GOVERNANCE', msg, 'ZTAN-OPERATOR-01', 'VERIFIED', epochStr, undefined, correlationMetadata);
 
     state.governanceProposals = [
       { id: 'GP-01', title: 'Add Autonomous AI Remediation Assistant to Root', riskLevel: 'CRITICAL', status: 'PENDING' },
@@ -282,7 +356,7 @@ router.post('/drill/trigger', async (req, res) => {
   } else if (id === 'TOTAL_QUORUM_FAILURE') {
     // 6. Total Quorum Failure
     const msg = 'QUORUM CRASH: Complete physical HSM authority rotation failure. Automated recovery path deadlocked.';
-    GovernanceLedger.appendEntry('GOVERNANCE', msg, 'SYSTEM', 'UNTRUSTED', epochStr);
+    await GovernanceLedger.appendEntry('GOVERNANCE', msg, 'SYSTEM', 'UNTRUSTED', epochStr, undefined, correlationMetadata);
 
     state.trustLevel = 'UNTRUSTED';
     state.isSafeMode = true;
@@ -303,19 +377,9 @@ router.post('/drill/trigger', async (req, res) => {
     });
   }
 
-  // --- PERSISTENCE: Write mitigation status to standard Prisma DB AuditLog ---
-  try {
-    await db.auditLog.create({
-      data: {
-        action: `DRILL_TRIGGERED:${id}`,
-        resource: 'ZTAN_GOVERNANCE',
-        userId: 'ZTAN-OPERATOR-01',
-        metadata: { activeDrill: id, timestamp: new Date().toISOString() }
-      }
-    });
-  } catch (dbErr) {
-    logger.warn('[GovernanceState] Failed to log drill trigger to Prisma DB');
-  }
+  res.setHeader('X-Request-UUID', requestUuid);
+  res.setHeader('X-Audit-UUID', auditUuid);
+  res.setHeader('X-Ledger-Block-UUID', ledgerBlockUuid);
 
   saveState(state);
   res.json(state);
@@ -325,6 +389,20 @@ router.post('/drill/trigger', async (req, res) => {
 router.post('/drill/resolve', async (req, res) => {
   const { id, actionsTaken, operatorSignature } = req.body;
   const state = loadState();
+
+  const requestUuid = (req.headers['x-request-uuid'] || req.headers['X-Request-UUID'] || req.body.requestUuid || crypto.randomUUID()) as string;
+  const auditUuid = (req.headers['x-audit-uuid'] || req.headers['X-Audit-UUID'] || req.body.auditUuid || crypto.randomUUID()) as string;
+  const outboxUuid = (req.headers['x-outbox-uuid'] || req.headers['X-Outbox-UUID'] || req.body.outboxUuid || crypto.randomUUID()) as string;
+  const ledgerBlockUuid = (req.headers['x-ledger-block-uuid'] || req.headers['X-Ledger-Block-UUID'] || req.body.ledgerBlockUuid || crypto.randomUUID()) as string;
+
+  const processed = await getProcessedRequestDetails(requestUuid);
+  if (processed) {
+    res.setHeader('X-Request-UUID', requestUuid);
+    res.setHeader('X-Audit-UUID', processed.auditUuid);
+    res.setHeader('X-Ledger-Block-UUID', processed.ledgerBlockUuid);
+    res.json(state);
+    return;
+  }
 
   if (state.activeDrill !== id) {
     res.status(400).json({ error: `Drill ${id} is not currently active.` });
@@ -357,7 +435,13 @@ router.post('/drill/resolve', async (req, res) => {
   // Append resolution block to the cryptographically chained ledger
   const msg = `MITIGATION SUCCESSFUL: Drill ${id} resolved. Actions: ${actionsTaken}. Reaction Time: ${reactionTime}s. Signature: ${ledgerSignature}`;
   const epochStr = state.epoch.toString();
-  GovernanceLedger.appendEntry('POLICY', msg, 'ZTAN-OPERATOR-01', 'VERIFIED', epochStr);
+  const correlationMetadata = {
+    requestUuid,
+    auditUuid,
+    outboxUuid,
+    ledgerBlockUuid
+  };
+  await GovernanceLedger.appendEntry('POLICY', msg, 'ZTAN-OPERATOR-01', 'VERIFIED', epochStr, undefined, correlationMetadata);
 
   // Clear incidents related to this drill
   state.activeIncidents = state.activeIncidents.filter(inc => !inc.id.includes(id) && !inc.id.includes('INC-TOTAL-FAIL'));
@@ -398,28 +482,32 @@ router.post('/drill/resolve', async (req, res) => {
     g.status === 'FAILED' ? { ...g, status: 'ACTIVE', desc: `Epoch ${g.id}: Reconstructed and Verified` } : g
   );
 
-  // --- PERSISTENCE: Write resolution to standard Prisma DB AuditLog ---
-  try {
-    await db.auditLog.create({
-      data: {
-        action: `DRILL_RESOLVED:${id}`,
-        resource: 'ZTAN_GOVERNANCE',
-        userId: operatorSignature || 'ZTAN-OPERATOR-01',
-        metadata: { reactionTime, actionsTaken, signature: operatorSignature }
-      }
-    });
-  } catch (dbErr) {
-    logger.warn('[GovernanceState] Failed to log drill resolution to Prisma DB');
-  }
+  res.setHeader('X-Request-UUID', requestUuid);
+  res.setHeader('X-Audit-UUID', auditUuid);
+  res.setHeader('X-Ledger-Block-UUID', ledgerBlockUuid);
 
   saveState(state);
   res.json(state);
 });
 
 // POST /api/v1/ztan/governance/proposal/resolve
-router.post('/proposal/resolve', (req, res) => {
+router.post('/proposal/resolve', async (req, res) => {
   const { proposalId, action, justification } = req.body;
   const state = loadState();
+
+  const requestUuid = (req.headers['x-request-uuid'] || req.headers['X-Request-UUID'] || req.body.requestUuid || crypto.randomUUID()) as string;
+  const auditUuid = (req.headers['x-audit-uuid'] || req.headers['X-Audit-UUID'] || req.body.auditUuid || crypto.randomUUID()) as string;
+  const outboxUuid = (req.headers['x-outbox-uuid'] || req.headers['X-Outbox-UUID'] || req.body.outboxUuid || crypto.randomUUID()) as string;
+  const ledgerBlockUuid = (req.headers['x-ledger-block-uuid'] || req.headers['X-Ledger-Block-UUID'] || req.body.ledgerBlockUuid || crypto.randomUUID()) as string;
+
+  const processed = await getProcessedRequestDetails(requestUuid);
+  if (processed) {
+    res.setHeader('X-Request-UUID', requestUuid);
+    res.setHeader('X-Audit-UUID', processed.auditUuid);
+    res.setHeader('X-Ledger-Block-UUID', processed.ledgerBlockUuid);
+    res.json(state);
+    return;
+  }
 
   state.governanceProposals = state.governanceProposals.map(p =>
     p.id === proposalId ? { ...p, status: (action === 'REJECT' ? 'REJECTED' : action === 'PRUNE' ? 'PRUNED' : 'APPROVED') as any, justification } : p
@@ -427,6 +515,13 @@ router.post('/proposal/resolve', (req, res) => {
 
   const allResolved = state.governanceProposals.every(p => p.status !== 'PENDING');
   state.habituationRisk = Math.max(12, state.habituationRisk - 15);
+
+  const correlationMetadata = {
+    requestUuid,
+    auditUuid,
+    outboxUuid,
+    ledgerBlockUuid
+  };
 
   if (allResolved) {
     const rejectsAndPrunes = state.governanceProposals.every(p => p.status === 'REJECTED' || p.status === 'PRUNED');
@@ -442,21 +537,27 @@ router.post('/proposal/resolve', (req, res) => {
       state.drillStartTime = null;
 
       // Append verification block
-      GovernanceLedger.appendEntry(
+      await GovernanceLedger.appendEntry(
         'GOVERNANCE',
         'MITIGATION SUCCESSFUL: Rejected automated capability expansions under freeze pressure.',
         'ZTAN-OPERATOR-01',
         'VERIFIED',
-        state.epoch.toString()
+        state.epoch.toString(),
+        undefined,
+        correlationMetadata
       );
     } else {
       // Operator approved unsafe capabilities under pressure! Trigger Trust Collapse!
       const alertMsg = 'TRUST FAILURE: Operator authorized capability expansion under freeze pressure.';
-      GovernanceLedger.appendEntry('GOVERNANCE', alertMsg, 'ZTAN-OPERATOR-01', 'UNTRUSTED', state.epoch.toString());
+      await GovernanceLedger.appendEntry('GOVERNANCE', alertMsg, 'ZTAN-OPERATOR-01', 'UNTRUSTED', state.epoch.toString(), undefined, correlationMetadata);
       state.trustLevel = 'UNTRUSTED';
       state.habituationRisk = 95;
     }
   }
+
+  res.setHeader('X-Request-UUID', requestUuid);
+  res.setHeader('X-Audit-UUID', auditUuid);
+  res.setHeader('X-Ledger-Block-UUID', ledgerBlockUuid);
 
   saveState(state);
   res.json(state);

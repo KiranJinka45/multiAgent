@@ -25,8 +25,12 @@ export class GlobalCoordinator {
   }
 
   public static async publishEvent(event: Omit<GlobalSreEvent, 'ts'>) {
-    const fullEvent = { ...event, ts: Date.now() };
-    await redis.publish(this.CHANNEL, JSON.stringify(fullEvent));
+    try {
+      const fullEvent = { ...event, ts: Date.now() };
+      await redis.publish(this.CHANNEL, JSON.stringify(fullEvent));
+    } catch (err) {
+      logger.warn({ err }, '[GlobalCoordinator] Failed to publish global SRE event due to Redis error');
+    }
   }
 
   private static handleIncomingEvent(event: GlobalSreEvent) {

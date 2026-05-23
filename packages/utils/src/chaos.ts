@@ -1,5 +1,5 @@
 import { logger } from '@packages/observability';
-import { redis } from './server.js';
+import { redis, injectRedisOutage } from './server.js';
 
 /**
  * ZTAN Chaos Engine
@@ -11,15 +11,7 @@ export const ChaosEngine = {
      */
     async simulateRedisOutage(durationMs: number = 5000) {
         logger.warn({ durationMs }, '[ChaosEngine] Injecting Redis Outage...');
-        // We can't easily "kill" the redis server from within node without sudo/exec,
-        // but we can force the client to disconnect or block.
-        if ((redis as any).disconnect) {
-            (redis as any).disconnect();
-            setTimeout(() => {
-                logger.info('[ChaosEngine] Restoring Redis Connection...');
-                (redis as any).connect().catch((e: any) => logger.error({ err: e.message }, 'Failed to restore Redis'));
-            }, durationMs);
-        }
+        injectRedisOutage(durationMs);
     },
 
     /**

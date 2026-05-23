@@ -1,5 +1,4 @@
-import { KubernetesDriver } from '../../autonomous-ops/src/drivers/kubernetes.js';
-import { TerraformDriver } from '../../autonomous-ops/src/drivers/terraform.js';
+import { KubernetesDriver, TerraformDriver } from '@packages/autonomous-ops';
 
 export interface ChaosEvent {
     id: string;

@@ -1,7 +1,7 @@
 import { Options } from 'tsup';
 
 export const baseConfig: Options = {
-  format: ['cjs', 'esm'],
+  format: ['esm'],
   dts: true,
   clean: true,
   sourcemap: true,

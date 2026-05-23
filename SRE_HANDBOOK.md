@@ -7,14 +7,14 @@ Unlike traditional SRE systems that trust their own metrics, this system operate
 
 ## 🏗️ Core Architecture Components
 
-### 1. Consensus & Stability
-- **RaftAuthority**: Ensures linearizable ordering of high-risk actions.
-- **IdentityBridge**: Provides cryptographic signing for all global commitments, allowing AWS nodes and GCP nodes to trust each other without a shared network.
+### 1. State Authority & Serialization
+- **PostgresTransactionAuthority**: Ensures serialized ordering, atomic transaction anchoring, and sequence numbers for all high-risk actions.
+- **AuditBridge**: Provides cryptographic signing and SHA-256 integrity chaining for all action commitments.
 
 ### 2. State Reconciliation
 - **TruthLoop**: A continuous audit cycle that compares Intent vs. Reality.
-- **InfraVerifier**: Queries multiple global observers to reach consensus on the state of DNS, DB, and Traffic.
-- **ConvergenceMonitor**: Tracks TTAC (Time To Actual Correctness) to account for physical propagation delays.
+- **InfraVerifier**: Queries multiple local infrastructure endpoints to verify the state of DNS, DB, and Traffic against the canonical PostgreSQL registry.
+- **ConvergenceMonitor**: Tracks TTAC (Time To Actual Correctness) to account for database replication and network propagation delays.
 
 ### 4. Autonomous Rollback Policy (Level 5)
 If a reconciliation action is completed, but the `TruthLoop` detects a persistent divergence (>60s) from the new target state, the system MUST:

@@ -1,6 +1,6 @@
 import { eventBus } from '@packages/utils';
 import { freeQueue } from '@packages/queue';
-import { Mission } from '@packages/contracts';
+import type { Mission } from '@packages/contracts';
 import crypto from 'crypto';
 import { logger } from '@packages/observability';
 import { redis } from '@packages/utils';

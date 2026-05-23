@@ -2,12 +2,12 @@
   "name": "@packages/resilience",
   "version": "0.1.0",
   "type": "module",
-  "main": "dist/index.cjs",
-  "module": "dist/index.mjs",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsup src/index.ts --no-dts && tsc --emitDeclarationOnly -p tsconfig.json --declarationDir ./dist",
-    "dev": "tsup src/index.ts --no-dts --watch",
+    "build": "tsup src/index.ts --format esm --no-dts && tsc --emitDeclarationOnly -p tsconfig.json --declarationDir ./dist",
+    "dev": "tsup src/index.ts --format esm --no-dts --watch",
     "lint": "eslint src/**"
   },
   "dependencies": {
@@ -31,8 +31,7 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.mjs"
+      "import": "./dist/index.js"
     }
   }
 }

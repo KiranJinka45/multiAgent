@@ -17,23 +17,26 @@ export class SreAnalyticsService {
   public static setOnEventListener(listener: (event: SreAnalyticsEvent) => void) {
     this.onEventListener = listener;
   }
-
   public static async recordEvent(event: Omit<SreAnalyticsEvent, 'ts'>) {
-    const payload = {
-      ...event,
-      ts: Date.now()
-    };
+    try {
+      const payload = {
+        ...event,
+        ts: Date.now()
+      };
 
-    // Store in a rolling stream for the dashboard
-    await redis.lpush(this.EVENT_LOG, JSON.stringify(payload));
-    await redis.ltrim(this.EVENT_LOG, 0, 1000); // Keep last 1000 events
+      // Store in a rolling stream for the dashboard
+      await redis.lpush(this.EVENT_LOG, JSON.stringify(payload));
+      await redis.ltrim(this.EVENT_LOG, 0, 1000); // Keep last 1000 events
 
-    if (this.onEventListener) {
-      this.onEventListener(payload);
+      if (this.onEventListener) {
+        this.onEventListener(payload);
+      }
+
+      // Perform aggregations for time-series metrics
+      await this.aggregate(payload);
+    } catch (err: any) {
+      logger.warn({ err }, '[SreAnalyticsService] Failed to record analytics event due to Redis connection/command error');
     }
-
-    // Perform aggregations for time-series metrics
-    await this.aggregate(payload);
   }
 
   private static async aggregate(event: SreAnalyticsEvent) {

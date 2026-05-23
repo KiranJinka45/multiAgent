@@ -133,8 +133,8 @@ export const PreviewServerManager: any = { start: async () => {}, stop: async ()
 export const PreviewWatchdog: any = { start: async () => {}, stop: async () => {} };
 export class BaseAgent {
     constructor(public name: string = 'base') {}
-    async run() { return { success: true }; }
-    async execute() { return { success: true }; }
+    async run(..._args: any[]) { return { success: true }; }
+    async execute(..._args: any[]): Promise<any> { return { success: true }; }
 }
 export class DatabaseAgent extends BaseAgent { constructor() { super('database'); } }
 export class BackendAgent extends BaseAgent { constructor() { super('backend'); } }
@@ -199,6 +199,7 @@ export const RuntimeMetrics: any = { record: async () => {} };
 
 export const runtimeStartupDuration: any = { observe: () => {} };
 export const runtimeCrashesTotal: any = { inc: () => {} };
+export const retryCountTotal: any = { inc: () => {} };
 export const runtimeActiveTotal: any = { inc: () => {}, dec: () => {} };
 export const runtimeProxyErrorsTotal: any = { inc: () => {} };
 export const runtimeEvictionsTotal: any = { inc: () => {} };

@@ -15,8 +15,9 @@ async function startValidationLoop() {
     app.get('/health', (req: express.Request, res: express.Response) => {
         res.json({ status: 'ok', service: 'control-plane' });
     });
-    app.listen(3011, '0.0.0.0', () => {
-        logger.info('[ValidationDaemon] Health server running on port 3011');
+    const PORT = parseInt(process.env.PORT || '3011', 10);
+    app.listen(PORT, '0.0.0.0', () => {
+        logger.info(`[ValidationDaemon] Health server running on port ${PORT}`);
     });
 
     // Run every 2 minutes

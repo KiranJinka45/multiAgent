@@ -11,6 +11,12 @@
 ZTAN is a **PostgreSQL-authoritative replay-and-recovery coordination platform**. It is NOT a regional decentralized consensus engine, global sovereignty layer, or Byzantine network. 
 All operational guarantees—including write sequencing, epoch fencing, and partition states—are authoritatively governed by PostgreSQL acting as the single transactional consistency root.
 
+* **Architecture Freeze Clarity**: The active **Architecture Freeze** applies strictly to **business-domain coordination primitives** (such as state-machine state space layout, consensus mechanics, transaction schemas, outbox ledger structures, and fencing generation policies). It does *not* restrict the development, integration, or expansion of **out-of-process reliability validation infrastructure** (such as telemetry agents, reproducibility analyzers, diagnostic dashboard servers, or destructive pathology suites), which are essential tools for our empirical verification program.
+* **Stateless Horizontal Scaling Boundary:** Stateless and advisory layers (AI agent orchestration, inference, policy evaluation, telemetry, read replicas) may scale horizontally immediately. The authoritative transactional coordination core, lease ownership, and write path must remain strictly single-writer to eliminate split-brain risk and replay ambiguity.
+* **Separation of Advisory and Execution Invariant:**
+  > *LLMs may recommend actions. Only deterministic systems may authorize irreversible execution.*
+  This single boundary is an immutable, frozen architectural gatekeeper across the platform. No probabilistic reasoning engine or stochastic agent loop shall ever possess direct mutation authorization or final execution rights.
+
 ---
 
 ## 📏 2. Measurable State-Machine Bounding
@@ -52,7 +58,7 @@ To prevent slow invariant erosion and ensure that future maintainers cannot intr
 
 * **State-Machine Diffs:** CI gates must inspect state transition modules. Any pull request attempting to add states, introduce custom transition bypasses, or weaken fencing guarantees must be automatically rejected.
 * **Stewardship Verification:** The validation suite (` drill:stewardship`) must be executed on every pull request. A verdict of `FAILED` in any wave blocks merge.
-* **TLA+ parity:** Transition logic modifications must maintain parity with the formal safety invariants defined in `invariants.tla`.
+* **TLA+ parity:** Planned TLA+ modeling to ensure transition logic modifications maintain parity with formal safety invariants.
 
 ---
 
@@ -65,7 +71,7 @@ Uptime, failover latencies, WAL growth curves, and operator incident frequency a
 ## 📋 6. Document Precedence & Truth Hierarchy
 
 To prevent documentation sprawl and ensure SRE operators have a single clear authority during recovery events:
-1. **Running Code & Formal Models:** The compiled TypeScript code and formal safety checks (`invariants.tla`) are the final source of system truth.
+1. **Running Code:** The compiled TypeScript code is the final source of system truth (with planned formal safety checks via `invariants.tla`).
 2. **This Charter (`INVARIANT_GOVERNANCE_CHARTER.md`):** Governs all architectural boundaries and permitted transitions.
 3. **Operational Reports:** Performance ledgers (`STEWARDSHIP_ENGINEERING_REPORT.md`) provide empirical execution baselines.
 4. **Auxiliary Planning Files:** Any file in `.planning/` serves as a temporal context record and has zero governing authority over active systems.

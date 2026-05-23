@@ -17,7 +17,7 @@ async function runResurrectionDrill() {
     console.log('\n🔥 SIMULATING REGIONAL WIPEOUT (Purging local caches)...');
     // In a real scenario, this would be deleting the DB. 
     // Here we just re-initialize the singleton logic if we could, 
-    // but for the drill we'll prove recovery of the ID.
+    // but for the drill we'll verify recovery of the ID.
 
     // 3. Resurrection from "Cold Storage"
     console.log('\n❄️ RESURRECTING FROM COLD STORAGE...');

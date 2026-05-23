@@ -1,6 +1,7 @@
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 const NAMESPACE = 'ztan-validation';
 const METRICS_FILE = 'METRICS.json';
@@ -115,6 +116,7 @@ async function runValidationCycle() {
 }
 
 // If run directly
-if (require.main === module) {
+const isMain = process.argv[1] && fs.realpathSync(process.argv[1]) === fs.realpathSync(fileURLToPath(import.meta.url));
+if (isMain) {
     runValidationCycle();
 }

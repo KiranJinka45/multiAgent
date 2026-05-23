@@ -1,7 +1,7 @@
-import { telemetryIngestion } from './telemetry-ingestion.service';
+import { telemetryIngestion } from './telemetry-ingestion.service.js';
 import { logger } from '@packages/observability';
 import { v4 as uuid } from 'uuid';
-import { chaosOrchestrator } from './chaos-orchestrator';
+import { chaosOrchestrator } from './chaos-orchestrator.js';
 
 export class TelemetrySimulator {
     private activeInterval: NodeJS.Timeout | null = null;

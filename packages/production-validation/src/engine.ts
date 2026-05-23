@@ -1,4 +1,4 @@
-import { OperationalEvidence, ProductionScorecard, ROIReport } from './types.js';
+import type { OperationalEvidence, ProductionScorecard, ROIReport } from './types.js';
 
 /**
  * Institutional Production Validation Engine
@@ -39,6 +39,8 @@ export class ProductionValidationEngine {
             institutionId: 'INST-GLOBAL-001',
             period: { start, end },
             survivabilityIndex: 94,
+            distributedResilience: 92,
+            epistemicConfidence: 88,
             burdenReduction: 42,
             recoveryConfidence: avgRecoveryConfidence,
             stabilityTrend: 'IMPROVING',

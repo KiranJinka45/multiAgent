@@ -12,34 +12,37 @@
     "skipLibCheck": true,
     "paths": {
       "@packages/auth-internal": [
-        "../../packages/auth-internal/src"
+        "../../packages/auth-internal/src/index.ts"
       ],
       "@packages/business": [
-        "../../packages/business/src"
+        "../../packages/business/src/index.ts"
       ],
       "@packages/db": [
-        "../../packages/db/src"
+        "../../packages/db/src/index.ts"
       ],
       "@packages/memory": [
-        "../../packages/memory/src"
+        "../../packages/memory/src/index.ts"
       ],
       "@packages/observability": [
-        "../../packages/observability/src"
+        "../../packages/observability/src/index.ts"
       ],
       "@packages/shared-services": [
-        "../../packages/shared-services/src"
+        "../../packages/shared-services/src/index.ts"
       ],
       "@packages/supabase": [
-        "../../packages/supabase/src"
+        "../../packages/supabase/src/index.ts"
+      ],
+      "@packages/queue": [
+        "../../packages/queue/src/index.ts"
       ],
       "@packages/utils": [
-        "../../packages/utils/src"
+        "../../packages/utils/src/index.ts"
       ],
       "@packages/ztan-crypto": [
-        "../../packages/ztan-crypto/src"
+        "../../packages/ztan-crypto/src/index.ts"
       ],
       "@packages/contracts": [
-        "../../packages/contracts/src"
+        "../../packages/contracts/src/index.ts"
       ]
     },
     "incremental": true,
@@ -67,6 +70,24 @@
     },
     {
       "path": "../../packages/contracts"
+    },
+    {
+      "path": "../../packages/ztan-crypto"
+    },
+    {
+      "path": "../../packages/business"
+    },
+    {
+      "path": "../../packages/memory-core"
+    },
+    {
+      "path": "../../packages/config"
+    },
+    {
+      "path": "../../packages/supabase"
+    },
+    {
+      "path": "../../packages/queue"
     }
   ]
 }

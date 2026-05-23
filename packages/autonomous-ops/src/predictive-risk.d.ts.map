@@ -1,1 +1,0 @@
-{"version":3,"file":"predictive-risk.d.ts","sourceRoot":"","sources":["predictive-risk.ts"],"names":[],"mappings":"AAAA,MAAM,WAAW,YAAY;IACzB,sBAAsB,EAAE,MAAM,CAAC;IAC/B,eAAe,EAAE,MAAM,EAAE,CAAC;IAC1B,eAAe,EAAE,MAAM,CAAC;IACxB,eAAe,EAAE,MAAM,CAAC;IACxB,SAAS,EAAE,MAAM,CAAC;CACrB;AAED;;;GAGG;AACH,qBAAa,oBAAoB;WAChB,YAAY,IAAI,OAAO,CAAC,YAAY,CAAC;CAUrD"}

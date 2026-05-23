@@ -86,7 +86,7 @@ def verify_vector(file_path):
         print(f"{'[PASS]' if payload_match else '[FAIL]'} canonicalPayloadHex")
         
         # We don't verify BLS signature mathematically here since py_ecc isn't installed by default,
-        # but matching the exact canonical byte layout proves cross-runtime encoding determinism.
+        # but matching the exact canonical byte layout operationally verifies cross-runtime encoding determinism.
         
         passed = id_match and payload_match
         print(f"{'[PASS] verification' if passed else '[FAIL] verification'}")

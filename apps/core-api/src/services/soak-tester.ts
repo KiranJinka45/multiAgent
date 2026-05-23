@@ -1,7 +1,7 @@
 import { logger } from '@packages/observability';
-import { chaosOrchestrator } from './chaos-orchestrator';
-import type { ChaosScenario } from './chaos-orchestrator';
-import { validationEngine } from './validation-engine';
+import { chaosOrchestrator } from './chaos-orchestrator.js';
+import type { ChaosScenario } from './chaos-orchestrator.js';
+import { validationEngine } from './validation-engine.js';
 
 /**
  * SoakTester: Automates the 72-hour chaos soak test.

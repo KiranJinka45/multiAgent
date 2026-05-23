@@ -1,5 +1,5 @@
 import express from 'express';
-import { TssSessionService } from '../services/tss-session.service';
+import { TssSessionService } from '../services/tss-session.service.js';
 import { RecoveryHistoryEngine, MigrationRehearsal } from '@packages/utils';
 
 const router = express.Router();

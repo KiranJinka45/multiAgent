@@ -4,9 +4,12 @@
     "outDir": "./dist",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "composite": true,
+    "composite": false,
+    "incremental": false,
     "declaration": true,
+    "declarationMap": false,
     "noEmit": false,
+    "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
       "@packages/core-engine": [
@@ -23,17 +26,29 @@
       ],
       "@packages/economics": [
         "../economics/src"
+      ],
+      "@packages/adversarial-telemetry": [
+        "../adversarial-telemetry/src"
+      ],
+      "@packages/economic-audit": [
+        "../economic-audit/src"
+      ],
+      "@packages/operator-compression": [
+        "../operator-compression/src"
+      ],
+      "@packages/deployment-hardening": [
+        "../deployment-hardening/src"
+      ],
+      "@packages/evidence-lifecycle": [
+        "../evidence-lifecycle/src"
+      ],
+      "@packages/institutional-dashboard": [
+        "../institutional-dashboard/src"
       ]
     },
-    "incremental": true,
     "rootDir": "src"
   },
   "include": [
-    "src*"
-  ],
-  "references": [
-    {
-      "path": "../observability"
-    }
+    "src/**/*"
   ]
 }

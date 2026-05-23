@@ -17,6 +17,22 @@ export class CausalCanary {
   }
 
   /**
+   * Decides action scope (FULL or CANARY) for an intervention.
+   */
+  public decideActionScope(interventionId: string): 'FULL' | 'CANARY' {
+    if (this.isCanary(interventionId)) {
+      return 'CANARY';
+    }
+    // Assign to CANARY group randomly for counterfactual uplift estimation
+    const isCanary = Math.random() < 0.5;
+    if (isCanary) {
+      this.registerExperiment(interventionId);
+      return 'CANARY';
+    }
+    return 'FULL';
+  }
+
+  /**
    * Applies a partial healing intensity to simulate a hold-out group.
    */
   public async applyCanary(nodeId: string) {

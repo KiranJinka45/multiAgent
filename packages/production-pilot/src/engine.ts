@@ -1,4 +1,4 @@
-import { PilotEnvironment, TrustCalibrationEvent, PilotScorecard } from './types.js';
+import type { PilotEnvironment, TrustCalibrationEvent, PilotScorecard } from './types.js';
 import { ChaosEngine } from './chaos.js';
 import { ReplayVerifier } from './replay.js';
 

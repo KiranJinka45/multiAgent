@@ -16,7 +16,7 @@ export interface ReliabilityInference {
 }
 
 export interface EvidenceItem {
-    source: 'METRIC' | 'LOG' | 'EVENT' | 'TOPOLOGY';
+    source: 'METRIC' | 'LOG' | 'EVENT' | 'TOPOLOGY' | 'AI_REASONING';
     id: string;
     description: string;
     value?: any;

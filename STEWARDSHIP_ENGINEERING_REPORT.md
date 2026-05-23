@@ -11,12 +11,12 @@
 
 | Wave | Stewardship Domain | Verdict | Success Highlights |
 | :--- | :--- | :--- | :--- |
-| **Wave 1** | Operational Soak & Stewardship Validation | ✅ **PASSED** | Bounded memory consumption, invariant parity, and absolute protection rules verified. |
-| **Wave 2** | Observability & Operational Intelligence | ✅ **PASSED** | Bounded memory consumption, invariant parity, and absolute protection rules verified. |
-| **Wave 3** | Governance Hardening | ✅ **PASSED** | Bounded memory consumption, invariant parity, and absolute protection rules verified. |
-| **Wave 4** | Real PostgreSQL Pathology Testing | ✅ **PASSED** | Bounded memory consumption, invariant parity, and absolute protection rules verified. |
-| **Wave 5** | Performance Envelope Mapping | ✅ **PASSED** | Bounded memory consumption, invariant parity, and absolute protection rules verified. |
-| **Wave 6** | Threat Modeling & Adversarial Review | ✅ **PASSED** | Bounded memory consumption, invariant parity, and absolute protection rules verified. |
+| **Wave 1** | Operational Soak & Stewardship Validation | ✅ **PASSED** | Bounded memory consumption, invariant parity, and fail-closed protection rules verified. |
+| **Wave 2** | Observability & Operational Intelligence | ✅ **PASSED** | Bounded memory consumption, invariant parity, and fail-closed protection rules verified. |
+| **Wave 3** | Governance Hardening | ✅ **PASSED** | Bounded memory consumption, invariant parity, and fail-closed protection rules verified. |
+| **Wave 4** | Real PostgreSQL Pathology Testing | ✅ **PASSED** | Bounded memory consumption, invariant parity, and fail-closed protection rules verified. |
+| **Wave 5** | Performance Envelope Mapping | ✅ **PASSED** | Bounded memory consumption, invariant parity, and fail-closed protection rules verified. |
+| **Wave 6** | Threat Modeling & Adversarial Review | ✅ **PASSED** | Bounded memory consumption, invariant parity, and fail-closed protection rules verified. |
 
 ---
 

@@ -1,7 +1,7 @@
 import { redis } from '@packages/utils';
 import { logger } from '@packages/observability';
 import { v4 as uuidv4 } from 'uuid';
-import { NotificationService } from './notification-service';
+import { NotificationService } from './notification-service.js';
 
 export type ApprovalStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'EXPIRED';
 
@@ -86,7 +86,7 @@ export class ApprovalService {
 
   public static async getActiveRequests(): Promise<ApprovalRequest[]> {
     const ids = await redis.lrange(this.LIST_KEY, 0, -1);
-    const requests = await Promise.all(ids.map(id => this.getRequest(id)));
+    const requests = await Promise.all(ids.map((id: string) => this.getRequest(id)));
     return requests.filter((r): r is ApprovalRequest => r !== null && r.status === 'PENDING');
   }
 }

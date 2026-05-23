@@ -1,8 +1,8 @@
 {
-  "totalTests": 3,
-  "successfulRecoveries": 3,
+  "totalTests": 4,
+  "successfulRecoveries": 4,
   "failedRecoveries": 0,
-  "lastTestTimestamp": "2026-05-15T18:23:45.455Z",
+  "lastTestTimestamp": "2026-05-22T07:05:30.967Z",
   "trustScore": 1,
   "history": [
     {
@@ -17,6 +17,11 @@
     },
     {
       "timestamp": "2026-05-15T18:23:45.455Z",
+      "success": true,
+      "type": "rollout_failure"
+    },
+    {
+      "timestamp": "2026-05-22T07:05:30.967Z",
       "success": true,
       "type": "rollout_failure"
     }

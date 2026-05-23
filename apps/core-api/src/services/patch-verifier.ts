@@ -3,8 +3,8 @@ import path from 'path';
 import fs from 'fs';
 import util from 'util';
 import { logger } from '@packages/observability';
-import { learningEngine } from './learning';
-import { VirtualFileSystem } from './vfs';
+import { learningEngine } from './learning/index.js';
+import { VirtualFileSystem } from './vfs/index.js';
 
 const execAsync = util.promisify(exec);
 

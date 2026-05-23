@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsup src/index.ts --no-dts --watch",
     "build": "tsup src/index.ts --no-dts && tsc --emitDeclarationOnly -p tsconfig.json --declarationDir ./dist",
-    "start": "tsx -r tsconfig-paths/register src/index.ts",
+    "start": "node dist/index.js",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },

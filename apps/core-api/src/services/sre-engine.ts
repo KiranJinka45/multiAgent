@@ -11,50 +11,50 @@ import type {
   SREOperationalControl,
   SREReliability
 } from '@packages/contracts';
-import { CausalityMapper } from './learning/causality-mapper';
-import { ConvergenceMonitor } from './learning/convergence-monitor';
-import { CalibrationEngine } from './calibration-engine';
-import { actuationController } from './actuation-controller';
-import { AnomalyEnsemble } from './learning/anomaly-detector';
+import { CausalityMapper } from './learning/causality-mapper.js';
+import { ConvergenceMonitor } from './learning/convergence-monitor.js';
+import { CalibrationEngine } from './calibration-engine.js';
+import { actuationController } from './actuation-controller.js';
+import { AnomalyEnsemble } from './learning/anomaly-detector.js';
 import { v4 as uuid } from 'uuid';
-import { validationEngine } from './validation-engine';
-import { sloManager } from './slo-manager';
-import { decisionEngine } from './decision-engine';
-import { kubernetesActuator } from './kubernetes-actuator';
-import { decisionAudit } from './operational-control/decision-audit';
-import { shadowExecutor } from './operational-control/shadow-executor';
-import { causalCanary } from './operational-control/causal-canary';
-import { topologyManager } from './learning/causal-topology';
+import { validationEngine } from './validation-engine.js';
+import { sloManager } from './slo-manager.js';
+import { decisionEngine } from './decision-engine.js';
+import { kubernetesActuator } from './kubernetes-actuator.js';
+import { decisionAudit } from './operational-control/decision-audit.js';
+import { shadowExecutor } from './operational-control/shadow-executor.js';
+import { causalCanary } from './operational-control/causal-canary.js';
+import { topologyManager } from './learning/causal-topology.js';
 
-import { NotificationService } from './notification-service';
-import { SreAnalyticsService } from './operational-control/sre-analytics';
-import { GlobalCoordinator } from './operational-control/global-coordinator';
-import { rootCauseEngine } from './learning/root-cause-engine';
-import type { NodeSignal, RCAResult } from './learning/root-cause-engine';
-import { verificationCoordinator } from './operational-control/verification-coordinator';
-import { actionEvaluator } from './learning/action-evaluator';
-import { qLearningAgent } from './learning/q-learning-agent';
-import type { RLState } from './learning/q-learning-agent';
-import { driftDetector } from './learning/drift-detector';
-import { adaptiveReliabilityManager } from './learning/adaptive-reliability';
-import { modelRegistry } from './learning/model-registry';
-import { IncidentReplayService } from './operational-control/incident-replay';
-import { businessMetrics, valueModel } from './operational-control/business-intelligence';
-import { businessOptimizer } from './operational-control/business-optimizer';
-import { operationalAudit } from './operational-control/audit-engine';
-import { operationalWatchdog } from './operational-control/watchdog';
-import { policyEngine } from './policy-engine';
-import { policyOptimizer } from './operational-control/policy-optimizer';
-import { postMortemService } from './operational-control/post-mortem-service';
+import { NotificationService } from './notification-service.js';
+import { SreAnalyticsService } from './operational-control/sre-analytics.js';
+import { GlobalCoordinator } from './operational-control/global-coordinator.js';
+import { rootCauseEngine } from './learning/root-cause-engine.js';
+import type { NodeSignal, RCAResult } from './learning/root-cause-engine.js';
+import { verificationCoordinator } from './operational-control/verification-coordinator.js';
+import { actionEvaluator } from './learning/action-evaluator.js';
+import { qLearningAgent } from './learning/q-learning-agent.js';
+import type { RLState } from './learning/q-learning-agent.js';
+import { driftDetector } from './learning/drift-detector.js';
+import { adaptiveReliabilityManager } from './learning/adaptive-reliability.js';
+import { modelRegistry } from './learning/model-registry.js';
+import { IncidentReplayService } from './operational-control/incident-replay.js';
+import { businessMetrics, valueModel } from './operational-control/business-intelligence.js';
+import { businessOptimizer } from './operational-control/business-optimizer.js';
+import { operationalAudit } from './operational-control/audit-engine.js';
+import { operationalWatchdog } from './operational-control/watchdog.js';
+import { policyEngine } from './policy-engine.js';
+import { policyOptimizer } from './operational-control/policy-optimizer.js';
+import { postMortemService } from './operational-control/post-mortem-service.js';
 import { 
   ReliabilityAgent, 
   CostAgent, 
   LatencyAgent 
-} from './learning/multi-agent-intelligence/specialized-agents';
-import { coordinationEngine } from './learning/multi-agent-intelligence/coordination-engine';
-import { StabilityEngine } from './stability-engine';
-import { OperationalControlEngine } from './operational-control-engine';
-import { ApprovalService } from './approval-service';
+} from './learning/multi-agent-intelligence/specialized-agents.js';
+import { coordinationEngine } from './learning/multi-agent-intelligence/coordination-engine.js';
+import { StabilityEngine } from './stability-engine.js';
+import { OperationalControlEngine } from './operational-control-engine.js';
+import { ApprovalService } from './approval-service.js';
 
 const SAFE_BOUNDS = {
   MIN_TTAC: 2000,
@@ -80,7 +80,7 @@ export class SreEngine extends EventEmitter {
   private tuning: SRETuningParams = {
     expectedTTAC: 15000,
     confidenceThreshold: 0.8,
-    stabilityDecayRate: 0.05,
+    reliabilityDecayRate: 0.05,
     minDiversity: 1
   };
 
@@ -139,9 +139,13 @@ export class SreEngine extends EventEmitter {
   }
 
   private async loadTuning() {
-    const saved = await redis.get(SreEngine.TUNING_KEY);
-    if (saved) {
-      this.tuning = { ...this.tuning, ...JSON.parse(saved) };
+    try {
+      const saved = await redis.get(SreEngine.TUNING_KEY);
+      if (saved) {
+        this.tuning = { ...this.tuning, ...JSON.parse(saved) };
+      }
+    } catch (err) {
+      logger.warn({ err }, '[SRE] Failed to load tuning config from redis');
     }
   }
 
@@ -166,7 +170,11 @@ export class SreEngine extends EventEmitter {
 
     this.tuning = { ...this.tuning, ...params };
     this.lastTuningTime = now;
-    await redis.set(SreEngine.TUNING_KEY, JSON.stringify(this.tuning));
+    try {
+      await redis.set(SreEngine.TUNING_KEY, JSON.stringify(this.tuning));
+    } catch (err) {
+      logger.warn({ err }, '[SRE] Failed to save tuning config to redis');
+    }
     
     this.addEvent('MANUAL_OVERRIDE_EVENT', `Thresholds updated: ${JSON.stringify(params)}`, 'WARNING');
     this.emit('stateChange', await this.getCurrentStateAsync());
@@ -299,7 +307,8 @@ export class SreEngine extends EventEmitter {
       burnRate,
       latencyP95: 200 + (perception.anomalyHypothesis.confidence * 1000),
       errorRate,
-      stabilityScore: 1.0 // Initial guess or previous stability
+      anomalyScore: perception.anomalyHypothesis.confidence,
+      reliabilityScore: 1.0 // Initial guess or previous reliability
     }));
     const consensus_result = coordinationEngine.decide(agentDecisions);
 
@@ -614,7 +623,11 @@ export class SreEngine extends EventEmitter {
     };
     
     // 🔥 PILLAR 1: Real-time telemetry publication for Gateway/UI
-    await redis.publish('sre:telemetry:update', JSON.stringify(update));
+    try {
+      await redis.publish('sre:telemetry:update', JSON.stringify(update));
+    } catch (err) {
+      // Ignore publish failures during transient Redis outages
+    }
 
     // 8. Multi-Stage Canary Actuation (Gated by Shadow Mode & Causal Redirection)
     logger.info({ decision, controlMode: operationalControl.mode, shadowMode: this.shadowMode }, '[SreEngine] Evaluating actuation condition');
@@ -727,7 +740,7 @@ export class SreEngine extends EventEmitter {
         this.nodeAnomalyRegistry.clear();
         this.observers.clear();
 
-        import('./telemetry-simulator').then(({ telemetrySimulator }) => {
+        import('./telemetry-simulator.js').then(({ telemetrySimulator }) => {
           telemetrySimulator.setHealing(60000); // Force healthy state for 60s
         });
 
@@ -1141,6 +1154,15 @@ export class SreEngine extends EventEmitter {
     this.lastRLAction = null;
     this.lastSnapshot = null;
     logger.info('[SRE] Engine state reset');
+  }
+
+  /**
+   * Causal intervention: overrides perception for a specific node.
+   * Used by Do-calculus analysis in causal-intervention-service.
+   */
+  public overridePerception(nodeId: string, value: number): void {
+    logger.warn({ nodeId, value }, '[SRE] Causal intervention: overriding perception for node');
+    this.addEvent('CAUSAL_INTERVENTION', `Perception override for ${nodeId} → ${value}`, 'WARNING');
   }
 }
 

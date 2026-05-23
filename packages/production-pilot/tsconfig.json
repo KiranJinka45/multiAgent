@@ -5,15 +5,18 @@
     "composite": true,
     "declaration": true,
     "noEmit": false,
+    "incremental": true,
+    "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
+    "rootDir": "src",
     "baseUrl": ".",
     "paths": {
       "@packages/observability": [
-        "../observability/src"
+        "../observability/src/index.ts"
+      ],
+      "@packages/autonomous-ops": [
+        "../autonomous-ops/src/index.ts"
       ]
-    },
-    "incremental": true,
-    "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
-    "rootDir": "src"
+    }
   },
   "include": [
     "src/**/*"
@@ -25,6 +28,9 @@
   "references": [
     {
       "path": "../observability"
+    },
+    {
+      "path": "../autonomous-ops"
     }
   ]
 }

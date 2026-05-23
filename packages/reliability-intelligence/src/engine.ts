@@ -1,5 +1,5 @@
-import { ReliabilityInference, EvidenceItem, RemediationPath, PlatformHealthState } from './types.js';
-import { InfraGraphEngine } from '../../infra-graph/src/engine.js';
+import type { ReliabilityInference, EvidenceItem, RemediationPath, PlatformHealthState } from './types.js';
+import { InfraGraphEngine } from '@packages/infra-graph';
 import { ReliabilityLLMProvider } from './llm.js';
 
 /**
@@ -52,7 +52,7 @@ ANOMALY DETECTED:
 - Value: ${value} (Threshold: ${threshold})
 
 TOPOLOGY CONTEXT:
-- Blast Radius Score: ${blastRadius.score}
+- Blast Radius Score: ${blastRadius.totalImpactCount}
 - Affected Dependencies: ${blastRadius.recursiveNodes.join(', ')}
 
 Explain the root cause and provide a remediation plan in JSON format.

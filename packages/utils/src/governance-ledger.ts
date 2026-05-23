@@ -391,6 +391,44 @@ export const GovernanceLedger = {
       return;
     }
 
+    // Enforce randomized restart jitter and exponential backoff to prevent synchronized restart storms
+    const suppressionFile = path.join(LEDGER_DIR, 'watchdog_suppression.json');
+    if (fs.existsSync(suppressionFile)) {
+      try {
+        const raw = fs.readFileSync(suppressionFile, 'utf8');
+        const data = JSON.parse(raw);
+        const now = Date.now();
+        // Filter failures in the last 60 seconds
+        const recentFailures = (data.restarts || []).filter((r: any) => now - r.timestamp < 60000);
+        
+        if (recentFailures.length > 0) {
+          const failureCount = recentFailures.length;
+          
+          // Rolling Restart Suppression: Quarantine the node if it fails 5 or more times in 60 seconds
+          if (failureCount >= 5) {
+            const errMsg = `[GovernanceLedger] [ROLLING_RESTART_SUPPRESSION] Node quarantined: ${failureCount} failures detected in the last 60 seconds. Aborting startup to prevent synchronized self-destruction.`;
+            logger.error(errMsg);
+            throw new Error(errMsg);
+          }
+
+          // Calculate exponential backoff: base 1.5 seconds, scaling with failure count
+          const backoffDelay = Math.min(45000, 1500 * Math.pow(2, failureCount - 1));
+          // Inject a randomized restart jitter (between 0 and 3000ms) to ensure staggered boot times
+          const jitterDelay = Math.floor(Math.random() * 3000);
+          const totalDelay = backoffDelay + jitterDelay;
+          
+          logger.warn(`[GovernanceLedger] [RESTART_STORM_PROTECTION] Recent crashes detected: ${failureCount} failures in last 60s. Enforcing backoff delay of ${backoffDelay}ms + jitter of ${jitterDelay}ms (Total: ${totalDelay}ms) to prevent synchronized restart amplification.`);
+          
+          await new Promise(resolve => setTimeout(resolve, totalDelay));
+        }
+      } catch (err: any) {
+        if (err.message && err.message.includes('ROLLING_RESTART_SUPPRESSION')) {
+          throw err;
+        }
+        logger.error(`[GovernanceLedger] Failed to read/enforce restart storm protection: ${err.message}`);
+      }
+    }
+
     await this.bootstrapDatabaseLeaseTable();
     const hostname = os.hostname();
     const pid = process.pid;
@@ -400,12 +438,31 @@ export const GovernanceLedger = {
     while (true) {
       try {
         await db.$transaction(async (tx: any) => {
+          // Enforce strict lock timeouts within the transaction boundary
+          // This ensures that if another node holds the FOR UPDATE lock but stalls,
+          // the database forcefully rejects our lock attempt after 15 seconds,
+          // converting a silent distributed hang into a deterministically caught exception.
+          await tx.$executeRawUnsafe(`SET LOCAL lock_timeout = '15s';`);
+
           const rows = (await tx.$queryRawUnsafe(`
             SELECT id, generation, owner_pid as "ownerPid", owner_host as "ownerHost", heartbeat
             FROM "ZtanActiveLease"
             WHERE id = $1
             FOR UPDATE
           `, leaseId)) as any[];
+
+          // Chaos Test Injection: Synthetic Partial Transaction Stall
+          // Pauses the event loop *after* acquiring the FOR UPDATE lock but *before* committing.
+          if (process.env.ZTAN_INJECT_TX_STALL === 'true') {
+             logger.warn(`[GovernanceLedger] Chaos Injection: Stalling active transaction for 20 seconds while holding FOR UPDATE lock...`);
+             await new Promise(resolve => setTimeout(resolve, 20000));
+          }
+
+          // Chaos Test Injection: Process Death Mid-Transaction
+          if (process.env.ZTAN_INJECT_TX_CRASH === 'true') {
+             logger.warn(`[GovernanceLedger] Chaos Injection: Crashing process mid-transaction! FOR UPDATE lock should be automatically rolled back by Postgres.`);
+             process.exit(139);
+          }
 
           if (rows.length === 0) {
             await tx.$executeRawUnsafe(`
@@ -1512,9 +1569,24 @@ export const GovernanceLedger = {
       let syncedToDb = false;
       try {
         await db.$transaction(async (tx: any) => {
+          // Enforce strict lock timeouts within the transaction boundary
+          await tx.$executeRawUnsafe(`SET LOCAL lock_timeout = '15s';`);
+
           if (process.env.ZTAN_KILL_POINT === 'BEFORE_DB_COMMIT') {
             logger.warn('[GovernanceLedger] Simulated crash triggered: BEFORE_DB_COMMIT');
             process.exit(138);
+          }
+
+          // Chaos Test Injection: Synthetic Partial Transaction Stall
+          if (process.env.ZTAN_INJECT_TX_STALL === 'true') {
+             logger.warn(`[GovernanceLedger] Chaos Injection: Stalling active mutation transaction for 20 seconds while holding FOR UPDATE lock...`);
+             await new Promise(resolve => setTimeout(resolve, 20000));
+          }
+
+          // Chaos Test Injection: Process Death Mid-Transaction
+          if (process.env.ZTAN_INJECT_TX_CRASH === 'true') {
+             logger.warn(`[GovernanceLedger] Chaos Injection: Crashing process mid-mutation-transaction! FOR UPDATE lock should be automatically rolled back by Postgres.`);
+             process.exit(139);
           }
 
           // Transaction-bound Epoch Fencing Check

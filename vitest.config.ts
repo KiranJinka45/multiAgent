@@ -22,7 +22,6 @@ export default defineConfig({
     alias: {
       '@packages/utils': path.resolve(__dirname, './packages/utils/src'),
       '@packages/ecosystem-governance': path.resolve(__dirname, './packages/ecosystem-governance/src'),
-      '@packages/observability': path.resolve(__dirname, './packages/observability/src'),
     },
   },
 });

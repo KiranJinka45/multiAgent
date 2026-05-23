@@ -1,6 +1,6 @@
 import { logger } from '@packages/observability';
-import { sreEngine } from './sre-engine';
-import { validationEngine } from './validation-engine';
+import { sreEngine } from './sre-engine.js';
+import { validationEngine } from './validation-engine.js';
 
 export type ChaosScenario = 'LATENCY_SPIKE' | 'DATA_LOSS' | 'DISTRIBUTION_SHIFT' | 'FLAPPING' | 'DEPENDENCY_FAILURE' | 'SLOW_DEGRADATION' | 'RETRY_STORM';
 

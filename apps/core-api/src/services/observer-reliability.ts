@@ -1,6 +1,6 @@
 import { redis } from '@packages/utils';
 import { logger } from '@packages/observability';
-import { SREObserver } from '@packages/contracts';
+import type { SREObserver } from '@packages/contracts';
 
 export class ObserverReliabilityService {
   private static KEY_PREFIX = 'sre:reliability:';

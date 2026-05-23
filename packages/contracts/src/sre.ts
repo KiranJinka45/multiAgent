@@ -97,6 +97,8 @@ export interface SREEvent {
 export interface SREUpdate {
   sequenceId: number; // Monotonic counter
   timestamp: number; // Unix ms
+  clusterId?: string;
+  region?: string;
   intent: string;
   perception?: SREPerception | any;
   operationalControl?: SREOperationalControl | any;

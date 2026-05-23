@@ -2,13 +2,13 @@
   "name": "@packages/contracts",
   "version": "1.0.0",
   "description": "MultiAgent Shared Interface & Protocol Definitions",
-  "main": "dist/index.cjs",
-  "module": "dist/index.mjs",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
   "type": "module",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsup src/index.ts --no-dts && tsc --emitDeclarationOnly",
-    "dev": "tsup src/index.ts --no-dts --watch"
+    "build": "tsup src/index.ts --format esm --no-dts && del /q tsconfig.tsbuildinfo 2>nul & tsc --emitDeclarationOnly",
+    "dev": "tsup src/index.ts --format esm --no-dts --watch"
   },
   "dependencies": {
     "zod": "3.22.0"
@@ -19,8 +19,7 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.mjs"
+      "import": "./dist/index.js"
     }
   }
 }

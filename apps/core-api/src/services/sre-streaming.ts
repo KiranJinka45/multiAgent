@@ -1,12 +1,12 @@
 import { Server, Socket } from 'socket.io';
 import { logger } from '@packages/observability';
-import { sreEngine } from './sre-engine';
+import { sreEngine } from './sre-engine.js';
 import type { SRETuningParams } from '@packages/contracts';
-import { chaosOrchestrator } from './chaos-orchestrator';
-import type { ChaosScenario } from './chaos-orchestrator';
-import { validationEngine } from './validation-engine';
-import { soakTester } from './soak-tester';
-import { SreAnalyticsService } from './operational-control/sre-analytics';
+import { chaosOrchestrator } from './chaos-orchestrator.js';
+import type { ChaosScenario } from './chaos-orchestrator.js';
+import { validationEngine } from './validation-engine.js';
+import { soakTester } from './soak-tester.js';
+import { SreAnalyticsService } from './operational-control/sre-analytics.js';
 
 export class SreStreamingService {
     private io: Server;
@@ -22,13 +22,13 @@ export class SreStreamingService {
 
     private setupEventListeners() {
         // Immediate broadcast on state transition (captures jitter)
-        sreEngine.on('stateChange', async (state) => {
+        sreEngine.on('stateChange', async (state: any) => {
             logger.debug('[SRE] State transition detected - broadcasting immediately');
             await this.broadcast(state);
         });
 
         // Analytics stream
-        SreAnalyticsService.setOnEventListener((event) => {
+        SreAnalyticsService.setOnEventListener((event: any) => {
             this.io.to('sre:analytics').emit('sre:analytics:event', event);
         });
     }
@@ -41,7 +41,7 @@ export class SreStreamingService {
                 socket.join('sre:telemetry');
                 
                 // Send current state immediately
-                sreEngine.getCurrentStateAsync().then(state => {
+                sreEngine.getCurrentStateAsync().then((state: any) => {
                     socket.emit('sre:update', state);
                 });
             });

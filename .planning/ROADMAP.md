@@ -36,7 +36,7 @@ The platform prioritizes longitudinal operational resilience, observability, and
 | **35-44** | **Infrastructure Reliability Stewardship** | **Complete** |
 | **47** | **Wave 1 — Operational Soak & Stewardship Validation** | **Active** |
 | **48** | **Wave 2 — Observability & Operational Intelligence** | **Active** |
-| **49** | **Wave 3 — Governance Hardening** | **Active** |
+| **49** | **Wave 3 — Governance Hardening / Longitudinal Evidence Science** | **Complete** |
 | **50** | **Wave 4 — Real PostgreSQL Pathology Testing** | **Active** |
 | **51** | **Wave 5 — Performance Envelope Mapping** | **Active** |
 | **52** | **Wave 6 — Threat Modeling & Adversarial Review** | **Active** |
@@ -53,10 +53,10 @@ The platform prioritizes longitudinal operational resilience, observability, and
 * **Status:** Active
 * **Evidence:** `STEWARDSHIP_ENGINEERING_REPORT.md` (Wave 2 section), observability dashboard metrics.
 
-### Phase 49: Wave 3 — Governance Hardening
-* **Goal:** Harden operational and socio-technical boundaries. Set up mandatory invariant checking, reject unauthorized state machine transitions, and constitutionalize `INVARIANT_GOVERNANCE_CHARTER.md` under automated CI verification rules.
-* **Status:** Active
-* **Evidence:** `STEWARDSHIP_ENGINEERING_REPORT.md` (Wave 3 section), TLA+ validation checkpoints.
+### Phase 49: Wave 3 — Governance Hardening / Longitudinal Evidence Science
+* **Goal:** Harden operational and socio-technical boundaries. Set up mandatory invariant checking, reject unauthorized state machine transitions, and constitutionalize `INVARIANT_GOVERNANCE_CHARTER.md` under automated CI verification rules. Implement statistically rigorous longitudinal evidence tracking via deterministic `--canonical` campaigns, three-tier drift envelopes, noise-floor suppressed reproducibility analyzer ($CV$), and a rates-hardened telemetry dashboard.
+* **Status:** Complete
+* **Evidence:** [REPRODUCIBILITY_REPORT.md](file:///c:/multiagentic_project/multiAgent-main/reports/REPRODUCIBILITY_REPORT.md), [reproducibility_report.json](file:///c:/multiagentic_project/multiAgent-main/reports/reproducibility_report.json), `scripts/reproducibility-analyzer.ts`, `walkthrough.md`.
 
 ### Phase 50: Wave 4 — Real PostgreSQL Pathology Testing
 * **Goal:** Harden ZTAN against catastrophic database level failures. Inject WAL corruption, simulated replica rewinds, failover under autovacuum freeze, checkpoint starvation, and fsync stalling.

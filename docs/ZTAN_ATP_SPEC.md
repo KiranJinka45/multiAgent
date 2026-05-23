@@ -198,7 +198,7 @@ $$N.\text{lineageHash} = \text{SHA256}(\text{Lineage Pre-image})$$
 > **Lineage Ordering Constraint**
 > The lexicographical sorting of parent digests (Section 6.1, Step 2) guarantees **deterministic tamper-resistance** and **reproducible causal-set membership verification**. 
 > However, because lexicographical sorting is non-chronological, the `lineageHash` **DOES NOT preserve true temporal sequence ordering or logical clock causality**.
-> *   The DAG proves **what parents causally contributed** to an action.
+> *   The DAG operationally models **what parents causally contributed** to an action.
 > *   The DAG **does not** prove the *relative temporal sequence* of those parents.
 
 ### 6.3 Strict DAG Acyclicity and Computational Bounds
