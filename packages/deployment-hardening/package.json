@@ -1,0 +1,18 @@
+{
+  "name": "@packages/deployment-hardening",
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts",
+    "test": "tsx src/run-tests.ts"
+  },
+  "dependencies": {
+    "@packages/observability": "workspace:*"
+  },
+  "devDependencies": {
+    "tsup": "8.5.1"
+  }
+}

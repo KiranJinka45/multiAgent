@@ -1,0 +1,10 @@
+{
+  "timestamp": 1779479219241,
+  "metrics": {
+    "t_retry_drift": 1099.9911,
+    "t_scheduler_lag": 1099.9911,
+    "t_lease_expiry_skew": 1249.9911,
+    "p_false_watchdog_trigger": 0,
+    "chronologicalIntegrity": true
+  }
+}

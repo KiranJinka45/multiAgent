@@ -1,0 +1,1761 @@
+{
+  "metadata": {
+    "timestamp": 1779468258270,
+    "durationSeconds": 15,
+    "seed": "NOMINAL_RUN",
+    "totalLogicalBytesWritten": 1093396,
+    "physicalWalByteDelta": "1038808",
+    "sequenceDriftDetected": false,
+    "duplicatedBlockCount": 0,
+    "failures": 0,
+    "canonicalOsConditions": {
+      "cpuCores": 12,
+      "totalMemoryGB": 31.53,
+      "freeMemoryGB": 10.71,
+      "memoryLoadPct": 66,
+      "osType": "Windows_NT",
+      "osRelease": "10.0.26200",
+      "osPlatform": "win32"
+    },
+    "isStateContaminated": false,
+    "replayIntegrityAudit": {
+      "overallPassed": true,
+      "timestamp": 1779468258160,
+      "hashChain": {
+        "passed": true,
+        "totalBlocksVerified": 104,
+        "fractures": []
+      },
+      "monotonicity": {
+        "passed": true,
+        "gaps": []
+      },
+      "outboxConvergence": {
+        "passed": true,
+        "pendingWalCount": 0,
+        "duplicateWalSeqs": []
+      },
+      "fencingEpoch": {
+        "passed": true,
+        "epochSequence": [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "100",
+          "100",
+          "100",
+          "100"
+        ],
+        "retrogradeEpochs": []
+      }
+    }
+  },
+  "latencies": {
+    "p50": 3.011099999999715,
+    "p95": 15.521999999997206,
+    "p99": 22.377400000001217
+  },
+  "services": {
+    "Gateway": {
+      "rssDeltaBytes": -30019584,
+      "heapDeltaBytes": -10577312,
+      "oldSpaceDeltaBytes": -4905440,
+      "avgElu": 11.375994959065299,
+      "peakElu": 67.80675136631531,
+      "handleDelta": 0,
+      "osHandleDelta": 49,
+      "osThreadDelta": 2,
+      "finalSockets": {
+        "established": 7,
+        "timeWait": 0,
+        "closeWait": 0,
+        "other": 1
+      },
+      "gc": {
+        "majorCount": 3,
+        "minorCount": 4,
+        "p50": 2.4222999960184097,
+        "p95": 14.343000002205372,
+        "p99": 21.5637000054121
+      }
+    },
+    "CoreAPI": {
+      "rssDeltaBytes": 7811072,
+      "heapDeltaBytes": 873656,
+      "oldSpaceDeltaBytes": 5901472,
+      "avgElu": 11.234389759408518,
+      "peakElu": 84.37895340527766,
+      "handleDelta": -2,
+      "osHandleDelta": -1,
+      "osThreadDelta": -1,
+      "finalSockets": {
+        "established": 10,
+        "timeWait": 0,
+        "closeWait": 0,
+        "other": 1
+      },
+      "gc": {
+        "majorCount": 0,
+        "minorCount": 1,
+        "p50": 3.747800000011921,
+        "p95": 16.810599997639656,
+        "p99": 52.83460000157356
+      }
+    },
+    "ControlPlane": {
+      "rssDeltaBytes": 102400,
+      "heapDeltaBytes": 162248,
+      "oldSpaceDeltaBytes": 0,
+      "avgElu": 5.326962385751788,
+      "peakElu": 51.63906188291416,
+      "handleDelta": -1,
+      "osHandleDelta": -1,
+      "osThreadDelta": 0,
+      "finalSockets": {
+        "established": 1,
+        "timeWait": 0,
+        "closeWait": 0,
+        "other": 1
+      },
+      "gc": {
+        "majorCount": 0,
+        "minorCount": 0,
+        "p50": 2.847300000488758,
+        "p95": 14.837200000882149,
+        "p99": 14.837200000882149
+      }
+    }
+  },
+  "history": {
+    "Gateway": [
+      {
+        "type": "TELEMETRY_REPORT",
+        "timestamp": 1779468239474,
+        "memory": {
+          "rss": 114753536,
+          "heapUsed": 39603400,
+          "heapTotal": 66523136,
+          "external": 4108825,
+          "heapStats": {
+            "total_heap_size": 66523136,
+            "used_heap_size": 39605104,
+            "heap_size_limit": 4345298944,
+            "fragmentationRatio": 0.404641657302506,
+            "malloced_memory": 811080,
+            "peak_malloced_memory": 12646184
+          },
+          "oldSpaceUsed": 28745256,
+          "oldSpaceSize": 29851648
+        },
+        "gc": {
+          "minorCount": 19,
+          "majorCount": 1,
+          "otherCount": 0,
+          "totalGcTime": 91.01770001649857,
+          "pauses": [
+            3.094700001180172,
+            1.7502999976277351,
+            2.138000003993511,
+            1.3607999980449677,
+            2.4222999960184097,
+            4.217000000178814,
+            1.9375,
+            14.343000002205372,
+            7.2304999977350235,
+            1.6799999997019768,
+            1.537100002169609,
+            2.2930999994277954,
+            0.9021000042557716,
+            4.668300002813339,
+            1.9346000030636787,
+            7.13849999755621,
+            5.996799997985363,
+            5.225100003182888,
+            14.218700006604195,
+            6.929300002753735
+          ]
+        },
+        "handles": [
+          "Pipe",
+          "Socket(inactive)",
+          "Socket(inactive)",
+          "Socket(local:26597, remote:none:)",
+          "Socket(local:26599, remote:none:)",
+          "Socket(local:26600, remote:none:)",
+          "Socket(local:26601, remote:none:)",
+          "Socket(local:26602, remote:none:)",
+          "Server(port:4020)",
+          "Socket(local:4020, remote:127.0.0.1:26622)"
+        ],
+        "requestsCount": 0,
+        "elu": 67.80675136631531,
+        "osMetrics": {
+          "handleCount": 231,
+          "threadCount": 29,
+          "sockets": {
+            "established": 5,
+            "timeWait": 0,
+            "closeWait": 0,
+            "other": 0
+          }
+        }
+      },
+      {
+        "type": "TELEMETRY_REPORT",
+        "timestamp": 1779468241580,
+        "memory": {
+          "rss": 116224000,
+          "heapUsed": 30242736,
+          "heapTotal": 72814592,
+          "external": 4239012,
+          "heapStats": {
+            "total_heap_size": 72814592,
+            "used_heap_size": 30244440,
+            "heap_size_limit": 4345298944,
+            "fragmentationRatio": 0.5846376506511222,
+            "malloced_memory": 548912,
+            "peak_malloced_memory": 12646184
+          },
+          "oldSpaceUsed": 23085288,
+          "oldSpaceSize": 34832384
+        },
+        "gc": {
+          "minorCount": 20,
+          "majorCount": 2,
+          "otherCount": 0,
+          "totalGcTime": 97.01320000737906,
+          "pauses": [
+            0.6870999932289124,
+            5.308399997651577
+          ]
+        },
+        "handles": [
+          "Pipe",
+          "Socket(inactive)",
+          "Socket(inactive)",
+          "Socket(local:26597, remote:none:)",
+          "Socket(local:26599, remote:none:)",
+          "Socket(local:26600, remote:none:)",
+          "Socket(local:26601, remote:none:)",
+          "Socket(local:26602, remote:none:)",
+          "Server(port:4020)",
+          "Socket(local:4020, remote:127.0.0.1:26637)"
+        ],
+        "requestsCount": 0,
+        "elu": 6.146427564408487,
+        "osMetrics": {
+          "handleCount": 266,
+          "threadCount": 29,
+          "sockets": {
+            "established": 7,
+            "timeWait": 0,
+            "closeWait": 0,
+            "other": 1
+          }
+        }
+      },
+      {
+        "type": "TELEMETRY_REPORT",
+        "timestamp": 1779468243092,
+        "memory": {
+          "rss": 117768192,
+          "heapUsed": 33331280,
+          "heapTotal": 73404416,
+          "external": 4542315,
+          "heapStats": {
+            "total_heap_size": 73404416,
+            "used_heap_size": 33331504,
+            "heap_size_limit": 4345298944,
+            "fragmentationRatio": 0.5459196351347582,
+            "malloced_memory": 548912,
+            "peak_malloced_memory": 12646184
+          },
+          "oldSpaceUsed": 23245360,
+          "oldSpaceSize": 34832384
+        },
+        "gc": {
+          "minorCount": 20,
+          "majorCount": 2,
+          "otherCount": 0,
+          "totalGcTime": 97.01320000737906,
+          "pauses": []
+        },
+        "handles": [
+          "Pipe",
+          "Socket(inactive)",
+          "Socket(inactive)",
+          "Socket(local:26597, remote:none:)",
+          "Socket(local:26599, remote:none:)",
+          "Socket(local:26600, remote:none:)",
+          "Socket(local:26601, remote:none:)",
+          "Socket(local:26602, remote:none:)",
+          "Server(port:4020)",
+          "Socket(local:4020, remote:127.0.0.1:26650)"
+        ],
+        "requestsCount": 0,
+        "elu": 5.206896109286766,
+        "osMetrics": {
+          "handleCount": 266,
+          "threadCount": 29,
+          "sockets": {
+            "established": 7,
+            "timeWait": 0,
+            "closeWait": 0,
+            "other": 1
+          }
+        }
+      },
+      {
+        "type": "TELEMETRY_REPORT",
+        "timestamp": 1779468244592,
+        "memory": {
+          "rss": 123920384,
+          "heapUsed": 38723008,
+          "heapTotal": 74354688,
+          "external": 5037155,
+          "heapStats": {
+            "total_heap_size": 74354688,
+            "used_heap_size": 38723232,
+            "heap_size_limit": 4345298944,
+            "fragmentationRatio": 0.47920927326061813,
+            "malloced_memory": 1699984,
+            "peak_malloced_memory": 12646184
+          },
+          "oldSpaceUsed": 23658960,
+          "oldSpaceSize": 34832384
+        },
+        "gc": {
+          "minorCount": 20,
+          "majorCount": 2,
+          "otherCount": 0,
+          "totalGcTime": 97.01320000737906,
+          "pauses": []
+        },
+        "handles": [
+          "Pipe",
+          "Socket(inactive)",
+          "Socket(inactive)",
+          "Socket(local:26597, remote:none:)",
+          "Socket(local:26599, remote:none:)",
+          "Socket(local:26600, remote:none:)",
+          "Socket(local:26601, remote:none:)",
+          "Socket(local:26602, remote:none:)",
+          "Server(port:4020)"
+        ],
+        "requestsCount": 0,
+        "elu": 7.500658232859787,
+        "osMetrics": {
+          "handleCount": 280,
+          "threadCount": 32,
+          "sockets": {
+            "established": 7,
+            "timeWait": 0,
+            "closeWait": 0,
+            "other": 1
+          }
+        }
+      },
+      {
+        "type": "TELEMETRY_REPORT",
+        "timestamp": 1779468246108,
+        "memory": {
+          "rss": 122937344,
+          "heapUsed": 40630544,
+          "heapTotal": 74354688,
+          "external": 5076917,
+          "heapStats": {
+            "total_heap_size": 74354688,
+            "used_heap_size": 40630768,
+            "heap_size_limit": 4345298944,
+            "fragmentationRatio": 0.45355472408141906,
+            "malloced_memory": 548912,
+            "peak_malloced_memory": 12646184
+          },
+          "oldSpaceUsed": 23757872,
+          "oldSpaceSize": 34832384
+        },
+        "gc": {
+          "minorCount": 20,
+          "majorCount": 2,
+          "otherCount": 0,
+          "totalGcTime": 97.01320000737906,
+          "pauses": []
+        },
+        "handles": [
+          "Pipe",
+          "Socket(inactive)",
+          "Socket(inactive)",
+          "Socket(local:26597, remote:none:)",
+          "Socket(local:26599, remote:none:)",
+          "Socket(local:26600, remote:none:)",
+          "Socket(local:26601, remote:none:)",
+          "Socket(local:26602, remote:none:)",
+          "Server(port:4020)"
+        ],
+        "requestsCount": 0,
+        "elu": 4.662315433421355,
+        "osMetrics": {
+          "handleCount": 280,
+          "threadCount": 32,
+          "sockets": {
+            "established": 7,
+            "timeWait": 0,
+            "closeWait": 0,
+            "other": 1
+          }
+        }
+      },
+      {
+        "type": "TELEMETRY_REPORT",
+        "timestamp": 1779468247611,
+        "memory": {
+          "rss": 122880000,
+          "heapUsed": 42612648,
+          "heapTotal": 74354688,
+          "external": 5142914,
+          "heapStats": {
+            "total_heap_size": 74354688,
+            "used_heap_size": 42612872,
+            "heap_size_limit": 4345298944,
+            "fragmentationRatio": 0.4268973060582273,
+            "malloced_memory": 548912,
+            "peak_malloced_memory": 12646184
+          },
+          "oldSpaceUsed": 23849520,
+          "oldSpaceSize": 34832384
+        },
+        "gc": {
+          "minorCount": 20,
+          "majorCount": 2,
+          "otherCount": 0,
+          "totalGcTime": 97.01320000737906,
+          "pauses": []
+        },
+        "handles": [
+          "Pipe",
+          "Socket(inactive)",
+          "Socket(inactive)",
+          "Socket(local:26597, remote:none:)",
+          "Socket(local:26599, remote:none:)",
+          "Socket(local:26600, remote:none:)",
+          "Socket(local:26601, remote:none:)",
+          "Socket(local:26602, remote:none:)",
+          "Server(port:4020)",
+          "Socket(local:4020, remote:127.0.0.1:26696)"
+        ],
+        "requestsCount": 0,
+        "elu": 6.012898013874049,
+        "osMetrics": {
+          "handleCount": 280,
+          "threadCount": 32,
+          "sockets": {
+            "established": 7,
+            "timeWait": 0,
+            "closeWait": 0,
+            "other": 1
+          }
+        }
+      },
+      {
+        "type": "TELEMETRY_REPORT",
+        "timestamp": 1779468249117,
+        "memory": {
+          "rss": 82100224,
+          "heapUsed": 27763040,
+          "heapTotal": 29298688,
+          "external": 3874107,
+          "heapStats": {
+            "total_heap_size": 29298688,
+            "used_heap_size": 27764744,
+            "heap_size_limit": 4345298944,
+            "fragmentationRatio": 0.052355381920173305,
+            "malloced_memory": 548912,
+            "peak_malloced_memory": 12646184
+          },
+          "oldSpaceUsed": 23807048,
+          "oldSpaceSize": 24346624
+        },
+        "gc": {
+          "minorCount": 22,
+          "majorCount": 4,
+          "otherCount": 0,
+          "totalGcTime": 122.99540001153946,
+          "pauses": [
+            0.9983999952673912,
+            21.5637000054121,
+            0.45010000467300415,
+            2.969999998807907
+          ]
+        },
+        "handles": [
+          "Pipe",
+          "Socket(inactive)",
+          "Socket(inactive)",
+          "Socket(local:26597, remote:none:)",
+          "Socket(local:26599, remote:none:)",
+          "Socket(local:26600, remote:none:)",
+          "Socket(local:26601, remote:none:)",
+          "Socket(local:26602, remote:none:)",
+          "Server(port:4020)",
+          "Socket(inactive)"
+        ],
+        "requestsCount": 1,
+        "elu": 11.243065648953197,
+        "osMetrics": {
+          "handleCount": 280,
+          "threadCount": 32,
+          "sockets": {
+            "established": 7,
+            "timeWait": 0,
+            "closeWait": 0,
+            "other": 1
+          }
+        }
+      },
+      {
+        "type": "TELEMETRY_REPORT",
+        "timestamp": 1779468250623,
+        "memory": {
+          "rss": 84090880,
+          "heapUsed": 28287752,
+          "heapTotal": 32706560,
+          "external": 3910618,
+          "heapStats": {
+            "total_heap_size": 32706560,
+            "used_heap_size": 28287976,
+            "heap_size_limit": 4345298944,
+            "fragmentationRatio": 0.13509779077958672,
+            "malloced_memory": 548912,
+            "peak_malloced_memory": 12646184
+          },
+          "oldSpaceUsed": 23839816,
+          "oldSpaceSize": 24608768
+        },
+        "gc": {
+          "minorCount": 23,
+          "majorCount": 4,
+          "otherCount": 0,
+          "totalGcTime": 124.04780001193285,
+          "pauses": [
+            1.0524000003933907
+          ]
+        },
+        "handles": [
+          "Pipe",
+          "Socket(inactive)",
+          "Socket(inactive)",
+          "Socket(local:26597, remote:none:)",
+          "Socket(local:26599, remote:none:)",
+          "Socket(local:26600, remote:none:)",
+          "Socket(local:26601, remote:none:)",
+          "Socket(local:26602, remote:none:)",
+          "Server(port:4020)",
+          "Socket(local:4020, remote:127.0.0.1:26721)"
+        ],
+        "requestsCount": 0,
+        "elu": 3.850828440678411,
+        "osMetrics": {
+          "handleCount": 280,
+          "threadCount": 32,
+          "sockets": {
+            "established": 7,
+            "timeWait": 0,
+            "closeWait": 0,
+            "other": 1
+          }
+        }
+      },
+      {
+        "type": "TELEMETRY_REPORT",
+        "timestamp": 1779468252139,
+        "memory": {
+          "rss": 83947520,
+          "heapUsed": 28417056,
+          "heapTotal": 32706560,
+          "external": 3930680,
+          "heapStats": {
+            "total_heap_size": 32706560,
+            "used_heap_size": 28417280,
+            "heap_size_limit": 4345298944,
+            "fragmentationRatio": 0.1311443331246086,
+            "malloced_memory": 548912,
+            "peak_malloced_memory": 12646184
+          },
+          "oldSpaceUsed": 23839816,
+          "oldSpaceSize": 24608768
+        },
+        "gc": {
+          "minorCount": 23,
+          "majorCount": 4,
+          "otherCount": 0,
+          "totalGcTime": 124.04780001193285,
+          "pauses": []
+        },
+        "handles": [
+          "Pipe",
+          "Socket(inactive)",
+          "Socket(inactive)",
+          "Socket(local:26597, remote:none:)",
+          "Socket(local:26599, remote:none:)",
+          "Socket(local:26600, remote:none:)",
+          "Socket(local:26601, remote:none:)",
+          "Socket(local:26602, remote:none:)",
+          "Server(port:4020)",
+          "Socket(local:4020, remote:127.0.0.1:26721)"
+        ],
+        "requestsCount": 0,
+        "elu": 0.28970892409583127,
+        "osMetrics": {
+          "handleCount": 280,
+          "threadCount": 32,
+          "sockets": {
+            "established": 7,
+            "timeWait": 0,
+            "closeWait": 0,
+            "other": 1
+          }
+        }
+      },
+      {
+        "type": "TELEMETRY_REPORT",
+        "timestamp": 1779468253649,
+        "memory": {
+          "rss": 84733952,
+          "heapUsed": 29026088,
+          "heapTotal": 32706560,
+          "external": 3976955,
+          "heapStats": {
+            "total_heap_size": 32706560,
+            "used_heap_size": 29026232,
+            "heap_size_limit": 4345298944,
+            "fragmentationRatio": 0.1125256829211021,
+            "malloced_memory": 548912,
+            "peak_malloced_memory": 12646184
+          },
+          "oldSpaceUsed": 23839816,
+          "oldSpaceSize": 24608768
+        },
+        "gc": {
+          "minorCount": 23,
+          "majorCount": 4,
+          "otherCount": 0,
+          "totalGcTime": 124.04780001193285,
+          "pauses": []
+        },
+        "handles": [
+          "Pipe",
+          "Socket(inactive)",
+          "Socket(inactive)",
+          "Socket(local:26597, remote:none:)",
+          "Socket(local:26599, remote:none:)",
+          "Socket(local:26600, remote:none:)",
+          "Socket(local:26601, remote:none:)",
+          "Socket(local:26602, remote:none:)",
+          "Server(port:4020)",
+          "Socket(local:4020, remote:127.0.0.1:26721)"
+        ],
+        "requestsCount": 0,
+        "elu": 1.040399856759798,
+        "osMetrics": {
+          "handleCount": 280,
+          "threadCount": 31,
+          "sockets": {
+            "established": 7,
+            "timeWait": 0,
+            "closeWait": 0,
+            "other": 1
+          }
+        }
+      }
+    ],
+    "CoreAPI": [
+      {
+        "type": "TELEMETRY_REPORT",
+        "timestamp": 1779468239473,
+        "memory": {
+          "rss": 144388096,
+          "heapUsed": 63508328,
+          "heapTotal": 86278144,
+          "external": 4654339,
+          "heapStats": {
+            "total_heap_size": 86278144,
+            "used_heap_size": 63510032,
+            "heap_size_limit": 4345298944,
+            "fragmentationRatio": 0.26389200027297754,
+            "malloced_memory": 540720,
+            "peak_malloced_memory": 15484024
+          },
+          "oldSpaceUsed": 36325712,
+          "oldSpaceSize": 37453824
+        },
+        "gc": {
+          "minorCount": 22,
+          "majorCount": 2,
+          "otherCount": 0,
+          "totalGcTime": 145.33340000361204,
+          "pauses": [
+            1.5515000000596046,
+            4.874600000679493,
+            4.278599999845028,
+            16.810599997639656,
+            3.2289999946951866,
+            4.117399998009205,
+            2.6023999974131584,
+            2.916500002145767,
+            1.3326999992132187,
+            0.8420000001788139,
+            2.066500000655651,
+            52.83460000157356,
+            2.2802000045776367,
+            1.6033999994397163,
+            3.747800000011921,
+            5.065200001001358,
+            7.615800000727177,
+            4.040300004184246,
+            0.9979999959468842,
+            7.973600000143051,
+            4.268500000238419,
+            4.331200003623962,
+            2.4747999981045723,
+            3.478200003504753
+          ]
+        },
+        "handles": [
+          "Pipe",
+          "Socket(inactive)",
+          "Socket(inactive)",
+          "Socket(local:26609, remote:none:)",
+          "Socket(local:26610, remote:none:)",
+          "Server(port:4022)",
+          "Socket(local:4022, remote:127.0.0.1:26619)",
+          "Socket(local:4022, remote:127.0.0.1:26621)"
+        ],
+        "requestsCount": 0,
+        "elu": 84.37895340527766,
+        "osMetrics": {
+          "handleCount": 296,
+          "threadCount": 32,
+          "sockets": {
+            "established": 11,
+            "timeWait": 0,
+            "closeWait": 0,
+            "other": 1
+          }
+        }
+      },
+      {
+        "type": "TELEMETRY_REPORT",
+        "timestamp": 1779468241579,
+        "memory": {
+          "rss": 145231872,
+          "heapUsed": 64388056,
+          "heapTotal": 86802432,
+          "external": 4662598,
+          "heapStats": {
+            "total_heap_size": 86802432,
+            "used_heap_size": 64388280,
+            "heap_size_limit": 4345298944,
+            "fragmentationRatio": 0.2582203226748301,
+            "malloced_memory": 540720,
+            "peak_malloced_memory": 15484024
+          },
+          "oldSpaceUsed": 36358480,
+          "oldSpaceSize": 37715968
+        },
+        "gc": {
+          "minorCount": 22,
+          "majorCount": 2,
+          "otherCount": 0,
+          "totalGcTime": 145.33340000361204,
+          "pauses": []
+        },
+        "handles": [
+          "Pipe",
+          "Socket(inactive)",
+          "Socket(inactive)",
+          "Socket(local:26609, remote:none:)",
+          "Socket(local:26610, remote:none:)",
+          "Server(port:4022)",
+          "Socket(local:4022, remote:127.0.0.1:26619)",
+          "Socket(local:4022, remote:127.0.0.1:26621)"
+        ],
+        "requestsCount": 0,
+        "elu": 2.630305592029808,
+        "osMetrics": {
+          "handleCount": 296,
+          "threadCount": 32,
+          "sockets": {
+            "established": 11,
+            "timeWait": 0,
+            "closeWait": 0,
+            "other": 1
+          }
+        }
+      },
+      {
+        "type": "TELEMETRY_REPORT",
+        "timestamp": 1779468243096,
+        "memory": {
+          "rss": 145465344,
+          "heapUsed": 65180216,
+          "heapTotal": 86802432,
+          "external": 4672865,
+          "heapStats": {
+            "total_heap_size": 86802432,
+            "used_heap_size": 65180440,
+            "heap_size_limit": 4345298944,
+            "fragmentationRatio": 0.24909431109026992,
+            "malloced_memory": 540720,
+            "peak_malloced_memory": 15484024
+          },
+          "oldSpaceUsed": 36583416,
+          "oldSpaceSize": 37715968
+        },
+        "gc": {
+          "minorCount": 22,
+          "majorCount": 2,
+          "otherCount": 0,
+          "totalGcTime": 145.33340000361204,
+          "pauses": []
+        },
+        "handles": [
+          "Pipe",
+          "Socket(inactive)",
+          "Socket(inactive)",
+          "Socket(local:26609, remote:none:)",
+          "Socket(local:26610, remote:none:)",
+          "Server(port:4022)",
+          "Socket(local:4022, remote:127.0.0.1:26621)"
+        ],
+        "requestsCount": 0,
+        "elu": 3.441012693988027,
+        "osMetrics": {
+          "handleCount": 297,
+          "threadCount": 32,
+          "sockets": {
+            "established": 12,
+            "timeWait": 0,
+            "closeWait": 0,
+            "other": 1
+          }
+        }
+      },
+      {
+        "type": "TELEMETRY_REPORT",
+        "timestamp": 1779468244592,
+        "memory": {
+          "rss": 151281664,
+          "heapUsed": 59513792,
+          "heapTotal": 92569600,
+          "external": 4905414,
+          "heapStats": {
+            "total_heap_size": 92569600,
+            "used_heap_size": 59514016,
+            "heap_size_limit": 4345298944,
+            "fragmentationRatio": 0.3570889795353982,
+            "malloced_memory": 540720,
+            "peak_malloced_memory": 15484024
+          },
+          "oldSpaceUsed": 42068576,
+          "oldSpaceSize": 43483136
+        },
+        "gc": {
+          "minorCount": 23,
+          "majorCount": 2,
+          "otherCount": 0,
+          "totalGcTime": 149.32990000396967,
+          "pauses": [
+            3.996500000357628
+          ]
+        },
+        "handles": [
+          "Pipe",
+          "Socket(inactive)",
+          "Socket(inactive)",
+          "Socket(local:26609, remote:none:)",
+          "Socket(local:26610, remote:none:)",
+          "Server(port:4022)"
+        ],
+        "requestsCount": 0,
+        "elu": 3.8055854169594596,
+        "osMetrics": {
+          "handleCount": 297,
+          "threadCount": 32,
+          "sockets": {
+            "established": 12,
+            "timeWait": 0,
+            "closeWait": 0,
+            "other": 1
+          }
+        }
+      },
+      {
+        "type": "TELEMETRY_REPORT",
+        "timestamp": 1779468246108,
+        "memory": {
+          "rss": 151285760,
+          "heapUsed": 60018880,
+          "heapTotal": 92569600,
+          "external": 4913633,
+          "heapStats": {
+            "total_heap_size": 92569600,
+            "used_heap_size": 60019104,
+            "heap_size_limit": 4345298944,
+            "fragmentationRatio": 0.3516326742256637,
+            "malloced_memory": 540720,
+            "peak_malloced_memory": 15484024
+          },
+          "oldSpaceUsed": 42068576,
+          "oldSpaceSize": 43483136
+        },
+        "gc": {
+          "minorCount": 23,
+          "majorCount": 2,
+          "otherCount": 0,
+          "totalGcTime": 149.32990000396967,
+          "pauses": []
+        },
+        "handles": [
+          "Pipe",
+          "Socket(inactive)",
+          "Socket(inactive)",
+          "Socket(local:26609, remote:none:)",
+          "Socket(local:26610, remote:none:)",
+          "Server(port:4022)"
+        ],
+        "requestsCount": 0,
+        "elu": 2.314218326708284,
+        "osMetrics": {
+          "handleCount": 295,
+          "threadCount": 32,
+          "sockets": {
+            "established": 10,
+            "timeWait": 0,
+            "closeWait": 0,
+            "other": 1
+          }
+        }
+      },
+      {
+        "type": "TELEMETRY_REPORT",
+        "timestamp": 1779468247611,
+        "memory": {
+          "rss": 151310336,
+          "heapUsed": 60708432,
+          "heapTotal": 92569600,
+          "external": 4930044,
+          "heapStats": {
+            "total_heap_size": 92569600,
+            "used_heap_size": 60708656,
+            "heap_size_limit": 4345298944,
+            "fragmentationRatio": 0.3441836628871682,
+            "malloced_memory": 540720,
+            "peak_malloced_memory": 15484024
+          },
+          "oldSpaceUsed": 42227184,
+          "oldSpaceSize": 43483136
+        },
+        "gc": {
+          "minorCount": 23,
+          "majorCount": 2,
+          "otherCount": 0,
+          "totalGcTime": 149.32990000396967,
+          "pauses": []
+        },
+        "handles": [
+          "Pipe",
+          "Socket(inactive)",
+          "Socket(inactive)",
+          "Socket(local:26609, remote:none:)",
+          "Socket(local:26610, remote:none:)",
+          "Server(port:4022)"
+        ],
+        "requestsCount": 0,
+        "elu": 3.377744142525205,
+        "osMetrics": {
+          "handleCount": 295,
+          "threadCount": 32,
+          "sockets": {
+            "established": 10,
+            "timeWait": 0,
+            "closeWait": 0,
+            "other": 1
+          }
+        }
+      },
+      {
+        "type": "TELEMETRY_REPORT",
+        "timestamp": 1779468249117,
+        "memory": {
+          "rss": 151986176,
+          "heapUsed": 63081240,
+          "heapTotal": 92831744,
+          "external": 5403808,
+          "heapStats": {
+            "total_heap_size": 92831744,
+            "used_heap_size": 63081464,
+            "heap_size_limit": 4345298944,
+            "fragmentationRatio": 0.3204752891424727,
+            "malloced_memory": 540720,
+            "peak_malloced_memory": 15484024
+          },
+          "oldSpaceUsed": 42227184,
+          "oldSpaceSize": 43483136
+        },
+        "gc": {
+          "minorCount": 23,
+          "majorCount": 2,
+          "otherCount": 0,
+          "totalGcTime": 149.32990000396967,
+          "pauses": []
+        },
+        "handles": [
+          "Pipe",
+          "Socket(inactive)",
+          "Socket(inactive)",
+          "Socket(local:26609, remote:none:)",
+          "Socket(local:26610, remote:none:)",
+          "Server(port:4022)"
+        ],
+        "requestsCount": 0,
+        "elu": 9.326903190252606,
+        "osMetrics": {
+          "handleCount": 295,
+          "threadCount": 32,
+          "sockets": {
+            "established": 10,
+            "timeWait": 0,
+            "closeWait": 0,
+            "other": 1
+          }
+        }
+      },
+      {
+        "type": "TELEMETRY_REPORT",
+        "timestamp": 1779468250623,
+        "memory": {
+          "rss": 151994368,
+          "heapUsed": 63433384,
+          "heapTotal": 92831744,
+          "external": 5409321,
+          "heapStats": {
+            "total_heap_size": 92831744,
+            "used_heap_size": 63433528,
+            "heap_size_limit": 4345298944,
+            "fragmentationRatio": 0.3166827933341423,
+            "malloced_memory": 540720,
+            "peak_malloced_memory": 15484024
+          },
+          "oldSpaceUsed": 42227184,
+          "oldSpaceSize": 43483136
+        },
+        "gc": {
+          "minorCount": 23,
+          "majorCount": 2,
+          "otherCount": 0,
+          "totalGcTime": 149.32990000396967,
+          "pauses": []
+        },
+        "handles": [
+          "Pipe",
+          "Socket(inactive)",
+          "Socket(inactive)",
+          "Socket(local:26609, remote:none:)",
+          "Socket(local:26610, remote:none:)",
+          "Server(port:4022)"
+        ],
+        "requestsCount": 0,
+        "elu": 1.9409285393165359,
+        "osMetrics": {
+          "handleCount": 295,
+          "threadCount": 32,
+          "sockets": {
+            "established": 10,
+            "timeWait": 0,
+            "closeWait": 0,
+            "other": 1
+          }
+        }
+      },
+      {
+        "type": "TELEMETRY_REPORT",
+        "timestamp": 1779468252139,
+        "memory": {
+          "rss": 151994368,
+          "heapUsed": 63473656,
+          "heapTotal": 92831744,
+          "external": 5417540,
+          "heapStats": {
+            "total_heap_size": 92831744,
+            "used_heap_size": 63473976,
+            "heap_size_limit": 4345298944,
+            "fragmentationRatio": 0.31624708030908044,
+            "malloced_memory": 540720,
+            "peak_malloced_memory": 15484024
+          },
+          "oldSpaceUsed": 42227184,
+          "oldSpaceSize": 43483136
+        },
+        "gc": {
+          "minorCount": 23,
+          "majorCount": 2,
+          "otherCount": 0,
+          "totalGcTime": 149.32990000396967,
+          "pauses": []
+        },
+        "handles": [
+          "Pipe",
+          "Socket(inactive)",
+          "Socket(inactive)",
+          "Socket(local:26609, remote:none:)",
+          "Socket(local:26610, remote:none:)",
+          "Server(port:4022)"
+        ],
+        "requestsCount": 0,
+        "elu": 0.18180375561971657,
+        "osMetrics": {
+          "handleCount": 295,
+          "threadCount": 31,
+          "sockets": {
+            "established": 10,
+            "timeWait": 0,
+            "closeWait": 0,
+            "other": 1
+          }
+        }
+      },
+      {
+        "type": "TELEMETRY_REPORT",
+        "timestamp": 1779468253649,
+        "memory": {
+          "rss": 152199168,
+          "heapUsed": 64381984,
+          "heapTotal": 92831744,
+          "external": 5874916,
+          "heapStats": {
+            "total_heap_size": 92831744,
+            "used_heap_size": 64382224,
+            "heap_size_limit": 4345298944,
+            "fragmentationRatio": 0.3064632718738969,
+            "malloced_memory": 540720,
+            "peak_malloced_memory": 15484024
+          },
+          "oldSpaceUsed": 42227184,
+          "oldSpaceSize": 43483136
+        },
+        "gc": {
+          "minorCount": 23,
+          "majorCount": 2,
+          "otherCount": 0,
+          "totalGcTime": 149.32990000396967,
+          "pauses": []
+        },
+        "handles": [
+          "Pipe",
+          "Socket(inactive)",
+          "Socket(inactive)",
+          "Socket(local:26609, remote:none:)",
+          "Socket(local:26610, remote:none:)",
+          "Server(port:4022)"
+        ],
+        "requestsCount": 0,
+        "elu": 0.9464425314078923,
+        "osMetrics": {
+          "handleCount": 295,
+          "threadCount": 31,
+          "sockets": {
+            "established": 10,
+            "timeWait": 0,
+            "closeWait": 0,
+            "other": 1
+          }
+        }
+      }
+    ],
+    "ControlPlane": [
+      {
+        "type": "TELEMETRY_REPORT",
+        "timestamp": 1779468239474,
+        "memory": {
+          "rss": 94691328,
+          "heapUsed": 24958352,
+          "heapTotal": 55746560,
+          "external": 2694915,
+          "heapStats": {
+            "total_heap_size": 55746560,
+            "used_heap_size": 24960056,
+            "heap_size_limit": 4345298944,
+            "fragmentationRatio": 0.552258363565393,
+            "malloced_memory": 802888,
+            "peak_malloced_memory": 17096616
+          },
+          "oldSpaceUsed": 17586592,
+          "oldSpaceSize": 19365888
+        },
+        "gc": {
+          "minorCount": 16,
+          "majorCount": 1,
+          "otherCount": 0,
+          "totalGcTime": 71.36610000580549,
+          "pauses": [
+            5.241800002753735,
+            1.9942000061273575,
+            1.5362999960780144,
+            1.1146999970078468,
+            1.5878000035881996,
+            14.837200000882149,
+            1.5718999952077866,
+            1.2955000028014183,
+            2.010000005364418,
+            2.847300000488758,
+            5.598499998450279,
+            3.836199998855591,
+            0.7378999963402748,
+            12.472599998116493,
+            4.530000001192093,
+            6.372299998998642,
+            3.781900003552437
+          ]
+        },
+        "handles": [
+          "Pipe",
+          "Socket(inactive)",
+          "Socket(inactive)",
+          "Socket(local:26589, remote:none:)",
+          "Server(port:4021)",
+          "Socket(local:4021, remote:127.0.0.1:26592)"
+        ],
+        "requestsCount": 0,
+        "elu": 51.63906188291416,
+        "osMetrics": {
+          "handleCount": 261,
+          "threadCount": 29,
+          "sockets": {
+            "established": 2,
+            "timeWait": 0,
+            "closeWait": 0,
+            "other": 1
+          }
+        }
+      },
+      {
+        "type": "TELEMETRY_REPORT",
+        "timestamp": 1779468241580,
+        "memory": {
+          "rss": 94781440,
+          "heapUsed": 24998072,
+          "heapTotal": 55746560,
+          "external": 2694982,
+          "heapStats": {
+            "total_heap_size": 55746560,
+            "used_heap_size": 24998296,
+            "heap_size_limit": 4345298944,
+            "fragmentationRatio": 0.5515724019562822,
+            "malloced_memory": 802888,
+            "peak_malloced_memory": 17096616
+          },
+          "oldSpaceUsed": 17586592,
+          "oldSpaceSize": 19365888
+        },
+        "gc": {
+          "minorCount": 16,
+          "majorCount": 1,
+          "otherCount": 0,
+          "totalGcTime": 71.36610000580549,
+          "pauses": []
+        },
+        "handles": [
+          "Pipe",
+          "Socket(inactive)",
+          "Socket(inactive)",
+          "Socket(local:26589, remote:none:)",
+          "Server(port:4021)"
+        ],
+        "requestsCount": 0,
+        "elu": 0.3560306532487569,
+        "osMetrics": {
+          "handleCount": 261,
+          "threadCount": 29,
+          "sockets": {
+            "established": 2,
+            "timeWait": 0,
+            "closeWait": 0,
+            "other": 1
+          }
+        }
+      },
+      {
+        "type": "TELEMETRY_REPORT",
+        "timestamp": 1779468243093,
+        "memory": {
+          "rss": 94781440,
+          "heapUsed": 25013304,
+          "heapTotal": 55746560,
+          "external": 2695009,
+          "heapStats": {
+            "total_heap_size": 55746560,
+            "used_heap_size": 25013528,
+            "heap_size_limit": 4345298944,
+            "fragmentationRatio": 0.55129916536554,
+            "malloced_memory": 802888,
+            "peak_malloced_memory": 17096616
+          },
+          "oldSpaceUsed": 17586592,
+          "oldSpaceSize": 19365888
+        },
+        "gc": {
+          "minorCount": 16,
+          "majorCount": 1,
+          "otherCount": 0,
+          "totalGcTime": 71.36610000580549,
+          "pauses": []
+        },
+        "handles": [
+          "Pipe",
+          "Socket(inactive)",
+          "Socket(inactive)",
+          "Socket(local:26589, remote:none:)",
+          "Server(port:4021)"
+        ],
+        "requestsCount": 0,
+        "elu": 0.13258410574668764,
+        "osMetrics": {
+          "handleCount": 260,
+          "threadCount": 29,
+          "sockets": {
+            "established": 1,
+            "timeWait": 0,
+            "closeWait": 0,
+            "other": 1
+          }
+        }
+      },
+      {
+        "type": "TELEMETRY_REPORT",
+        "timestamp": 1779468244593,
+        "memory": {
+          "rss": 94781440,
+          "heapUsed": 25028320,
+          "heapTotal": 55746560,
+          "external": 2695036,
+          "heapStats": {
+            "total_heap_size": 55746560,
+            "used_heap_size": 25028544,
+            "heap_size_limit": 4345298944,
+            "fragmentationRatio": 0.5510298034533432,
+            "malloced_memory": 802888,
+            "peak_malloced_memory": 17096616
+          },
+          "oldSpaceUsed": 17586592,
+          "oldSpaceSize": 19365888
+        },
+        "gc": {
+          "minorCount": 16,
+          "majorCount": 1,
+          "otherCount": 0,
+          "totalGcTime": 71.36610000580549,
+          "pauses": []
+        },
+        "handles": [
+          "Pipe",
+          "Socket(inactive)",
+          "Socket(inactive)",
+          "Socket(local:26589, remote:none:)",
+          "Server(port:4021)"
+        ],
+        "requestsCount": 0,
+        "elu": 0.12224996723018346,
+        "osMetrics": {
+          "handleCount": 260,
+          "threadCount": 29,
+          "sockets": {
+            "established": 1,
+            "timeWait": 0,
+            "closeWait": 0,
+            "other": 1
+          }
+        }
+      },
+      {
+        "type": "TELEMETRY_REPORT",
+        "timestamp": 1779468246109,
+        "memory": {
+          "rss": 94781440,
+          "heapUsed": 25043536,
+          "heapTotal": 55746560,
+          "external": 2695063,
+          "heapStats": {
+            "total_heap_size": 55746560,
+            "used_heap_size": 25043760,
+            "heap_size_limit": 4345298944,
+            "fragmentationRatio": 0.5507568538758266,
+            "malloced_memory": 802888,
+            "peak_malloced_memory": 17096616
+          },
+          "oldSpaceUsed": 17586592,
+          "oldSpaceSize": 19365888
+        },
+        "gc": {
+          "minorCount": 16,
+          "majorCount": 1,
+          "otherCount": 0,
+          "totalGcTime": 71.36610000580549,
+          "pauses": []
+        },
+        "handles": [
+          "Pipe",
+          "Socket(inactive)",
+          "Socket(inactive)",
+          "Socket(local:26589, remote:none:)",
+          "Server(port:4021)"
+        ],
+        "requestsCount": 0,
+        "elu": 0.1774075936138078,
+        "osMetrics": {
+          "handleCount": 260,
+          "threadCount": 29,
+          "sockets": {
+            "established": 1,
+            "timeWait": 0,
+            "closeWait": 0,
+            "other": 1
+          }
+        }
+      },
+      {
+        "type": "TELEMETRY_REPORT",
+        "timestamp": 1779468247611,
+        "memory": {
+          "rss": 94781440,
+          "heapUsed": 25058848,
+          "heapTotal": 55746560,
+          "external": 2695090,
+          "heapStats": {
+            "total_heap_size": 55746560,
+            "used_heap_size": 25059072,
+            "heap_size_limit": 4345298944,
+            "fragmentationRatio": 0.5504821822189567,
+            "malloced_memory": 802888,
+            "peak_malloced_memory": 17096616
+          },
+          "oldSpaceUsed": 17586592,
+          "oldSpaceSize": 19365888
+        },
+        "gc": {
+          "minorCount": 16,
+          "majorCount": 1,
+          "otherCount": 0,
+          "totalGcTime": 71.36610000580549,
+          "pauses": []
+        },
+        "handles": [
+          "Pipe",
+          "Socket(inactive)",
+          "Socket(inactive)",
+          "Socket(local:26589, remote:none:)",
+          "Server(port:4021)"
+        ],
+        "requestsCount": 0,
+        "elu": 0.16549800738915377,
+        "osMetrics": {
+          "handleCount": 260,
+          "threadCount": 29,
+          "sockets": {
+            "established": 1,
+            "timeWait": 0,
+            "closeWait": 0,
+            "other": 1
+          }
+        }
+      },
+      {
+        "type": "TELEMETRY_REPORT",
+        "timestamp": 1779468249118,
+        "memory": {
+          "rss": 94789632,
+          "heapUsed": 25073976,
+          "heapTotal": 55746560,
+          "external": 2695117,
+          "heapStats": {
+            "total_heap_size": 55746560,
+            "used_heap_size": 25074200,
+            "heap_size_limit": 4345298944,
+            "fragmentationRatio": 0.5502108112141808,
+            "malloced_memory": 802888,
+            "peak_malloced_memory": 17096616
+          },
+          "oldSpaceUsed": 17586592,
+          "oldSpaceSize": 19365888
+        },
+        "gc": {
+          "minorCount": 16,
+          "majorCount": 1,
+          "otherCount": 0,
+          "totalGcTime": 71.36610000580549,
+          "pauses": []
+        },
+        "handles": [
+          "Pipe",
+          "Socket(inactive)",
+          "Socket(inactive)",
+          "Socket(local:26589, remote:none:)",
+          "Server(port:4021)"
+        ],
+        "requestsCount": 0,
+        "elu": 0.23771576185410295,
+        "osMetrics": {
+          "handleCount": 260,
+          "threadCount": 29,
+          "sockets": {
+            "established": 1,
+            "timeWait": 0,
+            "closeWait": 0,
+            "other": 1
+          }
+        }
+      },
+      {
+        "type": "TELEMETRY_REPORT",
+        "timestamp": 1779468250623,
+        "memory": {
+          "rss": 94789632,
+          "heapUsed": 25089312,
+          "heapTotal": 55746560,
+          "external": 2695144,
+          "heapStats": {
+            "total_heap_size": 55746560,
+            "used_heap_size": 25089536,
+            "heap_size_limit": 4345298944,
+            "fragmentationRatio": 0.5499357090374725,
+            "malloced_memory": 802888,
+            "peak_malloced_memory": 17096616
+          },
+          "oldSpaceUsed": 17586592,
+          "oldSpaceSize": 19365888
+        },
+        "gc": {
+          "minorCount": 16,
+          "majorCount": 1,
+          "otherCount": 0,
+          "totalGcTime": 71.36610000580549,
+          "pauses": []
+        },
+        "handles": [
+          "Pipe",
+          "Socket(inactive)",
+          "Socket(inactive)",
+          "Socket(local:26589, remote:none:)",
+          "Server(port:4021)"
+        ],
+        "requestsCount": 0,
+        "elu": 0.17909258409443565,
+        "osMetrics": {
+          "handleCount": 260,
+          "threadCount": 29,
+          "sockets": {
+            "established": 1,
+            "timeWait": 0,
+            "closeWait": 0,
+            "other": 1
+          }
+        }
+      },
+      {
+        "type": "TELEMETRY_REPORT",
+        "timestamp": 1779468252139,
+        "memory": {
+          "rss": 94789632,
+          "heapUsed": 25104248,
+          "heapTotal": 55746560,
+          "external": 2695171,
+          "heapStats": {
+            "total_heap_size": 55746560,
+            "used_heap_size": 25104472,
+            "heap_size_limit": 4345298944,
+            "fragmentationRatio": 0.5496677821914033,
+            "malloced_memory": 802888,
+            "peak_malloced_memory": 17096616
+          },
+          "oldSpaceUsed": 17586592,
+          "oldSpaceSize": 19365888
+        },
+        "gc": {
+          "minorCount": 16,
+          "majorCount": 1,
+          "otherCount": 0,
+          "totalGcTime": 71.36610000580549,
+          "pauses": []
+        },
+        "handles": [
+          "Pipe",
+          "Socket(inactive)",
+          "Socket(inactive)",
+          "Socket(local:26589, remote:none:)",
+          "Server(port:4021)"
+        ],
+        "requestsCount": 0,
+        "elu": 0.11662715778263943,
+        "osMetrics": {
+          "handleCount": 260,
+          "threadCount": 29,
+          "sockets": {
+            "established": 1,
+            "timeWait": 0,
+            "closeWait": 0,
+            "other": 1
+          }
+        }
+      },
+      {
+        "type": "TELEMETRY_REPORT",
+        "timestamp": 1779468253650,
+        "memory": {
+          "rss": 94793728,
+          "heapUsed": 25120600,
+          "heapTotal": 55746560,
+          "external": 2695198,
+          "heapStats": {
+            "total_heap_size": 55746560,
+            "used_heap_size": 25120744,
+            "heap_size_limit": 4345298944,
+            "fragmentationRatio": 0.5493758897409993,
+            "malloced_memory": 802888,
+            "peak_malloced_memory": 17096616
+          },
+          "oldSpaceUsed": 17586592,
+          "oldSpaceSize": 19365888
+        },
+        "gc": {
+          "minorCount": 16,
+          "majorCount": 1,
+          "otherCount": 0,
+          "totalGcTime": 71.36610000580549,
+          "pauses": []
+        },
+        "handles": [
+          "Pipe",
+          "Socket(inactive)",
+          "Socket(inactive)",
+          "Socket(local:26589, remote:none:)",
+          "Server(port:4021)"
+        ],
+        "requestsCount": 0,
+        "elu": 0.14335614364394797,
+        "osMetrics": {
+          "handleCount": 260,
+          "threadCount": 29,
+          "sockets": {
+            "established": 1,
+            "timeWait": 0,
+            "closeWait": 0,
+            "other": 1
+          }
+        }
+      }
+    ]
+  },
+  "diagnostics": {
+    "checkpointDurationMs": 56.424300000000585,
+    "vacuumDurationMs": 428.5430000000015,
+    "eventLoopLagAvgMs": 6.954891666666694,
+    "eventLoopLagMaxMs": 83.38499999999999,
+    "prismaAcquireTimeAvgMs": 5.24193999999978
+  }
+}
