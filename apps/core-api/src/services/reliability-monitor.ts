@@ -71,7 +71,7 @@ export class ReliabilityMonitor {
             const successRate = totalNum > 0 ? (successNum / totalNum) * 100 : 0;
             
             const avgTime = durations.length > 0 
-                ? durations.reduce((acc, d) => acc + parseInt(d), 0) / durations.length 
+                ? durations.reduce((acc: number, d: string) => acc + parseInt(d), 0) / durations.length 
                 : 0;
 
             return {

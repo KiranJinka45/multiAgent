@@ -1,4 +1,5 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express from 'express';
+import type { Request, Response, NextFunction, RequestHandler } from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { redis } from '@packages/utils';
@@ -18,47 +19,51 @@ app.disable('x-powered-by');
 app.use(cors());
 
 // --- INTERNAL SECURITY ---
-app.use((req: Request, res: Response, next: NextFunction) => {
+app.use(((req: Request, res: Response, next: NextFunction): void => {
     const key = req.headers['x-internal-key'];
     if (key !== INTERNAL_KEY) {
         logger.warn(`[Core-API] Unauthorized access attempt from IP: ${req.ip}`);
-        return res.status(401).json({ error: 'Unauthorized: Internal service key required' });
+        res.status(401).json({ error: 'Unauthorized: Internal service key required' });
+        return;
     }
     next();
-});
+}) as RequestHandler);
 
 // Metrics
-app.get('/metrics', async (req: Request, res: Response) => {
+app.get('/metrics', (async (req: Request, res: Response): Promise<void> => {
     res.set('Content-Type', registry.contentType);
     res.end(await registry.metrics());
-});
+}) as RequestHandler);
 
 // Health Check
-app.get('/health', (req: Request, res: Response) => {
+app.get('/health', ((req: Request, res: Response): void => {
     res.json({ status: 'healthy', timestamp: Date.now(), service: 'core-api' });
-});
+}) as RequestHandler);
 
 /**
  * Preview Proxy Logic
  * Resolves project IDs to their isolated container ports via Redis.
  */
-app.use('/preview/:projectId', async (req, res) => {
+app.use('/preview/:projectId', (async (req: Request, res: Response): Promise<void> => {
     const { projectId } = req.params;
 
     // Sanitize: only allow alphanumeric, dash, underscore to prevent XSS/injection
     if (!/^[a-zA-Z0-9_-]+$/.test(projectId)) {
-        return res.status(400).send('Invalid project ID');
+        res.status(400).send('Invalid project ID');
+        return;
     }
     
     try {
         const targetPortStr = await redis.get(`preview:port:${projectId}`);
         if (!targetPortStr) {
-            return res.status(404).send('Preview not found or expired');
+            res.status(404).send('Preview not found or expired');
+            return;
         }
 
         const targetPort = parseInt(targetPortStr, 10);
         if (isNaN(targetPort) || targetPort < 1024 || targetPort > 65535) {
-            return res.status(500).send('Invalid proxy target configuration');
+            res.status(500).send('Invalid proxy target configuration');
+            return;
         }
 
         console.log(`[PreviewProxy] Steering to internal port ${targetPort}`);
@@ -67,7 +72,7 @@ app.use('/preview/:projectId', async (req, res) => {
         console.error('[PreviewProxy] Error:', err);
         res.status(500).send('Proxy Gateway Error');
     }
-});
+}) as RequestHandler);
 
 const server = createServer(app);
 

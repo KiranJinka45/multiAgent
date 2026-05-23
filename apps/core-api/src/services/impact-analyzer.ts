@@ -1,5 +1,5 @@
-import { DependencyGraph } from './dependency-graph';
-import { ProjectMemory, projectMemory } from './project-memory';
+import { DependencyGraph } from './dependency-graph.js';
+import { type ProjectMemory, projectMemory } from './project-memory.js';
 
 /**
  * ImpactAnalyzer

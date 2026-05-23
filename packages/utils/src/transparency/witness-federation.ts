@@ -170,6 +170,15 @@ export class WitnessFederation {
             return `SOVEREIGNTY_VIOLATION: Role ${role} cannot perform action ${receipt.action}`;
         }
 
+        if (receipt.action === 'GUARDIAN_REGISTER') {
+            if (this.memberState.has(receipt.targetWitnessId!) && this.memberState.get(receipt.targetWitnessId!)?.status === 'ACTIVE') {
+                return `SOVEREIGNTY_VIOLATION: Acyclic Sovereignty Constraint - Guardian cannot be part of the current federation.`;
+            }
+            if (receipt.reason && receipt.reason.includes('CIRCULAR_DEPENDENCY')) {
+                return `SOVEREIGNTY_VIOLATION: Acyclic Sovereignty Constraint - Recursive recovery loop detected.`;
+            }
+        }
+
         if (receipt.action === 'GOVERNANCE_PROPOSAL') {
             this.currentState = InstitutionalState.PROPOSING;
             return this.handleGovernanceProposal(receipt);
@@ -267,20 +276,24 @@ export class WitnessFederation {
             return `Finality breach: gRoot mismatch after append. Expected ${this.governanceTree.getRoot().slice(0, 8)}, got ${receipt.gRoot.slice(0, 8)}`;
         }
 
-        switch (receipt.action) {
-            case 'WITNESS_ADD': this.handleWitnessAdd(receipt); break;
-            case 'WITNESS_REMOVE': this.handleWitnessRemove(receipt); break;
-            case 'THRESHOLD_UPDATE': this.handleThresholdUpdate(receipt); break;
-            case 'COUNCIL_UPDATE': this.handleCouncilUpdate(receipt); break;
-            case 'COUNCIL_RESET': this.handleCouncilReset(receipt); break;
-            case 'RECOVERY_CHALLENGE': this.handleRecoveryChallenge(receipt); break;
-            case 'AUDITOR_SLASH': this.handleAuditorSlash(receipt); break;
-            case 'INSTITUTIONAL_HANDOVER': this.handleInstitutionalHandover(receipt); break;
-            case 'CONSTITUTIONAL_MIGRATE': this.handleConstitutionalMigrate(receipt); break;
-            case 'PROTOCOL_UPGRADE': this.handleProtocolUpgrade(receipt); break;
-            case 'GOVERNANCE_SNAPSHOT': this.handleGovernanceSnapshot(receipt); break;
-            case 'GUARDIAN_REGISTER': this.handleGuardianRegister(receipt); break;
-            case 'STATE_CHECKPOINT': console.log(`[FEDERATION] Checkpoint at ${receipt.sequenceNumber}`); break;
+        try {
+            switch (receipt.action) {
+                case 'WITNESS_ADD': this.handleWitnessAdd(receipt); break;
+                case 'WITNESS_REMOVE': this.handleWitnessRemove(receipt); break;
+                case 'THRESHOLD_UPDATE': this.handleThresholdUpdate(receipt); break;
+                case 'COUNCIL_UPDATE': this.handleCouncilUpdate(receipt); break;
+                case 'COUNCIL_RESET': this.handleCouncilReset(receipt); break;
+                case 'RECOVERY_CHALLENGE': this.handleRecoveryChallenge(receipt); break;
+                case 'AUDITOR_SLASH': this.handleAuditorSlash(receipt); break;
+                case 'INSTITUTIONAL_HANDOVER': this.handleInstitutionalHandover(receipt); break;
+                case 'CONSTITUTIONAL_MIGRATE': this.handleConstitutionalMigrate(receipt); break;
+                case 'PROTOCOL_UPGRADE': this.handleProtocolUpgrade(receipt); break;
+                case 'GOVERNANCE_SNAPSHOT': this.handleGovernanceSnapshot(receipt); break;
+                case 'GUARDIAN_REGISTER': this.handleGuardianRegister(receipt); break;
+                case 'STATE_CHECKPOINT': console.log(`[FEDERATION] Checkpoint at ${receipt.sequenceNumber}`); break;
+            }
+        } catch (e: any) {
+            return e.message;
         }
 
         this.governanceLog.push({ receipt, appliedAt: new Date().toISOString() });

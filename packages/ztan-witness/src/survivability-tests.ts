@@ -138,7 +138,7 @@ async function runSurvivabilityTests() {
                     algorithm: 'ed25519',
                     signature: `sig:${signerId}:mock-crash`,
                     signedAt: timestamp,
-                    trustEpochId: 'GENESIS-EPOCH-001',
+                    trustEpochId: '1',
                     scope: 'entry'
                 },
                 verificationState: VerificationState.VERIFIED
@@ -356,7 +356,7 @@ async function runSurvivabilityTests() {
         await clearState(cidEntropy);
 
         if (sequenceMonotonic && hashesLinked && metrics.failedAppends === 0 && chain.verificationState === VerificationState.VERIFIED) {
-            console.log('🎉 ALL DISTRIBUTED SURVIVABILITY DRILLS COMPLETED WITH ABSOLUTE SUCCESS!');
+            console.log('🎉 ALL DISTRIBUTED SURVIVABILITY DRILLS COMPLETED SUCCESSFULLY UNDER TESTED CONDITIONS!');
             console.log('================================================================\n');
             process.exit(0);
         } else {

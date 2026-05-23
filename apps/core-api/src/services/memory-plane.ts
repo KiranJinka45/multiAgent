@@ -1,6 +1,6 @@
-import { projectMemory } from './project-memory';
-import { VectorStore } from './memory/vector-store';
-import { EmbeddingsEngine } from './memory/embeddings-engine';
+import { projectMemory } from './project-memory.js';
+import { VectorStore } from './memory/vector-store.js';
+import { EmbeddingsEngine } from './memory/embeddings-engine.js';
 import { logger } from '@packages/observability';
 
 export interface ExperienceLesson {

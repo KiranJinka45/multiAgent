@@ -63,10 +63,11 @@ export const MigrationRehearsal = {
             
         const failureCount = stats.length;
         const readinessScore = Math.max(0, 100 - (failureCount * 10));
+        const statusText = readinessScore >= 90 ? 'NOMINAL' : readinessScore >= 75 ? 'WARNING' : 'BREACH';
         
         let report = `MIGRATION READINESS REPORT: ${target}\n`;
         report += `--------------------------------------------------\n`;
-        report += `Readiness Score:   ${readinessScore}/100\n`;
+        report += `Readiness Verdict: ${statusText}\n`;
         report += `Historical Risks:  ${failureCount === 0 ? 'NONE DETECTED' : `${failureCount} REGRESSIONS RECORDED`}\n`;
         report += `Status:            ${readinessScore > 80 ? 'READY' : 'CAUTION: STABILITY RISKS DETECTED'}\n`;
         report += `--------------------------------------------------\n`;

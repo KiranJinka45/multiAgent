@@ -3,26 +3,27 @@
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": "src",
+    "composite": true,
     "declaration": true,
     "declarationDir": "dist",
     "baseUrl": ".",
     "paths": {
-      "@packages/contracts": [
-        "../contracts/src/index.ts"
-      ],
-      "@packages/observability": [
-        "../observability/src/index.ts"
-      ],
-      "@packages/utils": [
-        "../utils/src/index.ts"
-      ],
-      "@packages/db": [
-        "../db/src/index.ts"
-      ]
+      "@packages/contracts": ["../contracts/src/index.ts"],
+      "@packages/observability": ["../observability/src/index.ts"],
+      "@packages/utils": ["../utils/src/index.ts"],
+      "@packages/db": ["../db/src/index.ts"]
     }
   },
   "include": ["src/**/*"],
-  "exclude": ["src/**/*.test.ts", "src/run-tests.ts"],
+  "exclude": [
+    "src/**/*.test.ts",
+    "src/run-tests.ts",
+    "src/chaos-tests.ts",
+    "src/physical-pathology-tests.ts",
+    "src/synthetic-pathology-tests.ts",
+    "src/soak-test.ts",
+    "src/survivability-tests.ts"
+  ],
   "references": [
     { "path": "../contracts" },
     { "path": "../observability" },

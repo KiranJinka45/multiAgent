@@ -1,9 +1,9 @@
 import { logger } from '@packages/observability';
-import { sloManager } from './slo-manager';
-import { ProgressiveCanary } from './operational-control/progressive-canary';
-import { globalSafetyGuard } from './operational-control/safety-guard';
-import type { SafetyContext } from './operational-control/safety-guard';
-import { kubernetesActuator } from './kubernetes-actuator';
+import { sloManager } from './slo-manager.js';
+import { ProgressiveCanary } from './operational-control/progressive-canary.js';
+import { globalSafetyGuard } from './operational-control/safety-guard.js';
+import type { SafetyContext } from './operational-control/safety-guard.js';
+import { kubernetesActuator } from './kubernetes-actuator.js';
 
 export interface ActuationTask {
   type: string;

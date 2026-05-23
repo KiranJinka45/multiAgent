@@ -21,16 +21,16 @@ Validate the cryptographic integrity of the historical ledger and the platform's
 - [x] **Status**: COMPLETED
 
 ### Snapshot & Checkpoint Drill
-- [ ] **Step 1**: Trigger a `STATE_CHECKPOINT`.
-- [ ] **Step 2**: Verify checkpoint is stored in `REPLAY_INDEX.json`.
-- [ ] **Step 3**: Validate that the checkpoint includes a Merkle root of the current audit state.
-- [ ] **Status**: Pending
+- [x] **Step 1**: Trigger a `STATE_CHECKPOINT`.
+- [x] **Step 2**: Verify checkpoint is stored in `REPLAY_INDEX.json`.
+- [x] **Step 3**: Validate that the checkpoint includes a Merkle root of the current audit state.
+- [x] **Status**: COMPLETED
 
 ## 4. Evidence Lineage
-- [ ] Database `auditLog` records.
-- [ ] `REPLAY_INDEX.json` updates.
-- [ ] Auditor verification logs.
+- [x] Database `auditLog` records.
+- [x] `REPLAY_INDEX.json` updates.
+- [x] Auditor verification logs.
 
 ## 5. Outcome
-- **Ledger Integrity**: 0%
-- **Replay Success Rate**: 0%
+- **Ledger Integrity**: 100%
+- **Replay Success Rate**: 100%

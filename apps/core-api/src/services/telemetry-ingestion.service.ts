@@ -1,6 +1,6 @@
-import { sreEngine } from './sre-engine';
+import { sreEngine } from './sre-engine.js';
 import { logger } from '@packages/observability';
-import { chaosOrchestrator } from './chaos-orchestrator';
+import { chaosOrchestrator } from './chaos-orchestrator.js';
 
 export class TelemetryIngestionService {
     private baselineLatency = 200; // Expected API latency in ms

@@ -15,7 +15,7 @@ This document outlines the architecture and operational procedures for the harde
 
 - **Unified SocketGateway**: Consolidation of multi-node WebSocket events via `@socket.io/redis-adapter`. Targets 10,000 concurrent connections per cluster.
 - **Redis Sentinel**: 3-node HA cluster (Master + Replica + Sentinel). Services use Sentinel-aware connection logic to survive master failures.
-- **Mission Watchdog**: A background resilience layer in the Orchestrator that reconciles stale missions and prevents "zombie" states without user intervention.
+- **Mission Watchdog**: Provides watchdog-assisted reconciliation of stale mission states during restart and recovery scenarios.
 - **Stateful Failover**: `MissionWorker` and `Watchdog` are resilient to container restarts via Redis-backed state recovery.
 
 ---
@@ -30,7 +30,11 @@ This document outlines the architecture and operational procedures for the harde
 ### Edge Protection
 
 - **WAF (Ingress)**: Hardened Ingress with OWASP ModSecurity rule-set and rate limiting.
-- **HTTPS Enforcement**: 100% TLS encryption for all ingress and data-in-transit.
+- **HTTPS Enforcement**: HTTPS enforced at ingress boundaries with optional internal TLS support depending on deployment topology.
+
+### Authority Escalation Invariant
+
+- **No Implicit Escalation**: No probabilistic or advisory subsystem (Tier A) may acquire mutation authority implicitly through retries, automation chaining, policy generation, or delegated execution pathways.
 
 ---
 
@@ -46,9 +50,9 @@ redis-cli -h <SENTINEL_ADDR> -p 26379 sentinel get-master-addr-by-name mymaster
 set system:kill_switch true
 ```
 
-### Immutable Audit Logs
+### Cryptographically Chained Audit Logs
 
-All critical actions are cryptographically hashed and chained.
+Cryptographically chained append-oriented audit logs with integrity verification.
 
 - **Table**: `audit_logs` (Supabase)
 - **Integrity Check**: Call `AuditLogger.verifyChain()` via the `admin-cli`.
@@ -65,9 +69,9 @@ All critical actions are cryptographically hashed and chained.
   - `mission_recovery_total` (Autonomous healing events)
   - `tokens_total` (Real-time billing consumption)
 
-### Reinforcement Learning & Self-Healing
+### Trace Retrieval & Assisted Recovery
 
-The system learns from every successful repair and automatically heals via the Watchdog.
+The system stores historical recovery traces and exposes them for operator-assisted heuristic retrieval during future incidents via the Watchdog.
 
 - **Table**: `global_experience_memory` (Vector DB)
 - **Watchdog Heartbeat**: Monitored via `watchdog:last_check` in Redis.
@@ -120,23 +124,23 @@ Available Metrics:
 
 The platform has been certified against **Enterprise SRE failure domains (Single-Region)**:
 1. **Immutable Sandbox**: Seccomp + Read-Only + Rootless (Zero-Trust isolation).
-2. **Exactly-Once**: Atomic Idempotency Locks with Transactional Safety.
-3. **Distributed Resilience**: Multi-node Failover with PEL Reclamation (<40s).
+2. **Effectively-Once**: Bounded effectively-once replay handling with atomic idempotency locks and transactional safety.
+3. **Failover Resilience**: Coordinated Single-Region Failover Resilience with Redis/Kafka recovery and bounded replay restoration (<40s observed MTTR in test conditions).
 4. **Endurance**: 3-Hour Sustained Load Validation (100-500 VU).
-5. **Load Shedding**: 100% Stability during Extreme Overload (Graceful 503 logic).
+5. **Load Shedding**: Observed stable overload degradation behavior under tested stress conditions using graceful 503-based load shedding.
 
 ### Mandatory Enterprise Checklist
 
 - [ ] Check `ai_token_cost_total` in "Operational Resilience" Dashboard.
 - [ ] Verify `ai_cache_savings_total` ROI is > 0.
-- [ ] Audit `global_experience_memory` for recursive learning health.
+- [ ] Audit `global_experience_memory` for recovery trace indexing and heuristic retrieval health.
 - [ ] Monitor `governance:total_active_jobs` for load shedding triggers.
 
 ---
 
 ## 🧯 Break-Glass Recovery Procedure (Catastrophic)
 
-In the event of total Kafka state loss or unrecoverable split-brain:
+In the event of total Kafka state loss, unrecoverable lease synchronization drift, or duplicate coordinator execution conflicts:
 
 1. **Flush Dead Letters**:
    `kubectl delete pods -l app=kafka -n multiagent --force`

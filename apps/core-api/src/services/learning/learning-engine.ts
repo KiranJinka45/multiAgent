@@ -31,6 +31,18 @@ export class LearningEngine {
 
     logger.info('[LEARNING] Learning cycle complete. Knowledge base expanded.');
   }
+
+  public async recommendFix(stderr: string): Promise<string | null> {
+    return FixRecommender.recommendFix(stderr);
+  }
+
+  public async recordSuccess(stderr: string, fixStrategy: string): Promise<void> {
+    const errors = ErrorAnalyzer.analyze(stderr);
+    for (const error of errors) {
+      const signature = error.message.slice(0, 100);
+      await KnowledgeStore.recordFix(signature, fixStrategy);
+    }
+  }
 }
 
 export const learningEngine = new LearningEngine();

@@ -46,7 +46,7 @@ The final message signed using BLS12-381 is the `BindingHash`.
 - The attacker can attempt to replay signatures across different ceremonies.
 
 ### 4.2 Security Guarantees
-- **Non-Repudiation**: A valid signature proves that at least `t` distinct nodes from the `eligiblePublicKeys` set agreed to sign the `PayloadHash` under the specific `ceremonyId`.
+- **Non-Repudiation**: A valid signature operationally verifies that at least `t` distinct nodes from the `eligiblePublicKeys` set agreed to sign the `PayloadHash` under the specific `ceremonyId`.
 - **Replay Resistance**: Signatures from Ceremony A cannot be reused in Ceremony B, even if the message hash is identical.
 - **Semantic Integrity**: The proof is invalid if the threshold or participant set is altered.
 

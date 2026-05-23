@@ -1,5 +1,5 @@
 import { Server, Socket } from 'socket.io';
-import { eventBus } from '@packages/utils';
+import { eventBus, redis } from '@packages/utils';
 import { logger } from '@packages/observability';
 
 export class LogStreamingService {
@@ -38,10 +38,8 @@ export class LogStreamingService {
                 try {
                     // Check stream bounds for gap detection
                     const streamKey = `build:stream:${buildId}`;
-                    const bus = (eventBus as any).getInternalBus?.() || (await import('@packages/events')).eventBus;
-                    
                     // Get the oldest available entry
-                    const oldestEntries = await bus.redis.xrange(streamKey, '-', '+', 'COUNT', 1).catch(() => []);
+                    const oldestEntries = await redis.xrange(streamKey, '-', '+', 'COUNT', 1).catch(() => []);
                     const oldestId = oldestEntries?.[0]?.[0] || '0-0';
 
                     socket.emit('replay-summary', { 

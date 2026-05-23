@@ -1,4 +1,4 @@
-import { AutonomousActionManifest } from '../../autonomous-ops/src/types.js';
+import type { AutonomousActionManifest } from '@packages/autonomous-ops';
 
 export interface ReplayReport {
     actionId: string;

@@ -295,7 +295,56 @@ if (!(globalThis as any).__redisClient) {
         throw new Error(errorMsg);
     }
 }
-export const redis = (globalThis as any).__redisClient;
+export let redisOutageActive = false;
+export let redisOutageDuration = 0;
+export let redisOutageStart = 0;
+
+export function injectRedisOutage(durationMs: number) {
+    redisOutageActive = true;
+    redisOutageDuration = durationMs;
+    redisOutageStart = Date.now();
+}
+
+export function clearRedisOutage() {
+    redisOutageActive = false;
+    redisOutageDuration = 0;
+    redisOutageStart = 0;
+}
+
+export function getActiveRedisOutage(): boolean {
+    if (!redisOutageActive) return false;
+    if (Date.now() - redisOutageStart > redisOutageDuration) {
+        clearRedisOutage();
+        return false;
+    }
+    return true;
+}
+
+const rawRedis = (globalThis as any).__redisClient;
+const redisProxy = new Proxy(rawRedis, {
+    get(target, prop, receiver) {
+        if (getActiveRedisOutage()) {
+            if (prop === 'disconnect' || prop === 'connect' || prop === 'on' || prop === 'off' || prop === 'status') {
+                const value = Reflect.get(target, prop, receiver);
+                return typeof value === 'function' ? value.bind(target) : value;
+            }
+
+            const value = Reflect.get(target, prop, receiver);
+            if (typeof value === 'function') {
+                return async function (...args: any[]) {
+                    const err = new Error('Connection lost');
+                    err.name = 'RedisConnectionError';
+                    throw err;
+                };
+            }
+        }
+
+        const value = Reflect.get(target, prop, receiver);
+        return typeof value === 'function' ? value.bind(target) : value;
+    }
+});
+
+export const redis = redisProxy;
 
 // Mission & Project Services
 export const projectService = {

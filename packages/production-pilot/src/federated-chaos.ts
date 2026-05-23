@@ -1,4 +1,4 @@
-import { ChaosEngine, ChaosEvent } from './chaos.js';
+import { ChaosEngine, type ChaosEvent } from './chaos.js';
 
 /**
  * Distributed Chaos Validation Suite

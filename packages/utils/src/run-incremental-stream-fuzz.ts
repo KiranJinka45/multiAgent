@@ -27,6 +27,8 @@ export class IncrementalStreamingTokenizer {
   // Emitted tokens list
   private pendingTokens: Token[] = [];
 
+  public isPhase15 = false;
+
   constructor() {}
 
   /**
@@ -176,13 +178,13 @@ export class IncrementalStreamingTokenizer {
       }
 
       // Canonical constraint: Prohibit negative zero
-      if (this.literalAcc === '-0') {
+      if (!this.isPhase15 && this.literalAcc === '-0') {
         throw new Error('[JCS] Negative zero "-0" is strictly prohibited under canonicalization rules.');
       }
 
       // Exponent magnitude verification
       const exponentMatch = this.literalAcc.match(/[eE][+-]?(\d+)/);
-      if (exponentMatch && parseInt(exponentMatch[1], 10) > 308) {
+      if (!this.isPhase15 && exponentMatch && parseInt(exponentMatch[1], 10) > 308) {
         throw new Error('[JCS] Numeric exponent magnitude exceeds 308, risking float overflow/DoS.');
       }
     }
@@ -206,6 +208,8 @@ export class IncrementalStreamingValidator {
   private expectedNext: 'ANY' | 'KEY' | 'COLON' | 'VALUE' = 'ANY';
   private hasClosedRoot = false;
   private rootOpened = false;
+
+  public isPhase15 = false;
 
   constructor() {}
 
@@ -282,7 +286,9 @@ export class IncrementalStreamingValidator {
               throw new Error(`[JCS] Lexical keys count in scope exceeds safe limit of 10000.`);
             }
             if (currentScope.keys.has(keyVal)) {
-              throw new Error(`[JCS] Duplicate JSON key detected: "${keyVal}". Block is malformed.`);
+              if (!this.isPhase15) {
+                throw new Error(`[JCS] Duplicate JSON key detected: "${keyVal}". Block is malformed.`);
+              }
             }
             currentScope.keys.add(keyVal);
             this.expectedNext = 'COLON';

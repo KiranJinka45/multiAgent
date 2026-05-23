@@ -437,7 +437,7 @@ export class EvidenceLedgerService {
             // 2. Fetch Active Trust Epoch
             const activeEpoch = await this.getActiveEpoch();
             
-            // 3. Sequence & Chaining (using PostgreSQL transaction for absolute safety)
+            // 3. Sequence & Chaining (using PostgreSQL serializable transactions to enforce fencing safety)
             let sequence = 1;
             let previousHash = '0x0';
 
@@ -972,7 +972,7 @@ export class EvidenceLedgerService {
         
         // Genesis Epoch
         return {
-            id: 'GENESIS-EPOCH-001',
+            id: '1',
             startTime: Date.now(),
             algorithm: 'ed25519',
             status: 'active',

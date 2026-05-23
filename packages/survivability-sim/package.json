@@ -1,9 +1,20 @@
 {
   "name": "@packages/survivability-sim",
   "version": "1.0.0",
+  "private": true,
   "type": "module",
-  "main": "dist/index.js",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --no-dts && tsc --emitDeclarationOnly -p tsconfig.json --declarationDir ./dist",
+    "dev": "tsup src/index.ts --format esm --no-dts --watch",
+    "typecheck": "tsc --noEmit"
+  },
   "dependencies": {
     "@packages/utils": "workspace:*"
+  },
+  "devDependencies": {
+    "tsup": "8.5.1",
+    "typescript": "5.5.4"
   }
 }

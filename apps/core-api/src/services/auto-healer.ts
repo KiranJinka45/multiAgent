@@ -4,7 +4,8 @@ import fs from 'fs';
 import { Groq } from 'groq-sdk';
 import util from 'util';
 import crypto from 'node:crypto';
-import { ThresholdCrypto, PatchIntent } from '@packages/ztan-crypto';
+import { ThresholdCrypto } from '@packages/ztan-crypto';
+import type { PatchIntent } from '@packages/ztan-crypto';
 
 const execAsync = util.promisify(exec);
 
@@ -191,7 +192,7 @@ export class DevinAutoHealer {
         }
 
         try {
-            const isValid = await ThresholdCrypto.verifyPatchIntent(intent);
+            const isValid = await ThresholdCrypto.verifyPatchIntent(intent, []);
             if (isValid) {
                 console.log(`[AutoHealer] Verified context-bound operator signature for patch: ${patch.path}`);
                 console.log(`- Epoch: ${intent.trustEpoch}`);

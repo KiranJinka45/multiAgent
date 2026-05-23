@@ -78,12 +78,12 @@ async function generateReport() {
 - **Resource Efficiency:** ${(trend.resourceEfficiency * 100).toFixed(1)}%
 
 ## 🏛️ GOVERNANCE EFFICIENCY
-- **Efficiency Index:** ${trend.governanceEfficiencyIndex.toFixed(1)}/100
+- **Governance Verdict:** ${trend.governanceEfficiencyIndex >= 90 ? 'NOMINAL' : trend.governanceEfficiencyIndex >= 75 ? 'WARNING' : 'BREACH'}
 - **Complexity Factor:** ${trend.complexityFactor.toFixed(2)} (Surface Area)
 - **Institutional Status:** ${trend.status === 'BORING' ? '✅ OPTIMIZED' : (trend.status === 'INEFFICIENT_GOVERNANCE' ? '⚠️ OVER-COMPLEX' : '❌ ATTENTION REQUIRED')}
 
 ## 📉 PREDICTIVE REGRESSION
-- **Stability Score:** ${trend.regressionScore}/100
+- **Stability Verdict:** ${trend.regressionScore >= 90 ? 'NOMINAL' : trend.regressionScore >= 75 ? 'WARNING' : 'BREACH'}
 - **Trend Status:** ${trend.regressionScore < 90 ? '⚠️ SLIGHT DEGRADATION' : '✅ STABLE'}
 
 ## 🛡️ "BORING TIME" METRICS

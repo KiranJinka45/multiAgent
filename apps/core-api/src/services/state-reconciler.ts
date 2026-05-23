@@ -1,4 +1,4 @@
-import Redis from 'ioredis';
+import { Redis } from 'ioredis';
 import { db } from '@packages/db';
 import { logger } from '@packages/observability';
 

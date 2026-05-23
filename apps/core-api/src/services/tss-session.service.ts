@@ -108,7 +108,7 @@ export class TssSessionService {
     }
 
     // Phase 5: Bind exact public keys at init to handle correctly
-    const participants = [];
+    const participants: ParticipantInfo[] = [];
     for (const nodeId of participantIds) {
         const publicKey = await IdentityService.getPublicKey(nodeId);
         if (!publicKey) throw new Error(`[SECURITY] Node ${nodeId} is not in the active registry.`);

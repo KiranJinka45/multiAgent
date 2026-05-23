@@ -16,5 +16,85 @@
     "node": "v20.20.0",
     "durationMs": 450,
     "lockfileSize": 15
+  },
+  {
+    "timestamp": "2026-05-22T07:04:47.275Z",
+    "success": true,
+    "category": "SCHEDULED_CHECKPOINT",
+    "os": "linux",
+    "node": "v20.20.0",
+    "durationMs": 450,
+    "lockfileSize": 15
+  },
+  {
+    "timestamp": "2026-05-22T07:08:21.822Z",
+    "success": true,
+    "category": "SCHEDULED_CHECKPOINT",
+    "os": "win32",
+    "node": "v20.20.0",
+    "durationMs": 450,
+    "lockfileSize": 15,
+    "merkleRoot": "f83384eca851c9d03a177f1203b8c52167a71563850656881a0509d591b07873",
+    "checkpointId": "checkpoint-1779433701739"
+  },
+  {
+    "timestamp": "2026-05-22T07:09:59.540Z",
+    "success": true,
+    "category": "SCHEDULED_CHECKPOINT",
+    "os": "win32",
+    "node": "v20.20.0",
+    "durationMs": 450,
+    "lockfileSize": 15,
+    "merkleRoot": "60991fedea8686fc80be67ed46c354e084e6559bdc58915941d20ab27a7defeb",
+    "checkpointId": "checkpoint-1779433799465"
+  },
+  {
+    "timestamp": "2026-05-15T17:58:59.228Z",
+    "success": false,
+    "os": "win32",
+    "node": "v20.20.0",
+    "lockfileSize": 0
+  },
+  {
+    "timestamp": "2026-05-15T17:59:35.938Z",
+    "success": false,
+    "os": "win32",
+    "node": "v20.20.0",
+    "lockfileSize": 0
+  },
+  {
+    "timestamp": "2026-05-15T17:59:48.112Z",
+    "success": true,
+    "os": "win32",
+    "node": "v20.20.0",
+    "lockfileSize": 0
+  },
+  {
+    "timestamp": "2026-05-15T18:21:43.690Z",
+    "success": true,
+    "os": "win32",
+    "node": "v20.20.0",
+    "lockfileSize": 0
+  },
+  {
+    "timestamp": "2026-05-15T18:22:44.866Z",
+    "success": true,
+    "os": "win32",
+    "node": "v20.20.0",
+    "lockfileSize": 0
+  },
+  {
+    "timestamp": "2026-05-15T18:23:45.449Z",
+    "success": true,
+    "os": "win32",
+    "node": "v20.20.0",
+    "lockfileSize": 0
+  },
+  {
+    "timestamp": "2026-05-22T07:05:30.964Z",
+    "success": true,
+    "os": "win32",
+    "node": "v20.20.0",
+    "lockfileSize": 0
   }
 ]

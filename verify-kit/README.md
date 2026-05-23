@@ -27,7 +27,7 @@ python v1.5/verify.py --bundle sample_bundle.json
 ```
 
 ## 🛡️ Security Guarantees
-When `verify.py` returns `[SUCCESS]`, it mathematically proves:
+When `verify.py` returns `[SUCCESS]`, it operationally models the verification that:
 1. **Quorum Integrity**: At least `threshold` nodes signed this specific message.
 2. **Signer Authorization**: Every signer is a member of the authorized `eligiblePublicKeys` set.
 3. **Session Isolation**: The signature is bound to the unique `ceremonyId` (prevents replay).

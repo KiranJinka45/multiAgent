@@ -1,4 +1,4 @@
-import { InfraNode, InfraEdge, TopologyEvent, BlastRadiusReport, RecoverySequence } from './types.js';
+import type { InfraNode, InfraEdge, TopologyEvent, BlastRadiusReport, RecoverySequence } from './types.js';
 /**
  * Infrastructure Knowledge Graph Engine
  *

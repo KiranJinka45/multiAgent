@@ -1,6 +1,6 @@
 import { createClientComponentClient, type SupabaseClient } from '@packages/supabase';
 import { type PostgrestError } from '@packages/supabase';
-import { Chat, Message } from '@packages/contracts';
+import type { Chat, Message } from '@packages/contracts';
 
 export const chatService = {
     getSupabase: (supabaseServer?: SupabaseClient) => supabaseServer || createClientComponentClient(),

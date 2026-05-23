@@ -1,4 +1,4 @@
-import { ReplayReport, ReplayVerifier } from './replay.js';
+import { type ReplayReport, ReplayVerifier } from './replay.js';
 
 /**
  * Federated Replay Engine

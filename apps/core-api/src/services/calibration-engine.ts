@@ -5,54 +5,73 @@ export class CalibrationEngine {
   private static STORAGE_KEY = 'sre:calibration:samples';
 
   public static async recordSample(confidence: number, outcome: number, hypothesisType?: string, actualType?: string) {
-    const samplesJson = await redis.get(this.STORAGE_KEY);
-    const samples = samplesJson ? JSON.parse(samplesJson) : [];
+    try {
+      const samplesJson = await redis.get(this.STORAGE_KEY);
+      const samples = samplesJson ? JSON.parse(samplesJson) : [];
 
-    samples.push({
-      time: new Date().toISOString(),
-      confidence,
-      outcome,
-      hypothesisType,
-      actualType
-    });
+      samples.push({
+        time: new Date().toISOString(),
+        confidence,
+        outcome,
+        hypothesisType,
+        actualType
+      });
 
-    // Keep last 500 samples for calibration
-    if (samples.length > 500) samples.shift();
+      // Keep last 500 samples for calibration
+      if (samples.length > 500) samples.shift();
 
-    await redis.set(this.STORAGE_KEY, JSON.stringify(samples));
+      await redis.set(this.STORAGE_KEY, JSON.stringify(samples));
+    } catch (err: any) {
+      logger.warn({ err }, '[CALIBRATION] Failed to record sample in redis');
+    }
   }
 
   public static async calculateHypothesisPrecision(type: string): Promise<number> {
-    const samplesJson = await redis.get(this.STORAGE_KEY);
-    if (!samplesJson) return 1.0;
+    try {
+      const samplesJson = await redis.get(this.STORAGE_KEY);
+      if (!samplesJson) return 1.0;
 
-    const samples = JSON.parse(samplesJson);
-    const relevant = samples.filter((s: any) => s.hypothesisType === type);
-    if (relevant.length === 0) return 1.0;
+      const samples = JSON.parse(samplesJson);
+      const relevant = samples.filter((s: any) => s.hypothesisType === type);
+      if (relevant.length === 0) return 1.0;
 
-    const correct = relevant.filter((s: any) => s.outcome === 1.0).length;
-    return correct / relevant.length;
+      const correct = relevant.filter((s: any) => s.outcome === 1.0).length;
+      return correct / relevant.length;
+    } catch (err: any) {
+      logger.warn({ err }, '[CALIBRATION] Failed to calculate hypothesis precision from redis');
+      return 1.0;
+    }
   }
 
   public static async calculateRecall(type: string): Promise<number> {
-    const samplesJson = await redis.get(this.STORAGE_KEY);
-    if (!samplesJson) return 1.0;
+    try {
+      const samplesJson = await redis.get(this.STORAGE_KEY);
+      if (!samplesJson) return 1.0;
 
-    const samples = JSON.parse(samplesJson);
-    // Recall: Predicted_Anomaly / Actual_Anomaly
-    const actualAnomalies = samples.filter((s: any) => s.actualType === type);
-    if (actualAnomalies.length === 0) return 1.0;
+      const samples = JSON.parse(samplesJson);
+      // Recall: Predicted_Anomaly / Actual_Anomaly
+      const actualAnomalies = samples.filter((s: any) => s.actualType === type);
+      if (actualAnomalies.length === 0) return 1.0;
 
-    const correctlyPredicted = actualAnomalies.filter((s: any) => s.hypothesisType === type).length;
-    return correctlyPredicted / actualAnomalies.length;
+      const correctlyPredicted = actualAnomalies.filter((s: any) => s.hypothesisType === type).length;
+      return correctlyPredicted / actualAnomalies.length;
+    } catch (err: any) {
+      logger.warn({ err }, '[CALIBRATION] Failed to calculate recall from redis');
+      return 1.0;
+    }
   }
 
   public static async getSupportCount(type: string, isActual: boolean = false): Promise<number> {
-    const samplesJson = await redis.get(this.STORAGE_KEY);
-    if (!samplesJson) return 0;
+    try {
+      const samplesJson = await redis.get(this.STORAGE_KEY);
+      if (!samplesJson) return 0;
 
-    const samples = JSON.parse(samplesJson);
-    return samples.filter((s: any) => isActual ? s.actualType === type : s.hypothesisType === type).length;
+      const samples = JSON.parse(samplesJson);
+      return samples.filter((s: any) => isActual ? s.actualType === type : s.hypothesisType === type).length;
+    } catch (err: any) {
+      logger.warn({ err }, '[CALIBRATION] Failed to get support count from redis');
+      return 0;
+    }
   }
 
   public static async calculateF1(type: string): Promise<number> {
@@ -67,31 +86,41 @@ export class CalibrationEngine {
    * Ranges from 0.0 (Perfect) to 1.0 (Total Failure)
    */
   public static async calculateBrierScore(): Promise<number> {
-    const samplesJson = await redis.get(this.STORAGE_KEY);
-    if (!samplesJson) return 0;
+    try {
+      const samplesJson = await redis.get(this.STORAGE_KEY);
+      if (!samplesJson) return 0;
 
-    const samples = JSON.parse(samplesJson);
-    if (samples.length === 0) return 0;
+      const samples = JSON.parse(samplesJson);
+      if (samples.length === 0) return 0;
 
-    const squaredErrors = samples.map((s: any) => Math.pow(s.confidence - s.outcome, 2));
-    const meanSquaredError = squaredErrors.reduce((a: number, b: number) => a + b, 0) / samples.length;
+      const squaredErrors = samples.map((s: any) => Math.pow(s.confidence - s.outcome, 2));
+      const meanSquaredError = squaredErrors.reduce((a: number, b: number) => a + b, 0) / samples.length;
 
-    return meanSquaredError;
+      return meanSquaredError;
+    } catch (err: any) {
+      logger.warn({ err }, '[CALIBRATION] Failed to calculate Brier score from redis');
+      return 0;
+    }
   }
 
   public static async getAnomalyArrivalRate(): Promise<number> {
-    const samplesJson = await redis.get(this.STORAGE_KEY);
-    if (!samplesJson) return 0;
+    try {
+      const samplesJson = await redis.get(this.STORAGE_KEY);
+      if (!samplesJson) return 0;
 
-    const samples = JSON.parse(samplesJson);
-    const anomalies = samples.filter((s: any) => s.actualType && s.actualType !== 'NOMINAL');
-    if (anomalies.length === 0) return 0;
+      const samples = JSON.parse(samplesJson);
+      const anomalies = samples.filter((s: any) => s.actualType && s.actualType !== 'NOMINAL');
+      if (anomalies.length === 0) return 0;
 
-    const first = new Date(samples[0].time).getTime();
-    const last = new Date(samples[samples.length - 1].time).getTime();
-    const durationHours = (last - first) / (3600 * 1000);
+      const first = new Date(samples[0].time).getTime();
+      const last = new Date(samples[samples.length - 1].time).getTime();
+      const durationHours = (last - first) / (3600 * 1000);
 
-    return anomalies.length / (durationHours || 1);
+      return anomalies.length / (durationHours || 1);
+    } catch (err: any) {
+      logger.warn({ err }, '[CALIBRATION] Failed to get anomaly arrival rate from redis');
+      return 0;
+    }
   }
 
   public static async isStatisticallySignificant(type: string): Promise<boolean> {

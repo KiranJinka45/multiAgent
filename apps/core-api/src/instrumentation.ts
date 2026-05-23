@@ -12,7 +12,7 @@
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-import { Resource } from '@opentelemetry/resources';
+import type { Resource } from '@opentelemetry/resources';
 import { SEMRESATTRS_SERVICE_NAME, SEMRESATTRS_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
 
 const OTEL_COLLECTOR_URL = process.env.OTEL_COLLECTOR_URL || 'http://localhost:4318';
@@ -47,6 +47,6 @@ try {
 process.on('SIGTERM', () => {
     sdk.shutdown()
         .then(() => console.log('[Instrumentation] OTel SDK shut down cleanly'))
-        .catch((err) => console.error('[Instrumentation] Error shutting down OTel SDK:', err))
+        .catch((err: any) => console.error('[Instrumentation] Error shutting down OTel SDK:', err))
         .finally(() => process.exit(0));
 });

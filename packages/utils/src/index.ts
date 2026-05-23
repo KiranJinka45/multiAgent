@@ -100,7 +100,13 @@ export {
     stuckBuildsTotal,
     runWithTracing,
     PreviewOrchestrator,
-    RuntimeCleanup
+    RuntimeCleanup,
+    plannerQueue,
+    architectureQueue,
+    generatorQueue,
+    validatorQueue,
+    deployQueue,
+    retryCountTotal
 } from './mocks.js';
 export type { RuntimeRecord, ManagedContainer, AgentResult, ExecutionContextType } from './mocks.js';
 

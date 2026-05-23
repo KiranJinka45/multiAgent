@@ -22,6 +22,8 @@ interface IndexEntry {
     node: string;
     durationMs: number;
     lockfileSize: number;
+    merkleRoot?: string;
+    checkpointId?: string;
 }
 
 async function runAuditReplay() {
@@ -52,7 +54,9 @@ async function runAuditReplay() {
                 os: meta.envFingerprint.os,
                 node: meta.envFingerprint.node,
                 durationMs: meta.durationMs,
-                lockfileSize: lockSize
+                lockfileSize: lockSize,
+                merkleRoot: meta.merkleRoot,
+                checkpointId: meta.checkpointId
             });
         }
     }

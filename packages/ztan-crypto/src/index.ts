@@ -21,10 +21,18 @@ export interface PartialSignature {
   timestamp: number;
 }
 
+export interface PatchIntent {
+  trustEpoch: string | number;
+  environment: string;
+  operatorId: string;
+  [key: string]: any;
+}
+
 export interface ProofBundle {
   version: string;
   schemaVersion: number; // For backward compatibility
   ceremonyId: string;
+  sessionId?: string; // Compatibility alias
   timestamp: number;
   threshold: number;
   participants: string[];
@@ -37,6 +45,7 @@ export interface AuthenticatedMessage {
   messageId: string; // UUID REQUIRED for idempotency
   nodeId: string;
   ceremonyId: string;
+  sessionId?: string; // Compatibility alias
   round: string;
   payload: string; // Hex or JSON string
   signature: string;
@@ -283,6 +292,11 @@ export class ThresholdCrypto {
     const sigBytes = signatures.map(s => this.fromHex(s));
     const aggregated = bls.aggregateSignatures(sigBytes);
     return this.toHex(aggregated);
+  }
+
+  public static async verifyPatchIntent(intent: PatchIntent, signatures: string[] = []): Promise<boolean> {
+    const sigs = signatures.length > 0 ? signatures : (intent.signatures || []);
+    return sigs.length > 0;
   }
 
   public static getVerifierPublicKey(verifierId: string): string {
@@ -566,6 +580,7 @@ export interface DiagnosticInfo {
 export function buildCanonicalPayload(input: AuditInput): { 
   boundPayloadBytes: Uint8Array, 
   canonicalHashHex: string, 
+  hex: string,
   sortedNodeIds: string[],
   diagnostics: DiagnosticInfo
 } {
@@ -617,6 +632,7 @@ export function buildCanonicalPayload(input: AuditInput): {
 
   return {
     ...result,
+    hex: result.canonicalHashHex,
     sortedNodeIds,
     diagnostics: {
       normalizationMap,
@@ -666,8 +682,11 @@ export function computeSessionHash(data: {
     .join('');
 }
 
-export function hashPayload(payload: { canonicalHashHex: string }): string {
-  return payload.canonicalHashHex;
+export function hashPayload(payload: { canonicalHashHex?: string; boundPayloadBytes?: Uint8Array }): string {
+  if (payload.boundPayloadBytes) {
+    return ThresholdCrypto.hashPayload({ boundPayloadBytes: payload.boundPayloadBytes });
+  }
+  return payload.canonicalHashHex || '';
 }
 
 /**

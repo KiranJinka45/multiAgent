@@ -156,7 +156,7 @@ async function runSoakTest() {
     
     console.log('\n================================================================');
     if (sequenceMonotonic && hashesLinked && metrics.failedAppends === 0 && chain.verificationState === VerificationState.VERIFIED) {
-        console.log('🎉 SOAK & CONTION DRILL COMPLETED WITH ABSOLUTE SUCCESS!');
+        console.log('🎉 SOAK & CONTION DRILL COMPLETED SUCCESSFULLY UNDER TESTED CONDITIONS!');
         console.log('================================================================\n');
         process.exit(0);
     } else {

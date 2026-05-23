@@ -4,11 +4,11 @@
   "type": "module",
   "private": true,
   "main": "dist/index.js",
-  "module": "dist/index.mjs",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsup src/index.ts --no-dts && tsc --emitDeclarationOnly",
-    "dev": "tsup src/index.ts --no-dts --watch",
+    "build": "tsup src/index.ts --format esm --no-dts && tsc --emitDeclarationOnly",
+    "dev": "tsup src/index.ts --format esm --no-dts --watch",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
@@ -18,8 +18,7 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.mjs"
+      "import": "./dist/index.js"
     }
   }
 }

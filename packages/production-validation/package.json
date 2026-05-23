@@ -1,18 +1,27 @@
 {
   "name": "@packages/production-validation",
   "version": "1.0.0",
-  "main": "dist/index.js",
+  "private": true,
   "type": "module",
-  "dependencies": {
-    "@packages/utils": "workspace:*",
-    "@apps/operational-protocol": "workspace:*"
-  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
+    "build": "tsup src/index.ts --format esm --no-dts && tsc --emitDeclarationOnly -p tsconfig.json --declarationDir ./dist",
+    "dev": "tsup src/index.ts --format esm --no-dts --watch",
+    "typecheck": "tsc --noEmit",
     "drill:phase-a": "npx cross-env NODE_ENV=test tsx src/phase-a-replay-drill.ts",
     "drill:phase-b": "npx cross-env NODE_ENV=test tsx src/phase-b-cognitive-drill.ts",
     "drill:phase-c": "npx cross-env NODE_ENV=test tsx src/phase-c-governance-drill.ts",
     "drill:phase-d": "npx cross-env NODE_ENV=test tsx src/phase-d-adversarial-drill.ts",
     "drill:phase-e": "npx cross-env NODE_ENV=test tsx src/phase-e-postgres-chaos-drill.ts",
     "drill:stewardship": "npx cross-env NODE_ENV=test tsx src/stewardship-engineering-suite.ts"
+  },
+  "dependencies": {
+    "@packages/utils": "workspace:*",
+    "@apps/operational-protocol": "workspace:*"
+  },
+  "devDependencies": {
+    "tsup": "8.5.1",
+    "typescript": "5.5.4"
   }
 }

@@ -12,8 +12,19 @@ const elog = pino({ level: 'info' });
 
 export async function initSocket(server: http.Server, app?: express.Application): Promise<any> {
     const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
-    const pubClient = new Redis(REDIS_URL);
+    const redisOptions = {
+        maxRetriesPerRequest: null,
+        retryStrategy(times: number) {
+            return Math.min(times * 200, 10000);
+        }
+    };
+    const pubClient = new Redis(REDIS_URL, redisOptions);
+    pubClient.on('error', (err: any) => elog.error({ err: err.message }, '[Socket] Redis pubClient connection error'));
+    pubClient.on('connect', () => elog.info('[Socket] Redis pubClient connected successfully'));
+
     const subClient = pubClient.duplicate();
+    subClient.on('error', (err: any) => elog.error({ err: err.message }, '[Socket] Redis subClient connection error'));
+    subClient.on('connect', () => elog.info('[Socket] Redis subClient connected successfully'));
 
     const io = new Server(server, {
         cors: {
@@ -93,6 +104,8 @@ export async function initSocket(server: http.Server, app?: express.Application)
 
     // --- PILLAR 2: TIME-TRAVEL AUDIT SYSTEM (REDIS PERSISTED) ---
     const eventSubscriber = pubClient.duplicate();
+    eventSubscriber.on('error', (err: any) => elog.error({ err: err.message }, '[Socket] Redis eventSubscriber connection error'));
+    eventSubscriber.on('connect', () => elog.info('[Socket] Redis eventSubscriber connected successfully'));
     eventSubscriber.subscribe('sre:telemetry:update', (err) => {
         if (err) elog.error({ err }, '[Socket] Failed to subscribe to SRE telemetry');
     });
@@ -155,6 +168,8 @@ export async function initSocket(server: http.Server, app?: express.Application)
 
     // Redis subscriber for all build and log events
     const buildEventSubscriber = pubClient.duplicate();
+    buildEventSubscriber.on('error', (err: any) => elog.error({ err: err.message }, '[Socket] Redis buildEventSubscriber connection error'));
+    buildEventSubscriber.on('connect', () => elog.info('[Socket] Redis buildEventSubscriber connected successfully'));
     buildEventSubscriber.subscribe('build-events', 'log-events', (err) => {
         if (err) elog.error({ err }, '[Socket] Redis subscribe error');
     });

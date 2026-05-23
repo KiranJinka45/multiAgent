@@ -1,4 +1,5 @@
 import express from 'express';
+import type { Request, Response, RequestHandler } from 'express';
 import { createServer } from 'http';
 import https from 'https';
 import fs from 'fs';
@@ -9,25 +10,25 @@ import cors from 'cors';
 
 import path from 'path';
 import { logger, initTelemetry, apiRequestDurationSeconds, registry } from '@packages/observability';
-import { YjsServer } from './yjs-server';
-import { projectService } from './project-service';
-import { stateReconciler } from './state-reconciler';
+import { YjsServer } from './yjs-server.js';
+import { projectService } from './project-service.js';
+import { stateReconciler } from './state-reconciler.js';
 import { internalAuth, userAuth } from '@packages/auth-internal';
-import { LogStreamingService } from './log-streaming';
-import { SreStreamingService } from './sre-streaming';
+import { LogStreamingService } from './log-streaming.js';
+import { SreStreamingService } from './sre-streaming.js';
 import { v4 as uuid } from 'uuid';
 import { db } from '@packages/db';
-import { telemetrySimulator } from './telemetry-simulator';
-import { otelReceiver } from './otel-receiver';
-import { MissionStartSchema, ProjectCreateSchema, LogIngestSchema } from './schemas';
+import { telemetrySimulator } from './telemetry-simulator.js';
+import { otelReceiver } from './otel-receiver.js';
+import { MissionStartSchema, ProjectCreateSchema, LogIngestSchema } from './schemas.js';
 import { ZodError } from 'zod';
-import debugRouter from '../controllers/debug-controller';
-import whoamiRouter from '../routes/whoami';
-import { sreEngine } from './sre-engine';
+import debugRouter from '../controllers/debug-controller.js';
+import whoamiRouter from '../routes/whoami.js';
+import { sreEngine } from './sre-engine.js';
 import { buildCanonicalPayload, hashPayload } from '@packages/ztan-crypto';
-import ztanRouter from '../routes/ztan';
-import ztanGovRouter from '../routes/ztan-governance';
-import { IdentityService } from './identity.service';
+import ztanRouter from '../routes/ztan.js';
+import ztanGovRouter from '../routes/ztan-governance.js';
+import { IdentityService } from './identity.service.js';
 
 // ZTAN Replay Tracking - Rolling Sliding-Window TTL Cache (Remediation)
 class SlidingWindowTTLReplayCache {
@@ -117,8 +118,16 @@ app.get('/api/v1/system-health', async (req, res) => {
         checks.redis = true;
     } catch (e) {}
 
-    const mode = await redis.get('system:mode') || 'NORMAL';
-    const confidence = parseFloat(await redis.get('system:confidence') || '1.0');
+    let mode = 'NORMAL';
+    let confidence = 1.0;
+    if (checks.redis) {
+        try {
+            mode = await redis.get('system:mode') || 'NORMAL';
+            confidence = parseFloat(await redis.get('system:confidence') || '1.0');
+        } catch (e) {
+            logger.warn({ err: e }, 'Failed to fetch mode/confidence from Redis during health check');
+        }
+    }
     
     // Fetch latest incident for Glass-Box transparency
     let activeIncident = null;
@@ -243,25 +252,31 @@ app.use((req, res, next) => {
 });
 
 // Metrics Endpoint
-app.get('/metrics', async (req, res) => {
+app.get('/metrics', (async (req: Request, res: Response) => {
     try {
         res.set('Content-Type', registry.contentType);
         res.end(await registry.metrics());
     } catch {
         res.status(500).end();
     }
-});
+}) as RequestHandler);
 
 // Routes
-app.post('/api/v1/logs/ingest', express.json(), async (req, res) => {
+app.post('/api/v1/logs/ingest', express.json(), (async (req: Request, res: Response) => {
     const result = LogIngestSchema.safeParse(req.body);
-    if (!result.success) return res.status(400).json({ error: result.error });
+    if (!result.success) {
+        res.status(400).json({ error: result.error });
+        return;
+    }
     res.json({ success: true });
-});
+}) as RequestHandler);
 
-app.post('/api/v1/missions', express.json(), async (req, res) => {
+app.post('/api/v1/missions', express.json(), (async (req: Request, res: Response) => {
     const result = MissionStartSchema.safeParse(req.body);
-    if (!result.success) return res.status(400).json({ error: result.error });
+    if (!result.success) {
+        res.status(400).json({ error: result.error });
+        return;
+    }
     
     const missionId = uuid();
     try {
@@ -278,9 +293,9 @@ app.post('/api/v1/missions', express.json(), async (req, res) => {
     } catch (e) {
         res.status(500).json({ success: false, error: 'Database error' });
     }
-});
+}) as RequestHandler);
 
-app.get('/api/v1/missions', async (req, res) => {
+app.get('/api/v1/missions', (async (req: Request, res: Response) => {
     try {
         const missions = await db.mission.findMany({
             orderBy: { createdAt: 'desc' },
@@ -291,16 +306,16 @@ app.get('/api/v1/missions', async (req, res) => {
         logger.error({ err: e }, '[CoreAPI] Failed to fetch missions - returning fallback');
         res.status(200).json([]); // Fallback to empty list instead of 500
     }
-});
+}) as RequestHandler);
 
 // Policy Engine Management Routes
-import { policyEngine } from './policy-engine';
+import { policyEngine } from './policy-engine.js';
 
-app.get('/api/v1/sre/policies', (req, res) => {
+app.get('/api/v1/sre/policies', ((req: Request, res: Response) => {
     res.json(policyEngine.getRules());
-});
+}) as RequestHandler);
 
-app.post('/api/v1/sre/policies/:id/toggle', express.json(), (req, res) => {
+app.post('/api/v1/sre/policies/:id/toggle', express.json(), ((req: Request, res: Response) => {
     const { id } = req.params;
     const { enabled } = req.body;
 
@@ -311,7 +326,7 @@ app.post('/api/v1/sre/policies/:id/toggle', express.json(), (req, res) => {
     }
 
     res.json({ success: true, ruleId: id, enabled });
-});
+}) as RequestHandler);
 
 async function bootstrap() {
     console.log("🚀 [CoreAPI] Bootstrap started");
@@ -347,7 +362,7 @@ async function bootstrap() {
         }
         */
 
-        const PORT = process.env.PORT || 3010;
+        const PORT = parseInt(process.env.PORT || '3010', 10);
         const YJS_PORT = 3011;
 
         console.log("➡️ [CoreAPI] Creating Server...");

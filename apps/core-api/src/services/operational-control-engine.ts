@@ -1,6 +1,6 @@
 import { logger } from '@packages/observability';
-import { CalibrationEngine } from './calibration-engine';
-import { StabilityEngine } from './stability-engine';
+import { CalibrationEngine } from './calibration-engine.js';
+import { StabilityEngine } from './stability-engine.js';
 import { DistributedExecutionContext } from '@packages/utils';
 
 export interface ControlMetrics {

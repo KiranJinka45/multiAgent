@@ -41,11 +41,10 @@ export class KubernetesActuator {
     }
 
     try {
-      const res = await this.appsApi.readNamespacedDeployment(name, namespace);
-      const deployment = res.body;
+      const deployment = await this.appsApi.readNamespacedDeployment({ name, namespace });
       deployment.spec!.replicas = replicas;
 
-      await this.appsApi.replaceNamespacedDeployment(name, namespace, deployment);
+      await this.appsApi.replaceNamespacedDeployment({ name, namespace, body: deployment });
       logger.info({ namespace, name, replicas }, '[K8S] Scale Successful');
     } catch (error) {
       logger.error({ error, name }, '[K8S] Scale Failed');
@@ -77,17 +76,11 @@ export class KubernetesActuator {
     };
 
     try {
-      await this.appsApi.patchNamespacedDeployment(
+      await this.appsApi.patchNamespacedDeployment({
         name,
         namespace,
-        patch,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        { headers: { 'Content-Type': 'application/strategic-merge-patch+json' } }
-      );
+        body: patch,
+      });
       logger.info({ namespace, name }, '[K8S] Restart Successful');
     } catch (error) {
       logger.error({ error, name }, '[K8S] Restart Failed');

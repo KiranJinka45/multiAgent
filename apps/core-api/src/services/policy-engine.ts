@@ -1,4 +1,4 @@
-import type { SreAction } from './actuation-controller';
+import type { SreAction } from './actuation-controller.js';
 import { logger } from '@packages/observability';
 
 export interface PolicyRule {

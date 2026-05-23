@@ -1,4 +1,4 @@
-import { agentMetrics } from './agent-metrics.js';
+import { AgentMetrics } from './agent-metrics.js';
 import { logger } from '@packages/observability';
 
 export interface Strategy {
@@ -12,7 +12,7 @@ export class StrategyEngine {
    * Evaluates the fitness of a set of strategies based on current agent metrics.
    */
   public async evaluateStrategies(strategies: Strategy[]) {
-    const metrics = await agentMetrics.getLatest();
+    const metrics = await AgentMetrics.getLatest();
     logger.info({ metrics }, '[STRATEGY] Evaluating strategies against latest metrics');
 
     // Simple fitness calculation: higher fitness if metrics are healthy

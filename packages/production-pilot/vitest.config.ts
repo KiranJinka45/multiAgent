@@ -1,12 +1,14 @@
 import { defineConfig } from 'vitest/config';
-import { resolve } from 'path';
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
-    alias: {
-      '@packages/observability': resolve(__dirname, '../observability/src/index.ts'),
-    },
-  },
+    pool: 'forks',
+  }
 });

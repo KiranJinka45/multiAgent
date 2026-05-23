@@ -1,16 +1,14 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
-  external: [/^@packages\/.*/],
-  entry: ['src/index.ts'],
-  format: ['cjs', 'esm'],
+  external: [/^@packages\/.*/, 'graceful-fs', 'fs-extra'],
+  entry: ['src/index.ts', 'src/dvk/bridges/ts_bridge.ts'],
+  format: ['esm'],
   dts: false,
   splitting: true,
   sourcemap: true,
   clean: true,
   minify: false,
   target: 'node20',
-  outExtension({ format }) {
-    return format === 'esm' ? { js: '.mjs' } : { js: '.cjs' };
-  }
+  platform: 'node',
 });

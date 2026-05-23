@@ -1,4 +1,4 @@
-import { InstitutionalPilotRegistry, PilotMetadata } from './index.ts';
+import { InstitutionalPilotRegistry, type PilotMetadata } from './index.js';
 import * as fs from 'fs';
 import * as path from 'path';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';

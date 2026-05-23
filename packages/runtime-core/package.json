@@ -6,8 +6,8 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsup src/index.ts --no-dts && tsc --emitDeclarationOnly -p tsconfig.json --declarationDir ./dist",
-    "dev": "tsup src/index.ts --no-dts --watch",
+    "build": "tsup src/index.ts --format esm --no-dts && tsc --emitDeclarationOnly -p tsconfig.json --declarationDir ./dist",
+    "dev": "tsup src/index.ts --format esm --no-dts --watch",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

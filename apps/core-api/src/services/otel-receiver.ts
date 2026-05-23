@@ -13,7 +13,7 @@
 
 import { metrics } from '@opentelemetry/api';
 import { logger } from '@packages/observability';
-import { telemetryIngestion } from './telemetry-ingestion.service';
+import { telemetryIngestion } from './telemetry-ingestion.service.js';
 import { v4 as uuid } from 'uuid';
 
 export class OtelReceiver {

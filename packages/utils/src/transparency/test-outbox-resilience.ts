@@ -1,3 +1,4 @@
+process.env.ZTAN_PARTITIONS = '1';
 import { GovernanceLedger } from '../governance-ledger.js';
 import { db } from '@packages/db';
 import * as fs from 'node:fs';
@@ -11,6 +12,8 @@ async function runOutboxResilienceValidation() {
   // 1. Reset database table and local storage to start with a clean baseline
   console.log('[RESET] Setting up pristine workspace environments...');
   await db.$executeRawUnsafe(`TRUNCATE TABLE "ZtanLedgerBlock" RESTART IDENTITY CASCADE;`);
+  await db.$executeRawUnsafe(`TRUNCATE TABLE "ZtanWalLog" RESTART IDENTITY CASCADE;`);
+  await db.$executeRawUnsafe(`TRUNCATE TABLE "AuditLog" RESTART IDENTITY CASCADE;`);
   
   const ledgerDir = path.join(process.cwd(), '.ztan-transparency');
   if (fs.existsSync(ledgerDir)) {
@@ -48,10 +51,24 @@ async function runOutboxResilienceValidation() {
   console.log('\n[SIMULATION] Injecting Total Database Connection Failure (Network Partition)...');
   
   // Store original Prisma database delegate handlers
+  const originalTransaction = db.$transaction;
   const originalCreate = db.ztanLedgerBlock.create;
   const originalFindUnique = db.ztanLedgerBlock.findUnique;
 
   // Mock Prisma methods to simulate database timeout/unreachable states
+  (db as any).$transaction = async (cb: any) => {
+    return originalTransaction.call(db, async (tx: any) => {
+      const txProxy = new Proxy(tx, {
+        get(target, prop) {
+          if (prop === 'ztanWalLog' || prop === 'ztanLedgerBlock' || prop === 'auditLog') {
+            throw new Error('Connection timed out: PostgreSQL consensus layer is unreachable.');
+          }
+          return target[prop];
+        }
+      });
+      return await cb(txProxy);
+    });
+  };
   (db.ztanLedgerBlock as any).create = async () => {
     throw new Error('Connection timed out: PostgreSQL consensus layer is unreachable.');
   };
@@ -116,6 +133,7 @@ async function runOutboxResilienceValidation() {
   console.log('\n[SIMULATION] Database network connection recovered successfully.');
   
   // Restore original Prisma delegates
+  (db as any).$transaction = originalTransaction;
   db.ztanLedgerBlock.create = originalCreate;
   db.ztanLedgerBlock.findUnique = originalFindUnique;
   

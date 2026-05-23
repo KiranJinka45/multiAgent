@@ -1,7 +1,9 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import { logger } from '@packages/observability';
-import { sreEngine } from '../services/sre-engine';
+import { sreEngine } from '../services/sre-engine.js';
+import { injectDbOutage, clearDbOutage } from '@packages/db';
+import { injectRedisOutage, clearRedisOutage } from '@packages/utils';
 
 export const debugRouter = Router();
 
@@ -68,7 +70,7 @@ debugRouter.get('/watchdog-test', (req: Request, res: Response) => {
     logger.warn({ mode }, '[DEBUG] Running Watchdog Integrity Test');
     
     if (!sreEngine) throw new Error('SRE Engine not initialized');
-
+  
     if (mode === 'FALSE_POSITIVE') {
       sreEngine.reportNodeAnomaly('api-service', 0.1); // Nominal score
     } else {
@@ -115,10 +117,10 @@ debugRouter.post('/reset', (req: Request, res: Response) => {
     // Multi-Layer Reset for Certification Purity
     sreEngine.reset();
     
-    import('../services/operational-control/audit-engine').then(({ operationalAudit }) => operationalAudit.reset());
-    import('../services/operational-control/policy-optimizer').then(({ policyOptimizer }) => policyOptimizer.reset());
+    import('../services/operational-control/audit-engine.js').then(({ operationalAudit }) => operationalAudit.reset());
+    import('../services/operational-control/policy-optimizer.js').then(({ policyOptimizer }) => policyOptimizer.reset());
     import('@packages/business').then(({ roiPipeline }) => roiPipeline.reset());
-    import('../services/telemetry-simulator').then(({ telemetrySimulator }) => {
+    import('../services/telemetry-simulator.js').then(({ telemetrySimulator }) => {
         // Stop any active healing
         (telemetrySimulator as any).isHealing = false;
     });
@@ -127,6 +129,49 @@ debugRouter.post('/reset', (req: Request, res: Response) => {
     res.json({ status: 'RESET_COMPLETE' });
   } catch (err: any) {
     res.status(500).json({ status: 'ERROR', error: err.message });
+  }
+});
+
+/**
+ * Injects simulated database or Redis failures.
+ */
+debugRouter.get('/inject-failure', (req: Request, res: Response) => {
+  try {
+    const type = req.query.type as string;
+    const duration = parseInt(req.query.duration as string) || 3000;
+    
+    logger.warn({ type, duration }, '[DEBUG] Injecting simulated failure');
+    
+    if (type === 'db') {
+      injectDbOutage(duration, 'db');
+      res.json({ status: 'INJECTED', type: 'db', duration });
+    } else if (type === 'pool') {
+      injectDbOutage(duration, 'pool');
+      res.json({ status: 'INJECTED', type: 'pool', duration });
+    } else if (type === 'redis') {
+      injectRedisOutage(duration);
+      res.json({ status: 'INJECTED', type: 'redis', duration });
+    } else {
+      res.status(400).json({ status: 'ERROR', error: 'Invalid failure type. Must be db, pool, or redis.' });
+    }
+  } catch (err: any) {
+    logger.error({ error: err.message }, '[DEBUG ERROR] Failure injection failed');
+    res.status(200).json({ status: 'FAILED_SAFE', error: err.message });
+  }
+});
+
+/**
+ * Manually clears all simulated failures.
+ */
+debugRouter.get('/clear-failure', (req: Request, res: Response) => {
+  try {
+    logger.info('[DEBUG] Clearing all injected failures');
+    clearDbOutage();
+    clearRedisOutage();
+    res.json({ status: 'CLEARED' });
+  } catch (err: any) {
+    logger.error({ error: err.message }, '[DEBUG ERROR] Clearing failures failed');
+    res.status(200).json({ status: 'FAILED_SAFE', error: err.message });
   }
 });
 

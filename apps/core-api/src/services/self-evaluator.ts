@@ -1,5 +1,7 @@
-import { BaseAgent, AgentResponse } from '@packages/agents';
-import { AgentContext } from '@packages/contracts';
+import { BaseAgent } from '@packages/utils';
+import type { AgentResponse, AgentContext } from '@packages/contracts';
+import { Groq } from 'groq-sdk';
+import { logger } from '@packages/observability';
 
 export interface DimensionScore {
     score: number;         // 0-1
@@ -31,6 +33,46 @@ export interface EvaluationResult {
  */
 export class SelfEvaluator extends BaseAgent {
     getName() { return 'SelfEvaluator'; }
+
+    private logs: string[] = [];
+
+    private log(message: string) {
+        logger.info({ agent: this.getName() }, message);
+        this.logs.push(message);
+    }
+
+    private async promptLLM(
+        system: string,
+        user: string,
+        model: string = 'llama-3.3-70b-versatile',
+        signal?: AbortSignal
+    ): Promise<{ result: any; tokens: number }> {
+        const apiKey = process.env.GROQ_API_KEY;
+        if (!apiKey) {
+            throw new Error('SelfEvaluator requires GROQ_API_KEY env variable');
+        }
+        const groq = new Groq({ apiKey });
+        
+        const response = await groq.chat.completions.create({
+            messages: [
+                { role: 'system', content: system },
+                { role: 'user', content: user }
+            ],
+            model: model,
+            temperature: 0.2,
+            response_format: { type: 'json_object' }
+        }, { signal });
+
+        const content = response.choices[0].message.content;
+        const tokensUsed = response.usage?.total_tokens || 0;
+
+        if (!content) throw new Error('Empty response from LLM');
+
+        return {
+            result: JSON.parse(content),
+            tokens: tokensUsed
+        };
+    }
 
     private static PASS_THRESHOLD = 0.8;
 
@@ -134,9 +176,11 @@ ${filesSummary}`;
             return {
                 success: true,
                 data: evaluation,
-                tokens,
-                confidence: evaluation.overallScore,
-                logs: (this as any).logs
+                metrics: {
+                    tokensTotal: tokens,
+                    durationMs: 0,
+                    confidence: evaluation.overallScore
+                }
             };
         } catch (error) {
             return {
@@ -153,7 +197,6 @@ ${filesSummary}`;
                     summary: 'SelfEvaluator failed to complete evaluation.',
                     criticalIssues: ['Evaluator internal error']
                 },
-                logs: (this as any).logs,
                 error: error instanceof Error ? error.message : String(error)
             };
         }

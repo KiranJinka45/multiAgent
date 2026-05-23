@@ -1,8 +1,8 @@
 import { supabaseAdmin } from '@packages/utils';
 import { logger } from '@packages/observability';
-import { CodeChunker } from './memory/code-chunker';
-import { EmbeddingsEngine } from './memory/embeddings-engine';
-import { VectorStore } from './memory/vector-store';
+import { CodeChunker } from './memory/code-chunker.js';
+import { EmbeddingsEngine } from './memory/embeddings-engine.js';
+import { VectorStore } from './memory/vector-store.js';
 import redis from '@packages/utils';
 import { createHash } from 'crypto';
 import { eventBus } from '@packages/utils';

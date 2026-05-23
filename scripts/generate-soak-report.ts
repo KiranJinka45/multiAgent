@@ -29,7 +29,7 @@ async function generateSoakReport(days: number = 30) {
 - **Determinism Rate**: ${(trend.determinismRate * 100).toFixed(2)}%
 - **Avg Semantic Drift**: ${(trend.avgSemanticDrift * 100).toFixed(3)}%
 - **Drift Acceleration**: ${trend.driftAcceleration.toFixed(6)} per day
-- **Governance Efficiency**: ${trend.governanceEfficiencyIndex.toFixed(1)}/100
+- **Governance Efficiency**: ${trend.governanceEfficiencyIndex >= 90 ? 'NOMINAL' : trend.governanceEfficiencyIndex >= 75 ? 'WARNING' : 'BREACH'}
 
 ## 🛡️ Continuity Proof
 - **Isolation Integrity**: ${trend.isolationIntegrityScore}%
