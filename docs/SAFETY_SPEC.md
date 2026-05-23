@@ -2,10 +2,10 @@
 
 ## 1. The Forbidden State Doctrine
 
-Institutional safety in ZTAN is defined by the **mathematical impossibility** of entering an illegal constitutional state. This specification formalizes the "Forbidden State" philosophy into a machine-enforceable safety model.
+Institutional safety in ZTAN is defined by the **algorithmic mitigation** of entering an illegal constitutional state. This specification formalizes the "Forbidden State" philosophy into a machine-enforceable safety model.
 
 ### 1.1 Existential Gatekeeping
-The `validateTransitionSafety()` function is the **Sole Normative Gatekeeper** of institutional reality. It rejects any action that would result in a state transition not explicitly enumerated in the **Authoritative Legal Runtime**.
+The `validateTransitionSafety()` function acts as the primary validation gatekeeper for enforcing the defined state transitions. In operational terms, it validates that all proposed state changes conform to the rules enumerated in the state matrix.
 
 ## 2. Authoritative Legal Runtime (ALR)
 
@@ -13,7 +13,7 @@ The institutional laws are encoded in `formal/STATE_MATRIX.json`.
 
 ### 2.1 Normative Interpretation
 - The `STATE_MATRIX.json` SHALL be interpreted as the **exclusive and exhaustive** definition of legal institutional transitions.
-- Any runtime behavior inconsistent with the matrix is **constitutionally invalid** and represents an institutional failure.
+- Any runtime behavior inconsistent with the matrix is treated as an invalid state transition and MUST trigger an operational exception or safety recovery protocol.
 - **Schema Invariants**: The matrix must specify `states`, `actions`, `transitions`, and `invariants`. Wildcards and ambiguous transition edges are strictly prohibited.
 
 ### 2.2 Determinism & Ordering
@@ -27,7 +27,7 @@ A state is considered **Illegal** and MUST be rejected by any compliant runtime 
 2.  **Ambiguous Quorum**: Any state where two conflicting governance quorums could simultaneously claim validity.
 3.  **Lineage Breach**: Any state where `previousGRoot` does not match the preceding receipt's `gRoot`.
 4.  **Sequence Non-Monotonicity**: Any state where `sequenceNumber` or `epochId` regresses or skips required increments.
-5.  **Constitutional Inconsistency**: Any state where the runtime policy deviates from the `CONSTITUTIONAL_ROOT` without 100% witness ratification.
+5.  **Constitutional Inconsistency**: Any state where the runtime policy deviates from the `CONSTITUTIONAL_ROOT` without valid witness ratification (conforming to the active consensus policy, such as a standard BFT quorum or emergency recovery overrides, to prevent irreversible governance deadlock).
 
 ## 4. Temporal Safety Semantics
 
@@ -64,7 +64,7 @@ Compliant ZTAN runtimes MUST assume an adversarial environment:
 ## 8. Formal Theorem Layer
 
 The ZTAN institution aims for **Theorem-Backed Governance**:
-- **Invariant Proofs**: The institution uses formal methods (e.g., TLA+, model checking) to prove that double finality and split-brain scenarios are impossible within the BFT safety bounds.
+- **Invariant Proofs**: The institution uses formal methods (e.g., TLA+, model checking) to model safety bounds and analyze whether double finality and split-brain scenarios are mitigated within the defined BFT limits.
 - **Machine-Checked Safety**: compliant runtimes SHOULD support the injection of formal proofs along with governance receipts to move toward **Proof-Carrying Transitions**.
 
 ## 9. Institutional Jurisprudence & Ambiguity
@@ -73,14 +73,14 @@ In the event of formal ambiguity or conflicting auditor conclusions, the followi
 
 1.  **Mandatory Hibernation**: The institution MUST enter `HIBERNATING` state immediately upon detection of a verification discrepancy between heterogeneous auditors.
 2.  **Resolution by Formal Proof**: The ambiguity SHALL ONLY be resolved by the submission of a formal, machine-checked proof (e.g., Isabelle/HOL or Coq) that demonstrates the unique valid interpretation of the lineage.
-3.  **Authority of the Proof**: Once a resolution proof is ratified by 100% of the Witness Federation, it becomes a **Permanent Institutional Precedent**, binding for all future audits.
+3.  **Resolution Authority**: Once a resolution proof is ratified by a constitutional majority (or defined quorum policy, including emergency recovery paths) of the Witness Federation, it is registered as an authoritative operational precedent for subsequent audits.
 
-## 10. External Reality Anchoring
+## 10. External Reality Anchoring [Tier 5: Research / Non-Normative]
 
-To prevent the creation of "perfectly replayable false universes," the institution MUST be anchored to external physical reality:
+To address theoretical "perfectly replayable lineage" scenarios (where a synthetic history could be executed without external context), the system suggests mechanisms for anchoring to external reality. These are non-normative research guidelines:
 
-1.  **Trusted Civilization Clock**: Every state checkpoint MUST include a signed attestation from at least two independent, high-availability civilization-scale time sources (e.g., Roughtime, NTP-sec).
-2.  **Entropy Infusion**: The Genesis block and subsequent epoch rollovers MUST incorporate external entropy from non-deterministic physical sources (e.g., cosmic ray counters or NIST Randomness Beacon) to ensure lineage uniqueness.
+1.  **Reference Time Anchoring**: Every state checkpoint should include a signed attestation from independent, high-availability time sources (e.g., Roughtime, NTP-sec) to establish a target temporal order.
+2.  **Entropy Infusion**: The Genesis block and subsequent epoch rollovers should incorporate external entropy from physical or public beacons (e.g., hardware entropy generators or NIST Randomness Beacon) to help ensure lineage uniqueness under test.
 
 ## 11. Institutional Death (Terminal Failure)
 
@@ -94,6 +94,6 @@ An institution is considered **Irrecoverably Extinct** if any of the following t
 
 To fulfill the **Semantic Preservation Mandate**, migrations MUST satisfy the following criteria:
 
-1.  **Effect Preservation**: The transition must prove that the net effect of existing governance commitments (e.g., witness lists, thresholds) remains unchanged in the target system.
+1.  **Effect Preservation**: The transition must verify that the net effect of existing governance commitments (e.g., witness lists, thresholds) remains unchanged in the target system.
 2.  **Jurisprudence Continuity**: Past actions must retain their legal force unless explicitly repealed.
-3.  **Interpretation Parity**: The logic for determining "legality" in the new system must be proven equivalent to the old system's logic for all historical transitions.
+3.  **Interpretation Parity**: The logic for determining "legality" in the new system is expected to remain equivalent under standard verification models to the old system's logic for all historical transitions.

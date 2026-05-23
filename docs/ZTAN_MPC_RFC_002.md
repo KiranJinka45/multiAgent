@@ -63,7 +63,7 @@ To make the Coordinator's behavior auditable, it MUST maintain a **Ceremony Tran
     - Node ID
     - Protocol Round
     - Payload Hash (Fingerprint)
-- **Auditability**: The transcript allows external auditors to verify that the Coordinator did not reorder or omit messages to bias the outcome.
+- **Auditor Verification Target**: The transcript is designed to improve the detectability, replayability, and forensic visibility of coordination anomalies. It allows external auditors to verify historical actions and detect if the Coordinator reordered, omitted, or delayed messages to bias the outcome, though it does not mathematically prevent coordinator-side equivocation or active network honesty violations at runtime.
 
 ## 8. Security Limitations
 - **Coordinated Model**: While cryptographically decentralized, the current implementation relies on a central Coordinator for message routing. A malicious Coordinator can deny service (DOS) but cannot compromise integrity or non-repudiation.

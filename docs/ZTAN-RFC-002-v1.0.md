@@ -42,7 +42,7 @@ The protocol MUST NOT fail silently. All malicious or malformed contributions MU
 The Coordinator MUST maintain a strictly-ordered, sequence-aware **Ceremony Transcript**.
 
 - **Transcript Record**: Every verified message is appended to the log with an atomic sequence index.
-- **Auditor Guarantee**: The transcript ensures that the Coordinator cannot reorder, omit, or delay messages without detection by external auditors.
+- **Auditor Verification Target**: The transcript is designed to improve the detectability, replayability, and forensic visibility of coordination anomalies. It allows external auditors to verify historical actions and detect if the Coordinator reordered, omitted, or delayed messages to bias the outcome, though it does not mathematically prevent coordinator-side equivocation or active network honesty violations at runtime.
 
 ## 6. Operational Constraints
 1. **Redlock Persistence**: All state transitions MUST be protected by distributed locking to ensure atomic transcript and status updates.

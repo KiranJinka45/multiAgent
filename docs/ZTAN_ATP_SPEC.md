@@ -18,12 +18,26 @@ This document represents an active standards proposal under rigorous operational
 > - The underlying system contains evolving and partially simulated distributed components (such as mock gossip routing and simulated threshold key DKG planes).
 > - Readers must distinguish between **specification intent** (conformance definitions for future interoperability) and the **validated operational behavior** currently observed in this research-grade environment.
 
+### 1.1 Simplicity Boundaries & Minimal Deployable Core
+
+To prevent specification maximalism and control bespoke protocol surface area, ZTAN-ATP defines a layered architecture. Implementations are NOT required to support all modules to achieve basic compliance. Features are divided into distinct operational tiers:
+
+| Layer | Component | Status | Description |
+| :--- | :--- | :--- | :--- |
+| **Tier 1: Core Mandatory** | Canonical Serialization (CER v1.5) + Public Key Invariants (SPKI/DER) + ECDSA Signatures | **Mandatory** | The absolute minimum surface area needed to construct and verify out-of-band assertions. |
+| **Tier 2: Recommended** | Sliding-Window Replay Protection & Basic Epoch Fencing (Local Cache) | **Recommended** | Bounded temporal checks to mitigate common out-of-sequence replay attacks in single-region setups. |
+| **Tier 3: Optional** | BLS12-381 Cryptographic Threshold Signing (DKG) | **Optional** | Advanced pairing-friendly signature aggregation to reduce wire size; falls back to Tier 1 logical quorums. |
+| **Tier 4: Experimental** | Gossip-Based Revocation Anti-Entropy & Reputation-Based Peer Routing | **Experimental** | Distributed sync and routing mitigations; subject to high design drift and active simulation limits. |
+| **Tier 5: Research** | Formal TLA+/Alloy protocol specifications and algebraic proof verification. | **Proposed Only** | Theoretical models designed for design analysis; completely out-of-scope for runtime execution engines. |
+
+By separating these boundaries, developers can implement and audit the **Tier 1 Core** independently without inheriting the complexity of the experimental or proposed layers.
+
 ### Normative Language
 The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **SHOULD**, **SHOULD NOT**, **RECOMMENDED**, **MAY**, and **OPTIONAL** in this document are to be interpreted as described in RFC 2119.
 
 ---
 
-## 📄 2. Wire Format & Schema Primitives
+## 📄 2. Wire Format & Schema Primitives [Tier 1: Core Mandatory]
 
 ### 2.1 Protobuf v3 Wire Specification
 To minimize network overhead and processing latency, the canonical wire format for transport and RPC interfaces is defined in Protocol Buffers v3.
@@ -86,9 +100,9 @@ message TrustAssertionProof {
 
 ---
 
-## 🔠 3. Deterministic Canonical Serialization (Inspired by RFC 8785)
+## 🔠 3. Deterministic Canonical Serialization (Inspired by RFC 8785) [Tier 1: Core Mandatory]
 
-To guarantee out-of-band verification parity across multiple runtimes (TypeScript, Go, Rust, Python, C++), the canonical payload MUST be constructed using the following deterministic encoding rules. 
+To support reproducible out-of-band verification parity across multiple runtimes (TypeScript, Go, Rust, Python, C++), the canonical payload MUST be constructed using the following deterministic encoding rules. 
 
 > [!NOTE]
 > **RFC 8785 Relation**
@@ -97,6 +111,12 @@ To guarantee out-of-band verification parity across multiple runtimes (TypeScrip
 ### 3.1 Custom Delimiter Serialization vs. Self-Describing Formats
 *   **Bespoke Pipe-Delimited Syntax Tradeoffs:** Standard self-describing serialization formats (e.g., MessagePack, deterministic CBOR [RFC 8949], or Protobuf) were explicitly bypassed for the signed assertion payload layer. While robust, they introduce binary decoding schema dependencies, parsing complexity, and architectural baggage that impede out-of-band human auditing. Standard JSON Canonicalization Schema (JCS [RFC 8785]) was also rejected because it does not semantically preserve whitespace (which is unacceptable for structured configuration or multi-line agent code).
     However, using a custom pipe-delimited wire format introduces a non-trivial engineering tradeoff: we sacrifice mature, battle-tested standard canonical parsers and native binary efficiency in exchange for dependency minimization, raw transport visibility, and zero-schema human-auditable verification.
+
+> [!WARNING]
+> **ARCHITECTURAL WARNING: RISKS OF BESPOKE SERIALIZATION & PARSER SURFACE AREA**
+> - **Audit & Parser Risk**: Bypassing established standards like JCS (RFC 8785), deterministic CBOR (RFC 8949), or Protobuf for the signed assertion payload directly increases the parser exploit surface and audit burden. Custom delimiter serialization, custom escaping FSMs, and custom canonicalization are historically prone to implementation divergence and parser differential exploits (where two different runtimes parse the same sequence differently).
+> - **Cross-Runtime Rigor**: This custom format shifts the entire burden of UTF-8 byte validation, escape FSM correctness, Unicode normalization (NFC) correctness, and parser-state invariants onto *every* independent runtime implementation (TypeScript, Go, Rust, Python, etc.). Any implementation bug or slight variation in how runtimes handle invalid UTF-8 sequences, escape boundaries, or sorting can lead to interoperability failures or validation bypasses.
+> - **Complexity vs. Evidence**: There is a widening abstraction-to-evidence gap between the complex mathematical constraints specified here and the actual validated operational behavior of existing runtimes. Developers are cautioned that bespoke protocol surfaces represent the highest long-term maintenance cost and risk of the ZTAN ecosystem.
 *   **Parser Rigor & Grammar Rejection:** Because this wire format relies on escaping delimiters, verifiers MUST NOT treat it as a trivial string split. Instead, it must be parsed using a constrained, single-pass non-recursive lexical automata.
 *   **String Encoding:** All string fields MUST be encoded strictly as **UTF-8** byte sequences.
 *   **Unicode Normalization:** All string data MUST be normalized to **Unicode Normalization Form C (NFC)** prior to processing.
@@ -106,6 +126,13 @@ To guarantee out-of-band verification parity across multiple runtimes (TypeScrip
     *   `|` becomes `\|`
     To prevent escape-recursion, delimiter smuggling, and parser state bypasses, any malformed escape sequence (such as an unescaped single backslash `\` at the end of a string, or double-escaping sequences like `\\:` aiming to bypass verification) MUST trigger immediate parser validation failure.
 *   **Strict Whitespace Preservation:** String values MUST NOT undergo any whitespace normalization or duplicate inner space truncation. Every space, tab, or newline character MUST be preserved exactly as-transmitted to maintain syntactic fidelity.
+
+### 3.1.1 Standard Serialization Escape Hatches & Interoperability Pathways [Tier 2: Recommended]
+*   **Standard Alternative Formats:** To mitigate the parser differential risks associated with custom pipe-delimited serialization, gateway implementations SHOULD support negotiating alternative canonical serialization formats:
+    *   **Deterministic CBOR (RFC 8949):** Recommended for binary-efficient, schema-free environments requiring standard canonical parsing support.
+    *   **Deterministic Protobuf Encoding:** Recommended for static schema-driven configurations.
+    *   **JCS (RFC 8785 JSON Canonicalization Scheme):** Recommended for environments requiring pure text-based JSON interoperability, provided whitespace preservation invariants are handled by out-of-band pre-processors.
+*   **Format Negotiation:** When alternative formats are negotiated, the custom escape FSM and pipe-delimited serialization rules specified in Appendix A are bypassed in favor of the respective standard canonicalization rules.
 
 ### 3.2 Prohibition of Floating-Point Formats
 *   Floating-point primitives (IEEE 754) MUST NOT be used in the signed `AutonomousActionEnvelope` payload.
@@ -128,7 +155,7 @@ actionId:<actionId>|actor:<actor>|actorType:<actorType>|intent:<intent>|jurisdic
 
 ---
 
-## 🔐 4. ASN.1 DER Public Key Encoding Invariant
+## 🔐 4. ASN.1 DER Public Key Encoding Invariant [Tier 1: Core Mandatory]
 
 To ensure platform SDKs do not fail intermittently due to raw point interpretation variances, ZTAN-ATP public keys MUST be transmitted and parsed strictly as standard **SubjectPublicKeyInfo (SPKI)** structures using **Distinguished Encoding Rules (DER)**.
 
@@ -161,7 +188,7 @@ All SDK implementations MUST wrap raw P-256 SEC1 public key coordinate points in
 
 ---
 
-## 🛡️ 5. Partition-Aware Monotonic Replay Protection & Epoch Fencing
+## 🛡️ 5. Partition-Aware Monotonic Replay Protection & Epoch Fencing [Tier 2: Recommended]
 
 ZTAN-ATP establishes a strict **sliding-window monotonic validation framework** designed to prevent duplicate execution attacks while maintaining operational safety across partitioned validator clusters.
 
@@ -185,7 +212,7 @@ In distributed or partitioned networks, relying on single counter caches introdu
 
 ---
 
-## 🕸️ 6. Causal Evidence Graph (DAG) Lineage & Acyclicity Checks
+## 🕸️ 6. Causal Evidence Graph (DAG) Lineage & Acyclicity Checks [Tier 2: Recommended]
 
 To prevent branching timeline vulnerabilities, ZTAN-ATP formalizes causal dependencies using a **Directed Acyclic Graph (DAG)** of cryptographic lineage.
 
@@ -202,7 +229,7 @@ $$N.\text{lineageHash} = \text{SHA256}(\text{Lineage Pre-image})$$
 ### 6.2 Crucial Distinction: Causal Membership vs. Temporal Order
 > [!IMPORTANT]
 > **Lineage Ordering Constraint**
-> The lexicographical sorting of parent digests (Section 6.1, Step 2) guarantees **deterministic tamper-resistance** and **reproducible causal-set membership verification**. 
+> The lexicographical sorting of parent digests (Section 6.1, Step 2) supports **reproducible lineage derivation** and **reduces canonicalization variance**. 
 > However, because lexicographical sorting is non-chronological, the `lineageHash` **DOES NOT preserve true temporal sequence ordering or logical clock causality**.
 > *   The DAG operationally models **what parents causally contributed** to an action.
 > *   The DAG **does not** prove the *relative temporal sequence* of those parents.
@@ -217,20 +244,20 @@ Adversarial circular lineages (e.g. $A \to B \to A$) can lead to infinite recurs
 
 ## 🔑 7. Federated Trust Architecture, Gossip Revocation, and Algorithmic Agility
 
-### 7.1 Threshold Signature Model vs. Threshold Cryptography
+### 7.1 Threshold Signature Model vs. Threshold Cryptography [Tier 3: Optional]
 To prevent cryptographic overstatement, implementations and spec authors MUST maintain a strict distinction between logical validation quorums and aggregated cryptographic schemes:
 *   **Logical Multi-Signature Quorum Model (Base):** The default ZTAN-ATP envelope validation represents a quorum validation mechanism where the verifier verifies $m$ independent signatures (e.g. ECDSA P-256) against the known validator list, verifying:
 $$\mathrm{Signatures\ Verified} \ge m \quad \left(m = \lfloor n/2\rfloor+1\right)$$
 *   **Cryptographic Threshold Signature Variant (Extended):** For high-throughput platforms supporting native pairing-friendly curves, the protocol specifies an optional cryptographic threshold signature scheme using **BLS12-381 Threshold Cryptography**. This involves distributed key generation (DKG) and Shamir secret-sharing to construct a single aggregated signature verifyable against a singular, static group public key, dramatically reducing wire size and CPU cost.
 
-### 7.2 Gossip Revocation and Eventual-Consistency Hardening
+### 7.2 Gossip Revocation and Eventual-Consistency Hardening [Tier 4: Experimental]
 Under network partitions, gossip propagation is eventually consistent, introducing a risk window where a revoked validator key remains active locally:
 1.  **Revocation Precedence:** Key revocation certificates (CRMs) strictly override and invalidate any signature produced by that key, regardless of the timestamp claims on the assertion.
 2.  **Revocation TTL:** CRMs have an infinite lifetime within the validator network; once a key is revoked, its status MUST remain permanently written in the local `TRUST_ANCHORS.json` blacklist.
 3.  **Offline Verifier Behavior:** If an offline or intermittently connected verifier has not successfully synced its key revocation database for more than 24 hours ($T_{\text{max\_stale}} = 86400 \text{s}$), it MUST downrate its validation state to **Quarantined** and reject high-risk transactions.
 4.  **Split-Brain Resolution:** If conflicting key anchor updates are received, the update possessing the highest epoch certificate index and signed by an absolute majority of remaining validators is applied.
 
-### 7.3 Protocol Version Negotiation and Algorithmic Agility
+### 7.3 Protocol Version Negotiation and Algorithmic Agility [Tier 1: Core Mandatory]
 To support seamless runtime upgrades and cryptographic migration without network disruption:
 1.  **Capability Advertisement & Version Negotiation:** All trust exchange handshakes MUST advertise their supported protocols (e.g., `ZTAN-ATP/1.0`, `ZTAN-ATP/2.0`). Runtimes MUST negotiate downward to the highest mutually supported version.
 2.  **Hash Algorithm Agility:** To mitigate future SHA-256 weaknesses, the protocol supports an explicit transition strategy. The schema includes a hash type prefix in the lineage identifier (e.g., `sha256:` or `sha3:`). Runtimes MUST reject unrecognized hash types, preventing downgrade attacks to deprecated hashes.
@@ -238,14 +265,14 @@ To support seamless runtime upgrades and cryptographic migration without network
 
 ---
 
-## 🛰️ 8. Threat Model, Attacker Matrix, and Gateway Operational Qualification
+## 🛰️ 8. Threat Model, Attacker Matrix, and Gateway Operational Qualification [Cross-Tier]
 
 ### 8.1 Threat Mitigation Matrix
 | Attacker Class / Threat Vector | Description | ZTAN-ATP Mitigation Prerequisite |
 | :--- | :--- | :--- |
 | **Out-of-Sequence Replay** | Adversary intercepts a signed envelope and attempts to re-execute it. | **Actor-Scoped Monotonic Counter + Sliding Window Check:** Verified $C_{\text{new}} \le C_{\text{last}}$ state-machine intercept, bounded by a 300s window. |
 | **Divergent Serialization** | Attacker crafts a payload that parses differently across runtimes, forging a signature validation bypass. | **NFC Normalization + Single-Pass Escaping + Whitespace Preservation:** Enforces identical canonical formatting before hashing without mutating semantic bytes. |
-| **Commutative DAG Tampering** | Attacker attempts to flip the execution sequence of parent agents $P_1$ and $P_2$. | **Lexicographical Parent Digest Ordering:** Concatenation sorting guarantees unique lineage pre-images regardless of ingestion timing. |
+| **Commutative DAG Tampering** | Attacker attempts to flip the execution sequence of parent agents $P_1$ and $P_2$. | **Lexicographical Parent Digest Ordering:** Concatenation sorting constrains canonicalization variance and supports reproducible lineage derivation regardless of ingestion timing. |
 | **Validator Key Compromise** | An attacker steals the private signing key of a ZTAN Validator node. | **Multi-Signature Threshold Quorum Verification:** Critical transactions require independent signatures from multiple distinct trust roots. |
 | **Adversarial Timestamp Forgery** | An agent's local clock is manipulated backwards to replay historic transactions. | **Bounded Drift Validation window:** Strict $\pm 300\text{s}$ wall-clock fence relative to the validating node's clock. |
 | **Temporal Sequencing Bypasses** | Attacker claims parents $A$ and $B$ occurred in a different order to bypass safety rules. | **Temporal Ordering Invariant Note:** Restricts developers from using raw Merkle hashes for time logic, mandating explicit vector clocks. |
@@ -254,12 +281,12 @@ To support seamless runtime upgrades and cryptographic migration without network
 
 ### 8.2 Operational Qualification Constraints
 *   **Compile-Time Verification vs. Runtime Resilience:** While ESM compliance, type-only imports, and strict TypeScript compilation are fully achieved in the gateway codebase, they do not prove runtime resilience.
-*   **Production Deployment Requirements:** Prior to enterprise deployment, gateway runtimes MUST be qualified using empirical load testing (verifying latency bounds under 2000 req/sec), active backpressure verification (validating client throttling when DB/cache limits are reached), failure injection (simulating HSM time-outs and connection drops), and memory profiling to detect potential leaks in long-lived cryptographic contexts.
+*   **Production Deployment Targets:** Prior to enterprise deployment, gateway runtimes SHOULD be qualified using empirical load testing (verifying target benchmark bounds such as 2000 req/sec under a specified reference profile: e.g., 8-core CPU, 10Gbps local network, no-op cryptographic verification bypass, and standard memory-only database persistence), active backpressure verification (validating client throttling when DB/cache limits are reached), failure injection (simulating HSM time-outs and connection drops), and memory profiling to detect potential leaks in long-lived cryptographic contexts.
 
 
 ---
 
-## 🧪 9. Interoperability Test Vectors (Conformance Suite)
+## 🧪 9. Interoperability Test Vectors (Conformance Suite) [Tier 1: Core Mandatory]
 
 Every compatible ZTAN-ATP SDK implementation (TypeScript, Go, Rust, Python) MUST pass the following test vector to demonstrate strict parser, serialization, and signature validation parity.
 
@@ -295,7 +322,7 @@ actionId:8f5a11c2-cc00-4b92-871d-5569e4f20101|actor:spiffe://ztan.domain/agent/s
 
 ---
 
-## 📐 Appendix A: Formal EBNF Grammar and Escape Automata Specification
+## 📐 Appendix A: Formal EBNF Grammar and Escape Automata Specification [Tier 1: Core Mandatory]
 
 To prevent cross-runtime parser divergence and eliminate lexical ambiguity, this appendix defines the formal grammar of the ZTAN-ATP canonical wire format using Extended Backus-Naur Form (EBNF) [ISO/IEC 14977], specifies the strict byte-to-scalar parsing pipeline, and defines the lexical automata.
 
@@ -388,7 +415,7 @@ stateDiagram-v2
 
 ---
 
-## 🔐 Appendix B: Threshold Cryptography & BLS12-381 Security Appendix
+## 🔐 Appendix B: Threshold Cryptography & BLS12-381 Security Appendix [Tier 3: Optional]
 
 The threshold signature extension replaces logical multi-signatures with pairing-friendly aggregated signatures. While highly efficient on the wire, this introduces new cryptographic attack surfaces that MUST be guarded against.
 
@@ -426,7 +453,7 @@ To prevent downgrade attacks and key-mode confusion, the logical and threshold s
 
 ---
 
-## 🕸️ Appendix C: Scalable Revocation and Incremental Anti-Entropy Recovery
+## 🕸️ Appendix C: Scalable Revocation and Incremental Anti-Entropy Recovery [Tier 4: Experimental]
 
 As the trust plane scales, two operational concerns arise: unbounded key revocation storage and rebuild storms following regional network partition recovery. This appendix specifies the mitigations.
 
@@ -458,7 +485,7 @@ To prevent malicious peers from exploiting the Merkle sync protocol as a Denial 
 
 *   **Sync Attempt Rate-Limiting:** Nodes MUST limit peers to at most **3 sync negotiation challenges per epoch** or a maximum frequency of **1 sync action every 10 minutes** per peer IP. Repeated violations trigger peer blacklisting.
 *   **Payload Delta Caps:** Range delta payloads are strictly capped at a maximum of **10,000 assertions** or **100 MiB** per synchronization window. If the target delta exceeds this boundary, the connection is instantly severed.
-*   **Reconstruction Parity Verification:** Recovering nodes MUST mathematically reconstruct the local range Merkle tree from the sync payload and verify its root against the consensus signed root. Any divergence triggers immediate node quarantine and decrements the peer's locally maintained reputation health score. Runtimes track a sliding-window score (0 to 100) of all immediate neighbors. If a neighbor's local score falls below 50 due to malformed payloads or invalid Merkle roots, the runtime severs active connections and enforces a strict exponential reconnection back-off starting at 5 minutes, doubling up to 24 hours. This local reputation scoring guarantees clean peer isolation under partition and sybil attacks without depending on a centralized governance authority.
+*   **Reconstruction Parity Verification:** Recovering nodes MUST mathematically reconstruct the local range Merkle tree from the sync payload and verify its root against the consensus signed root. Any divergence triggers immediate node quarantine and decrements the peer's locally maintained reputation health score. Runtimes track a sliding-window score (0 to 100) of all immediate neighbors. If a neighbor's local score falls below 50 due to malformed payloads or invalid Merkle roots, the runtime severs active connections and enforces a strict exponential reconnection back-off starting at 5 minutes, doubling up to 24 hours. This local reputation scoring is designed to support peer isolation under partition and sybil attacks without depending on a centralized governance authority.
 *   **Entropy Out-of-Bounds Check:** Runtimes MUST reject synchronization requests that propose sequence updates outside the current epoch window boundaries ($[E_{\text{last}} - 1, E_{\text{current}} + 1]$) to prevent historical pollution.
 
 ### C.2 Scalable Key Revocation Architecture
@@ -476,7 +503,7 @@ To prevent memory bloat and verifier startup latency caused by an infinite lifet
 
 ---
 
-## ⚡ Appendix D: Computational Budgets and Resource-Exhaustion Economics
+## ⚡ Appendix D: Computational Budgets and Resource-Exhaustion Economics [Tier 2: Recommended]
 
 To defend against asymmetric resource-exhaustion attacks where malicious entities submit payloads designed to consume excessive CPU or memory before verification rejection occurs, runtimes MUST enforce strict execution limits.
 
@@ -486,13 +513,13 @@ Runtimes MUST enforce hard memory caps during lexical analysis. Buffers MUST NOT
 
 *   **Maximum String Length:** Capped at **65,536 bytes (64 KiB)** per individual attribute.
 *   **Maximum Envelope Payload:** The entire raw canonical wire byte sequence MUST NOT exceed **262,144 bytes (256 KiB)**.
-*   **Static Parsing Boundary:** Runtimes MUST reject any payload that forces dynamic memory extension beyond **512 KiB** total parsing frame memory. To mitigate concurrent memory amplification (e.g., 50,000 concurrent requests reserving 25 GB of RAM), highly optimized runtimes SHOULD implement reusable, thread-local **parsing arenas** or **ring buffers** that recycle frame memory contexts. This static parser ceiling guarantees deterministic worst-case space bounds while preventing memory exhaustion exploits under high-concurrency environments.
+*   **Static Parsing Boundary:** Runtimes MUST reject any payload that forces dynamic memory extension beyond **512 KiB** total parsing frame memory. To mitigate concurrent memory amplification (e.g., 50,000 concurrent requests reserving 25 GB of RAM), highly optimized runtimes SHOULD implement reusable, thread-local **parsing arenas** or **ring buffers** that recycle frame memory contexts. This static parser ceiling constrains worst-case space bounds and is designed to mitigate memory exhaustion exploits under high-concurrency environments.
 
 ### D.2 Graph and Acyclicity Processing CEILINGS
 
 To prevent stack overflows and resource-intensive recursive iterations during Directed Acyclic Graph (DAG) cycle checks:
 
-*   **Maximum DAG Width (Out-Degree):** Bounded at a maximum of **16 children** branching per node. This limit is mathematically derived from the worst-case traversal bounds of high fan-out trees. An unbounded causal graph fan-out allows an attacker to construct extremely wide, shallow DAG trees that force exponential stack/heap traversals or massive breadth-first processing steps before rejection occurs. Restricting the out-degree to $W_{\text{max}} = 16$ guarantees that graph traversal algorithms operate strictly within a predictable $O(V + E)$ processing bound, keeping verifier CPU overhead fully linear.
+*   **Maximum DAG Width (Out-Degree):** Bounded at a maximum of **16 children** branching per node. This limit is mathematically derived from the worst-case traversal bounds of high fan-out trees. An unbounded causal graph fan-out allows an attacker to construct extremely wide, shallow DAG trees that force exponential stack/heap traversals or massive breadth-first processing steps before rejection occurs. Restricting the out-degree to $W_{\text{max}} = 16$ constrains graph traversal algorithms to operate within a predictable $O(V + E)$ processing bound, helping keep verifier CPU overhead linear.
 *   **Maximum Causal Depth:** The verifier MUST abort validation if the recursion depth or lineage search path exceeds **32 levels** ($D_{\text{max}} = 32$).
 
 ### D.3 Cryptographic Processing Budgets
@@ -503,11 +530,11 @@ Signature validation is the most computationally expensive operation. To limit C
 *   **Relative Computational Budgets & SLO Enforcement:** Runtimes MUST bound worst-case cryptographic execution to prevent signature-flooding exhaustion. Because hardware and VM profiles vary dramatically across cloud providers, hardware security modules (HSMs), and edge architectures, timing thresholds are defined as relative hardware-profile budgets rather than strict microsecond constants:
     *   *High-Performance Validator Profile:* Bounded at a relative budget equivalent to a maximum of **50 ms** per signature and **200 ms** total validation time on a baseline standardized CPU core (e.g., 1x Intel Xeon or equivalent).
     *   *Constrained Edge Profile:* Cryptographic validation limits auto-scale relative to the host CPU capabilities, utilizing a maximum relative time budget cap set to 4x the high-performance baseline.
-    *   *Percentile SLO Enforcement & Deterministic Overload Shedding:* Regardless of profile, runtimes MUST enforce a relative **p99 verification latency SLO** of **100 ms**. Runtimes MUST automatically shed and drop validating tasks that exceed this relative execution budget under peak saturation load to maintain system availability, applying the strict priority ordering defined in Appendix H to preserve consensus symmetry.
+    *   *Percentile SLO Enforcement & Deterministic Overload Shedding:* Regardless of profile, runtimes are expected to target a relative **p99 verification latency design budget** of **100 ms** under reference workloads. Runtimes SHOULD implement adaptive overload shedding and drop validating tasks that exceed this target execution budget under peak saturation load to support system availability, applying the priority ordering defined in Appendix H to preserve consensus symmetry.
 
 ---
 
-## 🕒 Appendix E: Clock Discipline, Synchronization, and Leap-Second Handling
+## 🕒 Appendix E: Clock Discipline, Synchronization, and Leap-Second Handling [Tier 2: Recommended]
 
 Because ZTAN-ATP relies on precise time boundaries for replay protection, revocation freshness, and epoch fencing, runtimes MUST enforce a unified, Byzantine-resilient clock discipline:
 
@@ -518,7 +545,7 @@ Because ZTAN-ATP relies on precise time boundaries for replay protection, revoca
 
 ---
 
-## 🛡️ Appendix F: Byzantine Decentralized Reputation & Eclipse Defense
+## 🛡️ Appendix F: Byzantine Decentralized Reputation & Eclipse Defense [Tier 4: Experimental]
 
 To prevent malicious coalitions from eclipsing legitimate nodes, isolating their view of the network, and manipulating local reputation metrics to cause network fragmentation, runtimes MUST enforce active routing diversity rules:
 
@@ -528,7 +555,7 @@ To prevent malicious coalitions from eclipsing legitimate nodes, isolating their
 
 ---
 
-## 🔒 Appendix G: Mutual Transport Security & Session Binding
+## 🔒 Appendix G: Mutual Transport Security & Session Binding [Tier 2: Recommended]
 
 To secure data-in-transit, enforce validator authentication at the packet layer, and prevent transport-level replay or session hijacking, ZTAN-ATP mandates unified cryptographic transport constraints:
 
@@ -540,18 +567,18 @@ To secure data-in-transit, enforce validator authentication at the packet layer,
 
 ---
 
-## 📊 Appendix H: Deterministic Overload Shedding Priority & Consensus Symmetry
+## 📊 Appendix H: Deterministic Overload Shedding Priority & Consensus Symmetry [Tier 2: Recommended]
 
-When p99 verification latency exceeds the $100\text{ ms}$ SLO boundary under peak transactional saturation, verifiers MUST NOT perform random request drops, which would trigger quorum fragmentation and network liveness failures. Instead, runtimes MUST apply a strict, **deterministic priority queueing** model:
+When p99 verification latency exceeds the $100\text{ ms}$ target design budget under peak transactional saturation, verifiers MUST NOT perform random request drops, which would trigger quorum fragmentation and network liveness failures. Instead, runtimes MUST apply a strict, **deterministic priority queueing** model:
 
-1.  **Priority Level 1 (Strictly Highest) - Key Revocation Messages (CRMs):** Revocation alerts and active accumulator updates must *never* be dropped. They occupy the front of the verification queue to guarantee active threat containment.
+1.  **Priority Level 1 (Strictly Highest) - Key Revocation Messages (CRMs):** Revocation alerts and active accumulator updates must *never* be dropped. They occupy the front of the verification queue to optimize active threat containment.
 2.  **Priority Level 2 - Epoch Transition Markers:** Block capability advertisements, capability upgrades, and state consensus transition signatures. Bounding these ensures the network maintains epoch progress.
 3.  **Priority Level 3 - Incremental Range Sync Deltas:** Peer anti-entropy packets to recover partitioned state log segments.
 4.  **Priority Level 4 (Strictly Lowest) - Standard Transaction Assertion Envelopes:** Sorted descending by timestamp, processed strictly on a First-In-First-Out (FIFO) basis within the remaining verification CPU window. Payloads failing to process within this lowest priority window are dropped with a deferred retry header.
 
 ---
 
-## 🔬 Appendix I: Formal State-Machine Verification Roadmap
+## 🔬 Appendix I: Formal State-Machine Verification Roadmap [Tier 5: Research]
 
 To transition the protocol draft to a formally proven specification, implementation teams MUST validate the interacting state spaces against the following model checking roadmaps:
 
