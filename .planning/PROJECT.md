@@ -75,7 +75,7 @@ The platform has reached **Core Architectural Stability**. The focus has shifted
 
 - **Strategic**: NO ARCHITECTURAL EXPANSION. Only operational stewardship.
 - **Safety**: High-confidence replay determinism and workflow convergence.
-- **Audit**: High-confidence forensic non-repudiability across decadal timelines.
+- **Audit**: Bounded, tamper-evident operational lineage and long-horizon forensic auditability.
 - **Tech Stack**: Frozen monorepo architecture with stable, versioned APIs.
 
 ## Key Decisions
