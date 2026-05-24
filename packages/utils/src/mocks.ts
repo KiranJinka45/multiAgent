@@ -60,7 +60,21 @@ import {
 } from '@packages/runtime-core';
 
 export { RuntimeStatus, JobStage, MissionStatus };
-export class DistributedExecutionContext extends RealContext {}
+export class DistributedExecutionContext extends RealContext {
+    static getTracer() {
+        return {
+            startActiveSpan: async (name: string, cb: (span: any) => Promise<any>) => {
+                const span = {
+                    setAttribute: (...args: any[]) => {},
+                    setStatus: (...args: any[]) => {},
+                    recordException: (...args: any[]) => {},
+                    end: () => {}
+                };
+                return cb(span);
+            }
+        };
+    }
+}
 
 export const redis: any = {
     get: async (key: string) => null,
@@ -92,11 +106,19 @@ export class Queue<T = any> {
     async add(...args: any[]) { return { id: 'mock' }; } 
     async close() {} 
     on(event: string, cb: any) { return this; }
+    async getRepeatableJobs() { return []; }
+    async addBulk(...args: any[]) { return []; }
+    async getJobs(...args: any[]) { return []; }
+    async getJobCounts() { return { waiting: 0, active: 0, completed: 0, failed: 0, delayed: 0 }; }
 }
 
 export class Worker { 
     public opts: any;
-    constructor(name: string, cb: any, opts?: any) { this.opts = opts || { connection: {} }; } 
+    public processFn: any;
+    constructor(name: string, cb: any, opts?: any) { 
+        this.opts = opts || { connection: {} }; 
+        this.processFn = cb;
+    } 
     async close() {} 
     on(event: string, cb: any) { return this; }
 }
@@ -239,7 +261,11 @@ export const agentRegistry: any = {
 
 export const patchVerifier: any = { verify: async (dir: string, vfs: any) => ({ passed: true, errors: [] }) };
 export class VirtualFileSystem { loadFromDiskState(files: any[]) {} read() { return ''; } write() {} }
-export const supervisorService: any = { start: async () => {} };
+export const supervisorService: any = {
+    start: async () => {},
+    checkHealth: async (id: string) => 'NONE',
+    handleDecision: async (id: string, decision: string) => {}
+};
 export const supabaseAdmin: any = {};
 export const deployQueue: any = new Queue('deploy');
 export const DEPLOYMENT_QUEUE = 'deploy';
@@ -293,3 +319,48 @@ export const ThresholdBls: any = {
 export const Canonical: any = {
     hash: (data: any) => 'hashed'
 };
+
+export const QUEUE_DOCKER = 'docker-queue';
+export const QUEUE_SUPERVISOR = 'supervisor-queue';
+export const QUEUE_REFACTOR = 'refactor-queue';
+export const QUEUE_EVOLUTION = 'evolution-queue';
+export const TenantService: any = {
+    getTenantForUser: async (userId: string) => ({ id: 'mock-tenant', plan: 'free' }),
+    checkQuota: async () => true
+};
+export const InfraProvisioner: any = {
+    provisionResources: async (projectId: string, plan: string) => ({})
+};
+export const CICDManager: any = {
+    setupPipeline: async (projectId: string, sandboxDir: string, templateId: string) => {}
+};
+export const CommitManager: any = {
+    commit: async (...args: any[]) => {}
+};
+export class BlueprintManager {
+    async getForTemplate(templateId: string) { return []; }
+}
+export const IS_PRODUCTION = false;
+
+export const SLOService: any = {
+    recordLatency: async (...args: any[]) => {},
+    recordFailure: async (...args: any[]) => {},
+    getMetrics: async () => ({}),
+    checkLatency: async (...args: any[]) => {}
+};
+export class SandboxPodController {
+    async deploy(projectId: string, executionId: string, files: any[]) {
+        return { success: true, url: 'http://127.0.0.1:3000' };
+    }
+    async createPod(...args: any[]) {}
+    async deletePod(...args: any[]) {}
+}
+export const usageService: any = {
+    recordAiUsage: async (...args: any[]) => {}
+};
+export const QUEUE_META = 'meta-queue';
+export const ANALYTICS_QUEUE = 'analytics-queue';
+export const QUEUE_BILLING = 'billing-queue';
+export const QUEUE_PATTERN = 'pattern-queue';
+export const QUEUE_EVALUATION = 'evaluation-queue';
+export const QUEUE_GENERATOR = 'generator-queue';

@@ -69,7 +69,7 @@ export class LongitudinalAnalyzer {
     }
 
     // Regression Score
-    const regressionScore = Math.max(0, Math.min(100, Math.round(100 - (avgSemanticDrift * 150))));
+    const regressionScore = LongitudinalAnalyzer.calculateRegressionScore(packets);
 
     // Governance Efficiency
     const governanceEfficiencyIndex = Math.max(0, Math.min(100, 100 - (complexityFactor - 1) * 20));
@@ -82,6 +82,8 @@ export class LongitudinalAnalyzer {
     let status = 'BORING';
     if (avgSemanticDrift > 0.10 || regressionScore < 85) {
       status = 'REGRESSION_RISK';
+    } else if (avgSemanticDrift > 0.05 || regressionScore < 95) {
+      status = 'ELEVATED_RISK';
     } else if (complexityFactor > 1.5) {
       status = 'INEFFICIENT_GOVERNANCE';
     }
@@ -98,6 +100,28 @@ export class LongitudinalAnalyzer {
       driftAcceleration,
       survivabilityProjection,
     };
+  }
+
+  /**
+   * Calculates the regression score and detects predictive risk based on drift trends (Hidden Risk).
+   */
+  static calculateRegressionScore(packets: any[]): number {
+    if (!packets || packets.length === 0) return 100;
+    const avgSemanticDrift = packets.reduce((sum, p) => sum + (p.semanticDrift ?? 0.0), 0) / packets.length;
+    
+    // Check drift acceleration trend (Hidden Risk)
+    let accelerationFactor = 0;
+    if (packets.length >= 2) {
+      const firstDrift = packets[0].semanticDrift ?? 0;
+      const lastDrift = packets[packets.length - 1].semanticDrift ?? 0;
+      const driftDelta = lastDrift - firstDrift;
+      if (driftDelta > 0) {
+        // Positive acceleration means increasing drift, apply penalty
+        accelerationFactor = driftDelta * 100;
+      }
+    }
+    
+    return Math.max(0, Math.min(100, Math.round(100 - (avgSemanticDrift * 150) - accelerationFactor)));
   }
 
   /**

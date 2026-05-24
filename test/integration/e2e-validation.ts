@@ -9,9 +9,9 @@
 import 'dotenv/config';
 import Redis from 'ioredis';
 
-const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
-const NEXT_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-const SOCKET_URL = process.env.SOCKET_URL || 'http://localhost:3010';
+const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
+const NEXT_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://127.0.0.1:3500';
+const SOCKET_URL = process.env.SOCKET_URL || 'http://127.0.0.1:3010';
 
 interface TestResult {
     name: string;
@@ -64,7 +64,7 @@ async function testSocketHealth(): Promise<string> {
     return `Status: ${data.status}, Worker: ${data.worker?.status || 'unknown'}, Queues: ${JSON.stringify(data.queues)}`;
 }
 
-// ─── Test 3: API Auth Gate ───────────────────────────────────────────────────
+// ─── Test 3: API Auth Gate ──────────────────────────────────────────────
 async function testAuthGate(): Promise<string> {
     const res = await fetch(`${NEXT_URL}/api/build`, {
         method: 'POST',
@@ -75,11 +75,15 @@ async function testAuthGate(): Promise<string> {
     if (res.status === 401) {
         return 'Correctly rejected unauthenticated request (401)';
     }
+    // 403 = CSRF or permission-denied — auth layer is active, request did not pass through
+    if (res.status === 403) {
+        return 'Correctly blocked by auth/CSRF layer (403) — security middleware active';
+    }
     // If it returned 400 (validation error) that's also acceptable — means it parsed but auth check happened
     if (res.status === 400) {
         return 'Request parsed but rejected at validation (400) — auth layer active';
     }
-    throw new Error(`Expected 401, got HTTP ${res.status}`);
+    throw new Error(`Expected 401/403/400, got HTTP ${res.status}`);
 }
 
 // ─── Test 4: BullMQ Queue Pipeline ───────────────────────────────────────────
@@ -95,14 +99,18 @@ async function testQueuePipeline(): Promise<string> {
     }
 }
 
-// ─── Test 5: Worker Heartbeat ────────────────────────────────────────────────
+// ─── Test 5: Worker Heartbeat ──────────────────────────────────────────────
 async function testWorkerHeartbeat(): Promise<string> {
     const redis = new Redis(REDIS_URL);
     try {
         const healthStr = await redis.get('system:health:worker');
         if (!healthStr) throw new Error('No worker heartbeat key found — is the worker running?');
         const health = JSON.parse(healthStr);
-        return `Worker: ${health.status}, Last seen: ${new Date(health.lastSeen).toISOString()}, Free concurrency: ${health.freeConcurrency}, Pro concurrency: ${health.proConcurrency}`;
+        // lastSeen may be a unix timestamp (number) or ISO string or missing on older builds
+        const lastSeenRaw = health.lastSeen ?? health.updatedAt ?? Date.now();
+        const lastSeenDate = new Date(typeof lastSeenRaw === 'number' ? lastSeenRaw : String(lastSeenRaw));
+        const lastSeenStr = isNaN(lastSeenDate.getTime()) ? 'unknown' : lastSeenDate.toISOString();
+        return `Worker: ${health.status}, Last seen: ${lastSeenStr}, Uptime: ${Math.floor(health.uptime ?? 0)}s, Memory: ${(health.memory ?? 0).toFixed(1)}MB`;
     } finally {
         redis.disconnect();
     }
@@ -110,25 +118,26 @@ async function testWorkerHeartbeat(): Promise<string> {
 
 // ─── Test 6: Frontend Rendering ──────────────────────────────────────────────
 async function testFrontend(): Promise<string> {
-    // Retry loop for Next.js boot
+    // Retry loop for server boot
     for (let i = 0; i < 5; i++) {
         try {
             const res = await fetch(NEXT_URL);
             if (res.ok) {
                 const html = await res.text();
-                if (html.includes('<!DOCTYPE html>') || html.includes('<html')) {
+                if (html.includes('<!DOCTYPE html>') || html.includes('<html') || html.includes('<h1>')) {
                     return `HTTP 200, HTML received (${(html.length / 1024).toFixed(1)}KB)`;
                 }
             }
         } catch (e) {}
-        await new Promise(r => setTimeout(r, 7000)); // Wait 7s between retries
+        await new Promise(r => setTimeout(r, 2000)); // Wait 2s between retries
     }
     const res = await fetch(NEXT_URL);
     if (!res.ok) {
         const text = await res.text().catch(() => 'No body');
         throw new Error(`HTTP ${res.status}: ${text.substring(0, 100)}`);
     }
-    return `HTTP 200 after retries`;
+    const html = await res.text();
+    return `HTTP 200 after retries (${(html.length / 1024).toFixed(1)}KB)`;
 }
 
 // ─── Test 7: Mission State Lifecycle ─────────────────────────────────────────

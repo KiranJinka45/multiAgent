@@ -54,9 +54,9 @@ const MODE_THRESHOLDS = {
     },
 };
 
-export function evaluateMode(state: SystemState): SystemMode {
-    // EMERGENCY: No workers or catastrophic failure rate
-    if (state.activeWorkers === 0) return 'EMERGENCY';
+export function evaluateMode(state: SystemState, isBootstrapping: boolean = false): SystemMode {
+    // EMERGENCY: No workers or catastrophic failure rate (bypass worker check during bootstrap grace window)
+    if (state.activeWorkers === 0 && !isBootstrapping) return 'EMERGENCY';
     if (state.failureRate > MODE_THRESHOLDS.emergency.failureRate || 
         state.queueDepth > MODE_THRESHOLDS.emergency.queueDepth) {
         return 'EMERGENCY';
@@ -119,6 +119,7 @@ export class ControlPlane {
     private missionsAtModeEntry: number = 0;
     private effectivenessScore: number = 0; // 0 to 1, where 1 is 100% reduction in error rate acceleration
     private errorsBeforeEscalation: number = 0;
+    private startupTime: number = Date.now();
     
     // Hysteresis: prevent mode flapping by requiring stable readings before downgrade
     private readonly STABILITY_WINDOW_MS = 15_000; // 15 seconds of stability before downgrading
@@ -211,7 +212,8 @@ export class ControlPlane {
         }
 
         const state = await this.getSystemState();
-        const candidateMode = evaluateMode(state);
+        const isBootstrapping = Date.now() - this.startupTime < 90000;
+        const candidateMode = evaluateMode(state, isBootstrapping);
         const budget = calculateErrorBudget(state.failureRate);
 
         // Error budget override: if budget is exhausted, force PROTECT mode minimum
@@ -264,7 +266,12 @@ export class ControlPlane {
                 this.errorsBeforeEscalation = 0;
             }
             
-            this.controlPlaneModeChangesTotal.inc({ from_mode: this.previousMode, to_mode: this.currentMode });
+            try {
+                this.controlPlaneModeChangesTotal.inc({ from_mode: this.previousMode, to_mode: this.currentMode });
+            } catch {
+                // Metric may not support labels — increment without labels as fallback
+                try { this.controlPlaneModeChangesTotal.inc(); } catch {}
+            }
             
             logger.warn({
                 previousMode: this.previousMode,

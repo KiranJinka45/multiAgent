@@ -22,10 +22,29 @@ export function createHealthRouter(options: {
   router.get('/health/ready', async (_req: Request, res: Response) => {
     try {
       await db.$queryRaw`SELECT 1`;
+      
+      if (options.checkDependencies) {
+        const deps = await options.checkDependencies().catch(err => {
+          logger.error({ err }, `[Health][${options.serviceName}] Dependency check failed inside readiness`);
+          return { custom: { status: 'down', message: String(err) } };
+        });
+        
+        const anyDown = Object.values(deps).some(d => d.status === 'down');
+        if (anyDown) {
+          logger.warn({ deps }, `[Health][${options.serviceName}] Readiness check degraded due to dependencies`);
+          res.status(503).json({ 
+            status: 'unready', 
+            error: 'Dependencies degraded',
+            details: deps 
+          });
+          return;
+        }
+      }
+      
       res.json({ status: 'ready', timestamp: new Date().toISOString() });
     } catch (err) {
       logger.error({ err }, `[Health][${options.serviceName}] Readiness check failed`);
-      res.status(503).json({ status: 'unready', error: 'Database unavailable' });
+      res.status(503).json({ status: 'unready', error: 'Database or dependencies unavailable' });
     }
   });
 

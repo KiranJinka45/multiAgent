@@ -1,6 +1,6 @@
 # Nexus ZTAN — Production Infrastructure
 > [!IMPORTANT]
-> This platform is in **Architecture Freeze**. No new subsystems, governance layers, or frameworks are permitted. Focus is exclusively on maintenance, security, and operational reliability.
+> Core execution model stabilized. Bounded operational hardening and subsystem evolution continue under rigorous maintenance, security, and operational reliability objectives.
 
 ## Overview
 > **"A replayable infrastructure reliability platform focused on deterministic recovery, replay durability, operational clarity, and sustainable long-term maintenance."**
@@ -33,12 +33,13 @@ Nexus ZTAN is an auditable production platform designed for long-term operationa
 * **Wave 4 — Real PostgreSQL Pathology Testing**: Resiliency under WAL corruption, replica rewind, autovacuum freeze, checkpoint starvation, and disk saturation.
 * **Wave 5 — Performance Envelope Mapping**: Mapping empirical curves for replay throughput, recovery latencies, and fencing contention.
 * **Wave 6 — Threat Modeling & Adversarial Review**: Simulating HSM override abuse, replay poisoning, stale replica recovery, and epoch desynchronization.
+* **Phase 9.3 — Operational Survivability Drills (External)**: Validating non-author operability in controlled environments and implementing predictive risk detection through Trust Regression Scoring (Complete).
 
 ### Status: Transitioning to Phase 50 (Active)
 
 We have successfully completed **Phase 49: Longitudinal Evidence Science**, which established a mathematically disciplined, statistically sound, and deterministic verification framework. Key accomplishments include `--canonical` run alignment, three-tier statistical drift envelopes ($\mu \pm 3\sigma$), noise-floor suppressed cross-run reproducibility analysis ($CV = 5.25\%$), and rate-limited Express dashboard integration.
 
-We are now initiating **Phase 50: Advanced Pathology Operations (Wave 4 — Real PostgreSQL Pathology Testing)**. This next phase transitions the hardened evidence platform into active failure stress scenarios (WAL corruption, replica rewind, autovacuum freeze, fsync stalls, and disk/pool saturation) to certify absolute survivability under disastrous database events.
+We are now initiating **Phase 50: Advanced Pathology Operations (Wave 4 — Real PostgreSQL Pathology Testing)**. This next phase transitions the hardened evidence platform into active failure stress scenarios (WAL corruption, replica rewind, autovacuum freeze, fsync stalls, and disk/pool saturation) to certify tested recovery envelopes under disastrous database events.
 
 The platform operates on its current bounded architectural baseline. All future modifications are governed by the [INVARIANT_GOVERNANCE_CHARTER.md](../INVARIANT_GOVERNANCE_CHARTER.md) constraints.
 

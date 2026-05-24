@@ -15,6 +15,8 @@ export * from './context.js';
 export * from './request-context.js';
 export * from './audit.js';
 export * from './idempotency.js';
+export * from './errors.js';
+export * from './side-effect-journal.js';
 export * from './control-plane.js';
 export * from './validation.js';
 export * from './build-cache.js';
@@ -82,7 +84,6 @@ export {
     Worker,
     Job,
     Queue,
-    eventBus,
     QUEUE_VALIDATE,
     QUEUE_ARCH,
     dockerQueue,
@@ -106,12 +107,46 @@ export {
     generatorQueue,
     validatorQueue,
     deployQueue,
-    retryCountTotal
+    retryCountTotal,
+    PreviewWatchdog,
+    QUEUE_DOCKER,
+    QUEUE_SUPERVISOR,
+    QUEUE_REFACTOR,
+    QUEUE_EVOLUTION,
+    TenantService,
+    InfraProvisioner,
+    CICDManager,
+    CommitManager,
+    BlueprintManager,
+    IS_PRODUCTION,
+    SLOService,
+    SandboxPodController,
+    QUEUE_PLANNER,
+    QUEUE_GENERATOR,
+    QUEUE_META,
+    QUEUE_REPAIR,
+    supervisorQueue,
+    ANALYTICS_QUEUE,
+    QUEUE_BILLING,
+    QUEUE_PATTERN,
+    QUEUE_ROLLBACK,
+    QUEUE_SELF_MODIFICATION,
+    QUEUE_STRATEGY,
+    QUEUE_EVALUATION,
+    usageService,
+    supervisorService
 } from './mocks.js';
 export type { RuntimeRecord, ManagedContainer, AgentResult, ExecutionContextType } from './mocks.js';
 
 export const QUEUE_DEPLOY = 'deploy-queue';
 
+export type JobPayload = Record<string, any> & {
+    missionId?: string;
+    taskId?: string;
+    executionId?: string;
+    projectId?: string;
+};
+export const JobPayload = {} as any;
 
 export { HSMVault, HSMErrorCode } from './hsm-vault.js';
 export type { HSMAttestation, HSMState } from './hsm-vault.js';

@@ -72,9 +72,10 @@ export class SreEngine extends EventEmitter {
   private observers: Map<string, SREObserver> = new Map();
   private events: SREEvent[] = [];
   private lastAction: SREUpdate['lastAction'] = null;
-  private networkDisorderScore: number = 1.0;
+  private networkDisorderScore: number = 1.0;  // 1.0 = no disorder (healthy), 0.0 = fully disordered
   private disorderHistory: number[] = []; // Last 30 samples (30s)
   private readonly DISORDER_WINDOW_SIZE = 1;
+  private eventRateHistory: { ts: number; seq: number }[] = []; // Rolling event rate tracker (60s window)
   
   // Default Tuning Params
   private tuning: SRETuningParams = {
@@ -314,9 +315,21 @@ export class SreEngine extends EventEmitter {
 
     // 5. Reliability Calibration (Calibrated after consensus is reached)
     const consensusFactor = consensus_result.confidence;
+
+    // Compute rolling eventsPerSec over last 60s for accurate data quality measurement
+    const nowMs = Date.now();
+    this.eventRateHistory.push({ ts: nowMs, seq: this.globalSequence });
+    // Prune entries older than 60 seconds
+    this.eventRateHistory = this.eventRateHistory.filter(e => nowMs - e.ts < 60000);
+    const eventWindowSec = Math.min(60, (nowMs - (this.eventRateHistory[0]?.ts || nowMs)) / 1000 || 1);
+    const eventsInWindow = this.eventRateHistory.length;
+    const eventsPerSec = eventsInWindow / (eventWindowSec || 1);
+
     const dataQuality = {
-      eventsPerSec: this.globalSequence / ( (Date.now() - this.lastTuningTime) / 1000 || 1),
-      disorder: this.networkDisorderScore
+      // networkDisorderScore: 1.0 = no disorder (healthy), 0.0 = fully disordered
+      // disorder parameter must be 0.0 = clean, 1.0 = chaos (inverted from networkDisorderScore)
+      eventsPerSec,
+      disorder: 1.0 - this.networkDisorderScore
     };
     const stability = await OperationalControlEngine.evaluate(perception.anomalyHypothesis.confidence, consensusFactor, dataQuality);
     

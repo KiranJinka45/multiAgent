@@ -28,6 +28,20 @@ export class DistributedExecutionContext {
     private static store = new Map<string, any>();
     private id: string;
 
+    static getTracer() {
+        return {
+            startActiveSpan: async (name: string, cb: (span: any) => Promise<any>) => {
+                const span = {
+                    setAttribute: (...args: any[]) => {},
+                    setStatus: (...args: any[]) => {},
+                    recordException: (...args: any[]) => {},
+                    end: () => {}
+                };
+                return cb(span);
+            }
+        };
+    }
+
     constructor(id: string) {
         this.id = id;
         if (!DistributedExecutionContext.store.has(id)) {

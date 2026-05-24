@@ -25,6 +25,7 @@ const LOCK_RETRY_INTERVAL_MS = 50;
 
 interface LockMetadata {
   pid: number;
+  hostname: string;
   timestamp: string;
   generation: number; // Monotonically increasing fencing token under compliant storage configurations
 }
@@ -561,6 +562,7 @@ export const GovernanceLedger = {
     const interval = setInterval(async () => {
       const activeDbGen = this.activeDbGenerations.get(partition) ?? null;
       if (activeDbGen === null) return;
+      this.renewLockFile(partition);
       const leaseId = `singleton-lease-partition-${partition}`;
       try {
         await db.$executeRawUnsafe(`
@@ -692,6 +694,7 @@ export const GovernanceLedger = {
         const nextGen = this.incrementGeneration(partition);
         const meta: LockMetadata = {
           pid: process.pid,
+          hostname: os.hostname(),
           timestamp: new Date().toISOString(),
           generation: nextGen
         };
@@ -729,6 +732,7 @@ export const GovernanceLedger = {
         const nextGen = this.incrementGeneration(partition);
         const meta: LockMetadata = {
           pid: process.pid,
+          hostname: os.hostname(),
           timestamp: new Date().toISOString(),
           generation: nextGen
         };
@@ -768,21 +772,30 @@ export const GovernanceLedger = {
       if (fs.existsSync(lockFile)) {
         const raw = fs.readFileSync(lockFile, 'utf8');
         const meta: LockMetadata = JSON.parse(raw);
+        const hostname = os.hostname();
         
+        const isLocal = !meta.hostname || meta.hostname === hostname;
         let isProcessAlive = true;
-        try {
-          process.kill(meta.pid, 0);
-        } catch {
-          isProcessAlive = false;
+        
+        if (isLocal) {
+          try {
+            process.kill(meta.pid, 0);
+          } catch {
+            isProcessAlive = false;
+          }
         }
 
         const heldDuration = Date.now() - new Date(meta.timestamp).getTime();
         const isLeaseExpired = heldDuration > LOCK_LEASE_MS;
 
-        if (!isProcessAlive || isLeaseExpired) {
+        // If local, we ONLY steal if the process is actually dead.
+        // If remote, we steal if the lease has expired (meaning the remote host stopped renewing it).
+        const shouldSteal = isLocal ? !isProcessAlive : isLeaseExpired;
+
+        if (shouldSteal) {
           logger.warn(
-            { pid: meta.pid, heldDuration, isProcessAlive },
-            `[GovernanceLedger] Stale lock detected on partition ${partition} (process dead or lease expired). Forcing release...`
+            { pid: meta.pid, hostname: meta.hostname, heldDuration, isProcessAlive, isLocal },
+            `[GovernanceLedger] Stale lock detected on partition ${partition} (shouldSteal=true). Forcing release...`
           );
           this.releaseLockForce(partition);
         }
@@ -828,6 +841,27 @@ export const GovernanceLedger = {
       logger.error({ err: e }, `[GovernanceLedger] Failed to force release lock on partition ${partition}`);
     } finally {
       this.activeLockGenerations.delete(partition);
+    }
+  },
+
+  renewLockFile(partition: number): void {
+    const lockFile = this.getLockFile(partition);
+    const activeLockGen = this.activeLockGenerations.get(partition) ?? null;
+    if (activeLockGen === null) return;
+    try {
+      if (fs.existsSync(lockFile)) {
+        const raw = fs.readFileSync(lockFile, 'utf8');
+        const meta: LockMetadata = JSON.parse(raw);
+        if (meta.pid === process.pid && meta.generation === activeLockGen) {
+          const updatedMeta: LockMetadata = {
+            ...meta,
+            timestamp: new Date().toISOString()
+          };
+          fs.writeFileSync(lockFile, JSON.stringify(updatedMeta), 'utf8');
+        }
+      }
+    } catch (e) {
+      // ignore write race
     }
   },
 

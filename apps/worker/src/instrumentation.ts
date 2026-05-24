@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { initInstrumentation as startTracing } from '@packages/observability';
+import { initTracing as startTracing } from '@packages/observability';
 
 /**
  * Worker Instrumentation

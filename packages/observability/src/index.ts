@@ -2,6 +2,7 @@ import pino from 'pino';
 import { Registry, Counter, Histogram, Gauge } from 'prom-client';
 import { AsyncLocalStorage } from 'async_hooks';
 import * as http from 'http';
+import { trace } from '@opentelemetry/api';
 
 
 export const logger = pino();
@@ -250,4 +251,67 @@ export const correlationMiddleware = (req: any, res: any, next: any) => {
         next();
     });
 };
+
+// ZTAN Engine Telemetry, Tracing & Analytics
+export const tracer = trace.getTracer('ztan-runtime', '1.0.0');
+
+export const ztanWorkflowDurationSeconds = new Histogram({
+    name: 'ztan_workflow_duration_seconds',
+    help: 'Latency of completed workflows in seconds',
+    labelNames: ['workflow_name', 'status'],
+    registers: [registry]
+});
+
+export const ztanWorkflowReplayDurationSeconds = new Histogram({
+    name: 'ztan_workflow_replay_duration_seconds',
+    help: 'Time spent replaying workflow logs in seconds',
+    labelNames: ['workflow_name'],
+    registers: [registry]
+});
+
+export const ztanTaskQueueDepth = new Gauge({
+    name: 'ztan_task_queue_depth',
+    help: 'Current size of active execution task queue',
+    labelNames: ['workflow_id'],
+    registers: [registry]
+});
+
+export const ztanWalThroughputBytes = new Counter({
+    name: 'ztan_wal_throughput_bytes_total',
+    help: 'Total volume of WAL logs written in bytes',
+    registers: [registry]
+});
+
+export const ztanPartitionRingSize = new Gauge({
+    name: 'ztan_partition_ring_size',
+    help: 'Number of active nodes on consistent hash ring',
+    registers: [registry]
+});
+
+export const ztanQuorumLatencySeconds = new Histogram({
+    name: 'ztan_quorum_latency_seconds',
+    help: 'Quorum network replication latency in seconds',
+    registers: [registry]
+});
+
+export const ztanTenantExecutionsTotal = new Counter({
+    name: 'ztan_tenant_executions_total',
+    help: 'Total number of started workflow executions per tenant',
+    labelNames: ['tenant_id', 'workflow_name'],
+    registers: [registry]
+});
+
+export const ztanTenantStepExecutionsTotal = new Counter({
+    name: 'ztan_tenant_step_executions_total',
+    help: 'Total number of workflow steps executed per tenant',
+    labelNames: ['tenant_id', 'workflow_name', 'step_name'],
+    registers: [registry]
+});
+
+export const ztanDivergenceEventsTotal = new Counter({
+    name: 'ztan_divergence_events_total',
+    help: 'Total number of replay divergence incidents detected',
+    labelNames: ['workflow_name', 'mismatch_type'],
+    registers: [registry]
+});
 

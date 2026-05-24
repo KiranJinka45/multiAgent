@@ -1,8 +1,8 @@
 # Roadmap: Nexus ZTAN Production Infrastructure
 
 > [!IMPORTANT]
-> **ARCHITECTURE FREEZE ACTIVE (Started 2026-05-13)**
-> No new subsystems or governance layers are permitted. Focus is on maintenance, reliability, and simplification.
+> **CORE EXECUTION MODEL STABILIZED (Started 2026-05-13)**
+> Bounded operational hardening and subsystem evolution continue. Focus is on maintenance, reliability, and simplification.
 
 ## Current Era: Production Stewardship
 The platform has transitioned from development to long-term operational infrastructure. Success is measured by uptime, predictable recovery, and maintenance simplicity.
@@ -27,7 +27,7 @@ The platform has transitioned from development to long-term operational infrastr
 - [ ] **Evidence Collection** — Tracking actual uptime, MTTR, and maintenance burden.
 
 ## Milestone 36: Stewardship Engineering Era (v1.6.0-LTS)
-The platform prioritizes longitudinal operational resilience, observability, and absolute governance boundaries over feature expansion.
+The platform prioritizes longitudinal operational resilience, observability, and stabilized governance rules over feature expansion.
 
 ### Active Phases
 
@@ -64,7 +64,7 @@ The platform prioritizes longitudinal operational resilience, observability, and
 * **Evidence:** `STEWARDSHIP_ENGINEERING_REPORT.md` (Wave 4 section).
 
 ### Phase 51: Wave 5 — Performance Envelope Mapping
-* **Goal:** Map the absolute empirical capacity boundaries. Identify throughput thresholds for recovery replay, log compaction latency under high memory saturation, and lease acquisition contention limits.
+* **Goal:** Map the tested empirical capacity envelopes. Identify throughput thresholds for recovery replay, log compaction latency under high memory saturation, and lease acquisition contention limits.
 * **Status:** Active
 * **Evidence:** `STEWARDSHIP_ENGINEERING_REPORT.md` (Wave 5 section).
 

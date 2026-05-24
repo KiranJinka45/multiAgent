@@ -80,6 +80,11 @@ model Mission {
   type        String   @default("exploration")
   description String?
   margin      Float?   @default(0)
+  totalCostUsd Float?   @default(0)
+  internalOptimizationCost Float? @default(0)
+  computeDurationMs Int?   @default(0)
+  queueWaitMs Int?         @default(0)
+  scalingImpact Float?     @default(0)
   tenantId    String?
   tenant      Tenant?  @relation(fields: [tenantId], references: [id])
   metadata    Json?
@@ -307,4 +312,27 @@ model ZtanSnapshot {
   createdAt DateTime @default(now())
 
   @@index([epoch])
+}
+
+model SideEffectRecord {
+  id              String   @id @default(uuid())
+  idempotencyKey  String
+  operationType   String
+  status          String   @default("PENDING") // PENDING, COMMITTED, FAILED, RETRYABLE, ABORTED
+  attemptNumber   Int      @default(1)
+  metadata        Json?
+  executionId     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([operationType, idempotencyKey])
+  @@index([executionId])
+}
+
+model ZtanActiveLease {
+  id         String   @id @db.VarChar(50)
+  generation Int      @default(0)
+  owner_pid  Int
+  owner_host String   @db.VarChar(255)
+  heartbeat  DateTime @default(now())
 }

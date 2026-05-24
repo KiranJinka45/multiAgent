@@ -1,6 +1,6 @@
 import { BaseWorker } from './base-worker';
 import { Job } from '@packages/utils';
-import { JobPayload } from '@packages/utils';
+import type { JobPayload } from '@packages/utils';
 /**
  * BackendWorker
  *

@@ -938,6 +938,9 @@ importers:
       '@kubernetes/client-node':
         specifier: 1.0.0
         version: 1.0.0(encoding@0.1.13)
+      '@packages/agents':
+        specifier: workspace:*
+        version: link:../../packages/agents
       '@packages/auth-internal':
         specifier: workspace:*
         version: link:../../packages/auth-internal
@@ -959,9 +962,15 @@ importers:
       '@packages/observability':
         specifier: workspace:*
         version: link:../../packages/observability
+      '@packages/refactor-agent':
+        specifier: workspace:*
+        version: link:../../packages/refactor-agent
       '@packages/resilience':
         specifier: workspace:*
         version: link:../../packages/resilience
+      '@packages/self-evolution':
+        specifier: workspace:*
+        version: link:../../packages/self-evolution
       '@packages/utils':
         specifier: workspace:*
         version: link:../../packages/utils
@@ -1066,6 +1075,19 @@ importers:
       tsup:
         specifier: 8.5.1
         version: 8.5.1(@swc/core@1.15.33)(jiti@1.21.7)(postcss@8.5.10)(tsx@4.21.0)(typescript@5.5.4)(yaml@2.9.0)
+
+  packages/agents:
+    dependencies:
+      '@packages/utils':
+        specifier: workspace:*
+        version: link:../utils
+    devDependencies:
+      tsup:
+        specifier: 8.5.1
+        version: 8.5.1(@swc/core@1.15.33)(jiti@1.21.7)(postcss@8.5.10)(tsx@4.21.0)(typescript@5.5.4)(yaml@2.9.0)
+      typescript:
+        specifier: 5.5.4
+        version: 5.5.4
 
   packages/auth-internal:
     dependencies:
@@ -1332,6 +1354,19 @@ importers:
         specifier: 8.5.1
         version: 8.5.1(@swc/core@1.15.33)(jiti@1.21.7)(postcss@8.5.10)(tsx@4.21.0)(typescript@5.5.4)(yaml@2.9.0)
 
+  packages/refactor-agent:
+    dependencies:
+      '@packages/utils':
+        specifier: workspace:*
+        version: link:../utils
+    devDependencies:
+      tsup:
+        specifier: 8.5.1
+        version: 8.5.1(@swc/core@1.15.33)(jiti@1.21.7)(postcss@8.5.10)(tsx@4.21.0)(typescript@5.5.4)(yaml@2.9.0)
+      typescript:
+        specifier: 5.5.4
+        version: 5.5.4
+
   packages/reliability-intelligence:
     dependencies:
       '@packages/infra-graph':
@@ -1395,6 +1430,19 @@ importers:
         version: 5.5.4
 
   packages/runtime-core:
+    devDependencies:
+      tsup:
+        specifier: 8.5.1
+        version: 8.5.1(@swc/core@1.15.33)(jiti@1.21.7)(postcss@8.5.10)(tsx@4.21.0)(typescript@5.5.4)(yaml@2.9.0)
+      typescript:
+        specifier: 5.5.4
+        version: 5.5.4
+
+  packages/self-evolution:
+    dependencies:
+      '@packages/utils':
+        specifier: workspace:*
+        version: link:../utils
     devDependencies:
       tsup:
         specifier: 8.5.1

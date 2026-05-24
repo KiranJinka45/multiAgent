@@ -40,16 +40,12 @@ export async function runReliabilityAggregation() {
         // 3. Store in IntelligenceROI (Longitudinal Evidence)
         await db.intelligenceROI.create({
             data: {
+                tenantId: 'system',
                 period: `PULSE-${new Date().toISOString().split('T')[0]}`,
                 optimizations: successes,
                 failureRate: failureRate,
                 estimatedSavings: totalRevenue - totalCost,
-                efficiencyGain: roi,
-                metadata: {
-                    totalMissions: stats.total,
-                    reliabilityIndex: ri,
-                    source: 'reliability-aggregator-worker'
-                }
+                efficiencyGain: roi
             }
         });
 

@@ -313,6 +313,237 @@ diag
     }
   });
 
+diag
+  .command('vector-clocks')
+  .description('Query vector clocks across the cluster nodes')
+  .option('-u, --url <url>', 'Diagnostic server base URL (e.g. http://127.0.0.1:9090)')
+  .option('-w, --wal <walDir>', 'Local WAL directory to inspect offline')
+  .action(async (options) => {
+    authorize('diag');
+    console.log(chalk.cyan.bold('\n⏱️  ZTAN VECTOR CLOCKS'));
+    console.log('----------------------------------------------------');
+
+    if (options.url) {
+      try {
+        const res = await fetch(`${options.url}/api/diagnostics/vector-clocks`);
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        const data = await res.json() as any;
+        console.log(chalk.green('Successfully queried live clocks:'));
+        console.log(JSON.stringify(data.clocks, null, 2));
+      } catch (err: any) {
+        console.error(chalk.red(`❌ Failed to query live diagnostic server: ${err.message}`));
+      }
+    } else if (options.wal) {
+      try {
+        console.log(`Analyzing local WAL directory: ${options.wal}...`);
+        const { DurableSegmentedWal } = await import('@packages/production-pilot');
+        const wal = new DurableSegmentedWal({ walDir: options.wal });
+        const blocks = wal.recoverLedger();
+        console.log(`Found ${blocks.length} blocks in WAL.`);
+        const clocks: Record<string, number> = {};
+        for (const block of blocks) {
+          const payload = block.payload as any;
+          if (payload && payload.vectorClock) {
+            Object.assign(clocks, payload.vectorClock);
+          }
+        }
+        console.log(chalk.green('Reconstructed clocks from WAL:'));
+        console.log(JSON.stringify(clocks, null, 2));
+      } catch (err: any) {
+        console.error(chalk.red(`❌ Failed to analyze WAL: ${err.message}`));
+      }
+    } else {
+      console.log(chalk.yellow('No live URL or WAL path provided. Displaying mock cluster vector clocks:'));
+      console.log(JSON.stringify({
+        "node-1": 102,
+        "node-2": 98,
+        "node-3": 95
+      }, null, 2));
+    }
+  });
+
+diag
+  .command('lineage')
+  .argument('[taskId]', 'Task ID to reconstruct lineage for', 'task-default')
+  .description('View causal lineage DAG for a specific workflow task')
+  .option('-u, --url <url>', 'Diagnostic server base URL')
+  .option('-w, --wal <walDir>', 'Local WAL directory')
+  .action(async (taskId, options) => {
+    authorize('diag');
+    console.log(chalk.magenta.bold(`\n🌿 CAUSAL LINEAGE DAG: ${taskId}`));
+    console.log('----------------------------------------------------');
+
+    let dag: any;
+    if (options.url) {
+      try {
+        const res = await fetch(`${options.url}/api/diagnostics/lineage?taskId=${taskId}`);
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        dag = await res.json();
+        console.log(chalk.green('Successfully fetched live lineage DAG:'));
+      } catch (err: any) {
+        console.error(chalk.red(`❌ Failed to fetch live DAG: ${err.message}`));
+        return;
+      }
+    } else if (options.wal) {
+      try {
+        const { DiagnosticControlPlane, DurableSegmentedWal } = await import('@packages/production-pilot');
+        const wal = new DurableSegmentedWal({ walDir: options.wal });
+        const cp = new DiagnosticControlPlane('local', undefined, wal);
+        dag = cp.getLineageDAG(taskId);
+        console.log(chalk.green('Reconstructed lineage DAG from local WAL:'));
+      } catch (err: any) {
+        console.error(chalk.red(`❌ Failed to reconstruct DAG from WAL: ${err.message}`));
+        return;
+      }
+    } else {
+      console.log(chalk.yellow('No live URL or WAL path provided. Displaying mock lineage DAG:'));
+      dag = {
+        nodes: [
+          { id: 'start', label: 'Workflow Init', type: 'ingress' },
+          { id: 'step-1', label: 'Verify Balance', type: 'step' },
+          { id: 'step-2', label: 'Debit Account', type: 'step' },
+          { id: 'effect-1', label: 'External Gateway Post', type: 'side-effect' },
+          { id: 'end', label: 'Workflow Complete', type: 'step' }
+        ],
+        edges: [
+          { from: 'start', to: 'step-1', type: 'sequence' },
+          { from: 'step-1', to: 'step-2', type: 'causal' },
+          { from: 'step-2', to: 'effect-1', type: 'parent-child' },
+          { from: 'effect-1', to: 'end', type: 'causal' }
+        ]
+      };
+    }
+
+    console.log(chalk.bold('\nNodes:'));
+    for (const node of dag.nodes) {
+      let typeColor = chalk.white;
+      if (node.type === 'ingress') typeColor = chalk.blue;
+      if (node.type === 'step') typeColor = chalk.yellow;
+      if (node.type === 'side-effect') typeColor = chalk.magenta;
+      console.log(`  - [${typeColor(node.type.toUpperCase())}] ${chalk.bold(node.id)}: ${node.label}`);
+    }
+
+    console.log(chalk.bold('\nEdges:'));
+    for (const edge of dag.edges) {
+      console.log(`  * ${edge.from} ${chalk.cyan(`--[${edge.type}]-->`)} ${edge.to}`);
+    }
+  });
+
+diag
+  .command('diff')
+  .description('Diff two execution traces to detect replay divergence')
+  .option('-b, --baseline <file>', 'Baseline JSON trace file path')
+  .option('-r, --replay <file>', 'Replayed JSON trace file path')
+  .option('-u, --url <url>', 'Diagnostic server base URL to perform diff on')
+  .action(async (options) => {
+    authorize('diag');
+    console.log(chalk.cyan.bold('\n🔍 DETERMINISM DIFF ENGINE'));
+    console.log('----------------------------------------------------');
+
+    let result: any;
+    if (options.url && options.baseline && options.replay) {
+      try {
+        const fs = await import('node:fs');
+        const baseline = JSON.parse(fs.readFileSync(options.baseline, 'utf8'));
+        const replay = JSON.parse(fs.readFileSync(options.replay, 'utf8'));
+
+        const res = await fetch(`${options.url}/api/diagnostics/diff`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ baseline, replay })
+        });
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        result = await res.json();
+      } catch (err: any) {
+        console.error(chalk.red(`❌ Failed to perform remote trace diff: ${err.message}`));
+        return;
+      }
+    } else if (options.baseline && options.replay) {
+      try {
+        const fs = await import('node:fs');
+        const { DeterminismDiffEngine } = await import('@packages/production-pilot');
+        const baseline = JSON.parse(fs.readFileSync(options.baseline, 'utf8'));
+        const replay = JSON.parse(fs.readFileSync(options.replay, 'utf8'));
+        result = DeterminismDiffEngine.compareTraces(baseline, replay);
+      } catch (err: any) {
+        console.error(chalk.red(`❌ Failed to load and diff traces locally: ${err.message}`));
+        return;
+      }
+    } else {
+      console.log(chalk.yellow('No traces provided. Performing mock trace comparison:'));
+      const mockBaseline = [
+        { type: 'side-effect', id: 'eff-1', name: 'http_post', details: { status: 200 }, order: 0 }
+      ] as any[];
+      const mockReplay = [
+        { type: 'side-effect', id: 'eff-1', name: 'http_post', details: { status: 500 }, order: 0 }
+      ] as any[];
+      const { DeterminismDiffEngine } = await import('@packages/production-pilot');
+      result = DeterminismDiffEngine.compareTraces(mockBaseline, mockReplay);
+    }
+
+    if (result.diverged) {
+      console.log(chalk.red.bold(`\n🚨 REPLAY DIVERGENCE DETECTED`));
+      console.log(`- Mismatch Type:  ${chalk.bold(result.mismatchType)}`);
+      if (result.mismatchIndex !== undefined) {
+        console.log(`- Sequence Index: ${result.mismatchIndex}`);
+      }
+      console.log(`- Details:        ${chalk.yellow(result.details)}`);
+    } else {
+      console.log(chalk.green.bold('\n✅ DETERMINISTIC ALIGNMENT: Baseline and Replay traces are 100% equivalent.'));
+    }
+  });
+
+diag
+  .command('health')
+  .description('Monitor cluster health and replication status')
+  .option('-u, --url <url>', 'Diagnostic server base URL')
+  .action(async (options) => {
+    authorize('diag');
+    console.log(chalk.cyan.bold('\n🌐 ZTAN CLUSTER HEALTH & STATUS'));
+    console.log('----------------------------------------------------');
+
+    let healthData: any;
+    if (options.url) {
+      try {
+        const res = await fetch(`${options.url}/api/diagnostics/health`);
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        healthData = await res.json();
+      } catch (err: any) {
+        console.error(chalk.red(`❌ Failed to fetch cluster health from live server: ${err.message}`));
+        return;
+      }
+    } else {
+      console.log(chalk.yellow('No live URL provided. Displaying mock cluster health:'));
+      healthData = {
+        status: 'OPTIMAL',
+        quorum: true,
+        nodes: [
+          { nodeId: 'node-1', host: '127.0.0.1', port: 40001, status: 'ONLINE', activeConnectionsOut: ['node-2'], incomingConnectionCount: 1, lastSequence: 12 },
+          { nodeId: 'node-2', host: '127.0.0.1', port: 40002, status: 'ONLINE', activeConnectionsOut: [], incomingConnectionCount: 1, lastSequence: 12 },
+          { nodeId: 'node-3', host: '127.0.0.1', port: 40003, status: 'OFFLINE', activeConnectionsOut: [], incomingConnectionCount: 0, lastSequence: 10 }
+        ]
+      };
+    }
+
+    console.log(`Cluster Status:   ${healthData.status === 'OPTIMAL' ? chalk.green.bold('OPTIMAL') : chalk.yellow.bold(healthData.status)}`);
+    console.log(`Quorum Achieved:  ${healthData.quorum ? chalk.green('YES') : chalk.red('NO')}`);
+    console.log('\nNode Table:');
+    
+    console.log(chalk.bold('Node ID     | Host      | Port  | Status  | Out Connections | Incoming Sockets | WAL Sequence'));
+    console.log('------------------------------------------------------------------------------------------------');
+    for (const node of healthData.nodes) {
+      const idStr = node.nodeId.padEnd(11);
+      const hostStr = node.host.padEnd(9);
+      const portStr = String(node.port).padEnd(5);
+      const statusStr = (node.status === 'ONLINE' ? chalk.green('ONLINE ') : chalk.red('OFFLINE')).padEnd(7);
+      const outStr = String(node.activeConnectionsOut?.length || 0).padEnd(15);
+      const inStr = String(node.incomingConnectionCount || 0).padEnd(16);
+      const seqStr = String(node.lastSequence !== undefined ? node.lastSequence : 'N/A');
+      
+      console.log(`${idStr} | ${hostStr} | ${portStr} | ${statusStr} | ${outStr} | ${inStr} | ${seqStr}`);
+    }
+  });
+
 const econ = diag.command('econ').description('Economic Reliability & Efficiency Intelligence');
 
 econ

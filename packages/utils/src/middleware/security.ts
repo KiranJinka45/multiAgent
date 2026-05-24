@@ -92,6 +92,11 @@ export function createCsrfMiddleware(): (req: Request, res: Response, next: Next
       return next();
     }
 
+    // Skip for chaos/testing endpoints (SRE Programmatic Faults)
+    if (req.path.startsWith('/api/v1/chaos')) {
+      return next();
+    }
+
     // 2. Skip for internal service-to-service requests (Stewardship Era Bypass)
     const internalToken = req.headers['x-internal-token'];
     if (internalToken && internalToken === process.env.INTERNAL_SERVICE_TOKEN) {

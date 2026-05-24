@@ -69,18 +69,121 @@ const safePublish = async (channel: string, payload: string) => {
 
 export const eventBus: any = {
     ...baseEventBus,
+    publishStream: async (streamKey: string, payload: any, maxLen = 1000) => {
+        try {
+            await redis.xadd(streamKey, 'MAXLEN', '~', maxLen, '*', 'data', JSON.stringify(payload));
+        } catch (err: any) {
+            logger.error({ err: err.message, streamKey }, '[EventBus] publishStream failed');
+        }
+    },
+    getShardForTenant: (tenantId: string, totalShards = 16) => {
+        let hash = 0;
+        for (let i = 0; i < tenantId.length; i++) {
+            hash = (hash << 5) - hash + tenantId.charCodeAt(i);
+            hash |= 0;
+        }
+        return Math.abs(hash) % totalShards;
+    },
+    getPartitionedStream: (prefix: string, shard: string) => {
+        return `${prefix}:${shard}`;
+    },
+    createGroup: async (streamKey: string, groupName: string) => {
+        try {
+            await redis.xgroup('CREATE', streamKey, groupName, '$', 'MKSTREAM');
+        } catch (err: any) {
+            if (!err.message.includes('BUSYGROUP')) {
+                throw err;
+            }
+        }
+    },
+    subscribeGroup: async (streamKey: string, groupName: string, consumerName: string, cb: (event: any, id: string, deliveryCount: number) => Promise<void>) => {
+        const getDeliveryCount = async (msgId: string) => {
+            try {
+                const info = await redis.xpending(streamKey, groupName, msgId, msgId, 1);
+                if (info && info[0]) {
+                    return info[0][3] || 1;
+                }
+            } catch (e) {}
+            return 1;
+        };
+
+        const poll = async () => {
+            while (true) {
+                try {
+                    if (redis.status !== 'ready') {
+                        await new Promise(r => setTimeout(r, 1000));
+                        continue;
+                    }
+                    let results = await redis.xreadgroup('GROUP', groupName, consumerName, 'COUNT', 1, 'STREAMS', streamKey, '0');
+                    if (!results || results.length === 0 || results[0][1].length === 0) {
+                        results = await redis.xreadgroup('GROUP', groupName, consumerName, 'COUNT', 1, 'BLOCK', 1000, 'STREAMS', streamKey, '>');
+                    }
+                    if (results && results[0] && results[0][1] && results[0][1].length > 0) {
+                        const [id, fields] = results[0][1][0];
+                        let dataStr = '';
+                        for (let i = 0; i < fields.length; i += 2) {
+                            if (fields[i] === 'data') {
+                                dataStr = fields[i+1];
+                                break;
+                            }
+                        }
+                        if (dataStr) {
+                            const event = JSON.parse(dataStr);
+                            const deliveryCount = await getDeliveryCount(id);
+                            try {
+                                await cb(event, id, deliveryCount);
+                            } catch (err) {
+                                logger.error({ err, id }, '[EventBus] Error in stream consumer callback');
+                            }
+                        }
+                    }
+                } catch (err: any) {
+                    await new Promise(r => setTimeout(r, 2000));
+                }
+            }
+        };
+        poll();
+    },
+    acknowledge: async (streamKey: string, groupName: string, id: string) => {
+        try {
+            await redis.xack(streamKey, groupName, id);
+        } catch (err: any) {
+            logger.error({ err: err.message, streamKey, id }, '[EventBus] acknowledge failed');
+        }
+    },
+    replayStream: async (streamKey: string, lastId = '0', end = '+') => {
+        try {
+            const startId = lastId === '0' ? '0-0' : lastId;
+            const raw = await redis.xrange(streamKey, startId, end);
+            return (raw || []).map(([id, fields]: any) => {
+                let dataStr = '';
+                for (let i = 0; i < fields.length; i += 2) {
+                    if (fields[i] === 'data') {
+                        dataStr = fields[i+1];
+                        break;
+                    }
+                }
+                return {
+                    id,
+                    data: dataStr ? JSON.parse(dataStr) : {}
+                };
+            });
+        } catch (err: any) {
+            logger.error({ err: err.message, streamKey }, '[EventBus] replayStream failed');
+            return [];
+        }
+    },
     publish: async (topic: string, data: any, projectId?: string, tenantId?: string) => {
         const executionId = data.executionId || 'global';
         const finalTenantId = tenantId || data.tenantId || data._tenantId || 'system';
         const payloadObj = { ...data, type: topic, projectId, tenantId: finalTenantId, timestamp: new Date().toISOString() };
         await safePublish('build-events', JSON.stringify(payloadObj));
         try {
-            // 🛡️ Phase 2.6.3: Scoped Stream Keys
             const streamKey = finalTenantId === 'system' ? `mission:events:${executionId}` : `tenant:${finalTenantId}:mission:events:${executionId}`;
-            await (baseEventBus as any).publishStream(streamKey, payloadObj, 1000);
-            const shard = (baseEventBus as any).getShardForTenant(projectId || 'global', 16);
-            const globalStreamKey = (baseEventBus as any).getPartitionedStream('platform:mission:events', shard);
-            await (baseEventBus as any).publishStream(globalStreamKey, payloadObj, 10000, { backpressureLimit: 5000 });
+            await eventBus.publishStream(streamKey, payloadObj, 1000);
+            const shard = eventBus.getShardForTenant(projectId || 'global', 16);
+            const globalStreamKey = eventBus.getPartitionedStream('platform:mission:events', shard);
+            await eventBus.publishStream(globalStreamKey, payloadObj, 10000);
         } catch (e) {
             logger.error({ err: e, executionId }, '[Bridge] publishStream failed');
         }
@@ -116,7 +219,7 @@ export const eventBus: any = {
     readBuildEvents: async (executionId: string, lastId = '0') => {
         try {
             const streamKey = `build:stream:${executionId}`;
-            const results = await (baseEventBus as any).replayStream(streamKey, lastId, '+');
+            const results = await eventBus.replayStream(streamKey, lastId, '+');
             return results.map((r: any) => [r.id, r.data]);
         } catch (e) {
             logger.error({ err: e, executionId }, '[Bridge] readBuildEvents failed');
@@ -241,6 +344,7 @@ export const stateManager = {
 export const projectMemory = {
     get: async (...args: any[]) => ({ memory: [] }),
     update: async (...args: any[]) => { },
+    initializeMemory: async (...args: any[]) => {},
 };
 
 // Redis Initialization
@@ -555,6 +659,7 @@ export class Worker extends BullWorker {
             }
         };
         super(name, wrappedCb, { connection: redis, ...opts });
+        (this as any).processFn = wrappedCb;
     }
 }
 

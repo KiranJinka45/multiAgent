@@ -1,6 +1,6 @@
 import express from 'express';
 import type { Request, Response, RequestHandler } from 'express';
-import { createServer } from 'http';
+import http, { createServer } from 'http';
 import https from 'https';
 import fs from 'fs';
 import { Server } from 'socket.io';
@@ -95,10 +95,51 @@ export const registerRoutes = (app: any) => {
 };
 
 
+import chaosRouter from '../routes/chaos.js';
+
 // Debug/Chaos Endpoints
+app.use('/api/v1/chaos', express.json(), chaosRouter);
 app.use('/debug', debugRouter);
 app.use('/api/v1/ztan', ztanRouter);
 app.use('/api/v1/ztan/governance', express.json(), ztanGovRouter);
+
+// Preview Proxy Route for E2E validation
+app.use('/preview/:projectId', async (req: Request, res: Response) => {
+    const { projectId } = req.params;
+    if (!/^[a-zA-Z0-9_-]+$/.test(projectId)) {
+        res.status(400).send('Invalid project ID');
+        return;
+    }
+    try {
+        const targetPortStr = await redis.get(`preview:port:${projectId}`);
+        if (!targetPortStr) {
+            res.status(404).send('Preview not found or expired');
+            return;
+        }
+        const targetPort = parseInt(targetPortStr, 10);
+        
+        const path = req.originalUrl.replace(`/preview/${projectId}`, '') || '/';
+        
+        const proxyReq = http.request({
+            host: '127.0.0.1',
+            port: targetPort,
+            path: path,
+            method: req.method,
+            headers: req.headers
+        }, (proxyRes) => {
+            res.writeHead(proxyRes.statusCode || 200, proxyRes.headers);
+            proxyRes.pipe(res);
+        });
+        
+        proxyReq.on('error', (err) => {
+            res.status(500).send('Preview Proxy Error: ' + err.message);
+        });
+        
+        req.pipe(proxyReq);
+    } catch (err: any) {
+        res.status(500).send('Proxy setup error: ' + err.message);
+    }
+});
 
 // Health Check (Deep) - MUST come before global auth
 app.get('/api/v1/system-health', async (req, res) => {
@@ -172,6 +213,23 @@ app.get('/api/v1/system-health', async (req, res) => {
 // Minimal Health (Standardized)
 app.get('/health', (_req, res) => {
     res.json({ status: 'ok', service: 'core-api', timestamp: new Date().toISOString() });
+});
+
+// Readiness Probe (Deep health checking DB and Redis)
+app.get('/health/ready', async (_req, res) => {
+    try {
+        await db.$queryRaw`SELECT 1`;
+        if (redis.status !== 'ready' && redis.status !== 'connect') {
+            throw new Error('Redis connection is not active');
+        }
+        res.json({ status: 'ready', service: 'core-api', timestamp: new Date().toISOString() });
+    } catch (err) {
+        res.status(503).json({
+            status: 'unready',
+            service: 'core-api',
+            error: err instanceof Error ? err.message : String(err)
+        });
+    }
 });
 
 // --- SRE VALIDATION ENDPOINTS (PUBLIC FOR STRESS TEST) ---

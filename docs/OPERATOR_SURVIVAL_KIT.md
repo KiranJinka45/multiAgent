@@ -1,8 +1,11 @@
 # ZTAN Operator Survival Kit (Phase 9.3)
 
-This document is designed for SREs and Infrastructure Operators who are not authors of the ZTAN platform. It provides the minimum necessary context to survive a system failure and restore institutional trust.
+> [!NOTE]
+> This survival kit is designed for local test clusters and controlled simulated staging environments. It provides bounded recovery playbooks under tested failure scenarios, and does not claim absolute survivability, absolute resilience, or Byzantine-safe consensus in unconstrained open-internet production environments.
 
-## 🏛️ The Institutional Philosophy
+This document is designed for SREs and Infrastructure Operators who are not authors of the ZTAN platform. It provides the necessary context to troubleshoot system failures and restore coordinated state progression.
+
+## 🏛️ The Operational Philosophy
 In ZTAN, **Containment is more important than Throughput.** If you detect a failure, the first priority is isolation, not restoration.
 
 ## 🚨 Critical Indicators (Interpretation)
@@ -11,7 +14,7 @@ In ZTAN, **Containment is more important than Throughput.** If you detect a fail
 | --- | --- | --- |
 | `Isolation Violation` | A sandbox breach was detected. | **Quarantine the Cell.** Run `scripts/isolation-watchdog.ts`. |
 | `Semantic Drift > 30%` | Behavioral divergence detected. | **Pause Missions.** Re-validate baseline in `LongitudinalAnalyzer`. |
-| `Stability Score < 80` | **Predictive Risk.** System is degrading. | **Schedule Maintenance.** Rotate keys or perform cell resurrection. |
+| `Stability Score < 80` | **Predictive Risk.** System is degrading. | **Schedule Bounded Maintenance.** Rotate keys or perform cell resurrection. |
 | `Merkle Gap` | State lineage divergence. | **Hard Stop.** Verify history against Governance Merkle Tree. |
 
 ## 🛠️ Recovery Workflows
@@ -39,4 +42,4 @@ If the system is offline and tools are unavailable:
 - **Verify Isolation:** `npx ts-node scripts/verify-tenant-isolation.ts`
 
 ---
-*ZTAN Phase 9.3 — Operational Survivability Verified.*
+*ZTAN Phase 9.3 — Bounded Operational Survivability Verified under Tested Scenarios.*

@@ -1,7 +1,7 @@
 # Phase 9: Operationalization & Market-Validation
 
 ## Objective
-Finalize the transition of Nexus ZTAN from a sealed technical institution into a validated market participant. This phase focuses on real-world enterprise pilots, longitudinal trust accumulation, and certified economic sustainability, while strictly enforcing the Phase 8.6 constitutional freeze.
+Finalize the transition of Nexus ZTAN from a sealed technical institution into a validated market participant. This phase focuses on real-world enterprise pilots, longitudinal trust accumulation, and certified economic sustainability, while strictly enforcing the Phase 8.6 stabilized model baseline.
 
 ## Strategic Constraints
 - **NO NEW CORE ABSTRACTIONS**: The engine is sealed. All work must be external or administrative.
@@ -31,7 +31,7 @@ Finalize the transition of Nexus ZTAN from a sealed technical institution into a
 - Institutional continuity audit: Verifying that truth persists after operator turnover.
 
 ## Success Criteria
-- [ ] 3+ successful enterprise pilots with 100% forensic parity.
+- [ ] 3+ successful enterprise pilots with complete forensic parity in all tested transactions.
 - [ ] 0 violations of the Determinism Boundary in production environments.
-- [ ] 100% recovery success in external survivability drills.
+- [x] Verified recovery success in controlled external survivability drills (Phase 9.3).
 - [ ] Auditor CLI dossiers certified by third-party protocols.

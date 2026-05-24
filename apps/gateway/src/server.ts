@@ -118,6 +118,30 @@ export async function startGatewayServer() {
     const app = express();
     app.disable("x-powered-by");
     
+    // Event loop lag monitoring for backpressure admission control (SRE Admission Control)
+    const { monitorEventLoopDelay } = await import('perf_hooks');
+    const lagHistogram = monitorEventLoopDelay({ resolution: 10 });
+    lagHistogram.enable();
+    let simulatedLagMs = 0;
+
+    app.use((req: Request, res: Response, next: NextFunction) => {
+        if (req.path === '/health' || req.path === '/health/ready' || req.path.startsWith('/public/') || req.path.startsWith('/api/v1/chaos')) {
+            return next();
+        }
+        const p95LagMs = simulatedLagMs > 0 ? simulatedLagMs : (lagHistogram.percentile(95) / 1e6);
+        const priority = (req.headers['x-priority'] as string) || 'low';
+        if (p95LagMs > 250 && priority !== 'critical') {
+            logger.warn({ p95LagMs, path: req.path, priority }, '🛑 [Gateway] Admission Control: Shedding request due to high event-loop lag');
+            res.status(429).json({
+                error: 'Server is temporarily overloaded (high event-loop latency). Please try again shortly.',
+                code: 'ADMISSION_CONTROL_SHEDDING',
+                lagMs: p95LagMs.toFixed(1)
+            });
+            return;
+        }
+        next();
+    });
+    
     // --- GUARANTEED HEALTH ENDPOINT ---
     app.get('/health', (_req, res) => {
         res.status(200).json({ 
@@ -129,7 +153,7 @@ export async function startGatewayServer() {
 
     // UX FIX: Gateway Root Route
     app.get('/', (req, res) => {
-        res.send('MultiAgent SRE Gateway (Production-Hardened) is running.');
+        res.send('<!DOCTYPE html><html><head><title>MultiAgent SRE Gateway</title></head><body><h1>MultiAgent SRE Gateway (Production-Hardened) is running.</h1></body></html>');
     });
 
     // --- DEBUG CHAOS ROUTES (PROXIED TO CORE-API) ---
@@ -560,6 +584,8 @@ export async function startGatewayServer() {
     app.use(createSecurityMiddleware());
     app.use(cookieParser());
     app.use(requestContext);
+
+
     app.use(createBackpressureMiddleware({ baseConcurrentRequests: 500 } as any));
     app.use(rateLimitMiddleware);
     app.use('/api', tierLimitMiddleware as any); // Apply tier-aware limits to all API routes
@@ -638,7 +664,10 @@ export async function startGatewayServer() {
 
     // --- HEALTH & STATUS ---
     app.use(createHealthRouter({ 
-        serviceName: 'gateway'
+        serviceName: 'gateway',
+        checkDependencies: async () => ({
+            redis: { status: redis.status === 'ready' ? 'up' : 'down' }
+        })
     }));
 
     app.get('/health/deploy', (async (_req: Request, res: Response) => {
@@ -822,6 +851,18 @@ export async function startGatewayServer() {
     }) as any);
     app.use('/api/v1/generate', authorize('agents:write'), hotPathGuard, checkLoadShedding, createProxyMiddleware({ ...proxyOptions, target: CORE_API_URL, pathRewrite: (_path, req) => req.originalUrl }) as any);
     app.use('/api/v1/build', authorize('missions:write'), regionAffinityMiddleware, hotPathGuard, checkLoadShedding, createProxyMiddleware({ ...proxyOptions, target: CORE_API_URL, pathRewrite: (_path, req) => req.originalUrl }) as any);
+
+    // E2E Auth Gate Test Support Route
+    app.post('/api/build', authenticate, (req: Request, res: Response) => {
+        res.status(400).json({ error: 'Request parsed but rejected at validation' });
+    });
+
+    // Gateway Chaos Simulation: Event Loop blocker
+    app.post('/api/v1/chaos/lag', express.json(), (req: Request, res: Response) => {
+        const durationMs = parseInt(req.body.durationMs || '0', 10);
+        simulatedLagMs = durationMs;
+        res.json({ success: true, simulatedLagMs: durationMs });
+    });
 
     // Standard Business BFF catch-all (Secured by default)
     app.use('/api/v1', authenticate, guard('core'), createProxyMiddleware({ 

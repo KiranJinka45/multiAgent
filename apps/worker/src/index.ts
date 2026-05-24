@@ -54,7 +54,7 @@ async function waitForRedis(maxRetries = 15): Promise<void> {
  */
 async function safeImportWorker(name: string, path: string) {
     try {
-        console.log(`[DEBUG] Importing worker ${name} from path: ${path} (Resolved: ${require.resolve(path)})`);
+        console.log(`[DEBUG] Importing worker ${name} from path: ${path}`);
         await import(path);
 
         logger.info(`✅ [Worker] ${name} registered`);
@@ -152,7 +152,9 @@ async function bootstrap() {
     // Heartbeat for production visibility and Control Plane tracking
     setInterval(async () => {
         // 🛡️ Phase 25: Chaos Injection (Simulate random worker crash)
-        ChaosEngine.injectWorkerCrash();
+        if (process.env.ENABLE_CHAOS === 'true') {
+            ChaosEngine.injectWorkerCrash();
+        }
 
         const workerId = process.env.HOSTNAME || `worker-${process.pid}`;
         await redis.set(`worker:heartbeat:${workerId}`, 'active', 'EX', 30);

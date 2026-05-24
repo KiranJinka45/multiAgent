@@ -27,7 +27,7 @@
     "db:push": "npx prisma db push --schema=packages/db/prisma/schema.prisma --accept-data-loss",
     "db:seed": "echo 'No seed script available'",
     "postinstall": "node scripts/prisma-generate-safe.js --skip-if-exists",
-    "test:chaos": "tsx test/integration/chaos-test.ts",
+    "test:chaos": "tsx scripts/run-chaos-campaign.ts",
     "test:phase-e": "tsx scripts/run-phase-e-drills.ts",
     "test:survivability": "tsx scripts/run-survivability-drills.ts",
     "test:certify": "tsx test/integration/causal-certification.ts",
@@ -35,8 +35,8 @@
     "test:safety": "tsx test/security/test-safety.ts",
     "test:e2e": "tsx test/integration/e2e-validation.ts",
     "audit:cost": "tsx scripts/audit-cost-roi.ts",
-    "orchestrate": "tsx scripts/dev-orchestrator.ts",
-    "dev:all": "tsx scripts/dev-orchestrator.ts",
+    "orchestrate": "tsx scripts/start-dev.ts",
+    "dev:all": "tsx scripts/start-dev.ts",
     "validate:cloud": "tsx scripts/validate-cloud.ts"
   },
   "prisma": {
