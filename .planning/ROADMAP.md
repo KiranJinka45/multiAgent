@@ -79,6 +79,35 @@ The platform prioritizes longitudinal operational resilience, observability, and
 * **Status:** Complete
 * **Evidence:** [test-ops-certification.ts](file:///c:/multiagentic_project/multiAgent-main/test/integration/test-ops-certification.ts), [pg_envelope_report.json](file:///c:/multiagentic_project/multiAgent-main/reports/pg_envelope_report.json), `packages/core-engine/src/reporting/replay-certification.ts`, `packages/core-engine/src/reporting/resource-envelope-profiler.ts`, `packages/core-engine/src/reporting/operator-recovery-certification.ts`.
 
+## Next Era: Operational Consolidation & Maintenance Discipline
+
+With Phase Z (Empirical Reliability Certification) fully complete, ZTAN transitions entirely away from invention and active architectural expansion. The ecosystem enforces a **Stewardship & Maintenance Era** where success is measured exclusively by stability, operational evidence, and complexity reduction.
+
+### Strategic Priorities Matrix
+
+| Priority | Focus Area | Objective |
+| :--- | :--- | :--- |
+| **Highest** | **Operational Evidence** | Accumulating real drift reports, MTTR histories, and scaling data. |
+| **High** | **Maintenance Simplicity** | Restricting third-party dynamics and aggressive dead-code elimination. |
+| **High** | **Continuous Certification** | Integrating replay harnesses and compatibility checks into the CI pipeline. |
+| **High** | **Pilot Reliability** | Bounding operational pilots to friendly, observed environments. |
+| **Medium** | **Recovery Ergonomics** | Refining SRE playbooks and taming indicators for non-author operators. |
+| **Medium** | **Cost Profiling** | Auditing resource metrics, heap slopes, and storage footprints. |
+| **Low** | **New Features** | Strictly bounded and gated under invariant-safety checks. |
+| **Very Low** | **Architectural Expansion** | Capped under complexity budgets; subject to codeowner vetoes. |
+
+### Concrete Next Maintenance Workstreams
+
+1. **Continuous Certification CI Pipeline**:
+   - Integrate the `ReplayCertificationHarness` directly into the CI validation stages.
+   - Run replay regression verification on historical corpus logs upon every commit to prevent drift.
+2. **Stewardship & SLO Reporting**:
+   - Automate monthly operational reports tracking actual WAL bytes growth rates, average MTTR during blind SRE drills, and CPU loop lag trends.
+3. **Bounded Operational Pilot Program**:
+   - Deploy 1-3 tightly monitored friendly internal pilots with active rollback hooks and continuous forensic lineage audit logs.
+4. **Aggressive Simplification Campaign**:
+   - Audit and delete redundant observability metrics, dead compatibility shims, and duplicated helper classes across packages to minimize the maintenance footprint.
+
 ---
 ## Historical Milestones
 All previous development milestones (Phases 1-34) are complete. See [ROADMAP_ARCHIVE.md](./ROADMAP_ARCHIVE.md) for details.
