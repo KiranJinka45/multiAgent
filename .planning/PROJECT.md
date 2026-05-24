@@ -3,7 +3,7 @@
 > Core execution model stabilized. Bounded operational hardening and subsystem evolution continue under rigorous maintenance, security, and operational reliability objectives.
 
 ## Overview
-> **"A replayable infrastructure reliability platform focused on deterministic recovery, replay durability, operational clarity, and sustainable long-term maintenance."**
+> **"A replayable infrastructure reliability platform focused on bounded replay determinism under controlled operational assumptions, replay durability, operational clarity, and sustainable long-term maintenance."**
 
 Nexus ZTAN is an auditable production platform designed for long-term operational stability. It provides a tenant-partitioned operational coordination platform with cryptographic lineage validation for secure task execution and reliable system operation.
 
@@ -50,6 +50,23 @@ The platform operates on its current bounded architectural baseline. All future 
 - **Recursive Orchestration** — Avoids violation of boundedness and complexity cascades.
 - **Autonomous Expansion Systems** — Mitigates "operational drama" and preserves containment.
 - **New Cognition Engines** — Prevents reintroduction of instability.
+
+### Operational Failure Taxonomy
+
+To maintain operational discipline, failures inside the ZTAN runtime are categorized into six explicit classes:
+1. **Recoverable**: Auto-remedied via local retry policies or TCP connection backoffs (e.g. transient socket loss).
+2. **Operator-Required**: Schema mismatches, package hash verification failures, or cryptographic key revocations requiring direct administrator action.
+3. **Replay-Divergent**: Mismatching state transitions detected during log playback, indicating impurity leaks or version divergence.
+4. **Degraded-Mode**: Read-only workflows allowed but state changes fenced (e.g., active cluster membership below required quorum).
+5. **Quorum-Loss**: Total replication path failure resulting in write path fencing to protect data integrity.
+6. **Partial-Data-Loss**: Dynamic disk/media failure requiring cold-cluster disaster recovery restoration from active shipped backups.
+
+### Complexity Budgeting & Scope Control
+
+To mitigate maintenance collapse and operational fragmentation, the platform enforces strict architectural budgets:
+- **Zero Additional Subsystems**: The core architectural boundary is capped. No new modules, frameworks, or service adapters are permitted.
+- **Dependency Growth Restraint**: Dynamic external npm and system libraries are locked under codeowner approval gates.
+- **Observability Cardinality Bounds**: Metrics collection is strictly restricted to prevent metrics server exhaustion or log volume inflation.
 
 ## Context
 The platform has reached **Core Architectural Stability**. The focus has shifted from technical invention to operational stewardship. Success is now defined by the measurable history of reliable operation and stable infrastructure. ZTAN is a stable production platform for the long-term execution of governed infrastructure coordination tasks.
