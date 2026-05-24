@@ -5,7 +5,7 @@
 ## Overview
 > **"A replayable infrastructure reliability platform focused on bounded replay determinism under controlled operational assumptions, replay durability, operational clarity, and sustainable long-term maintenance."**
 
-Nexus ZTAN is an auditable production platform designed for long-term operational stability. It provides a tenant-partitioned operational coordination platform with cryptographic lineage validation for secure task execution and reliable system operation.
+Nexus ZTAN is an auditable, production-oriented research platform designed for long-term operational stability. It provides a tenant-partitioned operational coordination platform with cryptographic lineage validation for secure task execution and reliable system operation.
 
 ## Core Value
 **STABILITY AND SURVIVABILITY.** The system prioritizes predictable operation, reliable recovery, and maintenance simplicity.
@@ -64,12 +64,12 @@ To maintain operational discipline, failures inside the ZTAN runtime are categor
 ### Complexity Budgeting & Scope Control
 
 To mitigate maintenance collapse and operational fragmentation, the platform enforces strict architectural budgets:
-- **Zero Additional Subsystems**: The core architectural boundary is capped. No new modules, frameworks, or service adapters are permitted.
+- **Zero Additional Subsystems**: The core architectural boundary is capped. No new modules, frameworks, or service adapters are permitted without explicit governance review and empirical justification under active codeowner gate approval.
 - **Dependency Growth Restraint**: Dynamic external npm and system libraries are locked under codeowner approval gates.
 - **Observability Cardinality Bounds**: Metrics collection is strictly restricted to prevent metrics server exhaustion or log volume inflation.
 
 ## Context
-The platform has reached **Core Architectural Stability**. The focus has shifted from technical invention to operational stewardship. Success is now defined by the measurable history of reliable operation and stable infrastructure. ZTAN is a stable production platform for the long-term execution of governed infrastructure coordination tasks.
+The platform has reached **Core Architectural Stability**. The focus has shifted from technical invention to operational stewardship. Success is now defined by the measurable history of reliable operation and stable infrastructure. ZTAN is an operationally hardened orchestration prototype for the long-term execution of governed infrastructure coordination tasks.
 
 ## Constraints
 
