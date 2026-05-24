@@ -65,8 +65,18 @@ To maintain operational discipline, failures inside the ZTAN runtime are categor
 
 To mitigate maintenance collapse and operational fragmentation, the platform enforces strict architectural budgets:
 - **Zero Additional Subsystems**: The core architectural boundary is capped. No new modules, frameworks, or service adapters are permitted without explicit governance review and empirical justification under active codeowner gate approval.
-- **Dependency Growth Restraint**: Dynamic external npm and system libraries are locked under codeowner approval gates.
-- **Observability Cardinality Bounds**: Metrics collection is strictly restricted to prevent metrics server exhaustion or log volume inflation.
+- **Dependency Growth Restraint**: Dynamic external npm and system libraries are locked under codeowner approval gates and validated mechanically via dependency audit checks in CI.
+- **Observability Cardinality Bounds**: Metrics collection is strictly restricted to prevent metrics server exhaustion or log volume inflation, enforced via automated CI cardinality threshold alerts.
+- **Bundle & Package Size Gates**: Core package footprints are verified mechanically in CI to block regressions or dynamic require expansions.
+
+### Bounded Pilot Program Governance
+
+Any temporary operational pilot deployed on ZTAN must define explicit, strict boundaries to prevent it from mutating into an accidental, unmanaged production dependency:
+1. **Success Criteria**: Clear, pre-defined target metrics (e.g., 99.9% uptime over a 14-day window under nominal load).
+2. **Rollback Triggers**: Immediate, automated fallback conditions if the error rate exceeds 1% or if a `Replay-Divergent` event is detected.
+3. **Operational Freeze Thresholds**: Freezing pilot modifications if telemetry volume spikes or if any unexpected memory leak slope is observed.
+4. **Data Retention Limits**: Strict lifetime boundaries on dynamic logs and historical replay databases to prevent storage saturation.
+5. **Termination & Exit Criteria**: Mandatory program sunset deadlines (e.g., 30 days maximum duration) followed by a postmortem and total cleanup.
 
 ## Context
 The platform has reached **Core Architectural Stability**. The focus has shifted from technical invention to operational stewardship. Success is now defined by the measurable history of reliable operation and stable infrastructure. ZTAN is an operationally hardened orchestration prototype for the long-term execution of governed infrastructure coordination tasks.
@@ -74,7 +84,7 @@ The platform has reached **Core Architectural Stability**. The focus has shifted
 ## Constraints
 
 - **Strategic**: NO ARCHITECTURAL EXPANSION. Only operational stewardship.
-- **Safety**: High-confidence replay determinism and workflow convergence.
+- **Safety**: Bounded replay determinism and workflow convergence under controlled operational timing variance, treated as empirical baselines rather than mathematical proofs.
 - **Audit**: Bounded, tamper-evident operational lineage and long-horizon forensic auditability.
 - **Tech Stack**: Frozen monorepo architecture with stable, versioned APIs.
 
