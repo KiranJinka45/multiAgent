@@ -40,6 +40,7 @@ The platform prioritizes longitudinal operational resilience, observability, and
 | **50** | **Wave 4 — Real PostgreSQL Pathology Testing** | **Active** |
 | **51** | **Wave 5 — Performance Envelope Mapping** | **Active** |
 | **52** | **Wave 6 — Threat Modeling & Adversarial Review** | **Active** |
+| **Phase Z** | **Empirical Reliability Certification & Envelope Science** | **Complete** |
 
 ### Stewardship Engineering Waves Details
 
@@ -72,6 +73,11 @@ The platform prioritizes longitudinal operational resilience, observability, and
 * **Goal:** Simulate and prevent sophisticated security drift or credential override attacks, covering lease desynchronization, stale replica recovery, quarantine bypass, and replay poisoning.
 * **Status:** Active
 * **Evidence:** `STEWARDSHIP_ENGINEERING_REPORT.md` (Wave 6 section).
+
+### Phase Z: Empirical Reliability Certification & Operational Envelope Science
+* **Goal:** Certify empirical scaling curves and operational scaling envelopes over sustained drift and controlled workloads.
+* **Status:** Complete
+* **Evidence:** [test-ops-certification.ts](file:///c:/multiagentic_project/multiAgent-main/test/integration/test-ops-certification.ts), [pg_envelope_report.json](file:///c:/multiagentic_project/multiAgent-main/reports/pg_envelope_report.json), `packages/core-engine/src/reporting/replay-certification.ts`, `packages/core-engine/src/reporting/resource-envelope-profiler.ts`, `packages/core-engine/src/reporting/operator-recovery-certification.ts`.
 
 ---
 ## Historical Milestones

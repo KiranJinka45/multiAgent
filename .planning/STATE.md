@@ -30,6 +30,7 @@ See: [.planning/PROJECT.md](./PROJECT.md) (updated 2026-05-19)
     - [x] **Phase 51: Wave 5 — Performance Envelope Mapping** (Complete)
     - [x] **Phase 52: Wave 6 — Threat Modeling & Adversarial Review** (Complete)
     - [x] **Phase 9.3: Operational Survivability Drills (External)** (Complete)
+    - [x] **Phase Z: Empirical Reliability Certification & Envelope Science** (Complete)
 
 Status: Active Execution of Stewardship Waves 1-6 and Operationalization
 Last activity: 2026-05-24

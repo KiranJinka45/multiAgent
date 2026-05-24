@@ -1,0 +1,26 @@
+{
+  "scenario": "WAL_CORRUPTION",
+  "startTime": 1779646058223,
+  "endTime": 1779646058224,
+  "mttrMs": 1,
+  "success": true,
+  "actions": [
+    {
+      "timestamp": 1779646058224,
+      "actionName": "locate_latest_signed_evidence",
+      "isAmbiguous": false
+    },
+    {
+      "timestamp": 1779646058224,
+      "actionName": "view_wal_diagnostics",
+      "isAmbiguous": true
+    },
+    {
+      "timestamp": 1779646058224,
+      "actionName": "run_cell_resurrection",
+      "isAmbiguous": false
+    }
+  ],
+  "ambiguityScore": 10,
+  "reproducibilityRate": 0.75
+}

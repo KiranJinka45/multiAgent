@@ -1,0 +1,61 @@
+{
+  "timestamp": 1779646094359,
+  "measuredSnapshots": [
+    {
+      "connectionsCount": 10,
+      "lockWaitTimeMs": 0,
+      "vacuumQueueLength": 0,
+      "checkpointLatencyMs": 80,
+      "transactionThroughput": 920,
+      "status": "NOMINAL"
+    },
+    {
+      "connectionsCount": 30,
+      "lockWaitTimeMs": 0,
+      "vacuumQueueLength": 0,
+      "checkpointLatencyMs": 80,
+      "transactionThroughput": 760,
+      "status": "NOMINAL"
+    },
+    {
+      "connectionsCount": 60,
+      "lockWaitTimeMs": 209.89,
+      "vacuumQueueLength": 2,
+      "checkpointLatencyMs": 80,
+      "transactionThroughput": 520,
+      "status": "SATURATED"
+    },
+    {
+      "connectionsCount": 90,
+      "lockWaitTimeMs": 840.65,
+      "vacuumQueueLength": 5,
+      "checkpointLatencyMs": 4700,
+      "transactionThroughput": 280,
+      "status": "SATURATED"
+    },
+    {
+      "connectionsCount": 100,
+      "lockWaitTimeMs": 1617.49,
+      "vacuumQueueLength": 6,
+      "checkpointLatencyMs": 9200,
+      "transactionThroughput": 200,
+      "status": "PATHOLOGICAL"
+    },
+    {
+      "connectionsCount": 110,
+      "lockWaitTimeMs": 3155.89,
+      "vacuumQueueLength": 7,
+      "checkpointLatencyMs": 13700,
+      "transactionThroughput": 120,
+      "status": "PATHOLOGICAL"
+    }
+  ],
+  "connectionCeiling": 100,
+  "peakLockWaitMs": 3156,
+  "vacuumFreezeThreshold": 200000000,
+  "maxThroughputRps": 920,
+  "contentionHotspots": [
+    "CONNECTION_SATURATION_AT_100",
+    "CONNECTION_SATURATION_AT_110"
+  ]
+}
