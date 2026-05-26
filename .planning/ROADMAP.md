@@ -1,115 +1,30 @@
 # Roadmap: Nexus ZTAN Production Infrastructure
 
 > [!IMPORTANT]
-> **CORE EXECUTION MODEL STABILIZED (Started 2026-05-13)**
+> **CORE EXECUTION MODEL STABILIZED**
 > Bounded operational hardening and subsystem evolution continue. Focus is on maintenance, reliability, and simplification.
 
-## Current Era: Production Stewardship
-The platform has transitioned from development to long-term operational infrastructure. Success is measured by uptime, predictable recovery, and maintenance simplicity.
+## Milestones
 
-### Operational Cadence
-
-| Frequency | Activity | Goal |
-| :--- | :--- | :--- |
-| **Weekly** | Alert Review | Prune noisy telemetry and tune thresholds. |
-| **Weekly** | Dependency Review | Apply security patches and dependency updates. |
-| **Weekly** | Backup Validation | Verify data integrity of recent snapshots. |
-| **Monthly** | Recovery Drills | Test restoration in isolated environments. |
-| **Monthly** | Dashboard Audit | Remove unused or redundant visualizations. |
-| **Quarterly** | Disaster Recovery | Full-scale infrastructure restoration exercise. |
-| **Quarterly** | Security Audit | Complete CVE remediation and secrets rotation. |
-
-### Active Operational Objectives
-
-- [ ] **Maintenance Hygiene** — Consistent dependency updates and certificate rotation.
-- [ ] **Recovery Hardening** — Regular restoration drills and deterministic failover testing.
-- [ ] **Simplification** — Continuous removal of unused code, configs, and metrics.
-- [ ] **Evidence Collection** — Tracking actual uptime, MTTR, and maintenance burden.
-
-## Milestone 36: Stewardship Engineering Era (v1.6.0-LTS)
-The platform prioritizes longitudinal operational resilience, observability, and stabilized governance rules over feature expansion.
-
-### Active Phases
-
-| Phase | Description | Status |
-| :--- | :--- | :--- |
-| **35-44** | **Infrastructure Reliability Stewardship** | **Complete** |
-| **47** | **Wave 1 — Operational Soak & Stewardship Validation** | **Active** |
-| **48** | **Wave 2 — Observability & Operational Intelligence** | **Active** |
-| **49** | **Wave 3 — Governance Hardening / Longitudinal Evidence Science** | **Complete** |
-| **50** | **Wave 4 — Real PostgreSQL Pathology Testing** | **Active** |
-| **51** | **Wave 5 — Performance Envelope Mapping** | **Active** |
-| **52** | **Wave 6 — Threat Modeling & Adversarial Review** | **Active** |
-| **Phase Z** | **Empirical Reliability Certification & Envelope Science** | **Complete** |
-
-### Stewardship Engineering Waves Details
-
-### Phase 47: Wave 1 — Operational Soak & Stewardship Validation
-* **Goal:** Verify long-duration stability under continuous heavy transaction loads. Monitor memory consumption patterns, WAL growth/pruning, read-replica lag, autovacuum constraints, and transactional outbox behavior during prolonged database partitions.
-* **Status:** Active
-* **Evidence:** `STEWARDSHIP_ENGINEERING_REPORT.md` (Wave 1 section), `packages/production-validation/src/stewardship-engineering-suite.ts`.
-
-### Phase 48: Wave 2 — Observability & Operational Intelligence
-* **Goal:** Realize high-fidelity event lineage tracing and replay causality graphing. Establish telemetry for lease timelines, partition health metrics, lost-ACK retries, and fencing reject events.
-* **Status:** Active
-* **Evidence:** `STEWARDSHIP_ENGINEERING_REPORT.md` (Wave 2 section), observability dashboard metrics.
-
-### Phase 49: Wave 3 — Governance Hardening / Longitudinal Evidence Science
-* **Goal:** Harden operational and socio-technical boundaries. Set up mandatory invariant checking, reject unauthorized state machine transitions, and constitutionalize `INVARIANT_GOVERNANCE_CHARTER.md` under automated CI verification rules. Implement statistically rigorous longitudinal evidence tracking via deterministic `--canonical` campaigns, three-tier drift envelopes, noise-floor suppressed reproducibility analyzer ($CV$), and a rates-hardened telemetry dashboard.
-* **Status:** Complete
-* **Evidence:** [REPRODUCIBILITY_REPORT.md](file:///c:/multiagentic_project/multiAgent-main/reports/REPRODUCIBILITY_REPORT.md), [reproducibility_report.json](file:///c:/multiagentic_project/multiAgent-main/reports/reproducibility_report.json), `scripts/reproducibility-analyzer.ts`, `walkthrough.md`.
-
-### Phase 50: Wave 4 — Real PostgreSQL Pathology Testing
-* **Goal:** Harden ZTAN against catastrophic database level failures. Inject WAL corruption, simulated replica rewinds, failover under autovacuum freeze, checkpoint starvation, and fsync stalling.
-* **Status:** Active
-* **Evidence:** `STEWARDSHIP_ENGINEERING_REPORT.md` (Wave 4 section).
-
-### Phase 51: Wave 5 — Performance Envelope Mapping
-* **Goal:** Map the tested empirical capacity envelopes. Identify throughput thresholds for recovery replay, log compaction latency under high memory saturation, and lease acquisition contention limits.
-* **Status:** Active
-* **Evidence:** `STEWARDSHIP_ENGINEERING_REPORT.md` (Wave 5 section).
-
-### Phase 52: Wave 6 — Threat Modeling & Adversarial Review
-* **Goal:** Simulate and prevent sophisticated security drift or credential override attacks, covering lease desynchronization, stale replica recovery, quarantine bypass, and replay poisoning.
-* **Status:** Active
-* **Evidence:** `STEWARDSHIP_ENGINEERING_REPORT.md` (Wave 6 section).
-
-### Phase Z: Empirical Reliability Certification & Operational Envelope Science
-* **Goal:** Certify empirical scaling curves and operational scaling envelopes over sustained drift and controlled workloads.
-* **Status:** Complete
-* **Evidence:** [test-ops-certification.ts](file:///c:/multiagentic_project/multiAgent-main/test/integration/test-ops-certification.ts), [pg_envelope_report.json](file:///c:/multiagentic_project/multiAgent-main/reports/pg_envelope_report.json), `packages/core-engine/src/reporting/replay-certification.ts`, `packages/core-engine/src/reporting/resource-envelope-profiler.ts`, `packages/core-engine/src/reporting/operator-recovery-certification.ts`.
+- ✅ **v1.6.0 Stewardship Engineering Era** (Shipped: 2026-05-26)
+  - See archived roadmap: [v1.6.0-ROADMAP.md](file:///c:/multiagentic_project/multiAgent-main/.planning/milestones/v1.6.0-ROADMAP.md)
+  - See archived requirements: [v1.6.0-REQUIREMENTS.md](file:///c:/multiagentic_project/multiAgent-main/.planning/milestones/v1.6.0-REQUIREMENTS.md)
+  - See archived audit: [v1.6.0-MILESTONE-AUDIT.md](file:///c:/multiagentic_project/multiAgent-main/.planning/milestones/v1.6.0-MILESTONE-AUDIT.md)
 
 ## Next Era: Operational Consolidation & Maintenance Discipline
 
-With Phase Z (Empirical Reliability Certification) fully complete, ZTAN transitions entirely away from invention and active architectural expansion. The ecosystem enforces a **Stewardship & Maintenance Era** where success is measured exclusively by stability, operational evidence, and complexity reduction.
+ZTAN has transitioned entirely away from invention and active architectural expansion. The ecosystem enforces a **Stewardship & Maintenance Era** where success is measured exclusively by stability, operational evidence, and complexity reduction.
+
+### Permanent Rule: Absolute Freeze on Governance Primitives
+To avoid governance self-reference saturation and recursion pressure, the addition of any new first-class governance primitives, orchestrational layers, or active automated correction engines is strictly banned.
 
 ### Strategic Priorities Matrix
-
 | Priority | Focus Area | Objective |
 | :--- | :--- | :--- |
-| **Highest** | **Operational Evidence** | Accumulating real drift reports, MTTR histories, and scaling data. |
-| **High** | **Maintenance Simplicity** | Restricting third-party dynamics and aggressive dead-code elimination. |
-| **High** | **Continuous Certification** | Integrating replay harnesses and compatibility checks into the CI pipeline. |
-| **High** | **Pilot Reliability** | Bounding operational pilots to friendly, observed environments. |
-| **Medium** | **Recovery Ergonomics** | Refining SRE playbooks and taming indicators for non-author operators. |
-| **Medium** | **Cost Profiling** | Auditing resource metrics, heap slopes, and storage footprints. |
-| **Low** | **New Features** | Strictly bounded and gated under invariant-safety checks. |
-| **Very Low** | **Architectural Expansion** | Capped under complexity budgets; subject to codeowner vetoes. |
-
-### Concrete Next Maintenance Workstreams
-
-1. **Continuous Certification CI Pipeline**:
-   - Integrate the `ReplayCertificationHarness` directly into the CI validation stages.
-   - Run replay regression verification on historical corpus logs upon every commit to prevent drift.
-2. **Stewardship & SLO Reporting**:
-   - Automate monthly operational reports tracking actual WAL bytes growth rates, average MTTR during blind SRE drills, and CPU loop lag trends.
-3. **Bounded Operational Pilot Program**:
-   - Deploy 1-3 tightly monitored friendly internal pilots with active rollback hooks and continuous forensic lineage audit logs.
-4. **Aggressive Simplification Campaign**:
-   - Audit and delete redundant observability metrics, dead compatibility shims, and duplicated helper classes across packages to minimize the maintenance footprint.
+| **Highest** | **Operational Evidence** | Accumulating real drift reports, MTTR histories, and scaling data across Target/Observed/Certified SLO bounds. |
+| **High** | **Maintenance Simplicity** | Restricting third-party dynamics, enforcing complexity budgets, and aggressive dead-code elimination. |
+| **High** | **Continuous Certification** | Integrating replay harnesses and immutable corpus verification in sandboxes. |
+| **Low** | **New Features** | Banned (Stewardship freeze in place). |
 
 ---
-## Historical Milestones
-All previous development milestones (Phases 1-34) are complete. See [ROADMAP_ARCHIVE.md](./ROADMAP_ARCHIVE.md) for details.
-
-*Last updated: 2026-05-16 — Stewardship Observation Cycle Active.*
+*Last updated: 2026-05-26 after v1.6.0 milestone completion*

@@ -10,7 +10,7 @@ async function runLedgerCompactionValidation() {
 
   // 1. Pristine reset
   console.log('[RESET] Setting up pristine database and filesystem environment...');
-  await db.$executeRawUnsafe(`TRUNCATE TABLE "ZtanLedgerBlock" RESTART IDENTITY CASCADE;`);
+  await db.$executeRawUnsafe(`TRUNCATE TABLE "ZtanLedgerBlock", "ZtanWalLog", "ZtanSnapshot", "ZtanActiveLease", "ZtanPayloadAttestation", "ZtanQuarantineBlob", "IdempotencyRecord", "AuditLog" RESTART IDENTITY CASCADE;`);
   
   const ledgerDir = path.join(process.cwd(), '.ztan-transparency');
   if (fs.existsSync(ledgerDir)) {
@@ -29,7 +29,8 @@ async function runLedgerCompactionValidation() {
   for (let i = 0; i < 150; i++) {
     const lockExists = fs.existsSync(LOCK_FILE);
     const outboxStatus = GovernanceLedger.getOutboxStatus();
-    if (!lockExists && outboxStatus.synchronized) {
+    const state = GovernanceLedger.getState(0);
+    if ((state === 'ACTIVE' || state === 'DEGRADED') && !lockExists && outboxStatus.synchronized) {
       syncSettled = true;
       break;
     }
@@ -67,9 +68,13 @@ async function runLedgerCompactionValidation() {
   // 4. Wait for full Postgres synchronization
   console.log('[TEST] Waiting for replication parity with PostgreSQL consensus storage...');
   let settled = false;
+  const localCount = initialLedger.length;
+  const EXPECTED_TOTAL = localCount;
   for (let i = 0; i < 50; i++) {
-    const dbCount = await db.ztanLedgerBlock.count();
-    if (dbCount === initialLedger.length) {
+    const allDbBlocks = await db.ztanLedgerBlock.findMany().catch(() => []);
+    const dbCount = allDbBlocks.filter((b: any) => !isNaN(parseInt(b.blockId, 10))).length;
+    console.log(`  - Checking parity: Local size = ${localCount}, PostgreSQL size = ${dbCount} (Expected: ${EXPECTED_TOTAL})`);
+    if (dbCount === EXPECTED_TOTAL) {
       settled = true;
       console.log(`  - Replicated! PostgreSQL settled with ${dbCount} blocks.`);
       break;

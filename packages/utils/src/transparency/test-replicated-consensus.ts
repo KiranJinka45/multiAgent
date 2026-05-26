@@ -21,7 +21,7 @@ async function runReplicatedConsensusValidation() {
 
   // 1. Pristine reset to avoid cross-test contamination
   console.log('[RESET] Setting up clean test workspaces...');
-  await db.$executeRawUnsafe(`TRUNCATE TABLE "ZtanLedgerBlock" RESTART IDENTITY CASCADE;`);
+  await db.$executeRawUnsafe(`TRUNCATE TABLE "ZtanLedgerBlock", "ZtanWalLog", "ZtanSnapshot", "ZtanActiveLease", "ZtanPayloadAttestation", "ZtanQuarantineBlob", "IdempotencyRecord", "AuditLog" RESTART IDENTITY CASCADE;`);
   
   const fs = await import('node:fs');
   const path = await import('node:path');
@@ -42,7 +42,8 @@ async function runReplicatedConsensusValidation() {
   for (let i = 0; i < 150; i++) {
     const lockExists = fs.existsSync(LOCK_FILE);
     const outboxStatus = GovernanceLedger.getOutboxStatus();
-    if (!lockExists && outboxStatus.synchronized) {
+    const state = GovernanceLedger.getState(0);
+    if ((state === 'ACTIVE' || state === 'DEGRADED') && !lockExists && outboxStatus.synchronized) {
       syncSettled = true;
       break;
     }
@@ -84,7 +85,8 @@ async function runReplicatedConsensusValidation() {
   
   let settled = false;
   for (let i = 0; i < 50; i++) {
-    const dbCount = await db.ztanLedgerBlock.count();
+    const allDbBlocks = await db.ztanLedgerBlock.findMany().catch(() => []);
+    const dbCount = allDbBlocks.filter((b: any) => !isNaN(parseInt(b.blockId, 10))).length;
     if (dbCount >= expectedBlockCount) {
       settled = true;
       console.log(`  - Parity achieved! Found ${dbCount} blocks in PostgreSQL.`);

@@ -41,6 +41,9 @@ export interface PilotMetadata {
     name: string;
     type: 'UNIVERSITY' | 'SANDBOX' | 'SOVEREIGN' | 'FINTECH' | 'INTERNAL' | 'HEALTHCARE';
     onboardingDate: string;
+    sunsetDate: string; // Dynamic lease expiration date (Layer 7)
+    maxConcurrencyQuota: number;
+    driftRollbackThreshold: number; // Maximum allowed dynamic semantic drift (e.g. 0.3)
     status: 'ACTIVE' | 'HIBERNATING' | 'COMPLETED';
     associatedCells: string[];
     profile: DeploymentProfile;
@@ -57,21 +60,27 @@ export interface HealthReport {
 export class InstitutionalPilotRegistry {
     private static REGISTRY_PATH = path.join(process.cwd(), '.ztan', 'pilot-registry.json');
 
-    static registerPilot(name: string, type: PilotMetadata['type']): PilotMetadata {
+    static registerPilot(name: string, type: PilotMetadata['type'], options?: { sunsetDays?: number; quota?: number; driftThreshold?: number }): PilotMetadata {
         const pilots = this.listPilots();
         const profile = DEPLOYMENT_PROFILES[type] || DEPLOYMENT_PROFILES['INTERNAL'];
+        const onboardingDate = new Date();
+        const sunsetDate = new Date(onboardingDate.getTime() + (options?.sunsetDays ?? 30) * 24 * 60 * 60 * 1000);
+        
         const pilot: PilotMetadata = {
             id: `PILOT-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
             name,
             type,
-            onboardingDate: new Date().toISOString(),
+            onboardingDate: onboardingDate.toISOString(),
+            sunsetDate: sunsetDate.toISOString(),
+            maxConcurrencyQuota: options?.quota ?? 10,
+            driftRollbackThreshold: options?.driftThreshold ?? 0.30,
             status: 'ACTIVE',
             associatedCells: [],
             profile
         };
         pilots.push(pilot);
         this.savePilots(pilots);
-        logger.info(`📝 Registered Institutional Pilot: ${pilot.name} (${pilot.id}) [Profile: ${type}]`);
+        logger.info(`📝 Registered Institutional Pilot: ${pilot.name} (${pilot.id}) [Profile: ${type}] [Sunset: ${pilot.sunsetDate}]`);
         return pilot;
     }
 
@@ -106,6 +115,37 @@ export class InstitutionalPilotRegistry {
         }
     }
 
+    /**
+     * Assures lease and quota restrictions are mechanically enforced.
+     */
+    static validateExecutionAllowed(pilotId: string, currentConcurrency: number, currentDrift: number): { allowed: boolean; reason?: string } {
+        const pilot = this.getPilot(pilotId);
+        if (!pilot) {
+            return { allowed: false, reason: `Pilot registry entry '${pilotId}' not found.` };
+        }
+
+        if (pilot.status !== 'ACTIVE') {
+            return { allowed: false, reason: `Pilot is in status [${pilot.status}].` };
+        }
+
+        // 1. Sunset Date Enforcement
+        if (new Date() > new Date(pilot.sunsetDate)) {
+            return { allowed: false, reason: `LEASE_EXPIRED: Pilot program lease expired on ${pilot.sunsetDate}.` };
+        }
+
+        // 2. Concurrency Quota Check
+        if (currentConcurrency > pilot.maxConcurrencyQuota) {
+            return { allowed: false, reason: `CONCURRENCY_QUOTA_EXCEEDED: Active concurrency ${currentConcurrency} exceeds quota ceiling of ${pilot.maxConcurrencyQuota}.` };
+        }
+
+        // 3. Dynamic Drift Rollback Threshold Check
+        if (currentDrift > pilot.driftRollbackThreshold) {
+            return { allowed: false, reason: `DYNAMIC_DRIFT_ROLLBACK_TRIGGERED: Semantic drift ${currentDrift} exceeds safety threshold of ${pilot.driftRollbackThreshold}. Initiating emergency rollback.` };
+        }
+
+        return { allowed: true };
+    }
+
     private static savePilots(pilots: PilotMetadata[]): void {
         const dir = path.dirname(this.REGISTRY_PATH);
         if (!fs.existsSync(dir)) {
@@ -114,6 +154,7 @@ export class InstitutionalPilotRegistry {
         fs.writeFileSync(this.REGISTRY_PATH, JSON.stringify(pilots, null, 2));
     }
 }
+
 
 export class ProductionPilot {
     /**

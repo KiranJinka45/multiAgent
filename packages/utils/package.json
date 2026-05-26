@@ -23,7 +23,6 @@
     "@packages/config": "workspace:*",
     "@packages/db": "workspace:*",
     "@packages/observability": "workspace:*",
-    "@packages/runtime-core": "workspace:*",
     "@packages/validator": "workspace:*",
     "@types/cors": "2.8.19",
     "@types/express": "5.0.6",

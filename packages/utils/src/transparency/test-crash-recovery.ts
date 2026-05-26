@@ -23,7 +23,7 @@ const __dirname = path.dirname(__filename);
 
 async function resetEnvironment(): Promise<void> {
   console.log('[RESET] Wiping database tables and local filesystem state...');
-  await db.$executeRawUnsafe(`TRUNCATE TABLE "ZtanLedgerBlock" RESTART IDENTITY CASCADE;`);
+  await db.$executeRawUnsafe(`TRUNCATE TABLE "ZtanLedgerBlock", "ZtanWalLog", "ZtanSnapshot", "ZtanActiveLease", "ZtanPayloadAttestation", "ZtanQuarantineBlob", "IdempotencyRecord", "AuditLog" RESTART IDENTITY CASCADE;`);
   await db.$executeRawUnsafe(`TRUNCATE TABLE "ZtanActiveLease" RESTART IDENTITY CASCADE;`);
   await db.$executeRawUnsafe(`TRUNCATE TABLE "ZtanWalLog" RESTART IDENTITY CASCADE;`);
   await db.$executeRawUnsafe(`TRUNCATE TABLE "AuditLog" RESTART IDENTITY CASCADE;`);

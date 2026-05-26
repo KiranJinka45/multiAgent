@@ -206,6 +206,20 @@ try {
     expectedJcs,
     'IEEE 754 Float Trailing Zero Truncation'
   );
+
+  // Negative Zero Determinism Parity
+  assertEqual(
+    canonicalizeJCS({ scale: -0 }),
+    '{"scale":0}',
+    'JCS Negative Zero Normalization'
+  );
+
+  // Scientific Exponent Format Parity
+  assertEqual(
+    canonicalizeJCS({ bigNum: 1e+21 }),
+    '{"bigNum":1e21}',
+    'JCS Scientific Exponent + Sign Removal'
+  );
 } catch (e: any) {
   console.error('[ERROR] Runtime sanity checks failed:', e.message);
 }

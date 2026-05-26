@@ -74,7 +74,7 @@ import { StewardshipService } from '../../stewardship.service';
               <div *ngFor="let drill of (state$ | async)?.drills" 
                    class="drill-card" 
                    [class.active]="drill.status === 'ACTIVE'"
-                   [class.passed]="drill.status?.includes('PASSED')">
+                   [class.passed]="drill.status.includes('PASSED')">
                 <div class="d-info">
                   <div class="d-header">
                     <span class="d-id">{{ drill.id }}</span>

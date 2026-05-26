@@ -6,6 +6,25 @@ async function runChildAppender() {
   // Wait a small bit to align execution with parent
   await new Promise(resolve => setTimeout(resolve, 100));
 
+  GovernanceLedger.init();
+  let retries = 0;
+  const count = GovernanceLedger.getPartitionCount();
+  let allActive = false;
+  while (!allActive && retries < 50) {
+    allActive = true;
+    for (let p = 0; p < count; p++) {
+      if (GovernanceLedger.getState(p) !== 'ACTIVE') {
+        allActive = false;
+        break;
+      }
+    }
+    if (!allActive) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      retries++;
+    }
+  }
+  GovernanceLedger.stopBackgroundTasks();
+
   for (let i = 1; i <= 10; i++) {
     try {
       const payload = `ZTAN-CONCURRENT-CHILD-${i}: Operator ceremony child lock write`;

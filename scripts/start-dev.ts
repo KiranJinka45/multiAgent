@@ -180,7 +180,7 @@ function cleanupStaleProcesses() {
         { name: 'Auth Service', port: 4005 },
         { name: 'Worker', port: 8082 },
         { name: 'Gateway', port: 3500 },
-        { name: 'Frontend', port: 4200 }
+        { name: 'Frontend', port: 4210 }
     ];
     
     for (const service of services) {
@@ -258,7 +258,7 @@ async function startService(command: string, args: string[], cwd: string, servic
         'Auth Service': 4005,
         'Worker': 8082,
         'Gateway': 3500,
-        'Frontend': 4200
+        'Frontend': 4210
     };
     const port = servicePorts[serviceName];
     if (port) {
@@ -474,11 +474,11 @@ async function main() {
         process.exit(1);
     }
 
-    // 5. Frontend (4200)
-    console.log('🚀 Starting Frontend (Angular Development Server)...');
+    // 5. Frontend (4210)
+    console.log('🚀 Starting Frontend (Angular Development Server on port 4210)...');
     await startService('pnpm', ['--filter', '@apps/stewardship-console', 'run', 'start'], '.', 'Frontend');
 
-    const frontendHealthy = await verifyStabilizedHealth('http://localhost:4200', 'Frontend', 60);
+    const frontendHealthy = await verifyStabilizedHealth('http://localhost:4210', 'Frontend', 60);
     if (!frontendHealthy) {
         console.error('❌ [Orchestrator] Frontend failed to stabilize. Aborting.');
         cleanup();
@@ -491,7 +491,7 @@ async function main() {
     console.log('\n╔══════════════════════════════════════════════════════════╗');
     console.log('║                ALL SERVICES OPERATIONAL                  ║');
     console.log('╠══════════════════════════════════════════════════════════╣');
-    console.log('║  👉 Stewardship Dashboard : http://localhost:4200       ║');
+    console.log('║  👉 Stewardship Dashboard : http://localhost:4210       ║');
     console.log('║  👉 Express API Gateway    : http://localhost:3500       ║');
     console.log('║  👉 ZTAN Core API          : http://localhost:3010       ║');
     console.log('║  👉 Authenticated Auth API : http://localhost:4005       ║');

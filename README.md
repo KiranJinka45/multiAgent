@@ -1,4 +1,4 @@
-# Nexus ZTAN: Governed Autonomous Execution Infrastructure
+# Nexus ZTAN: Bounded Operational Pathology, Replay Archaeology, Telemetry Compaction, and Operational Stewardship Laboratory
 
 > **STATUS**: **OPERATIONALLY COMPLETE** 🛡️
 >

@@ -41,5 +41,22 @@ If the system is offline and tools are unavailable:
 - **Generate Evidence Pack:** `npx ts-node scripts/generate-trust-report.ts`
 - **Verify Isolation:** `npx ts-node scripts/verify-tenant-isolation.ts`
 
+## 💾 Durability & Filesystem Assumptions
+
+The Write-Ahead Log (WAL) and Atomic Snapshot layers rely on physical filesystem guarantees to survive power loss and hard crash scenarios.
+
+### 1. Platform-Specific Durability Barriers
+* **UNIX/POSIX (Linux, macOS)**: ZTAN enforces **Parent Directory `fsync`** barriers. During WAL rotations, segment creations, and atomic snapshot renames, ZTAN opens the parent directory's file descriptor and calls `fsync()` directly. This guarantees catalog directory metadata updates are committed to non-volatile storage blocks, preventing directory entry loss.
+* **Windows (Win32/NTFS)**: Opening directory descriptors for writing is blocked at the OS layer (`EPERM`). On Windows, ZTAN automatically bypasses parent directory `fsync` operations, relying strictly on file-level metadata flushes.
+
+### 2. Supported Storage Environments
+* **Local POSIX Journaling Filesystems**: Ext4, XFS, and APFS running on block storage. These provide fully reliable metadata and segment ordering guarantees.
+
+### 3. Virtualization & Network Storage Limits (Warnings)
+Operators must account for the following virtualized storage behaviors:
+* **Docker Volumes & OverlayFS**: Under default `overlayfs` setups, directory `fsync` commands may become no-ops or trigger storage driver performance bottlenecks. SREs should use bind-mounts pointing directly to a host native ext4/XFS filesystem.
+* **WSL2 (Windows Subsystem for Linux)**: WSL2 routes storage writes through virtual disk files (`ext4.vhdx`). A parent directory `fsync` inside WSL2 guarantees durability only up to the Hyper-V host cache, not to physical non-volatile silicon, unless the host drive cache flushing is explicitly secured.
+* **Network Filesystems (NFS, SMB/CIFS)**: Calling `fsync` on directory handles is frequently ignored, returns errors, or introduces severe latency overhead. Running ZTAN WAL directories on shared network mounts is **strictly unsupported**.
+
 ---
 *ZTAN Phase 9.3 — Bounded Operational Survivability Verified under Tested Scenarios.*

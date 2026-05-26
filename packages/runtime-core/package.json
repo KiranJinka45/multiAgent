@@ -10,6 +10,11 @@
     "dev": "tsup src/index.ts --format esm --no-dts --watch",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "@packages/production-pilot": "workspace:*",
+    "@packages/utils": "workspace:*",
+    "@prisma/client": "5.22.0"
+  },
   "devDependencies": {
     "tsup": "8.5.1",
     "typescript": "5.5.4"

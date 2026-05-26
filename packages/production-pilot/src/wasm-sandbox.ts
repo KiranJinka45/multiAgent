@@ -117,6 +117,9 @@ export class WasmSandbox {
     }
 
     private readString(memory: WebAssembly.Memory, offset: number, len: number): string {
+        if (memory.buffer.byteLength === 0) {
+            throw new Error('[WASM-SANDBOX::DETACHED_BUFFER] Host memory read failed: WebAssembly linear memory buffer is detached.');
+        }
         if (offset + len > memory.buffer.byteLength) {
             throw new Error('[WASM-SANDBOX::OUT_OF_BOUNDS] Memory read exceeded linear memory allocation bounds.');
         }
@@ -126,12 +129,17 @@ export class WasmSandbox {
 
     private writeString(memory: WebAssembly.Memory, offset: number, maxLen: number, str: string): number {
         const bytes = new TextEncoder().encode(str);
+        if (memory.buffer.byteLength === 0) {
+            throw new Error('[WASM-SANDBOX::DETACHED_BUFFER] Host memory write failed: WebAssembly linear memory buffer is detached.');
+        }
+        if (bytes.length > maxLen) {
+            throw new Error(`[WASM-SANDBOX::BUFFER_OVERFLOW] Serialized payload size ${bytes.length} bytes exceeds allocated guest buffer limit of ${maxLen} bytes.`);
+        }
         if (offset + maxLen > memory.buffer.byteLength) {
             throw new Error('[WASM-SANDBOX::OUT_OF_BOUNDS] Memory write exceeded linear memory allocation bounds.');
         }
         const target = new Uint8Array(memory.buffer, offset, maxLen);
-        const len = Math.min(bytes.length, maxLen);
-        target.set(bytes.subarray(0, len));
-        return len;
+        target.set(bytes);
+        return bytes.length;
     }
 }

@@ -22,6 +22,7 @@
       "@packages/contracts": ["packages/contracts/dist/index.d.ts"],
       "@packages/observability": ["packages/observability/dist/index.d.ts"],
       "@packages/config": ["packages/config/dist/index.d.ts"],
+      "@packages/production-pilot": ["packages/production-pilot/dist/index.d.ts"],
       "@packages/business": ["packages/business/dist/index.d.ts"],
       "@packages/auth-internal": ["packages/auth-internal/dist/index.d.ts"],
       "@packages/db": ["packages/db/dist/index.d.ts"],

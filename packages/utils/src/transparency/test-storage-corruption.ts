@@ -10,7 +10,7 @@ async function runStorageCorruptionValidation() {
 
   // 1. Pristine reset
   console.log('[RESET] Setting up pristine database and filesystem environment...');
-  await db.$executeRawUnsafe(`TRUNCATE TABLE "ZtanLedgerBlock" RESTART IDENTITY CASCADE;`);
+  await db.$executeRawUnsafe(`TRUNCATE TABLE "ZtanLedgerBlock", "ZtanWalLog", "ZtanSnapshot", "ZtanActiveLease", "ZtanPayloadAttestation", "ZtanQuarantineBlob", "IdempotencyRecord", "AuditLog" RESTART IDENTITY CASCADE;`);
   
   const ledgerDir = path.join(process.cwd(), '.ztan-transparency');
   if (fs.existsSync(ledgerDir)) {

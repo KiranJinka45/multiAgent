@@ -57,7 +57,7 @@ import {
     JobStage, 
     MissionStatus, 
     DistributedExecutionContext as RealContext 
-} from '@packages/runtime-core';
+} from './runtime-types.js';
 
 export { RuntimeStatus, JobStage, MissionStatus };
 export class DistributedExecutionContext extends RealContext {

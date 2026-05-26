@@ -4,7 +4,8 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["metrics"]
 }
 
 model User {
@@ -336,3 +337,26 @@ model ZtanActiveLease {
   owner_host String   @db.VarChar(255)
   heartbeat  DateTime @default(now())
 }
+
+model ZtanPayloadAttestation {
+  id                  String   @id @default(uuid())
+  blockId             String   @unique
+  payloadSanitized    Boolean  @default(true)
+  transformations     String   // Stores JSON-serialized array of strings
+  originalByteLength  Int
+  sanitizedByteLength Int
+  sanitizationEpochId String   @default("1")
+  createdAt           DateTime @default(now())
+
+  @@index([blockId])
+}
+
+model ZtanQuarantineBlob {
+  id        String   @id @default(uuid())
+  blockId   String   @unique
+  rawBlob   String   // Pristine original raw un-sanitized payload
+  createdAt DateTime @default(now())
+
+  @@index([blockId])
+}
+

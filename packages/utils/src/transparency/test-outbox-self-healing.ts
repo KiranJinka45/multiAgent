@@ -11,7 +11,7 @@ async function runOutboxSelfHealingValidation() {
 
   // 1. Pristine reset
   console.log('[RESET] Setting up clean test workspaces...');
-  await db.$executeRawUnsafe(`TRUNCATE TABLE "ZtanLedgerBlock" RESTART IDENTITY CASCADE;`);
+  await db.$executeRawUnsafe(`TRUNCATE TABLE "ZtanLedgerBlock", "ZtanWalLog", "ZtanSnapshot", "ZtanActiveLease", "ZtanPayloadAttestation", "ZtanQuarantineBlob", "IdempotencyRecord", "AuditLog" RESTART IDENTITY CASCADE;`);
   await db.$executeRawUnsafe(`TRUNCATE TABLE "ZtanWalLog" RESTART IDENTITY CASCADE;`);
   await db.$executeRawUnsafe(`TRUNCATE TABLE "AuditLog" RESTART IDENTITY CASCADE;`);
   
@@ -49,7 +49,8 @@ async function runOutboxSelfHealingValidation() {
   for (let i = 0; i < 150; i++) {
     const lockExists = fs.existsSync(LOCK_FILE);
     const outboxStatus = GovernanceLedger.getOutboxStatus();
-    if (!lockExists && outboxStatus.synchronized) {
+    const state = GovernanceLedger.getState(0);
+    if ((state === 'ACTIVE' || state === 'DEGRADED') && !lockExists && outboxStatus.synchronized) {
       syncSettled = true;
       break;
     }
@@ -94,15 +95,13 @@ async function runOutboxSelfHealingValidation() {
     'POLICY',
     'ZTAN-RESOLUTION: Cognitive Saturation Override Ceremony Authorized by Operator.',
     'ZTAN-OPERATOR-01',
-    'VERIFIED',
-    '105'
+    'VERIFIED'
   );
   const entry2 = await GovernanceLedger.appendEntry(
     'TELEMETRY',
     'ZTAN-HEARTBEAT: Health metrics checked.',
     'SYSTEM',
-    'VERIFIED',
-    '105'
+    'VERIFIED'
   );
 
   const initialQueue = GovernanceLedger.loadOutbox();

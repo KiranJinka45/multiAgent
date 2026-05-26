@@ -87,4 +87,12 @@ packages/*/src/**/*.js.map
 apps/*/src/**/*.d.ts
 apps/*/src/**/*.d.ts.map
 apps/*/src/**/*.js
+packages/*/src/**/*.js.map
+apps/*/src/**/*.js
 apps/*/src/**/*.js.map
+
+# Rust build target
+auditor-rs/target/
+
+# Local PIDs file
+.ztan-orchestrator-pids.json

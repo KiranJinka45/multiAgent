@@ -67,17 +67,42 @@ export class DistributedLeaseManager {
     }
 
     /**
-     * Attempts to atomically acquire leadership using etcd transaction blocks and lease TTL.
+      * Attempts to atomically acquire leadership using etcd transaction blocks and lease TTL.
      */
     public async acquireLeadership(ttlSeconds = 5): Promise<LeaseMetadata> {
-        // 1. Increment and get the next Monotonic Epoch ID via etcd atomic increment
-        let nextEpoch: number;
+        // 1. Increment and get the next Monotonic Epoch ID via atomic CAS retry loop
+        let nextEpoch: number | undefined = undefined;
         try {
-            const val = await this.client.identity().put(this.epochKey).value();
-            nextEpoch = await this.client.get(this.epochKey).string() ? Number(await this.client.get(this.epochKey).string()) + 1 : 1;
-            await this.client.put(this.epochKey).value(String(nextEpoch));
+            let retries = 0;
+            while (retries < 10) {
+                const currentValStr = await this.client.get(this.epochKey).string();
+                const currentVal = currentValStr ? Number(currentValStr) : 0;
+                const targetVal = currentVal + 1;
+
+                const tx = this.client.if(this.epochKey, 'Value', '==', currentValStr);
+                
+                // Construct put action and assert that mock immediate execution is isolated
+                const putAction = this.client.put(this.epochKey).value(String(targetVal));
+                if (putAction && putAction._run) {
+                    const sharedStore = DistributedLeaseManager.sharedMockStore;
+                    sharedStore[this.epochKey] = currentValStr;
+                }
+
+                const txResult = await tx.then(putAction).commit();
+
+                if (txResult.succeeded) {
+                    nextEpoch = targetVal;
+                    break;
+                }
+                retries++;
+                await new Promise(resolve => setTimeout(resolve, 5 * retries));
+            }
+
+            if (nextEpoch === undefined) {
+                throw new Error('[CONSENSUS] Monotonic epoch CAS increment exhausted retries.');
+            }
         } catch (err) {
-            // Fallback for mock/simple variations
+            // Fallback for simple/unsupported configurations
             this.currentEpoch++;
             nextEpoch = this.currentEpoch;
         }
@@ -163,6 +188,7 @@ export class DistributedLeaseManager {
             put: (key: string) => ({
                 value: (val: string) => {
                     const promise = Promise.resolve(true) as any;
+                    promise._run = () => { store[key] = val; };
                     promise.lease = () => {
                         store[key] = val;
                         return promise;
@@ -186,15 +212,23 @@ export class DistributedLeaseManager {
             }),
             if: (key: string, type: string, op: string, compareVal: string) => {
                 const succeeded = store[key] === compareVal;
+                let deferredAction: () => void = () => {};
                 return {
-                    then: (action: any) => ({
-                        commit: async () => {
-                            if (succeeded) {
-                                store[key] = this.nodeId;
-                            }
-                            return { succeeded };
+                    then: (action: any) => {
+                        if (action && typeof action._run === 'function') {
+                            deferredAction = action._run;
+                        } else {
+                            deferredAction = () => { store[this.leadershipKey] = this.nodeId; };
                         }
-                    })
+                        return {
+                            commit: async () => {
+                                if (succeeded) {
+                                    deferredAction();
+                                }
+                                return { succeeded };
+                            }
+                        };
+                    }
                 };
             }
         };

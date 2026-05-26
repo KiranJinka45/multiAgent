@@ -18,6 +18,18 @@ export class WALCorruptException extends Error {
     }
 }
 
+export function fsyncDirectory(dirPath: string): void {
+    try {
+        if (process.platform !== 'win32') {
+            const fd = fs.openSync(dirPath, 'r');
+            fs.fsyncSync(fd);
+            fs.closeSync(fd);
+        }
+    } catch (err) {
+        // Safe platform-aware fallback for Windows
+    }
+}
+
 export class DurableSegmentedWal<E = any> {
     private walDir: string;
     private maxSegmentSize: number;
@@ -35,6 +47,8 @@ export class DurableSegmentedWal<E = any> {
 
         if (!fs.existsSync(this.walDir)) {
             fs.mkdirSync(this.walDir, { recursive: true });
+            fsyncDirectory(path.dirname(this.walDir));
+            fsyncDirectory(this.walDir);
         }
     }
 
@@ -251,6 +265,7 @@ export class DurableSegmentedWal<E = any> {
             const fileName = `segment_${String(this.activeSegmentIndex).padStart(6, '0')}.log`;
             const filePath = path.join(this.walDir, fileName);
             this.activeFileHandle = fs.openSync(filePath, 'a+');
+            fsyncDirectory(this.walDir);
         }
     }
 
@@ -289,6 +304,9 @@ export class AtomicSnapshotStore {
 
         // Atomic replace rename barrier
         fs.renameSync(tempPath, this.snapshotPath);
+
+        // Durability sync of parent directory after renaming
+        fsyncDirectory(path.dirname(this.snapshotPath));
     }
 
     public readSnapshot<S>(): StateSnapshot<S> | null {

@@ -3,40 +3,40 @@
   "stepCount": 2,
   "snapshots": [
     {
-      "timestamp": 1779646081632,
-      "heapUsedBytes": 7937808,
+      "timestamp": 1779646519804,
+      "heapUsedBytes": 7994224,
       "externalMemoryBytes": 2396181,
-      "rssBytes": 75370496,
+      "rssBytes": 74883072,
       "activeTimers": 0,
       "activeSockets": 0,
       "openFileHandles": 0,
       "eventLoopLagMs": 0
     },
     {
-      "timestamp": 1779646081632,
-      "heapUsedBytes": 7942592,
+      "timestamp": 1779646519805,
+      "heapUsedBytes": 7999008,
       "externalMemoryBytes": 2396221,
-      "rssBytes": 75370496,
+      "rssBytes": 74883072,
       "activeTimers": 0,
       "activeSockets": 0,
       "openFileHandles": 0,
       "eventLoopLagMs": 0
     },
     {
-      "timestamp": 1779646081632,
-      "heapUsedBytes": 7943504,
+      "timestamp": 1779646519805,
+      "heapUsedBytes": 7999920,
       "externalMemoryBytes": 2396221,
-      "rssBytes": 75370496,
+      "rssBytes": 74883072,
       "activeTimers": 0,
       "activeSockets": 0,
       "openFileHandles": 0,
       "eventLoopLagMs": 0
     },
     {
-      "timestamp": 1779646081633,
-      "heapUsedBytes": 7967000,
+      "timestamp": 1779646519806,
+      "heapUsedBytes": 8000832,
       "externalMemoryBytes": 2396221,
-      "rssBytes": 75370496,
+      "rssBytes": 74883072,
       "activeTimers": 3,
       "activeSockets": 2,
       "openFileHandles": 5,
@@ -45,7 +45,7 @@
   ],
   "walAmplificationRatio": 4,
   "telemetryAmplificationRatio": 0.8,
-  "memoryPerStepSlopeBytes": 14596,
+  "memoryPerStepSlopeBytes": 3304,
   "eventLoopLagVarianceMs": 0,
-  "peakRssBytes": 75370496
+  "peakRssBytes": 74883072
 }

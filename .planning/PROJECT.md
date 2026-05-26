@@ -10,7 +10,6 @@ Nexus ZTAN is an auditable, production-oriented research platform designed for l
 ## Core Value
 **STABILITY AND SURVIVABILITY.** The system prioritizes predictable operation, reliable recovery, and maintenance simplicity.
 
-
 ## Requirements
 
 ### Validated Operational Baseline
@@ -21,28 +20,28 @@ Nexus ZTAN is an auditable, production-oriented research platform designed for l
 - ✓ **Deterministic Invariant Modeling** — Finite state space verified by TLA+ safety proofs.
 - ✓ **Physical Chaos Resilience** — 10-drill PostgreSQL pathology failover suite certified.
 - ✓ **Stewardship Observability** — High-fidelity telemetry and operational telemetry dashboards.
+- ✓ **SOAK-01**: Stable memory footprints and WAL bounds — v1.6.0
+- ✓ **SOAK-02**: Suffix chronological lineage compaction — v1.6.0
+- ✓ **SOAK-03**: Zero false-positives under network partition — v1.6.0
+- ✓ **OBS-01**: Real-time lease timeline and replica lag tracking — v1.6.0
+- ✓ **OBS-02**: Lost-ACK and outbox-to-DB convergence timelines — v1.6.0
+- ✓ **GOV-01**: Invariant CI checking and unauthorized state-machine reject — v1.6.0
+- ✓ **GOV-02**: HSM Override ceremonies with non-repudiable audit logs — v1.6.0
+- ✓ **DB-01**: Instant step-down on WAL corruption or replica rewind — v1.6.0
+- ✓ **DB-02**: Zombie write prevention under autovacuum freeze or disk saturation — v1.6.0
+- ✓ **PERF-01**: Recovery replay throughput performance mapping — v1.6.0
+- ✓ **PERF-02**: Lease acquisition contention latency limits — v1.6.0
+- ✓ **SEC-01**: Poisoned log and desynchronized replay history quarantine — v1.6.0
 
-## Current Milestone: Milestone 36 — Stewardship Engineering Era (v1.6.0-LTS)
+## Current Post-Milestone Posture: Long-Term Maintenance Epoch
 
-**Goal:** Establish and validate longitudinal production durability, telemetry fidelity, invariant correctness, and threat resilience of the frozen coordination protocol.
+Following the completion of **Milestone 36: Stewardship Engineering Era (v1.6.0)**, the platform is in a long-term maintenance posture with an absolute freeze on new feature development or active architectural expansion.
 
-**Target Waves:**
-* **Wave 1 — Operational Soak & Stewardship Validation**: Long-duration stability, memory patterns, WAL growth, replica lag, autovacuum containment, and compaction correctness.
-* **Wave 2 — Observability & Operational Intelligence**: Forensic-grade event lineage tracing, replay causality graphs, lease timelines, and partition dashboards.
-* **Wave 3 — Governance Hardening**: Invariant CI validation (TLA+ checkpoints), structural freeze via `CODEOWNERS`, and institutional consensus bypass controls.
-* **Wave 4 — Real PostgreSQL Pathology Testing**: Resiliency under WAL corruption, replica rewind, autovacuum freeze, checkpoint starvation, and disk saturation.
-* **Wave 5 — Performance Envelope Mapping**: Mapping empirical curves for replay throughput, recovery latencies, and fencing contention.
-* **Wave 6 — Threat Modeling & Adversarial Review**: Simulating HSM override abuse, replay poisoning, stale replica recovery, and epoch desynchronization.
-* **Phase 9.3 — Operational Survivability Drills (External)**: Validating non-author operability in controlled environments and implementing predictive risk detection through Trust Regression Scoring (Complete).
-
-### Status: Transitioning to Phase 50 (Active)
-
-We have successfully completed **Phase 49: Longitudinal Evidence Science**, which established a mathematically disciplined, statistically sound, and deterministic verification framework. Key accomplishments include `--canonical` run alignment, three-tier statistical drift envelopes ($\mu \pm 3\sigma$), noise-floor suppressed cross-run reproducibility analysis ($CV = 5.25\%$), and rate-limited Express dashboard integration.
-
-We are now initiating **Phase 50: Advanced Pathology Operations (Wave 4 — Real PostgreSQL Pathology Testing)**. This next phase transitions the hardened evidence platform into active failure stress scenarios (WAL corruption, replica rewind, autovacuum freeze, fsync stalls, and disk/pool saturation) to certify tested recovery envelopes under disastrous database events.
-
-The platform operates on its current bounded architectural baseline. All future modifications are governed by the [INVARIANT_GOVERNANCE_CHARTER.md](../INVARIANT_GOVERNANCE_CHARTER.md) constraints.
-
+### Key accomplishments for v1.6.0:
+1. **Operational Soak Validation**: Confirmed memory stability (peak RSS 47.28 MB) and WAL growth bounds.
+2. **Observability Hardening**: Integrated high-fidelity causal lineage tracking and replica lag instrumentation.
+3. **PostgreSQL Pathology Hardening**: Validated fencing and fail-closed lease states under WAL corruption.
+4. **Complexity Budgeting Gates**: Enforced strict rules in PROJECT.md and CI checkers.
 
 ### Out of Scope
 
@@ -96,6 +95,8 @@ The platform has reached **Core Architectural Stability**. The focus has shifted
 | Operational Stewardship | Prioritize reliability, adoption, and supportability. | ✓ Active |
 | Primitive Freeze | Stabilize foundational building blocks for the ecosystem. | ✓ Effective |
 | Forensic Resilience Baseline | Mandate cryptographic evidence and safety invariants for recovery. | ✓ Mandatory |
+| Complete Freeze on Governance Primitives | Avoid governance self-reference saturation and recursion pressure. | ✓ Enforced |
+| Single Oracle Distributed Coordination | PostgreSQL acts as the existential coordination oracle for leases. | ✓ Confirmed |
 
 ---
-*Last updated: 2026-05-16 — Long-Term Reliability Stewardship Active*
+*Last updated: 2026-05-26 after v1.6.0 milestone completion*

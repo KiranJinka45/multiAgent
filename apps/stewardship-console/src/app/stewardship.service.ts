@@ -3,6 +3,14 @@ import { BehaviorSubject, interval, Subscription } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 
 
+export interface ZtanPayloadAttestation {
+  payloadSanitized: boolean;
+  transformations: string[];
+  originalByteLength: number;
+  sanitizedByteLength: number;
+  sanitizationEpochId: string;
+}
+
 export interface EvidenceEntry {
   sequenceId: number;
   timestamp: Date;
@@ -15,7 +23,10 @@ export interface EvidenceEntry {
     epoch: string;
     verdict: 'VERIFIED' | 'DEGRADED' | 'UNTRUSTED';
   };
+  attestation?: ZtanPayloadAttestation;
+  quarantineBlob?: string;
 }
+
 
 export interface SociotechnicalDrill {
   id: string;
@@ -56,6 +67,8 @@ export interface StewardshipState {
   // 2. Telemetry Erosion
   telemetryEroded: boolean;
   chronologyGaps: boolean;
+  chronologyConfidence: number;
+  verificationTier?: 'HOT' | 'WARM' | 'COLD';
 
   // 3. Ritual Decay
   ritualDecayed: boolean;
@@ -90,6 +103,7 @@ export interface StewardshipState {
   isOfflineMode?: boolean;
 }
 
+
 @Injectable({ providedIn: 'root' })
 export class StewardshipService {
   private evidenceSubject = new BehaviorSubject<EvidenceEntry[]>([]);
@@ -113,6 +127,8 @@ export class StewardshipService {
     replayIntegrity: 100,
     telemetryEroded: false,
     chronologyGaps: false,
+    chronologyConfidence: 100,
+    verificationTier: 'HOT',
     ritualDecayed: false,
     ceremonyDurationAvg: 254, // in seconds
     approvalNarrativeLengthAvg: 242, // chars
@@ -135,6 +151,7 @@ export class StewardshipService {
       { id: 'IFD-001', name: 'IFD-001: Replay Poisoning', status: 'INACTIVE', lastRun: '14d ago', description: 'Simulate forged payload insertion to trigger trust degradation and chain fractures.' },
       { id: 'IFD-002', name: 'IFD-002: Telemetry Erosion', status: 'INACTIVE', lastRun: 'Never', description: 'Simulate loss of forensic logs, chronology gaps, and timeline blindness.' },
       { id: 'IFD-003', name: 'IFD-003: Governance Collapse', status: 'INACTIVE', lastRun: 'Never', description: 'Simulate total epoch registry failure, SAFE_MODE locking, and Supervisor override.' },
+      { id: 'IFD-004', name: 'IFD-004: Dirty Archaeology', status: 'INACTIVE', lastRun: 'Never', description: 'Simulate corrupted databases, partial transactions, chronology gaps, and duplicate timelines.' },
       { id: 'RITUAL_DECAY', name: 'Ritual Decay Simulation', status: 'INACTIVE', lastRun: '7d ago', description: 'Inject rubber-stamping, narrative erosion, and approved-without-ceremony patterns.' },
       { id: 'FREEZE_PRESSURE', name: 'Institutional Freeze Pressure', status: 'INACTIVE', lastRun: '30d ago', description: 'Flood governance queues with capability expansions to test restraint.' },
       { id: 'TOTAL_QUORUM_FAILURE', name: 'Total Quorum Failure', status: 'INACTIVE', lastRun: 'Never', description: 'Simulate physical HSM failure requiring high-friction manual override ceremony.' }
@@ -146,16 +163,265 @@ export class StewardshipService {
   evidence$ = this.evidenceSubject.asObservable();
   state$ = this.stateSubject.asObservable();
 
+  private viewportSavepointCache: any = null;
+
+  public saveViewportSavepoint(savepoint: any) {
+    this.viewportSavepointCache = savepoint;
+    try {
+      localStorage.setItem('ztan_replay_savepoint', JSON.stringify(savepoint));
+    } catch (e) {
+      console.warn('[StewardshipService] Failed to write savepoint to localStorage:', e);
+    }
+  }
+
+  public getViewportSavepoint(): any {
+    if (this.viewportSavepointCache) {
+      return this.viewportSavepointCache;
+    }
+    try {
+      const raw = localStorage.getItem('ztan_replay_savepoint');
+      if (raw) {
+        this.viewportSavepointCache = JSON.parse(raw);
+        return this.viewportSavepointCache;
+      }
+    } catch (e) {
+      console.warn('[StewardshipService] Failed to read savepoint from localStorage:', e);
+    }
+    return null;
+  }
+
   private clockSubscription: Subscription | null = null;
   private rawEvidenceBackup: EvidenceEntry[] = [];
 
   private apiUrl = 'http://localhost:3010/api/v1/ztan/governance';
 
+  private worker: Worker | null = null;
+  private ws: any = null;
+  public totalEventsInDB = 0;
+
   constructor(private http: HttpClient) {
     this.initializeLedger();
     this.startLatencyTracker();
+    this.startParityAuditor();
+    this.initWorker();
+    this.initWebSocket();
     this.syncState();
-    this.syncLedger();
+
+    // Clear IndexedDB at startup to ensure clean endurance drill runs
+    setTimeout(() => {
+      if (this.worker) {
+        this.worker.postMessage({ type: 'CLEAR_DB' });
+      }
+    }, 1000);
+  }
+
+  private initWorker() {
+    if (typeof Worker !== 'undefined') {
+      try {
+        this.worker = new Worker(new URL('./workers/archaeology.worker', import.meta.url), { type: 'module' });
+        this.worker.onmessage = ({ data }) => {
+          const { type, count, lastSequenceId, error } = data;
+          if (type === 'INGEST_BATCH_SUCCESS') {
+            console.log(`[StewardshipService] WebWorker successfully ingested ${count} events. Last sequenceId: ${lastSequenceId}`);
+            this.refreshFromIndexedDB();
+          } else if (type === 'INGEST_BATCH_ERROR') {
+            console.error('[StewardshipService] Ingestion failed in WebWorker:', error);
+          } else if (type === 'CLEAR_DB_SUCCESS') {
+            console.log('[StewardshipService] WebWorker cleared IndexedDB successfully.');
+            this.refreshFromIndexedDB();
+          } else if (type === 'RECONSTRUCT_SUCCESS') {
+            console.log(`[StewardshipService] WebWorker reconstructed from capsule. Count: ${count}`);
+            this.refreshFromIndexedDB();
+            const current = this.stateSubject.value;
+            this.stateSubject.next({
+              ...current,
+              trustLevel: 'VERIFIED',
+              replayIntegrity: 100,
+              chronologyConfidence: 100
+            });
+            alert(`Capsule Rebuilt Successfully! Verified ${count} forensic chain blocks.`);
+          } else if (type === 'RECONSTRUCT_FAILURE') {
+            console.error('[StewardshipService] Ledger reconstruction failed in WebWorker:', error);
+            const current = this.stateSubject.value;
+            this.stateSubject.next({
+              ...current,
+              trustLevel: 'UNTRUSTED',
+              replayIntegrity: 0,
+              chronologyConfidence: 0
+            });
+            alert(`Capsule Integrity Compromised: ${error}`);
+            this.refreshFromIndexedDB();
+          }
+        };
+      } catch (e) {
+        console.error('[StewardshipService] Failed to spawn WebWorker:', e);
+      }
+    } else {
+      console.warn('[StewardshipService] WebWorkers are not supported in this environment.');
+    }
+  }
+
+  private initWebSocket() {
+    import('socket.io-client').then(({ io }) => {
+      this.ws = io('http://localhost:3500', {
+        path: '/socket.io',
+        transports: ['websocket'],
+        reconnection: true,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000,
+        randomizationFactor: 0.5
+      });
+
+      this.ws.on('connect', () => {
+        console.log('[StewardshipService] Connected to API Gateway Socket.IO Server');
+        this.ws.emit('sre:subscribe');
+      });
+
+      this.ws.on('sre:archaeology:chain_loaded', (chain: any[]) => {
+        console.log(`[StewardshipService] Received evidence chain batch of size ${chain.length} via WebSocket`);
+        if (this.worker) {
+          this.worker.postMessage({ type: 'INGEST_BATCH', payload: chain });
+        }
+      });
+
+      this.ws.on('sre:update', (state: any) => {
+        console.log('[StewardshipService] Received live SRE update via Socket.IO');
+        const current = this.stateSubject.value;
+        this.stateSubject.next({
+          ...current,
+          ...state,
+          isOfflineMode: false
+        });
+
+        // If there are incoming events, send them to WebWorker
+        if (state.lastAction) {
+          const mockEntry = this.generateEntry(
+            state.sequenceId || Date.now(),
+            state.trustLevel === 'VERIFIED' ? 'VERIFIED' : 'UNTRUSTED',
+            state.lastAction.message || 'System state synchronized',
+            'REPLAY'
+          );
+          if (this.worker) {
+            this.worker.postMessage({ type: 'INGEST_BATCH', payload: [mockEntry] });
+          }
+        }
+      });
+
+      this.ws.on('disconnect', () => {
+        console.warn('[StewardshipService] Disconnected from API Gateway Socket.IO Server');
+      });
+    }).catch(err => {
+      console.error('[StewardshipService] Failed to load socket.io-client:', err);
+    });
+  }
+
+  public async getPaginatedEvents(offset: number, limit: number): Promise<EvidenceEntry[]> {
+    return new Promise((resolve) => {
+      const request = indexedDB.open('ztan_archaeology_db', 1);
+      request.onsuccess = (e: any) => {
+        const db = e.target.result;
+        const tx = db.transaction('forensic_events', 'readonly');
+        const store = tx.objectStore('forensic_events');
+        
+        const events: any[] = [];
+        let cursorRequest = store.openCursor(null, 'prev'); // Get newest first
+        let count = 0;
+        let skipped = 0;
+        
+        cursorRequest.onsuccess = (event: any) => {
+          const cursor = event.target.result;
+          if (!cursor) {
+            return resolve(events);
+          }
+          
+          if (skipped < offset) {
+            skipped++;
+            cursor.continue();
+            return;
+          }
+          
+          events.push(cursor.value);
+          count++;
+          
+          if (count < limit) {
+            cursor.continue();
+          } else {
+            resolve(events);
+          }
+        };
+        cursorRequest.onerror = () => resolve([]);
+      };
+      request.onerror = () => resolve([]);
+    });
+  }
+
+  private async refreshFromIndexedDB() {
+    const latest = await this.getPaginatedEvents(0, 100);
+    this.evidenceSubject.next(latest);
+    
+    const request = indexedDB.open('ztan_archaeology_db', 1);
+    request.onsuccess = (e: any) => {
+      const db = e.target.result;
+      const tx = db.transaction('forensic_events', 'readonly');
+      const store = tx.objectStore('forensic_events');
+      const countRequest = store.count();
+      countRequest.onsuccess = () => {
+        this.totalEventsInDB = countRequest.result;
+      };
+    };
+  }
+
+  public simulateLocalEnduranceDrill(count: number = 50000) {
+    console.log(`[StewardshipService] Launching local browser endurance drill with ${count} events...`);
+    const batchSize = 5000;
+    let sequence = 10000;
+    
+    const types: Array<'GOVERNANCE' | 'REPLAY' | 'IDENTITY' | 'TELEMETRY' | 'POLICY'> = ['GOVERNANCE', 'REPLAY', 'IDENTITY', 'POLICY', 'TELEMETRY'];
+    const mockMessages = [
+      'Evidence block anchored and signature checked.',
+      'Causal chain node bound to physical hardware.',
+      'Cryptographic ledger checkpoint validated.',
+      'Quorum agreement reached for active block.',
+      'Blast-radius security policy enforced.'
+    ];
+
+    const sendNextBatch = () => {
+      if (sequence >= 10000 + count) {
+        console.log('[StewardshipService] Local endurance drill generation complete.');
+        return;
+      }
+
+      const batch: EvidenceEntry[] = [];
+      const currentBatchSize = Math.min(batchSize, (10000 + count) - sequence);
+      
+      for (let i = 0; i < currentBatchSize; i++) {
+        const id = sequence++;
+        const type = types[id % types.length];
+        const msg = mockMessages[id % mockMessages.length];
+        
+        batch.push({
+          sequenceId: id,
+          timestamp: new Date(),
+          type,
+          payload: `[Forensic Stream Entry #${id}] ${msg}`,
+          evidence: {
+            hash: '0x' + Math.random().toString(16).substring(2, 10),
+            prevHash: '0x' + Math.random().toString(16).substring(2, 10),
+            signature: 'ZTAN_SIG_' + Math.random().toString(16).substring(2, 8).toUpperCase(),
+            epoch: '102',
+            verdict: 'VERIFIED'
+          }
+        });
+      }
+
+      if (this.worker) {
+        this.worker.postMessage({ type: 'INGEST_BATCH', payload: batch });
+      }
+      
+      setTimeout(sendNextBatch, 50);
+    };
+
+    sendNextBatch();
   }
 
   private syncState() {
@@ -188,7 +454,11 @@ export class StewardshipService {
               verdict: e.verdict || 'VERIFIED'
             }
           }));
-          this.evidenceSubject.next(mapped);
+          if (this.worker) {
+            this.worker.postMessage({ type: 'INGEST_BATCH', payload: mapped });
+          } else {
+            this.evidenceSubject.next(mapped);
+          }
         }
       },
       error: (err) => {
@@ -223,6 +493,82 @@ export class StewardshipService {
     });
   }
 
+  private startParityAuditor() {
+    interval(15000).subscribe(async () => {
+      try {
+        const db = await new Promise<IDBDatabase>((resolve, reject) => {
+          const req = indexedDB.open('ztan_archaeology_db', 1);
+          req.onsuccess = (e: any) => resolve(e.target.result);
+          req.onerror = (e: any) => reject(e.target.error);
+        });
+
+        const tx = db.transaction('forensic_events', 'readonly');
+        const store = tx.objectStore('forensic_events');
+
+        const entries: any[] = [];
+        let cursorReq = store.openCursor(null, 'prev');
+        let count = 0;
+
+        await new Promise<void>((resolve) => {
+          cursorReq.onsuccess = (e: any) => {
+            const cursor = e.target.result;
+            if (cursor && count < 50) {
+              entries.push(cursor.value);
+              count++;
+              cursor.continue();
+            } else {
+              resolve();
+            }
+          };
+          cursorReq.onerror = () => resolve();
+        });
+
+        if (entries.length < 2) return;
+
+        let driftDetected = false;
+        let skewCount = 0;
+        const totalChecked = entries.length - 1;
+
+        for (let i = 0; i < entries.length - 1; i++) {
+          const current = entries[i];
+          const parent = entries[i + 1];
+
+          if (current.evidence && parent.evidence && current.evidence.prevHash !== parent.evidence.hash) {
+            console.error(`[Parity Auditor] Hash chain fracture detected between sequence #${current.sequenceId} and #${parent.sequenceId}!`);
+            driftDetected = true;
+          }
+
+          if (current.timestamp && parent.timestamp) {
+            const currentTs = new Date(current.timestamp).getTime();
+            const parentTs = new Date(parent.timestamp).getTime();
+            // skew if timestamp is backwards or jump is > 10m
+            if (currentTs < parentTs || (currentTs - parentTs) > 600000) {
+              skewCount++;
+            }
+          }
+        }
+
+        const current = this.stateSubject.value;
+        let newConfidence = 100;
+        if (driftDetected) {
+          newConfidence = 0;
+        } else if (totalChecked > 0) {
+          newConfidence = Math.max(0, Math.round(100 * (1 - (skewCount / totalChecked))));
+        }
+
+        this.stateSubject.next({
+          ...current,
+          trustLevel: newConfidence >= 80 ? (current.trustLevel === 'UNTRUSTED' ? 'UNTRUSTED' : 'VERIFIED') : 'DEGRADED',
+          chronologyConfidence: newConfidence,
+          chronologyGaps: newConfidence < 80,
+          replayIntegrity: driftDetected ? 12 : newConfidence
+        });
+      } catch (e) {
+        console.error('[Parity Auditor Error]', e);
+      }
+    });
+  }
+
   triggerDrill(id: string) {
     this.http.post<StewardshipState>(`${this.apiUrl}/drill/trigger`, { id }).subscribe({
       next: (state) => {
@@ -238,9 +584,16 @@ export class StewardshipService {
     });
   }
 
-  resolveDrill(id: string, actionsTaken: string) {
+  resolveDrill(id: string, actionsTaken: string, method?: string, justification?: string, certaintyInflation?: boolean) {
     const operatorSignature = 'ZTAN_SIG_' + Math.random().toString(16).substring(2, 8).toUpperCase();
-    this.http.post<StewardshipState>(`${this.apiUrl}/drill/resolve`, { id, actionsTaken, operatorSignature }).subscribe({
+    this.http.post<StewardshipState>(`${this.apiUrl}/drill/resolve`, { 
+      id, 
+      actionsTaken, 
+      operatorSignature,
+      method,
+      justification,
+      certaintyInflation
+    }).subscribe({
       next: (state) => {
         this.stateSubject.next({ ...state, isOfflineMode: false });
         this.syncLedger();
@@ -485,6 +838,50 @@ export class StewardshipService {
         ]
       });
       this.evidenceSubject.next(evidence);
+    } else if (id === 'IFD-004') {
+      // 1. Partial write entry (missing hash/prevHash)
+      const corruptedEntry = this.generateEntry(1008, 'UNTRUSTED', 'DIRTY ARCHAEOLOGY: Partial write and corrupted block hash.', 'REPLAY');
+      corruptedEntry.evidence.prevHash = '0xBAD_PREV_HASH';
+
+      // 2. Sequence gap entry (leaping 10 timeline slots ahead)
+      const gapEntry = this.generateEntry(1020, 'DEGRADED', 'DIRTY ARCHAEOLOGY: Stale timeline packet storm and clock desync.', 'TELEMETRY');
+      gapEntry.timestamp = new Date(Date.now() - 20 * 60000); // 20 minutes in the past (clock desync)
+
+      evidence = [gapEntry, corruptedEntry, ...evidence];
+
+      this.stateSubject.next({
+        ...current,
+        drills,
+        activeDrill: id,
+        trustLevel: 'UNTRUSTED',
+        replayIntegrity: 20,
+        chronologyConfidence: 40,
+        chronologyGaps: true,
+        drillStartTime,
+        operatorReactionTime: null,
+        currentRunningLatency: 0,
+        recoveryInvariants: {
+          causalContinuity: { status: false, label: 'Lineage broken: Malformed hashes detected' },
+          epochAlignment: { status: false, label: 'Epoch desynchronized: NTP Clock Skew' },
+          hsmSynchronicity: { status: false, label: 'Verification halted: Page corruption simulated' }
+        },
+        activeIncidents: [
+          {
+            id: 'INC-IFD-004',
+            type: 'DIRTY_ARCHAEOLOGY',
+            severity: 'CRITICAL',
+            title: 'Substrate Page Corruption & Desync',
+            description: 'Simulated partial write transaction failures and timeline desynchronization have fractured the storage layer.',
+            timestamp: new Date()
+          }
+        ]
+      });
+
+      if (this.worker) {
+        this.worker.postMessage({ type: 'INGEST_BATCH', payload: [corruptedEntry, gapEntry] });
+      } else {
+        this.evidenceSubject.next(evidence);
+      }
     }
   }
 
@@ -528,6 +925,8 @@ export class StewardshipService {
       replayIntegrity: 100,
       telemetryEroded: false,
       chronologyGaps: false,
+      chronologyConfidence: 100,
+      verificationTier: 'HOT',
       ritualDecayed: false,
       ceremonyDurationAvg: 254,
       approvalNarrativeLengthAvg: 242,
@@ -665,6 +1064,8 @@ export class StewardshipService {
       replayIntegrity: 100,
       telemetryEroded: false,
       chronologyGaps: false,
+      chronologyConfidence: 100,
+      verificationTier: 'HOT',
       ritualDecayed: false,
       ceremonyDurationAvg: 254,
       approvalNarrativeLengthAvg: 242,
@@ -687,6 +1088,7 @@ export class StewardshipService {
         { id: 'IFD-001', name: 'IFD-001: Replay Poisoning', status: 'INACTIVE', lastRun: '14d ago', description: 'Simulate forged payload insertion to trigger trust degradation and chain fractures.' },
         { id: 'IFD-002', name: 'IFD-002: Telemetry Erosion', status: 'INACTIVE', lastRun: 'Never', description: 'Simulate loss of forensic logs, chronology gaps, and timeline blindness.' },
         { id: 'IFD-003', name: 'IFD-003: Governance Collapse', status: 'INACTIVE', lastRun: 'Never', description: 'Simulate total epoch registry failure, SAFE_MODE locking, and Supervisor override.' },
+        { id: 'IFD-004', name: 'IFD-004: Dirty Archaeology', status: 'INACTIVE', lastRun: 'Never', description: 'Simulate corrupted databases, partial transactions, chronology gaps, and duplicate timelines.' },
         { id: 'RITUAL_DECAY', name: 'Ritual Decay Simulation', status: 'INACTIVE', lastRun: '7d ago', description: 'Inject rubber-stamping, narrative erosion, and approved-without-ceremony patterns.' },
         { id: 'FREEZE_PRESSURE', name: 'Institutional Freeze Pressure', status: 'INACTIVE', lastRun: '30d ago', description: 'Flood governance queues with capability expansions to test restraint.' },
         { id: 'TOTAL_QUORUM_FAILURE', name: 'Total Quorum Failure', status: 'INACTIVE', lastRun: 'Never', description: 'Simulate physical HSM failure requiring high-friction manual override ceremony.' }
@@ -710,6 +1112,102 @@ export class StewardshipService {
         verdict
       }
     };
+  }
+
+  public async exportReplayCapsule() {
+    const total = this.totalEventsInDB || 5;
+    const entries = await this.getPaginatedEvents(0, total);
+    entries.sort((a, b) => a.sequenceId - b.sequenceId);
+
+    const minSeq = entries.length ? entries[0].sequenceId : 1000;
+    const maxSeq = entries.length ? entries[entries.length - 1].sequenceId : 1000;
+
+    const entriesStr = JSON.stringify(entries);
+    let hash = 2166136261;
+    for (let i = 0; i < entriesStr.length; i++) {
+      hash ^= entriesStr.charCodeAt(i);
+      hash = Math.imul(hash, 16777619);
+    }
+    const checksum = (hash >>> 0).toString(16).toUpperCase().padStart(8, '0');
+
+    const state = this.stateSubject.value;
+    const capsule = {
+      manifest: {
+        version: '1.0.0',
+        epoch: state.epoch,
+        timestamp: Date.now(),
+        sequenceRange: [minSeq, maxSeq] as [number, number],
+        rootHash: entries.length ? entries[entries.length - 1].evidence.hash : '0x00',
+        signature: entries.length ? entries[entries.length - 1].evidence.signature : 'ZTAN_SIG_00',
+        totalEntries: entries.length,
+        checksum
+      },
+      entries
+    };
+
+    const blob = new Blob([JSON.stringify(capsule, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `ztan-replay-capsule-${state.epoch}-${Date.now()}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+    console.log(`[StewardshipService] Replay capsule exported with checksum ZTAN_${checksum}`);
+  }
+
+  private verifyJsonBracketDepth(str: string, maxDepth: number = 10): boolean {
+    let depth = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str[i];
+      if (char === '{' || char === '[') {
+        depth++;
+        if (depth > maxDepth) return false;
+      } else if (char === '}' || char === ']') {
+        depth = Math.max(0, depth - 1);
+      }
+    }
+    return true;
+  }
+
+  public importReplayCapsule(file: File) {
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      try {
+        const text = e.target.result;
+        if (text.length > 15 * 1024 * 1024) {
+          throw new Error('Capsule size exceeds 15MB safety limit.');
+        }
+
+        if (!this.verifyJsonBracketDepth(text, 10)) {
+          throw new Error('Capsule structure violates maximum JSON bracket nesting limit of 10.');
+        }
+
+        const capsule = JSON.parse(text);
+        if (!capsule.manifest || !Array.isArray(capsule.entries)) {
+          throw new Error('Malformed capsule format: missing manifest or entries.');
+        }
+
+        if (this.worker) {
+          this.worker.postMessage({ type: 'IMPORT_CAPSULE', payload: text });
+        }
+      } catch (err: any) {
+        console.error('[StewardshipService] Capsule import validation failed:', err);
+        alert(`Capsule Import Failed: ${err.message}`);
+      }
+    };
+    reader.readAsText(file);
+  }
+
+
+  public setVerificationTier(tier: 'HOT' | 'WARM' | 'COLD') {
+    const current = this.stateSubject.value;
+    this.stateSubject.next({
+      ...current,
+      verificationTier: tier
+    });
+    if (this.worker) {
+      this.worker.postMessage({ type: 'SET_VERIFICATION_TIER', payload: tier });
+    }
   }
 }
 

@@ -1,15 +1,31 @@
 {
-    "history": [
-        {
-            "receipt": {
-                "sequenceNumber": 1,
-                "epochId": 0,
-                "action": "STATE_CHECKPOINT",
-                "previousGRoot": "0000000000000000000000000000000000000000000000000000000000000000",
-                "gRoot": "f0e1d2c3b4a5968778695a4b3c2d1e0f0e1d2c3b4a5968778695a4b3c2d1e0f",
-                "signatures": []
-            },
-            "appliedAt": "2026-05-09T07:31:49.051Z"
-        }
-    ]
+  "history": [
+    {
+      "receipt": {
+        "sequenceNumber": 1,
+        "epochId": 1,
+        "action": "GOVERNANCE_PROPOSAL",
+        "previousGRoot": "root-0",
+        "gRoot": "root-1"
+      }
+    },
+    {
+      "receipt": {
+        "sequenceNumber": 2,
+        "epochId": 1,
+        "action": "COUNCIL_UPDATE",
+        "previousGRoot": "root-1",
+        "gRoot": "root-2"
+      }
+    },
+    {
+      "receipt": {
+        "sequenceNumber": 3,
+        "epochId": 1,
+        "action": "STATE_CHECKPOINT",
+        "previousGRoot": "root-2",
+        "gRoot": "root-3"
+      }
+    }
+  ]
 }

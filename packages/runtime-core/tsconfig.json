@@ -4,9 +4,15 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "declaration": true,
-    "declarationDir": "./dist"
+    "declarationDir": "./dist",
+    "verbatimModuleSyntax": false,
+    "moduleResolution": "NodeNext",
+    "module": "NodeNext"
   },
   "include": [
     "src/**/*"
+  ],
+  "references": [
+    { "path": "./tsconfig.node.json" }
   ]
 }

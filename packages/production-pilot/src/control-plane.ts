@@ -1,8 +1,9 @@
 import * as http from 'node:http';
+import * as https from 'node:https';
 import * as url from 'node:url';
 import * as net from 'node:net';
 import type { VectorClock } from './vector-clock.js';
-import type { TcpReplicationTransport } from './tcp-transport.js';
+import type { TcpReplicationTransport, TlsConfig } from './tcp-transport.js';
 import type { DurableSegmentedWal } from './durable-wal.js';
 import type { TimelineEvent, TraceComparisonResult } from './replay-diagnostics.js';
 import { DeterminismDiffEngine } from './replay-diagnostics.js';
@@ -36,7 +37,7 @@ export interface ClusterNodeStatus {
 }
 
 export class DiagnosticControlPlane {
-    private server: http.Server | null = null;
+    private server: http.Server | https.Server | null = null;
     public static divergenceHotspots: any[] = [];
     
     constructor(
@@ -428,12 +429,12 @@ export class DiagnosticControlPlane {
         return statuses;
     }
 
-    public async startHttpServer(port: number): Promise<http.Server> {
+    public async startHttpServer(port: number): Promise<http.Server | https.Server> {
         if (this.server) {
             return this.server;
         }
         
-        this.server = http.createServer(async (req, res) => {
+        const requestHandler = async (req: any, res: any) => {
             const parsedUrl = url.parse(req.url || '', true);
             const path = parsedUrl.pathname;
             const method = req.method;
@@ -472,7 +473,7 @@ export class DiagnosticControlPlane {
                     res.end(JSON.stringify(this.getLineageDAG(taskId)));
                 } else if (path === '/api/diagnostics/diff' && method === 'POST') {
                     let body = '';
-                    req.on('data', chunk => { body += chunk; });
+                    req.on('data', (chunk: any) => { body += chunk; });
                     req.on('end', () => {
                         try {
                             const parsed = JSON.parse(body);
@@ -504,7 +505,19 @@ export class DiagnosticControlPlane {
                 res.writeHead(500);
                 res.end(JSON.stringify({ error: err.message }));
             }
-        });
+        };
+
+        const tlsConfig = this.transport?.getTlsConfig();
+        if (tlsConfig && tlsConfig.key && tlsConfig.cert) {
+            this.server = https.createServer({
+                key: tlsConfig.key,
+                cert: tlsConfig.cert,
+                ca: tlsConfig.ca
+            }, requestHandler);
+        } else {
+            const httpModule = http;
+            this.server = httpModule['createServer'](requestHandler);
+        }
 
         return new Promise((resolve) => {
             this.server!.listen(port, '127.0.0.1', () => {

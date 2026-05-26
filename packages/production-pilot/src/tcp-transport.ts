@@ -90,6 +90,10 @@ export class TcpReplicationTransport implements ReplicationTransport {
         return this.peers.get(nodeId);
     }
 
+    public getTlsConfig(): TlsConfig | undefined {
+        return this.tlsConfig;
+    }
+
 
     public registerNode(nodeId: string, handler: (msg: ReplicationMessage) => Promise<ReplicationMessage>): void {
         if (nodeId === this.localNodeId) {

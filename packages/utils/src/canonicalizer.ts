@@ -51,10 +51,13 @@ export function canonicalizeJCS(
     if (!Number.isFinite(value)) {
       throw new Error('[JCS] Non-finite number values (Infinity, NaN) are strictly forbidden.');
     }
-    // Float normalization rules:
-    // Native JavaScript number toString() satisfies RFC 8785 float specifications
-    // for finite values by omitting trailing zeroes and decimal points where redundant.
-    return value.toString();
+    if (Object.is(value, -0)) {
+      return '0';
+    }
+    let str = value.toString().toLowerCase();
+    // Enforce lowercase exponent and strip redundant positive sign (+) in e.g. 1e+21
+    str = str.replace(/e\+?/, 'e');
+    return str;
   }
   
   if (typeof value === 'boolean') {

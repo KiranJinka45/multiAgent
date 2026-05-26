@@ -7,15 +7,7 @@
     "noEmit": false,
     "baseUrl": ".",
     "paths": {
-      "@packages/observability": [
-        "../observability/src/index.ts"
-      ],
-      "@packages/infra-graph": [
-        "../infra-graph/src/index.ts"
-      ],
-      "@packages/db": [
-        "../db/src/index.ts"
-      ]
+      "@packages/*": ["../../packages/*/dist/index.d.ts"]
     },
     "incremental": true,
     "rootDir": "src"

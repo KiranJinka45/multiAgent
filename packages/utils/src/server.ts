@@ -25,14 +25,14 @@ export class VirtualFileSystem {
     async write(p: string, c: string) {}
 }
 import { ArtifactValidator, ContainerManager, GovernanceEngine } from '@packages/validator';
-import { ProcessManager, DistributedExecutionContext, RuntimeStatus, JobStage, MissionStatus } from '@packages/runtime-core';
+import { ProcessManager, DistributedExecutionContext, RuntimeStatus, JobStage, MissionStatus } from './runtime-types.js';
 // Removed @packages/agents import to break cyclic dependency
 
 
 // Re-exports from modular packages for backward compatibility
 // export { VirtualFileSystem } from '@packages/vfs';
 export { ArtifactValidator, ContainerManager } from '@packages/validator';
-export { ProcessManager, DistributedExecutionContext, RuntimeStatus, JobStage, MissionStatus } from '@packages/runtime-core';
+export { ProcessManager, DistributedExecutionContext, RuntimeStatus, JobStage, MissionStatus } from './runtime-types.js';
 // Removed @packages/agents re-export to break cyclic dependency
 
 

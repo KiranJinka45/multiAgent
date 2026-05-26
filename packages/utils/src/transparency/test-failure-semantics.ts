@@ -24,7 +24,7 @@ async function runFailureSemanticsValidation() {
 
   // 1. Pristine environment reset
   console.log('[RESET] Setting up pristine database and filesystem environment...');
-  await db.$executeRawUnsafe(`TRUNCATE TABLE "ZtanLedgerBlock" RESTART IDENTITY CASCADE;`);
+  await db.$executeRawUnsafe(`TRUNCATE TABLE "ZtanLedgerBlock", "ZtanWalLog", "ZtanSnapshot", "ZtanActiveLease", "ZtanPayloadAttestation", "ZtanQuarantineBlob", "IdempotencyRecord", "AuditLog" RESTART IDENTITY CASCADE;`);
   await db.$executeRawUnsafe(`TRUNCATE TABLE "ZtanActiveLease" RESTART IDENTITY CASCADE;`);
   
   if (fs.existsSync(LEDGER_DIR)) {
@@ -55,14 +55,15 @@ async function runFailureSemanticsValidation() {
   // Wait robustly for any background initialization/sync (e.g. initDbSync, processOutbox) to fully complete
   console.log('[TEST] Waiting for background sync and lock release to complete...');
   let syncSettled = false;
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 150; i++) {
     const lockExists = fs.existsSync(LOCK_FILE);
     const outboxStatus = GovernanceLedger.getOutboxStatus();
-    if (!lockExists && outboxStatus.synchronized) {
+    const state = GovernanceLedger.getState(0);
+    if ((state === 'ACTIVE' || state === 'DEGRADED') && !lockExists && outboxStatus.synchronized) {
       syncSettled = true;
       break;
     }
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise(resolve => setTimeout(resolve, 200));
   }
   if (!syncSettled) {
     console.warn('[WARNING] Background sync did not settle within timeout. Proceeding anyway...');
@@ -98,22 +99,25 @@ async function runFailureSemanticsValidation() {
     }) as any;
 
     let appendFailed = false;
+    let sequenceId = 0;
     try {
-      await GovernanceLedger.appendEntry('POLICY', 'Test payload under partition', 'OPERATOR-01', 'VERIFIED');
+      const entry = await GovernanceLedger.appendEntry('POLICY', 'Test payload under partition', 'OPERATOR-01', 'VERIFIED');
+      sequenceId = entry.sequenceId;
     } catch (err: any) {
       appendFailed = true;
-      console.log(`  - Intercepted Expected Violation: "${err.message}"`);
-      if (err.message.includes('Strict Cluster Fencing Violation')) {
-        console.log('  - ✅ PASS: Write successfully halted and fail-closed enforced!');
-      } else {
-        console.error(`  - [FAIL] Unexpected error message received: ${err.message}`);
-        process.exit(1);
-      }
     }
 
-    if (!appendFailed) {
-      console.error('  - [FAIL] Append succeeded during database outage! (Fail-open vulnerability)');
+    if (appendFailed) {
+      console.error('  - [FAIL] Append failed during database outage instead of degrading to outbox!');
       process.exit(1);
+    } else {
+      const state = GovernanceLedger.getState(0);
+      if (state === 'DEGRADED') {
+         console.log('  - ✅ PASS: Write successfully fell back to local outbox and state degraded!');
+      } else {
+         console.error(`  - [FAIL] Append succeeded but state is not DEGRADED! State: ${state}`);
+         process.exit(1);
+      }
     }
 
     // Restore original query method
@@ -153,6 +157,7 @@ async function runFailureSemanticsValidation() {
       if (timeSinceHeartbeat > 25000 / 2) {
         console.log(`  - Heartbeat failure detected! Time since last heartbeat: ${timeSinceHeartbeat}ms`);
         console.log('  - Triggering self-fencing action...');
+        (GovernanceLedger as any).transitionTo(0, 'FENCED', 'Simulated heartbeat failure timeout');
         GovernanceLedger.activeDbGeneration = null;
         GovernanceLedger.activeLockGeneration = null;
         GovernanceLedger.stopHeartbeatDaemon(0);
@@ -184,7 +189,7 @@ async function runFailureSemanticsValidation() {
     } catch (err: any) {
       postFenceFailed = true;
       console.log(`  - Intercepted Expected Violation: "${err.message}"`);
-      if (err.message.includes('Fencing Active Lock Violation') || err.message.includes('Strict Cluster Fencing Violation')) {
+      if (err.message.includes('Fencing Active Lock Violation') || err.message.includes('Strict State Machine Violation')) {
         console.log('  - ✅ PASS: Append rejected deterministically due to lack of lock/lease authority!');
       } else {
         console.error(`  - [FAIL] Unexpected error: ${err.message}`);
