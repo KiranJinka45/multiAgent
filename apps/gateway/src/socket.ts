@@ -15,7 +15,9 @@ export async function initSocket(server: http.Server, app?: express.Application)
     const redisOptions = {
         maxRetriesPerRequest: null,
         retryStrategy(times: number) {
-            return Math.min(times * 200, 10000);
+            const delay = Math.min(times * 200, 10000);
+            const jitter = delay * 0.2 * (Math.random() - 0.5); // +-10% randomized jitter
+            return Math.round(delay + jitter);
         }
     };
     const pubClient = new Redis(REDIS_URL, redisOptions);
@@ -96,6 +98,81 @@ export async function initSocket(server: http.Server, app?: express.Application)
             }
         });
 
+        socket.on('sre:archaeology:stress_pump', (data: { count: number; byzantineType?: 'skew' | 'collision' | 'hash_mismatch' | 'gaps' }) => {
+            const count = data.count || 50000;
+            const byz = data.byzantineType;
+            elog.info({ socketId: socket.id, count, byzantineType: byz }, '⚡ [Socket] Stress pump triggered. Synthesizing evidence chain.');
+            
+            const batchSize = 5000;
+            let sequence = 20000;
+            const types = ['GOVERNANCE', 'REPLAY', 'IDENTITY', 'TELEMETRY', 'POLICY'];
+            
+            const sendBatch = () => {
+                if (sequence >= 20000 + count) {
+                    elog.info('[Socket] Stress pump completed successfully.');
+                    return;
+                }
+                
+                const batch: any[] = [];
+                const currentBatchSize = Math.min(batchSize, (20000 + count) - sequence);
+                
+                for (let i = 0; i < currentBatchSize; i++) {
+                    let id = sequence++;
+                    
+                    // Byzantine Type: Gaps (skip sequence numbers)
+                    if (byz === 'gaps' && i > 0 && i % 1000 === 0) {
+                        id += 10;
+                        sequence += 10;
+                    }
+
+                    // Byzantine Type: Clock Skew (timestamp goes backward or leaps)
+                    let timestamp = new Date().toISOString();
+                    if (byz === 'skew' && i > 0 && i % 1000 === 0) {
+                        timestamp = new Date(Date.now() - 1200000).toISOString();
+                    }
+
+                    // Byzantine Type: Hash Mismatch
+                    let payload = `[Forensic Pipeline Stress Event #${id}] System telemetry verified.`;
+                    if (byz === 'hash_mismatch' && i > 0 && i % 500 === 0) {
+                        payload += ' [BYZANTINE_HASH_MISMATCH] corrupt hash pointer.';
+                    }
+
+                    const ev = {
+                        sequenceId: id,
+                        timestamp,
+                        type: types[id % types.length],
+                        payload,
+                        evidence: {
+                          hash: crypto.randomBytes(8).toString('hex'),
+                          prevHash: crypto.randomBytes(8).toString('hex'),
+                          signature: 'ZTAN_SIG_' + crypto.randomBytes(3).toString('hex').toUpperCase(),
+                          epoch: '102',
+                          verdict: 'VERIFIED'
+                        }
+                    };
+
+                    batch.push(ev);
+
+                    // Byzantine Type: Collision (inject duplicate sequenceId with different payload)
+                    if (byz === 'collision' && i > 0 && i % 500 === 0) {
+                        batch.push({
+                            ...ev,
+                            payload: `[BYZANTINE_COLLISION] Malicious double-spending payload attempt at sequence #${id}.`,
+                            evidence: {
+                                ...ev.evidence,
+                                hash: crypto.randomBytes(8).toString('hex')
+                            }
+                        });
+                    }
+                }
+                
+                io.to('sre:telemetry').emit('sre:archaeology:chain_loaded', batch);
+                setTimeout(sendBatch, 50);
+            };
+            
+            sendBatch();
+        });
+
         socket.on('disconnect', () => {
             connectedSockets.delete(socket);
             elog.info({ socketId: socket.id }, '[Socket] User disconnected');
@@ -157,13 +234,68 @@ export async function initSocket(server: http.Server, app?: express.Application)
 
 
 
-    // Controlled broadcast loop (Backpressure management)
+    // Controlled broadcast loop (Backpressure management & Budget limits)
     setInterval(() => {
         if (!latestState) return;
 
-        // Broadcast to all subscribed clients
-        io.to('sre:telemetry').emit('sre:update', latestState);
-        elog.debug('[Socket] Broadcasted latest SRE state to telemetry room');
+        try {
+            // Measure Serialization Latency (Observability Risk 2)
+            const startSer = performance.now();
+            const serializedPayload = JSON.stringify(latestState);
+            const serLatency = (performance.now() - startSer) / 1000;
+            
+            import('@packages/observability').then(obs => {
+                if (obs && obs.websocketSerializationLatency) {
+                    obs.websocketSerializationLatency.observe(serLatency);
+                }
+            }).catch(() => {});
+
+            // Enforce Telemetry Budgets (Observability Risk 7)
+            // Ceiling 1: Max websocket telemetry throughput = 50 KB
+            const payloadSizeKb = Buffer.byteLength(serializedPayload, 'utf8') / 1024;
+            
+            let finalPayload = latestState;
+            if (payloadSizeKb > 50) {
+                elog.warn({ payloadSizeKb }, '⚠️  [Socket] Telemetry payload exceeds 50KB budget. Down-sampling payload to preserve network health.');
+                // Down-sampling / load-shedding: strip verbose fields (like full incident logs)
+                finalPayload = {
+                    ...latestState,
+                    activeIncidents: latestState.activeIncidents?.map((inc: any) => ({
+                        id: inc.id,
+                        type: inc.type,
+                        severity: inc.severity,
+                        title: inc.title,
+                        timestamp: inc.timestamp
+                    })) ?? [],
+                    governanceProposals: latestState.governanceProposals?.map((p: any) => ({
+                        id: p.id,
+                        title: p.title,
+                        riskLevel: p.riskLevel,
+                        status: p.status
+                    })) ?? []
+                };
+            }
+
+            // Track WebSocket Outbound Queue Depth (Observability Risk 2)
+            let totalQueueDepth = 0;
+            io.sockets.sockets.forEach((s: any) => {
+                if (s.conn && s.conn.writeBuffer) {
+                    totalQueueDepth += s.conn.writeBuffer.length;
+                }
+            });
+            
+            import('@packages/observability').then(obs => {
+                if (obs && obs.websocketOutboundQueueDepth) {
+                    obs.websocketOutboundQueueDepth.set(totalQueueDepth);
+                }
+            }).catch(() => {});
+
+            // Broadcast to all subscribed clients
+            io.to('sre:telemetry').emit('sre:update', finalPayload);
+            elog.debug('[Socket] Broadcasted latest SRE state to telemetry room');
+        } catch (e) {
+            elog.error({ err: e }, '[Socket] Telemetry broadcast error');
+        }
     }, 1000); // Stable 1Hz telemetry heart-beat
 
     // Redis subscriber for all build and log events

@@ -1,0 +1,42 @@
+[
+  {
+    "corpus_id": "cadence_001",
+    "provenance": {
+      "intended_pathology": "repetitive_escapes",
+      "expected_parser_pressure": "extreme",
+      "targeted_fsm_region": "StringEscape",
+      "targeted_decoder_state": "EscapeTransition"
+    },
+    "payload": "{\"a\":\"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\uD83D\"}"
+  },
+  {
+    "corpus_id": "cadence_002",
+    "provenance": {
+      "intended_pathology": "oscillating_nesting_transitions",
+      "expected_parser_pressure": "critical",
+      "targeted_fsm_region": "ObjectArrayNesting",
+      "targeted_decoder_state": "ValueTransition"
+    },
+    "payload": "[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]"
+  },
+  {
+    "corpus_id": "cadence_003",
+    "provenance": {
+      "intended_pathology": "alternating_delimiter_churn",
+      "expected_parser_pressure": "high",
+      "targeted_fsm_region": "ObjectArrayNesting",
+      "targeted_decoder_state": "ValueTransition"
+    },
+    "payload": "{\"x\":[{},[],{},[],{},[],{},[],{},[],{},[],{},[],{}]}"
+  },
+  {
+    "corpus_id": "cadence_004",
+    "provenance": {
+      "intended_pathology": "maximal_continuation_chains",
+      "expected_parser_pressure": "critical",
+      "targeted_fsm_region": "UTF8Decoder",
+      "targeted_decoder_state": "ContinuationByte"
+    },
+    "payload": "{\"a\":\"𠜎𠜎𠜎𠜎𠜎𠜎𠜎𠜎𠜎𠜎𠜎𠜎𠜎𠜎𠜎𠜎𠜎𠜎𠜎𠜎𠜎\"}"
+  }
+]

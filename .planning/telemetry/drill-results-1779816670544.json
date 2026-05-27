@@ -1,0 +1,60 @@
+{
+  "timestamp": "2026-05-26T17:31:10.543Z",
+  "successCount": 2,
+  "failureCount": 7,
+  "totalCount": 9,
+  "results": [
+    {
+      "name": "test-lease-fencing.ts",
+      "success": true,
+      "durationMs": 6112
+    },
+    {
+      "name": "test-failure-semantics.ts",
+      "success": false,
+      "durationMs": 5948,
+      "error": "Command failed: npx tsx \"C:\\multiagentic_project\\multiAgent-main\\packages\\utils\\src\\transparency\\test-failure-semantics.ts\""
+    },
+    {
+      "name": "test-outbox-self-healing.ts",
+      "success": false,
+      "durationMs": 6264,
+      "error": "Command failed: npx tsx \"C:\\multiagentic_project\\multiAgent-main\\packages\\utils\\src\\transparency\\test-outbox-self-healing.ts\""
+    },
+    {
+      "name": "test-outbox-resilience.ts",
+      "success": false,
+      "durationMs": 7288,
+      "error": "Command failed: npx tsx \"C:\\multiagentic_project\\multiAgent-main\\packages\\utils\\src\\transparency\\test-outbox-resilience.ts\""
+    },
+    {
+      "name": "test-ledger-compaction.ts",
+      "success": false,
+      "durationMs": 5182,
+      "error": "Command failed: npx tsx \"C:\\multiagentic_project\\multiAgent-main\\packages\\utils\\src\\transparency\\test-ledger-compaction.ts\""
+    },
+    {
+      "name": "test-multi-writer.ts",
+      "success": false,
+      "durationMs": 32546,
+      "error": "Command failed: npx tsx \"C:\\multiagentic_project\\multiAgent-main\\packages\\utils\\src\\transparency\\test-multi-writer.ts\""
+    },
+    {
+      "name": "test-byzantine-drift.ts",
+      "success": false,
+      "durationMs": 4417,
+      "error": "Command failed: npx tsx \"C:\\multiagentic_project\\multiAgent-main\\packages\\utils\\src\\transparency\\test-byzantine-drift.ts\""
+    },
+    {
+      "name": "test-hsm-ceremony.ts",
+      "success": true,
+      "durationMs": 2788
+    },
+    {
+      "name": "test-replicated-consensus.ts",
+      "success": false,
+      "durationMs": 3895,
+      "error": "Command failed: npx tsx \"C:\\multiagentic_project\\multiAgent-main\\packages\\utils\\src\\transparency\\test-replicated-consensus.ts\""
+    }
+  ]
+}

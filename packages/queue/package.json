@@ -1,0 +1,26 @@
+{
+  "name": "@packages/queue",
+  "version": "1.0.0",
+  "description": "MultiAgent Shared Queue client",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "type": "module",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --no-dts && del /q tsconfig.tsbuildinfo 2>nul & tsc --emitDeclarationOnly",
+    "dev": "tsup src/index.ts --format esm --no-dts --watch"
+  },
+  "dependencies": {
+    "@packages/utils": "workspace:*",
+    "bullmq": "5.71.0"
+  },
+  "devDependencies": {
+    "tsup": "8.5.1"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  }
+}

@@ -15,7 +15,7 @@ async function runMultiWriterContentionValidation() {
 
   // 1. Pristine environment reset
   console.log('[RESET] Setting up pristine database and filesystem environment...');
-  await db.$executeRawUnsafe(`TRUNCATE TABLE "ZtanLedgerBlock" RESTART IDENTITY CASCADE;`);
+  await db.$executeRawUnsafe(`TRUNCATE TABLE "ZtanLedgerBlock", "ZtanWalLog", "ZtanSnapshot", "ZtanActiveLease", "ZtanPayloadAttestation", "ZtanQuarantineBlob", "IdempotencyRecord", "AuditLog" RESTART IDENTITY CASCADE;`);
   await db.$executeRawUnsafe(`TRUNCATE TABLE "ZtanActiveLease" RESTART IDENTITY CASCADE;`);
   
   const ledgerDir = path.join(process.cwd(), '.ztan-transparency');
@@ -32,10 +32,18 @@ async function runMultiWriterContentionValidation() {
   // Wait robustly for any background initialization/sync (e.g. initDbSync, processOutbox) to fully complete
   console.log('[TEST] Waiting for background sync and lock release to complete...');
   let syncSettled = false;
+  const count = GovernanceLedger.getPartitionCount();
   for (let i = 0; i < 150; i++) {
-    const lockExists = fs.existsSync(LOCK_FILE);
-    const outboxStatus = GovernanceLedger.getOutboxStatus();
-    if (!lockExists && outboxStatus.synchronized) {
+    let allActive = true;
+    for (let p = 0; p < count; p++) {
+      const lockExists = fs.existsSync(GovernanceLedger.getLockFile(p));
+      const outboxStatus = GovernanceLedger.getOutboxStatus(p);
+      if (lockExists || !outboxStatus.synchronized || GovernanceLedger.getState(p) !== 'ACTIVE') {
+        allActive = false;
+        break;
+      }
+    }
+    if (allActive) {
       syncSettled = true;
       break;
     }
@@ -90,15 +98,21 @@ async function runMultiWriterContentionValidation() {
 
   console.log('\n[TEST] Waiting for replication sync and settling to database...');
   let settled = false;
-  // Total expected size: 1 (Genesis) + 10 (Parent) + 10 (Child) = 21 blocks
-  const EXPECTED_COUNT = 21;
+  // Total expected size: count (Genesis) + 10 (Parent) + 10 (Child) = count + 20 blocks
+  const EXPECTED_COUNT = count + 20;
 
   for (let i = 0; i < 50; i++) {
     // Check outbox reconciliation
     await GovernanceLedger.processOutbox().catch(() => {});
-    const dbCount = await db.ztanLedgerBlock.count();
-    const localCount = GovernanceLedger.loadLedger().length;
+    let localCount = 0;
+    for (let p = 0; p < count; p++) {
+      localCount += GovernanceLedger.loadLedger(p).length;
+    }
     
+    // Check dbCount manually to ignore NaN blocks
+    const allDbBlocks = await db.ztanLedgerBlock.findMany();
+    const dbCount = allDbBlocks.filter((b: any) => !isNaN(parseInt(b.blockId, 10))).length;
+
     console.log(`  - Checking parity: Local size = ${localCount}, PostgreSQL size = ${dbCount} (Expected: ${EXPECTED_COUNT})`);
     
     if (dbCount === EXPECTED_COUNT && localCount === EXPECTED_COUNT) {
@@ -138,15 +152,15 @@ async function runMultiWriterContentionValidation() {
 
   // 7. Verify perfectly continuous sequence IDs (No duplicates, no missing links)
   console.log('\n[TEST] Verifying sequence continuity constraints...');
-  const finalLedger = GovernanceLedger.loadLedger();
-  
-  // Sort ledger by sequenceId to verify monotonic increments
-  finalLedger.sort((a, b) => a.sequenceId - b.sequenceId);
-  for (let i = 0; i < finalLedger.length; i++) {
-    const expectedSeq = 1000 + i;
-    if (finalLedger[i].sequenceId !== expectedSeq) {
-      console.error(`[FAIL] Sequence breach: expected sequence ${expectedSeq} but found ${finalLedger[i].sequenceId}`);
-      process.exit(1);
+  for (let p = 0; p < count; p++) {
+    const finalLedger = GovernanceLedger.loadLedger(p);
+    finalLedger.sort((a, b) => a.sequenceId - b.sequenceId);
+    for (let i = 0; i < finalLedger.length; i++) {
+      const expectedSeq = (p * 1000000) + 1000 + i;
+      if (finalLedger[i].sequenceId !== expectedSeq) {
+        console.error(`[FAIL] Sequence breach on partition ${p}: expected sequence ${expectedSeq} but found ${finalLedger[i].sequenceId}`);
+        process.exit(1);
+      }
     }
   }
   console.log('  - ✅ PASS: Ledger sequence numbers are perfectly continuous and monotonically strictly incrementing!');

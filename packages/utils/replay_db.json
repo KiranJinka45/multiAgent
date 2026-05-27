@@ -1,0 +1,6623 @@
+[
+  {
+    "replay_id": "24466ed62c705dbe519921bf16704eb703cb6c73bfa45fa7b0255ded98c25770",
+    "contract": {
+      "corpus_id": "conformance_p17_t0_float_canonicalization",
+      "deterministic_seed": "phase17_t0",
+      "runtime_pair": {
+        "primary": "typescript",
+        "secondary": "rust"
+      },
+      "chunk_strategy": "boundary_targeted",
+      "fragmentation_profile": {
+        "strategy": "boundary_targeted"
+      },
+      "snapshot_schema_version": "v1.0",
+      "entropy_profile": {
+        "async_chunk_jitter": false,
+        "stdout_fragmentation": false
+      },
+      "topology_flush_interval": 64,
+      "ecosystem_profile": "ecma262"
+    },
+    "chunk_layout_sizes": [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      1
+    ],
+    "primary_artifacts": {
+      "runtime": "typescript",
+      "final_result": "accept",
+      "trace_digest": "918c78bd3e7db0e6b1765121121fb1ac74c599ba44779369f649547c049db974",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 19,
+        "snapshots_per_chunk": [
+          1,
+          0,
+          0,
+          2,
+          2,
+          0,
+          0,
+          2,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.2087912087912088,
+        "transition_density": {
+          "init": 1,
+          "token_processed": 17,
+          "finalize": 1
+        },
+        "snapshots_per_sec": 847.7185217573646,
+        "transitions_per_byte": 0.2087912087912088,
+        "throughput_bytes_per_sec": 4060.1255515747457,
+        "replay_wall_clock_ms": 22.413100000000014,
+        "chunk_stall_ms": 0,
+        "stdout_frame_count": 1,
+        "replay_memory_peak": 4887952,
+        "telemetry_overhead_ms": 12.422700000000034,
+        "topology_hash_cpu_cost": 8.726800000000011,
+        "snapshot_memory_cost": 3574,
+        "telemetry_frames_written": 1,
+        "telemetry_cost_per_snapshot": 0.6538263157894755,
+        "topology_cost_per_window": 8.726800000000011,
+        "memory_growth_per_transition": 188.10526315789474,
+        "serialization_cost_per_frame": 3.695900000000023,
+        "stdout_drain_latency": 269.6645
+      },
+      "topology_fingerprint": "44dde693b1da5c22614cbed7261cbe3042ea971a8ca98d7e1990b5cb671053a9",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": false,
+          "stdout_fragmentation": false
+        },
+        "transport_corruption_mode": "none",
+        "chunk_strategy": "boundary_targeted",
+        "jitter_profile": "none",
+        "stdout_strategy": "none",
+        "seed": "phase17_t0"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_19": "44dde693b1da5c22614cbed7261cbe3042ea971a8ca98d7e1990b5cb671053a9"
+      },
+      "snapshots_compressed": "H4sIAAAAAAAACs3XwW4bNxCA4XfZa5WAMxwOh7q5gZMacBLA9a0ojBlymCxqy661KdoafvfCiWUtEAkuEB90lgDuJ86/pH67G9b+5xdfVb8YV83/HpZhMXzW9edhOTiUzlAgmnGKAWpqLZJoISjmsWuwwsIhoKKJ9II5ELtREIBsPCyG6VZX63Ear1cXt67r69WwHMbVOA33i+9XhqeVsYmzY5Fm3TWLUIUUIIXqKlC4Ys+eelczJu3VxYtXKcg1JOO4Z+Xp+g9fXdzcXldfr70Ni+HKJ2066bC8e/x0+ufGh+Vwevz2/OLns6M3x8NiWE96O339ZXzVvj7nX3r55eFrd8P9Lgk+SbqUBEUNxRgqxAxIPYNjbxiwW4u51x5LoFxLduvZAjFVyyghpxeQ/Hp+dvLh3VYBG0XYMsbV5J/8djcmbjGtBYBc0SgXEQhNlGNoFXo2RNPazAAlAQVSYFHJAqxQmoNj+nHMm4+nHz/MLE9bMtuT5W4GPTHMA3c17Q9DGr1jjknNCqtAs+KBG4pbqerWUgJxrlgLA3dKbi/AOD05Pz47Op1BcAOJWwjthqQnSBMV8GwkDYq75dgiSk7dFFItZOghuObmPRFxQemEUEKqnTJReYn9eP/+aMaIGwZtGYvdDD7kRtKjA3Hr6JfXOu225MNNBDeThfHZROSQE0HaQPIskddhN6UcbiQPz/8NIs9GAuGAK8HyCKHZ23ddR19NYx/rHhEcbiu0ORsJn20F8JBjoc2LmGYzBq+D4x5NPNxeHgjfLOX5XuiAe0mb2wrPepnGK19PenWzB5QONxfe5ML/I5fZcV8pNVTVXjz1JiWJK4REkczIs0V0xiKhBqYGtbasna0JOULz8PIbw5tayuxOjAH5VUivMJxDWWJeEvwU0jLuOXBgeweoRVAZJIhr5UYxpkIBPLqYmytj1AAgRhhywtSsC2tnbsaJU/1x4NnJu1+++/tSNuNXZuN3v0czuwqE6slZpTdpFrl3gJwgZQtqidljEDFpktQYs1PRnKqnCN7dYN929XGll+O/Ptz//h9yDBTBhQ4AAA=="
+    },
+    "secondary_artifacts": {
+      "runtime": "rust",
+      "final_result": "accept",
+      "trace_digest": "0ba9c1fdf5c24074e83dd5b8f2cb934bf4fbbcc5df7f7a4a2fd73c43bac6efc0",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 31,
+        "snapshots_per_chunk": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.34065934065934067,
+        "transition_density": {
+          "ChunkIngress": 31
+        },
+        "stdout_drain_latency": 89.68619999999987
+      },
+      "topology_fingerprint": "915dd8a9bdb1dfd036ba3d8dee55b288b47f10129007e200a4fe538df7f94fef",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": false,
+          "backpressure_intensity": null,
+          "descriptor_exhaustion": null,
+          "jitter_intensity": null,
+          "partial_stdout_truncation": null,
+          "scheduler_contention": null,
+          "stderr_flood_intensity": null,
+          "stdout_fragmentation": false
+        },
+        "seed": "phase17_t0"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_31": "915dd8a9bdb1dfd036ba3d8dee55b288b47f10129007e200a4fe538df7f94fef"
+      },
+      "snapshots_compressed": "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"
+    },
+    "classification": "semantic_aligned_cadence_divergence",
+    "first_divergence_index": 0,
+    "divergence_windows": [
+      {
+        "start_snapshot": 0,
+        "end_snapshot": null
+      }
+    ],
+    "persistence_metrics": {
+      "raw_bytes": 10245,
+      "compressed_bytes": 2318,
+      "compression_ratio": 4.419758412424504,
+      "processing_time_ms": 4.590400000000045,
+      "shedded": false,
+      "sampled": false,
+      "telemetry_confidence": 1
+    }
+  },
+  {
+    "replay_id": "ecfa4ac5fab5eb0e92b0a81441274db12ad5c0e89c70fa7703434232aaaaba4d",
+    "contract": {
+      "corpus_id": "conformance_p17_t1_unicode_elements",
+      "deterministic_seed": "phase17_t1",
+      "runtime_pair": {
+        "primary": "typescript",
+        "secondary": "rust"
+      },
+      "chunk_strategy": "boundary_targeted",
+      "fragmentation_profile": {
+        "strategy": "boundary_targeted"
+      },
+      "snapshot_schema_version": "v1.0",
+      "entropy_profile": {
+        "async_chunk_jitter": false,
+        "stdout_fragmentation": false
+      },
+      "topology_flush_interval": 64,
+      "ecosystem_profile": "legacy_first_win"
+    },
+    "chunk_layout_sizes": [
+      3,
+      3,
+      3,
+      4,
+      9,
+      9,
+      3,
+      3,
+      3,
+      3,
+      5,
+      9,
+      7,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      1
+    ],
+    "primary_artifacts": {
+      "runtime": "typescript",
+      "final_result": "accept",
+      "trace_digest": "5ac50ec994c1d42fcbbaae5878e9b8f3e7d8860898dff74145600b7e602e0a67",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 23,
+        "snapshots_per_chunk": [
+          1,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          2,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.19166666666666668,
+        "transition_density": {
+          "init": 1,
+          "token_processed": 21,
+          "finalize": 1
+        },
+        "snapshots_per_sec": 1016.4892230044774,
+        "transitions_per_byte": 0.19166666666666668,
+        "throughput_bytes_per_sec": 5303.422033066839,
+        "replay_wall_clock_ms": 22.626899999999992,
+        "chunk_stall_ms": 0,
+        "stdout_frame_count": 1,
+        "replay_memory_peak": 4892600,
+        "telemetry_overhead_ms": 15.460499999999925,
+        "topology_hash_cpu_cost": 10.305499999999995,
+        "snapshot_memory_cost": 4334,
+        "telemetry_frames_written": 1,
+        "telemetry_cost_per_snapshot": 0.6721956521739098,
+        "topology_cost_per_window": 10.305499999999995,
+        "memory_growth_per_transition": 188.43478260869566,
+        "serialization_cost_per_frame": 5.15499999999993,
+        "stdout_drain_latency": 265.3674
+      },
+      "topology_fingerprint": "57e29766d70161096d1abb38d58776da3c8d3bd92afc9dca465eb5bc6ffde165",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": false,
+          "stdout_fragmentation": false
+        },
+        "transport_corruption_mode": "none",
+        "chunk_strategy": "boundary_targeted",
+        "jitter_profile": "none",
+        "stdout_strategy": "none",
+        "seed": "phase17_t1"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_23": "57e29766d70161096d1abb38d58776da3c8d3bd92afc9dca465eb5bc6ffde165"
+      },
+      "snapshots_compressed": "H4sIAAAAAAAACs3YzW4bRwzA8XfZsw4k54ujWxK4aYB8AG5uVWGQM5xaqLJypXVRx/CjFX2kvkJhx2sJsBQd4sMCuknA7m+5f4CjX2+7rf15bX2xi2Vf7e9uDrPuUraX3bwzzC1iRqcagwMsoVbnWbLHrOaagObIEYCElLllSuCjqQdGTBq7WTdspN8uh+W6v9iYbNd9N++W/XLo7mbPr4xPV6bKFo0yV20midkXDIABigljjoVastCaqEYvrRhbtsKZYoGg0R258rD+w/qLq8262HZrtZt1X2yQKoN089vHb4ebK+vm3fuznz5fvD5/9easm3XbQTbDw5Oxvj7c51+yur7/2W13d0hCT5LGOWAWJdaIBV1C8i2hUasE1LS61EpzGXwqOZm2pOCjL5qIIYUXkPzy+fzdx7c7BT4q0k7RVvL7YYjbQWoFxFRIfcrMCJUlOqgFW1IilVJVkTigBy8YWTgxRsFcDY3Cj0PefHr/6ePOkR4dvHPMDyP8DlF8qCQiLVtolXNgE4TgnVf1ltSRRcoMBaKvWEpN0qJW9kZYDV5+Gnl8p/YY//37z/PPYVp4olUWRkvquWI20+SqI06hqWAo2SsZgEmq1oL3MRM3T5ghlOaT9/kl5vPhw6u994xHWt7RZocZccK90Jg97Y1oe/NF16vDmDTdZmicCeWT1fCEq3HjTNx3szkMy9Ntxo3zcaebQZhwNH4ckN8b0OWyVuuPaHC61fhxKv50NUgTziaMU0l7K8yV3KzWUheL69szAIK74dgygG665aSntYZOl+MnXE5y416zB5FSrB+2RzhhuuncI75p3Ol04oTTYf8IyXuQ9WJxDQ74iCdNN5c8vmXZn86FJ5xLDuOWCXsHmq+2WV9sr6TYEVKebjIPkEfS6bMNwYSjQXg63uwfAmSxuCaA13qEtFsFSmaSiAxsUmL1zoXsAc0Zq6lJJCeAyOoJUqBQtXGUFmPVGGIoP046f/f252d/BDxovrnun//oujvi2a0ECsWCReFWuaqLrSGmgCEpiIYYzQGzcuUgGimZz5JCseDQmikeG1Fb9rJafrXu7rf/AaIxmqbREQAA"
+    },
+    "secondary_artifacts": {
+      "runtime": "rust",
+      "final_result": "accept",
+      "trace_digest": "728de29809ece32bed601d422fcaf3be56134805c2ec2a09af85fcfcbf4c9d4d",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 86,
+        "snapshots_per_chunk": [
+          1,
+          1,
+          1,
+          4,
+          10,
+          10,
+          1,
+          1,
+          1,
+          1,
+          4,
+          10,
+          7,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          2,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.589041095890411,
+        "transition_density": {
+          "ChunkIngress": 41,
+          "EscapeEnter": 3,
+          "Utf8ContinuationExit": 19,
+          "EscapeExit": 3,
+          "Utf8ContinuationEnter": 20
+        },
+        "stdout_drain_latency": 118.63390000000004
+      },
+      "topology_fingerprint": "215ced19ebb44873c5710a7c273687df38c0359c1a11f679a3572cffcc801dff",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": false,
+          "backpressure_intensity": null,
+          "descriptor_exhaustion": null,
+          "jitter_intensity": null,
+          "partial_stdout_truncation": null,
+          "scheduler_contention": null,
+          "stderr_flood_intensity": null,
+          "stdout_fragmentation": false
+        },
+        "seed": "phase17_t1"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_64_86": "2f365e4183575532bc783eab973f566aaad058f6757ea2d518b821a208ee5d71",
+        "window_0_64": "0193b90b3de62b7f7343eacb5a7a0340e9c00643454ef0dee6934fe9ddd7fee9"
+      },
+      "snapshots_compressed": "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"
+    },
+    "classification": "semantic_divergence",
+    "first_divergence_index": 0,
+    "divergence_windows": [
+      {
+        "start_snapshot": 0,
+        "end_snapshot": null
+      }
+    ],
+    "persistence_metrics": {
+      "raw_bytes": 23033,
+      "compressed_bytes": 4843,
+      "compression_ratio": 4.755936403055957,
+      "processing_time_ms": 3.656600000000026,
+      "shedded": false,
+      "sampled": false,
+      "telemetry_confidence": 1
+    }
+  },
+  {
+    "replay_id": "85671f076ba6e1c4fc61f678f1667f2b5e094ab65db6d8029c784a0d4bccab93",
+    "contract": {
+      "corpus_id": "conformance_p17_t2_surrogates_slashes",
+      "deterministic_seed": "phase17_t2",
+      "runtime_pair": {
+        "primary": "typescript",
+        "secondary": "rust"
+      },
+      "chunk_strategy": "boundary_targeted",
+      "fragmentation_profile": {
+        "strategy": "boundary_targeted"
+      },
+      "snapshot_schema_version": "v1.0",
+      "entropy_profile": {
+        "async_chunk_jitter": false,
+        "stdout_fragmentation": false
+      },
+      "topology_flush_interval": 64,
+      "ecosystem_profile": "duplicate_error"
+    },
+    "chunk_layout_sizes": [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      1
+    ],
+    "primary_artifacts": {
+      "runtime": "typescript",
+      "final_result": "accept",
+      "trace_digest": "18084e95d2f0783eeb745e3847be01d1dc7da96842fcc364e2302dfaab82ae57",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 11,
+        "snapshots_per_chunk": [
+          1,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.13924050632911392,
+        "transition_density": {
+          "init": 1,
+          "token_processed": 9,
+          "finalize": 1
+        },
+        "snapshots_per_sec": 777.8799236263337,
+        "transitions_per_byte": 0.13924050632911392,
+        "throughput_bytes_per_sec": 5586.592178770942,
+        "replay_wall_clock_ms": 14.14100000000002,
+        "chunk_stall_ms": 0,
+        "stdout_frame_count": 1,
+        "replay_memory_peak": 5360432,
+        "telemetry_overhead_ms": 9.58650000000003,
+        "topology_hash_cpu_cost": 6.776900000000012,
+        "snapshot_memory_cost": 2054,
+        "telemetry_frames_written": 1,
+        "telemetry_cost_per_snapshot": 0.8715000000000027,
+        "topology_cost_per_window": 6.776900000000012,
+        "memory_growth_per_transition": 186.72727272727272,
+        "serialization_cost_per_frame": 2.8096000000000174,
+        "stdout_drain_latency": 331.7428000000002
+      },
+      "topology_fingerprint": "bfbf5399016c2fd770ced3764352716c6ea287fb3703750d8ce934f4fabbad36",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": false,
+          "stdout_fragmentation": false
+        },
+        "transport_corruption_mode": "none",
+        "chunk_strategy": "boundary_targeted",
+        "jitter_profile": "none",
+        "stdout_strategy": "none",
+        "seed": "phase17_t2"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_11": "bfbf5399016c2fd770ced3764352716c6ea287fb3703750d8ce934f4fabbad36"
+      },
+      "snapshots_compressed": "H4sIAAAAAAAACs3Vy05bMRAG4HfxOioeX8bj7Fp6Q0IgUXZNFc3YYxKVnKQ5B0SLePcKSDmVmqoLumBtS+PP84/9+db0+u1Ku6LzZVf1xkztxCy4X5ipUcgNIYMXwegtlFirD8Q5QBb1ja1kJLTWsROill2yAVWCJYAkaCZm2HLXL4fluptvlft1Z6Zm2S0Hczf5szI8VXaVFNVlqtKUE1EoEC1EW5QJMhbXksbWWAQDt6KkWQtlh8VGQf+XysP6q3bzzXZdtO+1molZ6cCVBzbT293q8H2jZmqO370/n785e334zkxMP/B2eLgZ7erDOa/58up+26252ydxT5JGOUJmcSQIBXwCF1oCda0665pUn1ppPtuQSk4qLYkNGIokRzbF/yD5dH52dPJhVMBOkUbFhofFfogfIbVagFSchJSJwFZi9LYWaEmcEy5VBBxFCDYwIDElAmTIVUFdfD7k8PT49GR0pJ2DRsd0PyKMiBJidczcssZWKUdSBhuDDyJBk3in6DLZYjFUKKUmbiiVgjqoav9/N/JO4X9rx2IYNv10NjuYzQ70hlebS31V1qvZ7KBef91PxBccOP/LGONorLziC63zftguu4v9qPRyw3dPeTThP+NHLzh+8dcUpd/GqL/abtcXPOhsdvWWrF3oVvfT8hOtZHKMQJaUC9bgfczBgnolUVFG59kCkARnU3SxSiPkhlgFI8byfNrZ0YePfzzZ96xHXx59d/sxMP58YotGRaZWqYrH1gBShJjEskRE9ZZIqFJkQZc0ZE6xaPSgTQX+1qi27Phy+UPN3ZeflopM+HkHAAA="
+    },
+    "secondary_artifacts": {
+      "runtime": "rust",
+      "final_result": "accept",
+      "trace_digest": "38062fca4148816b93acfcede90a3a37ae09d58d9db049899347ad2f5f184d7f",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 35,
+        "snapshots_per_chunk": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          3,
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.4430379746835443,
+        "transition_density": {
+          "EscapeExit": 4,
+          "EscapeEnter": 4,
+          "ChunkIngress": 27
+        },
+        "stdout_drain_latency": 94.75809999999979
+      },
+      "topology_fingerprint": "e7329daf24661c1ca02475f652ea13334368cf32c83696db57872651b4535cf8",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": false,
+          "backpressure_intensity": null,
+          "descriptor_exhaustion": null,
+          "jitter_intensity": null,
+          "partial_stdout_truncation": null,
+          "scheduler_contention": null,
+          "stderr_flood_intensity": null,
+          "stdout_fragmentation": false
+        },
+        "seed": "phase17_t2"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_35": "e7329daf24661c1ca02475f652ea13334368cf32c83696db57872651b4535cf8"
+      },
+      "snapshots_compressed": "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"
+    },
+    "classification": "semantic_aligned_cadence_divergence",
+    "first_divergence_index": 0,
+    "divergence_windows": [
+      {
+        "start_snapshot": 0,
+        "end_snapshot": null
+      }
+    ],
+    "persistence_metrics": {
+      "raw_bytes": 9269,
+      "compressed_bytes": 2352,
+      "compression_ratio": 3.940901360544218,
+      "processing_time_ms": 5.877099999999928,
+      "shedded": false,
+      "sampled": true,
+      "telemetry_confidence": 0.9772727272727273
+    }
+  },
+  {
+    "replay_id": "e41beb8a7540c88e517a28b40cfd8dd56888ab887028e7bd9ac2970f4623396f",
+    "contract": {
+      "corpus_id": "conformance_p17_t3_sparse_and_unordered",
+      "deterministic_seed": "phase17_t3",
+      "runtime_pair": {
+        "primary": "typescript",
+        "secondary": "rust"
+      },
+      "chunk_strategy": "boundary_targeted",
+      "fragmentation_profile": {
+        "strategy": "boundary_targeted"
+      },
+      "snapshot_schema_version": "v1.0",
+      "entropy_profile": {
+        "async_chunk_jitter": false,
+        "stdout_fragmentation": false
+      },
+      "topology_flush_interval": 64,
+      "ecosystem_profile": "canonical_order_strict"
+    },
+    "chunk_layout_sizes": [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      2
+    ],
+    "primary_artifacts": {
+      "runtime": "typescript",
+      "final_result": "accept",
+      "trace_digest": "ed05869330978784383dd6bad41c243feccfa7b7bd0167aea880f189427231f0",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 21,
+        "snapshots_per_chunk": [
+          1,
+          2,
+          2,
+          1,
+          1,
+          2,
+          0,
+          0,
+          0,
+          1,
+          2,
+          2,
+          0,
+          2,
+          0,
+          3
+        ],
+        "snapshots_per_byte": 0.44680851063829785,
+        "transition_density": {
+          "init": 1,
+          "token_processed": 19,
+          "finalize": 1
+        },
+        "snapshots_per_sec": 1035.5131707413277,
+        "transitions_per_byte": 0.44680851063829785,
+        "throughput_bytes_per_sec": 2317.577096421067,
+        "replay_wall_clock_ms": 20.279800000000023,
+        "chunk_stall_ms": 0,
+        "stdout_frame_count": 1,
+        "replay_memory_peak": 4885248,
+        "telemetry_overhead_ms": 13.559099999999972,
+        "topology_hash_cpu_cost": 10.212999999999994,
+        "snapshot_memory_cost": 3954,
+        "telemetry_frames_written": 1,
+        "telemetry_cost_per_snapshot": 0.6456714285714272,
+        "topology_cost_per_window": 10.212999999999994,
+        "memory_growth_per_transition": 188.28571428571428,
+        "serialization_cost_per_frame": 3.3460999999999785,
+        "stdout_drain_latency": 308.0443
+      },
+      "topology_fingerprint": "065e9999e4debc67a27b899e170014b9b8af05a76632c46fd12c5b6cc6f028b9",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": false,
+          "stdout_fragmentation": false
+        },
+        "transport_corruption_mode": "none",
+        "chunk_strategy": "boundary_targeted",
+        "jitter_profile": "none",
+        "stdout_strategy": "none",
+        "seed": "phase17_t3"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_21": "065e9999e4debc67a27b899e170014b9b8af05a76632c46fd12c5b6cc6f028b9"
+      },
+      "snapshots_compressed": "H4sIAAAAAAAACs3WUWscRwwH8O+yz36QNBqNxm9ucFNTJwHXbyEYaUZDjrpn13cubYy/e3Hq8x7kjhR6BT/vwuxvNX9JHx+mVfx+H8sWV4tljz+nYziaPtvq83Q8BdYhWDG5S06ALfeeWK0yVo80DLyKCgAZueqoVIAlnEERi8t0NK3vbLlarBc3y6u7sNXNcjqeFsvFeno8+vZkfDmZuoYEVe0+wooqN8yAGVqYYpVGo0Qew9yFbbTQqNG0kjTILmnPyeubX2N5dXt302K1ij4dTb/F2rqtbTp+eH66/us2puPp/PTHy6sfLk7enE5H02ptd+uvfyaW/et3/mHX90+vPUyPuyT0IhlaM1ZzUhdsmAoSj4JBoxPQ8J7KaCNV4NJqCR/FgYWbF1Io+QCSXy4vzt6/nRX4rOBZ8WW3Is2K3gGxNHIuVRWhq0mC3nAUJ3Jr3R1JMzKwoahpURTD2gOD8n9XvPlw/uH9jOBnRJ4Rx7sR/ILwABnmNp7uZopBJWVzr2KK3WuAdNLw2iy854wa0qhVQRmcww+AOD+7PL04OZ8Z8swoM6PuZtQXRldTjOKsHWuEl9QTacnDDXOr7BQAYaXHyMxSSQcTVshtcGGuh6jFu3cnWxcqb3IhM+NoNwPhNSejPEMSzJDVrd2t4up6sVrvIeHrjUnatKyE3w0Kzk2rVLIYUFIVQxo+rHvpgyOBVs3Weu8OpTElQ8sFSApFTaO2PkZqB2y/P59ebnFow0kz5+Mezty9qGbuocIkjK7UIAhLZO6lqGXhZkil+PCsAoJYlIHDQ6AEJ/0fgv8E+Eey1cEQ9lDmHpa8p64xelajTuicI2XMJjwwFeJam6tBNGAHsyY1Nxmtugq4xcHDnzbhT/8i/PlVl2STft7KyvL++noPRl5vUfhlxtP3i1Jec1F4kxPeyknalxOdS8I2yKl6EmhK3aoR2fCojNh6thajN3NMOEK4K0gg6GhUeTQ+QEkuzt7+tKOF8SYvvJWXT3s889BvVckEFTSsSeeUcmXASKEeHiaUDBDVmaBkyt2Hig2R7pIlH6Ajz56tjZg3CwxvbTCPe3biefQ7tMghpqNr9yRjIJaMuTiYZ5GnOaOuXbO5UAmuVnKLnDBGOMIezVgs7XrxJabHT38D2fvxEtgMAAA="
+    },
+    "secondary_artifacts": {
+      "runtime": "rust",
+      "final_result": "accept",
+      "trace_digest": "b915579b5ab76e31bc249e6270a1a27ad61408135f6a9796978075816bb19ae6",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 16,
+        "snapshots_per_chunk": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.3404255319148936,
+        "transition_density": {
+          "ChunkIngress": 16
+        },
+        "stdout_drain_latency": 103.5507
+      },
+      "topology_fingerprint": "0f61fb00aab08169f468ab35821ec223dd757a3bb40781c49ab6abf4e62a5d65",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": false,
+          "backpressure_intensity": null,
+          "descriptor_exhaustion": null,
+          "jitter_intensity": null,
+          "partial_stdout_truncation": null,
+          "scheduler_contention": null,
+          "stderr_flood_intensity": null,
+          "stdout_fragmentation": false
+        },
+        "seed": "phase17_t3"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_16": "0f61fb00aab08169f468ab35821ec223dd757a3bb40781c49ab6abf4e62a5d65"
+      },
+      "snapshots_compressed": "H4sIAAAAAAAACq3WzW6dRQyA4Xv51ll4bI/HzpYVGzYsEYr8N21Ee1JyThGo6r2jsEiQQKhI3x340cx43p++HNf+9XNfsh8eL9W/H/dwd7z36/vj/rCtTi48lDW2JnSCpqaiG2MNnlooo3zlpsAWV0neqbPbifm4O27Pfrk+3h6fLg/P7deny3F/fPf+8+WX7y/vnvt6Pe6Oj33z8psf91+O+OPW14dPz0/Z12vXX8P0Nf1TP3jeHn/r4377h2vfHZ/8+drPD9eb3/q4P354ev7oH46vX+/+CRqvIHds6Klj1rK1NlH3CnRB7+Uo0wtDuHOgajevpcbOtWCNpAEngOgbQT/enh8v7/4dhK+gHiI1OGeKuhE7jeUMDntuyJW5UecMWsamgtsUiGEtSRklo08AyQknRG9XDm1km4gG7KU9s3KzyBDYOHJIkym16mwOkoStDrZzu4gN0xNAdgKIX0EbORB2y6oib51LcS9CFG3spmii0bSdey5eCQHLEAiQlirUCaCBJ4jmq2iQ6oSXqWsS8K7AJQt3w5wTq3Ymm3VjG+9gCSza5AbIqayniOYJInkVRUmbKuzJYnvaahRzztUzwUJ2qGp2rLlXDClIDGDQqOFaOs4Q6Ql7Yb2KpjpqD569IwSY1ho2dVbrbgjwzsKkzFSTqt42NJaqlaMmniHCcYJIX0UytqsOyhCdyyo9zKclSvTucIKh6T1CmmjtFZFjoobMgN1OZ4j4BJG9ijAHzxxolOApwILEtJWgbPloLZLSRTPXNDJnqNxeA4grIeQM0TpBNN6CQbeABO1Fo1+eUsQAivY1FsDahQbMFcVjp8y2mFx7V++hMQzXGf/rKcXwlgwxEnW2jYZZCV3LJ25N1qYlZV2sAwMykwYnsHGBAsmWbss8g/StzfCfpLdomCILxMJiVs1W2LEQZnrtQsalXOCDKQBMs32nCdgcLx9TmZ2xHOiMahj0t7AbykJDidtyB+M0UOVg2kIA5IGlEEUxJ21MKCeDyZ71knpnkP53N/z8J0fHOrB9CwAA"
+    },
+    "classification": "semantic_aligned_cadence_divergence",
+    "first_divergence_index": 0,
+    "divergence_windows": [
+      {
+        "start_snapshot": 0,
+        "end_snapshot": null
+      }
+    ],
+    "persistence_metrics": {
+      "raw_bytes": 6229,
+      "compressed_bytes": 1649,
+      "compression_ratio": 3.777440873256519,
+      "processing_time_ms": 3.0131999999998698,
+      "shedded": false,
+      "sampled": true,
+      "telemetry_confidence": 0.8285714285714286
+    }
+  },
+  {
+    "replay_id": "fdf5746ed722dbde9c7afe44594aaa80746af28c0f8abc93b32b184016fe19db",
+    "contract": {
+      "corpus_id": "conformance_p17_t4_float_canonicalization",
+      "deterministic_seed": "phase17_t4",
+      "runtime_pair": {
+        "primary": "typescript",
+        "secondary": "rust"
+      },
+      "chunk_strategy": "boundary_targeted",
+      "fragmentation_profile": {
+        "strategy": "boundary_targeted"
+      },
+      "snapshot_schema_version": "v1.0",
+      "entropy_profile": {
+        "async_chunk_jitter": false,
+        "stdout_fragmentation": false
+      },
+      "topology_flush_interval": 64,
+      "ecosystem_profile": "rfc8259_strict"
+    },
+    "chunk_layout_sizes": [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      1
+    ],
+    "primary_artifacts": {
+      "runtime": "typescript",
+      "final_result": "accept",
+      "trace_digest": "918c78bd3e7db0e6b1765121121fb1ac74c599ba44779369f649547c049db974",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 19,
+        "snapshots_per_chunk": [
+          1,
+          0,
+          0,
+          2,
+          2,
+          0,
+          0,
+          2,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.2087912087912088,
+        "transition_density": {
+          "init": 1,
+          "token_processed": 17,
+          "finalize": 1
+        },
+        "snapshots_per_sec": 493.50905718990754,
+        "transitions_per_byte": 0.2087912087912088,
+        "throughput_bytes_per_sec": 2363.64864233061,
+        "replay_wall_clock_ms": 38.49979999999999,
+        "chunk_stall_ms": 0,
+        "stdout_frame_count": 1,
+        "replay_memory_peak": 4850120,
+        "telemetry_overhead_ms": 23.763500000000022,
+        "topology_hash_cpu_cost": 16.714400000000012,
+        "snapshot_memory_cost": 3574,
+        "telemetry_frames_written": 1,
+        "telemetry_cost_per_snapshot": 1.2507105263157907,
+        "topology_cost_per_window": 16.714400000000012,
+        "memory_growth_per_transition": 188.10526315789474,
+        "serialization_cost_per_frame": 7.04910000000001,
+        "stdout_drain_latency": 382.86969999999997
+      },
+      "topology_fingerprint": "44dde693b1da5c22614cbed7261cbe3042ea971a8ca98d7e1990b5cb671053a9",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": false,
+          "stdout_fragmentation": false
+        },
+        "transport_corruption_mode": "none",
+        "chunk_strategy": "boundary_targeted",
+        "jitter_profile": "none",
+        "stdout_strategy": "none",
+        "seed": "phase17_t4"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_19": "44dde693b1da5c22614cbed7261cbe3042ea971a8ca98d7e1990b5cb671053a9"
+      },
+      "snapshots_compressed": "H4sIAAAAAAAACs3UT2ucNxAG8O+iazcwM5JGo/eWBjcxmAQc30oxM9KoWRK/dnfflCbG3z0kZP9AvPQQH3KWYPTT80h/3oet//PR5+bX67n7f2GCVXin23dhCo51MFaMZpwjYMu9xyRaE1bzOBSssjAAKZnIqFQgsVsCQSzGYRWWjc7b9bK+na83rtvbOUxhPa+X8LD6cTLuJ1MXZ6cq3YZrEUkNM2CG5ipYudEonsdQM046motXb1KJG2TjeGLycvve5+u7zW3z7dZ7WIUbX7TromG6/766fLrzMIWLsz+urn+/fP7iLKzCdtHN8u1mfO7fzvmvfvj4ddt9eHhMQnvJkJqxqpEYY8NYkNIo6DQ6AQ3rsYw2YoVUWi1uoxgkTs0KCZT8BJK3V5fnr18eFLhTwIGxnhf/2zePY+IB0zsglkaWShVB6KIcoTccxYhMWzdDkowJkiKLShFkxdodnfLPY168uXjz+siyj+Qok+lxRtozzIGHmo6vJY0+qMSsZpVVsFt14E7iVpu69ZxRnBu1ysgjZbcnYFycX51dPr84gtAOEg+Q9DgE0y/crrxLhI8SWdY3vl305u4EKP+6DePdc2H634YhHxwt5U6qOqrn0aVmcUXIKSaz5MUiOVMVaMCpY2u96GDrkpywOzx9MBy/Q+rRuycgfgb5GcEV1onKlPA3yFOEE8CyB7YqpIwC4tq4pxhzTYAeXczNlSkqIIolgpIpdxvCOpi7cebcfh54ef7y1Q9fdN3Vrx7V7+GERg4/AjTPziqjS7fIYyCWjLkYqGVmjyBi0iWrMRVPVUtuniP6cMNTcY31rB/Wnz08/PUFVqkx82kHAAA="
+    },
+    "secondary_artifacts": {
+      "runtime": "rust",
+      "final_result": "accept",
+      "trace_digest": "0ba9c1fdf5c24074e83dd5b8f2cb934bf4fbbcc5df7f7a4a2fd73c43bac6efc0",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 31,
+        "snapshots_per_chunk": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.34065934065934067,
+        "transition_density": {
+          "ChunkIngress": 31
+        },
+        "stdout_drain_latency": 106.39260000000013
+      },
+      "topology_fingerprint": "915dd8a9bdb1dfd036ba3d8dee55b288b47f10129007e200a4fe538df7f94fef",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": false,
+          "backpressure_intensity": null,
+          "descriptor_exhaustion": null,
+          "jitter_intensity": null,
+          "partial_stdout_truncation": null,
+          "scheduler_contention": null,
+          "stderr_flood_intensity": null,
+          "stdout_fragmentation": false
+        },
+        "seed": "phase17_t4"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_31": "915dd8a9bdb1dfd036ba3d8dee55b288b47f10129007e200a4fe538df7f94fef"
+      },
+      "snapshots_compressed": "H4sIAAAAAAAACq2Yu65exw1G3+WvVfA2vKhNlSZNyiAQOBzSFmIfOTrHQQLD7x5sFfoDJBAUYL/BLPDyreFffnu89t9/7ZfqDx9fTv/z8R7ePX7M1x8f7x8xnpwq6OJ7vKALvLycMoQOyvJDiiethje1pmvJlK/uZJHHu8fb53x5/fj28dPLh8+dr59eHu8ff/jx15e//fHlh8/9+vp49/i53/LkWz7e//bY/3rr1w+/fP5U/fra58tj+rXyl/6Q9fbxH/14P/nTa797/JKfX/vzh9e3fOvH+8efPn3+OX96/P77u/8Gwq9AmdTQy3EdC7Nh7rZNqZRtSbry0FbpQnLvFjMPSTkGhsUINwDxdwL9+e3zx5cf/jcQfQUCrPA5wIM+bjS2YLdMcZ59ONTK1QONRhwJWU2XI5GuZcXrBiC9AYi/Aq0xJlntqjwLF+oy8A26yo60iYEF9pHuGVQtM69VOrSdR/cNQHEDkHwFGpJNMK12Dmf7MqeLkdSbunk3MzZPSi8TK9hgQcBAbO5wbgBCumGI1lciZPcF16vPYpA5m0yNpmGtRedMlUR0U4fMFt10eDgDSMrFbyFaNxDpV6J9tMMdZonGrLAmjZSyXgWxdba7V29bYxv1QNEGAd8H04/jHUR+Q9fZc4w8yRtl9eytIGyGsXyd9mnYkF2HiqvKQ8/pCfRt7nGSvOgOIsIbiPwrUZ+jvXr3Mk2eRmorFSOtHJeW5YiHU1YGop6SPB3GUM3gtywGkhu6Lr4SOcC1m2eHbYhrc+M6ezwpJTd6qe9V4+lAk90pdKDEMtqPId9BZHfE61MYTimevXQjIvu2VbGAd2ZaNbUzeMl2gvHuad5AmVBZobP4FiT+XmP4VtvhUxlmW2Y3FJ2wmOqz1hq3dblEs5pPEuPZs/s0xMTU1mY3rEGoO5DucAZ8SkMIlFdFXuWq3Ux14kguPEInQiZxH9l7rS5hMjpX8y1WOyI0dyDdYQ341AYD7otFCGfthkzvfYq1T+CAca5OKa6Uktp4JgCOfGnK8cw7kO7wBnyKg1qdg8QDlNQVE9RcSF10JrDySMoABC8u5yxPW1Ndp9fxdccsyR3igE9zSGqHUh1wVHStwcPLoMyhgyk6qDNifAicdmvJzjxXiF3r8Q6kO8wBn+rgbGU5aIfFqlV3btKQE1dDbgVj2g5mwqzGTOVBUpI8vhv9DqTvVYdvIj3dwWpI6Ogg5BGSPSUQXltnZuuWhQoZVr1DVy/YkV5cKr5i35K06w53wKc8cIVVDfPphKjuMAc55evS8Ks0m7HqMKtOAe5pawGoywrR4w6k75WHbyI97cHaRDw11APOrEQQlDqi2KzQ5+zoEzHLBoGa+iRWuqYOQekdSN9rD9/8yz7tocK2KEC0sG2ro80ctXkWu5gbyJgJ8THDPABk19Inz3UA5I5c0jvsgZ72UNhzjRDAalVWK10h1nqFEXa1HQqHqYUSAuhAIh32xf+C7qiSfq89fGs90NMeDlBgVmF8OTLQZtvMy4NmoENksDtiHc3xcJIxX2zSnJMsd+SS3mEP9LSH2MiVanttmvE8l5Q2CY/AHrQlq1AYc1VA2XhxHHJaHWsS7jgL6R32QE97wLmk9PrKgfBJYfQDM8FAWZW+ltgCpZNCck5t5T4bZ8Ust7ljlux77eGbSE97sKjFstZ1uePpy2BLUnl7h1koaB8aXyYQCm2HHQ9F5vWdkr4jl+x77eGbSM+ozY3QiJAwo3OOsCEdRfNloUV6UIPmqPIOrMi9aMec2nWmnW5A8juilp5RK0E9yKcNS/DqwTVcW0U6cwCwtTZaXVZ7VYvVky617SDUtDuQ7ohaekZtQZqd7FUmKsWbqzmNd4dpJcZVthVoi/WS1n39gccEFhUh3lKlO6KW4T9uDyZoIXGdE1I7rAGkVlDk3sZJhSan5Rhv2MoaZ21cC69gnjuqFP/3af+v/wY/kvrtrRgAAA=="
+    },
+    "classification": "semantic_aligned_cadence_divergence",
+    "first_divergence_index": 0,
+    "divergence_windows": [
+      {
+        "start_snapshot": 0,
+        "end_snapshot": null
+      }
+    ],
+    "persistence_metrics": {
+      "raw_bytes": 8214,
+      "compressed_bytes": 2112,
+      "compression_ratio": 3.8892045454545454,
+      "processing_time_ms": 4.058100000000195,
+      "shedded": false,
+      "sampled": true,
+      "telemetry_confidence": 0.7916666666666666
+    }
+  },
+  {
+    "replay_id": "ec871067c8335933267846a6ab4882aa9ea685ad20669c4e0574986034696068",
+    "contract": {
+      "corpus_id": "conformance_p17_t5_unicode_elements",
+      "deterministic_seed": "phase17_t5",
+      "runtime_pair": {
+        "primary": "typescript",
+        "secondary": "rust"
+      },
+      "chunk_strategy": "boundary_targeted",
+      "fragmentation_profile": {
+        "strategy": "boundary_targeted"
+      },
+      "snapshot_schema_version": "v1.0",
+      "entropy_profile": {
+        "async_chunk_jitter": true,
+        "jitter_intensity": 2.5,
+        "stdout_fragmentation": true,
+        "backpressure_intensity": 2,
+        "scheduler_contention": true
+      },
+      "topology_flush_interval": 16,
+      "ecosystem_profile": "ecma262"
+    },
+    "chunk_layout_sizes": [
+      3,
+      3,
+      3,
+      4,
+      9,
+      9,
+      3,
+      3,
+      3,
+      3,
+      5,
+      9,
+      7,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      1
+    ],
+    "primary_artifacts": {
+      "runtime": "typescript",
+      "final_result": "accept",
+      "trace_digest": "5ac50ec994c1d42fcbbaae5878e9b8f3e7d8860898dff74145600b7e602e0a67",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 23,
+        "snapshots_per_chunk": [
+          1,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          2,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.19166666666666668,
+        "transition_density": {
+          "init": 1,
+          "token_processed": 21,
+          "finalize": 1
+        },
+        "snapshots_per_sec": 38.86853360683262,
+        "transitions_per_byte": 0.19166666666666668,
+        "throughput_bytes_per_sec": 202.79234925303976,
+        "replay_wall_clock_ms": 591.7383,
+        "chunk_stall_ms": 114.50053009905814,
+        "stdout_frame_count": 6,
+        "replay_memory_peak": 5194168,
+        "telemetry_overhead_ms": 11.211999999999932,
+        "topology_hash_cpu_cost": 0.27329999999994925,
+        "snapshot_memory_cost": 4334,
+        "telemetry_frames_written": 6,
+        "telemetry_cost_per_snapshot": 0.48747826086956225,
+        "topology_cost_per_window": 0.27329999999994925,
+        "memory_growth_per_transition": 188.43478260869566,
+        "serialization_cost_per_frame": 1.8231166666666638,
+        "stdout_drain_latency": 950.6249
+      },
+      "topology_fingerprint": "57e29766d70161096d1abb38d58776da3c8d3bd92afc9dca465eb5bc6ffde165",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "jitter_intensity": 2.5,
+          "stdout_fragmentation": true,
+          "backpressure_intensity": 2,
+          "scheduler_contention": true
+        },
+        "transport_corruption_mode": "none",
+        "chunk_strategy": "boundary_targeted",
+        "jitter_profile": "async_chunk_jitter",
+        "stdout_strategy": "stdout_fragmentation",
+        "seed": "phase17_t5"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_16": "11e5dda82c05d832e77157101484f17aa9a07a078197c3518443e8eb7881e055",
+        "window_16_23": "23ef72f66c35dd95334060c8e492fd34cdad29440081a7de09c760ac86c003e5"
+      }
+    },
+    "secondary_artifacts": {
+      "runtime": "rust",
+      "final_result": "accept",
+      "trace_digest": "728de29809ece32bed601d422fcaf3be56134805c2ec2a09af85fcfcbf4c9d4d",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 86,
+        "snapshots_per_chunk": [
+          1,
+          1,
+          1,
+          4,
+          10,
+          10,
+          1,
+          1,
+          1,
+          1,
+          4,
+          10,
+          7,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          2,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.589041095890411,
+        "transition_density": {
+          "ChunkIngress": 41,
+          "Utf8ContinuationExit": 19,
+          "Utf8ContinuationEnter": 20,
+          "EscapeExit": 3,
+          "EscapeEnter": 3
+        },
+        "stdout_drain_latency": 113.23829999999998
+      },
+      "topology_fingerprint": "215ced19ebb44873c5710a7c273687df38c0359c1a11f679a3572cffcc801dff",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "backpressure_intensity": 2,
+          "descriptor_exhaustion": null,
+          "jitter_intensity": 2.5,
+          "partial_stdout_truncation": null,
+          "scheduler_contention": true,
+          "stderr_flood_intensity": null,
+          "stdout_fragmentation": true
+        },
+        "seed": "phase17_t5"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_80_86": "66594b7752ca1477b2af6be508b4870ec42b061d9f0dc5fb586ee1160fba09a5",
+        "window_64_80": "a9b74a0997b405c8725b720a048bc4cfa8b3df5dee9965aebada885a1cd68b82",
+        "window_16_32": "3bc0a1836756d3df31d0e7249951c91989b45288309ed9e2894a2d446fb6c7cd",
+        "window_32_48": "c9cd40f237b5d307a7f3e1bbb409ac74821a6e735937fdd815c60da75ea848ce",
+        "window_48_64": "3c6b522f6d6400462ffd90fdeda2827c881e7bf1b96002ed711beee8a588d671",
+        "window_0_16": "d866ac263e3fbf670869ab974dfaa4d19357942c0da7501d513bc7f614c00fbf"
+      }
+    },
+    "classification": "semantic_divergence",
+    "first_divergence_index": 0,
+    "divergence_windows": [
+      {
+        "start_snapshot": 0,
+        "end_snapshot": null
+      }
+    ],
+    "persistence_metrics": {
+      "raw_bytes": 0,
+      "compressed_bytes": 0,
+      "compression_ratio": 1,
+      "processing_time_ms": 1.5630999999998494,
+      "shedded": true,
+      "sampled": false,
+      "telemetry_confidence": 0
+    }
+  },
+  {
+    "replay_id": "b6319e202b2b20fb781a8d11b1227c4c5acf3367ef769aa9b51da9781cc446ef",
+    "contract": {
+      "corpus_id": "conformance_p17_t6_surrogates_slashes",
+      "deterministic_seed": "phase17_t6",
+      "runtime_pair": {
+        "primary": "typescript",
+        "secondary": "rust"
+      },
+      "chunk_strategy": "boundary_targeted",
+      "fragmentation_profile": {
+        "strategy": "boundary_targeted"
+      },
+      "snapshot_schema_version": "v1.0",
+      "entropy_profile": {
+        "async_chunk_jitter": true,
+        "jitter_intensity": 2.5,
+        "stdout_fragmentation": true,
+        "backpressure_intensity": 2,
+        "scheduler_contention": true
+      },
+      "topology_flush_interval": 16,
+      "ecosystem_profile": "legacy_first_win"
+    },
+    "chunk_layout_sizes": [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      1
+    ],
+    "primary_artifacts": {
+      "runtime": "typescript",
+      "final_result": "accept",
+      "trace_digest": "18084e95d2f0783eeb745e3847be01d1dc7da96842fcc364e2302dfaab82ae57",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 11,
+        "snapshots_per_chunk": [
+          1,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.13924050632911392,
+        "transition_density": {
+          "init": 1,
+          "token_processed": 9,
+          "finalize": 1
+        },
+        "snapshots_per_sec": 30.416173440763256,
+        "transitions_per_byte": 0.13924050632911392,
+        "throughput_bytes_per_sec": 218.44342743820883,
+        "replay_wall_clock_ms": 361.6497,
+        "chunk_stall_ms": 60.129881972461206,
+        "stdout_frame_count": 4,
+        "replay_memory_peak": 5049112,
+        "telemetry_overhead_ms": 6.134800000000027,
+        "topology_hash_cpu_cost": 1.563699999999983,
+        "snapshot_memory_cost": 2054,
+        "telemetry_frames_written": 4,
+        "telemetry_cost_per_snapshot": 0.5577090909090934,
+        "topology_cost_per_window": 1.563699999999983,
+        "memory_growth_per_transition": 186.72727272727272,
+        "serialization_cost_per_frame": 1.142775000000011,
+        "stdout_drain_latency": 647.9923000000003
+      },
+      "topology_fingerprint": "bfbf5399016c2fd770ced3764352716c6ea287fb3703750d8ce934f4fabbad36",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "jitter_intensity": 2.5,
+          "stdout_fragmentation": true,
+          "backpressure_intensity": 2,
+          "scheduler_contention": true
+        },
+        "transport_corruption_mode": "none",
+        "chunk_strategy": "boundary_targeted",
+        "jitter_profile": "async_chunk_jitter",
+        "stdout_strategy": "stdout_fragmentation",
+        "seed": "phase17_t6"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_11": "bfbf5399016c2fd770ced3764352716c6ea287fb3703750d8ce934f4fabbad36"
+      }
+    },
+    "secondary_artifacts": {
+      "runtime": "rust",
+      "final_result": "accept",
+      "trace_digest": "38062fca4148816b93acfcede90a3a37ae09d58d9db049899347ad2f5f184d7f",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 35,
+        "snapshots_per_chunk": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          3,
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.4430379746835443,
+        "transition_density": {
+          "EscapeExit": 4,
+          "ChunkIngress": 27,
+          "EscapeEnter": 4
+        },
+        "stdout_drain_latency": 134.7868000000003
+      },
+      "topology_fingerprint": "e7329daf24661c1ca02475f652ea13334368cf32c83696db57872651b4535cf8",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "backpressure_intensity": 2,
+          "descriptor_exhaustion": null,
+          "jitter_intensity": 2.5,
+          "partial_stdout_truncation": null,
+          "scheduler_contention": true,
+          "stderr_flood_intensity": null,
+          "stdout_fragmentation": true
+        },
+        "seed": "phase17_t6"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_16_32": "b4faa9e37f5ada89a5b5d03369b00e96ee6a147de5d8237d611d732a9a46f39c",
+        "window_32_35": "e94ee2841f164a29cc28edd7284bfdb2eb3defb42ba07a07fed412cff80ce0ca",
+        "window_0_16": "296d60866c81861a1e268507498307ffb1fac2a3f98a5acabbb5eb2f072b1830"
+      }
+    },
+    "classification": "semantic_aligned_cadence_divergence",
+    "first_divergence_index": 0,
+    "divergence_windows": [
+      {
+        "start_snapshot": 0,
+        "end_snapshot": null
+      }
+    ],
+    "persistence_metrics": {
+      "raw_bytes": 0,
+      "compressed_bytes": 0,
+      "compression_ratio": 1,
+      "processing_time_ms": 0.9356999999999971,
+      "shedded": true,
+      "sampled": false,
+      "telemetry_confidence": 0
+    }
+  },
+  {
+    "replay_id": "76961ea6936d00689d05fc8b1d95aa40723560095a67c6579732811b1f22eef7",
+    "contract": {
+      "corpus_id": "conformance_p17_t7_sparse_and_unordered",
+      "deterministic_seed": "phase17_t7",
+      "runtime_pair": {
+        "primary": "typescript",
+        "secondary": "rust"
+      },
+      "chunk_strategy": "boundary_targeted",
+      "fragmentation_profile": {
+        "strategy": "boundary_targeted"
+      },
+      "snapshot_schema_version": "v1.0",
+      "entropy_profile": {
+        "async_chunk_jitter": true,
+        "jitter_intensity": 2.5,
+        "stdout_fragmentation": true,
+        "backpressure_intensity": 2,
+        "scheduler_contention": true
+      },
+      "topology_flush_interval": 16,
+      "ecosystem_profile": "duplicate_error"
+    },
+    "chunk_layout_sizes": [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      2
+    ],
+    "primary_artifacts": {
+      "runtime": "typescript",
+      "final_result": "accept",
+      "trace_digest": "ed05869330978784383dd6bad41c243feccfa7b7bd0167aea880f189427231f0",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 21,
+        "snapshots_per_chunk": [
+          1,
+          2,
+          2,
+          1,
+          1,
+          2,
+          0,
+          0,
+          0,
+          1,
+          2,
+          2,
+          0,
+          2,
+          0,
+          3
+        ],
+        "snapshots_per_byte": 0.44680851063829785,
+        "transition_density": {
+          "init": 1,
+          "token_processed": 19,
+          "finalize": 1
+        },
+        "snapshots_per_sec": 81.82180535527611,
+        "transitions_per_byte": 0.44680851063829785,
+        "throughput_bytes_per_sec": 183.1249929379989,
+        "replay_wall_clock_ms": 256.6553,
+        "chunk_stall_ms": 41.35573806088245,
+        "stdout_frame_count": 6,
+        "replay_memory_peak": 5067560,
+        "telemetry_overhead_ms": 6.226500000000129,
+        "topology_hash_cpu_cost": 0.30059999999997444,
+        "snapshot_memory_cost": 3954,
+        "telemetry_frames_written": 6,
+        "telemetry_cost_per_snapshot": 0.29650000000000615,
+        "topology_cost_per_window": 0.30059999999997444,
+        "memory_growth_per_transition": 188.28571428571428,
+        "serialization_cost_per_frame": 0.9876500000000258,
+        "stdout_drain_latency": 577.7003999999997
+      },
+      "topology_fingerprint": "065e9999e4debc67a27b899e170014b9b8af05a76632c46fd12c5b6cc6f028b9",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "jitter_intensity": 2.5,
+          "stdout_fragmentation": true,
+          "backpressure_intensity": 2,
+          "scheduler_contention": true
+        },
+        "transport_corruption_mode": "none",
+        "chunk_strategy": "boundary_targeted",
+        "jitter_profile": "async_chunk_jitter",
+        "stdout_strategy": "stdout_fragmentation",
+        "seed": "phase17_t7"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_16": "b5b50944b96ac2f0a4e9ca021496e7c2e5ca9624798287d166ad74415e690e67",
+        "window_16_21": "2a278d0d9f0fe586eef39cf37cdd04f8df49572bee5665f28c74b77eb0c20e45"
+      }
+    },
+    "secondary_artifacts": {
+      "runtime": "rust",
+      "final_result": "accept",
+      "trace_digest": "b915579b5ab76e31bc249e6270a1a27ad61408135f6a9796978075816bb19ae6",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 16,
+        "snapshots_per_chunk": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.3404255319148936,
+        "transition_density": {
+          "ChunkIngress": 16
+        },
+        "stdout_drain_latency": 72.154
+      },
+      "topology_fingerprint": "0f61fb00aab08169f468ab35821ec223dd757a3bb40781c49ab6abf4e62a5d65",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "backpressure_intensity": 2,
+          "descriptor_exhaustion": null,
+          "jitter_intensity": 2.5,
+          "partial_stdout_truncation": null,
+          "scheduler_contention": true,
+          "stderr_flood_intensity": null,
+          "stdout_fragmentation": true
+        },
+        "seed": "phase17_t7"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_16": "0f61fb00aab08169f468ab35821ec223dd757a3bb40781c49ab6abf4e62a5d65"
+      }
+    },
+    "classification": "semantic_aligned_cadence_divergence",
+    "first_divergence_index": 0,
+    "divergence_windows": [
+      {
+        "start_snapshot": 0,
+        "end_snapshot": null
+      }
+    ],
+    "persistence_metrics": {
+      "raw_bytes": 0,
+      "compressed_bytes": 0,
+      "compression_ratio": 1,
+      "processing_time_ms": 0.7842999999998028,
+      "shedded": true,
+      "sampled": false,
+      "telemetry_confidence": 0
+    }
+  },
+  {
+    "replay_id": "9e29f092d795874a488f6b1042c2145113c2513f399e337ca24536e9f409d590",
+    "contract": {
+      "corpus_id": "conformance_p17_t8_float_canonicalization",
+      "deterministic_seed": "phase17_t8",
+      "runtime_pair": {
+        "primary": "typescript",
+        "secondary": "rust"
+      },
+      "chunk_strategy": "boundary_targeted",
+      "fragmentation_profile": {
+        "strategy": "boundary_targeted"
+      },
+      "snapshot_schema_version": "v1.0",
+      "entropy_profile": {
+        "async_chunk_jitter": true,
+        "jitter_intensity": 2.5,
+        "stdout_fragmentation": true,
+        "backpressure_intensity": 2,
+        "scheduler_contention": true
+      },
+      "topology_flush_interval": 16,
+      "ecosystem_profile": "canonical_order_strict"
+    },
+    "chunk_layout_sizes": [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      1
+    ],
+    "primary_artifacts": {
+      "runtime": "typescript",
+      "final_result": "accept",
+      "trace_digest": "918c78bd3e7db0e6b1765121121fb1ac74c599ba44779369f649547c049db974",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 19,
+        "snapshots_per_chunk": [
+          1,
+          0,
+          0,
+          2,
+          2,
+          0,
+          0,
+          2,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.2087912087912088,
+        "transition_density": {
+          "init": 1,
+          "token_processed": 17,
+          "finalize": 1
+        },
+        "snapshots_per_sec": 50.19487499758932,
+        "transitions_per_byte": 0.2087912087912088,
+        "throughput_bytes_per_sec": 240.40703288319094,
+        "replay_wall_clock_ms": 378.52470000000005,
+        "chunk_stall_ms": 87.10942854674904,
+        "stdout_frame_count": 6,
+        "replay_memory_peak": 5108776,
+        "telemetry_overhead_ms": 4.43359999999997,
+        "topology_hash_cpu_cost": 0.48160000000001446,
+        "snapshot_memory_cost": 3574,
+        "telemetry_frames_written": 6,
+        "telemetry_cost_per_snapshot": 0.23334736842105105,
+        "topology_cost_per_window": 0.48160000000001446,
+        "memory_growth_per_transition": 188.10526315789474,
+        "serialization_cost_per_frame": 0.6586666666666593,
+        "stdout_drain_latency": 624.1169999999997
+      },
+      "topology_fingerprint": "44dde693b1da5c22614cbed7261cbe3042ea971a8ca98d7e1990b5cb671053a9",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "jitter_intensity": 2.5,
+          "stdout_fragmentation": true,
+          "backpressure_intensity": 2,
+          "scheduler_contention": true
+        },
+        "transport_corruption_mode": "none",
+        "chunk_strategy": "boundary_targeted",
+        "jitter_profile": "async_chunk_jitter",
+        "stdout_strategy": "stdout_fragmentation",
+        "seed": "phase17_t8"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_16": "37641f16ba857b5559381b417572ecf9a547e981799947c66be25b2bd1c901d1",
+        "window_16_19": "396dca9e319a45d7c09bc3141104e0e5a69d9ec226fcc071227080599b7465c5"
+      }
+    },
+    "secondary_artifacts": {
+      "runtime": "rust",
+      "final_result": "accept",
+      "trace_digest": "0ba9c1fdf5c24074e83dd5b8f2cb934bf4fbbcc5df7f7a4a2fd73c43bac6efc0",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 31,
+        "snapshots_per_chunk": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.34065934065934067,
+        "transition_density": {
+          "ChunkIngress": 31
+        },
+        "stdout_drain_latency": 78.33420000000024
+      },
+      "topology_fingerprint": "915dd8a9bdb1dfd036ba3d8dee55b288b47f10129007e200a4fe538df7f94fef",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "backpressure_intensity": 2,
+          "descriptor_exhaustion": null,
+          "jitter_intensity": 2.5,
+          "partial_stdout_truncation": null,
+          "scheduler_contention": true,
+          "stderr_flood_intensity": null,
+          "stdout_fragmentation": true
+        },
+        "seed": "phase17_t8"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_16_31": "9f54e8875ac8be2c930fcc165cf6643b4f24a169dcab432af20db6d5c1b677bc",
+        "window_0_16": "298104c62dd99761630206d3306945d101b937d3912e825d5b16cb7e64af8e74"
+      }
+    },
+    "classification": "semantic_aligned_cadence_divergence",
+    "first_divergence_index": 0,
+    "divergence_windows": [
+      {
+        "start_snapshot": 0,
+        "end_snapshot": null
+      }
+    ],
+    "persistence_metrics": {
+      "raw_bytes": 0,
+      "compressed_bytes": 0,
+      "compression_ratio": 1,
+      "processing_time_ms": 0.7784999999998945,
+      "shedded": true,
+      "sampled": false,
+      "telemetry_confidence": 0
+    }
+  },
+  {
+    "replay_id": "7ee489a60a404fc4622a0f4637201edaad9fa996cbd62435b43d947bf00a06db",
+    "contract": {
+      "corpus_id": "conformance_p17_t9_unicode_elements",
+      "deterministic_seed": "phase17_t9",
+      "runtime_pair": {
+        "primary": "typescript",
+        "secondary": "rust"
+      },
+      "chunk_strategy": "boundary_targeted",
+      "fragmentation_profile": {
+        "strategy": "boundary_targeted"
+      },
+      "snapshot_schema_version": "v1.0",
+      "entropy_profile": {
+        "async_chunk_jitter": true,
+        "jitter_intensity": 2.5,
+        "stdout_fragmentation": true,
+        "backpressure_intensity": 2,
+        "scheduler_contention": true
+      },
+      "topology_flush_interval": 16,
+      "ecosystem_profile": "rfc8259_strict"
+    },
+    "chunk_layout_sizes": [
+      3,
+      3,
+      3,
+      4,
+      9,
+      9,
+      3,
+      3,
+      3,
+      3,
+      5,
+      9,
+      7,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      1
+    ],
+    "primary_artifacts": {
+      "runtime": "typescript",
+      "final_result": "accept",
+      "trace_digest": "5ac50ec994c1d42fcbbaae5878e9b8f3e7d8860898dff74145600b7e602e0a67",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 23,
+        "snapshots_per_chunk": [
+          1,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          2,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.19166666666666668,
+        "transition_density": {
+          "init": 1,
+          "token_processed": 21,
+          "finalize": 1
+        },
+        "snapshots_per_sec": 38.166621530488165,
+        "transitions_per_byte": 0.19166666666666668,
+        "throughput_bytes_per_sec": 199.13019928950345,
+        "replay_wall_clock_ms": 602.6207999999999,
+        "chunk_stall_ms": 98.94459313416553,
+        "stdout_frame_count": 6,
+        "replay_memory_peak": 4914976,
+        "telemetry_overhead_ms": 7.2003999999999735,
+        "topology_hash_cpu_cost": 0.6403999999999996,
+        "snapshot_memory_cost": 4334,
+        "telemetry_frames_written": 6,
+        "telemetry_cost_per_snapshot": 0.3130608695652162,
+        "topology_cost_per_window": 0.6403999999999996,
+        "memory_growth_per_transition": 188.43478260869566,
+        "serialization_cost_per_frame": 1.093333333333329,
+        "stdout_drain_latency": 887.2797
+      },
+      "topology_fingerprint": "57e29766d70161096d1abb38d58776da3c8d3bd92afc9dca465eb5bc6ffde165",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "jitter_intensity": 2.5,
+          "stdout_fragmentation": true,
+          "backpressure_intensity": 2,
+          "scheduler_contention": true
+        },
+        "transport_corruption_mode": "none",
+        "chunk_strategy": "boundary_targeted",
+        "jitter_profile": "async_chunk_jitter",
+        "stdout_strategy": "stdout_fragmentation",
+        "seed": "phase17_t9"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_16": "11e5dda82c05d832e77157101484f17aa9a07a078197c3518443e8eb7881e055",
+        "window_16_23": "23ef72f66c35dd95334060c8e492fd34cdad29440081a7de09c760ac86c003e5"
+      }
+    },
+    "secondary_artifacts": {
+      "runtime": "rust",
+      "final_result": "accept",
+      "trace_digest": "728de29809ece32bed601d422fcaf3be56134805c2ec2a09af85fcfcbf4c9d4d",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 86,
+        "snapshots_per_chunk": [
+          1,
+          1,
+          1,
+          4,
+          10,
+          10,
+          1,
+          1,
+          1,
+          1,
+          4,
+          10,
+          7,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          2,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.589041095890411,
+        "transition_density": {
+          "EscapeEnter": 3,
+          "ChunkIngress": 41,
+          "EscapeExit": 3,
+          "Utf8ContinuationExit": 19,
+          "Utf8ContinuationEnter": 20
+        },
+        "stdout_drain_latency": 157.34689999999955
+      },
+      "topology_fingerprint": "215ced19ebb44873c5710a7c273687df38c0359c1a11f679a3572cffcc801dff",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "backpressure_intensity": 2,
+          "descriptor_exhaustion": null,
+          "jitter_intensity": 2.5,
+          "partial_stdout_truncation": null,
+          "scheduler_contention": true,
+          "stderr_flood_intensity": null,
+          "stdout_fragmentation": true
+        },
+        "seed": "phase17_t9"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_16_32": "3bc0a1836756d3df31d0e7249951c91989b45288309ed9e2894a2d446fb6c7cd",
+        "window_48_64": "3c6b522f6d6400462ffd90fdeda2827c881e7bf1b96002ed711beee8a588d671",
+        "window_80_86": "66594b7752ca1477b2af6be508b4870ec42b061d9f0dc5fb586ee1160fba09a5",
+        "window_0_16": "d866ac263e3fbf670869ab974dfaa4d19357942c0da7501d513bc7f614c00fbf",
+        "window_32_48": "c9cd40f237b5d307a7f3e1bbb409ac74821a6e735937fdd815c60da75ea848ce",
+        "window_64_80": "a9b74a0997b405c8725b720a048bc4cfa8b3df5dee9965aebada885a1cd68b82"
+      }
+    },
+    "classification": "semantic_divergence",
+    "first_divergence_index": 0,
+    "divergence_windows": [
+      {
+        "start_snapshot": 0,
+        "end_snapshot": null
+      }
+    ],
+    "persistence_metrics": {
+      "raw_bytes": 0,
+      "compressed_bytes": 0,
+      "compression_ratio": 1,
+      "processing_time_ms": 1.679800000000796,
+      "shedded": true,
+      "sampled": false,
+      "telemetry_confidence": 0
+    }
+  },
+  {
+    "replay_id": "a3372b149123d3f835567d912e8e0d70db4e312f2e34ba0b078e49be6b11dba4",
+    "contract": {
+      "corpus_id": "conformance_p17_t10_surrogates_slashes",
+      "deterministic_seed": "phase17_t10",
+      "runtime_pair": {
+        "primary": "typescript",
+        "secondary": "rust"
+      },
+      "chunk_strategy": "boundary_targeted",
+      "fragmentation_profile": {
+        "strategy": "boundary_targeted"
+      },
+      "snapshot_schema_version": "v1.0",
+      "entropy_profile": {
+        "async_chunk_jitter": true,
+        "jitter_intensity": 2.5,
+        "stdout_fragmentation": true,
+        "backpressure_intensity": 2,
+        "scheduler_contention": true
+      },
+      "topology_flush_interval": 16,
+      "ecosystem_profile": "ecma262"
+    },
+    "chunk_layout_sizes": [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      1
+    ],
+    "primary_artifacts": {
+      "runtime": "typescript",
+      "final_result": "accept",
+      "trace_digest": "18084e95d2f0783eeb745e3847be01d1dc7da96842fcc364e2302dfaab82ae57",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 11,
+        "snapshots_per_chunk": [
+          1,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.13924050632911392,
+        "transition_density": {
+          "init": 1,
+          "token_processed": 9,
+          "finalize": 1
+        },
+        "snapshots_per_sec": 26.426108995687738,
+        "transitions_per_byte": 0.13924050632911392,
+        "throughput_bytes_per_sec": 189.7875100599392,
+        "replay_wall_clock_ms": 416.25500000000005,
+        "chunk_stall_ms": 59.51554615249602,
+        "stdout_frame_count": 4,
+        "replay_memory_peak": 5072032,
+        "telemetry_overhead_ms": 9.412000000000077,
+        "topology_hash_cpu_cost": 3.094400000000064,
+        "snapshot_memory_cost": 2054,
+        "telemetry_frames_written": 4,
+        "telemetry_cost_per_snapshot": 0.8556363636363706,
+        "topology_cost_per_window": 3.094400000000064,
+        "memory_growth_per_transition": 186.72727272727272,
+        "serialization_cost_per_frame": 1.5794000000000032,
+        "stdout_drain_latency": 690.0964999999997
+      },
+      "topology_fingerprint": "bfbf5399016c2fd770ced3764352716c6ea287fb3703750d8ce934f4fabbad36",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "jitter_intensity": 2.5,
+          "stdout_fragmentation": true,
+          "backpressure_intensity": 2,
+          "scheduler_contention": true
+        },
+        "transport_corruption_mode": "none",
+        "chunk_strategy": "boundary_targeted",
+        "jitter_profile": "async_chunk_jitter",
+        "stdout_strategy": "stdout_fragmentation",
+        "seed": "phase17_t10"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_11": "bfbf5399016c2fd770ced3764352716c6ea287fb3703750d8ce934f4fabbad36"
+      }
+    },
+    "secondary_artifacts": {
+      "runtime": "rust",
+      "final_result": "accept",
+      "trace_digest": "38062fca4148816b93acfcede90a3a37ae09d58d9db049899347ad2f5f184d7f",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 35,
+        "snapshots_per_chunk": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          3,
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.4430379746835443,
+        "transition_density": {
+          "EscapeExit": 4,
+          "ChunkIngress": 27,
+          "EscapeEnter": 4
+        },
+        "stdout_drain_latency": 174.91600000000017
+      },
+      "topology_fingerprint": "e7329daf24661c1ca02475f652ea13334368cf32c83696db57872651b4535cf8",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "backpressure_intensity": 2,
+          "descriptor_exhaustion": null,
+          "jitter_intensity": 2.5,
+          "partial_stdout_truncation": null,
+          "scheduler_contention": true,
+          "stderr_flood_intensity": null,
+          "stdout_fragmentation": true
+        },
+        "seed": "phase17_t10"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_32_35": "e94ee2841f164a29cc28edd7284bfdb2eb3defb42ba07a07fed412cff80ce0ca",
+        "window_16_32": "b4faa9e37f5ada89a5b5d03369b00e96ee6a147de5d8237d611d732a9a46f39c",
+        "window_0_16": "296d60866c81861a1e268507498307ffb1fac2a3f98a5acabbb5eb2f072b1830"
+      }
+    },
+    "classification": "semantic_aligned_cadence_divergence",
+    "first_divergence_index": 0,
+    "divergence_windows": [
+      {
+        "start_snapshot": 0,
+        "end_snapshot": null
+      }
+    ],
+    "persistence_metrics": {
+      "raw_bytes": 0,
+      "compressed_bytes": 0,
+      "compression_ratio": 1,
+      "processing_time_ms": 1.484400000000278,
+      "shedded": true,
+      "sampled": false,
+      "telemetry_confidence": 0
+    }
+  },
+  {
+    "replay_id": "2095c9ce23e7feea7c7797677caa9ec569f5735a3a92d89a28ad16a4d71303d4",
+    "contract": {
+      "corpus_id": "conformance_p17_t11_sparse_and_unordered",
+      "deterministic_seed": "phase17_t11",
+      "runtime_pair": {
+        "primary": "typescript",
+        "secondary": "rust"
+      },
+      "chunk_strategy": "boundary_targeted",
+      "fragmentation_profile": {
+        "strategy": "boundary_targeted"
+      },
+      "snapshot_schema_version": "v1.0",
+      "entropy_profile": {
+        "async_chunk_jitter": true,
+        "jitter_intensity": 2.5,
+        "stdout_fragmentation": true,
+        "backpressure_intensity": 2,
+        "scheduler_contention": true
+      },
+      "topology_flush_interval": 16,
+      "ecosystem_profile": "legacy_first_win"
+    },
+    "chunk_layout_sizes": [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      2
+    ],
+    "primary_artifacts": {
+      "runtime": "typescript",
+      "final_result": "accept",
+      "trace_digest": "ed05869330978784383dd6bad41c243feccfa7b7bd0167aea880f189427231f0",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 21,
+        "snapshots_per_chunk": [
+          1,
+          2,
+          2,
+          1,
+          1,
+          2,
+          0,
+          0,
+          0,
+          1,
+          2,
+          2,
+          0,
+          2,
+          0,
+          3
+        ],
+        "snapshots_per_byte": 0.44680851063829785,
+        "transition_density": {
+          "init": 1,
+          "token_processed": 19,
+          "finalize": 1
+        },
+        "snapshots_per_sec": 71.88154742487778,
+        "transitions_per_byte": 0.44680851063829785,
+        "throughput_bytes_per_sec": 160.877748998536,
+        "replay_wall_clock_ms": 292.14730000000003,
+        "chunk_stall_ms": 44.76854988409648,
+        "stdout_frame_count": 6,
+        "replay_memory_peak": 5043856,
+        "telemetry_overhead_ms": 6.99249999999995,
+        "topology_hash_cpu_cost": 0.3059999999999832,
+        "snapshot_memory_cost": 3954,
+        "telemetry_frames_written": 6,
+        "telemetry_cost_per_snapshot": 0.3329761904761881,
+        "topology_cost_per_window": 0.3059999999999832,
+        "memory_growth_per_transition": 188.28571428571428,
+        "serialization_cost_per_frame": 1.114416666666661,
+        "stdout_drain_latency": 630.1221999999998
+      },
+      "topology_fingerprint": "065e9999e4debc67a27b899e170014b9b8af05a76632c46fd12c5b6cc6f028b9",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "jitter_intensity": 2.5,
+          "stdout_fragmentation": true,
+          "backpressure_intensity": 2,
+          "scheduler_contention": true
+        },
+        "transport_corruption_mode": "none",
+        "chunk_strategy": "boundary_targeted",
+        "jitter_profile": "async_chunk_jitter",
+        "stdout_strategy": "stdout_fragmentation",
+        "seed": "phase17_t11"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_16": "b5b50944b96ac2f0a4e9ca021496e7c2e5ca9624798287d166ad74415e690e67",
+        "window_16_21": "2a278d0d9f0fe586eef39cf37cdd04f8df49572bee5665f28c74b77eb0c20e45"
+      }
+    },
+    "secondary_artifacts": {
+      "runtime": "rust",
+      "final_result": "accept",
+      "trace_digest": "b915579b5ab76e31bc249e6270a1a27ad61408135f6a9796978075816bb19ae6",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 16,
+        "snapshots_per_chunk": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.3404255319148936,
+        "transition_density": {
+          "ChunkIngress": 16
+        },
+        "stdout_drain_latency": 89.80529999999999
+      },
+      "topology_fingerprint": "0f61fb00aab08169f468ab35821ec223dd757a3bb40781c49ab6abf4e62a5d65",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "backpressure_intensity": 2,
+          "descriptor_exhaustion": null,
+          "jitter_intensity": 2.5,
+          "partial_stdout_truncation": null,
+          "scheduler_contention": true,
+          "stderr_flood_intensity": null,
+          "stdout_fragmentation": true
+        },
+        "seed": "phase17_t11"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_16": "0f61fb00aab08169f468ab35821ec223dd757a3bb40781c49ab6abf4e62a5d65"
+      }
+    },
+    "classification": "semantic_aligned_cadence_divergence",
+    "first_divergence_index": 0,
+    "divergence_windows": [
+      {
+        "start_snapshot": 0,
+        "end_snapshot": null
+      }
+    ],
+    "persistence_metrics": {
+      "raw_bytes": 0,
+      "compressed_bytes": 0,
+      "compression_ratio": 1,
+      "processing_time_ms": 0.9024000000008527,
+      "shedded": true,
+      "sampled": false,
+      "telemetry_confidence": 0
+    }
+  },
+  {
+    "replay_id": "8c0529c419441fe80430013295fced97f3b51bfefd7e57484965f1ae86d417b9",
+    "contract": {
+      "corpus_id": "conformance_p17_t12_float_canonicalization",
+      "deterministic_seed": "phase17_t12",
+      "runtime_pair": {
+        "primary": "typescript",
+        "secondary": "rust"
+      },
+      "chunk_strategy": "boundary_targeted",
+      "fragmentation_profile": {
+        "strategy": "boundary_targeted"
+      },
+      "snapshot_schema_version": "v1.0",
+      "entropy_profile": {
+        "async_chunk_jitter": true,
+        "jitter_intensity": 2.5,
+        "stdout_fragmentation": true,
+        "backpressure_intensity": 2,
+        "scheduler_contention": true
+      },
+      "topology_flush_interval": 16,
+      "ecosystem_profile": "duplicate_error"
+    },
+    "chunk_layout_sizes": [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      1
+    ],
+    "primary_artifacts": {
+      "runtime": "typescript",
+      "final_result": "accept",
+      "trace_digest": "918c78bd3e7db0e6b1765121121fb1ac74c599ba44779369f649547c049db974",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 19,
+        "snapshots_per_chunk": [
+          1,
+          0,
+          0,
+          2,
+          2,
+          0,
+          0,
+          2,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.2087912087912088,
+        "transition_density": {
+          "init": 1,
+          "token_processed": 17,
+          "finalize": 1
+        },
+        "snapshots_per_sec": 45.46840352777378,
+        "transitions_per_byte": 0.2087912087912088,
+        "throughput_bytes_per_sec": 217.7697221593376,
+        "replay_wall_clock_ms": 417.8725999999999,
+        "chunk_stall_ms": 68.4202868958618,
+        "stdout_frame_count": 6,
+        "replay_memory_peak": 5153424,
+        "telemetry_overhead_ms": 8.38560000000004,
+        "topology_hash_cpu_cost": 1.4270999999999958,
+        "snapshot_memory_cost": 3574,
+        "telemetry_frames_written": 6,
+        "telemetry_cost_per_snapshot": 0.4413473684210547,
+        "topology_cost_per_window": 1.4270999999999958,
+        "memory_growth_per_transition": 188.10526315789474,
+        "serialization_cost_per_frame": 1.1597500000000072,
+        "stdout_drain_latency": 779.3127000000004
+      },
+      "topology_fingerprint": "44dde693b1da5c22614cbed7261cbe3042ea971a8ca98d7e1990b5cb671053a9",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "jitter_intensity": 2.5,
+          "stdout_fragmentation": true,
+          "backpressure_intensity": 2,
+          "scheduler_contention": true
+        },
+        "transport_corruption_mode": "none",
+        "chunk_strategy": "boundary_targeted",
+        "jitter_profile": "async_chunk_jitter",
+        "stdout_strategy": "stdout_fragmentation",
+        "seed": "phase17_t12"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_16": "37641f16ba857b5559381b417572ecf9a547e981799947c66be25b2bd1c901d1",
+        "window_16_19": "396dca9e319a45d7c09bc3141104e0e5a69d9ec226fcc071227080599b7465c5"
+      }
+    },
+    "secondary_artifacts": {
+      "runtime": "rust",
+      "final_result": "accept",
+      "trace_digest": "0ba9c1fdf5c24074e83dd5b8f2cb934bf4fbbcc5df7f7a4a2fd73c43bac6efc0",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 31,
+        "snapshots_per_chunk": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.34065934065934067,
+        "transition_density": {
+          "ChunkIngress": 31
+        },
+        "stdout_drain_latency": 121.79060000000027
+      },
+      "topology_fingerprint": "915dd8a9bdb1dfd036ba3d8dee55b288b47f10129007e200a4fe538df7f94fef",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "backpressure_intensity": 2,
+          "descriptor_exhaustion": null,
+          "jitter_intensity": 2.5,
+          "partial_stdout_truncation": null,
+          "scheduler_contention": true,
+          "stderr_flood_intensity": null,
+          "stdout_fragmentation": true
+        },
+        "seed": "phase17_t12"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_16_31": "9f54e8875ac8be2c930fcc165cf6643b4f24a169dcab432af20db6d5c1b677bc",
+        "window_0_16": "298104c62dd99761630206d3306945d101b937d3912e825d5b16cb7e64af8e74"
+      }
+    },
+    "classification": "semantic_aligned_cadence_divergence",
+    "first_divergence_index": 0,
+    "divergence_windows": [
+      {
+        "start_snapshot": 0,
+        "end_snapshot": null
+      }
+    ],
+    "persistence_metrics": {
+      "raw_bytes": 0,
+      "compressed_bytes": 0,
+      "compression_ratio": 1,
+      "processing_time_ms": 1.1291999999994005,
+      "shedded": true,
+      "sampled": false,
+      "telemetry_confidence": 0
+    }
+  },
+  {
+    "replay_id": "a407f71eef382e16aa83b56cfd1d04dd1449aca4b3ccf8fc8b44b8b4c2e1b4a8",
+    "contract": {
+      "corpus_id": "conformance_p17_t13_unicode_elements",
+      "deterministic_seed": "phase17_t13",
+      "runtime_pair": {
+        "primary": "typescript",
+        "secondary": "rust"
+      },
+      "chunk_strategy": "boundary_targeted",
+      "fragmentation_profile": {
+        "strategy": "boundary_targeted"
+      },
+      "snapshot_schema_version": "v1.0",
+      "entropy_profile": {
+        "async_chunk_jitter": true,
+        "jitter_intensity": 2.5,
+        "stdout_fragmentation": true,
+        "backpressure_intensity": 2,
+        "scheduler_contention": true
+      },
+      "topology_flush_interval": 16,
+      "ecosystem_profile": "canonical_order_strict"
+    },
+    "chunk_layout_sizes": [
+      3,
+      3,
+      3,
+      4,
+      9,
+      9,
+      3,
+      3,
+      3,
+      3,
+      5,
+      9,
+      7,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      1
+    ],
+    "primary_artifacts": {
+      "runtime": "typescript",
+      "final_result": "accept",
+      "trace_digest": "5ac50ec994c1d42fcbbaae5878e9b8f3e7d8860898dff74145600b7e602e0a67",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 23,
+        "snapshots_per_chunk": [
+          1,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          2,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.19166666666666668,
+        "transition_density": {
+          "init": 1,
+          "token_processed": 21,
+          "finalize": 1
+        },
+        "snapshots_per_sec": 44.38314852897843,
+        "transitions_per_byte": 0.19166666666666668,
+        "throughput_bytes_per_sec": 231.56425319467007,
+        "replay_wall_clock_ms": 518.2147,
+        "chunk_stall_ms": 92.17047184444158,
+        "stdout_frame_count": 6,
+        "replay_memory_peak": 4920208,
+        "telemetry_overhead_ms": 7.707400000000206,
+        "topology_hash_cpu_cost": 0.36189999999999145,
+        "snapshot_memory_cost": 4334,
+        "telemetry_frames_written": 6,
+        "telemetry_cost_per_snapshot": 0.3351043478260959,
+        "topology_cost_per_window": 0.36189999999999145,
+        "memory_growth_per_transition": 188.43478260869566,
+        "serialization_cost_per_frame": 1.2242500000000358,
+        "stdout_drain_latency": 888.6903000000002
+      },
+      "topology_fingerprint": "57e29766d70161096d1abb38d58776da3c8d3bd92afc9dca465eb5bc6ffde165",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "jitter_intensity": 2.5,
+          "stdout_fragmentation": true,
+          "backpressure_intensity": 2,
+          "scheduler_contention": true
+        },
+        "transport_corruption_mode": "none",
+        "chunk_strategy": "boundary_targeted",
+        "jitter_profile": "async_chunk_jitter",
+        "stdout_strategy": "stdout_fragmentation",
+        "seed": "phase17_t13"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_16": "11e5dda82c05d832e77157101484f17aa9a07a078197c3518443e8eb7881e055",
+        "window_16_23": "23ef72f66c35dd95334060c8e492fd34cdad29440081a7de09c760ac86c003e5"
+      }
+    },
+    "secondary_artifacts": {
+      "runtime": "rust",
+      "final_result": "accept",
+      "trace_digest": "728de29809ece32bed601d422fcaf3be56134805c2ec2a09af85fcfcbf4c9d4d",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 86,
+        "snapshots_per_chunk": [
+          1,
+          1,
+          1,
+          4,
+          10,
+          10,
+          1,
+          1,
+          1,
+          1,
+          4,
+          10,
+          7,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          2,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.589041095890411,
+        "transition_density": {
+          "Utf8ContinuationEnter": 20,
+          "ChunkIngress": 41,
+          "EscapeEnter": 3,
+          "EscapeExit": 3,
+          "Utf8ContinuationExit": 19
+        },
+        "stdout_drain_latency": 150.55559999999969
+      },
+      "topology_fingerprint": "215ced19ebb44873c5710a7c273687df38c0359c1a11f679a3572cffcc801dff",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "backpressure_intensity": 2,
+          "descriptor_exhaustion": null,
+          "jitter_intensity": 2.5,
+          "partial_stdout_truncation": null,
+          "scheduler_contention": true,
+          "stderr_flood_intensity": null,
+          "stdout_fragmentation": true
+        },
+        "seed": "phase17_t13"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_16": "d866ac263e3fbf670869ab974dfaa4d19357942c0da7501d513bc7f614c00fbf",
+        "window_16_32": "3bc0a1836756d3df31d0e7249951c91989b45288309ed9e2894a2d446fb6c7cd",
+        "window_48_64": "3c6b522f6d6400462ffd90fdeda2827c881e7bf1b96002ed711beee8a588d671",
+        "window_32_48": "c9cd40f237b5d307a7f3e1bbb409ac74821a6e735937fdd815c60da75ea848ce",
+        "window_64_80": "a9b74a0997b405c8725b720a048bc4cfa8b3df5dee9965aebada885a1cd68b82",
+        "window_80_86": "66594b7752ca1477b2af6be508b4870ec42b061d9f0dc5fb586ee1160fba09a5"
+      }
+    },
+    "classification": "semantic_divergence",
+    "first_divergence_index": 0,
+    "divergence_windows": [
+      {
+        "start_snapshot": 0,
+        "end_snapshot": null
+      }
+    ],
+    "persistence_metrics": {
+      "raw_bytes": 0,
+      "compressed_bytes": 0,
+      "compression_ratio": 1,
+      "processing_time_ms": 1.6989000000003216,
+      "shedded": true,
+      "sampled": false,
+      "telemetry_confidence": 0
+    }
+  },
+  {
+    "replay_id": "c6331d1a6bd24fca6b10a10764891ae6a5ad256c4e319cddf415c37e395ab0d9",
+    "contract": {
+      "corpus_id": "conformance_p17_t14_surrogates_slashes",
+      "deterministic_seed": "phase17_t14",
+      "runtime_pair": {
+        "primary": "typescript",
+        "secondary": "rust"
+      },
+      "chunk_strategy": "boundary_targeted",
+      "fragmentation_profile": {
+        "strategy": "boundary_targeted"
+      },
+      "snapshot_schema_version": "v1.0",
+      "entropy_profile": {
+        "async_chunk_jitter": true,
+        "jitter_intensity": 2.5,
+        "stdout_fragmentation": true,
+        "backpressure_intensity": 2,
+        "scheduler_contention": true
+      },
+      "topology_flush_interval": 16,
+      "ecosystem_profile": "rfc8259_strict"
+    },
+    "chunk_layout_sizes": [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      1
+    ],
+    "primary_artifacts": {
+      "runtime": "typescript",
+      "final_result": "accept",
+      "trace_digest": "18084e95d2f0783eeb745e3847be01d1dc7da96842fcc364e2302dfaab82ae57",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 11,
+        "snapshots_per_chunk": [
+          1,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.13924050632911392,
+        "transition_density": {
+          "init": 1,
+          "token_processed": 9,
+          "finalize": 1
+        },
+        "snapshots_per_sec": 29.5212934405833,
+        "transitions_per_byte": 0.13924050632911392,
+        "throughput_bytes_per_sec": 212.01656198237097,
+        "replay_wall_clock_ms": 372.6124,
+        "chunk_stall_ms": 64.41980977144438,
+        "stdout_frame_count": 4,
+        "replay_memory_peak": 5097936,
+        "telemetry_overhead_ms": 7.604599999999863,
+        "topology_hash_cpu_cost": 1.3583999999999605,
+        "snapshot_memory_cost": 2054,
+        "telemetry_frames_written": 4,
+        "telemetry_cost_per_snapshot": 0.6913272727272602,
+        "topology_cost_per_window": 1.3583999999999605,
+        "memory_growth_per_transition": 186.72727272727272,
+        "serialization_cost_per_frame": 1.5615499999999756,
+        "stdout_drain_latency": 706.3306000000002
+      },
+      "topology_fingerprint": "bfbf5399016c2fd770ced3764352716c6ea287fb3703750d8ce934f4fabbad36",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "jitter_intensity": 2.5,
+          "stdout_fragmentation": true,
+          "backpressure_intensity": 2,
+          "scheduler_contention": true
+        },
+        "transport_corruption_mode": "none",
+        "chunk_strategy": "boundary_targeted",
+        "jitter_profile": "async_chunk_jitter",
+        "stdout_strategy": "stdout_fragmentation",
+        "seed": "phase17_t14"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_11": "bfbf5399016c2fd770ced3764352716c6ea287fb3703750d8ce934f4fabbad36"
+      }
+    },
+    "secondary_artifacts": {
+      "runtime": "rust",
+      "final_result": "accept",
+      "trace_digest": "38062fca4148816b93acfcede90a3a37ae09d58d9db049899347ad2f5f184d7f",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 35,
+        "snapshots_per_chunk": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          3,
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.4430379746835443,
+        "transition_density": {
+          "EscapeExit": 4,
+          "ChunkIngress": 27,
+          "EscapeEnter": 4
+        },
+        "stdout_drain_latency": 182.84469999999965
+      },
+      "topology_fingerprint": "e7329daf24661c1ca02475f652ea13334368cf32c83696db57872651b4535cf8",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "backpressure_intensity": 2,
+          "descriptor_exhaustion": null,
+          "jitter_intensity": 2.5,
+          "partial_stdout_truncation": null,
+          "scheduler_contention": true,
+          "stderr_flood_intensity": null,
+          "stdout_fragmentation": true
+        },
+        "seed": "phase17_t14"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_16_32": "b4faa9e37f5ada89a5b5d03369b00e96ee6a147de5d8237d611d732a9a46f39c",
+        "window_32_35": "e94ee2841f164a29cc28edd7284bfdb2eb3defb42ba07a07fed412cff80ce0ca",
+        "window_0_16": "296d60866c81861a1e268507498307ffb1fac2a3f98a5acabbb5eb2f072b1830"
+      }
+    },
+    "classification": "semantic_aligned_cadence_divergence",
+    "first_divergence_index": 0,
+    "divergence_windows": [
+      {
+        "start_snapshot": 0,
+        "end_snapshot": null
+      }
+    ],
+    "persistence_metrics": {
+      "raw_bytes": 0,
+      "compressed_bytes": 0,
+      "compression_ratio": 1,
+      "processing_time_ms": 1.1539000000002488,
+      "shedded": true,
+      "sampled": false,
+      "telemetry_confidence": 0
+    }
+  },
+  {
+    "replay_id": "4c682a06e4d43159bb88216a8122c21d2167c34f9db69325b109dd99dbd995a1",
+    "contract": {
+      "corpus_id": "conformance_p17_t15_sparse_and_unordered",
+      "deterministic_seed": "phase17_t15",
+      "runtime_pair": {
+        "primary": "typescript",
+        "secondary": "rust"
+      },
+      "chunk_strategy": "boundary_targeted",
+      "fragmentation_profile": {
+        "strategy": "boundary_targeted"
+      },
+      "snapshot_schema_version": "v1.0",
+      "entropy_profile": {
+        "async_chunk_jitter": true,
+        "jitter_intensity": 2.5,
+        "stdout_fragmentation": true,
+        "backpressure_intensity": 2,
+        "scheduler_contention": true
+      },
+      "topology_flush_interval": 16,
+      "ecosystem_profile": "ecma262"
+    },
+    "chunk_layout_sizes": [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      2
+    ],
+    "primary_artifacts": {
+      "runtime": "typescript",
+      "final_result": "accept",
+      "trace_digest": "ed05869330978784383dd6bad41c243feccfa7b7bd0167aea880f189427231f0",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 21,
+        "snapshots_per_chunk": [
+          1,
+          2,
+          2,
+          1,
+          1,
+          2,
+          0,
+          0,
+          0,
+          1,
+          2,
+          2,
+          0,
+          2,
+          0,
+          3
+        ],
+        "snapshots_per_byte": 0.44680851063829785,
+        "transition_density": {
+          "init": 1,
+          "token_processed": 19,
+          "finalize": 1
+        },
+        "snapshots_per_sec": 82.2361336172699,
+        "transitions_per_byte": 0.44680851063829785,
+        "throughput_bytes_per_sec": 184.0522990481755,
+        "replay_wall_clock_ms": 255.36219999999997,
+        "chunk_stall_ms": 34.96428119628343,
+        "stdout_frame_count": 6,
+        "replay_memory_peak": 5060160,
+        "telemetry_overhead_ms": 8.970099999999974,
+        "topology_hash_cpu_cost": 0.23149999999998272,
+        "snapshot_memory_cost": 3954,
+        "telemetry_frames_written": 6,
+        "telemetry_cost_per_snapshot": 0.4271476190476178,
+        "topology_cost_per_window": 0.23149999999998272,
+        "memory_growth_per_transition": 188.28571428571428,
+        "serialization_cost_per_frame": 1.456433333333332,
+        "stdout_drain_latency": 762.8547000000008
+      },
+      "topology_fingerprint": "065e9999e4debc67a27b899e170014b9b8af05a76632c46fd12c5b6cc6f028b9",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "jitter_intensity": 2.5,
+          "stdout_fragmentation": true,
+          "backpressure_intensity": 2,
+          "scheduler_contention": true
+        },
+        "transport_corruption_mode": "none",
+        "chunk_strategy": "boundary_targeted",
+        "jitter_profile": "async_chunk_jitter",
+        "stdout_strategy": "stdout_fragmentation",
+        "seed": "phase17_t15"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_16": "b5b50944b96ac2f0a4e9ca021496e7c2e5ca9624798287d166ad74415e690e67",
+        "window_16_21": "2a278d0d9f0fe586eef39cf37cdd04f8df49572bee5665f28c74b77eb0c20e45"
+      }
+    },
+    "secondary_artifacts": {
+      "runtime": "rust",
+      "final_result": "accept",
+      "trace_digest": "b915579b5ab76e31bc249e6270a1a27ad61408135f6a9796978075816bb19ae6",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 16,
+        "snapshots_per_chunk": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.3404255319148936,
+        "transition_density": {
+          "ChunkIngress": 16
+        },
+        "stdout_drain_latency": 86.91890000000058
+      },
+      "topology_fingerprint": "0f61fb00aab08169f468ab35821ec223dd757a3bb40781c49ab6abf4e62a5d65",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "backpressure_intensity": 2,
+          "descriptor_exhaustion": null,
+          "jitter_intensity": 2.5,
+          "partial_stdout_truncation": null,
+          "scheduler_contention": true,
+          "stderr_flood_intensity": null,
+          "stdout_fragmentation": true
+        },
+        "seed": "phase17_t15"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_16": "0f61fb00aab08169f468ab35821ec223dd757a3bb40781c49ab6abf4e62a5d65"
+      }
+    },
+    "classification": "semantic_aligned_cadence_divergence",
+    "first_divergence_index": 0,
+    "divergence_windows": [
+      {
+        "start_snapshot": 0,
+        "end_snapshot": null
+      }
+    ],
+    "persistence_metrics": {
+      "raw_bytes": 0,
+      "compressed_bytes": 0,
+      "compression_ratio": 1,
+      "processing_time_ms": 0.9180000000005748,
+      "shedded": true,
+      "sampled": false,
+      "telemetry_confidence": 0
+    }
+  },
+  {
+    "replay_id": "b37807c07410c5854e4f5a0eff76102ff2b4e9c89c1266afc9a71bf37fb21d58",
+    "contract": {
+      "corpus_id": "conformance_p17_t16_float_canonicalization",
+      "deterministic_seed": "phase17_t16",
+      "runtime_pair": {
+        "primary": "typescript",
+        "secondary": "rust"
+      },
+      "chunk_strategy": "boundary_targeted",
+      "fragmentation_profile": {
+        "strategy": "boundary_targeted"
+      },
+      "snapshot_schema_version": "v1.0",
+      "entropy_profile": {
+        "async_chunk_jitter": true,
+        "jitter_intensity": 2.5,
+        "stdout_fragmentation": true,
+        "backpressure_intensity": 2,
+        "scheduler_contention": true
+      },
+      "topology_flush_interval": 16,
+      "ecosystem_profile": "legacy_first_win"
+    },
+    "chunk_layout_sizes": [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      1
+    ],
+    "primary_artifacts": {
+      "runtime": "typescript",
+      "final_result": "accept",
+      "trace_digest": "918c78bd3e7db0e6b1765121121fb1ac74c599ba44779369f649547c049db974",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 19,
+        "snapshots_per_chunk": [
+          1,
+          0,
+          0,
+          2,
+          2,
+          0,
+          0,
+          2,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.2087912087912088,
+        "transition_density": {
+          "init": 1,
+          "token_processed": 17,
+          "finalize": 1
+        },
+        "snapshots_per_sec": 40.16440347299483,
+        "transitions_per_byte": 0.2087912087912088,
+        "throughput_bytes_per_sec": 192.36635347592258,
+        "replay_wall_clock_ms": 473.0557,
+        "chunk_stall_ms": 86.51829283052375,
+        "stdout_frame_count": 6,
+        "replay_memory_peak": 5104280,
+        "telemetry_overhead_ms": 8.873800000000188,
+        "topology_hash_cpu_cost": 0.46550000000002,
+        "snapshot_memory_cost": 3574,
+        "telemetry_frames_written": 6,
+        "telemetry_cost_per_snapshot": 0.46704210526316775,
+        "topology_cost_per_window": 0.46550000000002,
+        "memory_growth_per_transition": 188.10526315789474,
+        "serialization_cost_per_frame": 1.4013833333333612,
+        "stdout_drain_latency": 981.5255000000006
+      },
+      "topology_fingerprint": "44dde693b1da5c22614cbed7261cbe3042ea971a8ca98d7e1990b5cb671053a9",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "jitter_intensity": 2.5,
+          "stdout_fragmentation": true,
+          "backpressure_intensity": 2,
+          "scheduler_contention": true
+        },
+        "transport_corruption_mode": "none",
+        "chunk_strategy": "boundary_targeted",
+        "jitter_profile": "async_chunk_jitter",
+        "stdout_strategy": "stdout_fragmentation",
+        "seed": "phase17_t16"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_16": "37641f16ba857b5559381b417572ecf9a547e981799947c66be25b2bd1c901d1",
+        "window_16_19": "396dca9e319a45d7c09bc3141104e0e5a69d9ec226fcc071227080599b7465c5"
+      }
+    },
+    "secondary_artifacts": {
+      "runtime": "rust",
+      "final_result": "accept",
+      "trace_digest": "0ba9c1fdf5c24074e83dd5b8f2cb934bf4fbbcc5df7f7a4a2fd73c43bac6efc0",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 31,
+        "snapshots_per_chunk": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.34065934065934067,
+        "transition_density": {
+          "ChunkIngress": 31
+        },
+        "stdout_drain_latency": 95.27030000000013
+      },
+      "topology_fingerprint": "915dd8a9bdb1dfd036ba3d8dee55b288b47f10129007e200a4fe538df7f94fef",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "backpressure_intensity": 2,
+          "descriptor_exhaustion": null,
+          "jitter_intensity": 2.5,
+          "partial_stdout_truncation": null,
+          "scheduler_contention": true,
+          "stderr_flood_intensity": null,
+          "stdout_fragmentation": true
+        },
+        "seed": "phase17_t16"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_16_31": "9f54e8875ac8be2c930fcc165cf6643b4f24a169dcab432af20db6d5c1b677bc",
+        "window_0_16": "298104c62dd99761630206d3306945d101b937d3912e825d5b16cb7e64af8e74"
+      }
+    },
+    "classification": "semantic_aligned_cadence_divergence",
+    "first_divergence_index": 0,
+    "divergence_windows": [
+      {
+        "start_snapshot": 0,
+        "end_snapshot": null
+      }
+    ],
+    "persistence_metrics": {
+      "raw_bytes": 0,
+      "compressed_bytes": 0,
+      "compression_ratio": 1,
+      "processing_time_ms": 0.8993000000000393,
+      "shedded": true,
+      "sampled": false,
+      "telemetry_confidence": 0
+    }
+  },
+  {
+    "replay_id": "622d3599c0cd02f8e1daa9b1fae7330cc5cbefded6e758efec5f9e3c0ffc6aa7",
+    "contract": {
+      "corpus_id": "conformance_p17_t17_unicode_elements",
+      "deterministic_seed": "phase17_t17",
+      "runtime_pair": {
+        "primary": "typescript",
+        "secondary": "rust"
+      },
+      "chunk_strategy": "boundary_targeted",
+      "fragmentation_profile": {
+        "strategy": "boundary_targeted"
+      },
+      "snapshot_schema_version": "v1.0",
+      "entropy_profile": {
+        "async_chunk_jitter": true,
+        "jitter_intensity": 2.5,
+        "stdout_fragmentation": true,
+        "backpressure_intensity": 2,
+        "scheduler_contention": true
+      },
+      "topology_flush_interval": 16,
+      "ecosystem_profile": "duplicate_error"
+    },
+    "chunk_layout_sizes": [
+      3,
+      3,
+      3,
+      4,
+      9,
+      9,
+      3,
+      3,
+      3,
+      3,
+      5,
+      9,
+      7,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      1
+    ],
+    "primary_artifacts": {
+      "runtime": "typescript",
+      "final_result": "accept",
+      "trace_digest": "5ac50ec994c1d42fcbbaae5878e9b8f3e7d8860898dff74145600b7e602e0a67",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 23,
+        "snapshots_per_chunk": [
+          1,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          2,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.19166666666666668,
+        "transition_density": {
+          "init": 1,
+          "token_processed": 21,
+          "finalize": 1
+        },
+        "snapshots_per_sec": 39.978870297941654,
+        "transitions_per_byte": 0.19166666666666668,
+        "throughput_bytes_per_sec": 208.58541025013037,
+        "replay_wall_clock_ms": 575.3039000000001,
+        "chunk_stall_ms": 96.71935025158092,
+        "stdout_frame_count": 6,
+        "replay_memory_peak": 4906816,
+        "telemetry_overhead_ms": 5.772299999999831,
+        "topology_hash_cpu_cost": 0.28700000000003456,
+        "snapshot_memory_cost": 4334,
+        "telemetry_frames_written": 6,
+        "telemetry_cost_per_snapshot": 0.25096956521738395,
+        "topology_cost_per_window": 0.28700000000003456,
+        "memory_growth_per_transition": 188.43478260869566,
+        "serialization_cost_per_frame": 0.9142166666666327,
+        "stdout_drain_latency": 846.1224999999995
+      },
+      "topology_fingerprint": "57e29766d70161096d1abb38d58776da3c8d3bd92afc9dca465eb5bc6ffde165",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "jitter_intensity": 2.5,
+          "stdout_fragmentation": true,
+          "backpressure_intensity": 2,
+          "scheduler_contention": true
+        },
+        "transport_corruption_mode": "none",
+        "chunk_strategy": "boundary_targeted",
+        "jitter_profile": "async_chunk_jitter",
+        "stdout_strategy": "stdout_fragmentation",
+        "seed": "phase17_t17"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_16": "11e5dda82c05d832e77157101484f17aa9a07a078197c3518443e8eb7881e055",
+        "window_16_23": "23ef72f66c35dd95334060c8e492fd34cdad29440081a7de09c760ac86c003e5"
+      }
+    },
+    "secondary_artifacts": {
+      "runtime": "rust",
+      "final_result": "accept",
+      "trace_digest": "728de29809ece32bed601d422fcaf3be56134805c2ec2a09af85fcfcbf4c9d4d",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 86,
+        "snapshots_per_chunk": [
+          1,
+          1,
+          1,
+          4,
+          10,
+          10,
+          1,
+          1,
+          1,
+          1,
+          4,
+          10,
+          7,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          2,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.589041095890411,
+        "transition_density": {
+          "ChunkIngress": 41,
+          "Utf8ContinuationEnter": 20,
+          "Utf8ContinuationExit": 19,
+          "EscapeEnter": 3,
+          "EscapeExit": 3
+        },
+        "stdout_drain_latency": 128.23129999999946
+      },
+      "topology_fingerprint": "215ced19ebb44873c5710a7c273687df38c0359c1a11f679a3572cffcc801dff",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "backpressure_intensity": 2,
+          "descriptor_exhaustion": null,
+          "jitter_intensity": 2.5,
+          "partial_stdout_truncation": null,
+          "scheduler_contention": true,
+          "stderr_flood_intensity": null,
+          "stdout_fragmentation": true
+        },
+        "seed": "phase17_t17"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_16": "d866ac263e3fbf670869ab974dfaa4d19357942c0da7501d513bc7f614c00fbf",
+        "window_64_80": "a9b74a0997b405c8725b720a048bc4cfa8b3df5dee9965aebada885a1cd68b82",
+        "window_32_48": "c9cd40f237b5d307a7f3e1bbb409ac74821a6e735937fdd815c60da75ea848ce",
+        "window_80_86": "66594b7752ca1477b2af6be508b4870ec42b061d9f0dc5fb586ee1160fba09a5",
+        "window_48_64": "3c6b522f6d6400462ffd90fdeda2827c881e7bf1b96002ed711beee8a588d671",
+        "window_16_32": "3bc0a1836756d3df31d0e7249951c91989b45288309ed9e2894a2d446fb6c7cd"
+      }
+    },
+    "classification": "semantic_divergence",
+    "first_divergence_index": 0,
+    "divergence_windows": [
+      {
+        "start_snapshot": 0,
+        "end_snapshot": null
+      }
+    ],
+    "persistence_metrics": {
+      "raw_bytes": 0,
+      "compressed_bytes": 0,
+      "compression_ratio": 1,
+      "processing_time_ms": 1.3296000000009371,
+      "shedded": true,
+      "sampled": false,
+      "telemetry_confidence": 0
+    }
+  },
+  {
+    "replay_id": "8aa47c15a5abe69ea0afd5ad46a8c0bb13d7f6404fd1fdda4b6353a70164d2b1",
+    "contract": {
+      "corpus_id": "conformance_p17_t18_surrogates_slashes",
+      "deterministic_seed": "phase17_t18",
+      "runtime_pair": {
+        "primary": "typescript",
+        "secondary": "rust"
+      },
+      "chunk_strategy": "boundary_targeted",
+      "fragmentation_profile": {
+        "strategy": "boundary_targeted"
+      },
+      "snapshot_schema_version": "v1.0",
+      "entropy_profile": {
+        "async_chunk_jitter": true,
+        "jitter_intensity": 4.5,
+        "stdout_fragmentation": true,
+        "backpressure_intensity": 4.5,
+        "scheduler_contention": true,
+        "stderr_flood_intensity": 4
+      },
+      "topology_flush_interval": 8,
+      "ecosystem_profile": "canonical_order_strict"
+    },
+    "chunk_layout_sizes": [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      1
+    ],
+    "primary_artifacts": {
+      "runtime": "typescript",
+      "final_result": "accept",
+      "trace_digest": "18084e95d2f0783eeb745e3847be01d1dc7da96842fcc364e2302dfaab82ae57",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 11,
+        "snapshots_per_chunk": [
+          1,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.13924050632911392,
+        "transition_density": {
+          "init": 1,
+          "token_processed": 9,
+          "finalize": 1
+        },
+        "snapshots_per_sec": 25.752131983890404,
+        "transitions_per_byte": 0.13924050632911392,
+        "throughput_bytes_per_sec": 184.94712970248565,
+        "replay_wall_clock_ms": 427.1491,
+        "chunk_stall_ms": 130.45259948098897,
+        "stdout_frame_count": 4,
+        "replay_memory_peak": 5070440,
+        "telemetry_overhead_ms": 3.778099999999881,
+        "topology_hash_cpu_cost": 0.1775000000000091,
+        "snapshot_memory_cost": 2054,
+        "telemetry_frames_written": 4,
+        "telemetry_cost_per_snapshot": 0.3434636363636256,
+        "topology_cost_per_window": 0.1775000000000091,
+        "memory_growth_per_transition": 186.72727272727272,
+        "serialization_cost_per_frame": 0.900149999999968,
+        "stdout_drain_latency": 694.6522000000004
+      },
+      "topology_fingerprint": "bfbf5399016c2fd770ced3764352716c6ea287fb3703750d8ce934f4fabbad36",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "jitter_intensity": 4.5,
+          "stdout_fragmentation": true,
+          "backpressure_intensity": 4.5,
+          "scheduler_contention": true,
+          "stderr_flood_intensity": 4
+        },
+        "transport_corruption_mode": "none",
+        "chunk_strategy": "boundary_targeted",
+        "jitter_profile": "async_chunk_jitter",
+        "stdout_strategy": "stdout_fragmentation",
+        "seed": "phase17_t18"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_8": "b605e0c49619c00fc1a27afe6f15011d4080ae61c613eb78a3dc8b01aad18a01",
+        "window_8_11": "396dca9e319a45d7c09bc3141104e0e5a69d9ec226fcc071227080599b7465c5"
+      }
+    },
+    "secondary_artifacts": {
+      "runtime": "rust",
+      "final_result": "accept",
+      "trace_digest": "38062fca4148816b93acfcede90a3a37ae09d58d9db049899347ad2f5f184d7f",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 35,
+        "snapshots_per_chunk": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          3,
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.4430379746835443,
+        "transition_density": {
+          "EscapeExit": 4,
+          "ChunkIngress": 27,
+          "EscapeEnter": 4
+        },
+        "stdout_drain_latency": 146.09400000000096
+      },
+      "topology_fingerprint": "e7329daf24661c1ca02475f652ea13334368cf32c83696db57872651b4535cf8",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "backpressure_intensity": 4.5,
+          "descriptor_exhaustion": null,
+          "jitter_intensity": 4.5,
+          "partial_stdout_truncation": null,
+          "scheduler_contention": true,
+          "stderr_flood_intensity": 4,
+          "stdout_fragmentation": true
+        },
+        "seed": "phase17_t18"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_8": "84a3d5bc3a78532359e4a2ce9bb590ec3be5861ec837323bc5612c2066ae02b2",
+        "window_16_24": "11d0c72e99defb50310035e0fd8f5054c1f6d8f6b9344716b731a1004d041013",
+        "window_8_16": "25682eca328a8099eae5c421076ea265ebe6c70a7cc1dce56ab61fbe94dd9f3e",
+        "window_24_32": "6edf6824183a2db408227e99ff36088ab2f1a82b7e8dff7182f617244d1a1fcd",
+        "window_32_35": "e94ee2841f164a29cc28edd7284bfdb2eb3defb42ba07a07fed412cff80ce0ca"
+      }
+    },
+    "classification": "semantic_aligned_cadence_divergence",
+    "first_divergence_index": 0,
+    "divergence_windows": [
+      {
+        "start_snapshot": 0,
+        "end_snapshot": null
+      }
+    ],
+    "persistence_metrics": {
+      "raw_bytes": 0,
+      "compressed_bytes": 0,
+      "compression_ratio": 1,
+      "processing_time_ms": 0.7934999999997672,
+      "shedded": true,
+      "sampled": false,
+      "telemetry_confidence": 0
+    }
+  },
+  {
+    "replay_id": "42fa540fd6f10afc127395ccd4c58c47d9a1abe12ab9aa0b47db5344edf0dfcc",
+    "contract": {
+      "corpus_id": "conformance_p17_t19_sparse_and_unordered",
+      "deterministic_seed": "phase17_t19",
+      "runtime_pair": {
+        "primary": "typescript",
+        "secondary": "rust"
+      },
+      "chunk_strategy": "boundary_targeted",
+      "fragmentation_profile": {
+        "strategy": "boundary_targeted"
+      },
+      "snapshot_schema_version": "v1.0",
+      "entropy_profile": {
+        "async_chunk_jitter": true,
+        "jitter_intensity": 4.5,
+        "stdout_fragmentation": true,
+        "backpressure_intensity": 4.5,
+        "scheduler_contention": true,
+        "stderr_flood_intensity": 4
+      },
+      "topology_flush_interval": 8,
+      "ecosystem_profile": "rfc8259_strict"
+    },
+    "chunk_layout_sizes": [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      2
+    ],
+    "primary_artifacts": {
+      "runtime": "typescript",
+      "final_result": "accept",
+      "trace_digest": "ed05869330978784383dd6bad41c243feccfa7b7bd0167aea880f189427231f0",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 21,
+        "snapshots_per_chunk": [
+          1,
+          2,
+          2,
+          1,
+          1,
+          2,
+          0,
+          0,
+          0,
+          1,
+          2,
+          2,
+          0,
+          2,
+          0,
+          3
+        ],
+        "snapshots_per_byte": 0.44680851063829785,
+        "transition_density": {
+          "init": 1,
+          "token_processed": 19,
+          "finalize": 1
+        },
+        "snapshots_per_sec": 80.9562708920186,
+        "transitions_per_byte": 0.44680851063829785,
+        "throughput_bytes_per_sec": 181.18784437737497,
+        "replay_wall_clock_ms": 259.3993,
+        "chunk_stall_ms": 79.49845426981892,
+        "stdout_frame_count": 6,
+        "replay_memory_peak": 5216968,
+        "telemetry_overhead_ms": 5.206599999999952,
+        "topology_hash_cpu_cost": 0.2924000000000433,
+        "snapshot_memory_cost": 3954,
+        "telemetry_frames_written": 6,
+        "telemetry_cost_per_snapshot": 0.24793333333333104,
+        "topology_cost_per_window": 0.2924000000000433,
+        "memory_growth_per_transition": 188.28571428571428,
+        "serialization_cost_per_frame": 0.8190333333333181,
+        "stdout_drain_latency": 536.7085000000006
+      },
+      "topology_fingerprint": "065e9999e4debc67a27b899e170014b9b8af05a76632c46fd12c5b6cc6f028b9",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "jitter_intensity": 4.5,
+          "stdout_fragmentation": true,
+          "backpressure_intensity": 4.5,
+          "scheduler_contention": true,
+          "stderr_flood_intensity": 4
+        },
+        "transport_corruption_mode": "none",
+        "chunk_strategy": "boundary_targeted",
+        "jitter_profile": "async_chunk_jitter",
+        "stdout_strategy": "stdout_fragmentation",
+        "seed": "phase17_t19"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_8": "112f5d189851f28d653677ce9613cb1e65cb03d00c2ca006210ef18fcdd28d79",
+        "window_8_16": "80591597d58e4b02ae8a1781f0145b4e2340cb9e1b2d9a84bedabbd2e2c0147f",
+        "window_16_21": "2a278d0d9f0fe586eef39cf37cdd04f8df49572bee5665f28c74b77eb0c20e45"
+      }
+    },
+    "secondary_artifacts": {
+      "runtime": "rust",
+      "final_result": "accept",
+      "trace_digest": "b915579b5ab76e31bc249e6270a1a27ad61408135f6a9796978075816bb19ae6",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 16,
+        "snapshots_per_chunk": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.3404255319148936,
+        "transition_density": {
+          "ChunkIngress": 16
+        },
+        "stdout_drain_latency": 115.90220000000045
+      },
+      "topology_fingerprint": "0f61fb00aab08169f468ab35821ec223dd757a3bb40781c49ab6abf4e62a5d65",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "backpressure_intensity": 4.5,
+          "descriptor_exhaustion": null,
+          "jitter_intensity": 4.5,
+          "partial_stdout_truncation": null,
+          "scheduler_contention": true,
+          "stderr_flood_intensity": 4,
+          "stdout_fragmentation": true
+        },
+        "seed": "phase17_t19"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_8": "15a977f9c550cf289e6c212bb509872d38099ee43152cb20e190b3f558aeccb8",
+        "window_8_16": "5981ba2d6aa50e80cae459f00f43295d5c9c6514801c2112049ee1fec72bce2f"
+      }
+    },
+    "classification": "semantic_aligned_cadence_divergence",
+    "first_divergence_index": 0,
+    "divergence_windows": [
+      {
+        "start_snapshot": 0,
+        "end_snapshot": null
+      }
+    ],
+    "persistence_metrics": {
+      "raw_bytes": 0,
+      "compressed_bytes": 0,
+      "compression_ratio": 1,
+      "processing_time_ms": 1.1090999999996711,
+      "shedded": true,
+      "sampled": false,
+      "telemetry_confidence": 0
+    }
+  },
+  {
+    "replay_id": "f941f9cfda1ababc31888f3449d4fd54e4d891e24997e259c83907214801c433",
+    "contract": {
+      "corpus_id": "conformance_p17_t20_float_canonicalization",
+      "deterministic_seed": "phase17_t20",
+      "runtime_pair": {
+        "primary": "typescript",
+        "secondary": "rust"
+      },
+      "chunk_strategy": "boundary_targeted",
+      "fragmentation_profile": {
+        "strategy": "boundary_targeted"
+      },
+      "snapshot_schema_version": "v1.0",
+      "entropy_profile": {
+        "async_chunk_jitter": true,
+        "jitter_intensity": 4.5,
+        "stdout_fragmentation": true,
+        "backpressure_intensity": 4.5,
+        "scheduler_contention": true,
+        "stderr_flood_intensity": 4
+      },
+      "topology_flush_interval": 8,
+      "ecosystem_profile": "ecma262"
+    },
+    "chunk_layout_sizes": [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      1
+    ],
+    "primary_artifacts": {
+      "runtime": "typescript",
+      "final_result": "accept",
+      "trace_digest": "918c78bd3e7db0e6b1765121121fb1ac74c599ba44779369f649547c049db974",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 19,
+        "snapshots_per_chunk": [
+          1,
+          0,
+          0,
+          2,
+          2,
+          0,
+          0,
+          2,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.2087912087912088,
+        "transition_density": {
+          "init": 1,
+          "token_processed": 17,
+          "finalize": 1
+        },
+        "snapshots_per_sec": 39.69152581745742,
+        "transitions_per_byte": 0.2087912087912088,
+        "throughput_bytes_per_sec": 190.101518388875,
+        "replay_wall_clock_ms": 478.6916,
+        "chunk_stall_ms": 139.6881071331155,
+        "stdout_frame_count": 6,
+        "replay_memory_peak": 5248664,
+        "telemetry_overhead_ms": 6.280000000000101,
+        "topology_hash_cpu_cost": 0.3831000000000131,
+        "snapshot_memory_cost": 3574,
+        "telemetry_frames_written": 6,
+        "telemetry_cost_per_snapshot": 0.330526315789479,
+        "topology_cost_per_window": 0.3831000000000131,
+        "memory_growth_per_transition": 188.10526315789474,
+        "serialization_cost_per_frame": 0.9828166666666812,
+        "stdout_drain_latency": 776.2258000000002
+      },
+      "topology_fingerprint": "44dde693b1da5c22614cbed7261cbe3042ea971a8ca98d7e1990b5cb671053a9",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "jitter_intensity": 4.5,
+          "stdout_fragmentation": true,
+          "backpressure_intensity": 4.5,
+          "scheduler_contention": true,
+          "stderr_flood_intensity": 4
+        },
+        "transport_corruption_mode": "none",
+        "chunk_strategy": "boundary_targeted",
+        "jitter_profile": "async_chunk_jitter",
+        "stdout_strategy": "stdout_fragmentation",
+        "seed": "phase17_t20"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_8": "112f5d189851f28d653677ce9613cb1e65cb03d00c2ca006210ef18fcdd28d79",
+        "window_8_16": "b919e5f2cc40d3716b1e447df35f82578cfa23be8b6b8e1c0cd84535b680d4e3",
+        "window_16_19": "396dca9e319a45d7c09bc3141104e0e5a69d9ec226fcc071227080599b7465c5"
+      }
+    },
+    "secondary_artifacts": {
+      "runtime": "rust",
+      "final_result": "accept",
+      "trace_digest": "0ba9c1fdf5c24074e83dd5b8f2cb934bf4fbbcc5df7f7a4a2fd73c43bac6efc0",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 31,
+        "snapshots_per_chunk": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.34065934065934067,
+        "transition_density": {
+          "ChunkIngress": 31
+        },
+        "stdout_drain_latency": 204.32300000000032
+      },
+      "topology_fingerprint": "915dd8a9bdb1dfd036ba3d8dee55b288b47f10129007e200a4fe538df7f94fef",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "backpressure_intensity": 4.5,
+          "descriptor_exhaustion": null,
+          "jitter_intensity": 4.5,
+          "partial_stdout_truncation": null,
+          "scheduler_contention": true,
+          "stderr_flood_intensity": 4,
+          "stdout_fragmentation": true
+        },
+        "seed": "phase17_t20"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_24_31": "1e877048c8af4c377d577f48290d15e8b145c0b80a56d80baf60dc824becddfb",
+        "window_0_8": "3e629b2b0092c5b8ac53969518f370cf7cd2ec9aac8ea1a4d37311658c816679",
+        "window_8_16": "c3a46b4cc8f8cdf4f7023f5d84363b17d7ed1b1a342e35642e17546df8c01305",
+        "window_16_24": "0d5ffd6d305393301dfb65e39d8a8c82bf3debc806b8d3554a4cfbb6ae4f4ada"
+      }
+    },
+    "classification": "semantic_aligned_cadence_divergence",
+    "first_divergence_index": 0,
+    "divergence_windows": [
+      {
+        "start_snapshot": 0,
+        "end_snapshot": null
+      }
+    ],
+    "persistence_metrics": {
+      "raw_bytes": 0,
+      "compressed_bytes": 0,
+      "compression_ratio": 1,
+      "processing_time_ms": 1.3431000000000495,
+      "shedded": true,
+      "sampled": false,
+      "telemetry_confidence": 0
+    }
+  },
+  {
+    "replay_id": "99d3f10a2690fc712b9c02c5321e9d515a5091a339f253cceed70ce049d3cd62",
+    "contract": {
+      "corpus_id": "conformance_p17_t21_unicode_elements",
+      "deterministic_seed": "phase17_t21",
+      "runtime_pair": {
+        "primary": "typescript",
+        "secondary": "rust"
+      },
+      "chunk_strategy": "boundary_targeted",
+      "fragmentation_profile": {
+        "strategy": "boundary_targeted"
+      },
+      "snapshot_schema_version": "v1.0",
+      "entropy_profile": {
+        "async_chunk_jitter": true,
+        "jitter_intensity": 4.5,
+        "stdout_fragmentation": true,
+        "backpressure_intensity": 4.5,
+        "scheduler_contention": true,
+        "stderr_flood_intensity": 4
+      },
+      "topology_flush_interval": 8,
+      "ecosystem_profile": "legacy_first_win"
+    },
+    "chunk_layout_sizes": [
+      3,
+      3,
+      3,
+      4,
+      9,
+      9,
+      3,
+      3,
+      3,
+      3,
+      5,
+      9,
+      7,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      1
+    ],
+    "primary_artifacts": {
+      "runtime": "typescript",
+      "final_result": "accept",
+      "trace_digest": "5ac50ec994c1d42fcbbaae5878e9b8f3e7d8860898dff74145600b7e602e0a67",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 23,
+        "snapshots_per_chunk": [
+          1,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          2,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.19166666666666668,
+        "transition_density": {
+          "init": 1,
+          "token_processed": 21,
+          "finalize": 1
+        },
+        "snapshots_per_sec": 31.475111192672703,
+        "transitions_per_byte": 0.19166666666666668,
+        "throughput_bytes_per_sec": 164.2179714400315,
+        "replay_wall_clock_ms": 730.7361,
+        "chunk_stall_ms": 196.5250016819288,
+        "stdout_frame_count": 7,
+        "replay_memory_peak": 5405336,
+        "telemetry_overhead_ms": 9.256400000000156,
+        "topology_hash_cpu_cost": 0.4087000000000671,
+        "snapshot_memory_cost": 4334,
+        "telemetry_frames_written": 7,
+        "telemetry_cost_per_snapshot": 0.40245217391305027,
+        "topology_cost_per_window": 0.4087000000000671,
+        "memory_growth_per_transition": 188.43478260869566,
+        "serialization_cost_per_frame": 1.2639571428571554,
+        "stdout_drain_latency": 1205.8089
+      },
+      "topology_fingerprint": "57e29766d70161096d1abb38d58776da3c8d3bd92afc9dca465eb5bc6ffde165",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "jitter_intensity": 4.5,
+          "stdout_fragmentation": true,
+          "backpressure_intensity": 4.5,
+          "scheduler_contention": true,
+          "stderr_flood_intensity": 4
+        },
+        "transport_corruption_mode": "none",
+        "chunk_strategy": "boundary_targeted",
+        "jitter_profile": "async_chunk_jitter",
+        "stdout_strategy": "stdout_fragmentation",
+        "seed": "phase17_t21"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_8": "b605e0c49619c00fc1a27afe6f15011d4080ae61c613eb78a3dc8b01aad18a01",
+        "window_8_16": "19208096f4629baa04d47f44b0bd61b5aeef8ce1d67d14167e02802434a606f5",
+        "window_16_23": "23ef72f66c35dd95334060c8e492fd34cdad29440081a7de09c760ac86c003e5"
+      }
+    },
+    "secondary_artifacts": {
+      "runtime": "rust",
+      "final_result": "accept",
+      "trace_digest": "728de29809ece32bed601d422fcaf3be56134805c2ec2a09af85fcfcbf4c9d4d",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 86,
+        "snapshots_per_chunk": [
+          1,
+          1,
+          1,
+          4,
+          10,
+          10,
+          1,
+          1,
+          1,
+          1,
+          4,
+          10,
+          7,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          2,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.589041095890411,
+        "transition_density": {
+          "Utf8ContinuationEnter": 20,
+          "ChunkIngress": 41,
+          "EscapeEnter": 3,
+          "EscapeExit": 3,
+          "Utf8ContinuationExit": 19
+        },
+        "stdout_drain_latency": 350.1046000000006
+      },
+      "topology_fingerprint": "215ced19ebb44873c5710a7c273687df38c0359c1a11f679a3572cffcc801dff",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "backpressure_intensity": 4.5,
+          "descriptor_exhaustion": null,
+          "jitter_intensity": 4.5,
+          "partial_stdout_truncation": null,
+          "scheduler_contention": true,
+          "stderr_flood_intensity": 4,
+          "stdout_fragmentation": true
+        },
+        "seed": "phase17_t21"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_8": "2bd4d9a99bde100ac2742abb3890bb7f708fff832f3c968520849e88eeafb6dc",
+        "window_16_24": "2a4d8ed86d8144de982f326ae73454dd6d77ffcfc6c4bd12f54fbc1e5fa939f0",
+        "window_40_48": "46bf77b713ea88a54e35b5338370e0cc86caeca0dcd18f47a993d9888d5850b1",
+        "window_8_16": "5e037da07bd5df7325eb0504e935b3bf25b0f14b0a9b93cdea0aacb0d62da3cf",
+        "window_32_40": "9340b7639928125e3fe78df96f856bb2dd96015638e15a78291a1d3177d8c9a1",
+        "window_72_80": "351a24976829f734403b8ff5eab2ba8323509b260e15969b72187c057ff621c4",
+        "window_56_64": "1166e01d0db392c1200a386f196e39991ea7514bfd78a14beeabba681511e3c8",
+        "window_24_32": "2a3c69aecbe2f8449c169f6b79c2d81f5dff8926021153c7df6a393a967e8c8c",
+        "window_80_86": "66594b7752ca1477b2af6be508b4870ec42b061d9f0dc5fb586ee1160fba09a5",
+        "window_48_56": "22af198642775030ac09074bd65aba6030bef2ee48fc06af3fb33284ae1cce24",
+        "window_64_72": "9a42653eb943927269e864158c9c8d5b7f3cbe8313ab1f67ead91d749c834299"
+      }
+    },
+    "classification": "semantic_divergence",
+    "first_divergence_index": 0,
+    "divergence_windows": [
+      {
+        "start_snapshot": 0,
+        "end_snapshot": null
+      }
+    ],
+    "persistence_metrics": {
+      "raw_bytes": 0,
+      "compressed_bytes": 0,
+      "compression_ratio": 1,
+      "processing_time_ms": 2.5227000000013504,
+      "shedded": true,
+      "sampled": false,
+      "telemetry_confidence": 0
+    }
+  },
+  {
+    "replay_id": "92bd2de7e75b9c26366eba1eea35c146c30cc5278eada04ad019144d2f25947e",
+    "contract": {
+      "corpus_id": "conformance_p17_t22_surrogates_slashes",
+      "deterministic_seed": "phase17_t22",
+      "runtime_pair": {
+        "primary": "typescript",
+        "secondary": "rust"
+      },
+      "chunk_strategy": "boundary_targeted",
+      "fragmentation_profile": {
+        "strategy": "boundary_targeted"
+      },
+      "snapshot_schema_version": "v1.0",
+      "entropy_profile": {
+        "async_chunk_jitter": true,
+        "jitter_intensity": 4.5,
+        "stdout_fragmentation": true,
+        "backpressure_intensity": 4.5,
+        "scheduler_contention": true,
+        "stderr_flood_intensity": 4
+      },
+      "topology_flush_interval": 8,
+      "ecosystem_profile": "duplicate_error"
+    },
+    "chunk_layout_sizes": [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      1
+    ],
+    "primary_artifacts": {
+      "runtime": "typescript",
+      "final_result": "accept",
+      "trace_digest": "18084e95d2f0783eeb745e3847be01d1dc7da96842fcc364e2302dfaab82ae57",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 11,
+        "snapshots_per_chunk": [
+          1,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.13924050632911392,
+        "transition_density": {
+          "init": 1,
+          "token_processed": 9,
+          "finalize": 1
+        },
+        "snapshots_per_sec": 23.051305500209143,
+        "transitions_per_byte": 0.13924050632911392,
+        "throughput_bytes_per_sec": 165.55028495604748,
+        "replay_wall_clock_ms": 477.1963999999999,
+        "chunk_stall_ms": 116.20917760040612,
+        "stdout_frame_count": 4,
+        "replay_memory_peak": 5113136,
+        "telemetry_overhead_ms": 7.082999999999856,
+        "topology_hash_cpu_cost": 0.4420000000000073,
+        "snapshot_memory_cost": 2054,
+        "telemetry_frames_written": 4,
+        "telemetry_cost_per_snapshot": 0.6439090909090779,
+        "topology_cost_per_window": 0.4420000000000073,
+        "memory_growth_per_transition": 186.72727272727272,
+        "serialization_cost_per_frame": 1.6602499999999623,
+        "stdout_drain_latency": 1004.6796000000013
+      },
+      "topology_fingerprint": "bfbf5399016c2fd770ced3764352716c6ea287fb3703750d8ce934f4fabbad36",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "jitter_intensity": 4.5,
+          "stdout_fragmentation": true,
+          "backpressure_intensity": 4.5,
+          "scheduler_contention": true,
+          "stderr_flood_intensity": 4
+        },
+        "transport_corruption_mode": "none",
+        "chunk_strategy": "boundary_targeted",
+        "jitter_profile": "async_chunk_jitter",
+        "stdout_strategy": "stdout_fragmentation",
+        "seed": "phase17_t22"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_8": "b605e0c49619c00fc1a27afe6f15011d4080ae61c613eb78a3dc8b01aad18a01",
+        "window_8_11": "396dca9e319a45d7c09bc3141104e0e5a69d9ec226fcc071227080599b7465c5"
+      }
+    },
+    "secondary_artifacts": {
+      "runtime": "rust",
+      "final_result": "accept",
+      "trace_digest": "38062fca4148816b93acfcede90a3a37ae09d58d9db049899347ad2f5f184d7f",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 35,
+        "snapshots_per_chunk": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          3,
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.4430379746835443,
+        "transition_density": {
+          "EscapeEnter": 4,
+          "ChunkIngress": 27,
+          "EscapeExit": 4
+        },
+        "stdout_drain_latency": 184.71569999999883
+      },
+      "topology_fingerprint": "e7329daf24661c1ca02475f652ea13334368cf32c83696db57872651b4535cf8",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "backpressure_intensity": 4.5,
+          "descriptor_exhaustion": null,
+          "jitter_intensity": 4.5,
+          "partial_stdout_truncation": null,
+          "scheduler_contention": true,
+          "stderr_flood_intensity": 4,
+          "stdout_fragmentation": true
+        },
+        "seed": "phase17_t22"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_24_32": "6edf6824183a2db408227e99ff36088ab2f1a82b7e8dff7182f617244d1a1fcd",
+        "window_0_8": "84a3d5bc3a78532359e4a2ce9bb590ec3be5861ec837323bc5612c2066ae02b2",
+        "window_16_24": "11d0c72e99defb50310035e0fd8f5054c1f6d8f6b9344716b731a1004d041013",
+        "window_8_16": "25682eca328a8099eae5c421076ea265ebe6c70a7cc1dce56ab61fbe94dd9f3e",
+        "window_32_35": "e94ee2841f164a29cc28edd7284bfdb2eb3defb42ba07a07fed412cff80ce0ca"
+      }
+    },
+    "classification": "semantic_aligned_cadence_divergence",
+    "first_divergence_index": 0,
+    "divergence_windows": [
+      {
+        "start_snapshot": 0,
+        "end_snapshot": null
+      }
+    ],
+    "persistence_metrics": {
+      "raw_bytes": 0,
+      "compressed_bytes": 0,
+      "compression_ratio": 1,
+      "processing_time_ms": 0.9904000000005908,
+      "shedded": true,
+      "sampled": false,
+      "telemetry_confidence": 0
+    }
+  },
+  {
+    "replay_id": "c5e9d7e382b6689752e42ea0d1b35b02c6fe46230cf92f9bec58d94213056abe",
+    "contract": {
+      "corpus_id": "conformance_p17_t23_sparse_and_unordered",
+      "deterministic_seed": "phase17_t23",
+      "runtime_pair": {
+        "primary": "typescript",
+        "secondary": "rust"
+      },
+      "chunk_strategy": "boundary_targeted",
+      "fragmentation_profile": {
+        "strategy": "boundary_targeted"
+      },
+      "snapshot_schema_version": "v1.0",
+      "entropy_profile": {
+        "async_chunk_jitter": true,
+        "jitter_intensity": 4.5,
+        "stdout_fragmentation": true,
+        "backpressure_intensity": 4.5,
+        "scheduler_contention": true,
+        "stderr_flood_intensity": 4
+      },
+      "topology_flush_interval": 8,
+      "ecosystem_profile": "canonical_order_strict"
+    },
+    "chunk_layout_sizes": [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      2
+    ],
+    "primary_artifacts": {
+      "runtime": "typescript",
+      "final_result": "accept",
+      "trace_digest": "ed05869330978784383dd6bad41c243feccfa7b7bd0167aea880f189427231f0",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 21,
+        "snapshots_per_chunk": [
+          1,
+          2,
+          2,
+          1,
+          1,
+          2,
+          0,
+          0,
+          0,
+          1,
+          2,
+          2,
+          0,
+          2,
+          0,
+          3
+        ],
+        "snapshots_per_byte": 0.44680851063829785,
+        "transition_density": {
+          "init": 1,
+          "token_processed": 19,
+          "finalize": 1
+        },
+        "snapshots_per_sec": 80.86122596400058,
+        "transitions_per_byte": 0.44680851063829785,
+        "throughput_bytes_per_sec": 180.97512477657273,
+        "replay_wall_clock_ms": 259.7042,
+        "chunk_stall_ms": 75.4259247198281,
+        "stdout_frame_count": 6,
+        "replay_memory_peak": 4930200,
+        "telemetry_overhead_ms": 6.987799999999879,
+        "topology_hash_cpu_cost": 0.4013999999999669,
+        "snapshot_memory_cost": 3954,
+        "telemetry_frames_written": 6,
+        "telemetry_cost_per_snapshot": 0.3327523809523752,
+        "topology_cost_per_window": 0.4013999999999669,
+        "memory_growth_per_transition": 188.28571428571428,
+        "serialization_cost_per_frame": 1.0977333333333188,
+        "stdout_drain_latency": 726.7839000000004
+      },
+      "topology_fingerprint": "065e9999e4debc67a27b899e170014b9b8af05a76632c46fd12c5b6cc6f028b9",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "jitter_intensity": 4.5,
+          "stdout_fragmentation": true,
+          "backpressure_intensity": 4.5,
+          "scheduler_contention": true,
+          "stderr_flood_intensity": 4
+        },
+        "transport_corruption_mode": "none",
+        "chunk_strategy": "boundary_targeted",
+        "jitter_profile": "async_chunk_jitter",
+        "stdout_strategy": "stdout_fragmentation",
+        "seed": "phase17_t23"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_8": "112f5d189851f28d653677ce9613cb1e65cb03d00c2ca006210ef18fcdd28d79",
+        "window_8_16": "80591597d58e4b02ae8a1781f0145b4e2340cb9e1b2d9a84bedabbd2e2c0147f",
+        "window_16_21": "2a278d0d9f0fe586eef39cf37cdd04f8df49572bee5665f28c74b77eb0c20e45"
+      }
+    },
+    "secondary_artifacts": {
+      "runtime": "rust",
+      "final_result": "accept",
+      "trace_digest": "b915579b5ab76e31bc249e6270a1a27ad61408135f6a9796978075816bb19ae6",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 16,
+        "snapshots_per_chunk": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.3404255319148936,
+        "transition_density": {
+          "ChunkIngress": 16
+        },
+        "stdout_drain_latency": 127.47470000000067
+      },
+      "topology_fingerprint": "0f61fb00aab08169f468ab35821ec223dd757a3bb40781c49ab6abf4e62a5d65",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "backpressure_intensity": 4.5,
+          "descriptor_exhaustion": null,
+          "jitter_intensity": 4.5,
+          "partial_stdout_truncation": null,
+          "scheduler_contention": true,
+          "stderr_flood_intensity": 4,
+          "stdout_fragmentation": true
+        },
+        "seed": "phase17_t23"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_8_16": "5981ba2d6aa50e80cae459f00f43295d5c9c6514801c2112049ee1fec72bce2f",
+        "window_0_8": "15a977f9c550cf289e6c212bb509872d38099ee43152cb20e190b3f558aeccb8"
+      }
+    },
+    "classification": "semantic_aligned_cadence_divergence",
+    "first_divergence_index": 0,
+    "divergence_windows": [
+      {
+        "start_snapshot": 0,
+        "end_snapshot": null
+      }
+    ],
+    "persistence_metrics": {
+      "raw_bytes": 0,
+      "compressed_bytes": 0,
+      "compression_ratio": 1,
+      "processing_time_ms": 0.9323999999996886,
+      "shedded": true,
+      "sampled": false,
+      "telemetry_confidence": 0
+    }
+  },
+  {
+    "replay_id": "b4ebd82c9080c3621f9ff7c66c7c90b26d713635d348365a25f4238d61776409",
+    "contract": {
+      "corpus_id": "conformance_p17_t24_float_canonicalization",
+      "deterministic_seed": "phase17_t24",
+      "runtime_pair": {
+        "primary": "typescript",
+        "secondary": "rust"
+      },
+      "chunk_strategy": "boundary_targeted",
+      "fragmentation_profile": {
+        "strategy": "boundary_targeted"
+      },
+      "snapshot_schema_version": "v1.0",
+      "entropy_profile": {
+        "async_chunk_jitter": true,
+        "jitter_intensity": 4.5,
+        "stdout_fragmentation": true,
+        "backpressure_intensity": 4.5,
+        "scheduler_contention": true,
+        "stderr_flood_intensity": 4
+      },
+      "topology_flush_interval": 8,
+      "ecosystem_profile": "rfc8259_strict"
+    },
+    "chunk_layout_sizes": [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      1
+    ],
+    "primary_artifacts": {
+      "runtime": "typescript",
+      "final_result": "accept",
+      "trace_digest": "918c78bd3e7db0e6b1765121121fb1ac74c599ba44779369f649547c049db974",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 19,
+        "snapshots_per_chunk": [
+          1,
+          0,
+          0,
+          2,
+          2,
+          0,
+          0,
+          2,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.2087912087912088,
+        "transition_density": {
+          "init": 1,
+          "token_processed": 17,
+          "finalize": 1
+        },
+        "snapshots_per_sec": 36.45313316598148,
+        "transitions_per_byte": 0.2087912087912088,
+        "throughput_bytes_per_sec": 174.59132200549024,
+        "replay_wall_clock_ms": 521.2171999999999,
+        "chunk_stall_ms": 125.85355370589077,
+        "stdout_frame_count": 6,
+        "replay_memory_peak": 5205400,
+        "telemetry_overhead_ms": 6.167500000000018,
+        "topology_hash_cpu_cost": 0.22829999999999018,
+        "snapshot_memory_cost": 3574,
+        "telemetry_frames_written": 6,
+        "telemetry_cost_per_snapshot": 0.3246052631578957,
+        "topology_cost_per_window": 0.22829999999999018,
+        "memory_growth_per_transition": 188.10526315789474,
+        "serialization_cost_per_frame": 0.9898666666666713,
+        "stdout_drain_latency": 970.1162000000004
+      },
+      "topology_fingerprint": "44dde693b1da5c22614cbed7261cbe3042ea971a8ca98d7e1990b5cb671053a9",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "jitter_intensity": 4.5,
+          "stdout_fragmentation": true,
+          "backpressure_intensity": 4.5,
+          "scheduler_contention": true,
+          "stderr_flood_intensity": 4
+        },
+        "transport_corruption_mode": "none",
+        "chunk_strategy": "boundary_targeted",
+        "jitter_profile": "async_chunk_jitter",
+        "stdout_strategy": "stdout_fragmentation",
+        "seed": "phase17_t24"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_8": "112f5d189851f28d653677ce9613cb1e65cb03d00c2ca006210ef18fcdd28d79",
+        "window_8_16": "b919e5f2cc40d3716b1e447df35f82578cfa23be8b6b8e1c0cd84535b680d4e3",
+        "window_16_19": "396dca9e319a45d7c09bc3141104e0e5a69d9ec226fcc071227080599b7465c5"
+      }
+    },
+    "secondary_artifacts": {
+      "runtime": "rust",
+      "final_result": "accept",
+      "trace_digest": "0ba9c1fdf5c24074e83dd5b8f2cb934bf4fbbcc5df7f7a4a2fd73c43bac6efc0",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 31,
+        "snapshots_per_chunk": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.34065934065934067,
+        "transition_density": {
+          "ChunkIngress": 31
+        },
+        "stdout_drain_latency": 130.7422999999999
+      },
+      "topology_fingerprint": "915dd8a9bdb1dfd036ba3d8dee55b288b47f10129007e200a4fe538df7f94fef",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": true,
+          "backpressure_intensity": 4.5,
+          "descriptor_exhaustion": null,
+          "jitter_intensity": 4.5,
+          "partial_stdout_truncation": null,
+          "scheduler_contention": true,
+          "stderr_flood_intensity": 4,
+          "stdout_fragmentation": true
+        },
+        "seed": "phase17_t24"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_8": "3e629b2b0092c5b8ac53969518f370cf7cd2ec9aac8ea1a4d37311658c816679",
+        "window_8_16": "c3a46b4cc8f8cdf4f7023f5d84363b17d7ed1b1a342e35642e17546df8c01305",
+        "window_16_24": "0d5ffd6d305393301dfb65e39d8a8c82bf3debc806b8d3554a4cfbb6ae4f4ada",
+        "window_24_31": "1e877048c8af4c377d577f48290d15e8b145c0b80a56d80baf60dc824becddfb"
+      }
+    },
+    "classification": "semantic_aligned_cadence_divergence",
+    "first_divergence_index": 0,
+    "divergence_windows": [
+      {
+        "start_snapshot": 0,
+        "end_snapshot": null
+      }
+    ],
+    "persistence_metrics": {
+      "raw_bytes": 0,
+      "compressed_bytes": 0,
+      "compression_ratio": 1,
+      "processing_time_ms": 0.8554000000003725,
+      "shedded": true,
+      "sampled": false,
+      "telemetry_confidence": 0
+    }
+  },
+  {
+    "replay_id": "38473312fb116644101946adabff69bc51ab048b76e35e088da5224474adabf6",
+    "contract": {
+      "corpus_id": "conformance_p17_t25_unicode_elements",
+      "deterministic_seed": "phase17_t25",
+      "runtime_pair": {
+        "primary": "typescript",
+        "secondary": "rust"
+      },
+      "chunk_strategy": "boundary_targeted",
+      "fragmentation_profile": {
+        "strategy": "boundary_targeted"
+      },
+      "snapshot_schema_version": "v1.0",
+      "entropy_profile": {
+        "async_chunk_jitter": false,
+        "stdout_fragmentation": false
+      },
+      "topology_flush_interval": 64,
+      "ecosystem_profile": "ecma262"
+    },
+    "chunk_layout_sizes": [
+      3,
+      3,
+      3,
+      4,
+      9,
+      9,
+      3,
+      3,
+      3,
+      3,
+      5,
+      9,
+      7,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      1
+    ],
+    "primary_artifacts": {
+      "runtime": "typescript",
+      "final_result": "accept",
+      "trace_digest": "5ac50ec994c1d42fcbbaae5878e9b8f3e7d8860898dff74145600b7e602e0a67",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 23,
+        "snapshots_per_chunk": [
+          1,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          2,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.19166666666666668,
+        "transition_density": {
+          "init": 1,
+          "token_processed": 21,
+          "finalize": 1
+        },
+        "snapshots_per_sec": 816.5235975319683,
+        "transitions_per_byte": 0.19166666666666668,
+        "throughput_bytes_per_sec": 4260.123117558096,
+        "replay_wall_clock_ms": 28.168200000000013,
+        "chunk_stall_ms": 0,
+        "stdout_frame_count": 1,
+        "replay_memory_peak": 4916576,
+        "telemetry_overhead_ms": 17.56349999999992,
+        "topology_hash_cpu_cost": 11.189999999999998,
+        "snapshot_memory_cost": 4334,
+        "telemetry_frames_written": 1,
+        "telemetry_cost_per_snapshot": 0.7636304347826052,
+        "topology_cost_per_window": 11.189999999999998,
+        "memory_growth_per_transition": 188.43478260869566,
+        "serialization_cost_per_frame": 6.373499999999922,
+        "stdout_drain_latency": 358.9346999999998
+      },
+      "topology_fingerprint": "57e29766d70161096d1abb38d58776da3c8d3bd92afc9dca465eb5bc6ffde165",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": false,
+          "stdout_fragmentation": false
+        },
+        "transport_corruption_mode": "none",
+        "chunk_strategy": "boundary_targeted",
+        "jitter_profile": "none",
+        "stdout_strategy": "none",
+        "seed": "phase17_t25"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_23": "57e29766d70161096d1abb38d58776da3c8d3bd92afc9dca465eb5bc6ffde165"
+      }
+    },
+    "secondary_artifacts": {
+      "runtime": "rust",
+      "final_result": "accept",
+      "trace_digest": "728de29809ece32bed601d422fcaf3be56134805c2ec2a09af85fcfcbf4c9d4d",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 86,
+        "snapshots_per_chunk": [
+          1,
+          1,
+          1,
+          4,
+          10,
+          10,
+          1,
+          1,
+          1,
+          1,
+          4,
+          10,
+          7,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          2,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.589041095890411,
+        "transition_density": {
+          "Utf8ContinuationEnter": 20,
+          "Utf8ContinuationExit": 19,
+          "ChunkIngress": 41,
+          "EscapeEnter": 3,
+          "EscapeExit": 3
+        },
+        "stdout_drain_latency": 104.12590000000091
+      },
+      "topology_fingerprint": "215ced19ebb44873c5710a7c273687df38c0359c1a11f679a3572cffcc801dff",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": false,
+          "backpressure_intensity": null,
+          "descriptor_exhaustion": null,
+          "jitter_intensity": null,
+          "partial_stdout_truncation": null,
+          "scheduler_contention": null,
+          "stderr_flood_intensity": null,
+          "stdout_fragmentation": false
+        },
+        "seed": "phase17_t25"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_64_86": "2f365e4183575532bc783eab973f566aaad058f6757ea2d518b821a208ee5d71",
+        "window_0_64": "0193b90b3de62b7f7343eacb5a7a0340e9c00643454ef0dee6934fe9ddd7fee9"
+      }
+    },
+    "classification": "semantic_divergence",
+    "first_divergence_index": 0,
+    "divergence_windows": [
+      {
+        "start_snapshot": 0,
+        "end_snapshot": null
+      }
+    ],
+    "persistence_metrics": {
+      "raw_bytes": 0,
+      "compressed_bytes": 0,
+      "compression_ratio": 1,
+      "processing_time_ms": 1.3228999999992084,
+      "shedded": true,
+      "sampled": false,
+      "telemetry_confidence": 0
+    }
+  },
+  {
+    "replay_id": "19a109cba641043553065a4cfe29e66d8bfd5fbf52409d7e0fd7e884fdc05b55",
+    "contract": {
+      "corpus_id": "conformance_p17_t26_surrogates_slashes",
+      "deterministic_seed": "phase17_t26",
+      "runtime_pair": {
+        "primary": "typescript",
+        "secondary": "rust"
+      },
+      "chunk_strategy": "boundary_targeted",
+      "fragmentation_profile": {
+        "strategy": "boundary_targeted"
+      },
+      "snapshot_schema_version": "v1.0",
+      "entropy_profile": {
+        "async_chunk_jitter": false,
+        "stdout_fragmentation": false
+      },
+      "topology_flush_interval": 64,
+      "ecosystem_profile": "legacy_first_win"
+    },
+    "chunk_layout_sizes": [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      1
+    ],
+    "primary_artifacts": {
+      "runtime": "typescript",
+      "final_result": "accept",
+      "trace_digest": "18084e95d2f0783eeb745e3847be01d1dc7da96842fcc364e2302dfaab82ae57",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 11,
+        "snapshots_per_chunk": [
+          1,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.13924050632911392,
+        "transition_density": {
+          "init": 1,
+          "token_processed": 9,
+          "finalize": 1
+        },
+        "snapshots_per_sec": 385.1702452483995,
+        "transitions_per_byte": 0.13924050632911392,
+        "throughput_bytes_per_sec": 2766.222670420324,
+        "replay_wall_clock_ms": 28.55880000000002,
+        "chunk_stall_ms": 0,
+        "stdout_frame_count": 1,
+        "replay_memory_peak": 5360432,
+        "telemetry_overhead_ms": 18.635999999999996,
+        "topology_hash_cpu_cost": 11.534599999999983,
+        "snapshot_memory_cost": 2054,
+        "telemetry_frames_written": 1,
+        "telemetry_cost_per_snapshot": 1.6941818181818178,
+        "topology_cost_per_window": 11.534599999999983,
+        "memory_growth_per_transition": 186.72727272727272,
+        "serialization_cost_per_frame": 7.101400000000012,
+        "stdout_drain_latency": 447.5535
+      },
+      "topology_fingerprint": "bfbf5399016c2fd770ced3764352716c6ea287fb3703750d8ce934f4fabbad36",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": false,
+          "stdout_fragmentation": false
+        },
+        "transport_corruption_mode": "none",
+        "chunk_strategy": "boundary_targeted",
+        "jitter_profile": "none",
+        "stdout_strategy": "none",
+        "seed": "phase17_t26"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_11": "bfbf5399016c2fd770ced3764352716c6ea287fb3703750d8ce934f4fabbad36"
+      }
+    },
+    "secondary_artifacts": {
+      "runtime": "rust",
+      "final_result": "accept",
+      "trace_digest": "38062fca4148816b93acfcede90a3a37ae09d58d9db049899347ad2f5f184d7f",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 35,
+        "snapshots_per_chunk": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          3,
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.4430379746835443,
+        "transition_density": {
+          "EscapeExit": 4,
+          "ChunkIngress": 27,
+          "EscapeEnter": 4
+        },
+        "stdout_drain_latency": 301.4920999999995
+      },
+      "topology_fingerprint": "e7329daf24661c1ca02475f652ea13334368cf32c83696db57872651b4535cf8",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": false,
+          "backpressure_intensity": null,
+          "descriptor_exhaustion": null,
+          "jitter_intensity": null,
+          "partial_stdout_truncation": null,
+          "scheduler_contention": null,
+          "stderr_flood_intensity": null,
+          "stdout_fragmentation": false
+        },
+        "seed": "phase17_t26"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_35": "e7329daf24661c1ca02475f652ea13334368cf32c83696db57872651b4535cf8"
+      }
+    },
+    "classification": "semantic_aligned_cadence_divergence",
+    "first_divergence_index": 0,
+    "divergence_windows": [
+      {
+        "start_snapshot": 0,
+        "end_snapshot": null
+      }
+    ],
+    "persistence_metrics": {
+      "raw_bytes": 0,
+      "compressed_bytes": 0,
+      "compression_ratio": 1,
+      "processing_time_ms": 0.975800000000163,
+      "shedded": true,
+      "sampled": false,
+      "telemetry_confidence": 0
+    }
+  },
+  {
+    "replay_id": "ec051d75dbc2a267dd58825f00bdacd1ad574ee3724a3f81a663f40095941caa",
+    "contract": {
+      "corpus_id": "conformance_p17_t27_sparse_and_unordered",
+      "deterministic_seed": "phase17_t27",
+      "runtime_pair": {
+        "primary": "typescript",
+        "secondary": "rust"
+      },
+      "chunk_strategy": "boundary_targeted",
+      "fragmentation_profile": {
+        "strategy": "boundary_targeted"
+      },
+      "snapshot_schema_version": "v1.0",
+      "entropy_profile": {
+        "async_chunk_jitter": false,
+        "stdout_fragmentation": false
+      },
+      "topology_flush_interval": 64,
+      "ecosystem_profile": "duplicate_error"
+    },
+    "chunk_layout_sizes": [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      2
+    ],
+    "primary_artifacts": {
+      "runtime": "typescript",
+      "final_result": "accept",
+      "trace_digest": "ed05869330978784383dd6bad41c243feccfa7b7bd0167aea880f189427231f0",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 21,
+        "snapshots_per_chunk": [
+          1,
+          2,
+          2,
+          1,
+          1,
+          2,
+          0,
+          0,
+          0,
+          1,
+          2,
+          2,
+          0,
+          2,
+          0,
+          3
+        ],
+        "snapshots_per_byte": 0.44680851063829785,
+        "transition_density": {
+          "init": 1,
+          "token_processed": 19,
+          "finalize": 1
+        },
+        "snapshots_per_sec": 657.9071035169835,
+        "transitions_per_byte": 0.44680851063829785,
+        "throughput_bytes_per_sec": 1472.4587554903917,
+        "replay_wall_clock_ms": 31.919399999999996,
+        "chunk_stall_ms": 0,
+        "stdout_frame_count": 1,
+        "replay_memory_peak": 4888432,
+        "telemetry_overhead_ms": 21.51739999999998,
+        "topology_hash_cpu_cost": 14.718699999999984,
+        "snapshot_memory_cost": 3954,
+        "telemetry_frames_written": 1,
+        "telemetry_cost_per_snapshot": 1.0246380952380942,
+        "topology_cost_per_window": 14.718699999999984,
+        "memory_growth_per_transition": 188.28571428571428,
+        "serialization_cost_per_frame": 6.798699999999997,
+        "stdout_drain_latency": 570.0533000000014
+      },
+      "topology_fingerprint": "065e9999e4debc67a27b899e170014b9b8af05a76632c46fd12c5b6cc6f028b9",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": false,
+          "stdout_fragmentation": false
+        },
+        "transport_corruption_mode": "none",
+        "chunk_strategy": "boundary_targeted",
+        "jitter_profile": "none",
+        "stdout_strategy": "none",
+        "seed": "phase17_t27"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_21": "065e9999e4debc67a27b899e170014b9b8af05a76632c46fd12c5b6cc6f028b9"
+      }
+    },
+    "secondary_artifacts": {
+      "runtime": "rust",
+      "final_result": "accept",
+      "trace_digest": "b915579b5ab76e31bc249e6270a1a27ad61408135f6a9796978075816bb19ae6",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 16,
+        "snapshots_per_chunk": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.3404255319148936,
+        "transition_density": {
+          "ChunkIngress": 16
+        },
+        "stdout_drain_latency": 553.3420999999998
+      },
+      "topology_fingerprint": "0f61fb00aab08169f468ab35821ec223dd757a3bb40781c49ab6abf4e62a5d65",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": false,
+          "backpressure_intensity": null,
+          "descriptor_exhaustion": null,
+          "jitter_intensity": null,
+          "partial_stdout_truncation": null,
+          "scheduler_contention": null,
+          "stderr_flood_intensity": null,
+          "stdout_fragmentation": false
+        },
+        "seed": "phase17_t27"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_16": "0f61fb00aab08169f468ab35821ec223dd757a3bb40781c49ab6abf4e62a5d65"
+      }
+    },
+    "classification": "semantic_aligned_cadence_divergence",
+    "first_divergence_index": 0,
+    "divergence_windows": [
+      {
+        "start_snapshot": 0,
+        "end_snapshot": null
+      }
+    ],
+    "persistence_metrics": {
+      "raw_bytes": 0,
+      "compressed_bytes": 0,
+      "compression_ratio": 1,
+      "processing_time_ms": 0.879399999999805,
+      "shedded": true,
+      "sampled": false,
+      "telemetry_confidence": 0
+    }
+  },
+  {
+    "replay_id": "19d4423d9ec574ad781993aae9239da7376de21860c3d60edbed75ba6c16bcb9",
+    "contract": {
+      "corpus_id": "conformance_p17_t28_float_canonicalization",
+      "deterministic_seed": "phase17_t28",
+      "runtime_pair": {
+        "primary": "typescript",
+        "secondary": "rust"
+      },
+      "chunk_strategy": "boundary_targeted",
+      "fragmentation_profile": {
+        "strategy": "boundary_targeted"
+      },
+      "snapshot_schema_version": "v1.0",
+      "entropy_profile": {
+        "async_chunk_jitter": false,
+        "stdout_fragmentation": false
+      },
+      "topology_flush_interval": 64,
+      "ecosystem_profile": "canonical_order_strict"
+    },
+    "chunk_layout_sizes": [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      1
+    ],
+    "primary_artifacts": {
+      "runtime": "typescript",
+      "final_result": "accept",
+      "trace_digest": "918c78bd3e7db0e6b1765121121fb1ac74c599ba44779369f649547c049db974",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 19,
+        "snapshots_per_chunk": [
+          1,
+          0,
+          0,
+          2,
+          2,
+          0,
+          0,
+          2,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.2087912087912088,
+        "transition_density": {
+          "init": 1,
+          "token_processed": 17,
+          "finalize": 1
+        },
+        "snapshots_per_sec": 446.7497778007683,
+        "transitions_per_byte": 0.2087912087912088,
+        "throughput_bytes_per_sec": 2139.69630420368,
+        "replay_wall_clock_ms": 42.52940000000001,
+        "chunk_stall_ms": 0,
+        "stdout_frame_count": 1,
+        "replay_memory_peak": 4841704,
+        "telemetry_overhead_ms": 24.10879999999986,
+        "topology_hash_cpu_cost": 16.429899999999975,
+        "snapshot_memory_cost": 3574,
+        "telemetry_frames_written": 1,
+        "telemetry_cost_per_snapshot": 1.2688842105263085,
+        "topology_cost_per_window": 16.429899999999975,
+        "memory_growth_per_transition": 188.10526315789474,
+        "serialization_cost_per_frame": 7.678899999999885,
+        "stdout_drain_latency": 1609.604800000001
+      },
+      "topology_fingerprint": "44dde693b1da5c22614cbed7261cbe3042ea971a8ca98d7e1990b5cb671053a9",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": false,
+          "stdout_fragmentation": false
+        },
+        "transport_corruption_mode": "none",
+        "chunk_strategy": "boundary_targeted",
+        "jitter_profile": "none",
+        "stdout_strategy": "none",
+        "seed": "phase17_t28"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_19": "44dde693b1da5c22614cbed7261cbe3042ea971a8ca98d7e1990b5cb671053a9"
+      }
+    },
+    "secondary_artifacts": {
+      "runtime": "rust",
+      "final_result": "accept",
+      "trace_digest": "0ba9c1fdf5c24074e83dd5b8f2cb934bf4fbbcc5df7f7a4a2fd73c43bac6efc0",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 31,
+        "snapshots_per_chunk": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.34065934065934067,
+        "transition_density": {
+          "ChunkIngress": 31
+        },
+        "stdout_drain_latency": 235.72289999999884
+      },
+      "topology_fingerprint": "915dd8a9bdb1dfd036ba3d8dee55b288b47f10129007e200a4fe538df7f94fef",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": false,
+          "backpressure_intensity": null,
+          "descriptor_exhaustion": null,
+          "jitter_intensity": null,
+          "partial_stdout_truncation": null,
+          "scheduler_contention": null,
+          "stderr_flood_intensity": null,
+          "stdout_fragmentation": false
+        },
+        "seed": "phase17_t28"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_31": "915dd8a9bdb1dfd036ba3d8dee55b288b47f10129007e200a4fe538df7f94fef"
+      }
+    },
+    "classification": "semantic_aligned_cadence_divergence",
+    "first_divergence_index": 0,
+    "divergence_windows": [
+      {
+        "start_snapshot": 0,
+        "end_snapshot": null
+      }
+    ],
+    "persistence_metrics": {
+      "raw_bytes": 0,
+      "compressed_bytes": 0,
+      "compression_ratio": 1,
+      "processing_time_ms": 1.025499999999738,
+      "shedded": true,
+      "sampled": false,
+      "telemetry_confidence": 0
+    }
+  },
+  {
+    "replay_id": "0ff226abb229ebf0b13a7a532fc96666b1ca191a400760247d47da3286f335e7",
+    "contract": {
+      "corpus_id": "conformance_p17_t29_unicode_elements",
+      "deterministic_seed": "phase17_t29",
+      "runtime_pair": {
+        "primary": "typescript",
+        "secondary": "rust"
+      },
+      "chunk_strategy": "boundary_targeted",
+      "fragmentation_profile": {
+        "strategy": "boundary_targeted"
+      },
+      "snapshot_schema_version": "v1.0",
+      "entropy_profile": {
+        "async_chunk_jitter": false,
+        "stdout_fragmentation": false
+      },
+      "topology_flush_interval": 64,
+      "ecosystem_profile": "rfc8259_strict"
+    },
+    "chunk_layout_sizes": [
+      3,
+      3,
+      3,
+      4,
+      9,
+      9,
+      3,
+      3,
+      3,
+      3,
+      5,
+      9,
+      7,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      1
+    ],
+    "primary_artifacts": {
+      "runtime": "typescript",
+      "final_result": "accept",
+      "trace_digest": "5ac50ec994c1d42fcbbaae5878e9b8f3e7d8860898dff74145600b7e602e0a67",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 23,
+        "snapshots_per_chunk": [
+          1,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          2,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.19166666666666668,
+        "transition_density": {
+          "init": 1,
+          "token_processed": 21,
+          "finalize": 1
+        },
+        "snapshots_per_sec": 440.4130691620854,
+        "transitions_per_byte": 0.19166666666666668,
+        "throughput_bytes_per_sec": 2297.807317367402,
+        "replay_wall_clock_ms": 52.22370000000001,
+        "chunk_stall_ms": 0,
+        "stdout_frame_count": 1,
+        "replay_memory_peak": 4878016,
+        "telemetry_overhead_ms": 37.50030000000038,
+        "topology_hash_cpu_cost": 28.994100000000003,
+        "snapshot_memory_cost": 4334,
+        "telemetry_frames_written": 1,
+        "telemetry_cost_per_snapshot": 1.630447826086973,
+        "topology_cost_per_window": 28.994100000000003,
+        "memory_growth_per_transition": 188.43478260869566,
+        "serialization_cost_per_frame": 8.506200000000376,
+        "stdout_drain_latency": 1182.8895000000011
+      },
+      "topology_fingerprint": "57e29766d70161096d1abb38d58776da3c8d3bd92afc9dca465eb5bc6ffde165",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": false,
+          "stdout_fragmentation": false
+        },
+        "transport_corruption_mode": "none",
+        "chunk_strategy": "boundary_targeted",
+        "jitter_profile": "none",
+        "stdout_strategy": "none",
+        "seed": "phase17_t29"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_23": "57e29766d70161096d1abb38d58776da3c8d3bd92afc9dca465eb5bc6ffde165"
+      }
+    },
+    "secondary_artifacts": {
+      "runtime": "rust",
+      "final_result": "accept",
+      "trace_digest": "728de29809ece32bed601d422fcaf3be56134805c2ec2a09af85fcfcbf4c9d4d",
+      "snapshots": [],
+      "metrics": {
+        "total_snapshots": 86,
+        "snapshots_per_chunk": [
+          1,
+          1,
+          1,
+          4,
+          10,
+          10,
+          1,
+          1,
+          1,
+          1,
+          4,
+          10,
+          7,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          2,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1
+        ],
+        "snapshots_per_byte": 0.589041095890411,
+        "transition_density": {
+          "EscapeEnter": 3,
+          "Utf8ContinuationExit": 19,
+          "ChunkIngress": 41,
+          "Utf8ContinuationEnter": 20,
+          "EscapeExit": 3
+        },
+        "stdout_drain_latency": 274.14520000000084
+      },
+      "topology_fingerprint": "215ced19ebb44873c5710a7c273687df38c0359c1a11f679a3572cffcc801dff",
+      "provenance_lineage": {
+        "entropy_profile": {
+          "async_chunk_jitter": false,
+          "backpressure_intensity": null,
+          "descriptor_exhaustion": null,
+          "jitter_intensity": null,
+          "partial_stdout_truncation": null,
+          "scheduler_contention": null,
+          "stderr_flood_intensity": null,
+          "stdout_fragmentation": false
+        },
+        "seed": "phase17_t29"
+      },
+      "cross_runtime_mode": "differential",
+      "topology_windows": {
+        "window_0_64": "0193b90b3de62b7f7343eacb5a7a0340e9c00643454ef0dee6934fe9ddd7fee9",
+        "window_64_86": "2f365e4183575532bc783eab973f566aaad058f6757ea2d518b821a208ee5d71"
+      }
+    },
+    "classification": "semantic_divergence",
+    "first_divergence_index": 0,
+    "divergence_windows": [
+      {
+        "start_snapshot": 0,
+        "end_snapshot": null
+      }
+    ],
+    "persistence_metrics": {
+      "raw_bytes": 0,
+      "compressed_bytes": 0,
+      "compression_ratio": 1,
+      "processing_time_ms": 1.9804000000003725,
+      "shedded": true,
+      "sampled": false,
+      "telemetry_confidence": 0
+    }
+  }
+]

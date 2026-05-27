@@ -1,0 +1,26 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "ignoreDeprecations": "5.0",
+    "outDir": "dist",
+    "composite": true,
+    "declaration": true,
+    "noEmit": false,
+    "incremental": true,
+    "rootDir": "src",
+    "paths": {
+      "@packages/utils": [
+        "../utils/src"
+      ]
+    }
+  },
+  "include": [
+    "src"
+  ],
+  "references": [
+    {
+      "path": "../utils"
+    }
+  ]
+}

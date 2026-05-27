@@ -1,0 +1,10 @@
+{
+  "timestamp": 1779479225175,
+  "metrics": {
+    "asymmetricDelayMs": 400,
+    "staleWritesAttempted": 1,
+    "staleWritesRejected": 1,
+    "p_stale_write_rejected": 1,
+    "verdict": "PASSED"
+  }
+}

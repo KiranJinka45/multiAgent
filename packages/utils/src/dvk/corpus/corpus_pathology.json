@@ -1,0 +1,52 @@
+[
+  {
+    "corpus_id": "pathology_001",
+    "provenance": {
+      "intended_pathology": "split_escape_boundaries",
+      "expected_parser_pressure": "high",
+      "targeted_fsm_region": "StringDecoder",
+      "targeted_decoder_state": "UnicodeSurrogate"
+    },
+    "payload": "{\"emoji\": \"\\uD83D\\uDE00\", \"nested\": \"\\\"escaped\\\"\"}"
+  },
+  {
+    "corpus_id": "pathology_002",
+    "provenance": {
+      "intended_pathology": "incomplete_surrogate_chains",
+      "expected_parser_pressure": "high",
+      "targeted_fsm_region": "StringDecoder",
+      "targeted_decoder_state": "UnicodeSurrogate"
+    },
+    "payload": "{\"bad_surrogate\": \"\\uD83D\"}"
+  },
+  {
+    "corpus_id": "pathology_003",
+    "provenance": {
+      "intended_pathology": "multi_byte_scalar_truncation",
+      "expected_parser_pressure": "critical",
+      "targeted_fsm_region": "UTF8Decoder",
+      "targeted_decoder_state": "ContinuationByte"
+    },
+    "payload": "{\"kanji\": \"日本語\", \"euro\": \"€\", \"music\": \"𝄞\"}"
+  },
+  {
+    "corpus_id": "pathology_004",
+    "provenance": {
+      "intended_pathology": "delimiter_adjacency_chains",
+      "expected_parser_pressure": "high",
+      "targeted_fsm_region": "ObjectArrayNesting",
+      "targeted_decoder_state": "ValueTransition"
+    },
+    "payload": "[{\"a\":[]}, {}, [[[]]], {\"b\":{}}]"
+  },
+  {
+    "corpus_id": "pathology_005",
+    "provenance": {
+      "intended_pathology": "deeply_nested_escaped_structures",
+      "expected_parser_pressure": "medium",
+      "targeted_fsm_region": "StringEscape",
+      "targeted_decoder_state": "EscapeTransition"
+    },
+    "payload": "{\"level1\":\"{\\\"level2\\\":\\\"{\\\\\\\"level3\\\\\\\":\\\\\\\"val\\\\\\\"}\\\"}\"}"
+  }
+]

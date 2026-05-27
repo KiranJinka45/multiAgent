@@ -1,0 +1,16 @@
+{
+  "ledger": {
+    "approvedConfigHashes": {
+      "package.json": "f76bac9a4e1da7921d7b9620b56dc8a87584aaf8976e9b94d0b38f6ae7dcdf6a",
+      "packages/db/prisma/schema.prisma": "9e10ae778927ad93fd5aca25dfd49111ab77bc05d17922f126f7e041b34da3b6",
+      "INVARIANT_GOVERNANCE_CHARTER.md": "2a9d323ba8235897fd92802afb5487a71bd05eb962cf40a71fe94714a719ccf5",
+      "UNIFIED_STRATEGIC_CHARTER.md": "fb5bae00af1690078e9ab23230a1646254f3fcbeafbf2ccefb11fcc336fe73fd",
+      "pnpm-workspace.yaml": "d1a586c3b48ec5ded713b8137ecd8b97d7be5190c4198117c16bb38d51468e31"
+    },
+    "approvedEnvValues": {
+      "NODE_ENV": "875b9380866e9d56e7110b0ee310962c16d9d4ae103f829d62bdffd2cbe7c61d"
+    }
+  },
+  "signature": "qTCtVDr7Wx+DflINfhk7X887Hld/BNlMkO6i6zkyVD7lkWTv8keQ9B7ZWnC9y2UWoKYtvfW7qnWMiv+9QLB/KWn8zdgetiYRr5UO0162q/IYPVQncVeJMRLrT0AjEg/r2FlYNtUKxiOn8Kwybc82BLtMqTSkivy1YEpYbwEKhDCDB1iwBaPfgFUvP07o2sO7FnQTV7xFx9JWPxZIpU24gyJcNdT6DZNke3FoTkRuSwjNWwVLMrxO2tjg0KEsz87jiwOxeyehShX9gowe/Sfg5Gcyn7luvIMi3uoUeUDez1yWD8Lcdfro/fE0BTDo6Or+HToFcHiIsrRIJ1hvg/lRyA==",
+  "signerKey": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2IWu3vXwjciaLG0G0RJw\nVgPxWw9p62nGoAbl6pHjtK+TjdDTuz6hy/8CAO7QSNLWyCKjPLJb40FEfJrWEyAw\n6DzilqCDhxp7VBM1E8KkBlaesiU62+Hmc+WuI9eV6hIFKmmJbgGbHxoICKf74LWQ\ncwLCW/UjPvZIHKOM6DLtsx4hd+Kw1QU0clYWhD0+8iJBT9t5QmMELK8Vsej9MX13\nfFhUiSfxPjNaTbahOj0fVQyUZA60OXAB9dWo4CZqUvondax0vZVedmPiM389Micz\nRaeFR+I5MP0R5jgoJ43nbOyr4Uu2H4hVX4wg7OpmEQVy3GMr2v7jwdvhux2xEkgF\nlQIDAQAB\n-----END PUBLIC KEY-----\n"
+}

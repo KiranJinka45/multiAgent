@@ -33,7 +33,9 @@ export class WebsocketService {
       transports: ['websocket', 'polling'], // Hybrid transport for production-grade reliability
       reconnection: true,
       reconnectionAttempts: Infinity,
-      reconnectionDelay: 1000
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      randomizationFactor: 0.5 // ±50% randomized backoff jitter
     });
 
     this.socket.on('connect', () => {

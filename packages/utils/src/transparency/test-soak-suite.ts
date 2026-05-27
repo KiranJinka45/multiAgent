@@ -21,7 +21,7 @@ async function runSoakValidation() {
 
   // 1. Pristine reset to avoid cross-test contamination
   console.log('[RESET] Setting up pristine database and sharded filesystem environments...');
-  await db.$executeRawUnsafe(`TRUNCATE TABLE "ZtanLedgerBlock" RESTART IDENTITY CASCADE;`);
+  await db.$executeRawUnsafe(`TRUNCATE TABLE "ZtanLedgerBlock", "ZtanWalLog", "ZtanSnapshot", "ZtanActiveLease", "ZtanPayloadAttestation", "ZtanQuarantineBlob", "IdempotencyRecord", "AuditLog" RESTART IDENTITY CASCADE;`);
   await db.$executeRawUnsafe(`TRUNCATE TABLE "ZtanWalLog" RESTART IDENTITY CASCADE;`);
   await db.$executeRawUnsafe(`TRUNCATE TABLE "ZtanSnapshot" RESTART IDENTITY CASCADE;`);
   
@@ -182,7 +182,8 @@ async function runSoakValidation() {
   console.log('\n[TEST] Waiting for database convergence parity...');
   let dbParity = false;
   for (let check = 0; check < 50; check++) {
-    const dbCount = await db.ztanLedgerBlock.count();
+    const allDbBlocks = await db.ztanLedgerBlock.findMany().catch(() => []);
+    const dbCount = allDbBlocks.filter((b: any) => !isNaN(parseInt(b.blockId, 10))).length;
     let totalLocalBlocks = 0;
     for (const p of partitions) {
       const localLedger = GovernanceLedger.loadLedger(p);

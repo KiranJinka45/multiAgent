@@ -21,7 +21,8 @@ export async function startAuthServer() {
     initTelemetry('auth-service');
 
     // --- SECURITY: Mandatory Startup Enforcement ---
-    if (process.env.NODE_ENV === 'production') {
+    const isLocalDevOrTest = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
+    if (!isLocalDevOrTest) {
         validateStartupSecrets(['JWT_SECRET', 'JWT_REFRESH_SECRET']);
     }
 
@@ -32,9 +33,8 @@ export async function startAuthServer() {
     let JWT_REFRESH_SECRET = config.JWT_REFRESH_SECRET;
 
     if (!JWT_SECRET || !JWT_REFRESH_SECRET) {
-        if (process.env.NODE_ENV === 'production') {
-            // Already handled by validateStartupSecrets, but extra safety check
-            throw new Error('FATAL: JWT secrets must be set in production');
+        if (!isLocalDevOrTest) {
+            throw new Error('FATAL: JWT secrets must be set outside development/test environment');
         }
 
         // Use ephemeral keys in development to avoid hardcoded secrets
@@ -456,7 +456,12 @@ export async function startAuthServer() {
     });
 
     // HEALTH & STATUS (Standardized)
-    app.use(createHealthRouter({ serviceName: 'auth-service' }));
+    app.use(createHealthRouter({ 
+        serviceName: 'auth-service',
+        checkDependencies: async () => ({
+            redis: { status: redis.status === 'ready' ? 'up' : 'down' }
+        })
+    }));
 
     // --- SRE Hardening: Warm-up Phase ---
     logger.info('[AuthService] Entering Warm-up phase (pre-priming connections)...');

@@ -1,0 +1,11 @@
+{
+  "incidentId": "INCIDENT-SZDLS5K0H",
+  "timestamp": 1779649747984,
+  "anomalyFingerprint": "ANOMALY_ERROR__REPLAY_DIVERGENCE_AT_SEQUENCE_STEP_42_4badb0ec",
+  "workflowId": "workflow-099",
+  "errorStack": "Error: Replay divergence at sequence step 42\n    at Reducer.replay (reducer.ts:88:12)",
+  "reproductionSteps": [
+    "Retrieve signed audit ledger",
+    "Execute cell-resurrection script"
+  ]
+}

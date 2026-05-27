@@ -1,7 +1,7 @@
 import express from 'express';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { logger } from '@packages/observability';
+import { logger, operatorCertaintyInflationTotal, operatorOverrideDisagreementTotal } from '@packages/observability';
 import { GovernanceLedger, type GovernanceLedgerEntry } from '@packages/utils';
 import { db } from '@packages/db';
 import * as crypto from 'node:crypto';
@@ -100,6 +100,8 @@ export interface StewardshipState {
   replayIntegrity: number;
   telemetryEroded: boolean;
   chronologyGaps: boolean;
+  chronologyConfidence: number;
+  verificationTier?: 'HOT' | 'WARM' | 'COLD';
   ritualDecayed: boolean;
   ceremonyDurationAvg: number;
   approvalNarrativeLengthAvg: number;
@@ -138,6 +140,8 @@ const DEFAULT_STATE: StewardshipState = {
   replayIntegrity: 100,
   telemetryEroded: false,
   chronologyGaps: false,
+  chronologyConfidence: 100,
+  verificationTier: 'HOT',
   ritualDecayed: false,
   ceremonyDurationAvg: 254,
   approvalNarrativeLengthAvg: 242,
@@ -160,6 +164,7 @@ const DEFAULT_STATE: StewardshipState = {
     { id: 'IFD-001', name: 'IFD-001: Replay Poisoning', status: 'INACTIVE', lastRun: '14d ago', description: 'Simulate forged payload insertion to trigger trust degradation and chain fractures.' },
     { id: 'IFD-002', name: 'IFD-002: Telemetry Erosion', status: 'INACTIVE', lastRun: 'Never', description: 'Simulate loss of forensic logs, chronology gaps, and timeline blindness.' },
     { id: 'IFD-003', name: 'IFD-003: Governance Collapse', status: 'INACTIVE', lastRun: 'Never', description: 'Simulate total epoch registry failure, SAFE_MODE locking, and Supervisor override.' },
+    { id: 'IFD-004', name: 'IFD-004: Dirty Archaeology', status: 'INACTIVE', lastRun: 'Never', description: 'Simulate corrupted databases, partial transactions, chronology gaps, and duplicate timelines.' },
     { id: 'RITUAL_DECAY', name: 'Ritual Decay Simulation', status: 'INACTIVE', lastRun: '7d ago', description: 'Inject rubber-stamping, narrative erosion, and approved-without-ceremony patterns.' },
     { id: 'FREEZE_PRESSURE', name: 'Institutional Freeze Pressure', status: 'INACTIVE', lastRun: '30d ago', description: 'Flood governance queues with capability expansions to test restraint.' },
     { id: 'TOTAL_QUORUM_FAILURE', name: 'Total Quorum Failure', status: 'INACTIVE', lastRun: 'Never', description: 'Simulate physical HSM failure requiring high-friction manual override ceremony.' }
@@ -375,6 +380,30 @@ router.post('/drill/trigger', async (req, res) => {
       description: 'Consensus registry deadlocked. Lock safe-mode activated. HSM override ceremony required.',
       timestamp: new Date()
     });
+  } else if (id === 'IFD-004') {
+    // 7. Dirty Archaeology Degradation
+    const msg1 = 'DIRTY ARCHAEOLOGY: Partial write and corrupted block hash.';
+    await GovernanceLedger.appendEntry('REPLAY', msg1, 'ZTAN-OPERATOR-01', 'UNTRUSTED', epochStr, undefined, correlationMetadata);
+
+    const msg2 = 'DIRTY ARCHAEOLOGY: Stale timeline packet storm and clock desync.';
+    await GovernanceLedger.appendEntry('TELEMETRY', msg2, 'ZTAN-OPERATOR-01', 'DEGRADED', epochStr, undefined, correlationMetadata);
+
+    state.trustLevel = 'UNTRUSTED';
+    state.replayIntegrity = 20;
+    state.chronologyConfidence = 40;
+    state.chronologyGaps = true;
+    state.recoveryInvariants.causalContinuity = {
+      status: false,
+      label: 'Lineage broken: Malformed hashes detected'
+    };
+    state.activeIncidents.push({
+      id: 'INC-IFD-004',
+      type: 'DIRTY_ARCHAEOLOGY',
+      severity: 'CRITICAL',
+      title: 'Substrate Page Corruption & Desync',
+      description: 'Simulated partial write transaction failures and timeline desynchronization have fractured the storage layer.',
+      timestamp: new Date()
+    });
   }
 
   res.setHeader('X-Request-UUID', requestUuid);
@@ -387,7 +416,7 @@ router.post('/drill/trigger', async (req, res) => {
 
 // POST /api/v1/ztan/governance/drill/resolve
 router.post('/drill/resolve', async (req, res) => {
-  const { id, actionsTaken, operatorSignature } = req.body;
+  const { id, actionsTaken, operatorSignature, method, justification, certaintyInflation } = req.body;
   const state = loadState();
 
   const requestUuid = (req.headers['x-request-uuid'] || req.headers['X-Request-UUID'] || req.body.requestUuid || crypto.randomUUID()) as string;
@@ -412,6 +441,15 @@ router.post('/drill/resolve', async (req, res) => {
   const reactionTime = state.drillStartTime
     ? parseFloat(((Date.now() - state.drillStartTime) / 1000).toFixed(1))
     : 2.5;
+
+  const isFracture = id === 'IFD-001' || id === 'IFD-004';
+  const isCertaintyInflation = certaintyInflation || (isFracture && method === 'rebuild' && !justification?.toLowerCase().includes('multi-sig'));
+
+  if (isCertaintyInflation) {
+    logger.warn(`[Certainty Inflation] Warning: Operator override disagreement detected. Override authorized without complete physical multi-sig agreement. (Drill: ${id}, Method: ${method}, Justification Length: ${justification?.length || 0})`);
+    operatorCertaintyInflationTotal.inc({ drill_id: id, method: method || 'rebuild' });
+    operatorOverrideDisagreementTotal.inc({ drill_id: id, method: method || 'rebuild' });
+  }
 
   // Cryptographically verify the manual override signature using the NIST P-256 validator key.
   // If it's a mock frontend console signature, we dynamically self-sign the resolution payload 

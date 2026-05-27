@@ -78,7 +78,7 @@ class ZtanLongSoakCampaign {
         console.log(`  - Heap Growth Delta:           ${heapDiffMB.toFixed(3)} MB`);
 
         // Write telemetry log to artifacts directory
-        const artifactDir = path.resolve(__dirname, '..', '..', '..', 'brain', 'b8a81fd6-555e-4df3-ba0d-6ad7b89a22a5', 'artifacts');
+        const artifactDir = process.env.ZTAN_ARTIFACTS_DIR || path.resolve(__dirname, '../../../../.ztan-transparency/telemetry');
         fs.mkdirSync(artifactDir, { recursive: true });
         
         const telemetryPath = path.join(artifactDir, 'soak_telemetry.json');

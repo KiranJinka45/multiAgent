@@ -9,6 +9,7 @@
     "build": "tsc -b"
   },
   "dependencies": {
+    "@packages/observability": "workspace:*",
     "@prisma/client": "5.22.0"
   }
 }

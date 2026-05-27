@@ -9,11 +9,100 @@ import {
   heartbeatDriftSeconds,
   invariantBreachesTotal
 } from '@packages/observability';
-import { db } from '@packages/db';
+import { db, getSharedClient, DbClientRole } from '@packages/db';
+import { faultSuppressor } from './fault-suppressor.js';
+import { dbHealthMonitor } from './health.js';
 
 const LEDGER_DIR = path.join(process.cwd(), '.ztan-transparency');
 const LEDGER_FILE = path.join(LEDGER_DIR, 'governance_ledger.json');
 const OUTBOX_FILE = path.join(LEDGER_DIR, 'outbox_queue.json');
+
+function getLeaseDb() {
+  return getSharedClient(DbClientRole.LEASE);
+}
+
+export interface ZtanPayloadAttestation {
+  payloadSanitized: boolean;
+  transformations: string[];
+  originalByteLength: number;
+  sanitizedByteLength: number;
+  sanitizationEpochId: string;
+}
+
+export function sanitizeAndAttest(str: string, epochId: string = "1"): {
+  sanitized: string;
+  attestation: ZtanPayloadAttestation | null;
+  wasSanitized: boolean;
+} {
+  if (!str) return { sanitized: str, attestation: null, wasSanitized: false };
+
+  const originalBytes = Buffer.byteLength(str, 'utf8');
+  let sanitized = str;
+  const transformations: string[] = [];
+
+  // 1. Unicode Normalization (NFC)
+  const normalized = sanitized.normalize('NFC');
+  if (normalized !== sanitized) {
+    sanitized = normalized;
+    transformations.push('UNICODE_NORMALIZATION');
+  }
+
+  // 2. Null Bytes replacement
+  if (sanitized.includes('\u0000')) {
+    sanitized = sanitized.replace(/\u0000/g, '[NULL]');
+    transformations.push('NULL_BYTE_REMOVED');
+  }
+
+  // 3. Unpaired UTF-16 surrogates replacement
+  const surrogateRegex = /[\uD800-\uDBFF](?![\uDC00-\uDFFF])|([^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]/g;
+  if (surrogateRegex.test(sanitized)) {
+    // Reset regex index and replace
+    surrogateRegex.lastIndex = 0;
+    sanitized = sanitized.replace(surrogateRegex, '$1\uFFFD');
+    transformations.push('UNPAIRED_SURROGATE_REPLACED');
+  }
+
+  // 4. Force standard UTF-8 canonical representation
+  const canonical = Buffer.from(sanitized, 'utf8').toString('utf8');
+  if (canonical !== sanitized) {
+    sanitized = canonical;
+    transformations.push('UTF8_CANONICALIZATION');
+  }
+
+  const wasSanitized = transformations.length > 0;
+  const sanitizedBytes = Buffer.byteLength(sanitized, 'utf8');
+
+  let attestation: ZtanPayloadAttestation | null = null;
+  if (wasSanitized) {
+    attestation = {
+      payloadSanitized: true,
+      transformations,
+      originalByteLength: originalBytes,
+      sanitizedByteLength: sanitizedBytes,
+      sanitizationEpochId: epochId
+    };
+  }
+
+  return { sanitized, attestation, wasSanitized };
+}
+
+function sanitizePayloadString(str: string): string {
+  return sanitizeAndAttest(str).sanitized;
+}
+
+async function countQuarantineBlobsForPartition(tx: any, partition: number): Promise<number> {
+  const minSeq = (partition * 1000000) + 1000;
+  const maxSeq = ((partition + 1) * 1000000) - 1;
+  const blobs = await tx.ztanQuarantineBlob.findMany({
+    select: { blockId: true }
+  });
+  return blobs.filter((b: any) => {
+    const seq = parseInt(b.blockId, 10);
+    return !isNaN(seq) && seq >= minSeq && seq <= maxSeq;
+  }).length;
+}
+
+
 const KEYS_DIR = path.join(LEDGER_DIR, 'keys');
 const OPERATOR_PRIV_FILE = path.join(KEYS_DIR, 'operator.key');
 const OPERATOR_PUB_FILE = path.join(KEYS_DIR, 'operator.pub');
@@ -25,8 +114,9 @@ const LOCK_RETRY_INTERVAL_MS = 50;
 
 interface LockMetadata {
   pid: number;
+  hostname: string;
   timestamp: string;
-  generation: number; // Monotonically strictly increasing fencing token
+  generation: number; // Monotonically increasing fencing token under compliant storage configurations
 }
 
 let reconciliationInterval: NodeJS.Timeout | null = null;
@@ -37,6 +127,7 @@ const lagSampler = setInterval(() => {
   eventLoopLag = Math.max(0, now - lastLagSample - 100);
   lastLagSample = now;
 }, 100);
+const outboxBatchSizes = new Map<number, number>();
 if (lagSampler && typeof lagSampler.unref === 'function') {
   lagSampler.unref();
 }
@@ -76,7 +167,10 @@ export interface GovernanceLedgerEntry {
   prevHash: string;
   epoch: string;
   verdict: 'VERIFIED' | 'DEGRADED' | 'UNTRUSTED';
+  attestation?: ZtanPayloadAttestation;
+  quarantineBlob?: string;
 }
+
 
 export type ZtanState = 'ACTIVE' | 'DEGRADED' | 'FENCED' | 'QUARANTINED' | 'REBUILDING' | 'REPLAYING' | 'READ_ONLY';
 
@@ -185,6 +279,7 @@ export const GovernanceLedger = {
   heartbeatIntervals: new Map<number, NodeJS.Timeout>(),
   livenessIntervals: new Map<number, NodeJS.Timeout>(),
   lastSuccessfulHeartbeats: new Map<number, number>(),
+  recentHeartbeatRtts: new Map<number, number[]>(),
 
   getState(partition: number): ZtanState {
     return this.states.get(partition) ?? 'READ_ONLY';
@@ -332,7 +427,7 @@ export const GovernanceLedger = {
     if (expectedGen !== null) {
       try {
         const leaseId = `singleton-lease-partition-${partition}`;
-        const rows = (await db.$queryRawUnsafe(`
+        const rows = (await getLeaseDb().$queryRawUnsafe(`
           SELECT generation, owner_pid as "ownerPid", owner_host as "ownerHost"
           FROM "ZtanActiveLease"
           WHERE id = $1
@@ -366,7 +461,7 @@ export const GovernanceLedger = {
 
   async bootstrapDatabaseLeaseTable(): Promise<void> {
     try {
-      await db.$executeRawUnsafe(`
+      await getLeaseDb().$executeRawUnsafe(`
         CREATE TABLE IF NOT EXISTS "ZtanActiveLease" (
           id VARCHAR(50) PRIMARY KEY DEFAULT 'singleton-lease',
           generation INT NOT NULL DEFAULT 0,
@@ -435,9 +530,10 @@ export const GovernanceLedger = {
     const startTime = Date.now();
     const leaseId = `singleton-lease-partition-${partition}`;
 
+    let attempt = 0;
     while (true) {
       try {
-        await db.$transaction(async (tx: any) => {
+        await getLeaseDb().$transaction(async (tx: any) => {
           // Enforce strict lock timeouts within the transaction boundary
           // This ensures that if another node holds the FOR UPDATE lock but stalls,
           // the database forcefully rejects our lock attempt after 15 seconds,
@@ -504,13 +600,28 @@ export const GovernanceLedger = {
         this.startHeartbeatDaemon(partition);
         return;
       } catch (err: any) {
+        attempt++;
         if (err.message && err.message.includes('Fencing Distributed Lease Violation')) {
           throw err;
         }
-        if (Date.now() - startTime > LOCK_TIMEOUT_MS) {
-          throw new Error(`[GovernanceLedger] Distributed database lease acquisition timed out for partition ${partition}: ${err.message || err}`);
+
+        // Enter degraded state defensively
+        try {
+          this.transitionTo(partition, 'DEGRADED', `DB lease acquisition failed (attempt ${attempt}): entering degraded state`);
+        } catch {}
+
+        const backoff = Math.min(5000, 100 * Math.pow(2, attempt));
+        const jitter = Math.random() * 50;
+        const retryDelay = backoff + jitter;
+
+        if (attempt === 1 || attempt % 10 === 0) {
+          logger.warn(`[GovernanceLedger] DB lease acquisition failed (attempt ${attempt}) for partition ${partition}, retrying in ${Math.round(retryDelay)}ms: ${err.message || err}`);
         }
-        await new Promise(resolve => setTimeout(resolve, LOCK_RETRY_INTERVAL_MS));
+
+        if (Date.now() - startTime > LOCK_TIMEOUT_MS) {
+          throw new Error(`[GovernanceLedger] Distributed database lease acquisition timed out for partition ${partition} after ${attempt} attempts: ${err.message || err}`);
+        }
+        await new Promise(resolve => setTimeout(resolve, retryDelay));
       }
     }
   },
@@ -554,16 +665,18 @@ export const GovernanceLedger = {
     this.stopHeartbeatDaemon(partition);
     const hostname = os.hostname();
     const pid = process.pid;
-    this.lastSuccessfulHeartbeats.set(partition, Date.now());
+    this.lastSuccessfulHeartbeats.set(partition, performance.now());
 
     this.startLivenessTick(partition);
 
-    const interval = setInterval(async () => {
+    const runTick = async () => {
       const activeDbGen = this.activeDbGenerations.get(partition) ?? null;
       if (activeDbGen === null) return;
+      this.renewLockFile(partition);
       const leaseId = `singleton-lease-partition-${partition}`;
       try {
-        await db.$executeRawUnsafe(`
+        const heartbeatStart = performance.now();
+        await getLeaseDb().$executeRawUnsafe(`
           UPDATE "ZtanActiveLease"
           SET heartbeat = NOW()
           WHERE id = $1 
@@ -571,20 +684,27 @@ export const GovernanceLedger = {
             AND owner_host = $3 
             AND generation = $4
         `, leaseId, pid, hostname, activeDbGen);
-        const elapsed = (Date.now() - (this.lastSuccessfulHeartbeats.get(partition) || Date.now())) / 1000;
+        const rttMs = performance.now() - heartbeatStart;
+        this.recordHeartbeatRtt(partition, rttMs);
+        const elapsed = (performance.now() - (this.lastSuccessfulHeartbeats.get(partition) || performance.now())) / 1000;
         heartbeatDriftSeconds.observe(elapsed);
-        this.lastSuccessfulHeartbeats.set(partition, Date.now());
+        this.lastSuccessfulHeartbeats.set(partition, performance.now());
       } catch (err: any) {
-        logger.error({ err }, `[GovernanceLedger] Failed to send lease heartbeat for partition ${partition}`);
+        faultSuppressor.report(
+          `heartbeat_db_failure_p${partition}`,
+          `[GovernanceLedger] Failed to send lease heartbeat for partition ${partition}`,
+          { err: err?.message, partition }
+        );
         
-        const timeSinceHeartbeat = Date.now() - (this.lastSuccessfulHeartbeats.get(partition) || 0);
-        if (timeSinceHeartbeat > LOCK_TIMEOUT_MS / 2) {
+        const timeSinceHeartbeat = performance.now() - (this.lastSuccessfulHeartbeats.get(partition) || 0);
+        const fenceThreshold = this.getAdaptiveFenceThreshold(partition);
+        if (timeSinceHeartbeat > fenceThreshold) {
           logger.error(
-            { timeSinceHeartbeat, pid, hostname },
-            `[GovernanceLedger] CRITICAL: Heartbeat threshold exceeded for partition ${partition}. Host disconnected from lease oracle. Self-fencing local authority!`
+            { timeSinceHeartbeat, fenceThreshold, pid, hostname },
+            `[GovernanceLedger] CRITICAL: Adaptive heartbeat threshold exceeded for partition ${partition} (${Math.round(timeSinceHeartbeat)}ms > ${Math.round(fenceThreshold)}ms). Self-fencing local authority!`
           );
           try {
-            this.transitionTo(partition, 'FENCED', 'Heartbeat renewal timeout exceeded');
+            this.transitionTo(partition, 'FENCED', `Heartbeat renewal timeout exceeded (adaptive threshold: ${Math.round(fenceThreshold)}ms)`);
           } catch {}
           this.activeDbGenerations.delete(partition);
           this.activeLockGenerations.delete(partition);
@@ -593,24 +713,30 @@ export const GovernanceLedger = {
           const lockFile = this.getLockFile(partition);
           if (fs.existsSync(lockFile)) {
             try {
-              fs.unlinkSync(lockFile);
+               fs.unlinkSync(lockFile);
             } catch {}
           }
+          return;
         }
       }
-    }, 5000);
 
-    this.heartbeatIntervals.set(partition, interval);
+      // Stagger next heartbeat with random jitter (+/- 500ms)
+      const baseDelay = 5000;
+      const jitter = (Math.random() - 0.5) * 1000;
+      const nextDelay = Math.max(2000, baseDelay + jitter);
 
-    if (interval && typeof interval.unref === 'function') {
-      interval.unref();
-    }
+      const timeoutId = setTimeout(runTick, nextDelay);
+      this.heartbeatIntervals.set(partition, timeoutId);
+    };
+
+    const timeoutId = setTimeout(runTick, 5000);
+    this.heartbeatIntervals.set(partition, timeoutId);
   },
 
   stopHeartbeatDaemon(partition: number): void {
     const interval = this.heartbeatIntervals.get(partition);
     if (interval) {
-      clearInterval(interval);
+      clearTimeout(interval);
       this.heartbeatIntervals.delete(partition);
     }
     const livenessInterval = this.livenessIntervals.get(partition);
@@ -646,7 +772,7 @@ export const GovernanceLedger = {
     this.activeDbGenerations.delete(partition);
     const leaseId = `singleton-lease-partition-${partition}`;
     try {
-      await db.$executeRawUnsafe(`
+      await getLeaseDb().$executeRawUnsafe(`
         UPDATE "ZtanActiveLease"
         SET heartbeat = NOW() - INTERVAL '30 seconds'
         WHERE id = $1
@@ -692,6 +818,7 @@ export const GovernanceLedger = {
         const nextGen = this.incrementGeneration(partition);
         const meta: LockMetadata = {
           pid: process.pid,
+          hostname: os.hostname(),
           timestamp: new Date().toISOString(),
           generation: nextGen
         };
@@ -729,6 +856,7 @@ export const GovernanceLedger = {
         const nextGen = this.incrementGeneration(partition);
         const meta: LockMetadata = {
           pid: process.pid,
+          hostname: os.hostname(),
           timestamp: new Date().toISOString(),
           generation: nextGen
         };
@@ -768,21 +896,30 @@ export const GovernanceLedger = {
       if (fs.existsSync(lockFile)) {
         const raw = fs.readFileSync(lockFile, 'utf8');
         const meta: LockMetadata = JSON.parse(raw);
+        const hostname = os.hostname();
         
+        const isLocal = !meta.hostname || meta.hostname === hostname;
         let isProcessAlive = true;
-        try {
-          process.kill(meta.pid, 0);
-        } catch {
-          isProcessAlive = false;
+        
+        if (isLocal) {
+          try {
+            process.kill(meta.pid, 0);
+          } catch {
+            isProcessAlive = false;
+          }
         }
 
         const heldDuration = Date.now() - new Date(meta.timestamp).getTime();
         const isLeaseExpired = heldDuration > LOCK_LEASE_MS;
 
-        if (!isProcessAlive || isLeaseExpired) {
+        // If local, we ONLY steal if the process is actually dead.
+        // If remote, we steal if the lease has expired (meaning the remote host stopped renewing it).
+        const shouldSteal = isLocal ? !isProcessAlive : isLeaseExpired;
+
+        if (shouldSteal) {
           logger.warn(
-            { pid: meta.pid, heldDuration, isProcessAlive },
-            `[GovernanceLedger] Stale lock detected on partition ${partition} (process dead or lease expired). Forcing release...`
+            { pid: meta.pid, hostname: meta.hostname, heldDuration, isProcessAlive, isLocal },
+            `[GovernanceLedger] Stale lock detected on partition ${partition} (shouldSteal=true). Forcing release...`
           );
           this.releaseLockForce(partition);
         }
@@ -831,6 +968,27 @@ export const GovernanceLedger = {
     }
   },
 
+  renewLockFile(partition: number): void {
+    const lockFile = this.getLockFile(partition);
+    const activeLockGen = this.activeLockGenerations.get(partition) ?? null;
+    if (activeLockGen === null) return;
+    try {
+      if (fs.existsSync(lockFile)) {
+        const raw = fs.readFileSync(lockFile, 'utf8');
+        const meta: LockMetadata = JSON.parse(raw);
+        if (meta.pid === process.pid && meta.generation === activeLockGen) {
+          const updatedMeta: LockMetadata = {
+            ...meta,
+            timestamp: new Date().toISOString()
+          };
+          fs.writeFileSync(lockFile, JSON.stringify(updatedMeta), 'utf8');
+        }
+      }
+    } catch (e) {
+      // ignore write race
+    }
+  },
+
   async recoverWal(): Promise<void> {
     try {
       logger.info('[GovernanceLedger] Running WAL recovery check...');
@@ -869,20 +1027,109 @@ export const GovernanceLedger = {
     }
   },
 
+  async assertDatabaseHealth(): Promise<boolean> {
+    try {
+      const { healthy } = await dbHealthMonitor.isHealthy();
+      return healthy;
+    } catch (e) {
+      return false;
+    }
+  },
+
+  async waitForDatabaseStabilization(timeoutMs: number = 30000): Promise<boolean> {
+    const startTime = Date.now();
+    let consecutiveSuccesses = 0;
+    const requiredSuccesses = 3;
+    
+    logger.info('[GovernanceLedger] Checking database substrate stabilization...');
+    while (Date.now() - startTime < timeoutMs) {
+      const healthy = await this.assertDatabaseHealth();
+      if (healthy) {
+        consecutiveSuccesses++;
+        if (consecutiveSuccesses >= requiredSuccesses) {
+          logger.info('[GovernanceLedger] Database substrate stabilized successfully.');
+          return true;
+        }
+      } else {
+        consecutiveSuccesses = 0;
+      }
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    logger.warn('[GovernanceLedger] Database substrate stabilization check timed out or database unavailable. Proceeding in DEGRADED mode.');
+    return false;
+  },
+
+  /**
+   * Adaptive Fence Threshold: uses P95 of recent heartbeat RTTs × 3 safety margin.
+   * Floor: 10s, Ceiling: 45s. Falls back to static LOCK_TIMEOUT_MS/2 with < 3 samples.
+   */
+  getAdaptiveFenceThreshold(partition: number): number {
+    const rtts = this.recentHeartbeatRtts.get(partition) || [];
+    if (rtts.length < 3) return LOCK_TIMEOUT_MS / 2; // Default: 12.5s
+
+    const sorted = [...rtts].sort((a: number, b: number) => a - b);
+    const p95 = sorted[Math.floor(sorted.length * 0.95)];
+    const adaptive = Math.max(10_000, Math.min(45_000, p95 * 3));
+    
+    if (adaptive > 20000) {
+      logger.warn({ partition, adaptiveThreshold: adaptive, p95 }, '[GovernanceLedger] ADVISORY: Adaptive fencing threshold elevated > 20s. Substrate latency is severely degraded.');
+    }
+    
+    return adaptive;
+  },
+
+  recordHeartbeatRtt(partition: number, rttMs: number): void {
+    let rtts = this.recentHeartbeatRtts.get(partition);
+    if (!rtts) { rtts = []; this.recentHeartbeatRtts.set(partition, rtts); }
+    rtts.push(rttMs);
+    if (rtts.length > 30) rtts.shift(); // Sliding window of 30 samples
+  },
+
   init(): void {
     const count = this.getPartitionCount();
-    for (let p = 0; p < count; p++) {
-      this.initPartition(p);
-    }
 
-    if (!reconciliationInterval) {
-      reconciliationInterval = setInterval(() => {
-        this.processOutbox().catch(() => {});
-      }, 10000);
-      if (reconciliationInterval && typeof reconciliationInterval.unref === 'function') {
-        reconciliationInterval.unref();
+    // Run database stabilization check first, then stagger partition startup
+    this.waitForDatabaseStabilization(30000).then(() => {
+      // TIER 0 — Sovereign: lease acquisition, fencing, WAL recovery
+      for (let p = 0; p < count; p++) {
+        const delay = p * (1000 + Math.random() * 300); // 1s stagger per partition with randomized jitter
+        setTimeout(() => {
+          this.initPartition(p);
+        }, delay);
       }
-    }
+
+      // TIER 2 — Deferred: outbox processing starts only after partitions have had time to reach ACTIVE
+      const totalPartitionDelay = count * 1300 + 5000; // Partition stagger + 5s buffer
+      let quorumActiveSince: number | null = null;
+      setTimeout(() => {
+        if (!reconciliationInterval) {
+          reconciliationInterval = setInterval(() => {
+            // Quorum Boot Stabilization: >= 80% partitions ACTIVE for 30s
+            const states = Array.from(this.states.values()) as ZtanState[];
+            const activeCount = states.filter(s => s === 'ACTIVE').length;
+            const quorumMet = states.length > 0 && (activeCount / states.length) >= 0.8;
+            
+            if (quorumMet) {
+              if (quorumActiveSince === null) quorumActiveSince = performance.now();
+              if (performance.now() - quorumActiveSince >= 30000) {
+                this.processOutbox().catch(() => {});
+              }
+            } else {
+              quorumActiveSince = null; // Reset quorum stabilization epoch
+            }
+          }, 10000);
+          if (reconciliationInterval && typeof reconciliationInterval.unref === 'function') {
+            reconciliationInterval.unref();
+          }
+          logger.info('[GovernanceLedger] Tier 2 (Deferred) subsystems activated: outbox processing enabled (waiting for quorum).');
+        }
+      }, totalPartitionDelay);
+    }).catch(err => {
+      logger.error({ err }, '[GovernanceLedger] Fatal error during database stabilization check, fallback starting immediately');
+      for (let p = 0; p < count; p++) {
+        this.initPartition(p);
+      }
+    });
   },
 
   initPartition(partition: number): void {
@@ -1041,10 +1288,15 @@ export const GovernanceLedger = {
       }
 
       logger.info(`[GovernanceLedger] Outbox worker processing ${queue.length} pending entries for partition ${partition}...`);
+      
+      let batchSize = outboxBatchSizes.get(partition) || 1;
+      const batch = queue.slice(0, batchSize);
+      
       const ledger = this.loadLedger(partition);
       const successful: number[] = [];
+      let batchFailed = false;
 
-      for (const seq of queue) {
+      for (const seq of batch) {
         const entry = ledger.find(e => e.sequenceId === seq);
         if (!entry) {
           successful.push(seq);
@@ -1114,6 +1366,32 @@ export const GovernanceLedger = {
                   createdAt: new Date(entry.timestamp)
                 }
               });
+
+              if (entry.attestation && entry.quarantineBlob) {
+                await tx.ztanPayloadAttestation.create({
+                  data: {
+                    blockId: blockIdStr,
+                    payloadSanitized: true,
+                    transformations: JSON.stringify(entry.attestation.transformations),
+                    originalByteLength: entry.attestation.originalByteLength,
+                    sanitizedByteLength: entry.attestation.sanitizedByteLength,
+                    sanitizationEpochId: entry.attestation.sanitizationEpochId
+                  }
+                });
+                const qCount = await countQuarantineBlobsForPartition(tx, partition);
+                if (qCount >= 500) {
+                  logger.warn(`[GovernanceLedger] [QUARANTINE_BUDGET_EXCEEDED] Sync outbox quarantine storage exceeded 500 records on partition ${partition}. Bypassing database quarantine write.`);
+                } else {
+                  await tx.ztanQuarantineBlob.create({
+                    data: {
+                      blockId: blockIdStr,
+                      rawBlob: entry.quarantineBlob
+                    }
+                  });
+                }
+              }
+
+
               logger.info({ sequenceId: seq }, `[GovernanceLedger] Outbox worker successfully synced block to PostgreSQL on partition ${partition}`);
               await tx.$executeRawUnsafe(`NOTIFY ztan_ledger_update, '${blockIdStr}';`).catch(() => {});
 
@@ -1152,9 +1430,16 @@ export const GovernanceLedger = {
             successful.push(seq);
           } else {
             logger.warn(`[GovernanceLedger] Outbox worker failed to sync block ${seq} on partition ${partition}: ${dbErr.message || dbErr}`);
+            batchFailed = true;
             break; 
           }
         }
+      }
+
+      if (batchFailed) {
+        outboxBatchSizes.set(partition, 1);
+      } else {
+        outboxBatchSizes.set(partition, Math.min(10, batchSize * 2));
       }
 
       if (successful.length > 0) {
@@ -1271,6 +1556,27 @@ export const GovernanceLedger = {
             verdict: dbBlock.status as any
           };
 
+          try {
+            const dbAtt = await db.ztanPayloadAttestation.findUnique({
+              where: { blockId: dbBlock.blockId }
+            });
+            if (dbAtt) {
+              restoredEntry.attestation = {
+                payloadSanitized: dbAtt.payloadSanitized,
+                transformations: JSON.parse(dbAtt.transformations),
+                originalByteLength: dbAtt.originalByteLength,
+                sanitizedByteLength: dbAtt.sanitizedByteLength,
+                sanitizationEpochId: dbAtt.sanitizationEpochId
+              };
+            }
+            const dbQ = await db.ztanQuarantineBlob.findUnique({
+              where: { blockId: dbBlock.blockId }
+            });
+            if (dbQ) {
+              restoredEntry.quarantineBlob = dbQ.rawBlob;
+            }
+          } catch (attErr) {}
+
           const expectedHash = this.computeHash(restoredEntry);
           if (expectedHash !== restoredEntry.hash) {
             logger.error({ seq: dbBlock.seqNum }, `[GovernanceLedger] Cryptographic mismatch on restoring block from DB! Expected ${expectedHash}, got ${restoredEntry.hash}`);
@@ -1282,6 +1588,7 @@ export const GovernanceLedger = {
           logger.info({ seq: dbBlock.seqNum }, `[GovernanceLedger] Successfully reconstructed missing local ledger block from PostgreSQL consensus store.`);
         }
       }
+
 
       if (localModified) {
         this.saveLedger(ledger, partition);
@@ -1548,6 +1855,10 @@ export const GovernanceLedger = {
       if (correlationMetadata) {
         enrichedPayload = `${payload} [CorrelationTrace: requestUuid=${correlationMetadata.requestUuid}, auditUuid=${correlationMetadata.auditUuid}, outboxUuid=${correlationMetadata.outboxUuid}, ledgerBlockUuid=${correlationMetadata.ledgerBlockUuid}]`;
       }
+      const originalRawPayload = enrichedPayload;
+      const sanitizationEpochId = "1";
+      const { sanitized, attestation, wasSanitized } = sanitizeAndAttest(enrichedPayload, sanitizationEpochId);
+      enrichedPayload = sanitized;
 
       const signature = this.signPayload(enrichedPayload);
 
@@ -1565,6 +1876,18 @@ export const GovernanceLedger = {
 
       const hash = this.computeHash(entryData);
       const entry: GovernanceLedgerEntry = { ...entryData, hash };
+      if (wasSanitized && attestation) {
+        entry.attestation = attestation;
+        const quarantineCount = ledger.filter(e => e.quarantineBlob).length;
+        if (quarantineCount >= 500) {
+          logger.warn(`[GovernanceLedger] [QUARANTINE_BUDGET_EXCEEDED] Local ledger quarantine storage exceeded 500 records. Bypassing local quarantine blob serialization.`);
+        } else {
+          entry.quarantineBlob = Buffer.from(originalRawPayload, 'utf16le').toString('base64');
+        }
+      }
+
+
+
 
       let syncedToDb = false;
       try {
@@ -1660,6 +1983,31 @@ export const GovernanceLedger = {
               createdAt: new Date(entry.timestamp)
             }
           });
+
+          if (wasSanitized && attestation) {
+            await tx.ztanPayloadAttestation.create({
+              data: {
+                blockId: entry.sequenceId.toString(),
+                payloadSanitized: true,
+                transformations: JSON.stringify(attestation.transformations),
+                originalByteLength: attestation.originalByteLength,
+                sanitizedByteLength: attestation.sanitizedByteLength,
+                sanitizationEpochId: attestation.sanitizationEpochId
+              }
+            });
+            const qCount = await countQuarantineBlobsForPartition(tx, partition);
+            if (qCount >= 500) {
+              logger.warn(`[GovernanceLedger] [QUARANTINE_BUDGET_EXCEEDED] Database quarantine storage exceeded 500 records on partition ${partition}. Bypassing database quarantine write.`);
+            } else if (entry.quarantineBlob) {
+              await tx.ztanQuarantineBlob.create({
+                data: {
+                  blockId: entry.sequenceId.toString(),
+                  rawBlob: entry.quarantineBlob
+                }
+              });
+            }
+          }
+
 
           // Atomic transaction write of the corresponding AuditLog row
           const auditInfo = parseCorrelationAndPayload(entry.payload, entry.timestamp, entry.operatorId);
@@ -1970,6 +2318,9 @@ export const GovernanceLedger = {
       const partitions = new Map<number, typeof dbEntries>();
       for (const entry of dbEntries) {
         const seq = parseInt(entry.blockId, 10);
+        if (isNaN(seq)) {
+          continue; // Skip non-numeric blocks (e.g., from other telemetry streams like default-operational-stream)
+        }
         const p = Math.floor(seq / 1000000);
         if (!partitions.has(p)) {
           partitions.set(p, []);

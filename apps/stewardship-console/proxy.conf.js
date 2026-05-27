@@ -1,0 +1,12 @@
+module.exports = {
+  "/api": {
+    "target": "http://127.0.0.1:3500",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/socket.io": {
+    "target": "http://127.0.0.1:3500",
+    "secure": false,
+    "ws": true
+  }
+};

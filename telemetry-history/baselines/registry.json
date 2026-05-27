@@ -1,0 +1,29 @@
+{
+  "versions": [
+    {
+      "version": "1.0.0",
+      "path": "telemetry-history/baselines/baseline-1.0.0.json",
+      "timestamp": 1779513701203,
+      "metadata": {
+        "durationSeconds": 21600,
+        "seed": "ZTAN_CANONICAL_SEED_6H",
+        "totalLogicalBytesWritten": 627696016,
+        "physicalWalByteDelta": "369552624",
+        "failures": 135
+      }
+    },
+    {
+      "version": "1.0.1",
+      "type": "CHAOS_REFERENCE",
+      "path": "telemetry-history/baselines/baseline-1.0.1.json",
+      "timestamp": 1779516976967,
+      "metadata": {
+        "durationSeconds": 21600,
+        "seed": "ZTAN_CANONICAL_SEED_6H",
+        "totalLogicalBytesWritten": 627696016,
+        "physicalWalByteDelta": "369552624",
+        "failures": 135
+      }
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "timestamp": 1779815636896,
+  "metrics": {
+    "replayAmplification": 3,
+    "queueDebt": 0,
+    "recoveryLatencyMs": 1029.2067000000002,
+    "walExpansionBytes": 188320,
+    "resourceRebound": {
+      "handles": 2,
+      "establishedSockets": 9
+    },
+    "memoryFragmentationRatio": 0.33732090917947
+  }
+}

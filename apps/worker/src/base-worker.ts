@@ -8,9 +8,11 @@ import {
     usageService, 
     TenantService, 
     SLOService,
-    contextStorage
+    contextStorage,
+    BaseExecutionError
 } from '@packages/utils';
 import { DEFAULT_RETRY_OPTIONS, DEAD_LETTER_QUEUE_NAME, createBreaker } from '@packages/resilience';
+import crypto from 'crypto';
 
 // Mock metrics for now if they are not in @packages/utils or use a generic one
 const workerTaskDurationSeconds = { observe: (...args: any[]) => {} };
@@ -101,11 +103,60 @@ export abstract class BaseWorker {
 
                         span.setStatus({ code: 1 }); // OK
                         return result;
-                    } catch (err) {
+                    } catch (err: any) {
                         status = 'failed';
                         agentFailuresTotal.inc({ agent_name: this.getName() });
                         span.setStatus({ code: 2, message: err.message }); // Error
                         span.recordException(err);
+
+                        // 1. Immediate DLQ containment for custom failure actions
+                        if (err && (err.action === 'dlq' || err.action === 'quarantine')) {
+                            logger.warn({ jobId: job.id, action: err.action }, '📥 [Worker] Failure Taxonomy Bypass: Immediate Dead Letter Queue (DLQ) routing.');
+                            await this.dlq.add('failed-job', {
+                                originalQueue: queueName,
+                                jobId: job.id,
+                                data: job.data,
+                                error: `[Bypass: ${err.name}] ${err.message}`,
+                                failedAt: new Date().toISOString()
+                            });
+                            return { status: 'dlq_bypassed', error: err.message };
+                        }
+
+                        // 2. Exception Fingerprinting for Poison Job Detection
+                        const exceptionMessage = err.message || '';
+                        const exceptionStack = err.stack || '';
+                        const failureFingerprint = crypto.createHash('sha256')
+                            .update(exceptionMessage + exceptionStack)
+                            .digest('hex');
+                        
+                        const fingerprintKey = `worker:poison:fingerprint:${job.id}`;
+                        const counterKey = `worker:poison:counter:${job.id}`;
+                        
+                        try {
+                            const prevFingerprint = await redis.get(fingerprintKey);
+                            if (prevFingerprint === failureFingerprint) {
+                                const count = await redis.incr(counterKey);
+                                if (count >= 2) {
+                                    logger.error({ jobId: job.id, fingerprint: failureFingerprint }, '💥 [Worker] Poison Candidate Detected: Same crash occurred 2+ consecutive times. Immediate DLQ quarantining.');
+                                    await this.dlq.add('failed-job', {
+                                        originalQueue: queueName,
+                                        jobId: job.id,
+                                        data: job.data,
+                                        error: `[Poison Pill] ${err.message}`,
+                                        failedAt: new Date().toISOString()
+                                    });
+                                    // Clear keys
+                                    await redis.del(fingerprintKey, counterKey);
+                                    return { status: 'poison_quarantined', error: err.message };
+                                }
+                            } else {
+                                await redis.set(fingerprintKey, failureFingerprint, 'EX', 3600);
+                                await redis.set(counterKey, '1', 'EX', 3600);
+                            }
+                        } catch (cacheErr) {
+                            logger.error({ err: cacheErr.message }, 'Failed to process poison job fingerprint check');
+                        }
+
                         throw err;
                     } finally {
                         const duration = (Date.now() - startTime) / 1000;

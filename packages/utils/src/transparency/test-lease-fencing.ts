@@ -23,7 +23,7 @@ async function runLeaseFencingValidation() {
 
   // 1. Pristine environment reset
   console.log('[RESET] Setting up pristine database and filesystem environment...');
-  await db.$executeRawUnsafe(`TRUNCATE TABLE "ZtanLedgerBlock" RESTART IDENTITY CASCADE;`);
+  await db.$executeRawUnsafe(`TRUNCATE TABLE "ZtanLedgerBlock", "ZtanWalLog", "ZtanSnapshot", "ZtanActiveLease", "ZtanPayloadAttestation", "ZtanQuarantineBlob", "IdempotencyRecord", "AuditLog" RESTART IDENTITY CASCADE;`);
   
   if (fs.existsSync(LEDGER_DIR)) {
     try {
@@ -56,7 +56,8 @@ async function runLeaseFencingValidation() {
   for (let i = 0; i < 150; i++) {
     const lockExists = fs.existsSync(LOCK_FILE);
     const outboxStatus = GovernanceLedger.getOutboxStatus();
-    if (!lockExists && outboxStatus.synchronized) {
+    const state = GovernanceLedger.getState(0);
+    if ((state === 'ACTIVE' || state === 'DEGRADED') && !lockExists && outboxStatus.synchronized) {
       syncSettled = true;
       break;
     }

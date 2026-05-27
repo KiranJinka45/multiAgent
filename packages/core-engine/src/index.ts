@@ -15,3 +15,11 @@ export class MissionOrchestrator {
         return { success: true };
     }
 }
+
+export * from './reporting/longitudinal-analyzer.js';
+export * from './reporting/replay-certification.js';
+export * from './reporting/resource-envelope-profiler.js';
+export * from './reporting/operator-recovery-certification.js';
+export * from './reporting/enforcement-runtime.js';
+export * from './reporting/intelligence-archive.js';
+

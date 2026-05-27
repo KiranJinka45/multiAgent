@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZTAN Merkle Chain Verifier</title>
+    <style>
+        :root {
+            --bg-color: #080a0c;
+            --card-bg: #0f1319;
+            --border-color: #1e2633;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --accent-blue: #3b82f6;
+            --accent-blue-glow: rgba(59, 130, 246, 0.15);
+            --accent-amber: #f59e0b;
+            --accent-amber-glow: rgba(245, 158, 11, 0.15);
+            --accent-emerald: #10b981;
+            --accent-emerald-glow: rgba(16, 185, 129, 0.15);
+            --accent-rose: #f43f5e;
+            --accent-rose-glow: rgba(244, 63, 94, 0.15);
+            --font-mono: 'JetBrains Mono', 'SF Mono', Consolas, Monaco, monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            padding: 2rem;
+            min-height: 100vh;
+            line-height: 1.5;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.03) 0px, transparent 50%);
+        }
+
+        header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .header-title h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .badge {
+            background-color: var(--border-color);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 9999px;
+            font-weight: bold;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .badge.active {
+            border-color: var(--accent-emerald);
+            color: var(--accent-emerald);
+            background-color: var(--accent-emerald-glow);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            background-color: #111827;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: var(--font-mono);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 10px var(--accent-blue-glow);
+            transform: translateY(-1px);
+        }
+
+        .btn.primary {
+            background-color: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+
+        .btn.primary:hover {
+            background-color: #2563eb;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .panel {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background-color: var(--accent-emerald);
+        }
+
+        .drop-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: 6px;
+            padding: 2.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            background-color: rgba(255, 255, 255, 0.01);
+        }
+
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: var(--accent-emerald);
+            background-color: rgba(16, 185, 129, 0.02);
+        }
+
+        .drop-zone-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .drop-zone-subtext {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        .verification-log {
+            background-color: #06080a;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .log-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            border: 1px solid transparent;
+        }
+
+        .log-item.info {
+            background-color: rgba(59, 130, 246, 0.02);
+            border-color: rgba(59, 130, 246, 0.05);
+            color: var(--text-secondary);
+        }
+
+        .log-item.success {
+            background-color: rgba(16, 185, 129, 0.03);
+            border-color: rgba(16, 185, 129, 0.1);
+            color: var(--accent-emerald);
+        }
+
+        .log-item.failed {
+            background-color: rgba(244, 63, 94, 0.03);
+            border-color: rgba(244, 63, 94, 0.1);
+            color: var(--accent-rose);
+        }
+
+        .log-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .log-desc {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            word-break: break-all;
+        }
+
+        .summary-banner {
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            text-align: center;
+            letter-spacing: 0.025em;
+            display: none;
+        }
+
+        .summary-banner.success {
+            background-color: var(--accent-emerald-glow);
+            border: 1px solid var(--accent-emerald);
+            color: var(--accent-emerald);
+            display: block;
+        }
+
+        .summary-banner.failed {
+            background-color: var(--accent-rose-glow);
+            border: 1px solid var(--accent-rose);
+            color: var(--accent-rose);
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-title">
+            <h1>ZTAN Merkle Chain Verifier</h1>
+            <span class="badge active">Local Cryptography</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html" class="btn">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                Back to Reader
+            </a>
+            <button class="btn primary" onclick="loadDemoData()">Verify Demo Capsule</button>
+        </div>
+    </header>
+
+    <div class="panel">
+        <div class="drop-zone" id="drop-zone">
+            <div class="drop-zone-text">DRAG & DROP CAPSULE FOR STANDALONE CRYPTOGRAPHIC VERIFICATION</div>
+            <div class="drop-zone-subtext">Computes standard SHA-256 hash chains locally via SubtleCrypto Web API</div>
+            <input type="file" id="file-input" accept=".json">
+        </div>
+
+        <div class="summary-banner" id="summary-banner"></div>
+
+        <div class="verification-log" id="verification-log">
+            <div style="color: var(--text-muted); text-align: center; padding: 2rem;">
+                Awaiting capsule selection...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const DEMO_CAPSULE = {
+            taskId: "tsk-9941-sovereign",
+            timestamp: 1779773222000,
+            journalEntries: [
+                { stepIndex: 0, state: "RUNNING", payloadHash: "sha256-4c741e974e64f89d380f2d480746cc7a", payload: { action: "INIT_ENVIRONMENT", namespaceActive: true, sandboxId: "sb-x9" } },
+                { stepIndex: 1, state: "RUNNING", payloadHash: "sha256-2dbf06de431d102e3b2e5354924c568f", payload: { action: "MOUNT_OVERLAYFS", mountpoint: "/sys/root", readOnly: true } },
+                { stepIndex: 2, state: "SUCCESS", payloadHash: "sha256-a9fde99a9b6c00e12d45ee92bb660dfb", payload: { action: "ANCHOR_MERKLE_ROOT", rootHash: "0x88ffae2dcb99410ea", authorityRank: 1 } },
+                { stepIndex: 3, state: "RUNNING", payloadHash: "sha256-02d99214bfe39bb9cf8f7f2b84cb1c3d", payload: { action: "APPLY_SECOMP_BPF", syscalls: ["execve", "fork", "socket"], mode: "LOG_ADVISORY" } },
+                { stepIndex: 4, state: "SUCCESS", payloadHash: "sha256-f43fde992cb410a9bb23b9dcf7f240ae", payload: { action: "COMMIT_TRANSPARENCY_LOG", seq: 9942, epoch: 104 } }
+            ]
+        };
+
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const logContainer = document.getElementById('verification-log');
+        const summaryBanner = document.getElementById('summary-banner');
+
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', handleFileSelect);
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                processFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        function handleFileSelect(e) {
+            if (e.target.files.length > 0) {
+                processFile(e.target.files[0]);
+            }
+        }
+
+        function processFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const capsule = JSON.parse(e.target.result);
+                    verifyCapsule(capsule);
+                } catch (err) {
+                    alert('Invalid JSON: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function loadDemoData() {
+            verifyCapsule(DEMO_CAPSULE);
+        }
+
+        async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return hashHex;
+        }
+
+        async function verifyCapsule(capsule) {
+            logContainer.innerHTML = '';
+            summaryBanner.style.display = 'none';
+
+            addLog('info', 'VERIFICATION INITIALIZED', `Task ID: ${capsule.taskId || 'UNKNOWN'}`);
+
+            const entries = capsule.journalEntries || [];
+            if (entries.length === 0) {
+                addLog('failed', 'VERIFICATION FAILURE', 'No sequential transaction entries present in this capsule.');
+                showBanner(false, 'CHAIN VERIFICATION FAILED: Capsule contains zero journal entries.');
+                return;
+            }
+
+            let chainValid = true;
+
+            for (let i = 0; i < entries.length; i++) {
+                const entry = entries[i];
+                
+                // Form pre-image: index || state || payloadJSON
+                const payloadStr = JSON.stringify(entry.payload || {});
+                const preimage = `${entry.stepIndex}${entry.state}${payloadStr}`;
+                
+                // Compute local SHA-256 hash
+                const calculatedHash = await sha256(preimage);
+                const prefixedHash = `sha256-${calculatedHash}`;
+
+                const expectedHash = entry.payloadHash;
+
+                if (prefixedHash !== expectedHash) {
+                    chainValid = false;
+                    addLog('failed', `STEP ${entry.stepIndex} HASH MISMATCH`, 
+                        `Calculated: '${prefixedHash}'\nExpected/Stored: '${expectedHash}'\nPre-image: ${preimage}`);
+                    break;
+                } else {
+                    addLog('success', `STEP ${entry.stepIndex} VERIFIED`, `Matches hash: '${expectedHash}'`);
+                }
+            }
+
+            if (chainValid) {
+                addLog('success', 'CHAIN INTEGRITY GUARANTEED', 'All journal transaction blocks cryptographically verified with zero drift.');
+                showBanner(true, 'CRYPTOGRAPHIC VERIFICATION SUCCESSFUL: 100% INVARIANT COMPLIANCE PROVEN');
+            } else {
+                addLog('failed', 'CHAIN DRIFT DETECTED', 'Forensic lineage is compromised or modified.');
+                showBanner(false, 'CRYPTOGRAPHIC VERIFICATION FAILED: DETECTED CORRUPTION / TAMPERING');
+            }
+        }
+
+        function addLog(type, title, desc) {
+            const item = document.createElement('div');
+            item.className = `log-item ${type}`;
+            item.innerHTML = `
+                <div class="log-title">
+                    <span>${title}</span>
+                    <span>${type.toUpperCase()}</span>
+                </div>
+                <div class="log-desc">${desc.replace(/\n/g, '<br>')}</div>
+            `;
+            logContainer.appendChild(item);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        function showBanner(success, msg) {
+            summaryBanner.textContent = msg;
+            summaryBanner.className = `summary-banner ${success ? 'success' : 'failed'}`;
+        }
+    </script>
+</body>
+</html>

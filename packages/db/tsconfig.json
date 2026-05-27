@@ -8,5 +8,8 @@
     "declarationDir": "./dist",
     "incremental": true
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
+  "references": [
+    { "path": "../observability" }
+  ]
 }

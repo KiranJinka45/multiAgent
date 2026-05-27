@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { BaseWorker } from './base-worker';
 import { Job } from '@packages/utils';
-import { JobPayload } from '@packages/utils';
+import type { JobPayload } from '@packages/utils';
 import { logger } from '@packages/observability';
 import { eventBus } from '@packages/utils';
 import { AgentMemory } from '@packages/agents';
@@ -60,7 +60,6 @@ export class FrontendWorker extends BaseWorker {
     }
 }
 
-if (require.main === module) {
-    new FrontendWorker();
-}
+// Instantiate worker when imported
+export const frontendWorker = new FrontendWorker();
 

@@ -70,7 +70,8 @@ setInterval(async () => {
             p95Latency: rollingLatencyMs, // Using rolling average as proxy for p95
             status: (activeJobs > 0 ? 'BUSY' : 'IDLE') as any,
             memory: process.memoryUsage().heapUsed / 1024 / 1024,
-            uptime: process.uptime()
+            uptime: process.uptime(),
+            lastSeen: Date.now()
         };
 
         // 1. Update Cluster Manager (For steering & pruning)

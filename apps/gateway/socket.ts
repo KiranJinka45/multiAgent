@@ -3,7 +3,7 @@ import Redis from 'ioredis';
 import { createAdapter } from '@socket.io/redis-adapter';
 import pino from 'pino';
 import http from 'http';
-import { eventBus } from '@packages/events';
+import { eventBus } from '@packages/utils';
 
 const elog = pino({ level: 'info' });
 

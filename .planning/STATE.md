@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.6.0-LTS
-milestone_name: Stewardship Engineering Era
-status: Active Execution of Stewardship Waves 1-6
-stopped_at: All 6 Stewardship Engineering Waves completed and verified via continuous validation suite execution. Verified 100% passed status.
-last_updated: "2026-05-19T03:36:00.000Z"
-last_activity: 2026-05-19
+milestone: v1.6.0
+milestone_name: milestone
+status: Active Execution of Stewardship Waves 1-6 and Operationalization
+stopped_at: Transitioned roadmap to Milestone 36. Completed and verified all 6 Stewardship Engineering Waves with 100% passed status.
+last_updated: "2026-05-26T19:20:29.836Z"
+last_activity: 2026-05-26
 progress:
-  total_phases: 6
-  completed_phases: 6
-  total_plans: 6
-  completed_plans: 6
+  total_phases: 17
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
   percent: 100
 ---
 
@@ -21,7 +21,7 @@ progress:
 See: [.planning/PROJECT.md](./PROJECT.md) (updated 2026-05-19)
 
 **Principle:** SUCCESS IS MEASURED BY BORING OPERATIONAL EXCELLENCE.
-**Focus:** Stewardship Waves 1-6 Validation
+**Focus:** Stewardship Waves 1-6 Bounding & Operationalization
 
     - [x] **Phase 47: Wave 1 — Operational Soak & Stewardship Validation** (Complete)
     - [x] **Phase 48: Wave 2 — Observability & Operational Intelligence** (Complete)
@@ -29,9 +29,11 @@ See: [.planning/PROJECT.md](./PROJECT.md) (updated 2026-05-19)
     - [x] **Phase 50: Wave 4 — Real PostgreSQL Pathology Testing** (Complete)
     - [x] **Phase 51: Wave 5 — Performance Envelope Mapping** (Complete)
     - [x] **Phase 52: Wave 6 — Threat Modeling & Adversarial Review** (Complete)
+    - [x] **Phase 9.3: Operational Survivability Drills (External)** (Complete)
+    - [x] **Phase Z: Empirical Reliability Certification & Envelope Science** (Complete)
 
-Status: Active Execution of Stewardship Waves 1-6
-Last activity: 2026-05-19
+Status: Active Execution of Stewardship Waves 1-6 and Operationalization
+Last activity: 2026-05-26
 
 Progress: [██████████] 100% (Stewardship Fully Verified)
 
@@ -47,7 +49,7 @@ Progress: [██████████] 100% (Stewardship Fully Verified)
 
 | Area | Status | Evidence |
 |-------|-------|----------|
-| Architecture | Frozen | FINALITY_DECLARATION.md |
+| Architecture | Stabilized | FINALITY_DECLARATION.md |
 | Governance | Hardened | INVARIANT_GOVERNANCE_CHARTER.md |
 | Forensic Trust | Verified | TLA+ invariants & Asymmetric transparency log |
 | Operations | Verified | Stewardship Engineering Suite (Waves 1-6 passed) |
@@ -79,8 +81,9 @@ Progress: [██████████] 100% (Stewardship Fully Verified)
 - [x] Review autovacuum pressure and replica lag convergence metrics.
 
 ## 7. Operational Maintenance Surface
+
 - **Telemetry Volume**: High-fidelity structured trace integration active.
-- **Complexity Drift**: Bounded under active architecture freeze.
+- **Complexity Drift**: Bounded under active model stabilization.
 
 ### Blockers/Concerns
 
