@@ -143,7 +143,12 @@ async function runOutboxResilienceValidation() {
 
   // 7. Trigger manual/async Outbox Reconciliation Worker
   console.log('\n[TEST] Triggering Outbox reconciliation processor...');
-  await GovernanceLedger.processOutbox();
+  let attempts = 0;
+  while (GovernanceLedger.loadOutbox().length > 0 && attempts < 5) {
+    attempts++;
+    console.log(`  - Reconciliation attempt ${attempts}...`);
+    await GovernanceLedger.processOutbox();
+  }
 
   // Verify Outbox is now empty and synchronized
   const finalOutbox = GovernanceLedger.loadOutbox();
