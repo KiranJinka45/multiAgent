@@ -1,0 +1,51 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "ignoreDeprecations": "5.0",
+    "outDir": "dist",
+    "composite": true,
+    "noEmit": false,
+    "declaration": true,
+    "declarationDir": "dist",
+    "paths": {
+      "@packages/config": [
+        "../../packages/config/src"
+      ],
+      "@packages/db": [
+        "../../packages/db/src"
+      ],
+      "@packages/observability": [
+        "../../packages/observability/src"
+      ],
+      "@packages/utils": [
+        "../../packages/utils/src"
+      ],
+      "@packages/runtime-core": [
+        "../../packages/runtime-core/src"
+      ]
+    },
+    "incremental": true,
+    "rootDir": "src"
+  },
+  "include": [
+    "src"
+  ],
+  "references": [
+    {
+      "path": "../../packages/config"
+    },
+    {
+      "path": "../../packages/db"
+    },
+    {
+      "path": "../../packages/observability"
+    },
+    {
+      "path": "../../packages/utils"
+    },
+    {
+      "path": "../../packages/runtime-core"
+    }
+  ]
+}

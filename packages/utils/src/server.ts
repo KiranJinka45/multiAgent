@@ -13,10 +13,12 @@ import { serverConfig as config } from '@packages/config';
 import * as governance from './transparency/governance.js';
 import { BuildCache } from './build-cache.js';
 
-// import { llmService } from '@packages/ai';
-const llmService: any = {};
-// import { supabase as supabaseClient } from '@packages/supabase';
-const supabaseClient: any = {};
+// SCOPE REDUCTION (v1.6.0 Audit): LLM orchestration is not implemented.
+// The original import was: import { llmService } from '@packages/ai';
+// If called, this will throw to prevent silent fabrication of AI capabilities.
+const llmService: any = new Proxy({}, { get(_, prop) { throw new Error(`[SCOPE_BOUNDARY] LLM orchestration is not implemented. Attempted to access llmService.${String(prop)}. See v1.6.0 audit.`); } });
+// SCOPE REDUCTION (v1.6.0 Audit): Supabase integration is not implemented.
+const supabaseClient: any = new Proxy({}, { get(_, prop) { throw new Error(`[SCOPE_BOUNDARY] Supabase integration is not implemented. Attempted to access supabaseClient.${String(prop)}. See v1.6.0 audit.`); } });
 
 // Modular Imports
 // import { VirtualFileSystem } from '@packages/vfs';
@@ -239,32 +241,18 @@ export const eventBus: any = {
             await eventBus.publish(executionId, 'timer_end', { source, label, message: `Finished: ${message} (${finalStatus})`, durationMs }, projectId);
         };
     },
-    // 🛡️ Phase 12.3: Operational Fatigue Analysis
-    // Tracking long-horizon production truth and governance friction.
+    // SCOPE REDUCTION (v1.6.0 Audit): Fatigue analysis requires longitudinal production data.
+    // Previously returned fabricated hardcoded metrics. Now explicitly absent.
     fatigueAnalysis: {
-        getMetrics: async (tenantId?: string): Promise<{ governanceFriction: number, causalDecay: number, findingResolutionRate: number, institutionalScarDepth: number, survivalIndex: number }> => {
-            logger.info({ tenantId }, '[FatigueAnalysis] Calculating long-horizon operational truth');
-            // Mocking longitudinal evidence
-            return {
-                governanceFriction: 0.14,
-                causalDecay: 0.02,
-                findingResolutionRate: 0.9997, // 99.97% of regulatory findings successfully remediated
-                institutionalScarDepth: 0.99992, // Near-perfect continuity after institutional scars
-                survivalIndex: 0.999998 // Historically-proven 15-year survival truth
-            };
+        getMetrics: async (_tenantId?: string) => {
+            throw new Error('[SCOPE_BOUNDARY] Fatigue analysis is not implemented. No longitudinal production data exists. See v1.6.0 audit.');
         }
     },
-    // 🛡️ Phase 11.3: Independent SLA Monitoring
-    // Tracking production reliability: Mean Time to Governance Failure (MTTGF)
+    // SCOPE REDUCTION (v1.6.0 Audit): SLA monitoring requires production deployment evidence.
+    // Previously returned fabricated SLA compliance data. Now explicitly absent.
     slaMonitor: {
-        getMetrics: async (tenantId?: string): Promise<{ mttgfHours: number, recoveryConvergenceMs: number, slaCompliance: string }> => {
-            logger.info({ tenantId }, '[SLAMonitor] Calculating production reliability metrics');
-            // Mocking production stability data
-            return {
-                mttgfHours: 2160, // 3 months of continuous governance integrity
-                recoveryConvergenceMs: 420, // Average time to formally verify recovery
-                slaCompliance: '99.999%'
-            };
+        getMetrics: async (_tenantId?: string) => {
+            throw new Error('[SCOPE_BOUNDARY] SLA monitoring is not implemented. No production deployment evidence exists. See v1.6.0 audit.');
         }
     },
     // 🛡️ Phase 10.4: Empirical Causal Science
@@ -313,20 +301,10 @@ export const eventBus: any = {
             intelligenceScore: total > 0 ? ((total - failures) / total).toFixed(2) : 0
         };
 
-        // 🛡️ Phase 7.2: Statistical Drift Science
-        // Moving beyond fixed 0.7 thresholds to a Rolling Mean & Standard Deviation ($2\sigma$)
-        const historicalScores = [0.85, 0.82, 0.88, 0.84, 0.86, 0.83]; // Mock historical data
-        const currentScore = parseFloat(metrics.intelligenceScore as string);
-        
-        const mean = historicalScores.reduce((a, b) => a + b) / historicalScores.length;
-        const stdDev = Math.sqrt(historicalScores.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / historicalScores.length);
-        
-        const zScore = Math.abs((currentScore - mean) / stdDev);
-        
-        if (zScore > 2) { // 2-sigma violation
-            logger.error({ currentScore, mean, stdDev, zScore }, '[DriftMonitor] 2-Sigma Statistical Deviation Detected! Triggering Emergency Circuit Breaker.');
-            // This triggers an immediate cessation of autonomous repairs
-        }
+        // SCOPE REDUCTION (v1.6.0 Audit): Statistical drift analysis removed.
+        // Previously used fabricated historical scores [0.85, 0.82, ...] to simulate drift detection.
+        // Real drift analysis requires longitudinal production telemetry, which does not exist.
+        // When production data becomes available, implement drift detection against actual historical scores.
 
         return metrics;
     }
@@ -335,16 +313,19 @@ export const eventBus: any = {
 export const getLatestBuildState = eventBus.getLatestBuildState;
 export const readBuildEvents = eventBus.readBuildEvents;
 
+// SCOPE REDUCTION (v1.6.0 Audit): State management is not implemented.
+// Callers will receive explicit errors instead of silent no-ops.
 export const stateManager = {
-    get: async (...args: any[]) => null,
-    set: async (...args: any[]) => { },
-    transition: async (...args: any[]) => { },
+    get: async (..._args: any[]) => { throw new Error('[SCOPE_BOUNDARY] stateManager is not implemented. See v1.6.0 audit.'); },
+    set: async (..._args: any[]) => { throw new Error('[SCOPE_BOUNDARY] stateManager is not implemented. See v1.6.0 audit.'); },
+    transition: async (..._args: any[]) => { throw new Error('[SCOPE_BOUNDARY] stateManager is not implemented. See v1.6.0 audit.'); },
 };
 
+// SCOPE REDUCTION (v1.6.0 Audit): Project memory/learning is not implemented.
 export const projectMemory = {
-    get: async (...args: any[]) => ({ memory: [] }),
-    update: async (...args: any[]) => { },
-    initializeMemory: async (...args: any[]) => {},
+    get: async (..._args: any[]) => { throw new Error('[SCOPE_BOUNDARY] projectMemory is not implemented. See v1.6.0 audit.'); },
+    update: async (..._args: any[]) => { throw new Error('[SCOPE_BOUNDARY] projectMemory is not implemented. See v1.6.0 audit.'); },
+    initializeMemory: async (..._args: any[]) => { throw new Error('[SCOPE_BOUNDARY] projectMemory is not implemented. See v1.6.0 audit.'); },
 };
 
 // Redis Initialization
@@ -451,17 +432,26 @@ const redisProxy = new Proxy(rawRedis, {
 export const redis = redisProxy;
 
 // Mission & Project Services
+// SCOPE REDUCTION (v1.6.0 Audit): Project service in utils/server.ts is a stub.
+// The real projectService lives in apps/core-api/src/services/project-service.ts.
+// This stub exists only for backward-compatible import paths. It throws on use.
 export const projectService = {
-    verifyProjectOwnership: async (...args: any[]) => true,
-    getProject: async (...args: any[]) => ({ id: 'mock', status: 'mock' }),
-    getProjects: async (...args: any[]) => [],
-    getProjectFiles: async (...args: any[]) => [],
-    createProject: async (...args: any[]) => ({ data: { id: 'mock-id' }, error: null }),
+    verifyProjectOwnership: async (..._args: any[]) => { throw new Error('[SCOPE_BOUNDARY] projectService stub in utils. Use apps/core-api/src/services/project-service.ts'); },
+    getProject: async (..._args: any[]) => { throw new Error('[SCOPE_BOUNDARY] projectService stub in utils. Use apps/core-api/src/services/project-service.ts'); },
+    getProjects: async (..._args: any[]) => { throw new Error('[SCOPE_BOUNDARY] projectService stub in utils. Use apps/core-api/src/services/project-service.ts'); },
+    getProjectFiles: async (..._args: any[]) => { throw new Error('[SCOPE_BOUNDARY] projectService stub in utils. Use apps/core-api/src/services/project-service.ts'); },
+    createProject: async (..._args: any[]) => { throw new Error('[SCOPE_BOUNDARY] projectService stub in utils. Use apps/core-api/src/services/project-service.ts'); },
 };
 export const ProjectService = projectService;
 
+// SCOPE REDUCTION (v1.6.0 Audit): Quota enforcement is a pass-through.
+// Previously returned { allowed: true, reason: 'MOCK_ALLOWED' } which masked quota bypass.
+// Now explicitly documented as unimplemented — always allows but logs the absence.
 const quotaEngine = {
-    reserveExecutionSlot: async (tenantId: string) => ({ allowed: true, reason: 'MOCK_ALLOWED' })
+    reserveExecutionSlot: async (tenantId: string) => {
+        logger.warn({ tenantId }, '[SCOPE_BOUNDARY] Quota enforcement is not implemented. All requests are allowed. See v1.6.0 audit.');
+        return { allowed: true, reason: 'QUOTA_NOT_IMPLEMENTED' };
+    }
 };
 
 export const missionController = {

@@ -360,3 +360,22 @@ model ZtanQuarantineBlob {
   @@index([blockId])
 }
 
+model GovernanceEvent {
+  eventId           String   @id @default(uuid()) @map("event_id")
+  eventType         String   @map("event_type")
+  correlationId     String   @map("correlation_id")
+  parentEventId     String?  @map("parent_event_id")
+  timestamp         DateTime @default(now()) @map("timestamp")
+  actor             String   @map("actor")
+  service           String   @map("service")
+  riskLevel         String?  @map("risk_level")
+  payloadHash       String   @map("payload_hash")
+  payload           String   @map("payload") // Stored as JCS or JSON string
+  signature         String?  @map("signature")
+  previousEventHash String?  @map("previous_event_hash")
+  currentEventHash  String   @map("current_event_hash")
+
+  @@index([correlationId])
+  @@index([eventType])
+  @@map("governance_events")
+}

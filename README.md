@@ -1,14 +1,15 @@
-# Nexus ZTAN: Bounded Operational Pathology, Replay Archaeology, Telemetry Compaction, and Operational Stewardship Laboratory
+# Nexus ZTAN: Forensic Governance and Replay-Coordination Substrate
 
-> **STATUS**: **OPERATIONALLY COMPLETE** 🛡️
+> **STATUS**: **DEVELOPMENT-STAGE SUBSTRATE** 🛡️
 >
-> Nexus ZTAN has completed architectural finality, passed recovery validation, and entered Permanent Operational Stewardship.
+> **System Identity Boundary Disclosure:**
+> Nexus ZTAN is a development-stage forensic governance and replay-coordination substrate with genuinely sophisticated ledger, federation, control-plane, and gateway resilience engineering, but with substantial mock-layer platform debt preventing credible claims of production AI orchestration or distributed infrastructure maturity.
 
 ---
 
 ## 🏛️ Permanent Operations Mode
 
-**CURRENT MISSION**: Operate the platform as real production infrastructure. Focus exclusively on uptime, recovery, maintenance, compatibility, security, and operator independence.
+**CURRENT MISSION**: Treat the platform as operational infrastructure under bounded development-stage assumptions, maintaining strict production-style operational discipline. Focus exclusively on uptime, recovery, maintenance, compatibility, security, and operator independence.
 
 ### Authorized Activities
 - **Security Maintenance**: Patch CVEs, rotate credentials, maintain dependency health.
@@ -48,7 +49,7 @@ This script automates environment bootstrapping, infrastructure orchestration, d
 
 ## 🛡️ Governance & Stability
 
-ZTAN is protected by the **Stability Charter** and the **Stewardship Registry**. No architectural mutations are permitted without formal witness ratification and TLA+ proof validation.
+ZTAN is protected by the **Stability Charter** and the **Stewardship Registry**. Architectural mutations are expected to undergo formal review, witness ratification, and model-validation procedures where available.
 
 ---
-**Governed by Nexus ZTAN Sovereignty.**
+**Maintained under the Nexus ZTAN Stewardship Charter.**

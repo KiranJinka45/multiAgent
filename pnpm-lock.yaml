@@ -777,6 +777,86 @@ importers:
         specifier: 8.5.1
         version: 8.5.1(@swc/core@1.15.40)(jiti@1.21.7)(postcss@8.5.10)(tsx@4.21.0)(typescript@5.5.4)(yaml@2.9.0)
 
+  apps/governance-ledger:
+    dependencies:
+      '@packages/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@packages/observability':
+        specifier: workspace:*
+        version: link:../../packages/observability
+      express:
+        specifier: 5.2.1
+        version: 5.2.1
+    devDependencies:
+      '@types/express':
+        specifier: 5.0.0
+        version: 5.0.0
+      '@types/node':
+        specifier: 20.11.30
+        version: 20.11.30
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(@swc/core@1.15.40)(jiti@1.21.7)(postcss@8.5.10)(tsx@4.21.0)(typescript@5.5.4)(yaml@2.9.0)
+      typescript:
+        specifier: 5.5.4
+        version: 5.5.4
+
+  apps/intent-gateway:
+    dependencies:
+      '@packages/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@packages/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@packages/observability':
+        specifier: workspace:*
+        version: link:../../packages/observability
+      '@packages/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
+      cors:
+        specifier: 2.8.5
+        version: 2.8.5
+      dotenv:
+        specifier: 17.4.2
+        version: 17.4.2
+      express:
+        specifier: 5.2.1
+        version: 5.2.1
+      jsonwebtoken:
+        specifier: 9.0.2
+        version: 9.0.2
+      pino:
+        specifier: 10.3.1
+        version: 10.3.1
+      uuid:
+        specifier: 11.1.1
+        version: 11.1.1
+      zod:
+        specifier: 3.23.3
+        version: 3.23.3
+    devDependencies:
+      '@types/cors':
+        specifier: 2.8.17
+        version: 2.8.17
+      '@types/express':
+        specifier: 5.0.0
+        version: 5.0.0
+      '@types/jsonwebtoken':
+        specifier: 9.0.9
+        version: 9.0.9
+      '@types/node':
+        specifier: 20.11.30
+        version: 20.11.30
+      tsconfig-paths:
+        specifier: 4.2.0
+        version: 4.2.0
+      tsup:
+        specifier: 8.5.1
+        version: 8.5.1(@swc/core@1.15.40)(jiti@1.21.7)(postcss@8.5.10)(tsx@4.21.0)(typescript@5.5.4)(yaml@2.9.0)
+
   apps/operational-protocol:
     dependencies:
       '@aws-sdk/client-s3':
@@ -823,6 +903,58 @@ importers:
         specifier: 8.5.1
         version: 8.5.1(@swc/core@1.15.40)(jiti@1.21.7)(postcss@8.5.10)(tsx@4.21.0)(typescript@5.5.4)(yaml@2.9.0)
 
+  apps/policy-engine:
+    dependencies:
+      '@packages/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@packages/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@packages/observability':
+        specifier: workspace:*
+        version: link:../../packages/observability
+      '@packages/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
+      cors:
+        specifier: 2.8.5
+        version: 2.8.5
+      dotenv:
+        specifier: 17.4.2
+        version: 17.4.2
+      express:
+        specifier: 5.2.1
+        version: 5.2.1
+      jsonwebtoken:
+        specifier: 9.0.2
+        version: 9.0.2
+      uuid:
+        specifier: 11.1.1
+        version: 11.1.1
+      zod:
+        specifier: 3.23.3
+        version: 3.23.3
+    devDependencies:
+      '@types/cors':
+        specifier: 2.8.17
+        version: 2.8.17
+      '@types/express':
+        specifier: 5.0.0
+        version: 5.0.0
+      '@types/jsonwebtoken':
+        specifier: 9.0.9
+        version: 9.0.9
+      '@types/node':
+        specifier: 20.11.30
+        version: 20.11.30
+      tsconfig-paths:
+        specifier: 4.2.0
+        version: 4.2.0
+      tsup:
+        specifier: 8.5.1
+        version: 8.5.1(@swc/core@1.15.40)(jiti@1.21.7)(postcss@8.5.10)(tsx@4.21.0)(typescript@5.5.4)(yaml@2.9.0)
+
   apps/reliability-dashboard:
     dependencies:
       lucide-react:
@@ -850,6 +982,61 @@ importers:
       vite:
         specifier: '>=6.4.2'
         version: 8.0.14(@types/node@20.11.30)(esbuild@0.27.7)(jiti@1.21.7)(less@4.2.2)(sass@1.85.0)(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0)
+
+  apps/sandbox-service:
+    dependencies:
+      '@packages/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@packages/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@packages/observability':
+        specifier: workspace:*
+        version: link:../../packages/observability
+      '@packages/runtime-core':
+        specifier: workspace:*
+        version: link:../../packages/runtime-core
+      '@packages/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
+      cors:
+        specifier: 2.8.5
+        version: 2.8.5
+      dockerode:
+        specifier: ^5.0.0
+        version: 5.0.0
+      dotenv:
+        specifier: 17.4.2
+        version: 17.4.2
+      express:
+        specifier: 5.2.1
+        version: 5.2.1
+      uuid:
+        specifier: 11.1.1
+        version: 11.1.1
+      zod:
+        specifier: 3.23.3
+        version: 3.23.3
+    devDependencies:
+      '@types/cors':
+        specifier: 2.8.17
+        version: 2.8.17
+      '@types/dockerode':
+        specifier: ^4.0.1
+        version: 4.0.1
+      '@types/express':
+        specifier: 5.0.0
+        version: 5.0.0
+      '@types/node':
+        specifier: 20.11.30
+        version: 20.11.30
+      tsconfig-paths:
+        specifier: 4.2.0
+        version: 4.2.0
+      tsup:
+        specifier: 8.5.1
+        version: 8.5.1(@swc/core@1.15.40)(jiti@1.21.7)(postcss@8.5.10)(tsx@4.21.0)(typescript@5.5.4)(yaml@2.9.0)
 
   apps/stewardship-console:
     dependencies:
@@ -1183,7 +1370,30 @@ importers:
         specifier: 8.5.1
         version: 8.5.1(@swc/core@1.15.40)(jiti@1.21.7)(postcss@8.5.10)(tsx@4.21.0)(typescript@5.5.4)(yaml@2.9.0)
 
-  packages/core-engine: {}
+  packages/core-engine:
+    dependencies:
+      '@packages/config':
+        specifier: workspace:*
+        version: link:../config
+      '@packages/db':
+        specifier: workspace:*
+        version: link:../db
+      '@packages/governance-sdk':
+        specifier: workspace:*
+        version: link:../governance-sdk
+      '@packages/observability':
+        specifier: workspace:*
+        version: link:../observability
+      '@packages/utils':
+        specifier: workspace:*
+        version: link:../utils
+      axios:
+        specifier: 1.15.2
+        version: 1.15.2
+    devDependencies:
+      typescript:
+        specifier: 5.5.4
+        version: 5.5.4
 
   packages/db:
     dependencies:
@@ -1270,6 +1480,22 @@ importers:
     devDependencies:
       tsup:
         specifier: 8.5.1
+        version: 8.5.1(@swc/core@1.15.40)(jiti@1.21.7)(postcss@8.5.10)(tsx@4.21.0)(typescript@5.5.4)(yaml@2.9.0)
+      typescript:
+        specifier: 5.5.4
+        version: 5.5.4
+
+  packages/governance-sdk:
+    dependencies:
+      axios:
+        specifier: 1.15.2
+        version: 1.15.2
+    devDependencies:
+      '@types/node':
+        specifier: 20.11.30
+        version: 20.11.30
+      tsup:
+        specifier: ^8.0.0
         version: 8.5.1(@swc/core@1.15.40)(jiti@1.21.7)(postcss@8.5.10)(tsx@4.21.0)(typescript@5.5.4)(yaml@2.9.0)
       typescript:
         specifier: 5.5.4

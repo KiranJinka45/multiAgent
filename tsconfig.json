@@ -22,6 +22,9 @@
     { "path": "./apps/frontend" },
     { "path": "./apps/gateway" },
     { "path": "./apps/incidents" },
+    { "path": "./apps/intent-gateway" },
+    { "path": "./apps/sandbox-service" },
+    { "path": "./apps/policy-engine" },
     { "path": "./apps/operational-protocol" },
     { "path": "./apps/reliability-dashboard" },
     { "path": "./apps/worker" },
@@ -50,6 +53,8 @@
     { "path": "./packages/operator-compression" },
     { "path": "./packages/deployment-hardening" },
     { "path": "./packages/evidence-lifecycle" },
-    { "path": "./packages/institutional-dashboard" }
+    { "path": "./packages/institutional-dashboard" },
+    { "path": "./apps/governance-ledger" },
+    { "path": "./packages/governance-sdk" }
   ]
 }
