@@ -13,6 +13,7 @@ import {
 } from '@packages/utils';
 import { DEFAULT_RETRY_OPTIONS, DEAD_LETTER_QUEUE_NAME, createBreaker } from '@packages/resilience';
 import crypto from 'crypto';
+import { ConsensusEngine } from '@packages/governance-core';
 
 // Mock metrics for now if they are not in @packages/utils or use a generic one
 const workerTaskDurationSeconds = { observe: (...args: any[]) => {} };
@@ -74,6 +75,35 @@ export abstract class BaseWorker {
                             jobId: job.id, 
                             queue: queueName 
                         }, '🏁 [Worker] Job started');
+
+                        // ZTAN InvariantGuard: Refuse to process if governance quorum is fractured
+                        try {
+                            const clusterNodes = ConsensusEngine.getClusterNodes();
+                            if (clusterNodes.size > 0) {
+                                const aliveCount = Array.from(clusterNodes.values()).filter(n => n.isAlive).length;
+                                const quorumSize = ConsensusEngine.getQuorumSize();
+                                if (aliveCount < quorumSize) {
+                                    logger.error({
+                                        worker: this.getName(),
+                                        jobId: job.id,
+                                        aliveNodes: aliveCount,
+                                        quorumSize
+                                    }, '🛑 [ZTAN InvariantGuard] GOVERNANCE_FRACTURE: Quorum broken — refusing to process job');
+                                    
+                                    await this.dlq.add('failed-job', {
+                                        originalQueue: queueName,
+                                        jobId: job.id,
+                                        data: job.data,
+                                        error: `[GOVERNANCE_FRACTURE] Consensus quorum broken (${aliveCount}/${quorumSize} alive). Job halted to prevent dirty archaeology.`,
+                                        failedAt: new Date().toISOString()
+                                    });
+                                    return { status: 'governance_fracture_halted', aliveNodes: aliveCount, quorumSize };
+                                }
+                            }
+                        } catch (guardErr) {
+                            // Guard failure is non-fatal — log and continue processing
+                            logger.warn({ err: guardErr }, '[ZTAN InvariantGuard] Guard check failed, proceeding with job');
+                        }
                         
                         const result = await this.breaker.fire(job);
                         

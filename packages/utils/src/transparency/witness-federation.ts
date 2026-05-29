@@ -618,7 +618,7 @@ export class WitnessFederation {
 
 // ─── Default Static Federation (Bootstrap) ──────────────────────────────────
 
-export const LOCAL_FEDERATION = new WitnessFederation([
+const DEFAULT_WITNESSES: { id: string; publicKey: string; url: string }[] = [
     {
         id: '8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368',
         publicKey: '-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA47klpFQCpq4kj4qvLCBQJpsjZAMtH6K5Jd9pdrywSs4=\n-----END PUBLIC KEY-----',
@@ -634,4 +634,36 @@ export const LOCAL_FEDERATION = new WitnessFederation([
         publicKey: '-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAU8bANjW6wL5dHtgCbHyIe+2lt5YSPPfbyEysJdfTpOo=\n-----END PUBLIC KEY-----',
         url: 'http://localhost:8083'
     }
-], 2);
+];
+
+/**
+ * Resolve witness configuration from environment variables.
+ * 
+ * WITNESS_URLS: Comma-separated list of witness endpoints.
+ *   Example: "https://w1.prod.ztan.io,https://w2.prod.ztan.io,https://w3.prod.ztan.io"
+ * 
+ * WITNESS_{i}_PUBKEY: PEM-encoded public key for witness i (0-indexed).
+ * WITNESS_{i}_ID: Hex ID for witness i (0-indexed). Auto-derived from pubkey hash if absent.
+ */
+function resolveWitnessMembers(): { id: string; publicKey: string; url: string }[] {
+    const envUrls = process.env.WITNESS_URLS;
+    if (!envUrls) return DEFAULT_WITNESSES;
+
+    const urls = envUrls.split(',').map(u => u.trim()).filter(Boolean);
+    if (urls.length === 0) return DEFAULT_WITNESSES;
+
+    return urls.map((url, i) => {
+        const pubKey = process.env[`WITNESS_${i}_PUBKEY`] || DEFAULT_WITNESSES[i]?.publicKey || '';
+        const id = process.env[`WITNESS_${i}_ID`]
+            || DEFAULT_WITNESSES[i]?.id
+            || crypto.createHash('sha256').update(pubKey).digest('hex');
+        return { id, publicKey: pubKey, url };
+    });
+}
+
+const resolvedMembers = resolveWitnessMembers();
+const resolvedThreshold = process.env.WITNESS_THRESHOLD
+    ? parseInt(process.env.WITNESS_THRESHOLD, 10)
+    : 2;
+
+export const LOCAL_FEDERATION = new WitnessFederation(resolvedMembers, resolvedThreshold);

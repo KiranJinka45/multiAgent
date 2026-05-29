@@ -1,14 +1,23 @@
-# Nexus ZTAN: Bounded Operational Pathology, Replay Archaeology, Telemetry Compaction, and Operational Stewardship Laboratory
+# Nexus ZTAN: Forensic Governance and Replay-Coordination Substrate
 
-> **STATUS**: **OPERATIONALLY COMPLETE** 🛡️
+> **STATUS**: **BOUNDED ADVERSARIAL DISTRIBUTED-SYSTEMS RESEARCH SUBSTRATE** 🛡️
 >
-> Nexus ZTAN has completed architectural finality, passed recovery validation, and entered Permanent Operational Stewardship.
+> **System Identity Boundary Disclosure:**
+> ZTAN is a bounded adversarial distributed-systems research platform focused on fail-closed orchestration, causal replay validation, authenticated consensus experimentation, and cryptographic trust-boundary modeling under explicitly constrained laboratory conditions.
+>
+> The platform combines adversarial falsification campaigns, cryptographic integrity verification, PBFT-inspired quorum coordination, and replay causality enforcement to iteratively discover and harden architectural failure modes.
+>
+> **Current Limitations & Unresolved Boundaries:**
+> 1. **Containment Semantics:** Dependence on shared-kernel container isolation (Docker) rather than true hypervisor-level microVM execution (e.g. Firecracker/KVM), leaving the host kernel as a shared root of compromise.
+> 2. **Byzantine Networking:** Absence of production-grade Byzantine networking assumptions (such as view change safety proofs, checkpoint stabilization, lock certificates, and timing asymmetry/prepare withholding scheduling).
+> 3. **Attestation Infrastructure:** Reliance on modeled rather than physical TPM 2.0 attestation hardware.
+
 
 ---
 
 ## 🏛️ Permanent Operations Mode
 
-**CURRENT MISSION**: Operate the platform as real production infrastructure. Focus exclusively on uptime, recovery, maintenance, compatibility, security, and operator independence.
+**CURRENT MISSION**: Treat the platform as operational infrastructure under bounded development-stage assumptions, maintaining strict production-style operational discipline. Focus exclusively on uptime, recovery, maintenance, compatibility, security, and operator independence.
 
 ### Authorized Activities
 - **Security Maintenance**: Patch CVEs, rotate credentials, maintain dependency health.
@@ -48,7 +57,7 @@ This script automates environment bootstrapping, infrastructure orchestration, d
 
 ## 🛡️ Governance & Stability
 
-ZTAN is protected by the **Stability Charter** and the **Stewardship Registry**. No architectural mutations are permitted without formal witness ratification and TLA+ proof validation.
+ZTAN is protected by the **Stability Charter** and the **Stewardship Registry**. Architectural mutations are expected to undergo formal review, witness ratification, and model-validation procedures where available.
 
 ---
-**Governed by Nexus ZTAN Sovereignty.**
+**Maintained under the Nexus ZTAN Stewardship Charter.**

@@ -1,0 +1,78 @@
+version: "3.9"
+
+services:
+  ztan-node-1:
+    build:
+      context: .
+      dockerfile: packages/governance-core/Dockerfile
+    environment:
+      - ZTAN_NODE_ID=node-1
+      - ZTAN_CLUSTER_SIZE=3
+      - ZTAN_QUORUM=2
+      - ZTAN_TCP_MODE=true
+    volumes:
+      - ztan-data-1:/app/data
+    networks:
+      - ztan-network
+
+  ztan-node-2:
+    build:
+      context: .
+      dockerfile: packages/governance-core/Dockerfile
+    environment:
+      - ZTAN_NODE_ID=node-2
+      - ZTAN_CLUSTER_SIZE=3
+      - ZTAN_QUORUM=2
+      - ZTAN_TCP_MODE=true
+    volumes:
+      - ztan-data-2:/app/data
+    networks:
+      - ztan-network
+
+  ztan-node-3:
+    build:
+      context: .
+      dockerfile: packages/governance-core/Dockerfile
+    environment:
+      - ZTAN_NODE_ID=node-3
+      - ZTAN_CLUSTER_SIZE=3
+      - ZTAN_QUORUM=2
+      - ZTAN_TCP_MODE=true
+    volumes:
+      - ztan-data-3:/app/data
+    networks:
+      - ztan-network
+
+  # Toxiproxy network injection layers
+  toxiproxy-node-1:
+    image: ghcr.io/shopify/toxiproxy
+    networks:
+      - ztan-network
+    command: -host 0.0.0.0 -config /config/toxiproxy.json
+    volumes:
+      - ./toxiproxy-config.json:/config/toxiproxy.json
+
+  toxiproxy-node-2:
+    image: ghcr.io/shopify/toxiproxy
+    networks:
+      - ztan-network
+    command: -host 0.0.0.0 -config /config/toxiproxy.json
+    volumes:
+      - ./toxiproxy-config.json:/config/toxiproxy.json
+
+  toxiproxy-node-3:
+    image: ghcr.io/shopify/toxiproxy
+    networks:
+      - ztan-network
+    command: -host 0.0.0.0 -config /config/toxiproxy.json
+    volumes:
+      - ./toxiproxy-config.json:/config/toxiproxy.json
+
+networks:
+  ztan-network:
+    driver: bridge
+
+volumes:
+  ztan-data-1:
+  ztan-data-2:
+  ztan-data-3:

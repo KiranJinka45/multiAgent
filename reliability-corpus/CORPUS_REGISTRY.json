@@ -1,0 +1,315 @@
+{
+  "schemaVersion": "1.0.0",
+  "generatedAt": "2026-05-28T08:28:23.166Z",
+  "manifestSignature": "UKcJWYDFox8zlqzxb3LClR4B34TafZdHq6thVCOQJ776ssNcrsNaPDlGH1eX6DE0+CAIKYCeFbYwcibmTyv1GdXc6XCok/U8czCCVC4ISdBc5PmbFTi365kQ3PJAhCKAs4RewanwmRm+GIykmru8ELShzrLiwYZLA7XSEdk3/ZW0QCn5rYg7qsS8KMBPc8e/Q4PeD1NCp9tcVDFr07thd7jlprmOJ67Zx8Nk56A6RgIPWO8794qb75VZ2WgN8jDUit7EG3789I4q+UyJgsmqXAOGpDuJFRGKMYKkwY+Of7zOStQ3NTYDjSRvauqXfLOAf2tR+GeHoBobK1maYNIMPw==",
+  "entries": {
+    "INCIDENT-04DB94AA": {
+      "id": "INCIDENT-04DB94AA",
+      "type": "INCIDENT",
+      "failureClass": "STARTUP_ATTESTATION_ENV_DRIFT",
+      "timestamp": "2026-05-25T05:31:06.987Z",
+      "files": {
+        "telemetry": {
+          "path": "reliability-corpus/incident-incident-04db94aa/telemetry.json",
+          "hash": "e1549b8c0ae47b8fea4dc868ac334e375b39a08abd6d1878f9465359c1b6a66c"
+        },
+        "verdict": {
+          "path": "reliability-corpus/incident-incident-04db94aa/verdict.json",
+          "hash": "0201ad2bd0e1302e0201c1567e5aac38d0d57b3315cb17b29730dabf85a0be06"
+        },
+        "operatorActions": {
+          "path": "reliability-corpus/incident-incident-04db94aa/operator-actions.md",
+          "hash": "b87eccd73fc3de9eea149585c1de134244810f74d807232852f7a7c7e27ae8c8"
+        }
+      },
+      "signature": "nT0prw2+V9pm/KIrTqagL6Th3RQMy4Vql0hoFBXvupE8+hm0w4ga+Bczqbq41lQUhouoeUJk9sY35wWsY0pnb8nvwe9PmxYJ2T5S7p8kLRjYi6sQy77Yr2fTPq5bJrEZmxTq6inxpKsvJnbxdqrN02S6kGUp0dcHww8wj0mf7YdGaE7nXtWHoRskQhMzabdiaTNMS6jQs5rOrMbm1ZNEyyDGqBn8GYTRQoUwpsIAh17KrnT++tdzoS6W6oB/sjyRZhGQElEtQv8sZDvd3w/lwZ9q0U46+rOoVEdabvxLNbPXyWh1Lj2wdJAxLqhlKrUVBqX025+dDfeAjcqhG45JaA==",
+      "signerKeyFingerprint": "d4c22808406fc0d83c536c2b6ccb8c3d6831aa65ad1e247ea061180f52f7bedf"
+    },
+    "INCIDENT-0AA1484A": {
+      "id": "INCIDENT-0AA1484A",
+      "type": "INCIDENT",
+      "failureClass": "STARTUP_ATTESTATION_ENV_DRIFT",
+      "timestamp": "2026-05-25T06:33:46.967Z",
+      "files": {
+        "telemetry": {
+          "path": "reliability-corpus/incident-incident-0aa1484a/telemetry.json",
+          "hash": "1a2cce6e1aef370eda5a5cbb5437a1bc192433bb855ba85ed28280367dd53c98"
+        },
+        "verdict": {
+          "path": "reliability-corpus/incident-incident-0aa1484a/verdict.json",
+          "hash": "b2ac4ee3eed73d76fb5605c0dadeab2f3a2396f650b5060cc988ba9007c3d840"
+        },
+        "operatorActions": {
+          "path": "reliability-corpus/incident-incident-0aa1484a/operator-actions.md",
+          "hash": "97393e8454ac1d32ac4fd104443320812e034243d059992f5a3fbb58c755243e"
+        }
+      },
+      "signature": "q8lEexCiHV2uLYz24IxU+DFMPP+em0do6cdih4RTTw6s1S/N6unTZGNgiRxlrINon3dz0yky04rP4+sHJGDzNJjWJyeKCN+rXNNWACzrD1Ju4CV9G7tNi/IHRwPVL2SxPWflJvBIwzXTWQa7UJMNcuhySuDqmoHcpa1g7AsZmWrej/58Of1dGgj9uIZ8xoV5rU/+gTjSmOtd+FBbjECypi63hyaP5+ZZm0Wo9soQqt9U0jgnCZI8zn0UvnklOYVf2MVoVYnVGD8dqcM04Uo0xtAJx0K7wZcK1BuC/qgzsSTdH/x/i4zH6oDZ0v/ym9L6dci3zBQO6SiAc9QaIK9gog==",
+      "signerKeyFingerprint": "d4c22808406fc0d83c536c2b6ccb8c3d6831aa65ad1e247ea061180f52f7bedf"
+    },
+    "INCIDENT-2CCE28A3": {
+      "id": "INCIDENT-2CCE28A3",
+      "type": "INCIDENT",
+      "failureClass": "STARTUP_ATTESTATION_ENV_DRIFT",
+      "timestamp": "2026-05-25T06:33:26.507Z",
+      "files": {
+        "telemetry": {
+          "path": "reliability-corpus/incident-incident-2cce28a3/telemetry.json",
+          "hash": "f7bb91e4121ceef51dc47c4b4a5ee5b896255adbfad3aac54d9ee9c95e4451b1"
+        },
+        "verdict": {
+          "path": "reliability-corpus/incident-incident-2cce28a3/verdict.json",
+          "hash": "a6f542f8d376c834edd526af09b9f1eb0504ff1072ea2504a8bc71561c69591a"
+        },
+        "operatorActions": {
+          "path": "reliability-corpus/incident-incident-2cce28a3/operator-actions.md",
+          "hash": "97aab3370405f98d8450acd04aad243f24e638f0eb2069623de07ccb75cb2377"
+        }
+      },
+      "signature": "bkNR6Mw9SgL2Nnw/AWzByvP/v8wUG1YzfOQSZbZk1qEMoX4yQWzhZcbUz4UJTCxPGW2Hr7uVr2J37TVhqVGYQvGuvrDjCkdYieUcx0doOY/8w/0GLDVRCIEpc1YtDleQkGg0yKNNfEFndzc5B74WYSqA2iBa1ZQR/oxU6aQzPfdmeKGF4DClioG8HUbWmFPttaQgzBwhieqERx5PxFVCQveYJFSGrhwhPqQcob59bplZGH/gcP298yI6Xmh+9yijrsHCQh0nPpeLIndzM5Ry+CKpaehimCI2EoyPHpX2fY2d03M+ac97lUMTxX3NcqaJ167ddxPKo3FDeeXXslhx4A==",
+      "signerKeyFingerprint": "d4c22808406fc0d83c536c2b6ccb8c3d6831aa65ad1e247ea061180f52f7bedf"
+    },
+    "INCIDENT-33F4088E": {
+      "id": "INCIDENT-33F4088E",
+      "type": "INCIDENT",
+      "failureClass": "STARTUP_ATTESTATION_ENV_DRIFT",
+      "timestamp": "2026-05-25T06:44:02.082Z",
+      "files": {
+        "telemetry": {
+          "path": "reliability-corpus/incident-incident-33f4088e/telemetry.json",
+          "hash": "cd29aef604cf9c775e0557e1444ebe22a3374a9f2e2a8af5a98b3799fb34f7a6"
+        },
+        "verdict": {
+          "path": "reliability-corpus/incident-incident-33f4088e/verdict.json",
+          "hash": "794f4488133d4619d49540b43d5cd9f7b266494b78b2bad2d65032ddc906ee5c"
+        },
+        "operatorActions": {
+          "path": "reliability-corpus/incident-incident-33f4088e/operator-actions.md",
+          "hash": "7e0f3b788e2f0457a1f14cfdaa600d8826bd32d979b69411a2a1aced8b7f71d4"
+        }
+      },
+      "signature": "V98LUvT5Eclf7E9cjWPWaZJ4FEYOxdSQv9WJoZXCaQ707h4vTlFly8jQ5RnifBYIswF9iUehbkmGSjeirWNghWmoUMValYUqWF6+6vjb4diFvPOB/4cw4KCI/Q9d1VZoFDCYZqp6t7tnlLRWDMCCwGKRgCqOs4pI+sYGu3agmeUXmuQeR+qbb1QiZE3gvp2XG87w6ybSTM64HXgkr/CwYZe9sgeCeYdw9tBEduguiqz81z+dnWC5gXAB1PSYCLyV6z3EruKjde9bao78Bdhk6U6GVFksNgu8uNG0ECtFn173SCuQt8vr0BtuKZmWvqDdchFKbJshWEC9vIwDP1L3GQ==",
+      "signerKeyFingerprint": "d4c22808406fc0d83c536c2b6ccb8c3d6831aa65ad1e247ea061180f52f7bedf"
+    },
+    "INCIDENT-56DBA3A2": {
+      "id": "INCIDENT-56DBA3A2",
+      "type": "INCIDENT",
+      "failureClass": "STARTUP_ATTESTATION_ENV_DRIFT",
+      "timestamp": "2026-05-28T03:27:03.378Z",
+      "files": {
+        "telemetry": {
+          "path": "reliability-corpus/incident-incident-56dba3a2/telemetry.json",
+          "hash": "4efeaa733d256be1a784ce495882dc2ca7f2c30fb722fc8092e1aaf791dbd1ff"
+        },
+        "verdict": {
+          "path": "reliability-corpus/incident-incident-56dba3a2/verdict.json",
+          "hash": "6593abeabda6c274085ca01c8d332b2b69391844e388dce8b261fc6b9470aefa"
+        },
+        "operatorActions": {
+          "path": "reliability-corpus/incident-incident-56dba3a2/operator-actions.md",
+          "hash": "2db1a133431455ffc41e9d54cfdff5731037a4d9de06c2434a781cf28259af1e"
+        }
+      },
+      "signature": "sdnXNwGSsTI6s503p9nOLxS746ntQPwx23Gn9pOIx4R5upokU9p0hehj845F45Fc+T4gqgfhaKVvif2Lj2PHfXLGe/P/ZYwilyuBaDYFqoNBibSgduoxNN2XUc6M69fDs9fWIljPov7xVexp8PeWxh/TxlucBG5LO/2lW+ShrxJk2THThfBuNGpUkTyqWs/Eg9tXHg/yBJfs385ZNUU+EedUCawa6pSfQWSzTnliPtCFFPtZx3rEhj4Ffyjw9LIgG5+3i4LVZ4kGzBap5oK4KRO6Z9tKAlD+VLIMiLputQjoAS309iQQn8jps8Ws0mV/RTJ7aMr1wyrqYE4YDWKgbw==",
+      "signerKeyFingerprint": "d4c22808406fc0d83c536c2b6ccb8c3d6831aa65ad1e247ea061180f52f7bedf"
+    },
+    "INCIDENT-632E70B5": {
+      "id": "INCIDENT-632E70B5",
+      "type": "INCIDENT",
+      "failureClass": "STARTUP_ATTESTATION_ENV_DRIFT",
+      "timestamp": "2026-05-25T06:45:11.954Z",
+      "files": {
+        "telemetry": {
+          "path": "reliability-corpus/incident-incident-632e70b5/telemetry.json",
+          "hash": "8dd135380a1b0143c06efb43e3768788abd128bf62696a3ae522924b50808889"
+        },
+        "verdict": {
+          "path": "reliability-corpus/incident-incident-632e70b5/verdict.json",
+          "hash": "cb49fc34b6d19039be97b32660be5935c68e5db0a06d48daa1186fda930320dd"
+        },
+        "operatorActions": {
+          "path": "reliability-corpus/incident-incident-632e70b5/operator-actions.md",
+          "hash": "56c3e2d8d4b8850afd36924844062c4515ecb243c285c1b3766134e30ddfce54"
+        }
+      },
+      "signature": "fZKztSOJpamzSAIXaAv2AHI+z01n1o1lQTVeWj8h+GjM9sFeQtf+zXXOg+FOIJXfCuCxVw4FWl0viKRy2lzBCiIfcDvj6kuhsQtQ+o+2/dHdzNrL4fkey+y2Xk0wPmBm0zVvpihujBrzRRAbStnF5lEwEJ9pwRh6NG4S5Sea99Zt9QOOyq1j15s5KRNkcnHYgPSx90Fm4imkgPVKoh2aWgKe0TnseOWH4L949Kw8scX+CAuu2mxxF4GeUgGm+I+YpB2f1ZFu456nJxaaTJFIh1/rIrT3JO+lIHXfAYYARi9L2ljkAHXjIEyxfowSKAd1veEBjHCBNtyHuUI3oxVfXQ==",
+      "signerKeyFingerprint": "d4c22808406fc0d83c536c2b6ccb8c3d6831aa65ad1e247ea061180f52f7bedf"
+    },
+    "INCIDENT-6E59FBE8": {
+      "id": "INCIDENT-6E59FBE8",
+      "type": "INCIDENT",
+      "failureClass": "STARTUP_ATTESTATION_ENV_DRIFT",
+      "timestamp": "2026-05-25T06:45:29.116Z",
+      "files": {
+        "telemetry": {
+          "path": "reliability-corpus/incident-incident-6e59fbe8/telemetry.json",
+          "hash": "6c58a8bd1dc103abf626881ed7ed1807f70a0ee824ea8e315d11e5511b6e4c57"
+        },
+        "verdict": {
+          "path": "reliability-corpus/incident-incident-6e59fbe8/verdict.json",
+          "hash": "914ea2499216b9cad77eb14bc933bf483d032d3db5256bb175710038c27f7d61"
+        },
+        "operatorActions": {
+          "path": "reliability-corpus/incident-incident-6e59fbe8/operator-actions.md",
+          "hash": "e596244a4250a53e152cb35386c9cd6ef988e02970949da26f5f5e1987af664e"
+        }
+      },
+      "signature": "ndmlRYX2kauC33d+z38f65k6WeB1kSH+bXiA1E1XzxrYvZ1qgdXAKYvivzJ1V9ay24jMNNeqNgaY9CplquEQtOonAwkd/m2Dw40YdmEX4rdHPoM8rxla0BFag6e2p1B7VHzvVb/3NdKQGi68mM5UlNJtRXL/XMtwAiGb9dwt9th5JA8U/VNnCRc/Kr0dzYp/K2r9Mu0DgVBf5ashwgCLtRqch3tYO8Rc7IAAke23FOvaoHbKQrkZgKnezLttWZRhzrcJ1ILAfOOzo4eFPvcEDRPNVuflHi5/F84YVhruNt9YpOu3cVMegcoFNrATfUoqP3xpGNN8A54PQARH0EW6Fg==",
+      "signerKeyFingerprint": "d4c22808406fc0d83c536c2b6ccb8c3d6831aa65ad1e247ea061180f52f7bedf"
+    },
+    "INCIDENT-6E8FD774": {
+      "id": "INCIDENT-6E8FD774",
+      "type": "INCIDENT",
+      "failureClass": "STARTUP_ATTESTATION_ENV_DRIFT",
+      "timestamp": "2026-05-25T05:01:42.742Z",
+      "files": {
+        "telemetry": {
+          "path": "reliability-corpus/incident-incident-6e8fd774/telemetry.json",
+          "hash": "fd699348b7532c6908d86210ee5cc96e8fe855a5f417ea8a0c24c9c2c2b791b3"
+        },
+        "verdict": {
+          "path": "reliability-corpus/incident-incident-6e8fd774/verdict.json",
+          "hash": "f4b8040645e484f9d2f7d4bc4852d8aa69fcc8b1b0856522afb41da8ac4b8ee8"
+        },
+        "operatorActions": {
+          "path": "reliability-corpus/incident-incident-6e8fd774/operator-actions.md",
+          "hash": "49bf4fa47735baf0a3ee03560d5706afdbb8ea51b7fd06308c2f08b578909aba"
+        }
+      },
+      "signature": "UV+KsB8n1/90/2EiZstU4uoXKH/T3e29UeKliHTo9+gTl6Y4lK4NqS7K6Uj1QgwyRu0uMkkSqDDV7tYpHu/6jar0+EbrEiucg7yXHvi24dAux1aICuZJLjZ3e82skYdGkZtLu5mVkeCOtjgZkGCVLpyHJp9EcuRdhU9hOIYT4lNHuJkwvHUxBTC8J3QLqd+YhLEFOLGa6hc3TE1V/YceBx3+HrphwYTFvX8w5fd2QJnDS9MvBOZugLxAW4tK79KxWt9IeMXBB/M+7sgagYUJWgETrqD4gdwjyh5ffUuaLZqRYxhQISl2pd5mlNM1KFjHdSZl9I1EwnqWFItlLWufvQ==",
+      "signerKeyFingerprint": "d4c22808406fc0d83c536c2b6ccb8c3d6831aa65ad1e247ea061180f52f7bedf"
+    },
+    "INCIDENT-718F0C1F": {
+      "id": "INCIDENT-718F0C1F",
+      "type": "INCIDENT",
+      "failureClass": "STARTUP_ATTESTATION_ENV_DRIFT",
+      "timestamp": "2026-05-25T06:49:59.454Z",
+      "files": {
+        "telemetry": {
+          "path": "reliability-corpus/incident-incident-718f0c1f/telemetry.json",
+          "hash": "3027764516429fbcdd4572ec1193b85ab7f46c786482877b04995602eb2b3af3"
+        },
+        "verdict": {
+          "path": "reliability-corpus/incident-incident-718f0c1f/verdict.json",
+          "hash": "665de6fcfa68c32e2655122aec60f9b45a59c3fcc354155e56369e6ab8f18c93"
+        },
+        "operatorActions": {
+          "path": "reliability-corpus/incident-incident-718f0c1f/operator-actions.md",
+          "hash": "0007a4ee47e8429649a307af5bb1380b0cd2848366146c7c43d4f26040cc2ec0"
+        }
+      },
+      "signature": "nLzxcnHkr40FORWpOPT2eZVJ2wF8uHJRscen9M2stTdNyj/1KTthq1xsKediNahAzj00Yx2PahunqH/GAPpl4+us8mtWDwxV/MdgE3FEV0EWl69IDzpM6wHXMoJqIm/QWvuUNOpb7HbNOzm8NG/52HhPweixdEo4+VH2cep43SwF7ijXT9yRjZpmiDCZ1RslKan5b2uAJsrhvtEX7RJWKW2B7T5IQRUUAWDChjr1+dX96NzBJlZEL+J/1loG4N8VGX8PbpMYu7+nzgkDGmq3SdukFPqFVNGAt9+GUNw3lVaucijpNmOvNPvSG+Ng6QfOBsnQnXFm8BvGbsgdowFvnw==",
+      "signerKeyFingerprint": "d4c22808406fc0d83c536c2b6ccb8c3d6831aa65ad1e247ea061180f52f7bedf"
+    },
+    "INCIDENT-9FA8319B": {
+      "id": "INCIDENT-9FA8319B",
+      "type": "INCIDENT",
+      "failureClass": "STARTUP_ATTESTATION_ENV_DRIFT",
+      "timestamp": "2026-05-28T03:27:09.887Z",
+      "files": {
+        "telemetry": {
+          "path": "reliability-corpus/incident-incident-9fa8319b/telemetry.json",
+          "hash": "d471162e37cc9f927acbfbaaa11551ba4576a424c716b395ac44d5dc5bb21fe7"
+        },
+        "verdict": {
+          "path": "reliability-corpus/incident-incident-9fa8319b/verdict.json",
+          "hash": "5779990566369cf8f243855b5fa773b94809106fdb39c847739f407834d6db9c"
+        },
+        "operatorActions": {
+          "path": "reliability-corpus/incident-incident-9fa8319b/operator-actions.md",
+          "hash": "6fe39383b6c178307c40b05050e2210fd1f3fb2c8a52a4510b2ae157d7244828"
+        }
+      },
+      "signature": "lcBt4JKkwhcWuyalpinnMzB76iXJJubqDf9MURS23Ca8ukjRqB8LIRDXFtu5HBN5HWnTtXDDVtlNL2C5AttxxQhel1QpglPEdDChxoEs/JKP/Gej8H4hZbeYpJqL7QGTnHWr0mq0jsrUiSPCp3RmU4HXJBZI1Qv2T47UiwIs9PdoameaFZMyLWo31Q5/7ILBghgL9nKmA+rn25a4xw7SgwRqkNqcU2YcvJg45rlDIEO7v0KOL/bQi7x+pshqztOet98jE7UwVIZgJ3qOit2BQrRGtWaH8maNbl1ZzveViw+cLaogfBt2pJdWMS5iBnG37e3boI5R0jrfuue/Nn1brQ==",
+      "signerKeyFingerprint": "d4c22808406fc0d83c536c2b6ccb8c3d6831aa65ad1e247ea061180f52f7bedf"
+    },
+    "INCIDENT-A0E6C8BA": {
+      "id": "INCIDENT-A0E6C8BA",
+      "type": "INCIDENT",
+      "failureClass": "STARTUP_ATTESTATION_ENV_DRIFT",
+      "timestamp": "2026-05-28T03:33:31.993Z",
+      "files": {
+        "telemetry": {
+          "path": "reliability-corpus/incident-incident-a0e6c8ba/telemetry.json",
+          "hash": "18812bf161b0ec033580e2a7a4be617899e2c9a20dfab46c87e1b34192eefefa"
+        },
+        "verdict": {
+          "path": "reliability-corpus/incident-incident-a0e6c8ba/verdict.json",
+          "hash": "afa979320f7ecf04659d222cead30b89862681def18353af2d1dab4796e54032"
+        },
+        "operatorActions": {
+          "path": "reliability-corpus/incident-incident-a0e6c8ba/operator-actions.md",
+          "hash": "d2563e5a48c53ef960660be56d314092bca6b64c9233eac7f833698dfcfe152a"
+        }
+      },
+      "signature": "WF1tdtzX2O5LWcQg5apE3ABP2GnRMO9EYGfCKVSo026rchelAu49bhxw44DApBCf1a/0PT9QHpYfX7ZPccTm9RDNXJuLNdKNEtgJLG32K2FVIcMvZZVhB5vG9AcmMAb6VlSTcm/zipUnP5O3juAPcWY+gaux6QL7s7e0BpBNvOQ4zYkmdcUNKGwE/91GWYP08dQATf4AQ2gzvFtFdf9w5XEugG3akVTJTQfk3fO8v0bE07LnFYtENEq0H2L1If7jjrsbOaHJMytrYfdpcBZHwdjlX5XmvpspEd5vmgI4XTSZhih83trB7WPJoLuWuYqOJz/iTbO0C3emvI2viRKDHw==",
+      "signerKeyFingerprint": "d4c22808406fc0d83c536c2b6ccb8c3d6831aa65ad1e247ea061180f52f7bedf"
+    },
+    "INCIDENT-A61A37DA": {
+      "id": "INCIDENT-A61A37DA",
+      "type": "INCIDENT",
+      "failureClass": "STARTUP_ATTESTATION_ENV_DRIFT",
+      "timestamp": "2026-05-25T06:51:42.333Z",
+      "files": {
+        "telemetry": {
+          "path": "reliability-corpus/incident-incident-a61a37da/telemetry.json",
+          "hash": "075c50e04581a0158dfecd9e65b3f582aa7437915aec23ae71d1c93aec679ceb"
+        },
+        "verdict": {
+          "path": "reliability-corpus/incident-incident-a61a37da/verdict.json",
+          "hash": "1400964aceead583bf6c383be6f0996c1430ef8b87e7f24d94e04e2a29eb4007"
+        },
+        "operatorActions": {
+          "path": "reliability-corpus/incident-incident-a61a37da/operator-actions.md",
+          "hash": "2b9b8146e32fb66b325e9e1f037793bc527ff6a13129cd3a74454f372f8bbcf8"
+        }
+      },
+      "signature": "bR+2p5eHXjjfqUn/ApXG/uYw4gGerlSBZrJi2jft/VY2eNLu6EXf8QbmsP3tU+IvOZavTM4tL50bkI+/V+v5JxXNoJBVNAR3Qbb/d4OFrsxnB/E72Q43NIwIJuft4JHSyd4GL5tZAA3t/wLfBdQWVfrYe38CUlBTGOVepyAXMeZjSBMXX0+B7fecXLgM652DYxxusvUdiaKjZkwO6ESXDijklGwExUYSzWY2N4R4etTYXVo08nEbj4MYs0Jf6ioAzz1ykHALjb6VMqzCmvXe78/s/CT4Z7/hmjNRhs9fqMcFYKGsFjuULct7oKqW1y8teZQwaJjPucjH8Mhtt/Ezrw==",
+      "signerKeyFingerprint": "d4c22808406fc0d83c536c2b6ccb8c3d6831aa65ad1e247ea061180f52f7bedf"
+    },
+    "INCIDENT-ABF8D8EE": {
+      "id": "INCIDENT-ABF8D8EE",
+      "type": "INCIDENT",
+      "failureClass": "STARTUP_ATTESTATION_ENV_DRIFT",
+      "timestamp": "2026-05-28T03:33:21.977Z",
+      "files": {
+        "telemetry": {
+          "path": "reliability-corpus/incident-incident-abf8d8ee/telemetry.json",
+          "hash": "faa2fc4636d8aa6deca84028a06e8aa4d3346e2a7075aa078826debad3ddc371"
+        },
+        "verdict": {
+          "path": "reliability-corpus/incident-incident-abf8d8ee/verdict.json",
+          "hash": "d280cf1e910311cdb96b3996b6aa1ed92b947454d50b9079a097ec9a596c4599"
+        },
+        "operatorActions": {
+          "path": "reliability-corpus/incident-incident-abf8d8ee/operator-actions.md",
+          "hash": "19e6aaf016dc37df1b03dd91f6253bd06ae7963c0e6319d775639d56305a8afe"
+        }
+      },
+      "signature": "adtwF/h4Y7hTHp53sbSW4ZYq3SLasNT+1v9rpx7G/UklxdovwMaZXpcQCOg5Ez/c2+Up1vg/hUOd5NJ2TmlBcFU+qoenNVlfHkU40VU+z3q1SJNlSSifjQJPVp8gCvw1Nr9DDQawQqSNhvesyhMzqnQ5zosk87xWb/KAGXNcbImIoWDgCEVwdsELpvPWRoLb1l/V3pTj/GIUL7jd1beMeDH3NuJMlDV8VGW+LwZBDfZ5RVX4rDlk0oj6lZY3LQJbmPpCyQ6RqaoU+Vt3DP1L+Vz5HalAN2QVwX+2ctjG2kKa3trej21OT0JZxKlE3jxC6lWOu3apYOf1CjXfgyFhWw==",
+      "signerKeyFingerprint": "d4c22808406fc0d83c536c2b6ccb8c3d6831aa65ad1e247ea061180f52f7bedf"
+    },
+    "INCIDENT-F6F574CE": {
+      "id": "INCIDENT-F6F574CE",
+      "type": "INCIDENT",
+      "failureClass": "STARTUP_ATTESTATION_ENV_DRIFT",
+      "timestamp": "2026-05-25T06:34:33.511Z",
+      "files": {
+        "telemetry": {
+          "path": "reliability-corpus/incident-incident-f6f574ce/telemetry.json",
+          "hash": "4f122cb8624ef81989066253223d1387752b4a23f9bedfda02c9fba4f443bcfe"
+        },
+        "verdict": {
+          "path": "reliability-corpus/incident-incident-f6f574ce/verdict.json",
+          "hash": "1daffdeb34d25bc9af47a4a2201ceb122a550075f1acc97724e4d83fc4766735"
+        },
+        "operatorActions": {
+          "path": "reliability-corpus/incident-incident-f6f574ce/operator-actions.md",
+          "hash": "6a563d2bddaf93860a3a2ec558097018f3557f69e9c8444f5b64fdb5aa20cf5e"
+        }
+      },
+      "signature": "d8grrGKVQy8iyo6qXsy3wGIWiJSfnAWKolZg8yKz3ZhEZGKiYPMOWdOHXj5YUSsxYOtkHe3mAbZPvR+U0gMJRPlUt5Bn8kRCmMQVC3T/W11WAdWJdypJP9a6w1f3YsPlVSkAYkO62d4VBAFpDJfqwBeCFgUZzp0NNKzjGrbUgzfLolTlSzCQtRga/o1J7O9mzwjowOBfxxJiyUxmNCE8Mblc7FYxpYioNk01YmBsiHLQ50pohBREDqVUiRTLXIwyef69tHjbCcSnYrVYzzhzoosrLurFnccmGuyjh6l72XxMcb+bwrL0XX61ujkHglsVg5uhTYXs8vzbGyPAuGcqQA==",
+      "signerKeyFingerprint": "d4c22808406fc0d83c536c2b6ccb8c3d6831aa65ad1e247ea061180f52f7bedf"
+    }
+  }
+}

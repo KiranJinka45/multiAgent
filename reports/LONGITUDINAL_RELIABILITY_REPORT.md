@@ -1,34 +1,34 @@
 # ZTAN SRE Longitudinal Reliability & Operational Entropy Report
   
-Generated dynamically on: **2026-05-23T02:28:35.233Z**  
-Campaign Duration: **21600 seconds**  
-PRNG Seed: `ZTAN_CANONICAL_SEED_6H`  
-Verification Verdict: **FAILED ❌** (Total fault events: 135)
+Generated dynamically on: **2026-05-28T03:25:36.731Z**  
+Campaign Duration: **15 seconds**  
+PRNG Seed: `ZTAN_SOAK_SEED_99`  
+Verification Verdict: **FAILED ❌** (Total fault events: 17)
 Pathology Mode: **NOMINAL TRIAL**
 
 ## Campaign Metadata
 | Parameter | Value |
 |---|---|
-| Duration | 21600s |
-| Seed | `ZTAN_CANONICAL_SEED_6H` |
-| Total Logical Bytes Written | 627696016 bytes |
-| Physical WAL Amplification (Bytes) | 369552624 |
+| Duration | 15s |
+| Seed | `ZTAN_SOAK_SEED_99` |
+| Total Logical Bytes Written | 252232 bytes |
+| Physical WAL Amplification (Bytes) | 1389928 |
 | Duplicated Blocks / Sequence Drift | 0 / Strict Ordered |
 
 ## SRE Diagnostics (Latency Jitter Drivers)
 | Diagnostic Metric | Observed Value |
 |---|---|
-| Avg V8 Event Loop Lag | 384.26 ms |
-| Max V8 Event Loop Lag | 22869944.77 ms |
-| Avg DB CHECKPOINT Latency | 82.60 ms |
-| Avg DB VACUUM Latency | 416.80 ms |
-| Avg Prisma Connection Acquire Latency | 5280.95 ms |
+| Avg V8 Event Loop Lag | 33.44 ms |
+| Max V8 Event Loop Lag | 452.06 ms |
+| Avg DB CHECKPOINT Latency | 4485.19 ms |
+| Avg DB VACUUM Latency | 18990.45 ms |
+| Avg Prisma Connection Acquire Latency | 104.71 ms |
 
 
 ## Replay Integrity Auditor Results
 | Audit Vector | Status | Details |
 |---|---|---|
-| **Cryptographic Hash-Chain** | PASSED ✅ | Verified 8 blocks. Gaps/Fractures: 0 |
+| **Cryptographic Hash-Chain** | PASSED ✅ | Verified 0 blocks. Gaps/Fractures: 0 |
 | **Index Monotonicity** | PASSED ✅ | Sequence jumps: 0 |
 | **Outbox Convergence** | PASSED ✅ | Pending WAL logs: 0 |
 | **Fencing Monotonicity** | PASSED ✅ | Epoch retrogrades: 0 |
@@ -37,46 +37,46 @@ Pathology Mode: **NOMINAL TRIAL**
 ## Client Latency Percentiles
 | Percentile | Latency (ms) |
 |---|---|
-| p50 | 1.83 ms |
-| p95 | 75.72 ms |
-| p99 | 582.44 ms |
+| p50 | 1640.43 ms |
+| p95 | 2728.08 ms |
+| p99 | 2950.48 ms |
 
 ## Service Telemetry Breakdown
 
 ### Gateway
-- **Memory RSS Growth:** 24.43 MB
-- **Memory Heap Growth:** 7.23 MB
-- **V8 Old-space Growth:** -2.49 MB
-- **Active Handle Leak Delta:** -1
-- **Event Loop Utilization (ELU):** Avg 11.35%, Peak 100.00%
-- **GC Performance:** Major GCs: 450, Minor GCs: 1446, p99 Pause: 64.66 ms
-- **Windows OS Handle Leak Delta:** +47
-- **Windows OS Thread Delta:** -2
-- **Final TCP Sockets:** Established: 6, TIME_WAIT: 0, CLOSE_WAIT: 0, Other: 1
+- **Memory RSS Growth:** 1.41 MB
+- **Memory Heap Growth:** 8.86 MB
+- **V8 Old-space Growth:** 1.39 MB
+- **Active Handle Leak Delta:** +55
+- **Event Loop Utilization (ELU):** Avg 91.11%, Peak 100.00%
+- **GC Performance:** Major GCs: 0, Minor GCs: 1, p99 Pause: 100.16 ms
+- **Windows OS Handle Leak Delta:** +60
+- **Windows OS Thread Delta:** 0
+- **Final TCP Sockets:** Established: 52, TIME_WAIT: 0, CLOSE_WAIT: 2, Other: 1
 
 
 ### CoreAPI
-- **Memory RSS Growth:** -14.76 MB
-- **Memory Heap Growth:** -6.60 MB
-- **V8 Old-space Growth:** -7.43 MB
-- **Active Handle Leak Delta:** -2
-- **Event Loop Utilization (ELU):** Avg 9.06%, Peak 100.00%
-- **GC Performance:** Major GCs: 107, Minor GCs: 4698, p99 Pause: 37.22 ms
-- **Windows OS Handle Leak Delta:** +87
-- **Windows OS Thread Delta:** +11
-- **Final TCP Sockets:** Established: 9, TIME_WAIT: 0, CLOSE_WAIT: 0, Other: 1
+- **Memory RSS Growth:** 6.39 MB
+- **Memory Heap Growth:** 11.33 MB
+- **V8 Old-space Growth:** 1.07 MB
+- **Active Handle Leak Delta:** +16
+- **Event Loop Utilization (ELU):** Avg 80.64%, Peak 100.00%
+- **GC Performance:** Major GCs: 0, Minor GCs: 0, p99 Pause: 23.26 ms
+- **Windows OS Handle Leak Delta:** +283
+- **Windows OS Thread Delta:** +32
+- **Final TCP Sockets:** Established: 11, TIME_WAIT: 0, CLOSE_WAIT: 0, Other: 2
 
 
 ### ControlPlane
-- **Memory RSS Growth:** -24.40 MB
-- **Memory Heap Growth:** -5.27 MB
-- **V8 Old-space Growth:** -1.51 MB
-- **Active Handle Leak Delta:** -1
-- **Event Loop Utilization (ELU):** Avg 0.35%, Peak 42.74%
-- **GC Performance:** Major GCs: 2, Minor GCs: 5, p99 Pause: 10.41 ms
-- **Windows OS Handle Leak Delta:** -4
-- **Windows OS Thread Delta:** -2
-- **Final TCP Sockets:** Established: 1, TIME_WAIT: 0, CLOSE_WAIT: 0, Other: 1
+- **Memory RSS Growth:** -25.77 MB
+- **Memory Heap Growth:** -6.38 MB
+- **V8 Old-space Growth:** -1.47 MB
+- **Active Handle Leak Delta:** 0
+- **Event Loop Utilization (ELU):** Avg 9.38%, Peak 38.23%
+- **GC Performance:** Major GCs: 1, Minor GCs: 1, p99 Pause: 229.48 ms
+- **Windows OS Handle Leak Delta:** 0
+- **Windows OS Thread Delta:** 0
+- **Final TCP Sockets:** Established: 0, TIME_WAIT: 0, CLOSE_WAIT: 0, Other: undefined
 
 
 ---

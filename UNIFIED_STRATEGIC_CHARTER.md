@@ -1,198 +1,541 @@
-# 🏰 Nexus ZTAN — Unified Strategic Charter
-## Toward a Bounded Deterministic Governance & Replay-Recovery Coordination Layer for Autonomous Operations
+# ZTAN Corrected Strategic Architecture & Execution Charter
 
-> [!IMPORTANT]
-> **STATE: STRATEGICALLY FINALIZED & ARCHITECTURALLY FROZEN 🛡️**
-> This Unified Strategic Charter merges the original bounded SRE-grade Nexus ZTAN governance/runtime architecture with the expanded global autonomous trust infrastructure vision, the institutional non-goals, and the governance freeze philosophy.
+## Unified Direction After Reliability, Measurement, and Adversarial Systems Review
 
----
+### Status
 
-## 🏛️ 1. Strategic Repositioning
+Authoritative Engineering Direction
 
-ZTAN is no longer merely an SRE governance console, an orchestration runtime, a chaos engineering platform, an AI operations tool, or an observability dashboard.
+### Purpose
 
-ZTAN is evolving into:
-# **“A Bounded Deterministic Governance & Replay-Recovery Coordination Layer for Autonomous Operations.”**
+This document supersedes the original Phase 0–4 sequencing assumptions and establishes the corrected architectural direction for ZTAN moving forward.
 
-The entire system exists to answer one governing question:
-> **“Can this autonomous action be trusted?”**
+The original roadmap contained several strong foundational concepts:
 
-*Everything else is subordinate to that invariant.*
+* proposal-only execution,
+* fail-closed semantics,
+* governance-first architecture,
+* deterministic replay science,
+* and sandbox-oriented thinking.
 
----
+However, the review process identified one major architectural sequencing flaw and several missing adversarial-governance requirements.
 
-## 🔐 2. Core Identity
+This charter consolidates:
 
-### What ZTAN IS:
-*   **A policy-enforced autonomous action governance runtime** specialized for mission safety boundaries.
-*   **Cryptographically traceable operational trust boundaries** backing automated transactions.
-*   **A fail-closed certification system** preventing stochastic execution escalation.
-*   **A replayable lineage infrastructure** allowing forensic auditability of state chains.
-*   **Institutional-grade operational auditability tooling** for cross-border enterprise compliance.
-*   **A human-authorized operational sovereignty runtime** preserving high-friction override ceremonies.
+* the original roadmap,
+* runtime reliability findings,
+* measurement integrity work,
+* adversarial instrumentation reviews,
+* and the corrected execution ordering
 
-### What ZTAN IS NOT (Institutional Non-Goals):
-*   ❌ **A generalized AI orchestration framework** (we are not LangChain, LlamaIndex, or CrewAI).
-*   ❌ **A speculative self-healing system** (we reject unverified runtime optimization drift).
-*   ❌ **A distributed consensus protocol** (we reject blockchain mythologies and decentralized theatrics).
-*   ❌ **An autonomous control plane** (we do not execute arbitrary action pipelines without out-of-band constraints).
-*   ❌ **An agent playground** (we are a production-hardened institutional gatekeeper).
+into a single authoritative implementation direction.
 
 ---
 
-## 🏛️ 3. The Core Authority Hierarchy
+# 1. Core Architectural Reframing
 
-To protect the integrity of coordination state and define a clear progression from suggestion to execution, ZTAN formally establishes and enforces a strict, four-tier authority hierarchy:
+ZTAN is no longer merely:
 
-* **Tier A — Probabilistic Advisory Systems (No Mutation Authority)**
-  * *Components:* LLMs, agent-driven reasoning loops, semantic analysis, anomaly scoring.
-  * *Operational Scope:* Highly scalable, horizontally deployable systems that generate recommendations, analyze telemetry, and propose state transitions. Zero capability to write directly to the coordination core or bypass policy gates.
-  
-* **Tier B — Deterministic Enforcement Systems (Safety Gating)**
-  * *Components:* Open Policy Agent (OPA) engines, schema validators, policy assertion engines, rate-limiters.
-  * *Operational Scope:* Enforces static, compiled safety boundaries on Tier A proposals. Rejects actions that violate resource ranges, permission scopes, or chronological constraints before database submission.
+* a reliability framework,
+* a replay system,
+* or an orchestration platform.
 
-* **Tier C — Authoritative Coordination Systems (State Sovereignty & Serialization)**
-  * *Components:* PostgreSQL, WAL-assisted recovery logs, transactional outboxes, idempotency maps, lease managers.
-  * *Operational Scope:* The primary transactional serialization authority within the bounded PostgreSQL storage domain. Single-writer serialized execution that provides bounded effectively-once replay handling within a PostgreSQL-authoritative coordination domain. All actions committed here are final, operationally attributable and cryptographically traceable within the platform’s authoritative storage boundary, and designed to fail closed under detected lease drift, replay ambiguity, or sequencing inconsistencies.
+ZTAN is now formally defined as:
 
-* **Tier D — Human Sovereignty (Emergency Fencing & Quorum Override)**
-  * *Components:* Multi-signature operator quorums, hardware keys (WebAuthn), emergency self-fencing releases.
-  * *Operational Scope:* The supreme governance layer. Initiates emergency read-only status, releases systems from quarantine back to read-only, and ratifies critical system upgrades.
+> A trusted execution governance substrate capable of safely constraining future autonomous systems under adversarial conditions.
 
----
+This changes the engineering model entirely.
 
-## 🧬 4. The Foundational Philosophy: The Trust Principle
+The platform is no longer solving only:
 
-Autonomous systems must not merely be intelligent, scalable, automated, and adaptive. They must be **attributable, bounded, certifiable, governable, replayable, auditable, and interruptible.**
+* runtime correctness,
+* telemetry integrity,
+* and deterministic replay.
 
-ZTAN enforces operational trust through:
-1.  **Deterministic Policies:** Immutable runtime assertions evaluated completely out-of-band.
-2.  **Cryptographic Lineage:** Verifiable serial hash-chains anchoring transitions to secure database states.
-3.  **Human Quorum Authority:** Multi-signature cryptographic ceremonies for high-risk overrides.
-4.  **Fail-Closed Execution Semantics:** Fail-closed quarantine behavior within tested recovery paths on sequence mismatch or clock drift.
-5.  **Cryptographically Chained Append-Oriented Operational Memory:** Persistent transactional history anchored to PostgreSQL transaction lineage.
+It must now additionally solve:
+
+* hostile input handling,
+* probabilistic model containment,
+* execution isolation,
+* tenant boundary enforcement,
+* irreversible side-effect prevention,
+* and policy-governed autonomy.
+
+This is adversarial systems engineering.
 
 ---
 
-## 📦 5. The Core Primitive — Autonomous Action Envelope
+# 2. The Non-Negotiable Boundary
 
-Every autonomous operation MUST be represented as a governed object. This envelope is the universal operational trust artifact, unifying governance, certification, lineage, and auditability.
+## Proposal-Only Intelligence
 
-### Canonical Envelope Structure
-```json
-{
-  "actionId": "uuid-v4",
-  "intent": "restart-postgres-replica",
-  "actor": "agent-runtime-7",
-  "actorType": "AUTONOMOUS_AGENT",
-  "riskClass": "HIGH",
-  "policyVersion": "v2026-LTS.1",
-  "lineageHash": "sha256:7f83b1c67e9b88f3c2a0cde...",
-  "replayId": "wal-seq-884991",
-  "requiredApprovals": 2,
-  "approvalChain": [],
-  "certificationState": "REQUIRES_HUMAN_QUORUM",
-  "jurisdiction": "EU-WEST",
-  "timestamp": "2026-05-19T12:00:00Z"
-}
+The most important invariant in the platform is:
+
+```text
+propose → validate → simulate → authorize → sandbox → verify
 ```
 
+LLMs, planners, agents, classifiers, and coordinators:
+
+* NEVER execute directly
+* NEVER bypass policy
+* NEVER receive execution authority
+
+All AI outputs are proposals only.
+
+Every proposal must pass:
+
+1. semantic inspection,
+2. command filtering,
+3. dry-run simulation,
+4. deterministic policy evaluation,
+5. human approval (when required),
+6. sandbox isolation,
+7. post-execution verification.
+
+If this boundary collapses, the platform becomes unsafe.
+
 ---
 
-## 🏗️ 6. The 11-Layer Trust Architecture
+# 3. Corrected Execution Order (Critical Fix)
 
+## The Original Sequencing Was Unsafe
+
+The original roadmap attempted to connect:
+
+* real LLM providers,
+* decomposition planners,
+* and multi-agent orchestration
+
+before:
+
+* sandbox isolation,
+* dry-run simulation,
+* policy enforcement,
+* and governance controls existed.
+
+That sequencing was architecturally incorrect.
+
+Connecting real models too early introduces:
+
+* prompt injection risk,
+* recursive planning risk,
+* unsafe proposal generation,
+* tool misuse amplification,
+* and adversarial payload generation
+
+before constraints exist to contain them.
+
+---
+
+# 4. Corrected Strategic Sequence
+
+## Phase A — Trusted Governance Substrate (Mandatory First)
+
+Build completely before any real AI integration.
+
+### A1 — Side-Effect Ontology
+
+Classify every operation type:
+
+* reversible,
+* irreversible,
+* approval-required,
+* partially simulatable,
+* dangerous,
+* externally observable.
+
+This ontology becomes the foundation of simulation correctness.
+
+Without it:
+the dry-run engine produces false confidence.
+
+---
+
+### A2 — Tool Permission Lattice
+
+Build a multidimensional permission model.
+
+Permissions are NOT binary allow/deny.
+
+Each permission includes:
+
+* tool name,
+* tenant scope,
+* filesystem scope,
+* network scope,
+* runtime mode,
+* approval requirement,
+* payload limits,
+* execution time limits,
+* allowed file types,
+* environment boundaries.
+
+No agent integration occurs before this lattice exists.
+
+---
+
+### A3 — Semantic Inspection Pipeline (Layer 7)
+
+Build the 4-stage inspection system:
+
+1. deterministic pattern checks,
+2. heuristic scoring,
+3. isolated LLM classifier,
+4. deterministic policy aggregation.
+
+Critical rule:
+classifier output is probabilistic evidence only.
+
+The classifier NEVER grants execution authority.
+
+Classifier outputs feed:
+risk scoring → policy engine → final deterministic decision.
+
+Never:
+
+```text
+classifier says safe → execute
 ```
-                                  [ Ephemeral Sandbox (Firecracker/gVisor) ]
-                                                      ▲
-                                                      │ (Layer 9: Isolation)
-                                                      ▼
-[ Agent Loop ]  ──►  [ Layer 1: Governance Proxy ]  ──►  [ Layer 2: Deterministic Policy Engine ]
-                                 │                                    │
-                                 ├── (Layer 3: Ephemeral Identity)    ├── (Layer 4: Safety Certifier)
-                                 │                                    │
-                                 ▼                                    ▼
-                      [ Layer 5: Ledger Lineage ]         [ Layer 6: Human Sovereignty ]
-                                 │                                    │
-                                 ▼                                    ▼
-                      [ Layer 8: Payload Minimiz. ]       [ Layer 7: Trust Observatory ]
-                                 │                                    │
-                                 ▼                                    ▼
-                      [ Layer 10: Behavioral Drift ]──►  [ Layer 11: Cross-Border Compliance ]
-```
 
-### Layer 1 — Autonomous Action Governance
-Every operation is designed to be attributable, policy-bound, replayable, risk-scored, and cryptographically signed. Production execution paths require authenticated attribution.
+Additionally:
 
-### Layer 2 — Deterministic Policy Execution Engine
-ZTAN evaluates operational policies, execution boundaries, safety invariants, and authority constraints outside the agent's context window. Inspired by OPA and SPIFFE/SPIRE but specialized for autonomous action safety.
-
-### Layer 3 — Operational Identity Infrastructure
-Every human, agent, workflow, runtime, pipeline, and service must possess a verifiable identity, scoped authority, revocable trust, and signed execution lineage. Aims for comprehensive identity attribution across all operational phases.
-
-### Layer 4 — Safety Certification Runtime
-Before execution, ZTAN evaluates blast radius, policy compliance, infrastructure health, operational drift, dependency stability, historical risk, and quorum requirements. Permitted verdicts:
-$$\text{Verdict} \in \{ \text{CERTIFIED}, \text{DENIED}, \text{REQUIRES\_HUMAN\_QUORUM}, \text{QUARANTINED} \}$$
-
-### Layer 5 — Cryptographically Chained Operational Lineage
-Every action is cryptographically chained, causally reconstructable, replayable, append-oriented, and sequence-ordered. We explicitly reject decentralized/ideological consensus; lineage is operational and anchored to local transaction logs.
-
-### Layer 6 — Human Sovereignty Layer
-*“Autonomy may recommend. Sovereignty must authorize.”* Destructive or high-risk actions require human approval, quorum signatures, and hardware-backed WebAuthn/FIDO2 keys. ZTAN preserves operational friction to prevent panic-driven automation failures.
-
-### Layer 7 — Trust Observatory
-The UI is not a flashy dashboard or a collaborative playground. It is a **governance observatory and forensic trust console** visualizing trust posture, lineage history, policy violations, drift detection, and quorum actions.
-
-### Layer 8 — Payload Minimization & Integrity Validation
-ZTAN tokenizes payloads and uses deterministic hashes to validate transition and schema integrity without requiring raw exposure of PII, classified payload contents, or financial records.
-
-### Layer 9 — Out-of-Band Isolation Runtime
-Autonomous actions run strictly within isolated, ephemeral, non-persistent, and revocable execution boundaries (Firecracker microVMs or gVisor sandboxes).
-
-### Layer 10 — Behavioral Drift Detection & Runtime Heuristics
-Detects semantic drift, memory poisoning, adversarial behavioral evolution, and abnormal action trajectories via heuristic analysis and anomaly scoring. Unsafe divergence results in automatic quarantine.
-
-### Layer 11 — Federated Cross-Border Compliance Engine
-Applies region-aware policy constraints and metadata tagging to support jurisdiction-sensitive operational governance.
+* classifier prompts must be isolated,
+* classifier tool access disabled,
+* chain-of-thought persistence disabled,
+* outputs treated as untrusted.
 
 ---
 
-## 🚫 7. The Frozen Operational Principles
-ZTAN explicitly enforces the following permanent structural constraints:
-*   **No optimistic UI:** All console states must represent confirmed, non-speculative database reality.
-*   **No speculative self-healing:** The SRE engine observes and fences; recovery requires structured protocols.
-*   **No distributed consensus layers:** All final transaction logs are held in PostgreSQL transactional scopes.
-*   **No generalized workflow engines:** ZTAN is a governance runtime, not a generalized builder.
-*   **No browser terminals:** Command execution must go through audited API boundaries, never raw shells in the UI.
-*   **No runtime plugin ecosystems:** Restrict dynamic runtime configuration to prevent unvetted code paths.
-*   **No real-time multiplayer control planes:** Actions are committed atomically through distinct operator signatures.
-*   **No AI-driven autonomous recovery decisions:** The safety loop degrades honestly to human overrides.
-*   **Separation of Advisory and Execution:** LLMs and probabilistic agents may recommend actions. Only deterministic, verified software loops or human multi-signature quorums may authorize irreversible execution.
-*   **Stateless Scaling Roadmap:** All horizontal horizontalization must strictly occur at the stateless and advisory layers (orchestration, inference, telemetry, policy evaluation). The write coordinate engine and lease database must remain unified and single-writer to prevent correctness degradation.
-*   **No Implicit Authority Escalation:** No probabilistic or advisory subsystem may acquire mutation authority implicitly through retries, automation chaining, policy generation, or delegated execution pathways.
+### A4 — Static Command Filter (Layer 5)
+
+Implement default-deny tool execution.
+
+Unknown tools:
+
+* denied immediately,
+* logged to governance ledger,
+* never simulated,
+* never sandboxed.
+
+Every allowed tool:
+
+* validated against the permission lattice,
+* tenant scoped,
+* parameter constrained.
 
 ---
 
-## 📈 8. The Technology Mapping
+### A5 — Dry-Run Simulation Gate (Layer 3)
 
-| Layer | System Mapping | Technology Stack |
-| :--- | :--- | :--- |
-| **Ingress Gateway** | Security Proxy | Rust / Go / Fastify |
-| **Runtime Isolation** | EPHEMERAL Sandbox | Firecracker / gVisor |
-| **Streaming Backbone** | Ledger Events | Event Streaming (Optional / Non-Authoritative) |
-| **Policy Cache** | Session Invariants | Redis |
-| **Persistent Authority** | State Registry | PostgreSQL |
-| **Trust UI** | Observatory | Angular |
-| **Formal Invariants** | State Math | Planned TLA+ Modeling |
-| **Identity** | Authentication | WebAuthn / SPIFFE |
-| **Cryptographic Lineage**| Integrity Chaining | Merkle Structures + PostgreSQL WAL |
-| **Long-Term Archive** | Compliance Notarization | Immutable WORM Storage |
+Extend replay science into predictive execution simulation.
+
+Simulation requirements:
+
+* speculative state branching,
+* deterministic effect modeling,
+* dependency forecasting,
+* reversibility classification,
+* irreversible-effect blocking.
+
+Irreversible effects:
+
+* email sends,
+* production deployment,
+* external POST requests,
+* credential rotation,
+* third-party mutations
+
+must trigger human approval workflows.
 
 ---
 
-## 🏛️ 9. Document Precedence & Truth Hierarchy
-To maintain strict governance order during operational incidents:
-1.  **Running Code:** The compiled TypeScript code is the final source of system truth (with planned formal `invariants.tla` safety modeling).
-2.  **This Unified Charter (`UNIFIED_STRATEGIC_CHARTER.md`):** Defines the complete strategic boundary, frozen principles, and operational identity of ZTAN.
-3.  **Active Constitutions:** `CONSTITUTION.md` and `INVARIANT_GOVERNANCE_CHARTER.md` govern local partition and recovery states.
-4.  **Operational Performance Ledgers:** Dynamic reports (`STEWARDSHIP_ENGINEERING_REPORT.md`) provide runtime verification baselines.
+### A6 — OPA/Rego Governance Layer (Layer 8)
+
+OPA wraps constitutional.ts.
+
+OPA does NOT replace it.
+
+OPA responsibilities:
+
+* enterprise-readable policy enforcement,
+* regulatory auditability,
+* customer policy customization,
+* deterministic authorization evaluation.
+
+Critical invariant:
+OPA unavailable → execution denied.
+
+Never fail-open.
+
+---
+
+### A7 — Human Escalation Workflows (Layer 10)
+
+Implement Temporal.io durable workflows.
+
+All approval workflows must:
+
+* survive restarts,
+* survive crashes,
+* persist pending approvals,
+* timeout safely,
+* default to cancellation.
+
+Timeout without approval:
+
+* cancels operation,
+* never auto-approves.
+
+All decisions become governance ledger attestations.
+
+---
+
+# 5. Phase B — Execution Isolation
+
+Only after Phase A fully exists.
+
+---
+
+## B1 — Firecracker Isolation Runtime
+
+Firecracker microVMs are mandatory.
+
+Docker alone is insufficient for adversarial execution.
+
+Each execution:
+
+* isolated VM,
+* isolated filesystem,
+* isolated memory,
+* isolated network,
+* isolated lifecycle.
+
+---
+
+## B2 — VM Hard Limits
+
+Per-VM constraints:
+
+* memory ceilings,
+* CPU quotas,
+* execution timeout,
+* filesystem quotas,
+* outbound network restrictions.
+
+Violations:
+
+* terminate VM immediately.
+
+---
+
+## B3 — Network Default-Deny
+
+Sandbox outbound network:
+
+* denied by default,
+* explicit allowlists only.
+
+Cloud metadata endpoints:
+
+* permanently blocked.
+
+---
+
+## B4 — Guaranteed VM Destruction
+
+VM destruction occurs inside finally blocks.
+
+No reusable execution VMs.
+
+Leaked VM = security defect.
+
+Zero tolerance.
+
+---
+
+# 6. Phase C — Intelligence Integration
+
+Only after:
+
+* governance substrate,
+* isolation runtime,
+* policy enforcement,
+* and simulation infrastructure
+
+are operational and verified.
+
+---
+
+## C1 — Real Model Providers
+
+Only now connect:
+
+* Gemini,
+* Claude,
+* or future providers.
+
+All calls:
+
+* proposal-only,
+* ledger-attested,
+* tenant-scoped,
+* quota-enforced.
+
+---
+
+## C2 — Complexity Router
+
+Simple tasks:
+
+* cheaper/faster models.
+
+Complex reasoning:
+
+* advanced models.
+
+Routing remains proposal-only.
+
+---
+
+## C3 — Task Planner
+
+Planner decomposes:
+
+* objectives,
+* dependencies,
+* execution order.
+
+Still no execution authority.
+
+---
+
+## C4 — Multi-Agent Coordination
+
+This becomes the LAST major capability added.
+
+Not first.
+
+Never before governance and isolation exist.
+
+---
+
+# 7. Redacted Governance Ledger Rules
+
+The governance ledger is authoritative evidence.
+
+However:
+
+raw prompts,
+tenant data,
+PHI,
+credentials,
+or proprietary payloads
+
+must NOT be stored directly in immutable ledger history.
+
+The ledger stores:
+
+* hashes,
+* attestation IDs,
+* rule IDs,
+* risk scores,
+* policy outcomes,
+* minimal provenance metadata.
+
+Raw payloads remain:
+
+* externally stored,
+* redactable,
+* retention-governed,
+* GDPR/HIPAA compliant.
+
+---
+
+# 8. Measurement & Reliability Positioning
+
+ZTAN reliability work remains valid and important:
+
+* replay equivalence,
+* telemetry provenance,
+* entropy accounting,
+* adversarial instrumentation,
+* fail-closed observability,
+* deterministic convergence.
+
+However:
+
+these systems are now classified as:
+supporting governance instrumentation,
+NOT autonomous authority.
+
+Telemetry:
+
+* informs decisions,
+* never grants authority.
+
+Classifiers:
+
+* score risk,
+* never authorize execution.
+
+Observability:
+
+* supports governance,
+* never bypasses policy.
+
+---
+
+# 9. The Correct Engineering Philosophy
+
+The original roadmap framed the platform as:
+“an AI platform with safety layers.”
+
+That framing is rejected.
+
+The corrected framing is:
+
+> ZTAN is a governance substrate that constrains intelligence.
+
+The constraints are the product:
+
+* semantic inspection,
+* policy enforcement,
+* simulation,
+* authorization,
+* isolation,
+* attestation,
+* governance.
+
+The AI is an optional capability attached later.
+
+Intelligence amplifies the substrate.
+It never precedes it.
+
+---
+
+# 10. Final Engineering Rule
+
+Do not build:
+
+* multi-agent orchestration,
+* autonomous execution,
+* advanced planners,
+* or generalized AI coordination
+
+until:
+
+* the governance substrate,
+* simulation layer,
+* permission lattice,
+* and execution isolation
+
+are fully operational and adversarially tested.
+
+The system earns intelligence only after it proves constraint integrity.
+
+Constraints first.
+Isolation second.
+Intelligence last.
+
+This merged direction is now internally consistent, adversarially aware, and much safer than the original roadmap. It also aligns properly with the reliability, replay, provenance, and fail-closed work you already completed.

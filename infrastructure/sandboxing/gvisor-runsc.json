@@ -1,0 +1,10 @@
+{
+  "platform": "kvm",
+  "network": "none",
+  "file-access": "shared",
+  "fsgofer-host-uds": true,
+  "overlay2": {
+    "size-mb": 32,
+    "flags": ["noexec", "nosuid", "nodev"]
+  }
+}

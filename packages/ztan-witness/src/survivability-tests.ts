@@ -49,16 +49,17 @@ async function runSurvivabilityTests() {
             await tx.ztanLedgerBlock.deleteMany({
                 where: { blockId: { startsWith: `${cid}:` } }
             });
-            await tx.ztanWalLog.deleteMany({});
-        });
+            // Use TRUNCATE to bypass FOR EACH ROW triggers (enforce_immutability)
+            // which cause transaction timeouts on large row counts
+            await tx.$executeRawUnsafe('TRUNCATE TABLE "ZtanWalLog" RESTART IDENTITY CASCADE;');
+        }, { timeout: 30000 });
     };
 
     try {
         // Clear WAL log table globally to prevent unique constraint conflicts on the 'seq' field from previous test runs
-        await db.$transaction(async (tx: any) => {
-            await tx.$executeRawUnsafe("SET LOCAL ztan.bypass_immutability = 'on';");
-            await tx.ztanWalLog.deleteMany({});
-        });
+        // Use TRUNCATE to bypass FOR EACH ROW triggers (enforce_immutability)
+        // which cause P2028 transaction timeouts when row count is high
+        await db.$executeRawUnsafe('TRUNCATE TABLE "ZtanWalLog" RESTART IDENTITY CASCADE;');
 
         // =========================================================================
         // DRILL 3: Redis Failover & Lock Epoch Rollback Chaos

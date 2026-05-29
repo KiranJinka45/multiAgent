@@ -30,6 +30,7 @@ export * from './governance-ledger.js';
 export * from './canonicalizer.js';
 export * from './rehearsal.js';
 export * from './chaos.js';
+export * from './startup-attestation.js';
 export * from './transparency/gossip-registry.js';
 export * from './transparency/equivocation-detector.js';
 export * from './transparency/witness-federation.js';
@@ -137,7 +138,10 @@ export {
     supervisorService
 } from './mocks.js';
 export type { RuntimeRecord, ManagedContainer, AgentResult, ExecutionContextType } from './mocks.js';
-
+import { redis } from './server.js';
+export async function getRedisClient() {
+    return redis;
+}
 export const QUEUE_DEPLOY = 'deploy-queue';
 
 export type JobPayload = Record<string, any> & {

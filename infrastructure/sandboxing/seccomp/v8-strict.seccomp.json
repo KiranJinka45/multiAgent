@@ -1,0 +1,49 @@
+{
+  "defaultAction": "SCMP_ACT_KILL_PROCESS",
+  "architectures": [
+    "SCMP_ARCH_X86_64",
+    "SCMP_ARCH_X86",
+    "SCMP_ARCH_X32"
+  ],
+  "syscalls": [
+    {
+      "names": [
+        "exit",
+        "exit_group",
+        "nanosleep",
+        "sched_yield",
+        "brk",
+        "mmap",
+        "munmap",
+        "mprotect",
+        "madvise",
+        "read",
+        "write",
+        "close",
+        "epoll_wait",
+        "epoll_ctl",
+        "clock_gettime",
+        "gettimeofday",
+        "futex",
+        "lseek",
+        "fstat",
+        "newfstatat",
+        "stat",
+        "poll",
+        "rt_sigaction",
+        "rt_sigprocmask",
+        "rt_sigreturn",
+        "getpid",
+        "getuid",
+        "getgid",
+        "geteuid",
+        "getegid"
+      ],
+      "action": "SCMP_ACT_ALLOW",
+      "args": [],
+      "comment": "Allowlisted syscalls for V8/Node execution inside sandbox",
+      "includes": {},
+      "excludes": {}
+    }
+  ]
+}

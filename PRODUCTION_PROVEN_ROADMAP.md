@@ -33,6 +33,15 @@ Achieve **PRODUCTION-PROVEN** certification through single-writer transaction se
 - [ ] **Tier P2: Physical Chaos Soak**: Ephemeral `tc/iptables` packet loss, WAL block corruption, and 1,000-writer parallel stress tests.
 - [ ] **Tier P3: Bounded Operator Observatory**: Develop the local visual state DAG, multi-sig release console, and incident path guides.
 
+## 🛡️ Phase 11B: Hardware-Rooted Trust & True Isolation Domains (Active Design)
+*Goal: Transition from hardened cooperative process isolation to true hypervisor/kernel containment and TPM-backed hardware attestation.*
+- [ ] **Tier H0: True Isolation Domains**: Ephemeral microVMs (Firecracker/gVisor), seccomp-bpf system-call filters, and immutable read-only rootfilesystems (Blueprinted in [PHASE_11B_HARDWARE_ROOTED_TRUST.md](file:///c:/multiagentic_project/multiAgent-main/PHASE_11B_HARDWARE_ROOTED_TRUST.md)).
+- [ ] **Tier H1: Hardware-Backed Attestation**: TPM 2.0 PCR sealing of state keys, Secure Boot path validation, and remote quote attestation protocols.
+- [ ] **Tier H2: Detached Witness Sovereignty**: Off-host/off-kernel witness authorities, cross-kernel signature aggregation, and out-of-band integrity handshakes.
+- [ ] **Tier H3: Immutable Deployment Provenance**: Mandatory signed container images, keyless Sigstore/Cosign validation, and SLSA Level 3 reproducible build provenance.
+- [ ] **Tier H4: Cryptographic Time Anchoring**: Trusted RFC 3161 timestamping, Rekor public/consortium append-only transparency logs, and clock-drift hard quarantine.
+
+
 ---
 
 ## 🏛️ Appendix: Archival Foundation Phases (Completed ✅)

@@ -20,6 +20,15 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           args: --all-projects --severity-threshold=high
+      - name: Generate CycloneDX SBOM
+        run: npx snyk sbom --all-projects --format=cyclonedx1.4+json --output=sbom.json
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      - name: Archive SBOM Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-report
+          path: sbom.json
 
   trivy:
     name: Trivy Container & IaC

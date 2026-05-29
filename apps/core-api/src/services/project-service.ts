@@ -81,8 +81,19 @@ export const projectService = {
         }
     },
 
-    async updateFile(id: string, content: string) {
+    async updateFile(id: string, content: string, tenantId: string) {
         try {
+            // Verify that the file belongs to a project owned by this tenant
+            const file = await db.projectFile.findFirst({
+                where: {
+                    id,
+                    project: { tenantId }
+                }
+            });
+            if (!file) {
+                throw new Error('Unauthorized or file not found');
+            }
+
             const data = await db.projectFile.update({
                 where: { id },
                 data: { content, updatedAt: new Date() }
@@ -90,7 +101,7 @@ export const projectService = {
             return data as any as ProjectFile;
         } catch (error) {
             console.error('[ProjectService] Error updating file:', error);
-            return null;
+            throw error;
         }
     },
 
@@ -135,8 +146,14 @@ export const projectService = {
         }
     },
 
-    async saveProjectFiles(projectId: string, files: { path: string, content: string, language?: string }[]) {
+    async saveProjectFiles(projectId: string, files: { path: string, content: string, language?: string }[], tenantId: string) {
         try {
+            // Verify project ownership first
+            const isOwner = await this.verifyProjectOwnership(projectId, tenantId);
+            if (!isOwner) {
+                throw new Error('Unauthorized or project not found');
+            }
+
             // 1. Deduplicate files by path
             const uniqueFilesMap = new Map<string, any>();
             files.forEach(f => {
@@ -154,7 +171,7 @@ export const projectService = {
                 db.projectFile.deleteMany({ 
                     where: { 
                         projectId,
-                        project: { tenantId: (files as any).tenantId || '' } // Dynamically check tenant ownership
+                        project: { tenantId } // Safely enforce parent relation tenancy
                     } 
                 }),
                 db.projectFile.createMany({

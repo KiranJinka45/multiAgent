@@ -1,0 +1,213 @@
+{
+  "timestamp": "2026-05-28T06:18:50.539Z",
+  "durationSeconds": 45,
+  "services": [
+    "HostDaemon",
+    "Gateway",
+    "CoreAPI",
+    "ControlPlane"
+  ],
+  "ledgerVerifiedOk": true,
+  "shutdownResults": [
+    {
+      "status": "ok",
+      "name": "HostDaemon",
+      "code": null
+    },
+    {
+      "status": "ok",
+      "name": "Gateway",
+      "code": null
+    },
+    {
+      "status": "ok",
+      "name": "CoreAPI",
+      "code": null
+    },
+    {
+      "status": "ok",
+      "name": "ControlPlane",
+      "code": null
+    }
+  ],
+  "requestMetrics": {
+    "totalRequests": 346,
+    "successRate": "95.95",
+    "avgLatency": "6.5",
+    "p95Latency": "21.0",
+    "p99Latency": "30.0",
+    "dualChaosSuccessRate": "96.07",
+    "dualRTO": "2.254 s (p95 latency stabilized)",
+    "budgetConsumed": "26.9"
+  },
+  "serviceStats": {
+    "HostDaemon": {
+      "rssDeltaMB": "-4.28",
+      "heapDeltaMB": "-0.96",
+      "phaseAverages": {
+        "NOMINAL_1": {
+          "avg": "47.35",
+          "peak": "94.61"
+        },
+        "DUAL_OUTAGE": {
+          "avg": "0.26",
+          "peak": "0.79"
+        },
+        "DUAL_RECOVERY": {
+          "avg": "0.06",
+          "peak": "0.18"
+        },
+        "NOMINAL_2": {
+          "avg": "0.04",
+          "peak": "0.07"
+        }
+      },
+      "handleDelta": -1,
+      "firstHandles": [
+        "Pipe",
+        "Server(port:unknown)",
+        "Socket(inactive)",
+        "Socket(inactive)",
+        "Server(port:5050)",
+        "Socket(local:5050, remote:127.0.0.1:38708)"
+      ],
+      "lastHandles": [
+        "Pipe",
+        "Server(port:unknown)",
+        "Socket(inactive)",
+        "Socket(inactive)",
+        "Server(port:5050)"
+      ]
+    },
+    "Gateway": {
+      "rssDeltaMB": "-22.93",
+      "heapDeltaMB": "3.56",
+      "phaseAverages": {
+        "NOMINAL_1": {
+          "avg": "46.18",
+          "peak": "91.59"
+        },
+        "DUAL_OUTAGE": {
+          "avg": "5.34",
+          "peak": "14.82"
+        },
+        "DUAL_RECOVERY": {
+          "avg": "3.12",
+          "peak": "4.05"
+        },
+        "NOMINAL_2": {
+          "avg": "4.08",
+          "peak": "10.53"
+        }
+      },
+      "handleDelta": 2,
+      "firstHandles": [
+        "Pipe",
+        "Socket(inactive)",
+        "Socket(inactive)",
+        "Socket(local:38727, remote:none:)",
+        "Socket(local:38730, remote:none:)",
+        "Socket(local:38731, remote:none:)",
+        "Socket(local:38732, remote:none:)",
+        "Socket(local:38733, remote:none:)",
+        "Server(port:4020)",
+        "Socket(local:4020, remote:127.0.0.1:38736)"
+      ],
+      "lastHandles": [
+        "Pipe",
+        "Socket(inactive)",
+        "Socket(inactive)",
+        "Server(port:4020)",
+        "Socket(local:46382, remote:none:)",
+        "Socket(local:15120, remote:none:)",
+        "Socket(local:15121, remote:none:)",
+        "Socket(local:15124, remote:none:)",
+        "Socket(local:15125, remote:none:)",
+        "Socket(local:15201, remote:127.0.0.1:4022)",
+        "Socket(local:4020, remote:127.0.0.1:15217)",
+        "Socket(local:15218, remote:127.0.0.1:4022)"
+      ]
+    },
+    "CoreAPI": {
+      "rssDeltaMB": "-25.87",
+      "heapDeltaMB": "-4.89",
+      "phaseAverages": {
+        "NOMINAL_1": {
+          "avg": "32.97",
+          "peak": "97.59"
+        },
+        "DUAL_OUTAGE": {
+          "avg": "3.36",
+          "peak": "11.18"
+        },
+        "DUAL_RECOVERY": {
+          "avg": "2.24",
+          "peak": "2.63"
+        },
+        "NOMINAL_2": {
+          "avg": "2.91",
+          "peak": "6.00"
+        }
+      },
+      "handleDelta": 1,
+      "firstHandles": [
+        "Pipe",
+        "Socket(inactive)",
+        "Socket(inactive)",
+        "Socket(local:38738, remote:none:)",
+        "Socket(local:38739, remote:none:)",
+        "Server(port:4022)",
+        "Socket(local:4022, remote:127.0.0.1:38741)"
+      ],
+      "lastHandles": [
+        "Pipe",
+        "Socket(inactive)",
+        "Socket(inactive)",
+        "Server(port:4022)",
+        "Socket(local:46381, remote:none:)",
+        "Socket(local:15122, remote:none:)",
+        "Socket(local:4022, remote:127.0.0.1:15201)",
+        "Socket(local:4022, remote:127.0.0.1:15218)"
+      ]
+    },
+    "ControlPlane": {
+      "rssDeltaMB": "-25.00",
+      "heapDeltaMB": "-5.52",
+      "phaseAverages": {
+        "NOMINAL_1": {
+          "avg": "32.77",
+          "peak": "96.63"
+        },
+        "DUAL_OUTAGE": {
+          "avg": "0.56",
+          "peak": "1.26"
+        },
+        "DUAL_RECOVERY": {
+          "avg": "0.51",
+          "peak": "0.57"
+        },
+        "NOMINAL_2": {
+          "avg": "0.42",
+          "peak": "0.76"
+        }
+      },
+      "handleDelta": -1,
+      "firstHandles": [
+        "Pipe",
+        "Socket(inactive)",
+        "Socket(inactive)",
+        "Socket(local:38722, remote:none:)",
+        "Server(port:4021)",
+        "Socket(local:4021, remote:127.0.0.1:38726)"
+      ],
+      "lastHandles": [
+        "Pipe",
+        "Socket(inactive)",
+        "Socket(inactive)",
+        "Server(port:4021)",
+        "Socket(local:15123, remote:none:)"
+      ]
+    }
+  },
+  "failures": 0
+}

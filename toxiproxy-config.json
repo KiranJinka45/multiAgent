@@ -1,0 +1,20 @@
+[
+  {
+    "name": "ztan_node_1_proxy",
+    "listen": "0.0.0.0:8474",
+    "upstream": "ztan-node-1:8080",
+    "enabled": true
+  },
+  {
+    "name": "ztan_node_2_proxy",
+    "listen": "0.0.0.0:8474",
+    "upstream": "ztan-node-2:8080",
+    "enabled": true
+  },
+  {
+    "name": "ztan_node_3_proxy",
+    "listen": "0.0.0.0:8474",
+    "upstream": "ztan-node-3:8080",
+    "enabled": true
+  }
+]

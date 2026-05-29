@@ -1,0 +1,19 @@
+{
+  "fuzzSchedule": {
+    "attackVector": "INVARIANT_VIOLATION_TRIGGERED",
+    "delayMs": 250,
+    "perturbedNodes": [
+      "node-1"
+    ],
+    "timestampStr": "2026-05-28T16:37:38.891Z"
+  },
+  "reason": "ZTAN_INVARIANT_VIOLATION: QUORUM_INTERSECTION_BROKEN",
+  "term": 1,
+  "timestamp": 1779986258883,
+  "__serialization_metadata__": {
+    "truncatedCount": 0,
+    "circularCount": 0,
+    "maxDepthReached": 3,
+    "timestampStr": "2026-05-28T16:37:38.883Z"
+  }
+}

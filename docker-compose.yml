@@ -138,10 +138,156 @@ services:
     networks:
       - multiagent-network
 
+  # ── Policy Engine (OPA Sidecar) ──────────────────────────────────────────
+  opa:
+    image: openpolicyagent/opa:latest-static
+    container_name: opa
+    command:
+      - "run"
+      - "--server"
+      - "--addr=0.0.0.0:8181"
+      - "--log-level=info"
+      - "/policies"
+    ports:
+      - "8181:8181"
+    volumes:
+      - ./rego/ztan/authz:/policies
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8181/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - multiagent-network
+
+  # ── Temporal Server (Durable Workflows) ──────────────────────────────────
+  temporal:
+    image: temporalio/auto-setup:1.24
+    container_name: temporal
+    ports:
+      - "7233:7233"
+    environment:
+      - DB=postgresql
+      - DB_PORT=5432
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PWD=${POSTGRES_PASSWORD:-password}
+      - POSTGRES_SEEDS=postgres
+      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development-sql.yaml
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "tctl", "--address", "temporal:7233", "cluster", "health"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    networks:
+      - multiagent-network
+
+  temporal-ui:
+    image: temporalio/ui:latest
+    container_name: temporal-ui
+    ports:
+      - "8088:8080"
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_CORS_ORIGINS=http://localhost:3000
+    depends_on:
+      temporal:
+        condition: service_healthy
+  # ── Witness Federation Nodes ──────────────────────────────────────────────
+  # Three geographically-distributed witnesses for governance quorum.
+  # Uses the same core-api image in WITNESS_MODE to serve only attestation endpoints.
+
+  witness-1:
+    build:
+      context: .
+      dockerfile: apps/core-api/Dockerfile
+    container_name: witness-1
+    ports:
+      - "8081:3010"
+    environment:
+      - NODE_ENV=production
+      - PORT=3010
+      - WITNESS_MODE=true
+      - WITNESS_ID=8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368
+      - WITNESS_URLS=http://witness-1:3010,http://witness-2:3010,http://witness-3:3010
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:password@postgres:5432/multiagent}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3010/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - multiagent-network
+
+  witness-2:
+    build:
+      context: .
+      dockerfile: apps/core-api/Dockerfile
+    container_name: witness-2
+    ports:
+      - "8082:3010"
+    environment:
+      - NODE_ENV=production
+      - PORT=3010
+      - WITNESS_MODE=true
+      - WITNESS_ID=5b85c135c30900cefff7edad9583ee68e362e34bc4d142d27ae7c4c733da48f0
+      - WITNESS_URLS=http://witness-1:3010,http://witness-2:3010,http://witness-3:3010
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:password@postgres:5432/multiagent}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3010/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - multiagent-network
+
+  witness-3:
+    build:
+      context: .
+      dockerfile: apps/core-api/Dockerfile
+    container_name: witness-3
+    ports:
+      - "8083:3010"
+    environment:
+      - NODE_ENV=production
+      - PORT=3010
+      - WITNESS_MODE=true
+      - WITNESS_ID=a88ce7ffe6733cf50cfb9292fe0c370f80bb9ccd104a2c15ad7398ec159da6ab
+      - WITNESS_URLS=http://witness-1:3010,http://witness-2:3010,http://witness-3:3010
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:password@postgres:5432/multiagent}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3010/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - multiagent-network
+
 networks:
   multiagent-network:
     driver: bridge
 
 volumes:
   postgres_data:
-  redis_data:
+  redis_data:

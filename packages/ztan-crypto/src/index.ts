@@ -4,6 +4,11 @@ import { Canonical } from './canonical.js';
 
 export * from './frost.js';
 export * from './ztan-bls.js';
+export * from './tpm/attestation-verifier.js';
+export * from './tpm/pcr-policy.js';
+export * from './sigstore/mock-cosign.js';
+export * from './time/mock-tsa.js';
+export * from './time/mock-rekor.js';
 
 const DST = 'BLS_SIG_ZTAN_AUDIT_V1';
 
@@ -167,7 +172,8 @@ export class ThresholdCrypto {
   }
 
   public static fromHex(hex: string): Uint8Array {
-    return new Uint8Array(hex.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
+    const clean = hex.startsWith('0x') ? hex.slice(2) : hex;
+    return new Uint8Array(clean.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
   }
 
   public static canonicalizeNodeIds(nodeIds: string[]): Uint8Array[] {
@@ -262,11 +268,11 @@ export class ThresholdCrypto {
   }
 
   private static VERIFIER_PK_MAP: Record<string, string> = {
-    'SEC-GOV-01': '0x895a45bc2ede4ed56206ca4fb747c1f930a0fd0c0fdd762bc5ee696a6628b58f',
-    'SRE-AUDIT-02': '0xec4c0e9bbaa056cded4da730eef8b9a617af90049a23256352f21e021b8cf5b',
-    'TRUST-NODE-03': '0x8e7f0978cd06c8f5e446cd0cbfd53e662754091d04e24da9eb079371232970c3',
-    'LEGAL-04': '0x3697dab15903dc6e61ff96008ee202ddca091d855714d881eeff16a7677f4b51',
-    'COMPLIANCE-05': '0x20f2ed62f5dce0ba77394e65a9ae5e5c20f2ed62f5dce0ba77394e65a9ae5e5c'
+    'SEC-GOV-01': '0xa75eb36b3dccd7af50d0d896b2ecf56a16f2100754aad233486fa0e703f6783b27be394d7e6bfce0e9303ef8bb233ad5',
+    'SRE-AUDIT-02': '0x8fb7e8d5f746a65b260a20b935bbb6698275f16a3140076200900948b229469db51ce18d3650d646c4a47868792e77db',
+    'TRUST-NODE-03': '0xb7529eb707c2fbf093c2f62434236ce2289b51c7ec7a53dd09c7556446181ef2c500351f13d65b0a838a2c4bdbed10bb',
+    'LEGAL-04': '0x839b1df41f757a55fe144830d799039d889d061a7ee07c7a70045fd5c0bb71f0e70fdab05832ccc79cd9d74f513190f0',
+    'COMPLIANCE-05': '0x8b755d3d55ad56382de575e9cec6b555eabe917461ece9862ea76619ce06bb44f346e4ce2418ee73e5efc10efd369e51'
   };
 
   /**
@@ -292,6 +298,22 @@ export class ThresholdCrypto {
     const sigBytes = signatures.map(s => this.fromHex(s));
     const aggregated = bls.aggregateSignatures(sigBytes);
     return this.toHex(aggregated);
+  }
+
+  public static async verifyAggregateSignature(
+    anchor: string,
+    aggregateSignature: string,
+    identities: string[]
+  ): Promise<boolean> {
+    try {
+      const message = this.fromHex(anchor);
+      const sigBytes = this.fromHex(aggregateSignature);
+      const publicKeys = identities.map(id => this.fromHex(this.getVerifierPublicKey(id)));
+      const aggregatedPk = bls.aggregatePublicKeys(publicKeys);
+      return await bls.verify(sigBytes, message, aggregatedPk);
+    } catch (e) {
+      return false;
+    }
   }
 
   public static async verifyPatchIntent(intent: PatchIntent, signatures: string[] = []): Promise<boolean> {

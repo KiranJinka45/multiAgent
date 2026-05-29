@@ -94,12 +94,12 @@
 The platform has achieved an **Architecturally Coherent Baseline**. While directionally strong, it is currently **Operationally Unproven** in large-scale production environments. Trust is being established through the **Constitutional Freeze** and the **Stewardship Validation Program**. The current scores (e.g., Phase A 92.5%) are **internal indicators of progress** and require further adversarial testing, reproducibility across environments, and human cognitive validation before being considered institutionally defensible.
 
 ## 14. Stewardship Validation Program (Phase A-D)
-| Phase | Focus                          | Status      | Evidence                                    |
-| ----- | ------------------------------ | ----------- | ------------------------------------------- |
-| A     | Replay Determinism             | **PASSED**  | IFD-001 [Record #92.5%]                     |
-| B     | Cognitive Intelligibility      | **PASSED**  | Narrative validation: Epistemic Continuity  |
-| C     | Real-World Governance          | *PLANNED*   | HSM Ceremony Propagation                    |
-| D     | Adversarial Resilience         | *PLANNED*   | Malicious Operator Simulation               |
+| Phase | Focus                          | Status                        | Evidence                                    |
+| ----- | ------------------------------ | ----------------------------- | ------------------------------------------- |
+| A     | Replay Determinism             | **PROVISIONAL - INCOMPLETE**  | IFD-001 [Record #92.5%] — Adversarial audit identified: OPA sidecar absent, Temporal setTimeout stub, fail-closed gaps in SemanticInspector, quota engine mock, cross-tenant query leaks. Remediation in progress. |
+| B     | Cognitive Intelligibility      | **PASSED**                    | Narrative validation: Epistemic Continuity  |
+| C     | Real-World Governance          | *PLANNED*                     | HSM Ceremony Propagation                    |
+| D     | Adversarial Resilience         | *PLANNED*                     | Malicious Operator Simulation               |
 
 ### 📊 Survivability Ledger
 

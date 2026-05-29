@@ -13,16 +13,48 @@ import { serverConfig as config } from '@packages/config';
 import * as governance from './transparency/governance.js';
 import { BuildCache } from './build-cache.js';
 
-// import { llmService } from '@packages/ai';
-const llmService: any = {};
-// import { supabase as supabaseClient } from '@packages/supabase';
-const supabaseClient: any = {};
+// SCOPE REDUCTION (v1.6.0 Audit): LLM orchestration is not implemented.
+// The original import was: import { llmService } from '@packages/ai';
+// If called, this will throw to prevent silent fabrication of AI capabilities.
+const llmService: any = new Proxy({}, { get(_, prop) { throw new Error(`[SCOPE_BOUNDARY] LLM orchestration is not implemented. Attempted to access llmService.${String(prop)}. See v1.6.0 audit.`); } });
+// SCOPE REDUCTION (v1.6.0 Audit): Supabase integration is not implemented.
+const supabaseClient: any = new Proxy({}, { get(_, prop) { throw new Error(`[SCOPE_BOUNDARY] Supabase integration is not implemented. Attempted to access supabaseClient.${String(prop)}. See v1.6.0 audit.`); } });
 
 // Modular Imports
 // import { VirtualFileSystem } from '@packages/vfs';
 export class VirtualFileSystem {
-    async read(p: string) { return ''; }
-    async write(p: string, c: string) {}
+    private getScopedPath(p: string): string {
+        const tenantId = contextStorage.getStore()?.tenantId || 'default';
+        const baseDir = path.resolve(process.platform === 'win32' ? './tmp/ztan' : '/tmp/ztan', tenantId);
+        const resolvedPath = path.resolve(baseDir, p.startsWith('/') ? p.substring(1) : p);
+        if (!resolvedPath.startsWith(baseDir)) {
+            throw new Error(`PATH_TRAVERSAL_DETECTED: Attempted to access path outside tenant boundary: ${p}`);
+        }
+        return resolvedPath;
+    }
+
+    async read(p: string): Promise<string> {
+        const fullPath = this.getScopedPath(p);
+        try {
+            if (!existsSync(fullPath)) {
+                return '';
+            }
+            return await fs.readFile(fullPath, 'utf8');
+        } catch (err: any) {
+            throw new Error(`VFS_READ_FAILED: Failed to read from VFS path ${p}: ${err.message}`);
+        }
+    }
+
+    async write(p: string, c: string): Promise<void> {
+        const fullPath = this.getScopedPath(p);
+        try {
+            const dir = path.dirname(fullPath);
+            await fs.mkdir(dir, { recursive: true });
+            await fs.writeFile(fullPath, c, 'utf8');
+        } catch (err: any) {
+            throw new Error(`VFS_WRITE_FAILED: Failed to write to VFS path ${p}: ${err.message}`);
+        }
+    }
 }
 import { ArtifactValidator, ContainerManager, GovernanceEngine } from '@packages/validator';
 import { ProcessManager, DistributedExecutionContext, RuntimeStatus, JobStage, MissionStatus } from './runtime-types.js';
@@ -239,32 +271,18 @@ export const eventBus: any = {
             await eventBus.publish(executionId, 'timer_end', { source, label, message: `Finished: ${message} (${finalStatus})`, durationMs }, projectId);
         };
     },
-    // 🛡️ Phase 12.3: Operational Fatigue Analysis
-    // Tracking long-horizon production truth and governance friction.
+    // SCOPE REDUCTION (v1.6.0 Audit): Fatigue analysis requires longitudinal production data.
+    // Previously returned fabricated hardcoded metrics. Now explicitly absent.
     fatigueAnalysis: {
-        getMetrics: async (tenantId?: string): Promise<{ governanceFriction: number, causalDecay: number, findingResolutionRate: number, institutionalScarDepth: number, survivalIndex: number }> => {
-            logger.info({ tenantId }, '[FatigueAnalysis] Calculating long-horizon operational truth');
-            // Mocking longitudinal evidence
-            return {
-                governanceFriction: 0.14,
-                causalDecay: 0.02,
-                findingResolutionRate: 0.9997, // 99.97% of regulatory findings successfully remediated
-                institutionalScarDepth: 0.99992, // Near-perfect continuity after institutional scars
-                survivalIndex: 0.999998 // Historically-proven 15-year survival truth
-            };
+        getMetrics: async (_tenantId?: string) => {
+            throw new Error('[SCOPE_BOUNDARY] Fatigue analysis is not implemented. No longitudinal production data exists. See v1.6.0 audit.');
         }
     },
-    // 🛡️ Phase 11.3: Independent SLA Monitoring
-    // Tracking production reliability: Mean Time to Governance Failure (MTTGF)
+    // SCOPE REDUCTION (v1.6.0 Audit): SLA monitoring requires production deployment evidence.
+    // Previously returned fabricated SLA compliance data. Now explicitly absent.
     slaMonitor: {
-        getMetrics: async (tenantId?: string): Promise<{ mttgfHours: number, recoveryConvergenceMs: number, slaCompliance: string }> => {
-            logger.info({ tenantId }, '[SLAMonitor] Calculating production reliability metrics');
-            // Mocking production stability data
-            return {
-                mttgfHours: 2160, // 3 months of continuous governance integrity
-                recoveryConvergenceMs: 420, // Average time to formally verify recovery
-                slaCompliance: '99.999%'
-            };
+        getMetrics: async (_tenantId?: string) => {
+            throw new Error('[SCOPE_BOUNDARY] SLA monitoring is not implemented. No production deployment evidence exists. See v1.6.0 audit.');
         }
     },
     // 🛡️ Phase 10.4: Empirical Causal Science
@@ -313,20 +331,10 @@ export const eventBus: any = {
             intelligenceScore: total > 0 ? ((total - failures) / total).toFixed(2) : 0
         };
 
-        // 🛡️ Phase 7.2: Statistical Drift Science
-        // Moving beyond fixed 0.7 thresholds to a Rolling Mean & Standard Deviation ($2\sigma$)
-        const historicalScores = [0.85, 0.82, 0.88, 0.84, 0.86, 0.83]; // Mock historical data
-        const currentScore = parseFloat(metrics.intelligenceScore as string);
-        
-        const mean = historicalScores.reduce((a, b) => a + b) / historicalScores.length;
-        const stdDev = Math.sqrt(historicalScores.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / historicalScores.length);
-        
-        const zScore = Math.abs((currentScore - mean) / stdDev);
-        
-        if (zScore > 2) { // 2-sigma violation
-            logger.error({ currentScore, mean, stdDev, zScore }, '[DriftMonitor] 2-Sigma Statistical Deviation Detected! Triggering Emergency Circuit Breaker.');
-            // This triggers an immediate cessation of autonomous repairs
-        }
+        // SCOPE REDUCTION (v1.6.0 Audit): Statistical drift analysis removed.
+        // Previously used fabricated historical scores [0.85, 0.82, ...] to simulate drift detection.
+        // Real drift analysis requires longitudinal production telemetry, which does not exist.
+        // When production data becomes available, implement drift detection against actual historical scores.
 
         return metrics;
     }
@@ -336,15 +344,55 @@ export const getLatestBuildState = eventBus.getLatestBuildState;
 export const readBuildEvents = eventBus.readBuildEvents;
 
 export const stateManager = {
-    get: async (...args: any[]) => null,
-    set: async (...args: any[]) => { },
-    transition: async (...args: any[]) => { },
+    get: async (key: string): Promise<string | null> => {
+        try {
+            return await redis.get(`ztan:state:${key}`);
+        } catch (err: any) {
+            logger.error({ key, err: err.message }, '[stateManager] get failed');
+            return null;
+        }
+    },
+    set: async (key: string, value: string, ttlSeconds?: number): Promise<void> => {
+        try {
+            if (ttlSeconds) {
+                await redis.set(`ztan:state:${key}`, value, 'EX', ttlSeconds);
+            } else {
+                await redis.set(`ztan:state:${key}`, value);
+            }
+        } catch (err: any) {
+            logger.error({ key, err: err.message }, '[stateManager] set failed');
+        }
+    },
+    transition: async (key: string, expectedOldValue: string | null, newValue: string, ttlSeconds?: number): Promise<boolean> => {
+        try {
+            const redisKey = `ztan:state:${key}`;
+            await redis.watch(redisKey);
+            const currentValue = await redis.get(redisKey);
+            if (currentValue !== expectedOldValue) {
+                await redis.unwatch();
+                return false;
+            }
+            const multi = redis.multi();
+            if (ttlSeconds) {
+                multi.set(redisKey, newValue, 'EX', ttlSeconds);
+            } else {
+                multi.set(redisKey, newValue);
+            }
+            const results = await multi.exec();
+            return results !== null;
+        } catch (err: any) {
+            logger.error({ key, err: err.message }, '[stateManager] transition failed');
+            try { await redis.unwatch(); } catch {}
+            return false;
+        }
+    }
 };
 
+// SCOPE REDUCTION (v1.6.0 Audit): Project memory/learning is not implemented.
 export const projectMemory = {
-    get: async (...args: any[]) => ({ memory: [] }),
-    update: async (...args: any[]) => { },
-    initializeMemory: async (...args: any[]) => {},
+    get: async (..._args: any[]) => { throw new Error('[SCOPE_BOUNDARY] projectMemory is not implemented. See v1.6.0 audit.'); },
+    update: async (..._args: any[]) => { throw new Error('[SCOPE_BOUNDARY] projectMemory is not implemented. See v1.6.0 audit.'); },
+    initializeMemory: async (..._args: any[]) => { throw new Error('[SCOPE_BOUNDARY] projectMemory is not implemented. See v1.6.0 audit.'); },
 };
 
 // Redis Initialization
@@ -451,23 +499,81 @@ const redisProxy = new Proxy(rawRedis, {
 export const redis = redisProxy;
 
 // Mission & Project Services
+// SCOPE REDUCTION (v1.6.0 Audit): Project service in utils/server.ts is a stub.
+// The real projectService lives in apps/core-api/src/services/project-service.ts.
+// This stub exists only for backward-compatible import paths. It throws on use.
 export const projectService = {
-    verifyProjectOwnership: async (...args: any[]) => true,
-    getProject: async (...args: any[]) => ({ id: 'mock', status: 'mock' }),
-    getProjects: async (...args: any[]) => [],
-    getProjectFiles: async (...args: any[]) => [],
-    createProject: async (...args: any[]) => ({ data: { id: 'mock-id' }, error: null }),
+    verifyProjectOwnership: async (..._args: any[]) => { throw new Error('[SCOPE_BOUNDARY] projectService stub in utils. Use apps/core-api/src/services/project-service.ts'); },
+    getProject: async (..._args: any[]) => { throw new Error('[SCOPE_BOUNDARY] projectService stub in utils. Use apps/core-api/src/services/project-service.ts'); },
+    getProjects: async (..._args: any[]) => { throw new Error('[SCOPE_BOUNDARY] projectService stub in utils. Use apps/core-api/src/services/project-service.ts'); },
+    getProjectFiles: async (..._args: any[]) => { throw new Error('[SCOPE_BOUNDARY] projectService stub in utils. Use apps/core-api/src/services/project-service.ts'); },
+    createProject: async (..._args: any[]) => { throw new Error('[SCOPE_BOUNDARY] projectService stub in utils. Use apps/core-api/src/services/project-service.ts'); },
 };
 export const ProjectService = projectService;
 
+// ═══ REDIS-BACKED QUOTA ENGINE (Remediation Fix #5) ═══
+// Enforces per-tenant hourly execution limits using Redis INCR + EXPIRE.
+// Tier limits: Free=10/hr, Pro=100/hr, Enterprise=unlimited.
+// Fail-closed: Redis errors → QUOTA_UNAVAILABLE (deny).
+const TIER_LIMITS: Record<string, number> = {
+    free: 10,
+    pro: 100,
+    enterprise: Infinity
+};
+
 const quotaEngine = {
-    reserveExecutionSlot: async (tenantId: string) => ({ allowed: true, reason: 'MOCK_ALLOWED' })
+    reserveExecutionSlot: async (tenantId: string): Promise<{ allowed: boolean; reason: string; currentCount?: number }> => {
+        try {
+            // Determine tenant tier. Default to 'free' for unknown tenants.
+            let tier = 'free';
+            try {
+                const tenant = await db.tenant.findUnique({ where: { id: tenantId } });
+                if (tenant && (tenant as any).tier) {
+                    tier = String((tenant as any).tier).toLowerCase();
+                }
+            } catch (_dbErr) {
+                // If DB lookup fails, enforce most restrictive tier.
+                logger.warn({ tenantId }, '[QUOTA] Tenant lookup failed, defaulting to free tier');
+            }
+
+            const limit = TIER_LIMITS[tier] ?? TIER_LIMITS['free'];
+            if (limit === Infinity) {
+                return { allowed: true, reason: 'ENTERPRISE_UNLIMITED' };
+            }
+
+            const hourBucket = Math.floor(Date.now() / 3600000);
+            const redisKey = `ztan:quota:${tenantId}:${hourBucket}`;
+
+            const redisClient = redis;
+            const currentCount = await redisClient.incr(redisKey);
+
+            // Set TTL on first increment (expire after 2 hours for safety margin)
+            if (currentCount === 1) {
+                await redisClient.expire(redisKey, 7200);
+            }
+
+            if (currentCount > limit) {
+                logger.warn({ tenantId, tier, currentCount, limit }, '[QUOTA] Tenant exceeded hourly limit');
+                return { allowed: false, reason: `QUOTA_EXCEEDED: ${currentCount}/${limit} per hour (${tier} tier)`, currentCount };
+            }
+
+            return { allowed: true, reason: `QUOTA_OK: ${currentCount}/${limit}`, currentCount };
+        } catch (err) {
+            // ═══ FAIL-CLOSED ═══
+            // Redis unavailability must not silently allow unlimited executions.
+            logger.error({ tenantId, err }, '[QUOTA] Redis quota check failed — fail-closed');
+            return { allowed: false, reason: 'QUOTA_UNAVAILABLE: Redis error, fail-closed' };
+        }
+    }
 };
 
 export const missionController = {
-    getMission: async (id: string, tenantId?: string) => {
+    // ═══ TENANT-SCOPED MISSION ACCESS (Remediation Fix #4) ═══
+    // tenantId is now REQUIRED. All queries are scoped to prevent cross-tenant access.
+    // System-level access uses tenantId='system' explicitly.
+    getMission: async (id: string, tenantId: string) => {
         if (!tenantId) {
-            return await db.mission.findUnique({ where: { id } });
+            throw new Error('[TENANT_BOUNDARY] tenantId is required for getMission. Cross-tenant access is prohibited.');
         }
         return await db.mission.findFirst({ where: { id, tenantId } });
     },
@@ -544,7 +650,8 @@ export const missionController = {
         }
         
         // 🛡️ Phase 4.3: Autonomous Repair Loop
-        const mission = await db.mission.findUnique({ where: { id } });
+        // ═══ TENANT-SCOPED (Remediation Fix #4) ═══
+        const mission = await db.mission.findFirst({ where: { id, tenantId } });
         const metadata = (mission?.metadata as any) || {};
         const repairCount = metadata.repairCount || 0;
         const MAX_REPAIRS = 3;
@@ -580,14 +687,26 @@ export const missionController = {
 export const MissionService = missionController;
 
 // Infrastructure & Monitoring
+import { registry as realRegistry, Counter as RealCounter, Gauge as RealGauge } from '@packages/observability';
+
 export const AppService = { getStatus: async () => 'online' };
 export const MetricService = { record: (...args: any[]) => { } };
-export const counterMock = { inc: (...args: any[]) => { }, dec: (...args: any[]) => { }, observe: (...args: any[]) => { }, set: (...args: any[]) => { } };
-export const runtimeCrashesTotal = counterMock;
-export const runtimeActiveTotal = counterMock;
-export const initTelemetry = (serviceName: string) => { };
-export const registry = { register: (...args: any[]) => { }, metrics: async () => '', contentType: 'text/plain; version=0.0.4' };
+export const registry = realRegistry;
 export const agentRegistry = registry;
+
+export const runtimeCrashesTotal = new RealCounter({
+    name: 'runtime_crashes_total_custom',
+    help: 'Total number of custom runtime process crashes',
+    registers: [registry]
+});
+
+export const runtimeActiveTotal = new RealGauge({
+    name: 'runtime_active_total_custom',
+    help: 'Total number of active custom runtime processes',
+    registers: [registry]
+});
+
+export const initTelemetry = (serviceName: string) => { };
 
 export class PreviewServerManager {
     start() { }
@@ -610,11 +729,9 @@ export const QueueManager = {
         const tenantId = data.tenantId || 'global';
         const region = data.region || process.env.CURRENT_REGION || 'us-east-1';
         
-        // 🛡️ Phase 3.1: Fairness Scheduling
-        let priority = 10; // Default
+        let priority = 10;
         try {
             const limits = await (governance as any).quotaEngine.getTenantLimits(tenantId);
-            // BullMQ priority: lower is higher priority
             const plan = (limits as any).plan || 'free';
             if (plan === 'enterprise') priority = 1;
             if (plan === 'pro') priority = 5;
@@ -622,7 +739,7 @@ export const QueueManager = {
             logger.warn({ tenantId }, '[QueueManager] Failed to fetch plan for priority, defaulting to 10');
         }
 
-        const queue = QueueManager.getQueue(name, region);
+        const queue = QueueManager.getQueue(name, region, tenantId);
         return queue.add(name, { ...data, tenantId, region }, { ...opts, priority, group: { id: tenantId } });
     },
     addJob: async (name: string, data: any, opts: any = {}) => QueueManager.add(name, data, opts),
@@ -630,14 +747,15 @@ export const QueueManager = {
         const region = opts.region || process.env.CURRENT_REGION || 'us-east-1';
         return new BullWorker(`${name}:${region}`, cb, { connection: redis, ...opts });
     },
-    getQueue: (name: string, region?: string) => {
+    getQueue: (name: string, region?: string, tenantId?: string) => {
+        const finalTenantId = tenantId || contextStorage.getStore()?.tenantId || 'global';
         const targetRegion = region || process.env.CURRENT_REGION || 'us-east-1';
-        const regionalName = `${name}:${targetRegion}`;
+        const queueName = `${name}:${finalTenantId}:${targetRegion}`;
         const globalQueues = (globalThis as any).__regionalQueues || ((globalThis as any).__regionalQueues = new Map());
-        if (!globalQueues.has(regionalName)) {
-            globalQueues.set(regionalName, new BullQueue(regionalName, { connection: redis }));
+        if (!globalQueues.has(queueName)) {
+            globalQueues.set(queueName, new BullQueue(queueName, { connection: redis }));
         }
-        return globalQueues.get(regionalName);
+        return globalQueues.get(queueName);
     },
     getQueueDepth: async (name: string, region?: string) => {
         const queue = QueueManager.getQueue(name, region);

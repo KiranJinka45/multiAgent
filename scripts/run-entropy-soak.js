@@ -16,6 +16,7 @@ import { PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
 import { performance } from 'perf_hooks';
 import crypto from 'crypto';
+import { classifyVerdict, formatVerdict } from './verdict-classifier.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -34,6 +35,12 @@ const TELEMETRY_INTERVAL_MS = 1500;
 const TRAFFIC_INTERVAL_MS = 400; // Fast transactional loop pacing
 
 const SERVICES = [
+  {
+    name: 'HostDaemon',
+    path: 'packages/runtime-core/dist/supervisor/host-daemon.js',
+    port: 5050,
+    env: {}
+  },
   {
     name: 'Gateway',
     path: 'apps/gateway/dist/index.js',
@@ -359,11 +366,11 @@ function bootService(service) {
       
       const elapsed = Date.now() - startTime;
       const isWarmup = elapsed < 10000; // 10s warmup grace window
-      const allowedPeak = isWarmup ? 98.0 : 90.0;
+      const allowedPeak = isWarmup ? 0.98 : 0.90;
 
       // Strict peak ELU assertion (> 90% is zero tolerated post-warmup, relaxed to > 98% during warmup)
       if (report.elu > allowedPeak) {
-        log(`❌ FAILURE: ${service.name} event loop utilization (ELU) peak exceeded ${isWarmup ? 'adaptive warmup' : 'zero-tolerance'} threshold! (Observed: ${report.elu.toFixed(2)}%, Limit: ${allowedPeak}%)`);
+        log(`❌ FAILURE: ${service.name} event loop utilization (ELU) peak exceeded ${isWarmup ? 'adaptive warmup' : 'zero-tolerance'} threshold! (Observed: ${(report.elu * 100).toFixed(2)}%, Limit: ${(allowedPeak * 100).toFixed(0)}%)`);
         failures++;
       }
     }
@@ -679,8 +686,8 @@ async function main() {
 
     const rssDeltaMB = ((final.memory.rss - initial.memory.rss) / 1024 / 1024).toFixed(2);
     const heapDeltaMB = ((final.memory.heapUsed - initial.memory.heapUsed) / 1024 / 1024).toFixed(2);
-    const avgElu = (entries.reduce((sum, e) => sum + (e.elu || 0), 0) / entries.length).toFixed(2);
-    const peakElu = Math.max(...entries.map(e => e.elu || 0)).toFixed(2);
+    const avgElu = (entries.reduce((sum, e) => sum + (e.elu || 0), 0) / entries.length * 100).toFixed(2);
+    const peakElu = (Math.max(...entries.map(e => e.elu || 0)) * 100).toFixed(2);
 
     const initialHandlesCount = initial.handles?.length || 0;
     const finalHandlesCount = final.handles?.length || 0;
@@ -722,7 +729,7 @@ async function main() {
     let maxConsecutiveElu80 = 0;
     let consecutiveElu80 = 0;
     for (const entry of entries) {
-      if (entry.elu > 80) {
+      if (entry.elu > 0.80) {
         consecutiveElu80++;
         if (consecutiveElu80 > maxConsecutiveElu80) {
           maxConsecutiveElu80 = consecutiveElu80;
@@ -778,7 +785,7 @@ async function main() {
       failures++;
     }
 
-    if (parseFloat(peakElu) > 65.0) {
+    if (parseFloat(peakElu) > 65.0) { // peakElu is already in percentage domain after * 100 conversion above
       log(`      ⚠️  Peak Event Loop Utilization exceeded threshold (Peak: ${peakElu}%)`);
     }
 
@@ -954,13 +961,25 @@ Based on these results, we assert that the system **correctly isolates state mut
   );
 
   log('================================================================');
+  // Tiered Verdict Classification
+  const nonCriticalFailures = [];
   if (failures > 0) {
-    log(`❌  CAMPAIGN DEGRADED: ${failures} SRE parameter bounds exceeded.`);
-    process.exit(1);
-  } else {
-    log(`🎉  CAMPAIGN SUCCEEDED: All SRE operational stability goals met.`);
-    process.exit(0);
+    for (let i = 0; i < failures; i++) {
+      nonCriticalFailures.push(`SRE parameter bound exceeded #${i + 1}`);
+    }
   }
+  const cleanShutdown = shutdownResults.every(r => r.status === 'fulfilled');
+  const verdict = classifyVerdict({
+    failures,
+    warnings: 0,
+    recoveries: 0,
+    criticalFailures: sequenceDriftDetected ? ['Ledger sequence drift detected — monotonicity violated'] : [],
+    nonCriticalFailures,
+    cleanShutdown,
+  });
+
+  log(formatVerdict(verdict, 'Long-Horizon Entropy Soak'));
+  process.exit(verdict.exitCode);
 }
 
 main().catch(err => {

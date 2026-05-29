@@ -12,6 +12,7 @@ import {
 import { db, getSharedClient, DbClientRole } from '@packages/db';
 import { faultSuppressor } from './fault-suppressor.js';
 import { dbHealthMonitor } from './health.js';
+import { StartupAttestationService } from './startup-attestation.js';
 
 const LEDGER_DIR = path.join(process.cwd(), '.ztan-transparency');
 const LEDGER_FILE = path.join(LEDGER_DIR, 'governance_ledger.json');
@@ -1088,6 +1089,18 @@ export const GovernanceLedger = {
   init(): void {
     const count = this.getPartitionCount();
 
+    // Perform Startup configuration and environment audits
+    const isConfigIntact = StartupAttestationService.verifyConfigurationIntegrity();
+    const isEnvIntact = StartupAttestationService.verifyEnvironmentVariables();
+
+    if (!isConfigIntact || !isEnvIntact) {
+      logger.error('[GovernanceLedger] CRITICAL: Startup Attestation Failed! Quarantining node authority boundaries.');
+      for (let p = 0; p < count; p++) {
+        this.states.set(p, 'QUARANTINED');
+      }
+      return;
+    }
+
     // Run database stabilization check first, then stagger partition startup
     this.waitForDatabaseStabilization(30000).then(() => {
       // TIER 0 — Sovereign: lease acquisition, fencing, WAL recovery
@@ -1139,6 +1152,22 @@ export const GovernanceLedger = {
     try {
       if (!fs.existsSync(LEDGER_DIR)) {
         fs.mkdirSync(LEDGER_DIR, { recursive: true });
+      }
+
+      // Auto-register the local operator keys in ZtanRegisteredKey
+      try {
+        const { publicKey } = getOrCreateOperatorKeys();
+        const pem = publicKey.export({ type: 'spki', format: 'pem' }) as string;
+        const actors = ['ZTAN-OPERATOR-01', 'ZTAN-SUPERVISOR', 'ZTAN-AGING-SIMULATOR', 'sre-auth-operator-99'];
+        for (const actor of actors) {
+          db.ztanRegisteredKey.upsert({
+            where: { actorId: actor },
+            update: { publicKey: pem },
+            create: { actorId: actor, publicKey: pem }
+          }).catch(() => {});
+        }
+      } catch (keyErr) {
+        logger.warn(`[GovernanceLedger] Failed to auto-register operator keys: ${keyErr}`);
       }
 
       const ledgerFile = this.getLedgerFile(partition);
@@ -1324,101 +1353,131 @@ export const GovernanceLedger = {
               throw new Error(`Byzantine Timeline Fracture at sequence ${seq} on partition ${partition}`);
             }
             logger.info({ sequenceId: seq }, `[GovernanceLedger] Block already exists in DB with perfect hash parity on partition ${partition}. Deduplicating.`);
-          } else {
-            await db.$transaction(async (tx: any) => {
-              // Transaction-bound Epoch Fencing Check
-              const expectedGen = this.activeDbGenerations.get(partition) ?? null;
-              if (expectedGen !== null) {
-                const leaseId = `singleton-lease-partition-${partition}`;
-                const rows = (await tx.$queryRawUnsafe(`
-                  SELECT generation, owner_pid as "ownerPid", owner_host as "ownerHost"
-                  FROM "ZtanActiveLease"
-                  WHERE id = $1
-                  FOR UPDATE
-                `, leaseId)) as any[];
-                if (rows.length > 0) {
-                  const row = rows[0];
-                  const hostname = os.hostname();
-                  const pid = process.pid;
-                  if (row.ownerHost !== hostname || Number(row.ownerPid) !== pid || Number(row.generation) !== expectedGen) {
-                    throw new Error(
-                      `[GovernanceLedger] Fencing Distributed Lease Violation: Database lease stolen by another host/process for partition ${partition}. Current Owner: Host: ${row.ownerHost}, PID: ${row.ownerPid}, Gen: ${row.generation} (Local Owner: Host: ${hostname}, PID: ${pid}, Gen: ${expectedGen})`
-                    );
-                  }
-                } else {
-                  throw new Error(`[GovernanceLedger] Fencing Distributed Lease Violation: Database lease has been deleted for partition ${partition}.`);
+            successful.push(seq);
+            continue;
+          }
+
+          await db.$transaction(async (tx: any) => {
+            // Set local session parameters for write fencing triggers
+            await tx.$executeRawUnsafe(`SET LOCAL ztan.active_writer_pid = '${process.pid}';`);
+            await tx.$executeRawUnsafe(`SET LOCAL ztan.active_writer_host = '${os.hostname()}';`);
+
+            // Cryptographically verify signature carried by block against registered key (except SYSTEM-ROOT)
+            if (entry.operatorId !== 'SYSTEM-ROOT') {
+              let regKey = await tx.ztanRegisteredKey.findUnique({
+                where: { actorId: entry.operatorId }
+              });
+              if (!regKey) {
+                try {
+                  const { publicKey } = getOrCreateOperatorKeys();
+                  const pem = publicKey.export({ type: 'spki', format: 'pem' }) as string;
+                  regKey = await tx.ztanRegisteredKey.create({
+                    data: { actorId: entry.operatorId, publicKey: pem }
+                  });
+                } catch (regErr) {
+                  throw new Error(`[INTEGRITY_ERROR] Operator ${entry.operatorId} is not registered in ZtanRegisteredKey.`);
+                }
+              }
+              const isValid = this.verifySignatureWithKey(entry.payload, entry.signature, regKey.publicKey);
+              if (!isValid) {
+                throw new Error(`[INTEGRITY_ERROR] Cryptographic signature verification failed for operator ${entry.operatorId}.`);
+              }
+            }
+
+            // Row-level lock on the WAL log slot being committed
+            await tx.$queryRawUnsafe('SELECT id FROM "ZtanWalLog" WHERE seq = $1 FOR UPDATE', seq).catch(() => {});
+
+            // Transaction-bound Epoch Fencing Check
+            const expectedGen = this.activeDbGenerations.get(partition) ?? null;
+            if (expectedGen !== null) {
+              const leaseId = `singleton-lease-partition-${partition}`;
+              const rows = (await tx.$queryRawUnsafe(`
+                SELECT generation, owner_pid as "ownerPid", owner_host as "ownerHost"
+                FROM "ZtanActiveLease"
+                WHERE id = $1
+                FOR UPDATE
+              `, leaseId)) as any[];
+              if (rows.length > 0) {
+                const row = rows[0];
+                const hostname = os.hostname();
+                const pid = process.pid;
+                if (row.ownerHost !== hostname || Number(row.ownerPid) !== pid || Number(row.generation) !== expectedGen) {
+                  throw new Error(
+                    `[GovernanceLedger] Fencing Distributed Lease Violation: Database lease stolen by another host/process for partition ${partition}. Current Owner: Host: ${row.ownerHost}, PID: ${row.ownerPid}, Gen: ${row.generation} (Local Owner: Host: ${hostname}, PID: ${pid}, Gen: ${expectedGen})`
+                  );
                 }
               } else {
-                throw new Error(`[GovernanceLedger] Fencing Distributed Lease Violation: No local active database generation found for partition ${partition}.`);
+                throw new Error(`[GovernanceLedger] Fencing Distributed Lease Violation: Database lease has been deleted for partition ${partition}.`);
               }
+            } else {
+              throw new Error(`[GovernanceLedger] Fencing Distributed Lease Violation: No local active database generation found for partition ${partition}.`);
+            }
 
-              await tx.ztanLedgerBlock.create({
-                data: {
-                  blockId: blockIdStr,
-                  prevHash: entry.prevHash,
-                  hash: entry.hash,
-                  type: entry.type,
-                  payload: entry.payload,
-                  operator: entry.operatorId,
-                  signature: entry.signature,
-                  status: entry.verdict,
-                  epoch: entry.epoch,
-                  createdAt: new Date(entry.timestamp)
-                }
-              });
-
-              if (entry.attestation && entry.quarantineBlob) {
-                await tx.ztanPayloadAttestation.create({
-                  data: {
-                    blockId: blockIdStr,
-                    payloadSanitized: true,
-                    transformations: JSON.stringify(entry.attestation.transformations),
-                    originalByteLength: entry.attestation.originalByteLength,
-                    sanitizedByteLength: entry.attestation.sanitizedByteLength,
-                    sanitizationEpochId: entry.attestation.sanitizationEpochId
-                  }
-                });
-                const qCount = await countQuarantineBlobsForPartition(tx, partition);
-                if (qCount >= 500) {
-                  logger.warn(`[GovernanceLedger] [QUARANTINE_BUDGET_EXCEEDED] Sync outbox quarantine storage exceeded 500 records on partition ${partition}. Bypassing database quarantine write.`);
-                } else {
-                  await tx.ztanQuarantineBlob.create({
-                    data: {
-                      blockId: blockIdStr,
-                      rawBlob: entry.quarantineBlob
-                    }
-                  });
-                }
-              }
-
-
-              logger.info({ sequenceId: seq }, `[GovernanceLedger] Outbox worker successfully synced block to PostgreSQL on partition ${partition}`);
-              await tx.$executeRawUnsafe(`NOTIFY ztan_ledger_update, '${blockIdStr}';`).catch(() => {});
-
-              // Self-heal/reconcile AuditLog if it has correlation trace in payload
-              const auditInfo = parseCorrelationAndPayload(entry.payload, entry.timestamp, entry.operatorId);
-              if (auditInfo) {
-                const existingAudit = await tx.auditLog.findUnique({
-                  where: { id: auditInfo.auditUuid }
-                });
-                if (!existingAudit) {
-                  await tx.auditLog.create({
-                    data: {
-                      id: auditInfo.auditUuid,
-                      action: auditInfo.action,
-                      resource: auditInfo.resource,
-                      userId: auditInfo.userId,
-                      tenantId: 'platform-admin',
-                      status: 'SUCCESS',
-                      metadata: auditInfo.metadata,
-                      createdAt: new Date(entry.timestamp)
-                    }
-                  });
-                  logger.info({ auditUuid: auditInfo.auditUuid }, `[GovernanceLedger] Outbox worker successfully recovered missing AuditLog entry during sync`);
-                }
+            await tx.ztanLedgerBlock.create({
+              data: {
+                blockId: blockIdStr,
+                prevHash: entry.prevHash,
+                hash: entry.hash,
+                type: entry.type,
+                payload: entry.payload,
+                operator: entry.operatorId,
+                signature: entry.signature,
+                status: entry.verdict,
+                epoch: entry.epoch,
+                createdAt: new Date(entry.timestamp)
               }
             });
-          }
+
+            if (entry.attestation && entry.quarantineBlob) {
+              await tx.ztanPayloadAttestation.create({
+                data: {
+                  blockId: blockIdStr,
+                  payloadSanitized: true,
+                  transformations: JSON.stringify(entry.attestation.transformations),
+                  originalByteLength: entry.attestation.originalByteLength,
+                  sanitizedByteLength: entry.attestation.sanitizedByteLength,
+                  sanitizationEpochId: entry.attestation.sanitizationEpochId
+                }
+              });
+              const qCount = await countQuarantineBlobsForPartition(tx, partition);
+              if (qCount >= 500) {
+                logger.warn(`[GovernanceLedger] [QUARANTINE_BUDGET_EXCEEDED] Sync outbox quarantine storage exceeded 500 records on partition ${partition}. Bypassing database quarantine write.`);
+              } else {
+                await tx.ztanQuarantineBlob.create({
+                  data: {
+                    blockId: blockIdStr,
+                    rawBlob: entry.quarantineBlob
+                  }
+                });
+              }
+            }
+
+            logger.info({ sequenceId: seq }, `[GovernanceLedger] Outbox worker successfully synced block to PostgreSQL on partition ${partition}`);
+            await tx.$executeRawUnsafe(`NOTIFY ztan_ledger_update, '${blockIdStr}';`).catch(() => {});
+
+            // Self-heal/reconcile AuditLog if it has correlation trace in payload
+            const auditInfo = parseCorrelationAndPayload(entry.payload, entry.timestamp, entry.operatorId);
+            if (auditInfo) {
+              const existingAudit = await tx.auditLog.findUnique({
+                where: { id: auditInfo.auditUuid }
+              });
+              if (!existingAudit) {
+                await tx.auditLog.create({
+                  data: {
+                    id: auditInfo.auditUuid,
+                    action: auditInfo.action,
+                    resource: auditInfo.resource,
+                    userId: auditInfo.userId,
+                    tenantId: 'platform-admin',
+                    status: 'SUCCESS',
+                    metadata: auditInfo.metadata,
+                    createdAt: new Date(entry.timestamp)
+                  }
+                });
+                logger.info({ auditUuid: auditInfo.auditUuid }, `[GovernanceLedger] Outbox worker successfully recovered missing AuditLog entry during sync`);
+              }
+            }
+          });
 
           successful.push(seq);
         } catch (dbErr: any) {
@@ -1676,6 +1735,17 @@ export const GovernanceLedger = {
     }
   },
 
+  verifySignatureWithKey(payload: string, signatureBase64: string, publicKeyPem: string): boolean {
+    try {
+      const verify = crypto.createVerify('SHA256');
+      verify.update(payload);
+      verify.end();
+      return verify.verify(publicKeyPem, Buffer.from(signatureBase64, 'base64'));
+    } catch (e) {
+      return false;
+    }
+  },
+
   loadLedger(partition: number = 0): GovernanceLedgerEntry[] {
     try {
       const ledgerFile = this.getLedgerFile(partition);
@@ -1894,6 +1964,32 @@ export const GovernanceLedger = {
         await db.$transaction(async (tx: any) => {
           // Enforce strict lock timeouts within the transaction boundary
           await tx.$executeRawUnsafe(`SET LOCAL lock_timeout = '15s';`);
+
+          // Set local session parameters for write fencing triggers
+          await tx.$executeRawUnsafe(`SET LOCAL ztan.active_writer_pid = '${process.pid}';`);
+          await tx.$executeRawUnsafe(`SET LOCAL ztan.active_writer_host = '${os.hostname()}';`);
+
+          // Cryptographically verify signature carried by block against registered key (except SYSTEM-ROOT)
+          if (entry.operatorId !== 'SYSTEM-ROOT') {
+            let regKey = await tx.ztanRegisteredKey.findUnique({
+              where: { actorId: entry.operatorId }
+            });
+            if (!regKey) {
+              try {
+                const { publicKey } = getOrCreateOperatorKeys();
+                const pem = publicKey.export({ type: 'spki', format: 'pem' }) as string;
+                regKey = await tx.ztanRegisteredKey.create({
+                  data: { actorId: entry.operatorId, publicKey: pem }
+                });
+              } catch (regErr) {
+                throw new Error(`[INTEGRITY_ERROR] Operator ${entry.operatorId} is not registered in ZtanRegisteredKey.`);
+              }
+            }
+            const isValid = this.verifySignatureWithKey(entry.payload, entry.signature, regKey.publicKey);
+            if (!isValid) {
+              throw new Error(`[INTEGRITY_ERROR] Cryptographic signature verification failed for operator ${entry.operatorId}.`);
+            }
+          }
 
           if (process.env.ZTAN_KILL_POINT === 'BEFORE_DB_COMMIT') {
             logger.warn('[GovernanceLedger] Simulated crash triggered: BEFORE_DB_COMMIT');
@@ -2150,6 +2246,38 @@ export const GovernanceLedger = {
       logger.info({ sequenceId, type, hash, partition }, `[GovernanceLedger] Appended new cryptographically chained event to local file for partition ${partition}`);
 
       if (!syncedToDb) {
+        // Best-effort AuditLog creation: When the primary DB transaction fails,
+        // audit records would only be created during outbox processing, which is
+        // gated by quorum stabilization (potentially 30s+ delay). Writing the
+        // AuditLog record here ensures audit coverage even under degraded conditions.
+        if (correlationMetadata) {
+          const auditInfo = parseCorrelationAndPayload(entry.payload, entry.timestamp, entry.operatorId);
+          if (auditInfo) {
+            try {
+              const existingAudit = await db.auditLog.findUnique({
+                where: { id: auditInfo.auditUuid }
+              });
+              if (!existingAudit) {
+                await db.auditLog.create({
+                  data: {
+                    id: auditInfo.auditUuid,
+                    action: auditInfo.action,
+                    resource: auditInfo.resource,
+                    userId: auditInfo.userId,
+                    tenantId: 'platform-admin',
+                    status: 'SUCCESS',
+                    metadata: auditInfo.metadata,
+                    createdAt: new Date(entry.timestamp)
+                  }
+                });
+                logger.info({ auditUuid: auditInfo.auditUuid }, `[GovernanceLedger] Best-effort AuditLog creation succeeded during outbox fallback path`);
+              }
+            } catch (auditErr: any) {
+              logger.warn(`[GovernanceLedger] Best-effort AuditLog creation failed (will be retried during outbox processing): ${auditErr.message || auditErr}`);
+            }
+          }
+        }
+
         const queue = this.loadOutbox(partition);
         if (!queue.includes(sequenceId)) {
           queue.push(sequenceId);

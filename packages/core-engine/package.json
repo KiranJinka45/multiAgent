@@ -7,5 +7,16 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc"
+  },
+  "dependencies": {
+    "@packages/config": "workspace:*",
+    "@packages/observability": "workspace:*",
+    "@packages/utils": "workspace:*",
+    "@packages/db": "workspace:*",
+    "@packages/governance-sdk": "workspace:*",
+    "axios": "1.15.2"
+  },
+  "devDependencies": {
+    "typescript": "5.5.4"
   }
 }

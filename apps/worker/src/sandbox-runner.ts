@@ -6,6 +6,12 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { spawn, ChildProcess } from 'child_process';
+import { 
+  IsolatedExecutionRunner, 
+  FirecrackerOrchestrator, 
+  EnvironmentDiscovery,
+  MockFirecrackerAdapter
+} from '@packages/governance-core';
 
 /**
  * SandboxRunner
@@ -83,72 +89,43 @@ export class SandboxRunner {
    * Spawns a child process and monitors its resource usage.
    */
   private async executeIsolated(command: string): Promise<boolean> {
-    return new Promise((resolve) => {
-      const parts = command.split(' ');
-      const mainCmd = parts[0];
-      const args = parts.slice(1);
+    const vmId = `vm-${this.executionId}-${Date.now()}`;
+    
+    let adapter;
+    try {
+        const features = EnvironmentDiscovery.discover();
+        if (features.kvmAccessible && process.platform !== 'win32') {
+            const { PhysicalFirecrackerAdapter } = await import('@packages/governance-core');
+            adapter = new PhysicalFirecrackerAdapter();
+        } else {
+            adapter = new MockFirecrackerAdapter();
+        }
+    } catch (err) {
+        adapter = new MockFirecrackerAdapter();
+    }
 
-      this.process = spawn(mainCmd, args, {
-        cwd: this.sandboxDir,
-        shell: true,
-        env: { ...process.env, NODE_ENV: 'test', CI: 'true' }
-      });
+    const orchestrator = new FirecrackerOrchestrator(adapter);
+    const runner = new IsolatedExecutionRunner(orchestrator);
 
-      // Stream Logs to EventBus
-      this.process.stdout?.on('data', (data) => {
-        const line = data.toString().trim();
-        if (line) eventBus.thought(this.executionId, 'SandboxRunner', `[stdout] ${line}`);
-      });
+    try {
+        const requestedQuotas = {
+            memorySizeMb: this.MAX_MEMORY_MB,
+            vcpuCount: 2,
+            executionTimeoutMs: this.MAX_CPU_TIME_MS
+        };
 
-      this.process.stderr?.on('data', (data) => {
-        const line = data.toString().trim();
-        if (line) eventBus.thought(this.executionId, 'SandboxRunner', `[stderr] ${line}`);
-      });
-
-      // Resource Watchdog
-      this.watchdogTimer = setInterval(async () => {
-        if (!this.process || this.process.killed || !this.process.pid) return;
+        const tenantId = 'system'; // Core orchestrator daemon system context
+        eventBus.thought(this.executionId, 'SandboxRunner', `Spawning MicroVM Sandbox Isolation (ID: ${vmId})`);
         
-        try {
-          const pidusage = (await import('pidusage')).default;
-          const stats = await pidusage(this.process.pid);
-          
-          const memoryMB = stats.memory / 1024 / 1024;
-          const cpuPercent = stats.cpu;
-
-          if (memoryMB > this.MAX_MEMORY_MB) {
-            logger.warn({ executionId: this.executionId, memoryMB }, '[SandboxRunner] Memory limit exceeded, killing process');
-            eventBus.error(this.executionId, `Process killed: Memory limit exceeded (${Math.round(memoryMB)}MB > ${this.MAX_MEMORY_MB}MB)`);
-            this.process.kill('SIGKILL');
-            if (this.watchdogTimer) clearInterval(this.watchdogTimer);
-            resolve(false);
-          }
-        } catch (err) {
-          // If pidusage fails (e.g. process just died), just ignore
-        }
-      }, 2000);
-
-      const timeout = setTimeout(() => {
-        if (this.process && !this.process.killed) {
-          logger.warn({ executionId: this.executionId }, '[SandboxRunner] Timeout exceeded, killing process');
-          eventBus.error(this.executionId, 'Build timed out in sandbox (max 5m)');
-          this.process.kill('SIGKILL');
-          resolve(false);
-        }
-      }, this.MAX_CPU_TIME_MS);
-
-      this.process.on('close', (code) => {
-        clearTimeout(timeout);
-        if (this.watchdogTimer) clearInterval(this.watchdogTimer);
-        logger.info({ code, executionId: this.executionId }, '[SandboxRunner] Process exited');
-        resolve(code === 0);
-      });
-
-      this.process.on('error', (err) => {
-        logger.error({ err, executionId: this.executionId }, '[SandboxRunner] Process error');
-        resolve(false);
-      });
-    });
+        const result = await runner.executeIsolated(vmId, command, requestedQuotas, tenantId);
+        
+        eventBus.thought(this.executionId, 'SandboxRunner', `[Isolated VM Result] ${result}`);
+        return true;
+    } catch (err: any) {
+        logger.error({ err: err.message, executionId: this.executionId }, '[SandboxRunner] MicroVM execution failed');
+        eventBus.error(this.executionId, `Containment Sandbox Failure: ${err.message}`);
+        return false;
+    }
   }
 
   private cleanup() {

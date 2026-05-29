@@ -1,0 +1,8 @@
+{
+  "tier": "STORAGE_LEDGER_LINEAGE_CORRUPTION",
+  "emoji": "🚨",
+  "label": "INCIDENT INCIDENT-718F0C1F DETECTED",
+  "description": "MERKLE_CHAIN_INTEGRITY_SCAN",
+  "exitCode": 1,
+  "ceilingReason": "MERKLE_CHAIN_INTEGRITY_SCAN"
+}

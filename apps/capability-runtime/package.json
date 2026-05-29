@@ -1,0 +1,29 @@
+{
+  "name": "@apps/capability-runtime",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsup",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "express": "^4.21.1",
+    "cors": "^2.8.5",
+    "jsonwebtoken": "^9.0.2",
+    "pino": "^10.3.1",
+    "@packages/config": "workspace:*",
+    "@packages/observability": "workspace:*",
+    "@packages/governance-sdk": "workspace:*",
+    "@packages/utils": "workspace:*",
+    "@packages/ztan-crypto": "workspace:*",
+    "@packages/supply-chain": "workspace:*"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.5",
+    "typescript": "5.7.2",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/cors": "^2.8.17"
+  }
+}

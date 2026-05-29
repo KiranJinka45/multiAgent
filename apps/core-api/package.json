@@ -23,6 +23,7 @@
     "@packages/config": "workspace:*",
     "@packages/contracts": "workspace:*",
     "@packages/db": "workspace:*",
+    "@packages/governance-core": "workspace:*",
     "@packages/memory-core": "workspace:*",
     "@packages/observability": "workspace:*",
     "@packages/queue": "workspace:*",

@@ -254,12 +254,60 @@ if (process.env.MOCK_DB === 'true') {
         }
     };
 
+    const governanceEvents: any[] = [];
+    const mockGovernanceEvent = {
+        findFirst: async (args: any) => {
+            const correlationId = args?.where?.correlationId;
+            const eventType = args?.where?.eventType;
+            if (correlationId) {
+                let events = governanceEvents.filter(e => e.correlationId === correlationId);
+                if (eventType) {
+                    events = events.filter(e => e.eventType === eventType);
+                }
+                if (args?.orderBy?.timestamp === 'desc') {
+                    return events[events.length - 1] || null;
+                }
+                return events[0] || null;
+            }
+            return null;
+        },
+        findMany: async (args: any) => {
+            const correlationId = args?.where?.correlationId;
+            let result = governanceEvents;
+            if (correlationId) {
+                result = result.filter(e => e.correlationId === correlationId);
+            }
+            if (args?.orderBy?.timestamp === 'asc') {
+                return result; // array is push order
+            }
+            return result;
+        },
+        create: async (args: any) => {
+            const data = { eventId: args.data.eventId || `mock-event-${Math.random().toString(36).substring(7)}`, ...args.data };
+            governanceEvents.push(data);
+            return data;
+        },
+        deleteMany: async () => {
+            governanceEvents.length = 0;
+            return { count: 0 };
+        },
+        update: async (args: any) => {
+            const eventId = args.where.eventId;
+            const event = governanceEvents.find(e => e.eventId === eventId);
+            if (event) {
+                Object.assign(event, args.data);
+            }
+            return event;
+        }
+    };
+
     prismaInstance = {
         ztanLedgerBlock: mockZtanLedgerBlock,
         ztanSnapshot: mockZtanSnapshot,
         ztanWalLog: mockZtanWalLog,
         auditLog: mockAuditLog,
         idempotencyRecord: mockIdempotencyRecord,
+        governanceEvent: mockGovernanceEvent,
         $queryRawUnsafe: mockQueryRawUnsafe,
         $executeRawUnsafe: mockExecuteRawUnsafe,
         $transaction: async (cb: any) => {
@@ -269,6 +317,7 @@ if (process.env.MOCK_DB === 'true') {
                 ztanWalLog: mockZtanWalLog,
                 auditLog: mockAuditLog,
                 idempotencyRecord: mockIdempotencyRecord,
+                governanceEvent: mockGovernanceEvent,
                 $queryRawUnsafe: mockQueryRawUnsafe,
                 $executeRawUnsafe: mockExecuteRawUnsafe
             });

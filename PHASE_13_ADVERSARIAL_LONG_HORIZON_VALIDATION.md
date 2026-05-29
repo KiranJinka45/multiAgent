@@ -89,6 +89,9 @@ Progress is measured by **elapsed stable runtime hours, reproducible recovery bo
     *   **Checkpoint Starvation & fsync Stalls:** Simulates disk write latency spikes and checkpoint buffer flushes during active WAL updates.
     *   **Connection Storm Collapse Simulator:** Floods the database port with connection requests to audit behavior under pool exhaustion.
     *   **Disk-Full WAL Replay Behavior:** Simulates storage exhaustion during active WAL replay and verifies fail-closed invariants.
+    *   **Transparency Log Equivocation Injector:** Injects simulated split-view (equivocation) attacks on the Rekor transparency log to verify that the off-host witness and main coordinator detect the mismatch and trigger a cluster-wide self-fence.
+    *   **Provenance Poisoning Simulator:** Spawns containers with corrupted build-provenance claims or invalid Sigstore/OIDC signatures to ensure admission controllers immediately fail-closed and reject execution.
+
 
 ---
 

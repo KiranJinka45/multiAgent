@@ -1,26 +1,37 @@
-import { PrismaClient } from '@prisma/client';
-import dotenv from 'dotenv';
-import path from 'path';
+import * as dotenv from 'dotenv';
+import * as dotenvExpand from 'dotenv-expand';
+import * as path from 'path';
+import * as fs from 'fs';
 
-dotenv.config();
-const prisma = new PrismaClient();
+// Load environment variables from workspace root
+const rootEnv = path.resolve(process.cwd(), '.env');
+if (fs.existsSync(rootEnv)) {
+    const envConfig = dotenv.config({ path: rootEnv });
+    dotenvExpand.expand(envConfig);
+}
 
-async function main() {
-  const blocks = await prisma.ztanLedgerBlock.findMany();
-  const walLogs = await prisma.ztanWalLog.findMany();
-  const snapshots = await prisma.ztanSnapshot.findMany();
-  const attestations = await prisma.ztanPayloadAttestation.findMany();
-  const quarantine = await prisma.ztanQuarantineBlob.findMany();
+const { db } = await import('../packages/db/src/index.js');
 
-  console.log('BLOCKS COUNT:', blocks.length);
-  console.log('WAL LOGS COUNT:', walLogs.length);
-  console.log('SNAPSHOTS COUNT:', snapshots.length);
-  console.log('ATTESTATIONS COUNT:', attestations.length);
-  console.log('QUARANTINE COUNT:', quarantine.length);
-
-  if (blocks.length > 0) {
-    console.log('First block:', blocks[0]);
+async function checkDb() {
+  try {
+    const walCount = await db.ztanWalLog.count();
+    console.log(`ZtanWalLog Count: ${walCount}`);
+    
+    const ledgerCount = await db.ztanLedgerBlock.count();
+    console.log(`ZtanLedgerBlock Count: ${ledgerCount}`);
+    
+    // Check active locks/queries
+    const activeQueries = await db.$queryRawUnsafe(`
+      SELECT pid, state, query, age(clock_timestamp(), query_start) 
+      FROM pg_stat_activity 
+      WHERE state != 'idle' AND query NOT LIKE '%pg_stat_activity%';
+    `);
+    console.log("Active Queries:", activeQueries);
+  } catch (err) {
+    console.error("Error checking DB:", err);
+  } finally {
+    await db.$disconnect();
   }
 }
 
-main().catch(console.error);
+checkDb();

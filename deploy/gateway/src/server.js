@@ -87,9 +87,13 @@ async function startGatewayServer() {
     const AUTH_SERVICE_URL = `https://127.0.0.1:${config_1.env.AUTH_SERVICE_PORT}`;
     const BILLING_SERVICE_URL = (process.env.BILLING_SERVICE_URL || 'https://127.0.0.1:4003').replace('http://', 'https://');
     const CORE_API_URL = `https://127.0.0.1:${config_1.env.CORE_API_PORT}`;
-    const INTERNAL_TOKEN = process.env.INTERNAL_SERVICE_TOKEN || 'internal-secret-456';
+    const INTERNAL_TOKEN = process.env.INTERNAL_SERVICE_TOKEN;
+    if (!INTERNAL_TOKEN && process.env.NODE_ENV === 'production') {
+        throw new Error('[GATEWAY FATAL] INTERNAL_SERVICE_TOKEN is required in production. Refusing to start with default secret.');
+    }
+    const RESOLVED_INTERNAL_TOKEN = INTERNAL_TOKEN || 'dev-only-internal-secret-not-for-production';
     // --- AUTH MIDDLEWARE ---
-    const authenticate = (0, auth_internal_1.userAuth)({ allowDevBypass: true });
+    const authenticate = (0, auth_internal_1.userAuth)({ allowDevBypass: process.env.NODE_ENV === 'development' });
     const requireRole = (role) => (req, res, next) => {
         const authReq = req;
         if (!authReq.user || !authReq.user.roles.includes(role)) {
