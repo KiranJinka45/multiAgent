@@ -1901,6 +1901,13 @@ importers:
         version: 5.5.4
 
   packages/validator:
+    dependencies:
+      '@packages/db':
+        specifier: workspace:*
+        version: link:../db
+      '@packages/governance-core':
+        specifier: workspace:*
+        version: link:../governance-core
     devDependencies:
       tsup:
         specifier: 8.5.1

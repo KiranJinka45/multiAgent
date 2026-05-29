@@ -385,10 +385,10 @@ export class ConsensusEngine {
 
                         // Persist block to PostgreSQL database with Row-Level Locking and Active Writer Session Settings
                         // This leverages native database-level write fencing triggers and prevents split-brain anomalies
-                        const osPromise = import('os');
-                        const dbPromise = import('@packages/db');
-                        Promise.all([osPromise, dbPromise]).then(([os, { db }]) => {
-                            db.$transaction(async (tx: any) => {
+                        const persistTask = async () => {
+                            const os = await import('os');
+                            const { db } = await import('@packages/db');
+                            await db.$transaction(async (tx: any) => {
                                 await tx.$executeRawUnsafe(`SET LOCAL ztan.active_writer_pid = '${process.pid}';`);
                                 await tx.$executeRawUnsafe(`SET LOCAL ztan.active_writer_host = '${os.hostname()}';`);
                                 
@@ -407,12 +407,17 @@ export class ConsensusEngine {
                                         epoch: String(term)
                                     }
                                 });
-                            }).catch((dbErr: any) => {
-                                if (dbErr.message && dbErr.message.includes('[FENCING_ERROR]')) {
-                                    console.error(`[ZTAN DB Fencing Alert] Write rejected by database trigger: ${dbErr.message}`);
-                                }
                             });
-                        }).catch(() => {});
+                        };
+                        
+                        // We push the promise to a queue or handle it, but wait, `appendEntries` is synchronous.
+                        // For a strict fail-closed system, if persistence fails, we must crash the node or fence it.
+                        persistTask().catch((err) => {
+                            console.error(`[ZTAN DB Fencing Alert] FATAL: Persistence failed. Fencing node to prevent split-brain. Error: ${err.message}`);
+                            if (process.env.ZTAN_TEST_NO_EXIT !== 'true') {
+                                process.exit(1);
+                            }
+                        });
                     }
                 }
             }

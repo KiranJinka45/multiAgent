@@ -105,7 +105,7 @@ export { NumaStarvationAnalyzer } from './isolation/numa-starvation-analyzer.js'
 export type { NumaMeminfoEntry, NumaAnalysisResult } from './isolation/numa-starvation-analyzer.js';
 
 // Phase C: Intelligence Integration
-export { StubbedModelProvider } from './intelligence/model-provider.js';
+export { StubbedModelProvider, LiveModelProvider } from './intelligence/model-provider.js';
 export type { ModelProviderInterface } from './intelligence/model-provider.js';
 export { ComplexityRouter } from './intelligence/complexity-router.js';
 export type { RouteAttestation, ModelTier } from './intelligence/complexity-router.js';

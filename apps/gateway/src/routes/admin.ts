@@ -55,6 +55,26 @@ router.get('/roi', async (req: Request, res: Response) => {
   }
 });
 
+import { AgentCoordinator } from '@packages/governance-core';
+
+/**
+ * POST /api/admin/intelligence/coordinate
+ * Coordinates an objective through the 7-layer governance pipeline.
+ */
+router.post('/intelligence/coordinate', async (req: Request, res: Response) => {
+    const { objective } = req.body;
+    const tenantId = (req.query.tenantId as string) || 'platform-admin';
+    
+    try {
+        const coordinator = new AgentCoordinator();
+        const result = await coordinator.coordinateObjective(objective, tenantId);
+        res.json({ success: true, data: result });
+    } catch (err: any) {
+        logger.error({ err, tenantId, objective }, '[Admin] Failed to coordinate objective');
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
 /**
  * GET /api/admin/intelligence/policy
  * Retrieves current self-optimization policy weights.

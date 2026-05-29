@@ -2,7 +2,7 @@ import { DecompositionPlanner } from './task-planner.js';
 import type { TaskPlan } from './task-planner.js';
 import { ComplexityRouter } from './complexity-router.js';
 import type { RouteAttestation } from './complexity-router.js';
-import { StubbedModelProvider } from './model-provider.js';
+import { LiveModelProvider } from './model-provider.js';
 import type { ModelProviderInterface } from './model-provider.js';
 import type { CommandExecutionProposal } from '../filters/command-filter.js';
 import { SemanticInspector } from '../inspection/semantic-pipeline.js';
@@ -17,7 +17,7 @@ export interface CoordinationResult {
 export class AgentCoordinator {
     private provider: ModelProviderInterface;
 
-    constructor(provider: ModelProviderInterface = new StubbedModelProvider()) {
+    constructor(provider: ModelProviderInterface = new LiveModelProvider()) {
         this.provider = provider;
     }
 
