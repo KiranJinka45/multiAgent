@@ -489,7 +489,7 @@ diag
       }
       console.log(`- Details:        ${chalk.yellow(result.details)}`);
     } else {
-      console.log(chalk.green.bold('\n✅ DETERMINISTIC ALIGNMENT: Baseline and Replay traces are 100% equivalent.'));
+      console.log(chalk.green.bold('\n✅ TRACE CONVERGENCE: Baseline and Replay traces are structurally equivalent.'));
     }
   });
 

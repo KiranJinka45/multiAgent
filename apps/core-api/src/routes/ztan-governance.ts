@@ -5,6 +5,7 @@ import { logger, operatorCertaintyInflationTotal, operatorOverrideDisagreementTo
 import { GovernanceLedger, type GovernanceLedgerEntry } from '@packages/utils';
 import { db } from '@packages/db';
 import * as crypto from 'node:crypto';
+import { ConsensusEngine, ConsensusInvariantMonitor } from '@packages/governance-core';
 
 const router = express.Router();
 
@@ -406,12 +407,27 @@ router.post('/drill/trigger', async (req, res) => {
     });
   }
 
+  // --- ZTAN Consensus Engine: Propose PBFT commit for drill activation ---
+  let consensusResult: { committed: boolean; reason: string } | null = null;
+  try {
+    const clusterNodes = ConsensusEngine.getClusterNodes();
+    if (clusterNodes.size > 0) {
+      consensusResult = ConsensusEngine.proposeCommit(`DRILL:${id}:${Date.now()}`);
+      logger.info({ drillId: id, consensusResult }, '[ZTAN Governance] PBFT consensus proposed for drill trigger');
+    }
+  } catch (err: any) {
+    logger.error({ err: err.message, drillId: id }, '[ZTAN Governance] Consensus proposal failed during drill trigger');
+  }
+
   res.setHeader('X-Request-UUID', requestUuid);
   res.setHeader('X-Audit-UUID', auditUuid);
   res.setHeader('X-Ledger-Block-UUID', ledgerBlockUuid);
+  if (consensusResult) {
+    res.setHeader('X-Consensus-Committed', String(consensusResult.committed));
+  }
 
   saveState(state);
-  res.json(state);
+  res.json({ ...state, consensus: consensusResult });
 });
 
 // POST /api/v1/ztan/governance/drill/resolve

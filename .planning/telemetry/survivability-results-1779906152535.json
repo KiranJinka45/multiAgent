@@ -1,0 +1,7 @@
+{
+  "timestamp": "2026-05-27T18:22:32.533Z",
+  "durationMs": 25533,
+  "success": false,
+  "drill": "survivability-tests.ts",
+  "error": "Command failed: npx tsx \"C:\\multiagentic_project\\multiAgent-main\\packages\\ztan-witness\\src\\survivability-tests.ts\""
+}

@@ -65,11 +65,14 @@ Progress is no longer primarily intellectual or architectural; it is strictly **
 
 ## 🏛️ Tier E4 — Human Operator Validation
 
-*   **Objective:** Validate cognitive operational survivability under extreme failure conditions.
+*   **Objective:** Validate cognitive operational survivability under extreme failure conditions and attestation-degradation states.
 *   **Deliverables:**
     *   **Blind Recovery Exercises:** Standardized drills where operators must resolve quarantines without direct process-shell access.
     *   **Conflicting Signal Drills:** Injecting misleading telemetry (e.g. lease success on expired heartbeats) to test operator correctness.
     *   **Command-Depth Audits:** Enforcing and measuring that recovery scripts remain extremely shallow (maximum 2 commands depth).
+    *   **TPM PCR Drift Recovery Drills:** Practical SRE simulations where a node is locked out due to legitimate host firmware updates. Operators must execute the offline hardware-key-backed multi-signature ceremony to securely update measurement baselines and re-admit the node.
+    *   **TSA Outage & Caching Exercises:** Drills where external Trusted Time Authorities are partitioned, forcing the node into a "degraded integrity state" with a 60-minute outbox-caching buffer, verifying that operators can either restore connectivity or prepare for quarantine-locking before the window expires.
+
 
 ---
 

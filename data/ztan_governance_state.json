@@ -1,0 +1,487 @@
+{
+  "epoch": 102,
+  "trustLevel": "VERIFIED",
+  "isSafeMode": false,
+  "escalationTier": "OPERATOR",
+  "activeDrill": "NONE",
+  "habituationRisk": 55,
+  "quorumStatus": "HEALTHY",
+  "decisionLatency": 4.2,
+  "ritualIntegrity": 100,
+  "replayIntegrity": 100,
+  "telemetryEroded": false,
+  "chronologyGaps": false,
+  "chronologyConfidence": 100,
+  "verificationTier": "HOT",
+  "ritualDecayed": false,
+  "ceremonyDurationAvg": 254,
+  "approvalNarrativeLengthAvg": 242,
+  "repeatedApproversCount": 0,
+  "governanceProposals": [],
+  "drillStartTime": null,
+  "operatorReactionTime": 0.3,
+  "currentRunningLatency": 0,
+  "governanceHistory": [
+    {
+      "id": 102,
+      "status": "ACTIVE",
+      "timestamp": "2026-05-16",
+      "desc": "Epoch 102: Reconstructed and Verified"
+    },
+    {
+      "id": 101,
+      "status": "ARCHIVED",
+      "timestamp": "2026-05-15",
+      "desc": "Epoch 101: Quorum Rotation Ceremony"
+    },
+    {
+      "id": 100,
+      "status": "ARCHIVED",
+      "timestamp": "2026-05-14",
+      "desc": "Epoch 100: Baseline Restoration Verified"
+    }
+  ],
+  "recoveryInvariants": {
+    "causalContinuity": {
+      "status": true,
+      "label": "Ledger lineage verified (Hash: 0x8a92...)"
+    },
+    "epochAlignment": {
+      "status": true,
+      "label": "Authority sync within 1ms tolerance"
+    },
+    "hsmSynchronicity": {
+      "status": true,
+      "label": "Physical anchor heartbeat verified"
+    }
+  },
+  "drills": [
+    {
+      "id": "IFD-001",
+      "name": "IFD-001: Replay Poisoning",
+      "status": "PASSED",
+      "lastRun": "Passed (0.3s)",
+      "description": "Simulate forged payload insertion to trigger trust degradation and chain fractures."
+    },
+    {
+      "id": "IFD-002",
+      "name": "IFD-002: Telemetry Erosion",
+      "status": "PASSED",
+      "lastRun": "Passed (0.3s)",
+      "description": "Simulate loss of forensic logs, chronology gaps, and timeline blindness."
+    },
+    {
+      "id": "IFD-003",
+      "name": "IFD-003: Governance Collapse",
+      "status": "PASSED",
+      "lastRun": "Passed (0.3s)",
+      "description": "Simulate total epoch registry failure, SAFE_MODE locking, and Supervisor override."
+    },
+    {
+      "id": "IFD-004",
+      "name": "IFD-004: Dirty Archaeology",
+      "status": "INACTIVE",
+      "lastRun": "Never",
+      "description": "Simulate corrupted databases, partial transactions, chronology gaps, and duplicate timelines."
+    },
+    {
+      "id": "RITUAL_DECAY",
+      "name": "Ritual Decay Simulation",
+      "status": "PASSED",
+      "lastRun": "Passed (0.3s)",
+      "description": "Inject rubber-stamping, narrative erosion, and approved-without-ceremony patterns."
+    },
+    {
+      "id": "FREEZE_PRESSURE",
+      "name": "Institutional Freeze Pressure",
+      "status": "PASSED",
+      "lastRun": "Passed (0.2s)",
+      "description": "Flood governance queues with capability expansions to test restraint."
+    },
+    {
+      "id": "TOTAL_QUORUM_FAILURE",
+      "name": "Total Quorum Failure",
+      "status": "INACTIVE",
+      "lastRun": "Never",
+      "description": "Simulate physical HSM failure requiring high-friction manual override ceremony."
+    }
+  ],
+  "activeIncidents": [
+    {
+      "id": "INC-RITUAL",
+      "type": "RITUAL_DECAY",
+      "severity": "MEDIUM",
+      "title": "Sociotechnical Ritual Degradation",
+      "description": "Approvals show rubber-stamping behavior. Narrative quality average has plummeted to 12 chars. Ceremony duration average < 2 seconds.",
+      "timestamp": "2026-05-28T07:29:54.191Z"
+    },
+    {
+      "id": "INC-FREEZE",
+      "type": "FREEZE_PRESSURE",
+      "severity": "HIGH",
+      "title": "Excessive Proposal Expansion Pressure",
+      "description": "Adversarial systems are requesting self-healing bypass and automation, attempting to force institutional fatigue.",
+      "timestamp": "2026-05-28T07:29:54.701Z"
+    },
+    {
+      "id": "INC-RITUAL",
+      "type": "RITUAL_DECAY",
+      "severity": "MEDIUM",
+      "title": "Sociotechnical Ritual Degradation",
+      "description": "Approvals show rubber-stamping behavior. Narrative quality average has plummeted to 12 chars. Ceremony duration average < 2 seconds.",
+      "timestamp": "2026-05-28T07:29:56.712Z"
+    },
+    {
+      "id": "INC-FREEZE",
+      "type": "FREEZE_PRESSURE",
+      "severity": "HIGH",
+      "title": "Excessive Proposal Expansion Pressure",
+      "description": "Adversarial systems are requesting self-healing bypass and automation, attempting to force institutional fatigue.",
+      "timestamp": "2026-05-28T07:29:57.212Z"
+    },
+    {
+      "id": "INC-RITUAL",
+      "type": "RITUAL_DECAY",
+      "severity": "MEDIUM",
+      "title": "Sociotechnical Ritual Degradation",
+      "description": "Approvals show rubber-stamping behavior. Narrative quality average has plummeted to 12 chars. Ceremony duration average < 2 seconds.",
+      "timestamp": "2026-05-28T07:30:25.225Z"
+    },
+    {
+      "id": "INC-FREEZE",
+      "type": "FREEZE_PRESSURE",
+      "severity": "HIGH",
+      "title": "Excessive Proposal Expansion Pressure",
+      "description": "Adversarial systems are requesting self-healing bypass and automation, attempting to force institutional fatigue.",
+      "timestamp": "2026-05-28T07:30:26.506Z"
+    },
+    {
+      "id": "INC-RITUAL",
+      "type": "RITUAL_DECAY",
+      "severity": "MEDIUM",
+      "title": "Sociotechnical Ritual Degradation",
+      "description": "Approvals show rubber-stamping behavior. Narrative quality average has plummeted to 12 chars. Ceremony duration average < 2 seconds.",
+      "timestamp": "2026-05-28T07:30:28.729Z"
+    },
+    {
+      "id": "INC-FREEZE",
+      "type": "FREEZE_PRESSURE",
+      "severity": "HIGH",
+      "title": "Excessive Proposal Expansion Pressure",
+      "description": "Adversarial systems are requesting self-healing bypass and automation, attempting to force institutional fatigue.",
+      "timestamp": "2026-05-28T07:30:29.254Z"
+    },
+    {
+      "id": "INC-RITUAL",
+      "type": "RITUAL_DECAY",
+      "severity": "MEDIUM",
+      "title": "Sociotechnical Ritual Degradation",
+      "description": "Approvals show rubber-stamping behavior. Narrative quality average has plummeted to 12 chars. Ceremony duration average < 2 seconds.",
+      "timestamp": "2026-05-28T07:30:31.322Z"
+    },
+    {
+      "id": "INC-FREEZE",
+      "type": "FREEZE_PRESSURE",
+      "severity": "HIGH",
+      "title": "Excessive Proposal Expansion Pressure",
+      "description": "Adversarial systems are requesting self-healing bypass and automation, attempting to force institutional fatigue.",
+      "timestamp": "2026-05-28T07:30:32.367Z"
+    },
+    {
+      "id": "INC-RITUAL",
+      "type": "RITUAL_DECAY",
+      "severity": "MEDIUM",
+      "title": "Sociotechnical Ritual Degradation",
+      "description": "Approvals show rubber-stamping behavior. Narrative quality average has plummeted to 12 chars. Ceremony duration average < 2 seconds.",
+      "timestamp": "2026-05-28T07:30:35.379Z"
+    },
+    {
+      "id": "INC-FREEZE",
+      "type": "FREEZE_PRESSURE",
+      "severity": "HIGH",
+      "title": "Excessive Proposal Expansion Pressure",
+      "description": "Adversarial systems are requesting self-healing bypass and automation, attempting to force institutional fatigue.",
+      "timestamp": "2026-05-28T07:30:36.419Z"
+    },
+    {
+      "id": "INC-RITUAL",
+      "type": "RITUAL_DECAY",
+      "severity": "MEDIUM",
+      "title": "Sociotechnical Ritual Degradation",
+      "description": "Approvals show rubber-stamping behavior. Narrative quality average has plummeted to 12 chars. Ceremony duration average < 2 seconds.",
+      "timestamp": "2026-05-28T07:30:40.368Z"
+    },
+    {
+      "id": "INC-RITUAL",
+      "type": "RITUAL_DECAY",
+      "severity": "MEDIUM",
+      "title": "Sociotechnical Ritual Degradation",
+      "description": "Approvals show rubber-stamping behavior. Narrative quality average has plummeted to 12 chars. Ceremony duration average < 2 seconds.",
+      "timestamp": "2026-05-28T07:32:45.902Z"
+    },
+    {
+      "id": "INC-FREEZE",
+      "type": "FREEZE_PRESSURE",
+      "severity": "HIGH",
+      "title": "Excessive Proposal Expansion Pressure",
+      "description": "Adversarial systems are requesting self-healing bypass and automation, attempting to force institutional fatigue.",
+      "timestamp": "2026-05-28T07:32:46.393Z"
+    },
+    {
+      "id": "INC-RITUAL",
+      "type": "RITUAL_DECAY",
+      "severity": "MEDIUM",
+      "title": "Sociotechnical Ritual Degradation",
+      "description": "Approvals show rubber-stamping behavior. Narrative quality average has plummeted to 12 chars. Ceremony duration average < 2 seconds.",
+      "timestamp": "2026-05-28T07:32:48.410Z"
+    },
+    {
+      "id": "INC-FREEZE",
+      "type": "FREEZE_PRESSURE",
+      "severity": "HIGH",
+      "title": "Excessive Proposal Expansion Pressure",
+      "description": "Adversarial systems are requesting self-healing bypass and automation, attempting to force institutional fatigue.",
+      "timestamp": "2026-05-28T07:32:48.923Z"
+    },
+    {
+      "id": "INC-RITUAL",
+      "type": "RITUAL_DECAY",
+      "severity": "MEDIUM",
+      "title": "Sociotechnical Ritual Degradation",
+      "description": "Approvals show rubber-stamping behavior. Narrative quality average has plummeted to 12 chars. Ceremony duration average < 2 seconds.",
+      "timestamp": "2026-05-28T07:32:50.970Z"
+    },
+    {
+      "id": "INC-FREEZE",
+      "type": "FREEZE_PRESSURE",
+      "severity": "HIGH",
+      "title": "Excessive Proposal Expansion Pressure",
+      "description": "Adversarial systems are requesting self-healing bypass and automation, attempting to force institutional fatigue.",
+      "timestamp": "2026-05-28T07:32:51.458Z"
+    },
+    {
+      "id": "INC-RITUAL",
+      "type": "RITUAL_DECAY",
+      "severity": "MEDIUM",
+      "title": "Sociotechnical Ritual Degradation",
+      "description": "Approvals show rubber-stamping behavior. Narrative quality average has plummeted to 12 chars. Ceremony duration average < 2 seconds.",
+      "timestamp": "2026-05-28T07:32:54.499Z"
+    },
+    {
+      "id": "INC-FREEZE",
+      "type": "FREEZE_PRESSURE",
+      "severity": "HIGH",
+      "title": "Excessive Proposal Expansion Pressure",
+      "description": "Adversarial systems are requesting self-healing bypass and automation, attempting to force institutional fatigue.",
+      "timestamp": "2026-05-28T07:32:55.015Z"
+    },
+    {
+      "id": "INC-RITUAL",
+      "type": "RITUAL_DECAY",
+      "severity": "MEDIUM",
+      "title": "Sociotechnical Ritual Degradation",
+      "description": "Approvals show rubber-stamping behavior. Narrative quality average has plummeted to 12 chars. Ceremony duration average < 2 seconds.",
+      "timestamp": "2026-05-28T07:32:56.978Z"
+    },
+    {
+      "id": "INC-FREEZE",
+      "type": "FREEZE_PRESSURE",
+      "severity": "HIGH",
+      "title": "Excessive Proposal Expansion Pressure",
+      "description": "Adversarial systems are requesting self-healing bypass and automation, attempting to force institutional fatigue.",
+      "timestamp": "2026-05-28T07:32:57.572Z"
+    },
+    {
+      "id": "INC-RITUAL",
+      "type": "RITUAL_DECAY",
+      "severity": "MEDIUM",
+      "title": "Sociotechnical Ritual Degradation",
+      "description": "Approvals show rubber-stamping behavior. Narrative quality average has plummeted to 12 chars. Ceremony duration average < 2 seconds.",
+      "timestamp": "2026-05-28T07:33:24.235Z"
+    },
+    {
+      "id": "INC-FREEZE",
+      "type": "FREEZE_PRESSURE",
+      "severity": "HIGH",
+      "title": "Excessive Proposal Expansion Pressure",
+      "description": "Adversarial systems are requesting self-healing bypass and automation, attempting to force institutional fatigue.",
+      "timestamp": "2026-05-28T07:33:24.777Z"
+    },
+    {
+      "id": "INC-RITUAL",
+      "type": "RITUAL_DECAY",
+      "severity": "MEDIUM",
+      "title": "Sociotechnical Ritual Degradation",
+      "description": "Approvals show rubber-stamping behavior. Narrative quality average has plummeted to 12 chars. Ceremony duration average < 2 seconds.",
+      "timestamp": "2026-05-28T07:33:27.899Z"
+    },
+    {
+      "id": "INC-FREEZE",
+      "type": "FREEZE_PRESSURE",
+      "severity": "HIGH",
+      "title": "Excessive Proposal Expansion Pressure",
+      "description": "Adversarial systems are requesting self-healing bypass and automation, attempting to force institutional fatigue.",
+      "timestamp": "2026-05-28T07:33:28.899Z"
+    },
+    {
+      "id": "INC-RITUAL",
+      "type": "RITUAL_DECAY",
+      "severity": "MEDIUM",
+      "title": "Sociotechnical Ritual Degradation",
+      "description": "Approvals show rubber-stamping behavior. Narrative quality average has plummeted to 12 chars. Ceremony duration average < 2 seconds.",
+      "timestamp": "2026-05-28T07:33:32.549Z"
+    },
+    {
+      "id": "INC-FREEZE",
+      "type": "FREEZE_PRESSURE",
+      "severity": "HIGH",
+      "title": "Excessive Proposal Expansion Pressure",
+      "description": "Adversarial systems are requesting self-healing bypass and automation, attempting to force institutional fatigue.",
+      "timestamp": "2026-05-28T07:33:33.379Z"
+    },
+    {
+      "id": "INC-RITUAL",
+      "type": "RITUAL_DECAY",
+      "severity": "MEDIUM",
+      "title": "Sociotechnical Ritual Degradation",
+      "description": "Approvals show rubber-stamping behavior. Narrative quality average has plummeted to 12 chars. Ceremony duration average < 2 seconds.",
+      "timestamp": "2026-05-28T07:33:36.951Z"
+    },
+    {
+      "id": "INC-FREEZE",
+      "type": "FREEZE_PRESSURE",
+      "severity": "HIGH",
+      "title": "Excessive Proposal Expansion Pressure",
+      "description": "Adversarial systems are requesting self-healing bypass and automation, attempting to force institutional fatigue.",
+      "timestamp": "2026-05-28T07:33:38.052Z"
+    },
+    {
+      "id": "INC-RITUAL",
+      "type": "RITUAL_DECAY",
+      "severity": "MEDIUM",
+      "title": "Sociotechnical Ritual Degradation",
+      "description": "Approvals show rubber-stamping behavior. Narrative quality average has plummeted to 12 chars. Ceremony duration average < 2 seconds.",
+      "timestamp": "2026-05-28T08:30:03.217Z"
+    },
+    {
+      "id": "INC-FREEZE",
+      "type": "FREEZE_PRESSURE",
+      "severity": "HIGH",
+      "title": "Excessive Proposal Expansion Pressure",
+      "description": "Adversarial systems are requesting self-healing bypass and automation, attempting to force institutional fatigue.",
+      "timestamp": "2026-05-28T08:30:03.691Z"
+    },
+    {
+      "id": "INC-RITUAL",
+      "type": "RITUAL_DECAY",
+      "severity": "MEDIUM",
+      "title": "Sociotechnical Ritual Degradation",
+      "description": "Approvals show rubber-stamping behavior. Narrative quality average has plummeted to 12 chars. Ceremony duration average < 2 seconds.",
+      "timestamp": "2026-05-28T08:34:41.386Z"
+    },
+    {
+      "id": "INC-FREEZE",
+      "type": "FREEZE_PRESSURE",
+      "severity": "HIGH",
+      "title": "Excessive Proposal Expansion Pressure",
+      "description": "Adversarial systems are requesting self-healing bypass and automation, attempting to force institutional fatigue.",
+      "timestamp": "2026-05-28T08:34:41.877Z"
+    },
+    {
+      "id": "INC-RITUAL",
+      "type": "RITUAL_DECAY",
+      "severity": "MEDIUM",
+      "title": "Sociotechnical Ritual Degradation",
+      "description": "Approvals show rubber-stamping behavior. Narrative quality average has plummeted to 12 chars. Ceremony duration average < 2 seconds.",
+      "timestamp": "2026-05-28T08:34:43.882Z"
+    },
+    {
+      "id": "INC-FREEZE",
+      "type": "FREEZE_PRESSURE",
+      "severity": "HIGH",
+      "title": "Excessive Proposal Expansion Pressure",
+      "description": "Adversarial systems are requesting self-healing bypass and automation, attempting to force institutional fatigue.",
+      "timestamp": "2026-05-28T08:34:44.413Z"
+    },
+    {
+      "id": "INC-RITUAL",
+      "type": "RITUAL_DECAY",
+      "severity": "MEDIUM",
+      "title": "Sociotechnical Ritual Degradation",
+      "description": "Approvals show rubber-stamping behavior. Narrative quality average has plummeted to 12 chars. Ceremony duration average < 2 seconds.",
+      "timestamp": "2026-05-28T08:34:46.411Z"
+    },
+    {
+      "id": "INC-FREEZE",
+      "type": "FREEZE_PRESSURE",
+      "severity": "HIGH",
+      "title": "Excessive Proposal Expansion Pressure",
+      "description": "Adversarial systems are requesting self-healing bypass and automation, attempting to force institutional fatigue.",
+      "timestamp": "2026-05-28T08:34:46.917Z"
+    },
+    {
+      "id": "INC-RITUAL",
+      "type": "RITUAL_DECAY",
+      "severity": "MEDIUM",
+      "title": "Sociotechnical Ritual Degradation",
+      "description": "Approvals show rubber-stamping behavior. Narrative quality average has plummeted to 12 chars. Ceremony duration average < 2 seconds.",
+      "timestamp": "2026-05-28T08:34:48.946Z"
+    },
+    {
+      "id": "INC-FREEZE",
+      "type": "FREEZE_PRESSURE",
+      "severity": "HIGH",
+      "title": "Excessive Proposal Expansion Pressure",
+      "description": "Adversarial systems are requesting self-healing bypass and automation, attempting to force institutional fatigue.",
+      "timestamp": "2026-05-28T08:34:49.455Z"
+    },
+    {
+      "id": "INC-RITUAL",
+      "type": "RITUAL_DECAY",
+      "severity": "MEDIUM",
+      "title": "Sociotechnical Ritual Degradation",
+      "description": "Approvals show rubber-stamping behavior. Narrative quality average has plummeted to 12 chars. Ceremony duration average < 2 seconds.",
+      "timestamp": "2026-05-28T08:35:13.100Z"
+    },
+    {
+      "id": "INC-FREEZE",
+      "type": "FREEZE_PRESSURE",
+      "severity": "HIGH",
+      "title": "Excessive Proposal Expansion Pressure",
+      "description": "Adversarial systems are requesting self-healing bypass and automation, attempting to force institutional fatigue.",
+      "timestamp": "2026-05-28T08:35:13.799Z"
+    },
+    {
+      "id": "INC-RITUAL",
+      "type": "RITUAL_DECAY",
+      "severity": "MEDIUM",
+      "title": "Sociotechnical Ritual Degradation",
+      "description": "Approvals show rubber-stamping behavior. Narrative quality average has plummeted to 12 chars. Ceremony duration average < 2 seconds.",
+      "timestamp": "2026-05-28T08:35:17.270Z"
+    },
+    {
+      "id": "INC-FREEZE",
+      "type": "FREEZE_PRESSURE",
+      "severity": "HIGH",
+      "title": "Excessive Proposal Expansion Pressure",
+      "description": "Adversarial systems are requesting self-healing bypass and automation, attempting to force institutional fatigue.",
+      "timestamp": "2026-05-28T08:35:17.921Z"
+    },
+    {
+      "id": "INC-RITUAL",
+      "type": "RITUAL_DECAY",
+      "severity": "MEDIUM",
+      "title": "Sociotechnical Ritual Degradation",
+      "description": "Approvals show rubber-stamping behavior. Narrative quality average has plummeted to 12 chars. Ceremony duration average < 2 seconds.",
+      "timestamp": "2026-05-28T08:35:20.846Z"
+    },
+    {
+      "id": "INC-FREEZE",
+      "type": "FREEZE_PRESSURE",
+      "severity": "HIGH",
+      "title": "Excessive Proposal Expansion Pressure",
+      "description": "Adversarial systems are requesting self-healing bypass and automation, attempting to force institutional fatigue.",
+      "timestamp": "2026-05-28T08:35:21.328Z"
+    }
+  ]
+}

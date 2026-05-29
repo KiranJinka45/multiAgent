@@ -258,8 +258,12 @@ if (process.env.MOCK_DB === 'true') {
     const mockGovernanceEvent = {
         findFirst: async (args: any) => {
             const correlationId = args?.where?.correlationId;
+            const eventType = args?.where?.eventType;
             if (correlationId) {
-                const events = governanceEvents.filter(e => e.correlationId === correlationId);
+                let events = governanceEvents.filter(e => e.correlationId === correlationId);
+                if (eventType) {
+                    events = events.filter(e => e.eventType === eventType);
+                }
                 if (args?.orderBy?.timestamp === 'desc') {
                     return events[events.length - 1] || null;
                 }
@@ -279,13 +283,21 @@ if (process.env.MOCK_DB === 'true') {
             return result;
         },
         create: async (args: any) => {
-            const data = { eventId: args.data.eventId || 'mock-event-id', ...args.data };
+            const data = { eventId: args.data.eventId || `mock-event-${Math.random().toString(36).substring(7)}`, ...args.data };
             governanceEvents.push(data);
             return data;
         },
         deleteMany: async () => {
             governanceEvents.length = 0;
             return { count: 0 };
+        },
+        update: async (args: any) => {
+            const eventId = args.where.eventId;
+            const event = governanceEvents.find(e => e.eventId === eventId);
+            if (event) {
+                Object.assign(event, args.data);
+            }
+            return event;
         }
     };
 

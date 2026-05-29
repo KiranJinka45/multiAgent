@@ -9,6 +9,7 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { serverConfig } from '@packages/config';
 import { logger } from '@packages/observability';
+import { getRedisClient } from '@packages/utils';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -48,6 +49,22 @@ export function createServer() {
   app.disable('x-powered-by');
   app.use(cors());
   app.use(express.json());
+
+  // Governance Freeze Middleware
+  app.use(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const redis = await getRedisClient();
+      const isFrozen = await redis.get('SYSTEM_FROZEN');
+      if (isFrozen === 'true') {
+        logger.warn(`[PolicyEngine] Rejected ${req.path} because SYSTEM_FROZEN is active.`);
+        res.status(503).json({ error: 'Governance Freeze Active. All operations suspended.' });
+        return;
+      }
+    } catch (e) {
+      // Allow through if redis fails
+    }
+    next();
+  });
 
   // Log incoming requests
   app.use((req: Request, res: Response, next: NextFunction) => {

@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  ztan-host:
+    image: node:20-alpine
+    container_name: ztan_host_daemon
+    working_dir: /app
+    volumes:
+      - ../:/app
+    # We expose port 5050 for the Detached Witness
+    ports:
+      - "5050:5050"
+    command: ["npx", "tsx", "packages/runtime-core/src/supervisor/host-daemon.ts"]
+    networks:
+      - ztan-host-net
+      - ztan-witness-bridge
+
+  ztan-witness:
+    image: node:20-alpine
+    container_name: ztan_detached_witness
+    working_dir: /app
+    volumes:
+      - ../:/app
+    environment:
+      - HOST_DAEMON_URL=http://ztan-host:5050
+    command: ["npx", "tsx", "scripts/ci/test-witness-handshake.ts"]
+    networks:
+      # Explicitly isolated network - no access to DB or primary host networks, ONLY the bridge
+      - ztan-witness-bridge
+    depends_on:
+      - ztan-host
+
+networks:
+  # Internal network for the Host Daemon and primary DBs (simulated)
+  ztan-host-net:
+    driver: bridge
+  # Dedicated cross-kernel bridge specifically for the attestation handshake
+  ztan-witness-bridge:
+    driver: bridge

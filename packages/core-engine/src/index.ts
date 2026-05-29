@@ -68,7 +68,7 @@ export class MissionOrchestrator {
                 : 'unsigned_fallback';
 
             await this.ledgerClient.emitEvent({
-                eventType: GovernanceEventType.INTENT_INSPECTED,
+                eventType: GovernanceEventType.POLICY_PRECHECK_ALLOWED, // Assuming pre-check
                 correlationId: executionId,
                 riskLevel: inspectionData.risk_level,
                 payload: { allowed: inspectionData.allowed, auditId: inspectionData.audit_id }
@@ -91,7 +91,7 @@ export class MissionOrchestrator {
                 }
 
                 await this.ledgerClient.emitEvent({
-                    eventType: GovernanceEventType.POLICY_EVALUATED,
+                    eventType: GovernanceEventType.POLICY_PRECHECK_ALLOWED,
                     correlationId: executionId,
                     payload: { phase: 'pre-generation', allowed: true }
                 });
@@ -151,7 +151,7 @@ export class MissionOrchestrator {
             }
 
             await this.ledgerClient.emitEvent({
-                eventType: GovernanceEventType.SIMULATION_COMPLETED,
+                eventType: GovernanceEventType.SIMULATION_PASSED,
                 correlationId: executionId,
                 payload: { success: true, rollback_confidence: simulationData.overall_rollback_confidence }
             });
@@ -264,7 +264,7 @@ Output ONLY the exact Next.js code for the page, wrapped inside [PAGE_START] and
                 }
 
                 await this.ledgerClient.emitEvent({
-                    eventType: GovernanceEventType.POLICY_EVALUATED,
+                    eventType: GovernanceEventType.GENERATION_COMPLETED,
                     correlationId: executionId,
                     payload: { phase: 'post-generation', allowed: true }
                 });
@@ -277,7 +277,7 @@ Output ONLY the exact Next.js code for the page, wrapped inside [PAGE_START] and
             }
 
             await this.ledgerClient.emitEvent({
-                eventType: GovernanceEventType.FILES_GENERATED,
+                eventType: GovernanceEventType.GENERATION_COMPLETED,
                 correlationId: executionId,
                 payload: { fileCount: generatedFiles.length }
             });
@@ -303,7 +303,7 @@ Output ONLY the exact Next.js code for the page, wrapped inside [PAGE_START] and
                 eventType: GovernanceEventType.EXECUTION_FINALIZED,
                 correlationId: executionId,
                 payload: { success: false, error: err.message }
-            }).catch(e => logger.error({ err: e.message }, '[GovernanceLedger] Failed to emit failure event'));
+            }).catch((e: any) => logger.error({ err: e.message }, '[GovernanceLedger] Failed to emit failure event'));
             
             return { success: false, error: err.message };
         }

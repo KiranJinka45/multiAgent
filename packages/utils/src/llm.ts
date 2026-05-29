@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 import { serverConfig as config } from '@packages/config';
 import { logger } from '@packages/observability';
+import * as crypto from 'node:crypto';
 
 /**
  * Unified LLM Service
@@ -17,6 +18,7 @@ export interface LlmOptions {
     model?: string;
     temperature?: number;
     maxTokens?: number;
+    bypassSafetyGate?: boolean;
 }
 
 export class LlmService {
@@ -54,12 +56,33 @@ export class LlmService {
      * Dispatches a chat completion request to the configured provider.
      */
     async chat(messages: LlmMessage[], options: LlmOptions = {}): Promise<string> {
+        const combinedPayload = messages.map(m => m.content).join('\n');
+
+        // Safety Gate Hook: Evaluate with SemanticInspector if not bypassed
+        if (!options.bypassSafetyGate) {
+            try {
+                // @ts-ignore — dynamic import to avoid circular build dependency
+                const { SemanticInspector } = await import('@packages/governance-core');
+                const safetyResult = await SemanticInspector.aggregate(combinedPayload);
+                if (safetyResult.verdict === 'DENIED') {
+                    throw new Error(`AI_EXECUTION_FAILED: Safety verdict DENIED. Failures: ${safetyResult.deterministicFailures.join(', ')}`);
+                }
+            } catch (err: any) {
+                if (err.message?.startsWith('AI_EXECUTION_FAILED')) {
+                    throw err;
+                }
+                // Under double-fault or missing package context, log and fail closed
+                logger.error({ err: err.message }, '[LlmService] Safety gate check error, failing closed');
+                throw new Error(`AI_EXECUTION_FAILED: Safety gate verification failed: ${err.message}`);
+            }
+        }
+
         try {
             let model = options.model || config.DEFAULT_LLM_MODEL || 'gpt-4o';
             
-            if (config.LLM_PROVIDER === 'groq' && (model === 'gpt-4o' || model === 'gpt-4')) {
+            if (config.LLM_PROVIDER === 'groq' && (model.startsWith('gemini') || model === 'gpt-4o' || model === 'gpt-4')) {
                 model = 'llama-3.3-70b-versatile';
-            } else if (config.LLM_PROVIDER === 'sambanova' && (model === 'gpt-4o' || model === 'gpt-4')) {
+            } else if (config.LLM_PROVIDER === 'sambanova' && (model.startsWith('gemini') || model === 'gpt-4o' || model === 'gpt-4')) {
                 model = 'Meta-Llama-3.1-70B-Instruct-Turbo';
             } else if (config.LLM_PROVIDER === 'gemini' && (model === 'gpt-4o' || model === 'gpt-4')) {
                 model = 'gemini-1.5-pro';
@@ -87,6 +110,28 @@ export class LlmService {
                 durationMs: Date.now()
             }, '[LlmService] Completion successful');
 
+            // Record transaction costs to Governance Ledger
+            const totalTokens = response.usage?.total_tokens ?? (Math.ceil(combinedPayload.length / 4) + Math.ceil(content.length / 4));
+            const promptHash = crypto.createHash('sha256').update(combinedPayload).digest('hex');
+
+            try {
+                // @ts-ignore — dynamic import to avoid circular build dependency
+                const { GovernanceLedger } = await import('@packages/governance-core');
+                GovernanceLedger.append(
+                    'LLM_TRANSACTION_LOG',
+                    'SYSTEM',
+                    promptHash,
+                    {
+                        model,
+                        totalTokens,
+                        promptTokens: response.usage?.prompt_tokens ?? Math.ceil(combinedPayload.length / 4),
+                        completionTokens: response.usage?.completion_tokens ?? Math.ceil(content.length / 4),
+                    }
+                );
+            } catch (ledgerErr) {
+                logger.error({ err: ledgerErr }, '[LlmService] Failed to record transaction log to ledger');
+            }
+
             return content;
         } catch (err: any) {
             console.error('💥 LLM ERROR:', err);
@@ -97,8 +142,6 @@ export class LlmService {
                 model: options.model
             }, '[LlmService] Critical AI failure');
             
-            // Fallback strategy: If real LLM fails, we could return a safe error message
-            // or re-throw to trigger agent-level retries.
             throw new Error(`AI_EXECUTION_FAILED: ${err.message}`);
         }
     }

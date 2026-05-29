@@ -94,6 +94,7 @@ export interface EvidenceEntry {
         signature?: EvidenceSignature; // Cryptographic attestation
         witnessId?: string;   // ID of the validator that certified this entry
         verificationState: VerificationState;
+        tst?: any;            // RFC 3161 Time-Stamp Token
     };
 }
 

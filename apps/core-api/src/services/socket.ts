@@ -29,6 +29,7 @@ import { buildCanonicalPayload, hashPayload } from '@packages/ztan-crypto';
 import ztanRouter from '../routes/ztan.js';
 import ztanGovRouter from '../routes/ztan-governance.js';
 import { IdentityService } from './identity.service.js';
+import { ConsensusEngine, ZtanLeaseManager } from '@packages/governance-core';
 
 // ZTAN Replay Tracking - Rolling Sliding-Window TTL Cache (Remediation)
 class SlidingWindowTTLReplayCache {
@@ -188,8 +189,34 @@ app.get('/api/v1/system-health', async (req, res) => {
     // We only flip to DEGRADED if failures persist
     const isHealthy = checks.db && checks.redis;
     const systemMode = mode === 'NORMAL' ? 'NORMAL' : (mode === 'RECOVERING' ? 'RECOVERING' : 'DOWN');
+
+    // ZTAN Consensus Cluster Health (Phase 11A: Mechanical Trust Enforcement)
+    let consensusHealth: any = { initialized: false };
+    try {
+        const clusterNodes = ConsensusEngine.getClusterNodes();
+        if (clusterNodes.size > 0) {
+            const nodes = Array.from(clusterNodes.values());
+            const aliveNodes = nodes.filter(n => n.isAlive);
+            const leader = nodes.find(n => n.state === 2); // NodeState.LEADER
+            consensusHealth = {
+                initialized: true,
+                clusterSize: clusterNodes.size,
+                aliveNodes: aliveNodes.length,
+                quorumSize: ConsensusEngine.getQuorumSize(),
+                quorumMet: aliveNodes.length >= ConsensusEngine.getQuorumSize(),
+                leaderTerm: leader?.currentTerm ?? 0,
+                leaderId: leader?.nodeId ?? null,
+            };
+        }
+    } catch (e) {
+        logger.warn({ err: e }, '[SystemHealth] Failed to fetch consensus cluster state');
+    }
+
+    // If consensus quorum is broken, the system is degraded regardless of DB/Redis
+    const governanceFracture = consensusHealth.initialized && !consensusHealth.quorumMet;
+    const effectiveStatus = governanceFracture ? 'governance_fracture' : (isHealthy ? 'healthy' : 'degraded');
     
-    res.status(200).json({ // Always 200 for the health aggregator to prevent Gateway 502s
+    res.status(governanceFracture ? 503 : 200).json({
         activeWorkers: 4, 
         totalWorkers: 8,
         queueDepth: 0,
@@ -204,9 +231,10 @@ app.get('/api/v1/system-health', async (req, res) => {
             dlqSize: 0,
             latencyMs: 12
         },
-        status: isHealthy ? 'healthy' : 'degraded',
+        status: effectiveStatus,
         service: 'core-api',
-        checks
+        checks,
+        consensus: consensusHealth
     });
 });
 
@@ -458,11 +486,26 @@ async function bootstrap() {
             telemetrySimulator.start();
         }
 
-        /*
         // ZTAN Identity: Seed default nodes and ensure registry is ready
         console.log("➡️ [CoreAPI] IdentityService.bootstrap");
         await IdentityService.bootstrap();
 
+        // Initialize ZTAN Consensus Laboratory verified engine
+        console.log("➡️ [CoreAPI] ConsensusEngine.initializeCluster");
+        ConsensusEngine.initializeCluster(3);
+
+        // Initialize ZTAN Lease Manager
+        console.log("➡️ [CoreAPI] ZtanLeaseManager.startLeaseLoop");
+        try {
+            const leaseManager = new ZtanLeaseManager(process.env.ETCD_ENDPOINTS || 'localhost:2379');
+            leaseManager.startLeaseLoop().catch(err => {
+                console.warn(`⚠️ [CoreAPI] ZtanLeaseManager failed to start loops: ${err.message}. Running in fallback/laboratory mode.`);
+            });
+        } catch (err: any) {
+            console.warn(`⚠️ [CoreAPI] ZtanLeaseManager initialization failed: ${err.message}. Running in fallback/laboratory mode.`);
+        }
+
+        /*
         // ZTAN MPC: Resume/Recover ceremonies on startup
         console.log("➡️ [CoreAPI] TssCeremonyService.bootstrap");
         TssCeremonyService.bootstrap();
@@ -473,7 +516,7 @@ async function bootstrap() {
             TssCeremonyService.checkTimeouts().catch(err => {
                 logger.error({ err: err.message }, '[TSS] Timeout Watchdog Failed');
             });
-        }, 15000); 
+        }, 15000);
         */
 
         console.log("🚀 [CoreAPI] Bootstrap logic completed (ISOLATION MODE)");

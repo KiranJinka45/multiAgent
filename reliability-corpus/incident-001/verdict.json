@@ -1,0 +1,8 @@
+{
+  "tier": "PASS_RECOVERED",
+  "emoji": "🔄",
+  "label": "CAMPAIGN PASSED (RECOVERED)",
+  "description": "Transient failures occurred (14 failed requests/timeouts), but the system successfully self-healed and converged.",
+  "exitCode": 0,
+  "ceilingReason": null
+}

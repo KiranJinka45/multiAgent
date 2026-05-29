@@ -592,6 +592,4 @@ setInterval(() => {
             activeRequests.set((process as any)._getActiveRequests().length);
         } catch (e) {}
     }
-}, 2000).unref();
-
-
+}, 2000).unref();export { Counter, Gauge, Histogram };

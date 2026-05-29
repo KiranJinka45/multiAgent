@@ -231,7 +231,7 @@ export async function startGatewayServer() {
 
     // --- AUTH MIDDLEWARE ---
     console.log(`[Gateway] NODE_ENV: ${process.env.NODE_ENV}`);
-    const authenticate = (userAuth as any)({ allowDevBypass: process.env.NODE_ENV === 'development' });
+    const authenticate = (userAuth as any)();
     const requirePermission = (permission: string) => {
         return (req: any, res: any, next: any) => {
             const user = req.user;
@@ -1016,24 +1016,34 @@ export async function startGatewayServer() {
         logger.info('[Gateway] Warm startup complete');
     };
 
-    // Initialize Socket.io
+    // Initialize Socket.io before listening
     await initSocket(server, app);
+
+    // CRITICAL: Start listening FIRST so /health is available during orchestration readiness checks.
+    // waitForCore() is an infinite poll loop that blocks until CoreAPI is reachable.
+    // If we called waitForCore() before listen(), the Gateway port would never bind,
+    // causing external readiness checks to timeout.
+    await new Promise<void>((resolve, reject) => {
+        server.listen(PORT, '0.0.0.0', 2048, () => {
+            logger.info({ port: PORT, pid: process.pid }, '[Gateway] HTTP server bound (awaiting Core API...)');
+            resolve();
+        });
+        server.on('error', (err) => reject(err));
+    });
 
     await waitForCore();
 
-    server.listen(PORT, '0.0.0.0', 2048, async () => {
-        await preloadModules();
-        
-        // GRACEFUL STARTUP BUFFER: Ensure all internal handles are warm
-        logger.info("🕒 [Gateway] Warming up handles (2s buffer)...");
-        await new Promise(r => setTimeout(r, 2000));
-        
-        logger.info({ port: PORT, pid: process.pid }, '[Gateway] Production BFF Worker operational');
+    await preloadModules();
+    
+    // GRACEFUL STARTUP BUFFER: Ensure all internal handles are warm
+    logger.info("🕒 [Gateway] Warming up handles (2s buffer)...");
+    await new Promise(r => setTimeout(r, 2000));
+    
+    logger.info({ port: PORT, pid: process.pid }, '[Gateway] Production BFF Worker operational');
 
-        // Register Graceful Shutdown Tasks
-        onShutdown('HTTP Server', () => new Promise(resolve => server.close(() => resolve(undefined))));
-        onShutdown('Kafka Manager', () => kafkaManager.shutdown());
-    });
+    // Register Graceful Shutdown Tasks
+    onShutdown('HTTP Server', () => new Promise(resolve => server.close(() => resolve(undefined))));
+    onShutdown('Kafka Manager', () => kafkaManager.shutdown());
 
     server.on('error', (err) => {
         logger.error({ err }, '🚨 [Gateway] FATAL SERVER ERROR');

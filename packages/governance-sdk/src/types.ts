@@ -1,11 +1,20 @@
 export enum GovernanceEventType {
-  INTENT_RECEIVED = 'INTENT_RECEIVED',
-  INTENT_INSPECTED = 'INTENT_INSPECTED',
-  POLICY_EVALUATED = 'POLICY_EVALUATED',
-  SIMULATION_COMPLETED = 'SIMULATION_COMPLETED',
-  GENERATION_STARTED = 'GENERATION_STARTED',
-  FILES_GENERATED = 'FILES_GENERATED',
-  EXECUTION_FINALIZED = 'EXECUTION_FINALIZED'
+  INTENT_RECEIVED = 'security.intent.received',
+  INTENT_BLOCKED = 'security.intent.blocked',
+  POLICY_PRECHECK_ALLOWED = 'policy.precheck.allowed',
+  POLICY_PRECHECK_DENIED = 'policy.precheck.denied',
+  SIMULATION_PASSED = 'sandbox.simulation.passed',
+  SIMULATION_FAILED = 'sandbox.simulation.failed',
+  GENERATION_STARTED = 'generation.started',
+  GENERATION_COMPLETED = 'generation.completed',
+  EXECUTION_FINALIZED = 'execution.finalized',
+  CAPABILITY_GRANTED = 'capability.granted',
+  CAPABILITY_USED = 'capability.used',
+  CAPABILITY_DENIED = 'capability.denied',
+  RESOURCE_EXCEEDED = 'resource.exceeded',
+  SANDBOX_TERMINATED = 'sandbox.terminated',
+  EXECUTION_ATTESTATION_CREATED = 'execution.attestation.created',
+  EXECUTION_REPLAY_STORED = 'execution.replay.stored'
 }
 
 export interface EmitEventRequest {

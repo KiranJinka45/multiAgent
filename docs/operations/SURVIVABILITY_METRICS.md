@@ -5,16 +5,31 @@
 Nexus ZTAN's success is now measured by its institutional stability and operational trust. The following metrics are used to track longitudinal health and survivability.
 
 ### 1. REPLAY CONSISTENCY (TRUST SIGNAL)
-*Definition*: The percentage of autonomous missions that can be replayed with 100% deterministic state matching.
+*Definition*: The percentage of autonomous missions that can be replayed with structural state and sequence matching.
 - **Target**: > 99.9%
 - **Frequency**: Measured per mission execution.
 - **Why**: Replayability is the bedrock of institutional trust and auditability.
 
 ### 2. OPERATIONAL DRAMA (MATURITY SIGNAL)
 *Definition*: The ratio of manual "Human-in-the-Loop" interventions vs. successful autonomous completions.
-- **Target**: < 1% of total mission steps.
+- **Target**: < 1% of total mission steps (for nominal operations).
 - **Frequency**: Monthly audit.
-- **Why**: Low drama indicates a mature, predictable system that handles edge cases safely without constant supervision.
+- **Why**: Low drama indicates a mature, predictable system that handles nominal operational edge cases safely without constant supervision.
+
+#### Fail-Closed Escalation & Fault Class Boundaries
+To reconcile low-intervention targets with strict fail-closed deterministic governance, ZTAN separates faults into distinct classes with explicit escalation paths:
+
+1. **Class A: Auto-Recoverable Operational Faults** (Autonomous Continuity)
+   * *Scope*: Transient infrastructure availability degradation.
+   * *Examples*: Minor database socket timeouts, transient Redis connection drops, and host/container restarts.
+   * *Mitigation*: Automatically resolved via state-aware reconciliation loops and retry cooldown protocols.
+   * *Escalation Threshold*: If recovery exceeds the 15% error budget or the 5.0-second RTO boundary, the transaction is abandoned, and the system escalates to Class B human intervention.
+
+2. **Class B: Fail-Closed Integrity & Governance Faults** (Mandatory Human Intervention)
+   * *Scope*: Security, cryptographic, or invariant violations.
+   * *Examples*: Cryptographic sequence ID fractures, ledger checksum failures (bit-rot), unverified OCI provenance signatures, unauthorized enclave spawn attempts, and quarantine breaches.
+   * *Mitigation*: Zero autonomous recovery or self-healing is permitted. The system immediately halts operations, enters a `READ_ONLY` or `QUARANTINED` state, and escalates to human operator resolution.
+   * *Effect on Metrics*: Class B events are excluded from the < 1% operational drama target; they represent system-level assertions where human intervention is the mathematically required safe state.
 
 ### 3. GOVERNANCE FRICTION (USABILITY SIGNAL)
 *Definition*: The average time from mission dispute/challenge to resolution.

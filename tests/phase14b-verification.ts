@@ -4,6 +4,7 @@ dotenv.config();
 
 import fs from 'fs';
 import path from 'path';
+import { execSync } from 'child_process';
 import {
     TimeWarpPathology,
     TimeWarpConfig,
@@ -21,6 +22,13 @@ async function runPhase14bVerification() {
     console.log('================================================================================');
     console.log('🧪  ZTAN PHASE 14B - PATHOLOGY & CHRONOLOGY FAUST INJECTION RUNNER');
     console.log('================================================================================\n');
+
+    // ---- 0. Preflight port and process cleanup ----
+    try {
+        execSync('npx tsx scripts/preflight-cleanup.ts', { stdio: 'inherit' });
+    } catch (e: any) {
+        console.warn(`     [Warning] Preflight cleanup failed: ${e.message}`);
+    }
 
     const workspaceRoot = process.cwd();
     const timeWarp = new TimeWarpPathology(workspaceRoot);

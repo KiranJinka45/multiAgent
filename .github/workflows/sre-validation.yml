@@ -54,6 +54,9 @@ jobs:
       - name: Run Validation Runner
         run: npx ts-node validation/run-validation.ts
 
+      - name: Run Semantic Ledger Integration Tests
+        run: npx tsx test/integration/test-semantic-ledger.ts
+
       - name: Upload Audit Evidence
         uses: actions/upload-artifact@v4
         if: always()

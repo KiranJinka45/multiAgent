@@ -5,6 +5,15 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
+    pool: 'forks',
+    server: {
+      deps: {
+        inline: [/@temporalio/]
+      }
+    },
+    deps: {
+      inline: [/@temporalio/]
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],

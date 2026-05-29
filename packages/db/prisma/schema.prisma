@@ -286,6 +286,8 @@ model ZtanLedgerBlock {
   signature String   // Base64 NIST P-256 signature
   status    String   // VERIFIED, UNVERIFIED, CONFLICT
   epoch     String
+  timeToken String?  // Base64 RFC 3161 signed Time Stamp Token
+  tpmQuote  String?  // Base64 TPM 2.0 attestation quote for measured boot
   createdAt DateTime @default(now())
 
   @@index([epoch])
@@ -379,3 +381,11 @@ model GovernanceEvent {
   @@index([eventType])
   @@map("governance_events")
 }
+
+model ZtanRegisteredKey {
+  id        String   @id @default(uuid())
+  actorId   String   @unique
+  publicKey String   // PEM format of the NIST P-256 public key
+  createdAt DateTime @default(now())
+}
+

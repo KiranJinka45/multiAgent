@@ -1,0 +1,8 @@
+import fs from 'fs';
+const content = fs.readFileSync('scripts/run-stateful-chaos-soak.js', 'utf8');
+const lines = content.split('\n');
+lines.forEach((line, index) => {
+  if (line.includes('spawn') || line.includes('std')) {
+    console.log(`${index + 1}: ${line.trim()}`);
+  }
+});

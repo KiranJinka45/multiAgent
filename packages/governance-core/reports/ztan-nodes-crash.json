@@ -1,0 +1,37 @@
+{
+  "nodes": [
+    {
+      "currentTerm": 1,
+      "isAlive": true,
+      "logLength": 2,
+      "nodeId": "node-1",
+      "preparePoolSize": 5,
+      "state": 2
+    },
+    {
+      "currentTerm": 1,
+      "isAlive": true,
+      "logLength": 1,
+      "nodeId": "node-2",
+      "preparePoolSize": 5,
+      "state": 0
+    },
+    {
+      "currentTerm": 1,
+      "isAlive": false,
+      "logLength": 1,
+      "nodeId": "node-3",
+      "preparePoolSize": 3,
+      "state": 0
+    }
+  ],
+  "reason": "ZTAN_INVARIANT_VIOLATION: QUORUM_INTERSECTION_BROKEN",
+  "term": 1,
+  "timestamp": 1780037515644,
+  "__serialization_metadata__": {
+    "truncatedCount": 0,
+    "circularCount": 0,
+    "maxDepthReached": 3,
+    "timestampStr": "2026-05-29T06:51:55.644Z"
+  }
+}

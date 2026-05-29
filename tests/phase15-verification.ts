@@ -238,7 +238,7 @@ async function runPhase15Verification() {
 
   // Perform repair
   const backupFile = path.join(tempDir, 'torn_repair_target.json.bak');
-  const repairStats = await arch.attemptRepair(corruptFile, backupFile);
+  const repairStats = await arch.attemptRepair(corruptFile, false, false, backupFile);
   console.log(`     - Repair status: success=${repairStats.success}, originalSize=${repairStats.originalSizeBytes}, repairedSize=${repairStats.repairedSizeBytes}, repairedCount=${repairStats.repairedBlockCount}`);
   
   if (!repairStats.success || repairStats.repairedBlockCount !== 1) {

@@ -16,7 +16,7 @@ To prevent future engineering teams from reintroducing rejected complexity. The 
    * **Why:** The system must fail-closed and await human authority. Unsupervised orchestration inevitably masks severe lineage drift until it becomes unrecoverable.
 
 4. **No AI-Driven Recovery Decisions**
-   * **Why:** AI is non-deterministic. SRE recovery workflows demand 100% predictable, testable, and legally auditable mathematical guarantees.
+   * **Why:** AI is probabilistic. SRE recovery workflows demand highly predictable, testable, and legally auditable trace guarantees.
 
 5. **No Runtime Plugin Marketplace / Extensions**
    * **Why:** Third-party plugins introduce supply-chain vulnerabilities, memory leaks, and unpredictable dashboard entropy that violates browser resource budgets.

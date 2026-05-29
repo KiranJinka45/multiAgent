@@ -1,0 +1,26 @@
+{
+  "reason": "ZTAN_INVARIANT_VIOLATION: QUORUM_INTERSECTION_BROKEN",
+  "term": 1,
+  "timestamp": 1780037515644,
+  "wal": [
+    {
+      "command": "entry-1",
+      "term": 1
+    },
+    {
+      "command": "entry-2",
+      "term": 1
+    }
+  ],
+  "walMetadata": {
+    "originalSize": 2,
+    "trimmedSize": 2,
+    "wasTruncated": false
+  },
+  "__serialization_metadata__": {
+    "truncatedCount": 0,
+    "circularCount": 0,
+    "maxDepthReached": 3,
+    "timestampStr": "2026-05-29T06:51:55.644Z"
+  }
+}

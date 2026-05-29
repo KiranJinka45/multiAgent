@@ -5,6 +5,7 @@ export class TimeWarpPathology {
     private static originalDateNow: typeof Date.now = Date.now;
     private static originalDate: typeof Date = Date;
     private static originalHrtime: typeof process.hrtime.bigint = process.hrtime.bigint;
+    private static originalPerformanceNow: typeof performance.now = performance.now;
     private static activeConfig: TimeWarpConfig | null = null;
     private static isIntercepting = false;
 
@@ -100,6 +101,7 @@ export class TimeWarpPathology {
             this.originalDateNow = Date.now;
             this.originalDate = Date;
             this.originalHrtime = process.hrtime.bigint;
+            this.originalPerformanceNow = globalThis.performance ? globalThis.performance.now.bind(globalThis.performance) : performance.now;
         }
 
         const self = this;
@@ -160,6 +162,28 @@ export class TimeWarpPathology {
 
             return virtualMono;
         };
+
+        // Monkey-patch performance.now
+        if (globalThis.performance && globalThis.performance.now) {
+            globalThis.performance.now = () => {
+                if (!self.activeConfig) return self.originalPerformanceNow();
+                const config = self.activeConfig;
+
+                if (config.frozenTimeMs !== null) {
+                    return config.frozenTimeMs;
+                }
+
+                const realMono = self.originalHrtime();
+                const injectedMono = BigInt(config.injectedAtMonoNs ?? realMono.toString());
+                const elapsedMono = realMono - injectedMono;
+
+                let virtualMono = injectedMono + BigInt(Math.floor(Number(elapsedMono) * config.timeAcceleration));
+                virtualMono += BigInt(config.monotonicOffsetNs);
+
+                const elapsedMs = Number(virtualMono) / 1000000;
+                return elapsedMs + config.offsetMs;
+            };
+        }
     }
 
     private static restoreInterceptor(): void {
@@ -167,6 +191,9 @@ export class TimeWarpPathology {
         Date.now = this.originalDateNow;
         globalThis.Date = this.originalDate;
         process.hrtime.bigint = this.originalHrtime;
+        if (globalThis.performance && globalThis.performance.now) {
+            globalThis.performance.now = this.originalPerformanceNow;
+        }
         this.activeConfig = null;
         this.isIntercepting = false;
     }

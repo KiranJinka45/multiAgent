@@ -2,6 +2,7 @@ import express from 'express';
 import type { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import { logger } from '@packages/observability';
+import { getRedisClient } from '@packages/utils';
 import { detectPromptInjection } from './prompt-injection-detection.js';
 import { evaluateToolRisk } from './tool-risk-model.js';
 import { scoreSemanticIntent } from './semantic-scorer.js';
@@ -13,6 +14,22 @@ export function createServer() {
   app.disable('x-powered-by');
   app.use(cors());
   app.use(express.json());
+
+  // Governance Freeze Middleware
+  app.use(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const redis = await getRedisClient();
+      const isFrozen = await redis.get('SYSTEM_FROZEN');
+      if (isFrozen === 'true') {
+        logger.warn(`[IntentGateway] Rejected ${req.path} because SYSTEM_FROZEN is active.`);
+        res.status(503).json({ error: 'Governance Freeze Active. All operations suspended.' });
+        return;
+      }
+    } catch (e) {
+      // Allow through if redis fails (fail-open or fail-closed based on policy, but usually we don't want to crash on redis timeout)
+    }
+    next();
+  });
 
   // Log incoming requests
   app.use((req: Request, res: Response, next: NextFunction) => {

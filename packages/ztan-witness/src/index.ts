@@ -28,6 +28,7 @@ import {
 } from '@packages/observability';
 import { redis } from '@packages/utils';
 import { db } from '@packages/db';
+import { AttestationVerifier, tsa, rekor } from '@packages/ztan-crypto';
 import crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -52,6 +53,51 @@ export class EvidenceLedgerService {
     }>>();
     private static readonly batchTimeouts = new Map<string, NodeJS.Timeout>();
     private static readonly activeBatches = new Set<string>();
+    
+    // Configurable Host Daemon Attestation Endpoint
+    private static HOST_DAEMON_URL = process.env.HOST_DAEMON_URL || 'http://127.0.0.1:5050';
+
+    /**
+     * Pre-flight Attestation Handshake (Tier H2 Detached Witness)
+     * Must be called before any co-signing or ledger appends.
+     */
+    private static async performPreflightAttestation(): Promise<void> {
+        const nonce = crypto.randomBytes(32).toString('hex');
+        
+        try {
+            const response = await fetch(`${this.HOST_DAEMON_URL}/attest`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nonce })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HostDaemon returned status ${response.status}`);
+            }
+            
+            const { quote, akPublicKey } = await response.json() as any;
+            
+            // Reconstruct Verifier with the provided AK (in prod this comes from a trusted directory)
+            const verifier = new AttestationVerifier(akPublicKey);
+            
+            // Expected PCR Baseline (simulated for Wave 3)
+            const expectedPcrValues = {
+                0: crypto.createHash('sha256').update('fw-baseline').digest('hex'),
+                7: crypto.createHash('sha256').update('secure-boot-keys').digest('hex'),
+                10: crypto.createHash('sha256').update('ima-measurement-list').digest('hex')
+            };
+
+            const isValid = verifier.verifyQuote(quote, nonce, expectedPcrValues);
+            if (!isValid) {
+                throw new Error('TPM Quote verification failed mathematically. PCR baseline mismatch or invalid signature.');
+            }
+            
+            logger.debug('[EvidenceLedger] Pre-flight Detached Attestation successful. Physical state is trustworthy.');
+        } catch (err: any) {
+            logger.error({ err: err.message }, '🚫 [EvidenceLedger] HARD QUARANTINE: Out-of-band attestation failed. Refusing to co-sign transactions.');
+            throw new Error(`QuarantineError: Out-of-band attestation failed: ${err.message}`);
+        }
+    }
 
     /**
      * Ingests a new operational event with cryptographic attestation.
@@ -114,6 +160,9 @@ export class EvidenceLedgerService {
         }
 
         try {
+            // Tier H2 Detached Witness Pre-flight Check
+            await this.performPreflightAttestation();
+
             if (batch.length === 1) {
                 const { params, resolve, reject, queueStart } = batch[0];
                 const queueWaitTimeMs = performance.now() - queueStart;
@@ -194,6 +243,22 @@ export class EvidenceLedgerService {
         let redisCacheTimeMs = 0;
         const timestamp = Date.now();
 
+        // Tier H4: Clock Drift Quarantine
+        const authTime = tsa.getAuthoritativeTime();
+        if (Math.abs(timestamp - authTime) > 10) {
+            const err = new Error(`QuarantineError: Local clock drifted by ${Math.abs(timestamp - authTime)}ms`);
+            logger.error({ local: timestamp, auth: authTime }, '🚫 [EvidenceLedger] HARD QUARANTINE: Clock drift exceeds 10ms threshold. Rejecting batch.');
+            for (const item of batch) {
+                item.reject(err);
+            }
+            // Also need to release lock
+            const currentValue = await redis.get(lockKey);
+            if (currentValue === lockValue) {
+                await redis.del(lockKey);
+            }
+            return;
+        }
+
         try {
             // 2. Fetch Active Trust Epoch
             const activeEpoch = await this.getActiveEpoch();
@@ -253,6 +318,8 @@ export class EvidenceLedgerService {
                         scope: 'entry'
                     };
 
+                    const tst = tsa.generateTimeStampToken(hash);
+
                     const entryObj: EvidenceEntry = {
                         id,
                         timestamp,
@@ -266,7 +333,8 @@ export class EvidenceLedgerService {
                             hash,
                             previousHash: prevHash,
                             signature,
-                            verificationState: VerificationState.VERIFIED
+                            verificationState: VerificationState.VERIFIED,
+                            tst
                         }
                     };
 
@@ -320,6 +388,11 @@ export class EvidenceLedgerService {
                 return preparedEntries;
             });
             dbTransactionTimeMs = performance.now() - dbStart;
+
+            // Tier H4: Rekor Transparency Ledger Anchoring
+            for (const item of results) {
+                rekor.publishEntry(item.hash, item.signature.signature);
+            }
 
             // 4. Pipelined cache updates to Redis
             const cacheStart = performance.now();
@@ -434,6 +507,13 @@ export class EvidenceLedgerService {
             const id = uuidv4();
             const timestamp = Date.now();
             
+            // Tier H4: Clock Drift Quarantine
+            const authTime = tsa.getAuthoritativeTime();
+            if (Math.abs(timestamp - authTime) > 10) {
+                logger.error({ local: timestamp, auth: authTime }, '🚫 [EvidenceLedger] HARD QUARANTINE: Clock drift exceeds 10ms threshold. Rejecting transaction.');
+                throw new Error(`QuarantineError: Local clock drifted by ${Math.abs(timestamp - authTime)}ms`);
+            }
+
             // 2. Fetch Active Trust Epoch
             const activeEpoch = await this.getActiveEpoch();
             
@@ -476,6 +556,8 @@ export class EvidenceLedgerService {
                         scope: 'entry'
                     };
 
+                    const tst = tsa.generateTimeStampToken(hash);
+
                     const entryObj: EvidenceEntry = {
                         id,
                         timestamp,
@@ -489,7 +571,8 @@ export class EvidenceLedgerService {
                             hash,
                             previousHash,
                             signature,
-                            verificationState: VerificationState.VERIFIED
+                            verificationState: VerificationState.VERIFIED,
+                            tst
                         }
                     };
 
@@ -557,6 +640,8 @@ export class EvidenceLedgerService {
                     scope: 'entry'
                 };
 
+                const tst = tsa.generateTimeStampToken(hash);
+
                 entry = {
                     id,
                     timestamp,
@@ -570,7 +655,8 @@ export class EvidenceLedgerService {
                         hash,
                         previousHash,
                         signature,
-                        verificationState: VerificationState.VERIFIED
+                        verificationState: VerificationState.VERIFIED,
+                        tst
                     }
                 };
             }
@@ -578,6 +664,9 @@ export class EvidenceLedgerService {
             if (!entry) {
                 throw new Error('[EvidenceLedger] Append failed: No entry generated during execution');
             }
+
+            // Tier H4: Rekor Transparency Ledger Anchoring
+            rekor.publishEntry(entry.integrity.hash, entry.integrity.signature!.signature);
 
             // 5. Commit to Redis as high-performance sequence cache
             const cacheStart = performance.now();

@@ -1,0 +1,8 @@
+{
+  "tier": "POLICY_OPA_GATE_DENIAL",
+  "emoji": "🚨",
+  "label": "INCIDENT INCIDENT-632E70B5 DETECTED",
+  "description": "FAIL_CLOSED_REGO_GATE",
+  "exitCode": 1,
+  "ceilingReason": "FAIL_CLOSED_REGO_GATE"
+}

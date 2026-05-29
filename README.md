@@ -1,9 +1,17 @@
 # Nexus ZTAN: Forensic Governance and Replay-Coordination Substrate
 
-> **STATUS**: **DEVELOPMENT-STAGE SUBSTRATE** 🛡️
+> **STATUS**: **BOUNDED ADVERSARIAL DISTRIBUTED-SYSTEMS RESEARCH SUBSTRATE** 🛡️
 >
 > **System Identity Boundary Disclosure:**
-> Nexus ZTAN is a development-stage forensic governance and replay-coordination substrate with genuinely sophisticated ledger, federation, control-plane, and gateway resilience engineering, but with substantial mock-layer platform debt preventing credible claims of production AI orchestration or distributed infrastructure maturity.
+> ZTAN is a bounded adversarial distributed-systems research platform focused on fail-closed orchestration, causal replay validation, authenticated consensus experimentation, and cryptographic trust-boundary modeling under explicitly constrained laboratory conditions.
+>
+> The platform combines adversarial falsification campaigns, cryptographic integrity verification, PBFT-inspired quorum coordination, and replay causality enforcement to iteratively discover and harden architectural failure modes.
+>
+> **Current Limitations & Unresolved Boundaries:**
+> 1. **Containment Semantics:** Dependence on shared-kernel container isolation (Docker) rather than true hypervisor-level microVM execution (e.g. Firecracker/KVM), leaving the host kernel as a shared root of compromise.
+> 2. **Byzantine Networking:** Absence of production-grade Byzantine networking assumptions (such as view change safety proofs, checkpoint stabilization, lock certificates, and timing asymmetry/prepare withholding scheduling).
+> 3. **Attestation Infrastructure:** Reliance on modeled rather than physical TPM 2.0 attestation hardware.
+
 
 ---
 

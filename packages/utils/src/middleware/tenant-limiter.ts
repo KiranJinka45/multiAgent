@@ -40,9 +40,11 @@ export const tenantLimiter = async (req: Request, res: Response, next: NextFunct
         }
 
         next();
-    } catch (err) {
-        logger.error({ err, tenantId }, '[TenantLimiter] Failed to process rate limit');
-        // Fail open in case of Redis issues
-        next();
+    } catch (err: any) {
+        logger.error({ err: err.message, tenantId }, '[TenantLimiter] Failed to process rate limit (FAIL_CLOSED)');
+        return res.status(503).json({
+            error: 'RATE_LIMIT_UNAVAILABLE',
+            message: 'The governance control plane rate limiter is offline. Fail-closed security policy enforced.'
+        });
     }
 };
