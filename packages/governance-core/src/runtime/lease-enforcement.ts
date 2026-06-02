@@ -1,7 +1,8 @@
 import { Etcd3 } from 'etcd3';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@packages/db';
 import { PerformanceObserver } from 'perf_hooks';
 import os from 'os';
+import fs from 'fs';
 
 /**
  * ─── ZTAN Lease Enforcement & GC Tuning Engine ──────────────────────────────
@@ -36,9 +37,24 @@ export class ZtanLeaseManager {
     private etcdLease: any = null;
     private dbConnectionActive = true;
 
-    constructor(etcdEndpoints = 'localhost:2379') {
+    constructor(etcdEndpoints = process.env.ETCD_ENDPOINTS || 'http://localhost:2379') {
         const hosts = etcdEndpoints.split(',').map(h => h.trim());
-        this.etcd = new Etcd3({ hosts });
+        const options: any = { hosts };
+
+        if (etcdEndpoints.includes('https')) {
+            try {
+                options.credentials = {
+                    rootCertificate: fs.readFileSync('/certs/ca.crt'),
+                    privateKey: fs.readFileSync('/certs/client.key'),
+                    certChain: fs.readFileSync('/certs/client.crt')
+                };
+            } catch (e: any) {
+                console.error(`[Lease Engine] Failed to load mTLS credentials: ${e.message}`);
+                throw new Error('ETCD_ENDPOINTS requested https but mTLS certificates were not found in /certs.');
+            }
+        }
+
+        this.etcd = new Etcd3(options);
         this.prisma = new PrismaClient();
         this.setupGcObserver();
     }
