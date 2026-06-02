@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-28T08:28:23.166Z",
-  "manifestSignature": "UKcJWYDFox8zlqzxb3LClR4B34TafZdHq6thVCOQJ776ssNcrsNaPDlGH1eX6DE0+CAIKYCeFbYwcibmTyv1GdXc6XCok/U8czCCVC4ISdBc5PmbFTi365kQ3PJAhCKAs4RewanwmRm+GIykmru8ELShzrLiwYZLA7XSEdk3/ZW0QCn5rYg7qsS8KMBPc8e/Q4PeD1NCp9tcVDFr07thd7jlprmOJ67Zx8Nk56A6RgIPWO8794qb75VZ2WgN8jDUit7EG3789I4q+UyJgsmqXAOGpDuJFRGKMYKkwY+Of7zOStQ3NTYDjSRvauqXfLOAf2tR+GeHoBobK1maYNIMPw==",
+  "generatedAt": "2026-05-30T06:17:28.856Z",
+  "manifestSignature": "WGlyIzY/rpYEWndwsNdTDzDhfyIirTk9roVLB6yWt7WgeCqh5q3NQwfv8PZBDZVV2W7NeZ2Y816x070cfK7yVMN99IkEmrcr6Sm1mwuZk2BIz7+IxL7GqspjcxG689pKbrC/xXcyxK0XNtQmaHI/qPAuM55UhfE4Q4DxYqhbQsOJtUqGWPBbgY0amgazUW6Rmy91NFHI9Mmj1MaLgk3VSb3Vq5jPYU2i6WZQpY1S7bD8n2vkdE7zDtkC42HxCDprXkguMP9PwBLfbqnsPEv8KY+qJ4xCNKkaQtqDb1I5kMuRf7dLCn0XyusOv5rhT1j38ldGMvcaEHf1EUYusA9UWw==",
   "entries": {
     "INCIDENT-04DB94AA": {
       "id": "INCIDENT-04DB94AA",
@@ -243,6 +243,28 @@
         }
       },
       "signature": "WF1tdtzX2O5LWcQg5apE3ABP2GnRMO9EYGfCKVSo026rchelAu49bhxw44DApBCf1a/0PT9QHpYfX7ZPccTm9RDNXJuLNdKNEtgJLG32K2FVIcMvZZVhB5vG9AcmMAb6VlSTcm/zipUnP5O3juAPcWY+gaux6QL7s7e0BpBNvOQ4zYkmdcUNKGwE/91GWYP08dQATf4AQ2gzvFtFdf9w5XEugG3akVTJTQfk3fO8v0bE07LnFYtENEq0H2L1If7jjrsbOaHJMytrYfdpcBZHwdjlX5XmvpspEd5vmgI4XTSZhih83trB7WPJoLuWuYqOJz/iTbO0C3emvI2viRKDHw==",
+      "signerKeyFingerprint": "d4c22808406fc0d83c536c2b6ccb8c3d6831aa65ad1e247ea061180f52f7bedf"
+    },
+    "INCIDENT-A0F286AF": {
+      "id": "INCIDENT-A0F286AF",
+      "type": "INCIDENT",
+      "failureClass": "STARTUP_ATTESTATION_ENV_DRIFT",
+      "timestamp": "2026-05-30T05:45:36.482Z",
+      "files": {
+        "telemetry": {
+          "path": "reliability-corpus/incident-incident-a0f286af/telemetry.json",
+          "hash": "9e2d3afd2d71c7575197f1688576e87ce870cb4f75e6327d64687bce6b88da07"
+        },
+        "verdict": {
+          "path": "reliability-corpus/incident-incident-a0f286af/verdict.json",
+          "hash": "afc7a1dfc04f9a734c9d289514e7e34694ca7003a4c884962381e81fbf67c41d"
+        },
+        "operatorActions": {
+          "path": "reliability-corpus/incident-incident-a0f286af/operator-actions.md",
+          "hash": "8cf65c09f9e5337811869994eae9e6c776d3ecc248ac0fb8a8318260473b1a32"
+        }
+      },
+      "signature": "zNutnHeY5ExLcXdVuBUOsrKsDwMdwqYBX+zg2JvBIYVWUroqBzWfGgyF7ZJZVPkL2kzywlvL39Sv8gaLtCaQyMUJKh/YutLBTuDs9FVAICtB4GKzudRU3WY0n1MJUlgWYmrF4UHr9dWhT3W5IPYtAw43Phk0YDy5PLUhJps7UWLZaLrDUrLiI20cLd5WfQaFOX0LmYIpiPSfZtwewX6WkMJy9RYcZ8Ns3UJOp1fuz+BKKQTCLr7mY+MILHQopcxqerZlllnclSOYpSLBWXja5Ftcp7vPkXaxoo/rNulcWeZPbsjDBJDlE5WLhtiabygNSx4kjMVi1JTWN/y/H0hJwQ==",
       "signerKeyFingerprint": "d4c22808406fc0d83c536c2b6ccb8c3d6831aa65ad1e247ea061180f52f7bedf"
     },
     "INCIDENT-A61A37DA": {

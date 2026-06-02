@@ -1,0 +1,74 @@
+{
+  "generatedAt": "2026-05-30T06:26:14.910Z",
+  "overallPassed": true,
+  "totalDrills": 4,
+  "passedDrills": 4,
+  "drills": [
+    {
+      "drillName": "Replication Slot Growth & WAL Lag",
+      "status": "SUCCESS",
+      "executed": true,
+      "metrics": {
+        "activeSlotsCount": 1,
+        "createdMockSlot": true,
+        "mockSlotActive": false,
+        "currentLsn": "0/1B08C18"
+      },
+      "anomalies": []
+    },
+    {
+      "drillName": "Prepared Transactions & VACUUM Starvation",
+      "status": "SUCCESS",
+      "executed": true,
+      "metrics": {
+        "maxPreparedTransactions": 0,
+        "detectedLocks": [
+          {
+            "count": "5",
+            "mode": "RowShareLock"
+          },
+          {
+            "count": "3",
+            "mode": "ExclusiveLock"
+          },
+          {
+            "count": "1",
+            "mode": "AccessShareLock"
+          }
+        ],
+        "lockDurationMs": 3096
+      },
+      "anomalies": []
+    },
+    {
+      "drillName": "fsync Disk Stalls & Checkpoint Starvation",
+      "status": "SUCCESS",
+      "executed": true,
+      "metrics": {
+        "writeLatencies": [
+          508,
+          566,
+          563,
+          567,
+          570
+        ],
+        "averageWriteLatencyMs": 554.8,
+        "totalStallTimeMs": 570,
+        "poolAcquisitionCheckMs": 4
+      },
+      "anomalies": []
+    },
+    {
+      "drillName": "Data Block Checksum Corruption",
+      "status": "SUCCESS",
+      "executed": true,
+      "metrics": {
+        "simulatedBlock": "canonical-block-200",
+        "expectedPrevHash": "0xrighthash789",
+        "actualPrevHash": "0xwronghash456",
+        "quarantineTriggered": true
+      },
+      "anomalies": []
+    }
+  ]
+}

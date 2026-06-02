@@ -1,0 +1,14 @@
+{
+  "generatedAt": "2026-05-30T06:29:47.512Z",
+  "drillPassed": true,
+  "scenario": "Asymmetric Attestation Quarantine Reset",
+  "operatorId": "operator-01",
+  "durationMs": 1509,
+  "success": true,
+  "anomalies": [],
+  "metrics": {
+    "operatorHesitationBudgetMs": 1509,
+    "overridesAudited": 1,
+    "signatureValid": true
+  }
+}
