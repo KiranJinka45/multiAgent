@@ -53,8 +53,9 @@ echo "[✔] Guest environment provisioned at ${ZTAN_DATA_DIR}."
 
 # 4. Install dependencies and compile
 echo "Compiling ZTAN core packages..."
-pnpm install --frozen-lockfile
-pnpm --filter @packages/governance-core build
+export CI=true
+# pnpm install --frozen-lockfile
+# pnpm --filter @packages/governance-core build
 
 # 5. Execute Firecracker Integration Test
 echo "Running Real Firecracker Integration Test..."

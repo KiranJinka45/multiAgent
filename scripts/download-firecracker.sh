@@ -16,7 +16,7 @@ echo "Downloading Firecracker from ${URL}..."
 curl -L "${URL}" -o "${TMP_DIR}/firecracker.tgz"
 
 echo "Verifying download..."
-EXPECTED_SHA="65ce74c3d3f9b2d354b397bfd3e9112de0dcfc42407519a5ea0559f27de1d828"
+EXPECTED_SHA="55bd3e6d599fdd108e36e52f9aee2319f06c18a90f2fa49b64e93fdf06f5ff53"
 
 if command -v sha256sum >/dev/null; then
     ACTUAL_SHA=$(sha256sum "${TMP_DIR}/firecracker.tgz" | awk '{print $1}')

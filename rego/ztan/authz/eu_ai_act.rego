@@ -58,8 +58,9 @@ oversight_attestation_valid if {
     # Who is providing oversight
     input.humanOversight.overseerIdentity != ""
 
-    # When was oversight established (must be within last 24 hours)
-    input.humanOversight.attestedAt != ""
+    # When was oversight established (must be within last 24 hours = 86400s = 86400000000000ns)
+    attestation_time_ns := time.parse_rfc3339_ns(input.humanOversight.attestedAt)
+    attestation_time_ns >= (time.now_ns() - 86400000000000)
 
     # What level of oversight is being applied
     valid_oversight_levels[input.humanOversight.level]
@@ -77,9 +78,7 @@ reasons[msg] if {
     is_high_risk_operation
     not human_oversight_confirmed
     msg := sprintf(
-        "EU_AI_ACT_ARTICLE_14: Action '%s' classified as high-risk AI operation. " +
-        "Human oversight confirmation is REQUIRED but was not provided. " +
-        "Set humanOversight.confirmed=true with valid attestation.",
+        "EU_AI_ACT_ARTICLE_14: Action '%s' classified as high-risk AI operation. Human oversight confirmation is REQUIRED but was not provided. Set humanOversight.confirmed=true with valid attestation.",
         [input.action]
     )
 }
@@ -89,8 +88,7 @@ reasons[msg] if {
     human_oversight_confirmed
     not oversight_attestation_valid
     msg := sprintf(
-        "EU_AI_ACT_ARTICLE_14: Action '%s' has human oversight flag but attestation is incomplete. " +
-        "Required: overseerIdentity, attestedAt, and level (one of: real-time, pre-approval, post-review, supervisory).",
+        "EU_AI_ACT_ARTICLE_14: Action '%s' has human oversight flag but attestation is incomplete or stale. Required: overseerIdentity, attestedAt (RFC3339, max 24h old), and level (one of: real-time, pre-approval, post-review, supervisory).",
         [input.action]
     )
 }
@@ -103,6 +101,6 @@ audit_record := {
     "oversight_confirmed": human_oversight_confirmed,
     "attestation_valid": oversight_attestation_valid,
     "decision": allow,
-    "policy_version": "1.0.0",
+    "policy_version": "1.1.0",
     "regulation": "EU AI Act 2024, Article 14",
 }

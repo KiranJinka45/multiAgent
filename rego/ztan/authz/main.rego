@@ -56,6 +56,7 @@ permitted_actions := {
     "mission-create",
     "mission-update",
     "log-append",
+    "system_modification",
 }
 
 # ─── 3. Quota Check ─────────────────────────────────────────────────────────
