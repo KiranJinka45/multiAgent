@@ -1,41 +1,58 @@
-export type ModelTier = 'GEMINI_FLASH' | 'GEMINI_PRO' | 'CLAUDE_SONNET' | 'CLAUDE_OPUS';
+export type ModelTier = 'FAST_TIER' | 'BALANCED_TIER' | 'SMART_TIER' | 'STRATEGIC_TIER';
 
 export interface RouteAttestation {
     prompt: string;
     assignedTier: ModelTier;
+    /** The actual LLM provider resolved from environment, not the tier name */
+    resolvedProvider: string;
     reason: string;
 }
 
 export class ComplexityRouter {
     private static readonly AGENT_TIER_MAP: Record<string, ModelTier> = {
-        // GEMINI_FLASH (Simple tasks)
-        'file-read': 'GEMINI_FLASH',
-        'file-write': 'GEMINI_FLASH',
-        'logger': 'GEMINI_FLASH',
-        'query': 'GEMINI_FLASH',
-        'tracer': 'GEMINI_FLASH',
+        // FAST_TIER (Simple tasks)
+        'file-read': 'FAST_TIER',
+        'file-write': 'FAST_TIER',
+        'logger': 'FAST_TIER',
+        'query': 'FAST_TIER',
+        'tracer': 'FAST_TIER',
         
-        // GEMINI_PRO (Moderate tasks)
-        'data-parser': 'GEMINI_PRO',
-        'configurer': 'GEMINI_PRO',
-        'rest-client': 'GEMINI_PRO',
-        'database-query': 'GEMINI_PRO',
-        'cache-manager': 'GEMINI_PRO',
+        // BALANCED_TIER (Moderate tasks)
+        'data-parser': 'BALANCED_TIER',
+        'configurer': 'BALANCED_TIER',
+        'rest-client': 'BALANCED_TIER',
+        'database-query': 'BALANCED_TIER',
+        'cache-manager': 'BALANCED_TIER',
         
-        // CLAUDE_SONNET (Complex generation)
-        'code-generator': 'CLAUDE_SONNET',
-        'test-runner': 'CLAUDE_SONNET',
-        'vulnerability-scanner': 'CLAUDE_SONNET',
-        'refactor-assistant': 'CLAUDE_SONNET',
-        'optimizer': 'CLAUDE_SONNET',
+        // SMART_TIER (Complex generation)
+        'code-generator': 'SMART_TIER',
+        'test-runner': 'SMART_TIER',
+        'vulnerability-scanner': 'SMART_TIER',
+        'refactor-assistant': 'SMART_TIER',
+        'optimizer': 'SMART_TIER',
         
-        // CLAUDE_OPUS (Architecture & strategy)
-        'system-designer': 'CLAUDE_OPUS',
-        'coordinator': 'CLAUDE_OPUS',
-        'architect': 'CLAUDE_OPUS',
-        'threat-modeler': 'CLAUDE_OPUS',
-        'consensus-manager': 'CLAUDE_OPUS'
+        // STRATEGIC_TIER (Architecture & strategy)
+        'system-designer': 'STRATEGIC_TIER',
+        'coordinator': 'STRATEGIC_TIER',
+        'architect': 'STRATEGIC_TIER',
+        'threat-modeler': 'STRATEGIC_TIER',
+        'consensus-manager': 'STRATEGIC_TIER'
     };
+
+    /**
+     * Resolves the actual LLM provider from environment variables.
+     * Tier names (GEMINI_FLASH etc.) are abstract capability tiers —
+     * this returns the real provider that will service the request.
+     */
+    private static resolveProvider(): string {
+        const provider = process.env.LLM_PROVIDER;
+        if (provider) return provider.toUpperCase();
+        if (process.env.GROQ_API_KEY) return 'GROQ';
+        if (process.env.OPENAI_API_KEY) return 'OPENAI';
+        if (process.env.ANTHROPIC_API_KEY) return 'ANTHROPIC';
+        if (process.env.GOOGLE_API_KEY) return 'GOOGLE';
+        return 'UNKNOWN';
+    }
 
     /**
      * Statically evaluates the complexity of a task based on heuristics 
@@ -43,6 +60,7 @@ export class ComplexityRouter {
      */
     static routeObjective(prompt: string, agentType?: string): RouteAttestation {
         const lowerPrompt = prompt.toLowerCase();
+        const resolvedProvider = this.resolveProvider();
         
         // If an explicit agent type is passed and matches our 20 types:
         if (agentType && this.AGENT_TIER_MAP[agentType]) {
@@ -50,6 +68,7 @@ export class ComplexityRouter {
             return {
                 prompt,
                 assignedTier: tier,
+                resolvedProvider,
                 reason: `Explicit agent type '${agentType}' mapped directly to tier ${tier}.`
             };
         }
@@ -60,6 +79,7 @@ export class ComplexityRouter {
                 return {
                     prompt,
                     assignedTier: tier,
+                    resolvedProvider,
                     reason: `Inferred agent type '${type}' from prompt mapped to tier ${tier}.`
                 };
             }
@@ -73,7 +93,8 @@ export class ComplexityRouter {
         if (architectureStrategyIndicators.some(ind => lowerPrompt.includes(ind))) {
             return {
                 prompt,
-                assignedTier: 'CLAUDE_OPUS',
+                assignedTier: 'STRATEGIC_TIER',
+                resolvedProvider,
                 reason: 'Prompt contains architectural/coordination keywords requiring strategic reasoning.'
             };
         }
@@ -81,7 +102,8 @@ export class ComplexityRouter {
         if (complexGenIndicators.some(ind => lowerPrompt.includes(ind))) {
             return {
                 prompt,
-                assignedTier: 'CLAUDE_SONNET',
+                assignedTier: 'SMART_TIER',
+                resolvedProvider,
                 reason: 'Prompt contains generation or testing keywords requiring advanced coding capabilities.'
             };
         }
@@ -89,15 +111,18 @@ export class ComplexityRouter {
         if (moderateIndicators.some(ind => lowerPrompt.includes(ind))) {
             return {
                 prompt,
-                assignedTier: 'GEMINI_PRO',
+                assignedTier: 'BALANCED_TIER',
+                resolvedProvider,
                 reason: 'Prompt contains keywords indicating configuration, parsing, or API client logic.'
             };
         }
 
         return {
             prompt,
-            assignedTier: 'GEMINI_FLASH',
+            assignedTier: 'FAST_TIER',
+            resolvedProvider,
             reason: 'Fallback to default entry tier for simple, low-complexity objectives.'
         };
     }
 }
+
