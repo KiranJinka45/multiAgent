@@ -301,6 +301,19 @@ if (process.env.MOCK_DB === 'true') {
         }
     };
 
+    const proposals: any[] = [];
+    const mockProposedChange = {
+        findUnique: async (args: any) => {
+            const id = args?.where?.id;
+            return proposals.find(p => p.id === id) || null;
+        },
+        create: async (args: any) => {
+            const data = { id: `mock-proposal-${Math.random().toString(36).substring(7)}`, ...args.data };
+            proposals.push(data);
+            return data;
+        }
+    };
+
     prismaInstance = {
         ztanLedgerBlock: mockZtanLedgerBlock,
         ztanSnapshot: mockZtanSnapshot,
@@ -308,6 +321,7 @@ if (process.env.MOCK_DB === 'true') {
         auditLog: mockAuditLog,
         idempotencyRecord: mockIdempotencyRecord,
         governanceEvent: mockGovernanceEvent,
+        proposedChange: mockProposedChange,
         $queryRawUnsafe: mockQueryRawUnsafe,
         $executeRawUnsafe: mockExecuteRawUnsafe,
         $transaction: async (cb: any) => {
@@ -318,6 +332,7 @@ if (process.env.MOCK_DB === 'true') {
                 auditLog: mockAuditLog,
                 idempotencyRecord: mockIdempotencyRecord,
                 governanceEvent: mockGovernanceEvent,
+                proposedChange: mockProposedChange,
                 $queryRawUnsafe: mockQueryRawUnsafe,
                 $executeRawUnsafe: mockExecuteRawUnsafe
             });

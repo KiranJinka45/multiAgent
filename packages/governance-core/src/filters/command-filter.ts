@@ -20,9 +20,9 @@ export class StaticCommandFilter {
      * Evaluates the proposed execution against the PermissionLattice.
      * @returns True if allowed, false if denied.
      */
-    static evaluateProposal(proposal: CommandExecutionProposal): boolean {
+    static async evaluateProposal(proposal: CommandExecutionProposal): Promise<boolean> {
         // 1. Evaluate the exact tool using the Permission Engine built in Phase A2
-        const isToolAllowed = PermissionEngine.evaluateRequest(
+        const isToolAllowed = await PermissionEngine.evaluateRequestAsync(
             proposal.toolName,
             proposal.tenantId,
             proposal.networkHost,
@@ -43,7 +43,7 @@ export class StaticCommandFilter {
                 continue;
             }
 
-            const isOpAllowed = PermissionEngine.evaluateRequest(
+            const isOpAllowed = await PermissionEngine.evaluateRequestAsync(
                 op,
                 proposal.tenantId,
                 proposal.networkHost,

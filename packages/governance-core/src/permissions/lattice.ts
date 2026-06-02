@@ -19,18 +19,18 @@ export interface PermissionLattice {
 
 export class PermissionEngine {
     private static latticeRegistry: Map<string, PermissionLattice> = new Map();
+    private static opaUrl = process.env.OPA_URL || 'http://localhost:8181';
 
     static registerLattice(lattice: PermissionLattice): void {
         this.latticeRegistry.set(lattice.toolName, lattice);
     }
 
-    static evaluateRequest(
+    static async evaluateRequestAsync(
         toolName: string,
         tenantId: string,
         networkHost?: string,
         filePath?: string
-    ): boolean {
-        // Default-deny for unknown tools
+    ): Promise<boolean> {
         if (!this.latticeRegistry.has(toolName)) {
             console.warn(`[Governance] Execution denied: Tool ${toolName} not found in Permission Lattice.`);
             return false;
@@ -46,48 +46,69 @@ export class PermissionEngine {
             console.warn(`[Governance] Execution denied: Tool ${toolName} missing from Side-Effect Ontology.`);
             return false;
         }
+        
+        const isIrreversible = SideEffectOntology.isIrreversible(toolName);
 
-        // Irreversible operations MUST have approvalRequirement = true
-        if (SideEffectOntology.isIrreversible(toolName) && !lattice.approvalRequirement) {
-            console.warn(`[Governance] Execution denied: Irreversible tool ${toolName} lacks strict approval requirement in Lattice.`);
+        try {
+            const response = await fetch(`${this.opaUrl}/v1/data/ztan/lattice/allow`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    input: {
+                        toolName,
+                        tenantId,
+                        networkHost,
+                        filePath,
+                        isIrreversible,
+                        lattice
+                    }
+                })
+            });
+
+            if (!response.ok) {
+                console.error(`[Governance] OPA Sidecar returned HTTP ${response.status}. Defaulting to DENY.`);
+                return false;
+            }
+
+            const json = await response.json();
+            if (json.result === true) {
+                return true;
+            } else {
+                console.warn(`[Governance] OPA Sidecar explicitly denied execution for tool ${toolName}.`);
+                return false;
+            }
+        } catch (err: any) {
+            console.error(`[Governance] OPA Sidecar unreachable: ${err.message}. Fail-closed active. Defaulting to DENY.`);
             return false;
         }
-
-        // Evaluate Tenant Scope
-        if (lattice.tenantScope.length > 0 && !lattice.tenantScope.includes(tenantId) && !lattice.tenantScope.includes('*')) {
-            console.warn(`[Governance] Execution denied: Tenant ${tenantId} not authorized for tool ${toolName}.`);
-            return false;
-        }
-
-        // Evaluate Network Scope if requested
+    }
+    
+    // Kept for backward compatibility in tests that haven't moved to async, though it should throw or warn in prod
+    static evaluateRequest(
+        toolName: string,
+        tenantId: string,
+        networkHost?: string,
+        filePath?: string
+    ): boolean {
+        console.warn('[Governance] Synchronous evaluateRequest called. OPA requires async. Falling back to local strict TS evaluation for test compatibility.');
+        
+        if (!this.latticeRegistry.has(toolName)) return false;
+        const lattice = this.latticeRegistry.get(toolName)!;
+        let operation: OperationDescriptor;
+        try { operation = SideEffectOntology.getOperation(toolName); } catch (e) { return false; }
+        
+        if (SideEffectOntology.isIrreversible(toolName) && !lattice.approvalRequirement) return false;
+        if (lattice.tenantScope.length > 0 && !lattice.tenantScope.includes(tenantId) && !lattice.tenantScope.includes('*')) return false;
         if (networkHost) {
             const hostLower = networkHost.toLowerCase().trim();
             const hostPart = hostLower.split(':')[0];
-            if (
-                hostPart === 'localhost' ||
-                hostPart === '::1' ||
-                hostPart === '0.0.0.0' ||
-                hostPart.startsWith('127.')
-            ) {
-                console.warn(`[Governance] Execution denied: Loopback/local network host ${networkHost} is strictly blocked.`);
-                return false;
-            }
-
-            if (lattice.networkScope.length === 0 || (!lattice.networkScope.includes(networkHost) && !lattice.networkScope.includes('*'))) {
-                console.warn(`[Governance] Execution denied: Network host ${networkHost} not allowed for tool ${toolName}.`);
-                return false;
-            }
+            if (hostPart === 'localhost' || hostPart === '::1' || hostPart === '0.0.0.0' || hostPart.startsWith('127.')) return false;
+            if (lattice.networkScope.length === 0 || (!lattice.networkScope.includes(networkHost) && !lattice.networkScope.includes('*'))) return false;
         }
-
-        // Evaluate Filesystem Scope if requested
         if (filePath) {
             const allowed = lattice.filesystemScope.some(scope => filePath.startsWith(scope) || scope === '*');
-            if (!allowed) {
-                console.warn(`[Governance] Execution denied: Path ${filePath} not allowed for tool ${toolName}.`);
-                return false;
-            }
+            if (!allowed) return false;
         }
-
         return true;
     }
 }

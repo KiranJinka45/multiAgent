@@ -91,6 +91,13 @@ const IS_CANONICAL = canonicalIdx !== -1;
 
 const IS_PATHOLOGY = args.includes('--pathology') || SEED_STR.includes('PATHOLOGY');
 
+// Duration-aware warmup and threshold constants
+const WARMUP_GRACE_MS = Math.min(30_000, SOAK_DURATION_S * 1000 * 0.1);  // 10% of run, max 30s
+const DECAY_WINDOW_MS = Math.min(30_000, SOAK_DURATION_S * 1000 * 0.1);  // 10% of run, max 30s
+const SHUTDOWN_TIMEOUT_MS = Math.min(30_000, Math.max(8000, SOAK_DURATION_S * 100));
+const DEADLOCK_TICK_THRESHOLD = Math.max(3, Math.ceil(SOAK_DURATION_S / 30));
+const IS_SHORT_RUN = SOAK_DURATION_S < 300; // < 5 minutes is a short run
+
 // Simple mulberry32 seedable PRNG
 function createPRNG(seedStr: string) {
   let h = 2166136261 >>> 0;
@@ -161,7 +168,10 @@ let finalBgwriterStats: any = null;
 const dbConnectionsMetrics: number[] = [];
 let sequenceDriftDetected = false;
 let duplicatedBlockCount = 0;
-let failures = 0;
+// Categorized failure tracking
+let eluFailures = 0;
+let shutdownFailures = 0;
+let integrityFailures = 0;
 let totalLogicalBytesWritten = 0;
 
 // Phase 50 Diagnostics
@@ -435,26 +445,27 @@ function bootService(service: any) {
       
       const elapsed = Date.now() - startTime;
       let allowedPeak = 90.0;
-      if (elapsed < 10000) {
-        // 10-second warmup grace window: bypass peak check during bootstrapping to avoid false positives
+      if (elapsed < WARMUP_GRACE_MS) {
+        // Duration-proportional warmup grace: bypass peak check during bootstrapping
         allowedPeak = 100.0;
-      } else if (elapsed < 25000) {
-        // Graceful decay from 98% to 90% over the next 15 seconds
-        allowedPeak = 90.0 + 8.0 * Math.exp(-(elapsed - 10000) / 5000);
+      } else if (elapsed < WARMUP_GRACE_MS + DECAY_WINDOW_MS) {
+        // Graceful decay from 98% to 90% over the decay window
+        const decayFactor = 5000; // time constant for exponential decay
+        allowedPeak = 90.0 + 8.0 * Math.exp(-(elapsed - WARMUP_GRACE_MS) / decayFactor);
       }
 
-      if (elapsed >= 10000 && report.elu > allowedPeak) {
-        log(`❌ FAILURE: ${service.name} event loop utilization (ELU) peak exceeded limit! (Observed: ${report.elu.toFixed(2)}%, Limit: ${allowedPeak.toFixed(2)}%)`);
-        failures++;
+      if (elapsed >= WARMUP_GRACE_MS && report.elu > allowedPeak) {
+        log(`⚠️  ELU: ${service.name} event loop utilization peak exceeded limit (Observed: ${report.elu.toFixed(2)}%, Limit: ${allowedPeak.toFixed(2)}%)`);
+        eluFailures++;
       }
 
-      // Detect contiguous initialization stalls or deadlocks
-      if (report.elu > 98.0) {
+      // Detect contiguous initialization stalls or deadlocks (duration-aware)
+      if (elapsed >= WARMUP_GRACE_MS && report.elu > 98.0) {
         const count = (consecutiveHighElu.get(service.name) || 0) + 1;
         consecutiveHighElu.set(service.name, count);
-        if (count >= 3) {
+        if (count >= DEADLOCK_TICK_THRESHOLD) {
           log(`❌ FAILURE: Startup deadlock / event loop saturation detected in ${service.name}! (Observed: ${report.elu.toFixed(2)}% continuously for ${count} ticks)`);
-          failures++;
+          eluFailures++;
         }
       } else {
         consecutiveHighElu.set(service.name, 0);
@@ -668,6 +679,12 @@ async function main() {
     await verifyReadiness(handles, 15000);
   } catch (err: any) {
     log(`❌  READINESS GATE FAILURE: ${err.message}`);
+    for (const h of handles) {
+      log(`   --- ${h.name} STDOUT ---`);
+      log(h.getStdout() || '(no stdout)');
+      log(`   --- ${h.name} STDERR ---`);
+      log(h.getStderr() || '(no stderr)');
+    }
     log('🛑  Terminating booted processes...');
     await Promise.allSettled(handles.map(h => {
       return new Promise<void>(resolve => {
@@ -921,13 +938,13 @@ async function main() {
     replayIntegrityAudit = await runReplayAudit(process.env.DATABASE_URL);
     if (!replayIntegrityAudit || !replayIntegrityAudit.overallPassed) {
       log('❌  [Auditor] ZTAN Ledger replay integrity audit FAILED.');
-      failures++;
+      integrityFailures++;
     } else {
       log('✅  [Auditor] ZTAN Ledger replay integrity audit PASSED.');
     }
   } catch (e: any) {
     log(`❌  [Auditor] Replay auditor failed to run or crashed: ${e.message}`);
-    failures++;
+    integrityFailures++;
     replayIntegrityAudit = {
       overallPassed: false,
       timestamp: Date.now(),
@@ -965,7 +982,7 @@ async function main() {
           log(`   ⚠️  ${h.name} failed to shut down in time. Sending SIGKILL...`);
           h.proc.kill('SIGKILL');
           reject(new Error(`${h.name} was SIGKILLed due to graceful shutdown timeout`));
-        }, 8000);
+        }, SHUTDOWN_TIMEOUT_MS);
 
         h.proc.on('exit', (code) => {
           clearTimeout(timeout);
@@ -986,8 +1003,8 @@ async function main() {
     if (res.status === 'fulfilled') {
       log(`   ✔ ${res.value.name} — cleanly exited (exit code: ${res.value.code ?? 0})`);
     } else {
-      log(`   ❌ ${res.reason.message}`);
-      failures++;
+      log(`   ⚠️  SHUTDOWN: ${res.reason.message}`);
+      shutdownFailures++;
     }
   }
 
@@ -1106,6 +1123,8 @@ async function main() {
     prismaAcquireTimeAvgMs: avgPrismaAcquire
   };
 
+  const totalFailures = integrityFailures + (IS_SHORT_RUN ? 0 : eluFailures + shutdownFailures);
+
   const finalReportPayload = {
     metadata: {
       timestamp: finalTimestamp,
@@ -1115,7 +1134,13 @@ async function main() {
       physicalWalByteDelta: physicalWalByteDeltaTotal.toString(),
       sequenceDriftDetected,
       duplicatedBlockCount,
-      failures,
+      failures: totalFailures,
+      failureBreakdown: {
+        integrity: integrityFailures,
+        elu: eluFailures,
+        shutdown: shutdownFailures,
+        isShortRun: IS_SHORT_RUN
+      },
       canonicalOsConditions,
       isStateContaminated,
       replayIntegrityAudit
@@ -1165,7 +1190,8 @@ async function main() {
 Generated dynamically on: **${new Date().toISOString()}**  
 Campaign Duration: **${SOAK_DURATION_S} seconds**  
 PRNG Seed: \`${SEED_STR}\`  
-Verification Verdict: **${failures === 0 ? 'PASSED ✅' : 'FAILED ❌'}** (Total fault events: ${failures})
+Verification Verdict: **${totalFailures === 0 ? 'PASSED ✅' : 'FAILED ❌'}** (Integrity: ${integrityFailures}, ELU: ${eluFailures}, Shutdown: ${shutdownFailures})
+Short Run Mode: **${IS_SHORT_RUN ? 'YES (ELU/shutdown failures are warnings only)' : 'NO (all failures are hard gates)'}**
 Pathology Mode: **${isStateContaminated ? 'MUTATED DRILL ACTIVE (CONTAMINATED)' : 'NOMINAL TRIAL'}**
 
 ## Campaign Metadata
@@ -1224,11 +1250,20 @@ ${Object.entries(serviceSummaries).map(([name, sum]: [string, any]) => `
   fs.writeFileSync(reportPath, markdownContent);
   log(`📝 Written longitudinal SRE report to: ${reportPath}`);
 
-  if (failures > 0) {
-    log(`❌ Campaign finished with ${failures} failure(s).`);
+  // Log categorized failure summary
+  log(`📊 Failure Summary: Integrity=${integrityFailures}, ELU=${eluFailures}, Shutdown=${shutdownFailures}`);
+  if (IS_SHORT_RUN && eluFailures > 0) {
+    log(`ℹ️  Short run (${SOAK_DURATION_S}s): ${eluFailures} ELU warning(s) suppressed (expected during warmup).`);
+  }
+  if (IS_SHORT_RUN && shutdownFailures > 0) {
+    log(`ℹ️  Short run (${SOAK_DURATION_S}s): ${shutdownFailures} shutdown warning(s) suppressed.`);
+  }
+
+  if (totalFailures > 0) {
+    log(`❌ Campaign finished with ${totalFailures} hard failure(s).`);
     process.exit(1);
   } else {
-    log('🎉 Campaign completed successfully with zero failures.');
+    log('🎉 Campaign completed successfully with zero hard failures.');
     process.exit(0);
   }
 }

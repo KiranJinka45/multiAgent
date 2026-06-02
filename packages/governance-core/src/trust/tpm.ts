@@ -1,4 +1,5 @@
 import * as crypto from 'crypto';
+import { PhysicalTpmConnector } from './physical-tpm-spec.js';
 
 export interface TpmQuote {
     signature: string;
@@ -49,6 +50,28 @@ export class TpmEngine {
     }
 
     static generateQuote(nonce: string, pcrsToQuote: number[], customTimestamp?: number): TpmQuote {
+        if (PhysicalTpmConnector.isHardwareTpmAvailable()) {
+            console.log('[TPM_ENGINE] Leveraging hardware-rooted physical TPM 2.0...');
+            const quotePayload = PhysicalTpmConnector.generatePhysicalQuote(nonce, { algorithm: 'sha256', pcrs: pcrsToQuote });
+            const timestamp = customTimestamp !== undefined ? customTimestamp : Date.now();
+            const attestedDataObj = {
+                nonce,
+                pcrValues: quotePayload.pcrs,
+                type: 'TPM2B_ATTEST_HARDWARE',
+                timestamp,
+                quoteBytes: quotePayload.quoteBytes
+            };
+            const attestedData = JSON.stringify(attestedDataObj);
+            
+            return {
+                signature: quotePayload.signatureBytes,
+                pcrValues: quotePayload.pcrs,
+                nonce,
+                attestedData,
+                timestamp
+            };
+        }
+
         const quotedPcrs: Record<number, string> = {};
         for (const idx of pcrsToQuote) {
             quotedPcrs[idx] = this.getMockPcr(idx);
@@ -84,6 +107,53 @@ export class TpmEngine {
         nonce: string,
         expectedPcrs: Record<number, string>
     ): { verified: boolean; errorType?: 'NONCE_MISMATCH' | 'SIGNATURE_INVALID' | 'HARD_QUARANTINE' | 'DEGRADED_MODE' | 'QUOTE_EXPIRED'; details?: string } {
+        // 0. Check if this is a physical hardware quote
+        let isHardware = false;
+        try {
+            const parsed = JSON.parse(quote.attestedData);
+            if (parsed.type === 'TPM2B_ATTEST_HARDWARE') {
+                isHardware = true;
+            }
+        } catch {}
+
+        if (isHardware) {
+            console.log('[TPM_ENGINE] Verifying physical hardware-rooted TPM 2.0 quote...');
+            
+            // Check nonce
+            if (quote.nonce !== nonce) {
+                return {
+                    verified: false,
+                    errorType: 'NONCE_MISMATCH',
+                    details: `Quote nonce (${quote.nonce}) does not match challenge nonce (${nonce})`
+                };
+            }
+
+            // Verify PCR measurements matching expected physical baseline
+            for (const [idxStr, expectedVal] of Object.entries(expectedPcrs)) {
+                const idx = parseInt(idxStr, 10);
+                const actualVal = quote.pcrValues[idx];
+
+                if (actualVal !== expectedVal) {
+                    if ([0, 1, 2, 3, 4, 5, 7].includes(idx)) {
+                        return {
+                            verified: false,
+                            errorType: 'HARD_QUARANTINE',
+                            details: `Critical hardware substrate deviation detected on physical PCR ${idx}: expected "${expectedVal}", found "${actualVal}"`
+                        };
+                    }
+                    if (idx === 10) {
+                        return {
+                            verified: false,
+                            errorType: 'DEGRADED_MODE',
+                            details: `Software integrity deviation detected on physical PCR 10 (IMA): expected "${expectedVal}", found "${actualVal}"`
+                        };
+                    }
+                }
+            }
+
+            return { verified: true };
+        }
+
         // 1. Verify signature first
         const expectedSig = crypto.createHmac('sha256', TpmEngine.AK_KEY)
             .update(quote.attestedData)

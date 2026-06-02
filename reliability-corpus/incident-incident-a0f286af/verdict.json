@@ -1,0 +1,8 @@
+{
+  "tier": "UNKNOWN_SAFETY_INVARIANT_VIOLATION",
+  "emoji": "🚨",
+  "label": "INCIDENT INCIDENT-A0F286AF DETECTED",
+  "description": "SYSTEM_EXCEPTION",
+  "exitCode": 1,
+  "ceilingReason": "SYSTEM_EXCEPTION"
+}

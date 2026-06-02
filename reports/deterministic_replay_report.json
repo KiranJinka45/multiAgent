@@ -1,0 +1,295 @@
+{
+  "generatedAt": "2026-05-30T06:18:50.919Z",
+  "rootProvenanceOk": true,
+  "totalIncidents": 15,
+  "passedIncidents": 15,
+  "failIncidents": 0,
+  "replaySuccessRate": "100.00%",
+  "incidents": [
+    {
+      "incidentId": "INCIDENT-04DB94AA",
+      "provenanceOk": true,
+      "ledgerChainOk": true,
+      "walParityOk": true,
+      "verdictParityOk": true,
+      "timelineParityOk": true,
+      "envSnapshotOk": true,
+      "success": true,
+      "anomalies": [],
+      "metrics": {
+        "blocksReplayed": 10,
+        "walReplayed": 10,
+        "verdictOriginal": "STORAGE_LEDGER_LINEAGE_CORRUPTION",
+        "verdictReplayed": "STORAGE_LEDGER_LINEAGE_CORRUPTION",
+        "brokenLinksOriginal": 0,
+        "brokenLinksReplayed": 0
+      }
+    },
+    {
+      "incidentId": "INCIDENT-0AA1484A",
+      "provenanceOk": true,
+      "ledgerChainOk": true,
+      "walParityOk": true,
+      "verdictParityOk": true,
+      "timelineParityOk": true,
+      "envSnapshotOk": true,
+      "success": true,
+      "anomalies": [],
+      "metrics": {
+        "blocksReplayed": 10,
+        "walReplayed": 10,
+        "verdictOriginal": "POLICY_OPA_GATE_DENIAL",
+        "verdictReplayed": "POLICY_OPA_GATE_DENIAL",
+        "brokenLinksOriginal": 4,
+        "brokenLinksReplayed": 4
+      }
+    },
+    {
+      "incidentId": "INCIDENT-2CCE28A3",
+      "provenanceOk": true,
+      "ledgerChainOk": true,
+      "walParityOk": true,
+      "verdictParityOk": true,
+      "timelineParityOk": true,
+      "envSnapshotOk": true,
+      "success": true,
+      "anomalies": [],
+      "metrics": {
+        "blocksReplayed": 10,
+        "walReplayed": 10,
+        "verdictOriginal": "POLICY_OPA_GATE_DENIAL",
+        "verdictReplayed": "POLICY_OPA_GATE_DENIAL",
+        "brokenLinksOriginal": 4,
+        "brokenLinksReplayed": 4
+      }
+    },
+    {
+      "incidentId": "INCIDENT-33F4088E",
+      "provenanceOk": true,
+      "ledgerChainOk": true,
+      "walParityOk": true,
+      "verdictParityOk": true,
+      "timelineParityOk": true,
+      "envSnapshotOk": true,
+      "success": true,
+      "anomalies": [],
+      "metrics": {
+        "blocksReplayed": 10,
+        "walReplayed": 10,
+        "verdictOriginal": "STORAGE_LEDGER_LINEAGE_CORRUPTION",
+        "verdictReplayed": "STORAGE_LEDGER_LINEAGE_CORRUPTION",
+        "brokenLinksOriginal": 0,
+        "brokenLinksReplayed": 0
+      }
+    },
+    {
+      "incidentId": "INCIDENT-56DBA3A2",
+      "provenanceOk": true,
+      "ledgerChainOk": true,
+      "walParityOk": true,
+      "verdictParityOk": true,
+      "timelineParityOk": true,
+      "envSnapshotOk": true,
+      "success": true,
+      "anomalies": [],
+      "metrics": {
+        "blocksReplayed": 0,
+        "walReplayed": 0,
+        "verdictOriginal": "POLICY_OPA_GATE_DENIAL",
+        "verdictReplayed": "POLICY_OPA_GATE_DENIAL",
+        "brokenLinksOriginal": 0,
+        "brokenLinksReplayed": 0
+      }
+    },
+    {
+      "incidentId": "INCIDENT-632E70B5",
+      "provenanceOk": true,
+      "ledgerChainOk": true,
+      "walParityOk": true,
+      "verdictParityOk": true,
+      "timelineParityOk": true,
+      "envSnapshotOk": true,
+      "success": true,
+      "anomalies": [],
+      "metrics": {
+        "blocksReplayed": 10,
+        "walReplayed": 10,
+        "verdictOriginal": "POLICY_OPA_GATE_DENIAL",
+        "verdictReplayed": "POLICY_OPA_GATE_DENIAL",
+        "brokenLinksOriginal": 1,
+        "brokenLinksReplayed": 1
+      }
+    },
+    {
+      "incidentId": "INCIDENT-6E59FBE8",
+      "provenanceOk": true,
+      "ledgerChainOk": true,
+      "walParityOk": true,
+      "verdictParityOk": true,
+      "timelineParityOk": true,
+      "envSnapshotOk": true,
+      "success": true,
+      "anomalies": [],
+      "metrics": {
+        "blocksReplayed": 10,
+        "walReplayed": 10,
+        "verdictOriginal": "POLICY_OPA_GATE_DENIAL",
+        "verdictReplayed": "POLICY_OPA_GATE_DENIAL",
+        "brokenLinksOriginal": 2,
+        "brokenLinksReplayed": 2
+      }
+    },
+    {
+      "incidentId": "INCIDENT-6E8FD774",
+      "provenanceOk": true,
+      "ledgerChainOk": true,
+      "walParityOk": true,
+      "verdictParityOk": true,
+      "timelineParityOk": true,
+      "envSnapshotOk": true,
+      "success": true,
+      "anomalies": [],
+      "metrics": {
+        "blocksReplayed": 10,
+        "walReplayed": 10,
+        "verdictOriginal": "STORAGE_LEDGER_LINEAGE_CORRUPTION",
+        "verdictReplayed": "STORAGE_LEDGER_LINEAGE_CORRUPTION",
+        "brokenLinksOriginal": 0,
+        "brokenLinksReplayed": 0
+      }
+    },
+    {
+      "incidentId": "INCIDENT-718F0C1F",
+      "provenanceOk": true,
+      "ledgerChainOk": true,
+      "walParityOk": true,
+      "verdictParityOk": true,
+      "timelineParityOk": true,
+      "envSnapshotOk": true,
+      "success": true,
+      "anomalies": [],
+      "metrics": {
+        "blocksReplayed": 10,
+        "walReplayed": 10,
+        "verdictOriginal": "STORAGE_LEDGER_LINEAGE_CORRUPTION",
+        "verdictReplayed": "STORAGE_LEDGER_LINEAGE_CORRUPTION",
+        "brokenLinksOriginal": 0,
+        "brokenLinksReplayed": 0
+      }
+    },
+    {
+      "incidentId": "INCIDENT-9FA8319B",
+      "provenanceOk": true,
+      "ledgerChainOk": true,
+      "walParityOk": true,
+      "verdictParityOk": true,
+      "timelineParityOk": true,
+      "envSnapshotOk": true,
+      "success": true,
+      "anomalies": [],
+      "metrics": {
+        "blocksReplayed": 0,
+        "walReplayed": 0,
+        "verdictOriginal": "POLICY_OPA_GATE_DENIAL",
+        "verdictReplayed": "POLICY_OPA_GATE_DENIAL",
+        "brokenLinksOriginal": 0,
+        "brokenLinksReplayed": 0
+      }
+    },
+    {
+      "incidentId": "INCIDENT-A0E6C8BA",
+      "provenanceOk": true,
+      "ledgerChainOk": true,
+      "walParityOk": true,
+      "verdictParityOk": true,
+      "timelineParityOk": true,
+      "envSnapshotOk": true,
+      "success": true,
+      "anomalies": [],
+      "metrics": {
+        "blocksReplayed": 0,
+        "walReplayed": 0,
+        "verdictOriginal": "STORAGE_LEDGER_LINEAGE_CORRUPTION",
+        "verdictReplayed": "STORAGE_LEDGER_LINEAGE_CORRUPTION",
+        "brokenLinksOriginal": 0,
+        "brokenLinksReplayed": 0
+      }
+    },
+    {
+      "incidentId": "INCIDENT-A0F286AF",
+      "provenanceOk": true,
+      "ledgerChainOk": true,
+      "walParityOk": true,
+      "verdictParityOk": true,
+      "timelineParityOk": true,
+      "envSnapshotOk": true,
+      "success": true,
+      "anomalies": [],
+      "metrics": {
+        "blocksReplayed": 10,
+        "walReplayed": 0,
+        "verdictOriginal": "UNKNOWN_SAFETY_INVARIANT_VIOLATION",
+        "verdictReplayed": "UNKNOWN_SAFETY_INVARIANT_VIOLATION",
+        "brokenLinksOriginal": 9,
+        "brokenLinksReplayed": 9
+      }
+    },
+    {
+      "incidentId": "INCIDENT-A61A37DA",
+      "provenanceOk": true,
+      "ledgerChainOk": true,
+      "walParityOk": true,
+      "verdictParityOk": true,
+      "timelineParityOk": true,
+      "envSnapshotOk": true,
+      "success": true,
+      "anomalies": [],
+      "metrics": {
+        "blocksReplayed": 10,
+        "walReplayed": 10,
+        "verdictOriginal": "POLICY_OPA_GATE_DENIAL",
+        "verdictReplayed": "POLICY_OPA_GATE_DENIAL",
+        "brokenLinksOriginal": 1,
+        "brokenLinksReplayed": 1
+      }
+    },
+    {
+      "incidentId": "INCIDENT-ABF8D8EE",
+      "provenanceOk": true,
+      "ledgerChainOk": true,
+      "walParityOk": true,
+      "verdictParityOk": true,
+      "timelineParityOk": true,
+      "envSnapshotOk": true,
+      "success": true,
+      "anomalies": [],
+      "metrics": {
+        "blocksReplayed": 0,
+        "walReplayed": 0,
+        "verdictOriginal": "STORAGE_LEDGER_LINEAGE_CORRUPTION",
+        "verdictReplayed": "STORAGE_LEDGER_LINEAGE_CORRUPTION",
+        "brokenLinksOriginal": 0,
+        "brokenLinksReplayed": 0
+      }
+    },
+    {
+      "incidentId": "INCIDENT-F6F574CE",
+      "provenanceOk": true,
+      "ledgerChainOk": true,
+      "walParityOk": true,
+      "verdictParityOk": true,
+      "timelineParityOk": true,
+      "envSnapshotOk": true,
+      "success": true,
+      "anomalies": [],
+      "metrics": {
+        "blocksReplayed": 10,
+        "walReplayed": 10,
+        "verdictOriginal": "POLICY_OPA_GATE_DENIAL",
+        "verdictReplayed": "POLICY_OPA_GATE_DENIAL",
+        "brokenLinksOriginal": 4,
+        "brokenLinksReplayed": 4
+      }
+    }
+  ]
+}

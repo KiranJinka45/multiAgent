@@ -21,6 +21,7 @@
  */
 
 import type { CommandExecutionProposal } from '../filters/command-filter.js';
+import * as temporalWorkflow from '@temporalio/workflow';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Types (shared between workflow, client, and worker)
@@ -61,11 +62,8 @@ export async function humanEscalationWorkflow(
     proposal: CommandExecutionProposal,
     timeoutMs: number = 3600000
 ): Promise<HumanEscalationWorkflowState> {
-    // Obscured dynamic import to bypass static Vite SSR analysis in test environments
-    const workflowPkg = '@temporalio/workflow';
-    const { defineSignal, setHandler, condition } = await import(workflowPkg);
     
-    const escalationDecisionSignal = (defineSignal as any)('escalationDecision');
+    const escalationDecisionSignal = (temporalWorkflow.defineSignal as any)('escalationDecision');
     let status: EscalationStatus = 'PENDING';
 
     const state: HumanEscalationWorkflowState = {
@@ -77,7 +75,7 @@ export async function humanEscalationWorkflow(
     };
 
     // ═══ SIGNAL HANDLER ═══
-    setHandler(escalationDecisionSignal, (signal: EscalationDecisionSignal) => {
+    temporalWorkflow.setHandler(escalationDecisionSignal, (signal: EscalationDecisionSignal) => {
         if (status !== 'PENDING') return; // Idempotent — ignore if already decided
         status = signal.decision === 'APPROVE' ? 'APPROVED' : 'REJECTED';
         state.status = status;
@@ -85,7 +83,7 @@ export async function humanEscalationWorkflow(
 
     // ═══ DURABLE TIMEOUT ═══
     // condition() durably waits for state transition or timeout.
-    const decided = await condition(() => status !== 'PENDING', timeoutMs);
+    const decided = await temporalWorkflow.condition(() => status !== 'PENDING', timeoutMs);
 
     if (!decided) {
         // ═══ FAIL-CLOSED DEFAULT ═══
@@ -275,6 +273,51 @@ export class TemporalWorkflowOrchestrator {
 
     static getStatus(workflowId: string): EscalationStatus | undefined {
         return this.activeWorkflows.get(workflowId)?.status;
+    }
+
+    /**
+     * Development/Test Helper: Dumps all simulated active workflows to a JSON string
+     * to simulate Temporal persistence.
+     */
+    static serializeState(): string {
+        const stateObj: Record<string, HumanEscalationWorkflowState> = {};
+        for (const [key, value] of this.activeWorkflows.entries()) {
+            stateObj[key] = value;
+        }
+        return JSON.stringify(stateObj);
+    }
+
+    /**
+     * Development/Test Helper: Loads simulated active workflows from a JSON string,
+     * restoring their pending timers to simulate Temporal worker resumption.
+     */
+    static deserializeState(jsonStr: string): void {
+        const stateObj = JSON.parse(jsonStr) as Record<string, HumanEscalationWorkflowState>;
+        this.activeWorkflows.clear();
+        for (const [key, value] of Object.entries(stateObj)) {
+            // Restore status to PENDING if it was interrupted
+            if (value.status === 'PENDING') {
+                this.activeWorkflows.set(key, value);
+                
+                // Re-arm the simulated timeout
+                const elapsed = Date.now() - value.createdAt;
+                const remaining = Math.max(0, value.timeoutMs - elapsed);
+                
+                setTimeout(() => {
+                    const currentState = this.activeWorkflows.get(key);
+                    if (currentState && currentState.status === 'PENDING') {
+                        currentState.status = 'CANCELLED_TIMEOUT';
+                        console.warn(
+                            `[TEMPORAL_WORKFLOW_RECOVERY] Escalation ${key} timed out after recovery. ` +
+                            `Defaulting to CANCELLED_TIMEOUT (fail-closed).`
+                        );
+                    }
+                }, remaining);
+            } else {
+                this.activeWorkflows.set(key, value);
+            }
+        }
+        console.log(`[TEMPORAL_WORKFLOW] Restored ${Object.keys(stateObj).length} workflows from persistent storage.`);
     }
 
     static getWorkflowState(workflowId: string): HumanEscalationWorkflowState | undefined {

@@ -33,4 +33,11 @@ router.delete('/', (req, res) => {
     });
 });
 
+import { QuarantineError } from '@packages/governance-core';
+
+router.post('/trigger-quarantine', (req, res, next) => {
+    // Explicitly throw a QuarantineError to test Phase 12 Tier E3 Archaeology Integration
+    next(new QuarantineError('HARD QUARANTINE: Simulated infrastructure attestation failure during drill'));
+});
+
 export default router;

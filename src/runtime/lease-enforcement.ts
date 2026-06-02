@@ -133,6 +133,18 @@ export class ZtanLeaseManager {
             if (putResult) {
                 if (!this.isLeader) {
                     // Transition: We just acquired leadership! Monotonically increment epoch.
+                    if (this.activeEpoch === 0 && this.dbConnectionActive) {
+                        try {
+                            const existingLease = await this.prisma.ztanActiveLease.findUnique({
+                                where: { id: this.leaseId }
+                            });
+                            if (existingLease) {
+                                this.activeEpoch = existingLease.generation;
+                            }
+                        } catch (e) {
+                            console.warn(`[Lease Engine] Could not read existing lease generation: ${(e as Error).message}`);
+                        }
+                    }
                     this.activeEpoch += 1;
                     console.log(`[Lease Engine] Leadership ACQUIRED. Monotonic Epoch Incremented -> ${this.activeEpoch}`);
                 }

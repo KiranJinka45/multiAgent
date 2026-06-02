@@ -41,15 +41,16 @@ export class LlmService {
             apiKey = config.OPENROUTER_API_KEY;
             baseURL = 'https://openrouter.ai/api/v1';
         } else {
-            apiKey = config.OPENAI_API_KEY;
-            baseURL = process.env.OPENAI_BASE_URL;
+            apiKey = config.OPENAI_API_KEY || 'sk-mock-key';
+            baseURL = process.env.OPENAI_BASE_URL || undefined;
         }
 
-        this.client = new OpenAI({
-            apiKey: apiKey,
-            baseURL,
-            dangerouslyAllowBrowser: true 
-        });
+        const clientOptions: any = { apiKey, dangerouslyAllowBrowser: true };
+        if (baseURL) {
+            clientOptions.baseURL = baseURL;
+        }
+
+        this.client = new OpenAI(clientOptions);
     }
 
     /**
@@ -86,6 +87,8 @@ export class LlmService {
                 model = 'Meta-Llama-3.1-70B-Instruct-Turbo';
             } else if (config.LLM_PROVIDER === 'gemini' && (model === 'gpt-4o' || model === 'gpt-4')) {
                 model = 'gemini-1.5-pro';
+            } else if (config.LLM_PROVIDER === 'openai' && model.startsWith('gemini')) {
+                model = 'gpt-3.5-turbo';
             }
             
             logger.info({ 

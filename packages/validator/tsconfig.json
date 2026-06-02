@@ -4,7 +4,12 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "declaration": true,
-    "declarationDir": "./dist"
+    "declarationDir": "./dist",
+    "paths": {
+      "@packages/validator": [
+        "./src/index.ts"
+      ]
+    }
   },
   "include": [
     "src/**/*"

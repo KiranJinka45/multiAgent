@@ -1,0 +1,10 @@
+{
+  "timestamp": "2026-05-29T19:35:51.865Z",
+  "metrics": {
+    "step1_ledgerSeeded": true,
+    "step2_initialAuditPass": true,
+    "step3_tamperingDetected": true,
+    "step4_diskFullFailClosed": true,
+    "finalVerdict": "PASSED"
+  }
+}

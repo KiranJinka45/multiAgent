@@ -8,6 +8,14 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
       POSTGRES_DB: ${POSTGRES_DB:-multiagent}
+    command: >
+      sh -c "
+      mkdir -p /tmp/certs &&
+      cp /certs/* /tmp/certs/ &&
+      chown -R postgres:postgres /tmp/certs &&
+      chmod 600 /tmp/certs/postgres.key &&
+      exec docker-entrypoint.sh postgres -c ssl=on -c ssl_cert_file=/tmp/certs/postgres.crt -c ssl_key_file=/tmp/certs/postgres.key -c ssl_ca_file=/tmp/certs/ca.crt
+      "
     ports:
       - "54399:5432"
     healthcheck:
@@ -17,6 +25,29 @@ services:
       retries: 10
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./certs:/certs
+    networks:
+      - multiagent-network
+
+  etcd:
+    image: gcr.io/etcd-development/etcd:v3.5.9
+    container_name: etcd
+    ports:
+      - "2379:2379"
+      - "2380:2380"
+    command:
+      - /usr/local/bin/etcd
+      - --name=ztan-etcd
+      - --data-dir=/etcd-data
+      - --listen-client-urls=https://0.0.0.0:2379
+      - --advertise-client-urls=https://etcd:2379
+      - --client-cert-auth=true
+      - --trusted-ca-file=/certs/ca.crt
+      - --cert-file=/certs/etcd.crt
+      - --key-file=/certs/etcd.key
+    volumes:
+      - etcd_data:/etcd-data
+      - ./certs:/certs
     networks:
       - multiagent-network
 
@@ -47,13 +78,19 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3010
-      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:password@postgres:5432/multiagent}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:password@postgres:5432/multiagent?sslmode=verify-full&sslrootcert=/certs/ca.crt&sslcert=/certs/client.crt&sslkey=/certs/client.key}
       - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+      - OPA_URL=http://opa:8181
+      - ETCD_ENDPOINTS=https://etcd:2379
+    volumes:
+      - ./certs:/certs
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
+      etcd:
+        condition: service_started
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3010/health"]
       interval: 10s
@@ -72,8 +109,11 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=4005
-      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:password@postgres:5432/multiagent}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:password@postgres:5432/multiagent?sslmode=verify-full&sslrootcert=/certs/ca.crt&sslcert=/certs/client.crt&sslkey=/certs/client.key}
       - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+      - OPA_URL=http://opa:8181
+    volumes:
+      - ./certs:/certs
     depends_on:
       core-api:
         condition: service_healthy
@@ -92,8 +132,12 @@ services:
     container_name: worker
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:password@postgres:5432/multiagent}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:password@postgres:5432/multiagent?sslmode=verify-full&sslrootcert=/certs/ca.crt&sslcert=/certs/client.crt&sslkey=/certs/client.key}
       - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+      - OPA_URL=http://opa:8181
+      - ETCD_ENDPOINTS=https://etcd:2379
+    volumes:
+      - ./certs:/certs
     depends_on:
       auth-service:
         condition: service_healthy
@@ -112,6 +156,7 @@ services:
       - PORT=3500
       - CORE_API_URL=http://core-api:3010
       - AUTH_SERVICE_URL=http://auth-service:4005
+      - OPA_URL=http://opa:8181
     depends_on:
       core-api:
         condition: service_healthy
@@ -167,12 +212,11 @@ services:
     ports:
       - "7233:7233"
     environment:
-      - DB=postgresql
+      - DB=postgres12
       - DB_PORT=5432
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
       - POSTGRES_PWD=${POSTGRES_PASSWORD:-password}
       - POSTGRES_SEEDS=postgres
-      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development-sql.yaml
     depends_on:
       postgres:
         condition: service_healthy
@@ -196,10 +240,8 @@ services:
     depends_on:
       temporal:
         condition: service_healthy
-  # ── Witness Federation Nodes ──────────────────────────────────────────────
-  # Three geographically-distributed witnesses for governance quorum.
-  # Uses the same core-api image in WITNESS_MODE to serve only attestation endpoints.
 
+  # ── Witness Federation Nodes ──────────────────────────────────────────────
   witness-1:
     build:
       context: .
@@ -213,8 +255,10 @@ services:
       - WITNESS_MODE=true
       - WITNESS_ID=8a13f44fea2e2ae89acd0394c890961282dd0544e801058f93ae447376721368
       - WITNESS_URLS=http://witness-1:3010,http://witness-2:3010,http://witness-3:3010
-      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:password@postgres:5432/multiagent}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:password@postgres:5432/multiagent?sslmode=verify-full&sslrootcert=/certs/ca.crt&sslcert=/certs/client.crt&sslkey=/certs/client.key}
       - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+    volumes:
+      - ./certs:/certs
     depends_on:
       postgres:
         condition: service_healthy
@@ -241,8 +285,10 @@ services:
       - WITNESS_MODE=true
       - WITNESS_ID=5b85c135c30900cefff7edad9583ee68e362e34bc4d142d27ae7c4c733da48f0
       - WITNESS_URLS=http://witness-1:3010,http://witness-2:3010,http://witness-3:3010
-      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:password@postgres:5432/multiagent}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:password@postgres:5432/multiagent?sslmode=verify-full&sslrootcert=/certs/ca.crt&sslcert=/certs/client.crt&sslkey=/certs/client.key}
       - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+    volumes:
+      - ./certs:/certs
     depends_on:
       postgres:
         condition: service_healthy
@@ -269,8 +315,10 @@ services:
       - WITNESS_MODE=true
       - WITNESS_ID=a88ce7ffe6733cf50cfb9292fe0c370f80bb9ccd104a2c15ad7398ec159da6ab
       - WITNESS_URLS=http://witness-1:3010,http://witness-2:3010,http://witness-3:3010
-      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:password@postgres:5432/multiagent}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:password@postgres:5432/multiagent?sslmode=verify-full&sslrootcert=/certs/ca.crt&sslcert=/certs/client.crt&sslkey=/certs/client.key}
       - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+    volumes:
+      - ./certs:/certs
     depends_on:
       postgres:
         condition: service_healthy
@@ -290,4 +338,5 @@ networks:
 
 volumes:
   postgres_data:
-  redis_data:
+  redis_data:
+  etcd_data:

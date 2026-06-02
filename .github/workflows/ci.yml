@@ -39,6 +39,14 @@ jobs:
           JWT_SECRET: "secret"
           INTERNAL_KEY: "key"
 
+      - name: Snyk SBOM & Vulnerability Audit (Tier P0 Constraint)
+        run: |
+          npm install -g snyk
+          snyk sbom --format=cyclonedx1.4+json > sbom.json
+          snyk test --all-projects
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
       - name: Build Monorepo (Turbo)
         run: pnpm build
         env:

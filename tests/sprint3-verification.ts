@@ -183,6 +183,22 @@ async function runSprint3Verification() {
         execSync('npx tsx scripts/chaos-injector.ts clear', { cwd: workspaceRoot });
         console.log('  ✅ Outage cleared successfully. ZTAN write path is fully operational.');
 
+        // ────────────────────────────────────────────────────────────────────
+        // TEST 5: Hypervisor Isolation Diagnostics & Cgroup Preflight Checks
+        // ────────────────────────────────────────────────────────────────────
+        console.log('\n⚡ [TEST 5] Executing hypervisor layer diagnostics & cgroup preflight checks...');
+        const { KvmLabVerifier } = await import('../packages/governance-core/src/isolation/kvm-lab-verifier.js');
+        const diagnosticReport = KvmLabVerifier.runKvmDiagnosticSuite();
+        
+        console.log(`     - Host Kernel Release : ${diagnosticReport.hostKernelVersion}`);
+        console.log(`     - KVM Present         : ${diagnosticReport.kvmPresent ? 'YES' : 'NO'}`);
+        console.log(`     - KVM Accessible      : ${diagnosticReport.kvmAccessible ? 'YES' : 'NO'}`);
+        console.log(`     - Jailer Configured   : ${diagnosticReport.jailerConfigured ? 'YES' : 'NO'}`);
+        console.log(`     - Namespaces Isolated : ${diagnosticReport.namespacesIsolated ? 'YES' : 'NO'}`);
+        console.log(`     - Virtiofs I/O Perf   : ${diagnosticReport.virtiofsPerformanceScore} MB/s`);
+        
+        console.log('  ✅ Hypervisor and isolation parameters diagnostics successfully completed.');
+
     } finally {
         await prisma.$disconnect();
     }

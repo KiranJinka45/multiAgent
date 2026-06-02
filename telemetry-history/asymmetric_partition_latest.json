@@ -1,10 +1,11 @@
 {
-  "timestamp": 1779479225175,
+  "timestamp": "2026-05-29T19:34:19.770Z",
   "metrics": {
-    "asymmetricDelayMs": 400,
-    "staleWritesAttempted": 1,
-    "staleWritesRejected": 1,
-    "p_stale_write_rejected": 1,
-    "verdict": "PASSED"
+    "step1_acquiredNodeA": true,
+    "step2_partitionActive": true,
+    "step3_preemptedNodeB": true,
+    "step4_staleWriteRejected": true,
+    "step5_healed": true,
+    "finalVerdict": "PASSED"
   }
 }

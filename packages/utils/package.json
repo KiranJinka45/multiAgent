@@ -13,7 +13,7 @@
     }
   },
   "scripts": {
-    "build": "tsup --format esm --no-dts && del /q tsconfig.tsbuildinfo 2>nul & tsc --emitDeclarationOnly",
+    "build": "tsup && tsc --emitDeclarationOnly -p tsconfig.json --declarationDir ./dist",
     "dev": "tsup --format esm --no-dts --watch",
     "phase16": "tsx src/run-phase-16-compatibility.ts",
     "phase17": "tsx src/run-phase-17-morphodynamics.ts"
@@ -23,7 +23,6 @@
     "@packages/config": "workspace:*",
     "@packages/db": "workspace:*",
     "@packages/observability": "workspace:*",
-    "@packages/validator": "workspace:*",
     "@types/cors": "2.8.19",
     "@types/express": "5.0.6",
     "@types/uuid": "10.0.0",
