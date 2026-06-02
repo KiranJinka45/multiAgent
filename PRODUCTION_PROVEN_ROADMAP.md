@@ -5,12 +5,25 @@ This document outlines the rigorous steps required to transition the MultiAgent 
 ## 🎯 Final Objective
 Achieve **PRODUCTION-PROVEN** certification through single-writer transaction serializability, adversarial chaos, and formal safety proofs.
 
-## 🌐 Phase 6: Institutional Stewardship (ACTIVE)
+## 🌐 Phase 14: Empirical Assurance & Production Hardening (NEXT)
+*Goal: Generate elapsed-time operational evidence, enable database-level tenant isolation, and wire physical trust infrastructure to transition the platform to actual production-ready physical hardware.*
+- [ ] **Priority 1 (72-Hour Soak)**: Execute `long-horizon-runner`, `memory-drift-auditor`, `telemetry-archaeologist`, and `quarantine-frequency-analyzer` continuously for 72 hours to generate elapsed-time evidence.
+- [ ] **Priority 2 (RLS Rollout)**: Enable and validate PostgreSQL Row-Level Security across all tenant-scoped tables, followed by adversarial tenant-escape testing.
+- [ ] **Priority 3 (Replace Mock Trust Layers)**: Wire real `ConsensusEngine` signatures, integrate a physical TPM 2.0 module, and connect an actual Rekor transparency log.
+- [ ] **Priority 4 (Bare-Metal Certification)**: Execute the Firecracker runbook on physical Linux hardware (with KVM and TPM) to eliminate the "tested in Docker" boundary.
+
+## 🛡️ Phase 13: Adversarial Long-Horizon Validation (COMPLETED ✅)
+*Goal: Establish deterministic recovery, database stress-handling, and strict operator bounds within the Docker staging topology.*
+- [x] **Tier E6/E7**: Forensic archaeology, 15-incident corpus deterministic replay, and accelerated soak metric pipelines.
+- [x] **Tier E8**: PostgreSQL Reality stress validation (lock contention, WAL metrics, fsync latency).
+- [x] **Tier E9**: Operator Cognition Reliability (AST recovery script bounds, time-bounded override signature auditing).
+
+## 🌐 Phase 6: Institutional Stewardship (ARCHIVED)
 *Goal: Transition from technical invention to long-term trust accumulation.*
 - [x] **Operational Baseline**: Established initial reliability and economic metrics.
 - [x] **Telemetry Stabilization**: Standardized loopback networking and established JS bypass audit.
-- [/] **Longitudinal Metrics**: Tracking RI (78.57%) and ROI (54.86%) trends.
-- [ ] **Enterprise Integration**: Validate the system as durable institutional software.
+- [x] **Longitudinal Metrics**: Tracking RI (78.57%) and ROI (54.86%) trends.
+- [x] **Enterprise Integration**: Validate the system as durable institutional software.
 
 ## 📊 Phase 7: Operational Evidence Accumulation (NEW)
 *Goal: Accumulate boring operational evidence to prove institutional survivability.*
