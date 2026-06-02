@@ -63,7 +63,17 @@ export class PhysicalTpmConnector {
 
     // Command mapping for tpm2_quote (Signing PCR state with AK)
     static generatePhysicalQuote(nonceHex: string, pcrSelection: Tpm2PcrSelection): Tpm2QuotePayload {
-        if (!this.isHardwareTpmAvailable()) {
+        let useRealTpm = this.isHardwareTpmAvailable();
+        if (useRealTpm) {
+            try {
+                const cmd = os.platform() === 'win32' ? 'where tpm2_quote' : 'which tpm2_quote';
+                execSync(cmd, { stdio: 'ignore' });
+            } catch {
+                useRealTpm = false;
+            }
+        }
+
+        if (!useRealTpm) {
             // Simulated physical hardware TPM response
             return {
                 quoteBytes: Buffer.from(`SIMULATED_PHYSICAL_QUOTE_NONCE_${nonceHex}`).toString('base64'),
