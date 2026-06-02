@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsup src/index.ts --format esm --no-dts && tsc --emitDeclarationOnly -p tsconfig.json --declarationDir ./dist",
     "dev": "tsup src/index.ts --format esm --no-dts --watch",
@@ -12,14 +12,16 @@
     "test:verify:external": "tsx scripts/run-validation-harness.ts"
   },
   "dependencies": {
-    "zod": "3.23.3",
+    "@anthropic-ai/sdk": "^0.100.1",
+    "@google/generative-ai": "^0.24.1",
     "@packages/config": "workspace:*",
-    "@packages/utils": "workspace:*",
     "@packages/db": "workspace:*",
-    "etcd3": "1.1.2",
+    "@packages/utils": "workspace:*",
     "@temporalio/client": "1.15.0",
+    "@temporalio/worker": "1.15.0",
     "@temporalio/workflow": "1.15.0",
-    "@temporalio/worker": "1.15.0"
+    "etcd3": "1.1.2",
+    "zod": "3.23.3"
   },
   "devDependencies": {
     "tsup": "8.5.1",

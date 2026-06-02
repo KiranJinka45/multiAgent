@@ -38,6 +38,9 @@
       "@packages/utils": [
         "../../packages/utils/src/index.ts"
       ],
+      "@packages/runtime-core": [
+        "../../packages/runtime-core/src/index.ts"
+      ],
       "@packages/ztan-crypto": [
         "../../packages/ztan-crypto/src/index.ts"
       ],
@@ -67,6 +70,9 @@
     },
     {
       "path": "../../packages/utils"
+    },
+    {
+      "path": "../../packages/runtime-core"
     },
     {
       "path": "../../packages/contracts"

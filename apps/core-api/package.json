@@ -29,6 +29,7 @@
     "@packages/queue": "workspace:*",
     "@packages/supabase": "workspace:*",
     "@packages/utils": "workspace:*",
+    "@packages/runtime-core": "workspace:*",
     "@packages/ztan-crypto": "workspace:*",
     "@supabase/supabase-js": "2.43.2",
     "@temporalio/client": "1.15.0",

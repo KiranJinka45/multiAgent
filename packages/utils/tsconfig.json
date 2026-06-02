@@ -5,44 +5,15 @@
     "ignoreDeprecations": "5.0",
     "outDir": "dist",
     "composite": true,
-    "incremental": true,
+
     "declaration": true,
     "declarationDir": "dist",
     "skipLibCheck": true,
-    "paths": {
-      "@packages/config": [
-        "../config/src/index.ts"
-      ],
-      "@packages/db": [
-        "../db/src/index.ts"
-      ],
-      "@packages/events": [
-        "../events/src/index.ts"
-      ],
-      "@packages/observability": [
-        "../observability/src/index.ts"
-      ],
-      "@packages/runtime-core": [
-        "../runtime-core/src/index.ts"
-      ],
-      "@packages/vfs": [
-        "../vfs/src/index.ts"
-      ],
-      "@packages/validator": [
-        "../validator/src/index.ts"
-      ],
-      "@packages/ai": [
-        "../ai/src/index.ts"
-      ],
-      "@packages/supabase": [
-        "../supabase/src/index.ts"
-      ]
-    },
     "noEmit": false,
     "rootDir": "src"
   },
   "include": [
-    "src"
+    "src/**/*"
   ],
   "references": [
     {
@@ -56,9 +27,6 @@
     },
     {
       "path": "../runtime-core"
-    },
-    {
-      "path": "../validator"
     }
   ]
 }
