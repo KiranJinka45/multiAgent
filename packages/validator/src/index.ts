@@ -1,4 +1,4 @@
-import { OPAGovernanceLayer, SemanticInspector, StaticCommandFilter } from '@packages/governance-core';
+import { OPAGovernanceLayer, SemanticInspector, StaticCommandFilter, timedGateSync, timedGate } from '@packages/governance-core';
 import { db } from '@packages/db';
 
 export class ArtifactValidator {
@@ -32,17 +32,37 @@ export class GovernanceEngine {
             payload: proposal.patch || proposal.targetPath
         };
 
-        const staticCheck = StaticCommandFilter.evaluateProposal(cmdProposal);
+        // ═══ GATE 1: StaticCommandFilter ═══
+        const staticCheck = await timedGate(
+            'StaticCommandFilter',
+            proposalId,
+            () => StaticCommandFilter.evaluateProposal(cmdProposal),
+            (passed) => passed ? 'PASS' : 'DENY'
+        );
         if (!staticCheck) {
             return { allowed: false, reason: `StaticCommandFilter: Denied` };
         }
 
-        const semanticCheck = await SemanticInspector.aggregate(proposal.description || proposal.patch || '');
+        // ═══ GATE 2: SemanticInspector ═══
+        const semanticCheck = await timedGate(
+            'SemanticInspector',
+            proposalId,
+            () => SemanticInspector.aggregate(proposal.description || proposal.patch || ''),
+            (result) => result.verdict === 'DENIED' ? 'DENY' : 'PASS',
+            (result) => ({ verdict: result.verdict, heuristicScore: result.heuristicScore })
+        );
         if (semanticCheck.verdict === 'DENIED') {
             return { allowed: false, reason: `SemanticInspector: ${semanticCheck.deterministicFailures.join(', ')}` };
         }
 
-        const opaCheck = await OPAGovernanceLayer.evaluateProposal(cmdProposal);
+        // ═══ GATE 3: OPAGovernanceLayer ═══
+        const opaCheck = await timedGate(
+            'OPAGovernanceLayer',
+            proposalId,
+            () => OPAGovernanceLayer.evaluateProposal(cmdProposal),
+            (result) => result.isAllowed ? 'PASS' : 'DENY',
+            (result) => ({ matchedPolicies: result.matchedPolicies, reason: result.reason })
+        );
         if (!opaCheck.isAllowed) {
             return { allowed: false, reason: `OPAGovernanceLayer: ${opaCheck.reason}` };
         }

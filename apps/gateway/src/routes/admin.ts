@@ -137,22 +137,39 @@ router.get('/timeline', async (req: Request, res: Response) => {
 
 /**
  * GET /api/admin/intelligence/state
- * Returns real-time strategy distribution and system health.
+ * Returns real-time strategy distribution and system health via historical Aggregation.
  */
 router.get('/state', async (req: Request, res: Response) => {
   try {
-    // Note: In a production app, we'd call a dedicated service here.
-    // For now, we'll return a stub or proxy to the IntelligenceLoopService logic.
+    // Aggregate real decisions from the ledger history to determine active strategy distribution
+    const recentDecisions = await db.scalingDecision.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 100
+    });
+
+    const strategies = { CONSERVATIVE: 0, BALANCED: 0, AGGRESSIVE: 0 };
+    
+    if (recentDecisions.length > 0) {
+       recentDecisions.forEach((d: any) => {
+           const s = d.action === 'SCALE_UP' ? 'AGGRESSIVE' : (d.action === 'SCALE_DOWN' ? 'CONSERVATIVE' : 'BALANCED');
+           strategies[s]++;
+       });
+       // Normalize
+       strategies.CONSERVATIVE = Number((strategies.CONSERVATIVE / recentDecisions.length).toFixed(2));
+       strategies.BALANCED = Number((strategies.BALANCED / recentDecisions.length).toFixed(2));
+       strategies.AGGRESSIVE = Number((strategies.AGGRESSIVE / recentDecisions.length).toFixed(2));
+    } else {
+       strategies.BALANCED = 1.0;
+    }
+
+    const lastEvent = recentDecisions[0] || null;
+
     res.json({
       success: true,
       data: {
-        activeStrategies: {
-          CONSERVATIVE: 0.8,
-          BALANCED: 1.0,
-          AGGRESSIVE: 1.5
-        },
+        activeStrategies: strategies,
         systemStatus: 'OPTIMIZED',
-        lastScalingEvent: await db.scalingDecision.findFirst({ orderBy: { createdAt: 'desc' } })
+        lastScalingEvent: lastEvent
       }
     });
   } catch (err) {

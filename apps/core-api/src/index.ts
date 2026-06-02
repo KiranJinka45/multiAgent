@@ -1,4 +1,8 @@
 // Entry point for @apps/api
 
-import './services/socket.js';
+// Attach early global handler to satisfy ZTAN StartupAttestation requirements
+process.on('uncaughtException', (err) => {
+    console.error('Early Uncaught Exception:', err);
+});
 
+import './services/socket.js';

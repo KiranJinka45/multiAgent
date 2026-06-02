@@ -1,5 +1,5 @@
 import express from 'express';
-import type { Request, Response, RequestHandler } from 'express';
+import type { Request, Response, NextFunction, RequestHandler } from 'express';
 import http, { createServer } from 'http';
 import https from 'https';
 import fs from 'fs';
@@ -29,7 +29,44 @@ import { buildCanonicalPayload, hashPayload } from '@packages/ztan-crypto';
 import ztanRouter from '../routes/ztan.js';
 import ztanGovRouter from '../routes/ztan-governance.js';
 import { IdentityService } from './identity.service.js';
-import { ConsensusEngine, ZtanLeaseManager } from '@packages/governance-core';
+import { ConsensusEngine, ZtanLeaseManager, QuarantineError } from '@packages/governance-core';
+import { FailureBundleGenerator } from '@packages/runtime-core';
+
+// ZTAN Tier E3: Forensic IO Rate-Limiting State
+let lastBundleGenerationTime = 0;
+const BUNDLE_DEBOUNCE_MS = 5000;
+
+async function handleQuarantineEvent(err: Error, source: string) {
+    if (err.name === 'QuarantineError' || err.message.includes('QuarantineError') || err instanceof QuarantineError) {
+        const now = Date.now();
+        if (now - lastBundleGenerationTime < BUNDLE_DEBOUNCE_MS) {
+            logger.warn({ source, err: err.message }, '[ZTAN ARCHAEOLOGY] Skipping forensic bundle generation (Rate-limited)');
+            return;
+        }
+        lastBundleGenerationTime = now;
+        
+        logger.fatal({ source, err: err.message }, '[ZTAN ARCHAEOLOGY] QuarantineError detected! Triggering Failure Snapshot Bundle...');
+        try {
+            // Use process.cwd() or similar root for bundle output
+            const generator = new FailureBundleGenerator(process.cwd());
+            await generator.generateIncidentBundle([err.message]);
+            logger.info('[ZTAN ARCHAEOLOGY] Snapshot bundle successfully written to disk.');
+        } catch (bundleErr) {
+            logger.error({ err: bundleErr }, '[ZTAN ARCHAEOLOGY] Failed to generate forensic bundle during quarantine!');
+        }
+    }
+}
+
+// Global Process Hooks for Asynchronous Quarantines
+process.on('uncaughtException', async (err) => {
+    await handleQuarantineEvent(err, 'uncaughtException');
+});
+
+process.on('unhandledRejection', async (reason) => {
+    if (reason instanceof Error) {
+        await handleQuarantineEvent(reason, 'unhandledRejection');
+    }
+});
 
 // ZTAN Replay Tracking - Rolling Sliding-Window TTL Cache (Remediation)
 class SlidingWindowTTLReplayCache {
@@ -413,6 +450,16 @@ app.post('/api/v1/sre/policies/:id/toggle', express.json(), ((req: Request, res:
 
     res.json({ success: true, ruleId: id, enabled });
 }) as RequestHandler);
+
+// Global Express Archaeology Hook
+app.use(async (err: any, req: Request, res: Response, next: NextFunction) => {
+    if (err) {
+        await handleQuarantineEvent(err instanceof Error ? err : new Error(String(err)), `Express Route ${req.path}`);
+        res.status(500).json({ error: 'Internal Server Error', message: err.message });
+    } else {
+        next();
+    }
+});
 
 async function bootstrap() {
     console.log("🚀 [CoreAPI] Bootstrap started");

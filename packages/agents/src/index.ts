@@ -1,8 +1,15 @@
+import { AgnosticMultiProvider } from '@packages/governance-core';
+
 export class IntentDetectionAgent {
+    private provider = new AgnosticMultiProvider();
+
     async execute(payload: any, ctx: any) {
+        const prompt = `Analyze intent for payload: ${JSON.stringify(payload)} with context ${JSON.stringify(ctx)}`;
+        const proposals = await this.provider.generateProposals(prompt, ctx?.tenantId || 'system', 'FAST_TIER');
         return {
             success: true,
             data: {
+                proposals,
                 templateId: payload.context?.techStack || 'nextjs'
             }
         };
@@ -10,13 +17,17 @@ export class IntentDetectionAgent {
 }
 
 export class GeneratorAgent {
+    private provider = new AgnosticMultiProvider();
+
     async execute(payload: any, ctx: any) {
+        const prompt = `Generate code files for payload: ${JSON.stringify(payload)}`;
+        const proposals = await this.provider.generateProposals(prompt, ctx?.tenantId || 'system', 'BALANCED_TIER');
         return {
             success: true,
             data: {
+                proposals,
                 files: [
-                    { path: 'src/app/page.tsx', content: 'export default function Page() { return <div>Aion Web App</div>; }' },
-                    { path: 'package.json', content: '{"name": "test-app", "dependencies": {}}' }
+                    { path: 'src/app/page.tsx', content: '// Live code generation delegated to provider' }
                 ]
             }
         };
@@ -24,10 +35,15 @@ export class GeneratorAgent {
 }
 
 export class RepairAgent {
+    private provider = new AgnosticMultiProvider();
+
     async execute(payload: any, ctx: any) {
+        const prompt = `Generate repair patches for payload: ${JSON.stringify(payload)}`;
+        const proposals = await this.provider.generateProposals(prompt, ctx?.tenantId || 'system', 'SMART_TIER');
         return {
             success: true,
             data: {
+                proposals,
                 patches: []
             }
         };
@@ -35,10 +51,15 @@ export class RepairAgent {
 }
 
 export class MetaAgent {
+    private provider = new AgnosticMultiProvider();
+
     async execute(payload: any, ctx: any) {
+        const prompt = `Evaluate meta strategy for payload: ${JSON.stringify(payload)}`;
+        const proposals = await this.provider.generateProposals(prompt, ctx?.tenantId || 'system', 'STRATEGIC_TIER');
         return {
             success: true,
             data: {
+                proposals,
                 recommendedTechStack: 'nextjs'
             }
         };
