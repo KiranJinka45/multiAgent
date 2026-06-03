@@ -5,9 +5,10 @@ import { TrustRegistry } from '../../federation/src/trust-registry';
 import { OfflineAuditor } from './auditor';
 import { ExecutionCell } from '../../federation/src/cell';
 
-describe('Phase 08.6 Empirical Cryptographic Verification Wave', () => {
-    it('executes the end-to-end true cryptographic trust chain validation', () => {
-        // Step 1 & 2: Generate a real EvidencePacket and sign it with actual keys.
+describe('Phase 08.6 Trust Finality Audit', () => {
+    it('executes the full cryptographic trust chain validation suite', () => {
+        // --- 1. Successful Verification Case ---
+        // Generate a real EvidencePacket and sign it with actual keys.
         const generator = new EvidencePacketGenerator();
         const epochKeyPair = CryptoUtils.generateKeyPair();
         const governanceEpoch = 'epoch-crypto-v1';
@@ -28,30 +29,47 @@ describe('Phase 08.6 Empirical Cryptographic Verification Wave', () => {
         expect(signedPacket.containmentProof.signature.length).toBeGreaterThan(50);
         expect(signedPacket.recoveryAssurance.engineSignature.length).toBeGreaterThan(50);
 
-        // Step 3: Export TrustRegistry snapshot anchoring the real public key
+        // Export TrustRegistry snapshot anchoring the real public key
         const registry = new TrustRegistry();
         registry.anchorEpoch(governanceEpoch, rootHash, [epochKeyPair.publicKey]);
         const snapshotJson = registry.serialize();
 
-        // Step 4: Verify packet offline with ztan-auditor
+        // Verify packet offline with ztan-auditor
         const auditor = new OfflineAuditor(snapshotJson);
         const report1 = auditor.auditPacket(JSON.stringify(signedPacket));
-        expect(report1.isValid).toBe(true); // Should pass crypto verification
+        expect(report1.isValid).toBe(true);
 
-        // Step 5: Revoke the key
+        // --- 2. Tampered Payload Case ---
+        const tamperedPacket = JSON.parse(JSON.stringify(signedPacket));
+        tamperedPacket.containmentProof.locDelta = 999; // Attacker alters evidence
+        
+        const tamperedReport = auditor.auditPacket(JSON.stringify(tamperedPacket));
+        expect(tamperedReport.isValid).toBe(false);
+        expect(tamperedReport.reasons).toContain('Cryptographic signature verification failed or no trusted key matched.');
+
+        // --- 3. Unknown Epoch Case ---
+        const invalidEpochPacket = JSON.parse(JSON.stringify(signedPacket));
+        invalidEpochPacket.governanceEpoch = 'epoch-unknown-v99';
+        
+        const unknownEpochReport = auditor.auditPacket(JSON.stringify(invalidEpochPacket));
+        expect(unknownEpochReport.isValid).toBe(false);
+        expect(unknownEpochReport.reasons).toContain('Untrusted governance root for epoch epoch-unknown-v99.');
+
+        // --- 4. Revoked Key Case ---
+        // Revoke the public key
         const compromisedRegistry = TrustRegistry.deserialize(snapshotJson);
         compromisedRegistry.revokePublicKey(epochKeyPair.publicKey);
         const compromisedSnapshotJson = compromisedRegistry.serialize();
 
-        // Step 6: Re-run verification using the updated (revoked) registry snapshot
+        // Re-run verification using the updated (revoked) registry snapshot
         const auditor2 = new OfflineAuditor(compromisedSnapshotJson);
         const report2 = auditor2.auditPacket(JSON.stringify(signedPacket));
 
-        // Step 7: Ensure packet rejection occurs for cryptographic reasons
+        // Ensure rejection occurs because of policy, not math
         expect(report2.isValid).toBe(false);
         expect(report2.reasons).toContain('Packet contains signatures from a revoked operator key.');
 
-        // Step 8: Perform cross-cell verification between two independent instances
+        // --- 5. Cross-Cell Verification Case ---
         const cell1 = new ExecutionCell();
         cell1.syncTrustRegistry(snapshotJson);
         
