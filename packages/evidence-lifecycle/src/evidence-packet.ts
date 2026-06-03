@@ -31,6 +31,7 @@ export interface EconomicRationality {
 export interface FinalizedEnvelope {
     missionId: string;
     timestamp: number;
+    governanceEpoch: string;
     merkleLineage: MerkleProof;
     containmentProof: ContainmentProof;
     recoveryAssurance: RollbackProof;
@@ -41,13 +42,14 @@ export interface FinalizedEnvelope {
 export class EvidencePacketGenerator {
     public generateEnvelope(
         missionId: string,
+        governanceEpoch: string,
         merkle: MerkleProof,
         containment: ContainmentProof,
         rollback: RollbackProof,
         sandbox: SandboxAttestation,
         economic: EconomicRationality
     ): FinalizedEnvelope {
-        if (!merkle || !containment || !rollback || !sandbox || !economic) {
+        if (!governanceEpoch || !merkle || !containment || !rollback || !sandbox || !economic) {
             throw new Error('All 5 evidence pillars must be provided to generate a FinalizedEnvelope');
         }
 
@@ -62,6 +64,7 @@ export class EvidencePacketGenerator {
         return {
             missionId,
             timestamp: Date.now(),
+            governanceEpoch,
             merkleLineage: merkle,
             containmentProof: containment,
             recoveryAssurance: rollback,

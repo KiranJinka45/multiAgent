@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ExecutionCell } from './cell';
+import { TrustRegistry } from './trust-registry';
 import type { FinalizedEnvelope } from '../../evidence-lifecycle/src/evidence-packet';
 
 describe('ExecutionCell', () => {
@@ -26,16 +27,19 @@ describe('ExecutionCell', () => {
 
     it('prevents syncing governance roots when quarantined', () => {
         cell.quarantine('Test');
-        expect(() => cell.syncGovernanceRoots(['0xnewroot'])).toThrow(/Cannot sync trust assets/);
+        expect(() => cell.syncTrustRegistry('{}')).toThrow(/Cannot sync trust assets/);
     });
 
     it('verifies foreign evidence against known governance roots', () => {
         // Sync a trusted root
-        cell.syncGovernanceRoots(['0xtrusted']);
+        const registry = new TrustRegistry();
+        registry.anchorEpoch('epoch-test', '0xtrusted');
+        cell.syncTrustRegistry(registry.serialize());
 
         const validForeignPacket: FinalizedEnvelope = {
             missionId: 'foreign-m-1',
             timestamp: Date.now(),
+            governanceEpoch: 'epoch-test',
             merkleLineage: { rootHash: '0xtrusted', inclusionHash: '0x123', siblings: [] },
             containmentProof: { locDelta: 0, fileGlobs: [], pathTraversalDetected: false, signature: 'sig' },
             recoveryAssurance: { preMutationSnapshotId: 'snap', revertHash: '0xrev', engineSignature: 'sig' },
@@ -51,6 +55,7 @@ describe('ExecutionCell', () => {
         const untrustedPacket: FinalizedEnvelope = {
             missionId: 'foreign-m-2',
             timestamp: Date.now(),
+            governanceEpoch: 'epoch-test',
             merkleLineage: { rootHash: '0xuntrusted', inclusionHash: '0x123', siblings: [] },
             containmentProof: { locDelta: 0, fileGlobs: [], pathTraversalDetected: false, signature: 'sig' },
             recoveryAssurance: { preMutationSnapshotId: 'snap', revertHash: '0xrev', engineSignature: 'sig' },
@@ -63,12 +68,15 @@ describe('ExecutionCell', () => {
     });
 
     it('prevents verifying foreign evidence when quarantined', () => {
-        cell.syncGovernanceRoots(['0xtrusted']);
+        const registry = new TrustRegistry();
+        registry.anchorEpoch('epoch-test', '0xtrusted');
+        cell.syncTrustRegistry(registry.serialize());
         cell.quarantine('Isolation mode');
 
         const validForeignPacket = {
             missionId: 'foreign-m-1',
             timestamp: Date.now(),
+            governanceEpoch: 'epoch-test',
             merkleLineage: { rootHash: '0xtrusted', inclusionHash: '0x123', siblings: [] },
             containmentProof: { locDelta: 0, fileGlobs: [], pathTraversalDetected: false, signature: 'sig' }
         } as FinalizedEnvelope;

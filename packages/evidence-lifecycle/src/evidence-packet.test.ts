@@ -44,6 +44,7 @@ describe('EvidencePacketGenerator', () => {
     it('generates a valid FinalizedEnvelope when all pillars are met', () => {
         const envelope = generator.generateEnvelope(
             'mission-1',
+            'epoch-alpha',
             validMerkle,
             validContainment,
             validRollback,
@@ -64,7 +65,7 @@ describe('EvidencePacketGenerator', () => {
         const invalidContainment = { ...validContainment, pathTraversalDetected: true };
         
         expect(() => {
-            generator.generateEnvelope('mission-1', validMerkle, invalidContainment, validRollback, validSandbox, validEconomic);
+            generator.generateEnvelope('mission-1', 'epoch-alpha', validMerkle, invalidContainment, validRollback, validSandbox, validEconomic);
         }).toThrow(/path traversal detected/);
     });
 
@@ -72,14 +73,14 @@ describe('EvidencePacketGenerator', () => {
         const invalidEconomic = { ...validEconomic, withinBudget: false };
         
         expect(() => {
-            generator.generateEnvelope('mission-1', validMerkle, validContainment, validRollback, validSandbox, invalidEconomic);
+            generator.generateEnvelope('mission-1', 'epoch-alpha', validMerkle, validContainment, validRollback, validSandbox, invalidEconomic);
         }).toThrow(/budget exceeded/);
     });
 
     it('fails if any pillar is missing', () => {
         expect(() => {
             // @ts-expect-error testing invalid input
-            generator.generateEnvelope('mission-1', null, validContainment, validRollback, validSandbox, validEconomic);
+            generator.generateEnvelope('mission-1', 'epoch-alpha', null, validContainment, validRollback, validSandbox, validEconomic);
         }).toThrow(/All 5 evidence pillars must be provided/);
     });
 });

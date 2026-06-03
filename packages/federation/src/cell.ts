@@ -1,11 +1,16 @@
 import { FinalizedEnvelope } from '../../evidence-lifecycle/src/evidence-packet';
+import { TrustRegistry } from './trust-registry';
 
 export type CellState = 'ACTIVE' | 'QUARANTINED';
 
 export class ExecutionCell {
     private state: CellState = 'ACTIVE';
     private quarantineReason?: string;
-    private governanceRoots: Set<string> = new Set();
+    private registry: TrustRegistry;
+
+    constructor(registry?: TrustRegistry) {
+        this.registry = registry || new TrustRegistry();
+    }
 
     /**
      * Isolates the cell. Halts execution and syncs.
@@ -24,22 +29,20 @@ export class ExecutionCell {
     }
 
     /**
-     * Synchronize governance roots. Only allows updating if active.
+     * Get the local trust registry.
      */
-    public syncGovernanceRoots(roots: string[]): void {
-        if (this.state === 'QUARANTINED') {
-            throw new Error('Cannot sync trust assets while quarantined.');
-        }
-        for (const root of roots) {
-            this.governanceRoots.add(root);
-        }
+    public getTrustRegistry(): TrustRegistry {
+        return this.registry;
     }
 
     /**
-     * Checks if a governance root is known to this cell.
+     * Sync trust registry from another source.
      */
-    public hasGovernanceRoot(root: string): boolean {
-        return this.governanceRoots.has(root);
+    public syncTrustRegistry(snapshot: string): void {
+        if (this.state === 'QUARANTINED') {
+            throw new Error('Cannot sync trust assets while quarantined.');
+        }
+        this.registry = TrustRegistry.deserialize(snapshot);
     }
 
     /**
@@ -56,13 +59,24 @@ export class ExecutionCell {
         }
 
         // Basic structural validation
-        if (!packet || !packet.missionId || !packet.merkleLineage || !packet.containmentProof) {
+        if (!packet || !packet.missionId || !packet.governanceEpoch || !packet.merkleLineage || !packet.containmentProof) {
             return false;
         }
 
-        // Must rely on known governance roots for trust portability
-        if (!this.governanceRoots.has(packet.merkleLineage.rootHash)) {
+        // Must rely on known governance epochs for trust portability
+        if (!this.registry.isValidRootForEpoch(packet.governanceEpoch, packet.merkleLineage.rootHash)) {
             return false; // Untrusted governance root
+        }
+
+        // Check if any signatures in the packet are revoked
+        const signatures = [
+            packet.containmentProof.signature,
+            packet.recoveryAssurance.engineSignature,
+            packet.sandboxAttestation.providerSignature
+        ];
+
+        if (this.registry.hasRevokedSignatures(signatures)) {
+            return false; // Packet contains revoked signatures
         }
 
         return true;
