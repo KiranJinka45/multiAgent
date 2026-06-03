@@ -186,7 +186,14 @@ router.get('/billing/tenant/:tenantId', async (req: Request, res: Response) => {
   const { tenantId } = req.params;
   
   try {
-    const missions = await db.mission.findMany({
+    const agg = await db.mission.aggregate({
+      where: { tenantId, status: 'complete' },
+      _sum: { totalCostUsd: true },
+      _avg: { computeDurationMs: true },
+      _count: true
+    });
+
+    const history = await db.mission.findMany({
       where: { tenantId, status: 'complete' },
       select: {
         totalCostUsd: true,
@@ -195,20 +202,17 @@ router.get('/billing/tenant/:tenantId', async (req: Request, res: Response) => {
         createdAt: true
       },
       orderBy: { createdAt: 'desc' },
-      take: 100
+      take: 20
     });
-
-    const totalCost = missions.reduce((sum: number, m: any) => sum + (m.totalCostUsd || 0), 0);
-    const avgCompute = missions.length ? missions.reduce((sum: number, m: any) => sum + (m.computeDurationMs || 0), 0) / missions.length : 0;
     
     res.json({
       success: true,
       data: {
         tenantId,
-        totalCost,
-        avgComputeTimeMs: avgCompute,
-        missionCount: missions.length,
-        history: missions
+        totalCost: agg._sum.totalCostUsd || 0,
+        avgComputeTimeMs: agg._avg.computeDurationMs || 0,
+        missionCount: agg._count || 0,
+        history: history
       }
     });
   } catch (err) {
@@ -224,22 +228,24 @@ router.get('/billing/tenant/:tenantId', async (req: Request, res: Response) => {
 router.get('/tenants/summary', async (req: Request, res: Response) => {
   try {
     const tenants = await db.tenant.findMany({
-      include: {
-        _count: { select: { missions: true } },
-        missions: {
-          where: { status: 'complete' },
-          select: { totalCostUsd: true, margin: true }
-        }
-      }
+      select: { id: true, name: true }
+    });
+
+    const missionStats = await db.mission.groupBy({
+      by: ['tenantId'],
+      where: { status: 'complete' },
+      _sum: { totalCostUsd: true, margin: true },
+      _count: true
     });
 
     const summary = tenants.map((t: any) => {
-      const totalCost = t.missions.reduce((sum: number, m: any) => sum + (m.totalCostUsd || 0), 0);
-      const totalMargin = t.missions.reduce((sum: number, m: any) => sum + (m.margin || 0), 0);
+      const stats = missionStats.find((s: any) => s.tenantId === t.id);
+      const totalCost = stats?._sum?.totalCostUsd || 0;
+      const totalMargin = stats?._sum?.margin || 0;
       return {
         id: t.id,
         name: t.name,
-        missionCount: t._count.missions,
+        missionCount: stats?._count || 0,
         totalCost,
         totalMargin,
         avgMarginPct: totalCost > 0 ? (totalMargin / totalCost) * 100 : 0

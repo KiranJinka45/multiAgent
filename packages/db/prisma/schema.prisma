@@ -389,3 +389,11 @@ model ZtanRegisteredKey {
   createdAt DateTime @default(now())
 }
 
+model ZtanIdentity {
+  id        String   @id @default(uuid())
+  nodeId    String   @unique
+  publicKey String
+  status    String   @default("ACTIVE")
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+}

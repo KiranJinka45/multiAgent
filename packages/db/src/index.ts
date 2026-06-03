@@ -314,6 +314,37 @@ if (process.env.MOCK_DB === 'true') {
         }
     };
 
+    const identities: any[] = [];
+    const mockZtanIdentity = {
+        findUnique: async (args: any) => {
+            const nodeId = args?.where?.nodeId;
+            return identities.find(i => i.nodeId === nodeId) || null;
+        },
+        create: async (args: any) => {
+            identities.push(args.data);
+            return args.data;
+        },
+        upsert: async (args: any) => {
+            const nodeId = args.where.nodeId;
+            let id = identities.find(i => i.nodeId === nodeId);
+            if (id) {
+                Object.assign(id, args.update);
+            } else {
+                id = args.create;
+                identities.push(id);
+            }
+            return id;
+        },
+        update: async (args: any) => {
+            const nodeId = args.where.nodeId;
+            const id = identities.find(i => i.nodeId === nodeId);
+            if (id) {
+                Object.assign(id, args.data);
+            }
+            return id;
+        }
+    };
+
     prismaInstance = {
         ztanLedgerBlock: mockZtanLedgerBlock,
         ztanSnapshot: mockZtanSnapshot,
@@ -322,6 +353,7 @@ if (process.env.MOCK_DB === 'true') {
         idempotencyRecord: mockIdempotencyRecord,
         governanceEvent: mockGovernanceEvent,
         proposedChange: mockProposedChange,
+        ztanIdentity: mockZtanIdentity,
         $queryRawUnsafe: mockQueryRawUnsafe,
         $executeRawUnsafe: mockExecuteRawUnsafe,
         $transaction: async (cb: any) => {
@@ -333,6 +365,7 @@ if (process.env.MOCK_DB === 'true') {
                 idempotencyRecord: mockIdempotencyRecord,
                 governanceEvent: mockGovernanceEvent,
                 proposedChange: mockProposedChange,
+                ztanIdentity: mockZtanIdentity,
                 $queryRawUnsafe: mockQueryRawUnsafe,
                 $executeRawUnsafe: mockExecuteRawUnsafe
             });
@@ -340,14 +373,18 @@ if (process.env.MOCK_DB === 'true') {
     };
 } else {
     const dbUrl = process.env.DATABASE_URL;
-    const urlWithLimit = getUrlWithConnectionLimit(dbUrl, 50);
-    prismaInstance = new PrismaClient({
-        datasources: {
-            db: {
-                url: urlWithLimit
+    if (dbUrl) {
+        const urlWithLimit = getUrlWithConnectionLimit(dbUrl, 50);
+        prismaInstance = new PrismaClient({
+            datasources: {
+                db: {
+                    url: urlWithLimit
+                }
             }
-        }
-    });
+        });
+    } else {
+        prismaInstance = new PrismaClient();
+    }
 }
 
 export function getUrlWithConnectionLimit(baseUrl: string | undefined, limit: number): string | undefined {
