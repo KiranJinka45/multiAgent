@@ -96,7 +96,6 @@
       "express": "5.2.1",
       "fastify": "5.8.5",
       "sandbox": "npm:is-plain-obj",
-      "ajv": "^8.20.0",
       "esbuild@<=0.24.2": ">=0.25.0",
       "@smithy/config-resolver@<4.4.0": ">=4.4.0",
       "rollup@>=4.0.0 <4.59.0": ">=4.59.0",
