@@ -19,7 +19,7 @@ export class RekorClient {
   /**
    * Publishes a confirmed state hash to the transparency log.
    */
-  public async publishEntry(payloadHash: string, signature: string): Promise<RekorEntry> {
+  public async publishEntry(payloadHash: string, signature: string, publicKeyPem?: string): Promise<RekorEntry> {
     const logIndex = this.log.length;
     let inclusionProof = '';
 
@@ -41,7 +41,7 @@ export class RekorClient {
                 signature: {
                     content: Buffer.from(signature).toString('base64'),
                     publicKey: {
-                        content: Buffer.from("ztan-public-key-placeholder").toString('base64')
+                        content: Buffer.from(publicKeyPem || "ztan-public-key-placeholder").toString('base64')
                     }
                 }
             }

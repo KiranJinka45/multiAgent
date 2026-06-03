@@ -23,7 +23,7 @@ Establish and validate end-to-end trust-chain operationalization.
 
 | Phase | Description | Status |
 | :--- | :--- | :--- |
-| **Phase 5** | **Rekor PEM Resolution** | **Not Started** |
+| **Phase 5** | **Rekor PEM Resolution** | **Complete** |
 | **Phase 6** | **Attestation Evidence Flow** | **Not Started** |
 | **Phase 7** | **Transparency-Log Validation** | **Not Started** |
 

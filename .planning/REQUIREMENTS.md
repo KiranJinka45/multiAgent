@@ -6,8 +6,8 @@
 ## Active Requirements: Trust-Chain Operationalization
 
 ### 1. Rekor PEM Resolution (PEM)
-- [ ] **PEM-01**: Investigate and resolve PEM encoding issues of Rekor submission keys. Ensure ZTAN can parse and decode standard Rekor PEM public keys correctly without falling back to local-only appends.
-- [ ] **PEM-02**: Verify that signatures from Rekor-compatible keys can be parsed, decoded, and matched correctly.
+- [x] **PEM-01**: Investigate and resolve PEM encoding issues of Rekor submission keys. Ensure ZTAN can parse and decode standard Rekor PEM public keys correctly without falling back to local-only appends.
+- [x] **PEM-02**: Verify that signatures from Rekor-compatible keys can be parsed, decoded, and matched correctly.
 
 ### 2. Attestation Evidence Flow (ATT)
 - [ ] **ATT-01**: Implement the attestation evidence flow ensuring that virtualization-level evidence packets can flow into the main auditor.
@@ -29,8 +29,8 @@
 
 | Requirement | Component / Action | Status |
 |-------------|--------------------|--------|
-| PEM-01 | Phase 5: Rekor PEM Resolution | Pending |
-| PEM-02 | Phase 5: Rekor PEM Resolution | Pending |
+| PEM-01 | Phase 5: Rekor PEM Resolution | Complete |
+| PEM-02 | Phase 5: Rekor PEM Resolution | Complete |
 | ATT-01 | Phase 6: Attestation Evidence Flow | Pending |
 | ATT-02 | Phase 6: Attestation Evidence Flow | Pending |
 | TLOG-01 | Phase 7: Transparency-Log Validation | Pending |

@@ -38,6 +38,20 @@ export class EvidenceLedgerService {
     private static readonly EPOCH_KEY = 'ztan:gov:active_epoch';
     private static readonly CHECKPOINT_PREFIX = 'ztan:checkpoint:';
 
+    private static readonly keyCache = new Map<string, string>();
+
+    private static getPublicKeyPemForSigner(signerId: string): string {
+        let pubKey = this.keyCache.get(signerId);
+        if (!pubKey) {
+            const { publicKey } = crypto.generateKeyPairSync('ed25519', {
+                publicKeyEncoding: { type: 'spki', format: 'pem' }
+            });
+            pubKey = publicKey as string;
+            this.keyCache.set(signerId, pubKey);
+        }
+        return pubKey;
+    }
+
     private static readonly batchQueues = new Map<string, Array<{
         params: {
             category: EventCategory;
@@ -433,7 +447,7 @@ export class EvidenceLedgerService {
 
             // Tier H4: Rekor Transparency Ledger Anchoring
             for (const item of results) {
-                await rekor.publishEntry(item.hash, item.signature.signature);
+                await rekor.publishEntry(item.hash, item.signature.signature, this.getPublicKeyPemForSigner(item.signature.signerId));
             }
 
             // 4. Pipelined cache updates to Redis
@@ -708,7 +722,7 @@ export class EvidenceLedgerService {
             }
 
             // Tier H4: Rekor Transparency Ledger Anchoring
-            await rekor.publishEntry(entry.integrity.hash, entry.integrity.signature!.signature);
+            await rekor.publishEntry(entry.integrity.hash, entry.integrity.signature!.signature, this.getPublicKeyPemForSigner(entry.integrity.signature!.signerId));
 
             // 5. Commit to Redis as high-performance sequence cache
             const cacheStart = performance.now();

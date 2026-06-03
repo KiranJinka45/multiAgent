@@ -32,6 +32,7 @@ Nexus ZTAN is an auditable, production-oriented research platform designed for l
 - ✓ **PERF-01**: Recovery replay throughput performance mapping — v1.6.0
 - ✓ **PERF-02**: Lease acquisition contention latency limits — v1.6.0
 - ✓ **SEC-01**: Poisoned log and desynchronized replay history quarantine — v1.6.0
+- ✓ **PEM-01/02**: Rekor PEM key decoding & submission validation — v1.8.0 (Phase 5)
 
 ## Current Milestone: v1.8.0 Trust-Chain Operationalization
 
@@ -131,4 +132,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-03 after v1.8.0 milestone initialization*
+*Last updated: 2026-06-03 after Phase 5 completion*
