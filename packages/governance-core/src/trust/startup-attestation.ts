@@ -1,4 +1,5 @@
 import { createHash } from 'crypto';
+import { PhysicalTpmConnector } from './physical-tpm-spec.js';
 
 export interface AttestationResult {
     isAttested: boolean;
@@ -56,7 +57,6 @@ export class StartupAttestation {
         }
 
         // 4. Request Physical TPM 2.0 Quote (Priority 3 Hardening)
-        const { PhysicalTpmConnector } = require('./physical-tpm-spec.js');
         const hasHardware = PhysicalTpmConnector.isHardwareTpmAvailable();
         let quotePayload: any = null;
 
