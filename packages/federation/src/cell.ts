@@ -1,4 +1,5 @@
 import { FinalizedEnvelope } from '../../evidence-lifecycle/src/evidence-packet';
+import { CryptoUtils } from '../../evidence-lifecycle/src/crypto-utils';
 import { TrustRegistry } from './trust-registry';
 
 export type CellState = 'ACTIVE' | 'QUARANTINED';
@@ -68,18 +69,29 @@ export class ExecutionCell {
             return false; // Untrusted governance root
         }
 
-        // Check if any signatures in the packet are revoked
-        const signatures = [
-            packet.containmentProof.signature,
-            packet.recoveryAssurance.engineSignature,
-            packet.sandboxAttestation.providerSignature
-        ];
+        // Extract payload data to verify against signature
+        const { signature: sig1, ...containmentData } = packet.containmentProof;
+        const { engineSignature: sig2, ...rollbackData } = packet.recoveryAssurance;
+        const { providerSignature: sig3, ...sandboxData } = packet.sandboxAttestation;
 
-        if (this.registry.hasRevokedSignatures(signatures)) {
-            return false; // Packet contains revoked signatures
+        const trustedKeys = this.registry.getOperatorKeysForEpoch(packet.governanceEpoch);
+        
+        let validKeyFound = false;
+
+        for (const pubKey of trustedKeys) {
+            if (this.registry.isRevoked(pubKey)) continue;
+
+            const isContainmentValid = CryptoUtils.verifySignature(containmentData, sig1, pubKey);
+            const isRollbackValid = CryptoUtils.verifySignature(rollbackData, sig2, pubKey);
+            const isSandboxValid = CryptoUtils.verifySignature(sandboxData, sig3, pubKey);
+
+            if (isContainmentValid && isRollbackValid && isSandboxValid) {
+                validKeyFound = true;
+                break;
+            }
         }
 
-        return true;
+        return validKeyFound;
     }
 
     /**

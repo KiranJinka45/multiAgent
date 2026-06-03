@@ -1,3 +1,5 @@
+import { CryptoUtils } from './crypto-utils';
+
 export interface MerkleProof {
     rootHash: string;
     inclusionHash: string;
@@ -71,5 +73,47 @@ export class EvidencePacketGenerator {
             sandboxAttestation: sandbox,
             economicRationality: economic
         };
+    }
+
+    /**
+     * Generates a fully cryptographically signed envelope using the provided Ed25519 private key.
+     */
+    public generateSignedEnvelope(
+        missionId: string,
+        governanceEpoch: string,
+        merkle: MerkleProof,
+        containmentData: Omit<ContainmentProof, 'signature'>,
+        rollbackData: Omit<RollbackProof, 'engineSignature'>,
+        sandboxData: Omit<SandboxAttestation, 'providerSignature'>,
+        economic: EconomicRationality,
+        privateKeyPem: string
+    ): FinalizedEnvelope {
+        // Sign containment proof
+        const containmentProof: ContainmentProof = {
+            ...containmentData,
+            signature: CryptoUtils.signPayload(containmentData, privateKeyPem)
+        };
+
+        // Sign rollback proof
+        const recoveryAssurance: RollbackProof = {
+            ...rollbackData,
+            engineSignature: CryptoUtils.signPayload(rollbackData, privateKeyPem)
+        };
+
+        // Sign sandbox attestation
+        const sandboxAttestation: SandboxAttestation = {
+            ...sandboxData,
+            providerSignature: CryptoUtils.signPayload(sandboxData, privateKeyPem)
+        };
+
+        return this.generateEnvelope(
+            missionId,
+            governanceEpoch,
+            merkle,
+            containmentProof,
+            recoveryAssurance,
+            sandboxAttestation,
+            economic
+        );
     }
 }

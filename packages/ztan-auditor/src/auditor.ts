@@ -1,4 +1,5 @@
 import { FinalizedEnvelope } from '../../evidence-lifecycle/src/evidence-packet';
+import { CryptoUtils } from '../../evidence-lifecycle/src/crypto-utils';
 import { TrustRegistry } from '../../federation/src/trust-registry';
 
 export interface AuditReport {
@@ -39,31 +40,49 @@ export class OfflineAuditor {
             report.reasons.push(`Untrusted governance root for epoch ${packet.governanceEpoch}.`);
         }
 
-        const signaturesToCheck: string[] = [];
-        if (packet.containmentProof?.signature) {
-            signaturesToCheck.push(packet.containmentProof.signature);
+        const { signature: sig1, ...containmentData } = packet.containmentProof || { signature: '' };
+        const { engineSignature: sig2, ...rollbackData } = packet.recoveryAssurance || { engineSignature: '' };
+        const { providerSignature: sig3, ...sandboxData } = packet.sandboxAttestation || { providerSignature: '' };
+
+        if (!sig1) report.reasons.push('Missing containment proof signature.');
+        if (!sig2) report.reasons.push('Missing recovery assurance signature.');
+        if (!sig3) report.reasons.push('Missing sandbox attestation signature.');
+
+        if (sig1 && sig2 && sig3 && report.isValid) {
+            const trustedKeys = this.registry.getOperatorKeysForEpoch(packet.governanceEpoch);
+            let validKeyFound = false;
+            let revokedKeyEncountered = false;
+
+            for (const pubKey of trustedKeys) {
+                if (this.registry.isRevoked(pubKey)) {
+                    // Try to verify if this was the key used
+                    const isContainmentValid = CryptoUtils.verifySignature(containmentData, sig1, pubKey);
+                    if (isContainmentValid) {
+                        revokedKeyEncountered = true;
+                        break;
+                    }
+                    continue;
+                }
+
+                const isContainmentValid = CryptoUtils.verifySignature(containmentData, sig1, pubKey);
+                const isRollbackValid = CryptoUtils.verifySignature(rollbackData, sig2, pubKey);
+                const isSandboxValid = CryptoUtils.verifySignature(sandboxData, sig3, pubKey);
+
+                if (isContainmentValid && isRollbackValid && isSandboxValid) {
+                    validKeyFound = true;
+                    break;
+                }
+            }
+
+            if (revokedKeyEncountered) {
+                report.isValid = false;
+                report.reasons.push('Packet contains signatures from a revoked operator key.');
+            } else if (!validKeyFound) {
+                report.isValid = false;
+                report.reasons.push('Cryptographic signature verification failed or no trusted key matched.');
+            }
         } else {
             report.isValid = false;
-            report.reasons.push('Missing containment proof signature.');
-        }
-
-        if (packet.recoveryAssurance?.engineSignature) {
-            signaturesToCheck.push(packet.recoveryAssurance.engineSignature);
-        } else {
-            report.isValid = false;
-            report.reasons.push('Missing recovery assurance signature.');
-        }
-
-        if (packet.sandboxAttestation?.providerSignature) {
-            signaturesToCheck.push(packet.sandboxAttestation.providerSignature);
-        } else {
-            report.isValid = false;
-            report.reasons.push('Missing sandbox attestation signature.');
-        }
-
-        if (this.registry.hasRevokedSignatures(signaturesToCheck)) {
-            report.isValid = false;
-            report.reasons.push('Packet contains revoked signatures.');
         }
 
         if (packet.containmentProof?.pathTraversalDetected) {

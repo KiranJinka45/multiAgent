@@ -1,42 +1,54 @@
+export interface EpochAnchor {
+    rootHash: string;
+    operatorPublicKeys: string[];
+}
+
 export class TrustRegistry {
-    private epochRoots: Map<string, string> = new Map();
-    private revokedSignatures: Set<string> = new Set();
+    private epochRoots: Map<string, EpochAnchor> = new Map();
+    private revokedPublicKeys: Set<string> = new Set();
 
     /**
-     * Anchor a specific governance epoch to a Merkle root.
+     * Anchor a specific governance epoch to a Merkle root and operator public keys.
      */
-    public anchorEpoch(epochId: string, rootHash: string): void {
-        this.epochRoots.set(epochId, rootHash);
+    public anchorEpoch(epochId: string, rootHash: string, operatorPublicKeys: string[] = []): void {
+        this.epochRoots.set(epochId, { rootHash, operatorPublicKeys });
     }
 
     /**
      * Check if a root hash is valid for a given epoch.
      */
     public isValidRootForEpoch(epochId: string, rootHash: string): boolean {
-        const expectedRoot = this.epochRoots.get(epochId);
-        return expectedRoot === rootHash;
+        const anchor = this.epochRoots.get(epochId);
+        return anchor?.rootHash === rootHash;
     }
 
     /**
-     * Revoke a cell key or specific signature.
+     * Retrieves trusted operator public keys for a specific epoch.
      */
-    public revokeSignature(signature: string): void {
-        this.revokedSignatures.add(signature);
+    public getOperatorKeysForEpoch(epochId: string): string[] {
+        return this.epochRoots.get(epochId)?.operatorPublicKeys || [];
     }
 
     /**
-     * Check if a signature is revoked.
+     * Revoke an operator's public key (PEM format).
      */
-    public isRevoked(signature: string): boolean {
-        return this.revokedSignatures.has(signature);
+    public revokePublicKey(publicKeyPem: string): void {
+        this.revokedPublicKeys.add(publicKeyPem);
     }
 
     /**
-     * Check if a list of signatures contains any revoked signatures.
+     * Check if a public key is revoked.
      */
-    public hasRevokedSignatures(signatures: string[]): boolean {
-        for (const sig of signatures) {
-            if (this.revokedSignatures.has(sig)) {
+    public isRevoked(publicKeyPem: string): boolean {
+        return this.revokedPublicKeys.has(publicKeyPem);
+    }
+
+    /**
+     * Check if a list of public keys contains any revoked keys.
+     */
+    public hasRevokedKeys(publicKeys: string[]): boolean {
+        for (const pk of publicKeys) {
+            if (this.revokedPublicKeys.has(pk)) {
                 return true;
             }
         }
@@ -49,7 +61,7 @@ export class TrustRegistry {
     public serialize(): string {
         return JSON.stringify({
             epochRoots: Array.from(this.epochRoots.entries()),
-            revokedSignatures: Array.from(this.revokedSignatures)
+            revokedPublicKeys: Array.from(this.revokedPublicKeys)
         });
     }
 
@@ -61,13 +73,13 @@ export class TrustRegistry {
         const registry = new TrustRegistry();
         
         if (parsed.epochRoots) {
-            parsed.epochRoots.forEach(([epoch, root]: [string, string]) => {
-                registry.anchorEpoch(epoch, root);
+            parsed.epochRoots.forEach(([epoch, anchor]: [string, EpochAnchor]) => {
+                registry.anchorEpoch(epoch, anchor.rootHash, anchor.operatorPublicKeys);
             });
         }
-        if (parsed.revokedSignatures) {
-            parsed.revokedSignatures.forEach((sig: string) => {
-                registry.revokeSignature(sig);
+        if (parsed.revokedPublicKeys) {
+            parsed.revokedPublicKeys.forEach((pk: string) => {
+                registry.revokePublicKey(pk);
             });
         }
         return registry;
