@@ -14,6 +14,9 @@ export enum DrillScenario {
   BACKEND_PARTITION = 'BACKEND_PARTITION',
   WAL_DIVERGENCE = 'WAL_DIVERGENCE',
   ROGUE_NODE_QUARANTINE = 'ROGUE_NODE_QUARANTINE',
+  CELL_RESURRECTION = 'CELL_RESURRECTION',
+  GOVERNANCE_SUCCESSION = 'GOVERNANCE_SUCCESSION',
+  ARCHIVE_RECONSTRUCTION = 'ARCHIVE_RECONSTRUCTION',
 }
 
 export class OperatorDrillSimulator extends EventEmitter {
@@ -40,6 +43,15 @@ export class OperatorDrillSimulator extends EventEmitter {
         break;
       case DrillScenario.ROGUE_NODE_QUARANTINE:
         this.simulateQuarantineWorkflow();
+        break;
+      case DrillScenario.CELL_RESURRECTION:
+        this.simulateCellResurrection();
+        break;
+      case DrillScenario.GOVERNANCE_SUCCESSION:
+        this.simulateGovernanceSuccession();
+        break;
+      case DrillScenario.ARCHIVE_RECONSTRUCTION:
+        this.simulateArchiveReconstruction();
         break;
     }
   }
@@ -76,6 +88,38 @@ export class OperatorDrillSimulator extends EventEmitter {
         requiredQuorum: 2
       });
     }, 1500);
+  }
+
+  private simulateCellResurrection() {
+    console.log('[SIMULATOR] Cell memory wiped. Simulating Cold Start resurrection...');
+    setTimeout(() => {
+      this.emit('cell_resurrection_required', {
+        offlineTrustRegistry: 'registry_snapshot_v9',
+        lastKnownGovernanceEpoch: 'epoch-alpha',
+        instruction: 'Operator must supply the offline TrustRegistry to restore Trust Roots'
+      });
+    }, 1000);
+  }
+
+  private simulateGovernanceSuccession() {
+    console.log('[SIMULATOR] Current operators flagged for succession. Rotating governance keys...');
+    setTimeout(() => {
+      this.emit('governance_rotation_required', {
+        retiringSignatures: ['sig_alpha', 'sig_beta'],
+        newEpochId: 'epoch-beta',
+        instruction: 'Operator must anchor epoch-beta and revoke retiring signatures'
+      });
+    }, 1500);
+  }
+
+  private simulateArchiveReconstruction() {
+    console.log('[SIMULATOR] Runtime caches purged. Reconstructing from Evidence Packet corpus...');
+    setTimeout(() => {
+      this.emit('archive_reconstruction_started', {
+        packetsToProcess: 500,
+        expectedRootHash: '0xfinal_root_hash',
+      });
+    }, 2000);
   }
 
   public haltDrill() {
