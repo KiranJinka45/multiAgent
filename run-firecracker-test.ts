@@ -16,6 +16,9 @@ async function main() {
         });
         console.log("✅ VM spawned successfully!");
         
+        console.log("Waiting 15 seconds for the guest kernel and OS to boot...");
+        await new Promise((resolve) => setTimeout(resolve, 15000));
+        
         console.log("Executing arbitrary command via adapter executeCommand()...");
         const output = await adapter.executeCommand("wsl-real-test", "echo \"Hello from true Firecracker isolated microVM!\"");
         console.log("✅ Command executed! Output:", output);
