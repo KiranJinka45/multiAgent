@@ -56,8 +56,8 @@ const HEARTBEAT_INTERVAL = 5000;
 setInterval(async () => {
     try {
         // Get queue depths if workers are initialized
-        let queueDepth = 0;
-        let activeJobs = 0;
+        const queueDepth = 0;
+        const activeJobs = 0;
         // Temporary fix: Removed invalid queue metrics call to restore heartbeat
 
 

@@ -296,7 +296,7 @@ router.post('/provision', async (req: Request, res: Response) => {
   }
 
   try {
-    // @ts-ignore
+    // @ts-expect-error: ProvisioningService might not be fully typed during import
     const { ProvisioningService } = await import('../services/ProvisioningService');
     const result = await ProvisioningService.provisionTenant(orgName, ownerId);
     

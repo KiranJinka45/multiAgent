@@ -43,7 +43,6 @@ export async function initSocket(server: http.Server, app?: express.Application)
     // --- PILLAR 1: BACKPRESSURE-AWARE STREAMING ---
     const connectedSockets = new Set<any>();
     let latestState: any = null;
-    let lastHash: string = '0'.repeat(64); // Genesis hash
     const REDIS_AUDIT_KEY = 'sre:audit:log';
     const MAX_AUDIT_LOG = 1000;
 

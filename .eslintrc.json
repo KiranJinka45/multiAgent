@@ -1,5 +1,5 @@
 {
-  "ignorePatterns": ["dist", ".next", "node_modules"],
+  "ignorePatterns": ["dist", ".next", "node_modules", "**/*.js", "**/scratch/**"],
   "plugins": ["boundaries"],
   "extends": [
     "next/core-web-vitals",

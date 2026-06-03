@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { AxiosInstance, AxiosRequestConfig } from 'axios';
 import axiosRetry from 'axios-retry';
 import CircuitBreaker from 'opossum';
-import { logger, circuitBreakerState } from '@packages/observability';
+import { logger, circuitBreakerState, retryAttemptsTotal } from '@packages/observability';
 import { contextStorage } from '@packages/utils';
 
 interface OutboundClientOptions {
@@ -43,7 +43,6 @@ export function createOutboundClient(options: OutboundClientOptions): AxiosInsta
       const target = options.serviceName;
 
       // Phase 21: Track Retry Pressure
-      const { retryAttemptsTotal } = require('@packages/observability');
       retryAttemptsTotal.inc({ source_service: source, target_service: target });
 
       logger.warn(

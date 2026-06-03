@@ -84,7 +84,7 @@ export function createServer() {
         isolationProfile 
       } = req.body;
 
-      let finalResources = {
+      const finalResources = {
         cpuPercent: 0,
         memoryMb: 0,
         maxMemoryLimitMb: 512,
@@ -92,7 +92,7 @@ export function createServer() {
         ...resources
       };
 
-      let violations: string[] = [];
+      const violations: string[] = [];
       let quarantineTriggered = false;
 
       // Real Docker Integration: If containerId is provided, attempt to inspect it using dockerode
