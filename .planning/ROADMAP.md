@@ -16,6 +16,31 @@
   - See archived requirements: [v1.6.0-REQUIREMENTS.md](file:///c:/multiagentic_project/multiAgent-main/.planning/milestones/v1.6.0-REQUIREMENTS.md)
   - See archived audit: [v1.6.0-MILESTONE-AUDIT.md](file:///c:/multiagentic_project/multiAgent-main/.planning/milestones/v1.6.0-MILESTONE-AUDIT.md)
 
+## Milestone v1.8.0: Trust-Chain Operationalization
+Establish and validate end-to-end trust-chain operationalization.
+
+## Active Phases
+
+| Phase | Description | Status |
+| :--- | :--- | :--- |
+| **Phase 5** | **Rekor PEM Resolution** | **Not Started** |
+| **Phase 6** | **Attestation Evidence Flow** | **Not Started** |
+| **Phase 7** | **Transparency-Log Validation** | **Not Started** |
+
+## Phase Details
+
+### Phase 5: Rekor PEM Resolution
+- **Goal:** Resolve standard PEM decoding issues of Rekor submission keys. Ensure public key parsing works correctly, verifying signatures from Rekor-compatible keys without falling back to local-only appends.
+- **Evidence:** Code changes to support PEM public key parsing, and corresponding test cases in `packages/ztan-auditor/src`.
+
+### Phase 6: Attestation Evidence Flow
+- **Goal:** Implement the virtualization-level attestation evidence flow. Ensure containment proofs and sandbox attestation results flow into the offline auditor and validate properly.
+- **Evidence:** Dynamic verification of attestation flow via tests.
+
+### Phase 7: Transparency-Log Validation
+- **Goal:** Implement and integrate transparency-log verification and validation. Allow the ztan-auditor to run local validations of transparency log inclusion proofs.
+- **Evidence:** Integration tests for inclusion proof verification.
+
 ## Next Era: Operational Consolidation & Maintenance Discipline
 
 ZTAN has transitioned entirely away from invention and active architectural expansion. The ecosystem enforces a **Stewardship & Maintenance Era** where success is measured exclusively by stability, operational evidence, and complexity reduction.

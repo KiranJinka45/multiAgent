@@ -1,37 +1,34 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.7.0
-milestone_name: milestone
-status: completed
-stopped_at: Completed and verified CI stabilization, frontend test repair, and witness fencing DB trigger bypass.
-last_updated: "2026-06-03T12:58:49.462Z"
+milestone: v1.8.0
+milestone_name: Trust-Chain Operationalization
+status: planning
+stopped_at: Initialized milestone v1.8.0. Defining requirements.
+last_updated: "2026-06-03T18:42:00.000Z"
 last_activity: 2026-06-03
 progress:
   total_phases: 36
   completed_phases: 8
   total_plans: 38
   completed_plans: 13
-  percent: 100
+  percent: 0
 ---
 
-# Project State — Platform Stabilization & CI Integrity
+# Project State — Trust-Chain Operationalization
 
 ## Project Reference
 
 See: [.planning/PROJECT.md](./PROJECT.md) (updated 2026-06-03)
 
 **Principle:** SUCCESS IS MEASURED BY BORING OPERATIONAL EXCELLENCE.
-**Focus:** CI Baseline Stabilization & Test Suite Restoration
+**Focus:** Trust-chain operationalization (Rekor PEM decoding & attestation evidence flow)
 
-    - [x] **Phase 1: CI Recovery & ESLint Compatibility** (Complete)
-    - [x] **Phase 2: Frontend Test Infrastructure Repair** (Complete)
-    - [x] **Phase 3: Witness Fencing Bypass Repair** (Complete)
-    - [x] **Phase 4: Verification, Validation & Lint Cleanups** (Complete)
+## Current Position
 
-Status: Completed
-Last activity: 2026-06-03
-
-Progress: [██████████] 100% (CI and Tests Fully Verified)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-06-03 — Milestone v1.8.0 started
 
 ## Performance Metrics
 

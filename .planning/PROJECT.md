@@ -33,6 +33,15 @@ Nexus ZTAN is an auditable, production-oriented research platform designed for l
 - ✓ **PERF-02**: Lease acquisition contention latency limits — v1.6.0
 - ✓ **SEC-01**: Poisoned log and desynchronized replay history quarantine — v1.6.0
 
+## Current Milestone: v1.8.0 Trust-Chain Operationalization
+
+**Goal:** Establish and validate end-to-end trust-chain operationalization, resolving the Rekor PEM submission key issue and implementing attestation evidence flow alongside transparency-log validation.
+
+**Target features:**
+- Resolve Rekor PEM public key decoding & submission issues
+- Implement attestation evidence flow
+- Integrate transparency-log validation
+
 ## Current Post-Milestone Posture: Platform Stabilization Baseline
 
 Following the completion of **Milestone v1.7.0: Platform Stabilization & CI Integrity**, the repository has established a clean, passing CI pipeline across all 58 workspace packages, ensuring successful typechecking and test integrity. The platform continues under its strict governance freeze with no functional alterations to virtualization (Firecracker/TPM) or core cryptographic primitives.
@@ -104,5 +113,22 @@ The platform has reached **Core Architectural Stability**. The focus has shifted
 | Complete Freeze on Governance Primitives | Avoid governance self-reference saturation and recursion pressure. | ✓ Enforced |
 | Single Oracle Distributed Coordination | PostgreSQL acts as the existential coordination oracle for leases. | ✓ Confirmed |
 
+## Evolution
+
+This document evolves at phase transitions and milestone boundaries.
+
+**After each phase transition** (via `/gsd-transition`):
+1. Requirements invalidated? → Move to Out of Scope with reason
+2. Requirements validated? → Move to Validated with phase reference
+3. New requirements emerged? → Add to Active
+4. Decisions to log? → Add to Key Decisions
+5. "What This Is" still accurate? → Update if drifted
+
+**After each milestone** (via `/gsd-complete-milestone`):
+1. Full review of all sections
+2. Core Value check — still the right priority?
+3. Audit Out of Scope — reasons still valid?
+4. Update Context with current state
+
 ---
-*Last updated: 2026-06-03 after v1.7.0 milestone completion*
+*Last updated: 2026-06-03 after v1.8.0 milestone initialization*
