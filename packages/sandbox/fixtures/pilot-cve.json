@@ -1,0 +1,11 @@
+{
+  "runtime": "firecracker",
+  "network": {
+    "outbound": false
+  },
+  "resources": {
+    "cpu": "1.0",
+    "memory": "1Gi",
+    "timeoutSeconds": 60
+  }
+}
