@@ -101,8 +101,8 @@ export class PhysicalTpmConnector {
             throw new Error('HARDWARE_TPM_REQUIRED: /dev/tpm0 is absent. Cannot verify physical hardware quote.');
         }
 
-        fs.writeFileSync('quote_verify.dat', Buffer.from(quoteBytesBase64, 'base64'));
-        fs.writeFileSync('sig_verify.dat', Buffer.from(signatureBytesBase64, 'base64'));
+        fs.writeFileSync('quote_verify.dat', new Uint8Array(Buffer.from(quoteBytesBase64, 'base64')));
+        fs.writeFileSync('sig_verify.dat', new Uint8Array(Buffer.from(signatureBytesBase64, 'base64')));
 
         try {
             this.runCommand('tpm2_checkquote', [
