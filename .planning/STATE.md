@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.6.0
-milestone_name: milestone
-status: Active Execution of Stewardship Waves 1-6 and Operationalization
-stopped_at: Transitioned roadmap to Milestone 36. Completed and verified all 6 Stewardship Engineering Waves with 100% passed status.
-last_updated: "2026-05-26T19:20:29.836Z"
-last_activity: 2026-05-26
+milestone: v1.7.0
+milestone_name: Platform Stabilization & CI Integrity
+status: Completed
+stopped_at: Completed and verified CI stabilization, frontend test repair, and witness fencing DB trigger bypass.
+last_updated: "2026-06-03T15:10:52Z"
+last_activity: 2026-06-03
 progress:
-  total_phases: 17
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_phases: 4
+  completed_phases: 4
+  total_plans: 4
+  completed_plans: 4
   percent: 100
 ---
 

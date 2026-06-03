@@ -33,9 +33,15 @@ Nexus ZTAN is an auditable, production-oriented research platform designed for l
 - ✓ **PERF-02**: Lease acquisition contention latency limits — v1.6.0
 - ✓ **SEC-01**: Poisoned log and desynchronized replay history quarantine — v1.6.0
 
-## Current Post-Milestone Posture: Long-Term Maintenance Epoch
+## Current Post-Milestone Posture: Platform Stabilization Baseline
 
-Following the completion of **Milestone 36: Stewardship Engineering Era (v1.6.0)**, the platform is in a long-term maintenance posture with an absolute freeze on new feature development or active architectural expansion.
+Following the completion of **Milestone v1.7.0: Platform Stabilization & CI Integrity**, the repository has established a clean, passing CI pipeline across all 58 workspace packages, ensuring complete type safety and test integrity. The platform continues under its strict governance freeze with no functional alterations to virtualization (Firecracker/TPM) or core cryptographic primitives.
+
+### Key accomplishments for v1.7.0:
+1. **CI Pipeline Stabilization**: Restored legacy ESLint and AJV compatibility by pinning ESLint to v8.57.0 with custom overrides.
+2. **Frontend Testing Repair**: Migrated Angular 19 test configuration to Vitest to bypass broken builder dependency issues.
+3. **Witness Fencing Bypass**: Resolved active lease triggers in Postgres by adopting HSM operator ID prefixes in witness tests.
+4. **Clean Baseline**: Verified 100% test and build pass rates across the entire workspace.
 
 ### Key accomplishments for v1.6.0:
 1. **Operational Soak Validation**: Confirmed memory stability (peak RSS 47.28 MB) and WAL growth bounds.
@@ -99,4 +105,4 @@ The platform has reached **Core Architectural Stability**. The focus has shifted
 | Single Oracle Distributed Coordination | PostgreSQL acts as the existential coordination oracle for leases. | ✓ Confirmed |
 
 ---
-*Last updated: 2026-05-26 after v1.6.0 milestone completion*
+*Last updated: 2026-06-03 after v1.7.0 milestone completion*
