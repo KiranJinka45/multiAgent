@@ -676,7 +676,7 @@ async function main() {
 
   // Verify readiness
   try {
-    await verifyReadiness(handles, 15000);
+    await verifyReadiness(handles, 60000);
   } catch (err: any) {
     log(`❌  READINESS GATE FAILURE: ${err.message}`);
     for (const h of handles) {

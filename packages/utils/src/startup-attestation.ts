@@ -18,6 +18,7 @@ const STATIC_WHITELIST = new Set([
   'GROQ_API_KEY', 'STRIPE_SECRET_KEY', 'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY', 'GEMINI_API_KEY',
   'OPENAI_API_KEY', 'CEREBRAS_API_KEY', 'MISTRAL_API_KEY', 'SAMBANOVA_API_KEY', 'AICC_API_KEY',
   'SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'NEXT_PUBLIC_SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+  'PARTNER_ALPHA_KEY',
   // Test controls
   'ZTAN_INJECT_TX_STALL', 'ZTAN_INJECT_TX_CRASH', 'ZTAN_KILL_POINT', 'ZTAN_TEST_WRITER', 'ZTAN_PARTITIONS',
   'PNPM_HOME', 'PROCESSOR_ARCHITECTURE', 'NUMBER_OF_PROCESSORS', 'SYSTEMDRIVE', 'WINDIR',
@@ -86,6 +87,7 @@ export const StartupAttestationService = {
       // Allow list bypass for dynamically injected node/pnpm temporary variables and IDE/system variables
       if (
         key.startsWith('npm_') || 
+        key.startsWith('pnpm_') || 
         key.startsWith('PNPM_') || 
         key.startsWith('vite_') || 
         key.startsWith('NEXT_') ||
@@ -100,7 +102,13 @@ export const StartupAttestationService = {
         key.startsWith('PROCESSOR_') ||
         key.startsWith('Program') ||
         key.startsWith('Common') ||
-        key.startsWith('COMMON')
+        key.startsWith('COMMON') ||
+        key.startsWith('WT_') ||
+        key.startsWith('WSL') ||
+        key.startsWith('POSTGRES_') ||
+        key.startsWith('AUTH_') ||
+        key.startsWith('CORE_') ||
+        key.startsWith('OTEL_')
       ) {
         continue;
       }

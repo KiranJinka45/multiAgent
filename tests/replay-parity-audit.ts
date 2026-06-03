@@ -25,39 +25,56 @@ export async function scanLedgerMerkleChain(prisma: PrismaClient): Promise<Audit
     let brokenLinksCount = 0;
 
     try {
-        const blocks = await prisma.ztanLedgerBlock.findMany({
-            orderBy: { id: 'asc' }
-        });
+        const totalBlocks = await prisma.ztanLedgerBlock.count();
+        console.log(`[Merkle Scanner] Discovered ${totalBlocks} ledger blocks in storage.`);
 
-        const totalBlocks = blocks.length;
-        console.log(`[Merkle Scanner] Loaded ${totalBlocks} ledger blocks from storage.`);
+        const BATCH_SIZE = 500;
+        let prevBlockHash: string | null = null;
+        let prevBlockId: number | null = null;
 
-        for (let i = 0; i < totalBlocks; i++) {
-            const block = blocks[i];
+        for (let skip = 0; skip < totalBlocks; skip += BATCH_SIZE) {
+            const blocks = await prisma.ztanLedgerBlock.findMany({
+                orderBy: { id: 'asc' },
+                skip,
+                take: BATCH_SIZE
+            });
 
-            // 1. Recalculate block hash envelope
-            const expectedHash = crypto.createHash('sha256')
-                .update(block.blockId + block.prevHash + block.payload + block.operator)
-                .digest('hex');
+            for (let i = 0; i < blocks.length; i++) {
+                const block = blocks[i];
+                
+                // 1. Recalculate block hash envelope
+                const expectedHash = crypto.createHash('sha256')
+                    .update(block.blockId + block.prevHash + block.payload + block.operator)
+                    .digest('hex');
 
-            // If MOCK_DB is active, standard database hashes might not be persisted.
-            // On a real DB, we verify this strictly.
-            if (process.env.MOCK_DB !== 'true' && block.hash !== expectedHash) {
-                tamperedBlocks.push(block.id);
-                errors.push(`[INTEGRITY_DRIFT] Cryptographic mismatch on Block ID ${block.id}. Stored: ${block.hash}, Recomputed: ${expectedHash}`);
-            }
-
-            // 2. Verify Merkle sequential hash chaining link
-            if (i > 0) {
-                const prevBlock = blocks[i - 1];
-                if (block.prevHash !== prevBlock.hash) {
-                    brokenLinksCount++;
-                    errors.push(`[LINEAGE_BREAK] Hash chain broken! Block ID ${block.id} prevHash (${block.prevHash}) does not match Block ID ${prevBlock.id} hash (${prevBlock.hash})`);
+                // If MOCK_DB is active, standard database hashes might not be persisted.
+                // On a real DB, we verify this strictly.
+                if (process.env.MOCK_DB !== 'true' && block.hash !== expectedHash) {
+                    tamperedBlocks.push(block.id);
+                    errors.push(`[INTEGRITY_DRIFT] Cryptographic mismatch on Block ID ${block.id}. Stored: ${block.hash}, Recomputed: ${expectedHash}`);
                 }
-            } else {
-                // Genesis block validation
-                if (block.prevHash !== 'sha256:0000000000000000000000000000000000000000000000000000000000000000') {
-                    errors.push(`[GENESIS_BREAK] Genesis block prevHash anchor is invalid: ${block.prevHash}`);
+
+                // 2. Verify Merkle sequential hash chaining link
+                const isGenesis = skip === 0 && i === 0;
+                
+                if (!isGenesis) {
+                    if (block.prevHash !== prevBlockHash) {
+                        brokenLinksCount++;
+                        errors.push(`[LINEAGE_BREAK] Hash chain broken! Block ID ${block.id} prevHash (${block.prevHash}) does not match previous Block ID ${prevBlockId} hash (${prevBlockHash})`);
+                    }
+                } else {
+                    // Genesis block validation
+                    if (block.prevHash !== 'sha256:0000000000000000000000000000000000000000000000000000000000000000') {
+                        errors.push(`[GENESIS_BREAK] Genesis block prevHash anchor is invalid: ${block.prevHash}`);
+                    }
+                }
+
+                prevBlockHash = block.hash;
+                prevBlockId = block.id;
+
+                // Yield to the event loop every 100 blocks to prevent ELU saturation (100% ELU lag)
+                if (i % 100 === 0) {
+                    await new Promise(resolve => setImmediate(resolve));
                 }
             }
         }
