@@ -71,7 +71,7 @@ Last activity: 2026-06-03
 
 ### Pending Todos
 
-- [ ] Investigate PEM encoding of Rekor submission keys. (Trust-path gap)
+- [x] Investigate PEM encoding of Rekor submission keys. (Trust-path gap — resolved in Phase 5)
 - [ ] Warning Debt Reduction (backlog of unused variables and implicit `any` types).
 
 ## Operational Maintenance Surface
@@ -81,7 +81,7 @@ Last activity: 2026-06-03
 
 ### Blockers/Concerns
 
-- [Trust Chain]: Rekor transparency ledger rejects PEM public keys, forcing a fallback to local append. Unresolved trust-path gap.
+(None outstanding. Rekor PEM public key decoding resolved in Phase 5.)
 
 ## Session Continuity
 
