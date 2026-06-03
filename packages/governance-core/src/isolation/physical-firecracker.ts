@@ -17,6 +17,7 @@ export class PhysicalFirecrackerAdapter implements FirecrackerAdapter {
     private activeProcesses = new Map<string, ChildProcess>();
     private socketPaths = new Map<string, string>();
     private containerFallbacks = new Set<string>();
+    private vsockPaths = new Map<string, string>();
 
     // Toggle to enable jailer sandboxing on native Linux hosts
     public static useJailer = true;
@@ -104,26 +105,43 @@ export class PhysicalFirecrackerAdapter implements FirecrackerAdapter {
             const chrootRoot = path.join(PhysicalFirecrackerAdapter.jailerChrootBase, 'firecracker', config.vmId, 'root');
             socketPath = path.join(chrootRoot, chrootSocketPath);
             
-            // Jailer requires kernel and rootfs to be inside the chroot
-            // Wipe any existing polluted chroot from previous runs
-            if (fs.existsSync(chrootRoot)) {
-                fs.rmSync(chrootRoot, { recursive: true, force: true });
-            }
-            fs.mkdirSync(chrootRoot, { recursive: true });
-            const kernelDest = path.join(chrootRoot, 'vmlinux');
-            const rootfsDest = path.join(chrootRoot, 'rootfs');
-            if (fs.existsSync(config.kernelImagePath)) {
-                fs.copyFileSync(config.kernelImagePath, kernelDest);
-            }
-            if (fs.existsSync(config.rootfsPath)) {
-                fs.copyFileSync(config.rootfsPath, rootfsDest);
+            // The jailer panics if the jail root directory already exists.
+            // Wipe the entire jail dir from previous runs.
+            const jailDir = path.join(PhysicalFirecrackerAdapter.jailerChrootBase, 'firecracker', config.vmId);
+            if (fs.existsSync(jailDir)) {
+                fs.rmSync(jailDir, { recursive: true, force: true });
             }
             
-            // Make sure the unprivileged user can read the files
-            try {
-                fs.chmodSync(kernelDest, 0o644);
-                fs.chmodSync(rootfsDest, 0o644);
-            } catch (e) {}
+            // Save original paths before we mutate config
+            let origKernelPath = config.kernelImagePath;
+            let origRootfsPath = config.rootfsPath;
+
+            // Resolve directory rootfs structure (e.g., if rootfsPath is a directory, locate the real file inside it)
+            if (!fs.existsSync(origKernelPath)) {
+                throw new Error(`Source kernel image path not found: ${origKernelPath}`);
+            }
+            if (fs.statSync(origKernelPath).isDirectory()) {
+                throw new Error(`Source kernel image path is a directory: ${origKernelPath}`);
+            }
+
+            if (!fs.existsSync(origRootfsPath)) {
+                throw new Error(`Source rootfs path not found: ${origRootfsPath}`);
+            }
+            if (fs.statSync(origRootfsPath).isDirectory()) {
+                const files = fs.readdirSync(origRootfsPath);
+                // Look for any file ending with .ext4, .img, or rootfs
+                const ext4File = files.find(f => f.endsWith('.ext4') || f.endsWith('.img') || f === 'rootfs');
+                if (ext4File) {
+                    origRootfsPath = path.join(origRootfsPath, ext4File);
+                } else {
+                    const defaultFile = path.join(origRootfsPath, 'rootfs');
+                    if (fs.existsSync(defaultFile) && !fs.statSync(defaultFile).isDirectory()) {
+                        origRootfsPath = defaultFile;
+                    } else {
+                        throw new Error(`Source rootfs path is a directory and no .ext4, .img, or rootfs file was found inside: ${origRootfsPath}`);
+                    }
+                }
+            }
             
             // Update config for the API calls to use paths relative to chroot
             config = { ...config, kernelImagePath: 'vmlinux', rootfsPath: 'rootfs' };
@@ -143,6 +161,46 @@ export class PhysicalFirecrackerAdapter implements FirecrackerAdapter {
             child.stderr?.on('data', (d) => console.error('[JAILER STDERR]', d.toString()));
             child.on('error', (e) => console.error('[JAILER ERROR]', e));
             child.on('exit', (code) => console.log('[JAILER EXIT]', code));
+
+            // Wait for the jailer to create the chroot root/ directory before we inject files
+            for (let i = 0; i < 200; i++) {
+                if (fs.existsSync(chrootRoot)) break;
+                await new Promise((resolve) => setTimeout(resolve, 50));
+            }
+            if (!fs.existsSync(chrootRoot)) {
+                child.kill();
+                throw new Error(`Jailer did not create chroot directory: ${chrootRoot}`);
+            }
+            
+            // Now copy kernel/rootfs into the jailer-created chroot
+            const kernelDest = path.join(chrootRoot, 'vmlinux');
+            const rootfsDest = path.join(chrootRoot, 'rootfs');
+            
+            try {
+                fs.copyFileSync(origKernelPath, kernelDest);
+                fs.copyFileSync(origRootfsPath, rootfsDest);
+            } catch (err: any) {
+                child.kill();
+                throw new Error(`Failed to copy virtualization assets into jailer chroot: ${err.message}`);
+            }
+            
+            // Make sure the unprivileged user can read the files
+            try {
+                fs.chmodSync(kernelDest, 0o644);
+                fs.chmodSync(rootfsDest, 0o644);
+            } catch (e) {}
+            
+            // Create /run dir for the vsock UDS path with permissive permissions
+            try {
+                const runDir = path.join(chrootRoot, 'run');
+                fs.mkdirSync(runDir, { recursive: true });
+                fs.chmodSync(runDir, 0o777);
+                try {
+                    fs.chownSync(runDir, 100, 100);
+                } catch {}
+            } catch (e: any) {
+                console.warn(`[FIRECRACKER_PHYSICAL] Failed to configure chroot /run dir: ${e.message}`);
+            }
         } else {
             if (fs.existsSync(socketPath)) {
                 try {
@@ -164,11 +222,13 @@ export class PhysicalFirecrackerAdapter implements FirecrackerAdapter {
             console.log(`[FIRECRACKER_PHYSICAL] Enforcing physical cgroup resource limits for ${config.vmId}`);
             CgroupController.applyMemoryLimit(config.vmId, config.memorySizeMb * 1024 * 1024);
             CgroupController.applyCpuLimit(config.vmId, config.vcpuCount);
+            CgroupController.applyCpuAffinity(config.vmId, '0'); // Pin to NUMA node 0 CPU
+            CgroupController.applyMemoryNodes(config.vmId, '0'); // Pin to NUMA memory node 0
         }
 
         // Wait for the socket to be created (polling)
         let socketReady = false;
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < 200; i++) {
             if (fs.existsSync(socketPath)) {
                 socketReady = true;
                 break;
@@ -191,6 +251,19 @@ export class PhysicalFirecrackerAdapter implements FirecrackerAdapter {
 
         // Configure Drives
         await this.sendRequest(socketPath, 'PUT', '/drives/rootfs', this.serializeDriveConfig(config));
+
+        // Configure Vsock Device for command communication
+        const vsockUdsPath = PhysicalFirecrackerAdapter.useJailer ? 'run/vsock.sock' : `/tmp/vsock-${config.vmId}.sock`;
+        const hostVsockPath = PhysicalFirecrackerAdapter.useJailer
+            ? path.join(PhysicalFirecrackerAdapter.jailerChrootBase, 'firecracker', config.vmId, 'root', 'run', 'vsock.sock')
+            : `/tmp/vsock-${config.vmId}.sock`;
+        this.vsockPaths.set(config.vmId, hostVsockPath);
+
+        await this.sendRequest(socketPath, 'PUT', '/vsock', {
+            vsock_id: 'vsock0',
+            guest_cid: 3,
+            uds_path: vsockUdsPath
+        });
 
         // Start VM Instance
         await this.sendRequest(socketPath, 'PUT', '/actions', {
@@ -225,6 +298,74 @@ export class PhysicalFirecrackerAdapter implements FirecrackerAdapter {
             }
             this.socketPaths.delete(vmId);
         }
+
+        const vsockPath = this.vsockPaths.get(vmId);
+        if (vsockPath) {
+            if (fs.existsSync(vsockPath)) {
+                try {
+                    fs.unlinkSync(vsockPath);
+                } catch {
+                    // ignore
+                }
+            }
+            this.vsockPaths.delete(vmId);
+        }
+    }
+
+    private async connectToVsock(hostVsockPath: string, guestPort: number): Promise<net.Socket> {
+        return new Promise((resolve, reject) => {
+            const socket = net.connect(hostVsockPath);
+            let responseBuffer = '';
+            let isConnected = false;
+
+            const onData = (chunk: Buffer) => {
+                responseBuffer += chunk.toString('utf8');
+                if (responseBuffer.includes('\n')) {
+                    const lines = responseBuffer.split('\n');
+                    const firstLine = lines[0].trim();
+                    if (/^OK \d+$/.test(firstLine)) {
+                        isConnected = true;
+                        socket.off('data', onData);
+                        socket.off('error', onError);
+                        socket.off('end', onEnd);
+                        resolve(socket);
+                    } else {
+                        socket.destroy();
+                        reject(new Error(`Vsock handshake failed: ${firstLine}`));
+                    }
+                }
+            };
+
+            const onError = (err: Error) => {
+                socket.destroy();
+                reject(err);
+            };
+
+            const onEnd = () => {
+                socket.destroy();
+                reject(new Error('Vsock socket closed during handshake'));
+            };
+
+            socket.on('data', onData);
+            socket.on('error', onError);
+            socket.on('end', onEnd);
+
+            socket.write(`CONNECT ${guestPort}\n`);
+        });
+    }
+
+    private async connectToVsockWithRetry(hostVsockPath: string, guestPort: number, retries = 30, delayMs = 1000): Promise<net.Socket> {
+        for (let i = 0; i < retries; i++) {
+            try {
+                return await this.connectToVsock(hostVsockPath, guestPort);
+            } catch (err: any) {
+                if (i === retries - 1) {
+                    throw new Error(`Failed to connect to guest vsock after ${retries} attempts: ${err.message}`);
+                }
+                await new Promise((resolve) => setTimeout(resolve, delayMs));
+            }
+        }
+        throw new Error(`Failed to connect to guest vsock after ${retries} attempts`);
     }
 
     async executeCommand(vmId: string, command: string): Promise<string> {
@@ -238,10 +379,57 @@ export class PhysicalFirecrackerAdapter implements FirecrackerAdapter {
             }
         }
 
-        if (!this.activeProcesses.has(vmId)) {
-            throw new Error(`[FIRECRACKER_PHYSICAL] Cannot execute command in dead VM: ${vmId}`);
+        const hostVsockPath = this.vsockPaths.get(vmId);
+        if (!hostVsockPath) {
+            throw new Error(`[FIRECRACKER_PHYSICAL] No vsock path registered for VM: ${vmId}`);
         }
-        return `Physical output for command: ${command}`;
+
+        let socket: net.Socket;
+        try {
+            socket = await this.connectToVsockWithRetry(hostVsockPath, 5005);
+        } catch (err: any) {
+            throw new Error(`[FIRECRACKER_PHYSICAL] Failed to connect to guest agent: ${err.message}`);
+        }
+
+        return new Promise<string>((resolve, reject) => {
+            let buffer = '';
+
+            const onData = (chunk: Buffer) => {
+                buffer += chunk.toString('utf8');
+                if (buffer.includes('\n')) {
+                    socket.destroy();
+                    try {
+                        const response = JSON.parse(buffer.trim());
+                        if (response.exitCode === 0) {
+                            resolve(response.stdout.trim());
+                        } else {
+                            reject(new Error(`[FIRECRACKER_EXEC_FAILURE] Command failed with exit code ${response.exitCode}: ${response.stderr.trim()}`));
+                        }
+                    } catch (parseErr: any) {
+                        reject(new Error(`[FIRECRACKER_PHYSICAL] Failed to parse guest agent response: ${parseErr.message}. Raw output: ${buffer}`));
+                    }
+                }
+            };
+
+            const onError = (err: Error) => {
+                socket.destroy();
+                reject(new Error(`[FIRECRACKER_PHYSICAL] Vsock connection error: ${err.message}`));
+            };
+
+            const onEnd = () => {
+                socket.destroy();
+                if (!buffer.includes('\n')) {
+                    reject(new Error(`[FIRECRACKER_PHYSICAL] Vsock connection closed prematurely. Raw output: ${buffer}`));
+                }
+            };
+
+            socket.on('data', onData);
+            socket.on('error', onError);
+            socket.on('end', onEnd);
+
+            const payload = JSON.stringify({ cmd: command }) + '\n';
+            socket.write(payload);
+        });
     }
 
     private async sendRequest(socketPath: string, method: string, urlPath: string, body?: any): Promise<any> {
