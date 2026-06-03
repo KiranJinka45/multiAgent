@@ -96,3 +96,8 @@ auditor-rs/target/
 
 # Local PIDs file
 .ztan-orchestrator-pids.json
+nul
+scratch/
+telemetry-history/*.json
+telemetry-history/*.jsonl
+.ztan-orchestrator-pids.json
