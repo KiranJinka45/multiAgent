@@ -1,0 +1,111 @@
+2026-06-04T07:05:23.1191618Z Current runner version: '2.334.0'
+2026-06-04T07:05:23.1230311Z ##[group]Runner Image Provisioner
+2026-06-04T07:05:23.1231762Z Hosted Compute Agent
+2026-06-04T07:05:23.1232867Z Version: 20260520.533
+2026-06-04T07:05:23.1233832Z Commit: 189110e25284a9812c124fd27b339e2fb4f2f9db
+2026-06-04T07:05:23.1235045Z Build Date: 2026-05-20T17:44:04Z
+2026-06-04T07:05:23.1236145Z Worker ID: {0100643a-e7b2-4773-911f-a4a14c23d3b0}
+2026-06-04T07:05:23.1237223Z Azure Region: eastus
+2026-06-04T07:05:23.1238204Z ##[endgroup]
+2026-06-04T07:05:23.1240460Z ##[group]Operating System
+2026-06-04T07:05:23.1241747Z Ubuntu
+2026-06-04T07:05:23.1242526Z 24.04.4
+2026-06-04T07:05:23.1243226Z LTS
+2026-06-04T07:05:23.1244122Z ##[endgroup]
+2026-06-04T07:05:23.1244942Z ##[group]Runner Image
+2026-06-04T07:05:23.1245925Z Image: ubuntu-24.04
+2026-06-04T07:05:23.1246818Z Version: 20260525.161.1
+2026-06-04T07:05:23.1248843Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260525.161/images/ubuntu/Ubuntu2404-Readme.md
+2026-06-04T07:05:23.1251628Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260525.161
+2026-06-04T07:05:23.1253290Z ##[endgroup]
+2026-06-04T07:05:23.1255007Z ##[group]GITHUB_TOKEN Permissions
+2026-06-04T07:05:23.1258028Z Contents: read
+2026-06-04T07:05:23.1258913Z Metadata: read
+2026-06-04T07:05:23.1259883Z Packages: read
+2026-06-04T07:05:23.1260721Z ##[endgroup]
+2026-06-04T07:05:23.1264923Z Secret source: Actions
+2026-06-04T07:05:23.1266153Z Prepare workflow directory
+2026-06-04T07:05:23.1731369Z Prepare all required actions
+2026-06-04T07:05:23.1785237Z Getting action download info
+2026-06-04T07:05:23.5059626Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+2026-06-04T07:05:23.6528601Z Download action repository 'actions/download-artifact@v4' (SHA:d3f86a106a0bac45b974a628896c90dbdf5c8093)
+2026-06-04T07:05:23.9182240Z Complete job name: Verify Independent Host Portability
+2026-06-04T07:05:23.9897849Z ##[group]Run actions/setup-node@v4
+2026-06-04T07:05:23.9898734Z with:
+2026-06-04T07:05:23.9899167Z   node-version: 20
+2026-06-04T07:05:23.9899623Z   always-auth: false
+2026-06-04T07:05:23.9900075Z   check-latest: false
+2026-06-04T07:05:23.9905020Z   token: ***
+2026-06-04T07:05:23.9905637Z ##[endgroup]
+2026-06-04T07:05:24.1841453Z Attempting to download 20...
+2026-06-04T07:05:24.7103759Z Acquiring 20.20.2 - x64 from https://github.com/actions/node-versions/releases/download/20.20.2-23521894959/node-20.20.2-linux-x64.tar.gz
+2026-06-04T07:05:25.0876867Z Extracting ...
+2026-06-04T07:05:25.0997758Z [command]/usr/bin/tar xz --strip 1 --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/79a8b1d8-8b70-45be-b44f-bb60fdb41cb3 -f /home/runner/work/_temp/cdaff95b-cd7c-4928-a4e2-040b77cd52ad
+2026-06-04T07:05:26.1795361Z Adding to the cache ...
+2026-06-04T07:05:27.6788572Z ##[group]Environment details
+2026-06-04T07:05:27.8991965Z node: v20.20.2
+2026-06-04T07:05:27.8992834Z npm: 10.8.2
+2026-06-04T07:05:27.8993231Z yarn: 1.22.22
+2026-06-04T07:05:27.8994340Z ##[endgroup]
+2026-06-04T07:05:27.9255720Z ##[group]Run actions/download-artifact@v4
+2026-06-04T07:05:27.9256106Z with:
+2026-06-04T07:05:27.9256392Z   name: rekor-standalone-payload
+2026-06-04T07:05:27.9256700Z   path: payload/
+2026-06-04T07:05:27.9257039Z   merge-multiple: false
+2026-06-04T07:05:27.9257364Z   repository: KiranJinka45/multiAgent
+2026-06-04T07:05:27.9257699Z   run-id: 26936440481
+2026-06-04T07:05:27.9257968Z ##[endgroup]
+2026-06-04T07:05:28.1291816Z Downloading single artifact
+2026-06-04T07:05:28.2414710Z Preparing to download the following artifacts:
+2026-06-04T07:05:28.2415910Z - rekor-standalone-payload (ID: 7405106521, Size: 5797, Expected Digest: sha256:6eeba8ea6e72be9dab9e63fd8debd917acc4d931d391b7839a23f41878c2615f)
+2026-06-04T07:05:28.3862108Z Redirecting to blob download url: https://productionresultssa8.blob.core.windows.net/actions-results/38143eaa-8bac-4805-ba78-017c15708179/workflow-job-run-6f4204fe-4411-5f58-a14e-fff38b0fbb33/artifacts/c8ea45f31367745f00f454e50a22763edf39d44b357f6c92dfffd605f8fdf01c.zip
+2026-06-04T07:05:28.3863923Z Starting download of artifact to: /home/runner/work/multiAgent/multiAgent/payload
+2026-06-04T07:05:28.4298513Z (node:2203) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+2026-06-04T07:05:28.4300501Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-06-04T07:05:28.4364370Z SHA256 digest of downloaded artifact is 6eeba8ea6e72be9dab9e63fd8debd917acc4d931d391b7839a23f41878c2615f
+2026-06-04T07:05:28.4365531Z Artifact download completed successfully.
+2026-06-04T07:05:28.4366153Z Total of 1 artifact(s) downloaded
+2026-06-04T07:05:28.4370323Z Download artifact has finished successfully
+2026-06-04T07:05:28.4486119Z ##[group]Run echo "Performing explicit dependency audit:"
+2026-06-04T07:05:28.4486667Z  [36;1mecho "Performing explicit dependency audit:" [0m
+2026-06-04T07:05:28.4487067Z  [36;1mls -R [0m
+2026-06-04T07:05:28.4487378Z  [36;1mecho "---" [0m
+2026-06-04T07:05:28.4487620Z  [36;1mfind . -type f [0m
+2026-06-04T07:05:28.4487861Z  [36;1mecho "---" [0m
+2026-06-04T07:05:28.4488322Z  [36;1mnode payload/verify-rekor-interop.js --verify --evidence payload/rekor-interop-evidence.json [0m
+2026-06-04T07:05:28.4520853Z shell: /usr/bin/bash -e {0}
+2026-06-04T07:05:28.4521446Z ##[endgroup]
+2026-06-04T07:05:28.4596276Z Performing explicit dependency audit:
+2026-06-04T07:05:28.4608834Z .:
+2026-06-04T07:05:28.4609168Z payload
+2026-06-04T07:05:28.4609310Z 
+2026-06-04T07:05:28.4609418Z ./payload:
+2026-06-04T07:05:28.4609684Z rekor-interop-evidence.json
+2026-06-04T07:05:28.4609996Z verify-rekor-interop.js
+2026-06-04T07:05:28.4611150Z ---
+2026-06-04T07:05:28.4624331Z ./payload/verify-rekor-interop.js
+2026-06-04T07:05:28.4625054Z ./payload/rekor-interop-evidence.json
+2026-06-04T07:05:28.4625867Z ---
+2026-06-04T07:05:28.5062308Z 🔍 Starting Rekor separate-process verification mode...
+2026-06-04T07:05:28.5063410Z 📂 Loaded evidence file from: /home/runner/work/multiAgent/multiAgent/payload/rekor-interop-evidence.json
+2026-06-04T07:05:28.5064344Z    - UUID: 108e9186e8c5677a05e1a969cf34f28b87971c54e014f088f42a2fb081a38e3f6fa0a8b44530761e
+2026-06-04T07:05:28.5064844Z    - Log Index: 1714923984
+2026-06-04T07:05:28.5065326Z    - Payload Hash: 135e2359b244b69be5d20ecfa515abf654e5f7c1a03389286dc8ef18f17331a3
+2026-06-04T07:05:28.5065931Z ✅ Local cryptographic signature match: Verified.
+2026-06-04T07:05:28.5066677Z ✅ Rekor Signed Entry Timestamp (SET) present. Proof verified.
+2026-06-04T07:05:28.5067243Z 🌳 Reconstructing Merkle Root (RFC 6962 path validation)...
+2026-06-04T07:05:28.5067699Z 📂 RFC 6962 Pre-flight Diagnostics: {
+2026-06-04T07:05:28.5068016Z   proofLogIndex: 1593019722,
+2026-06-04T07:05:28.5068326Z   proofTreeSize: 1593019728,
+2026-06-04T07:05:28.5068585Z   siblingCount: 20
+2026-06-04T07:05:28.5068825Z }
+2026-06-04T07:05:28.5069296Z Calculated Leaf Hash: 05e1a969cf34f28b87971c54e014f088f42a2fb081a38e3f6fa0a8b44530761e
+2026-06-04T07:05:28.5069883Z ---------------------------------------------------------
+2026-06-04T07:05:28.5070562Z Computed Root: 7bbab95e3184df5b9f71d884f10026c8840ff4ab36d53b7c794af98a0af85b0d
+2026-06-04T07:05:28.5071425Z Expected Root: 7bbab95e3184df5b9f71d884f10026c8840ff4ab36d53b7c794af98a0af85b0d
+2026-06-04T07:05:28.5071854Z Match: true
+2026-06-04T07:05:28.5072170Z ---------------------------------------------------------
+2026-06-04T07:05:28.5072886Z 🚀 Verification Complete: Separate-process validation successful (cross-machine validation pending).
+2026-06-04T07:05:28.5219223Z Post job cleanup.
+2026-06-04T07:05:28.6923657Z Cleaning up orphan processes
+2026-06-04T07:05:28.7219491Z ##[warning]Node.js 20 actions are deprecated. The following actions are running on Node.js 20 and may not work as expected: actions/download-artifact@v4, actions/setup-node@v4. Actions will be forced to run with Node.js 24 by default starting June 16th, 2026. Node.js 20 will be removed from the runner on September 16th, 2026. Please check if updated versions of these actions are available that support Node.js 24. To opt into Node.js 24 now, set the FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true environment variable on the runner or in your workflow file. Once Node.js 24 becomes the default, you can temporarily opt out by setting ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

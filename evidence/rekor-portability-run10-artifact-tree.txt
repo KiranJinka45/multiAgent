@@ -1,0 +1,4 @@
+.
+└── payload
+    ├── rekor-interop-evidence.json
+    └── verify-rekor-interop.js
