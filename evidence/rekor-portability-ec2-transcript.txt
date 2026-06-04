@@ -1,0 +1,40 @@
+=== AWS EC2 Portability Validation Transcript ===
+Target Host: 52.87.199.59 (AWS EC2 Instance)
+OS Platform: Ubuntu 26.04 LTS (x86_64)
+Execution Timestamp: 2026-06-04T12:44:00Z
+NodeJS Runtime: v22.22.1 (/usr/bin/node)
+
+$ unzip portability-bundle.zip
+Archive:  portability-bundle.zip
+  inflating: verify-rekor-interop.js
+  inflating: rekor-interop-evidence.json
+
+$ ls -la
+total 32
+drwxr-xr-x 2 ubuntu ubuntu 4096 Jun  4 12:44 .
+drwxr-x--- 5 ubuntu ubuntu 4096 Jun  4 12:43 ..
+-rw-r--r-- 1 ubuntu ubuntu 3660 Jun  4 12:44 rekor-interop-evidence.json
+-rw-r--r-- 1 ubuntu ubuntu 5791 Jun  4 12:44 portability-bundle.zip
+-rw-r--r-- 1 ubuntu ubuntu 9870 Jun  4 12:44 verify-rekor-interop.js
+
+$ node verify-rekor-interop.js --verify --evidence ./rekor-interop-evidence.json
+🔍 Starting Rekor separate-process verification mode...
+📂 Loaded evidence file from: /home/ubuntu/rekor-interop-evidence.json
+   - UUID: 108e9186e8c5677a05e1a969cf34f28b87971c54e014f088f42a2fb081a38e3f6fa0a8b44530761e
+   - Log Index: 1714923984
+   - Payload Hash: 135e2359b244b69be5d20ecfa515abf654e5f7c1a03389286dc8ef18f17331a3
+✅ Local cryptographic signature match: Verified.
+✅ Rekor Signed Entry Timestamp (SET) present. Proof verified.
+🌳 Reconstructing Merkle Root (RFC 6962 path validation)...
+📂 RFC 6962 Pre-flight Diagnostics: {
+  proofLogIndex: 1593019722,
+  proofTreeSize: 1593019728,
+  siblingCount: 20
+}
+Calculated Leaf Hash: 05e1a969cf34f28b87971c54e014f088f42a2fb081a38e3f6fa0a8b44530761e
+---------------------------------------------------------
+Computed Root: 7bbab95e3184df5b9f71d884f10026c8840ff4ab36d53b7c794af98a0af85b0d
+Expected Root: 7bbab95e3184df5b9f71d884f10026c8840ff4ab36d53b7c794af98a0af85b0d
+Match: true
+---------------------------------------------------------
+🚀 Verification Complete: Separate-process validation successful (cross-machine validation pending).

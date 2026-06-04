@@ -6,22 +6,18 @@
 
 ## Milestones
 
-### Real Rekor Interoperability & Portability Validation
-- Status: ACTIVE
-  - Live Rekor interoperability: VERIFIED
-  - RFC6962 inclusion proof validation: VERIFIED
-  - Cross-process verification: VERIFIED
-  - Containerized portability: VERIFIED (Proven via independent execution on clean Alpine Linux Docker container)
-  - Standalone artifact portability: VERIFIED (Proven via clean GitHub Actions standalone build and execution run 10)
-  - Physical host portability: PENDING
+- ✅ **Real Rekor Interoperability & Portability Validation** (Shipped: 2026-06-04)
+  - Objective: Submit payload to a real Rekor instance, retrieve inclusion proof, verify proof from a separate process, and establish independent-host portability evidence.
+  - Portability Verification Status:
+    - Containerized Portability: **VERIFIED** (Proven via independent execution on clean Alpine Linux Docker container)
+    - Standalone Artifact Portability: **VERIFIED** (Proven via clean GitHub Actions standalone build and execution run 10)
+    - Independent Host Portability: **VERIFIED** (Proven on AWS EC2 Ubuntu 26.04 with Node.js 22.22.1)
+  - Archived Evidence:
+    - Portability bundle: [portability-bundle.zip](file:///c:/multiagentic_project/multiAgent-main/evidence/portability-bundle.zip)
+    - Standalone CI log: [rekor-portability-run10.log](file:///c:/multiagentic_project/multiAgent-main/evidence/rekor-portability-run10.log)
+    - Standalone CI summary: [rekor-portability-run10-summary.md](file:///c:/multiagentic_project/multiAgent-main/evidence/rekor-portability-run10-summary.md)
+    - Independent EC2 transcript: [rekor-portability-ec2-transcript.txt](file:///c:/multiagentic_project/multiAgent-main/evidence/rekor-portability-ec2-transcript.txt)
 
-### Portability Claim Definitions
-| Claim | Meaning | Status |
-| :--- | :--- | :--- |
-| **Containerized portability** | Artifact runs on clean container (e.g., node:20-alpine Docker container) | **VERIFIED** |
-| **Standalone artifact portability** | Artifact runs on clean, isolated GitHub runner with no repo checkout | **VERIFIED** |
-| **Physical host portability** | Artifact runs on a separate, distinct physical machine or cloud VM | **PENDING** |
-- Objective: Submit payload to a real Rekor instance, retrieve inclusion proof, verify proof from a separate process and establish independent-host portability evidence, export evidence, and add CI validation path.
 
 - ✅ **Operational Evidence Collection & Production Reality Verification** (Shipped: 2026-06-03)
   - Objective: Audited, verified, and documented production-level operational evidence, including real telemetry, SLO measurements, TPM configs, Cosign verification, and Rekor interoperability.
