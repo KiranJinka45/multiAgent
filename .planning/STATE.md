@@ -36,14 +36,14 @@ Last activity: 2026-06-04
   - RFC6962 inclusion proof validation: VERIFIED
   - Cross-process verification: VERIFIED
 - Containerized portability: VERIFIED (Proven via independent execution on clean Alpine Linux Docker container)
-- Standalone artifact portability: AWAITING CI EVIDENCE
+- Standalone artifact portability: VERIFIED (Proven via clean GitHub Actions standalone build and execution run 10)
 - Physical host portability: PENDING
 
 ### Portability Claim Definitions
 | Claim | Meaning | Status |
 | :--- | :--- | :--- |
 | **Containerized portability** | Artifact runs on clean container (e.g., node:20-alpine Docker container) | **VERIFIED** |
-| **Standalone artifact portability** | Artifact runs on clean, isolated GitHub runner with no repo checkout | **AWAITING CI EVIDENCE** |
+| **Standalone artifact portability** | Artifact runs on clean, isolated GitHub runner with no repo checkout | **VERIFIED** |
 | **Physical host portability** | Artifact runs on a separate, distinct physical machine or cloud VM | **PENDING** |
 
 ## Performance Metrics
