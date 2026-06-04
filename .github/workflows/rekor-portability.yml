@@ -26,7 +26,7 @@ jobs:
         run: pnpm install
 
       - name: Build Standalone Bundle
-        run: pnpm exec tsup scripts/verify-rekor-interop.ts --format esm --outDir dist/scripts --clean
+        run: pnpm exec tsup scripts/verify-rekor-interop.ts --tsconfig tsconfig.standalone.json --format esm --outDir dist/scripts --clean
 
       - name: Prepare Artifact Payload
         run: |
