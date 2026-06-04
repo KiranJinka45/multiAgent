@@ -10,8 +10,8 @@
 - [x] **PEM-02**: Verify that signatures from Rekor-compatible keys can be parsed, decoded, and matched correctly.
 
 ### 2. Attestation Evidence Flow (ATT)
-- [ ] **ATT-01**: Implement the attestation evidence flow ensuring that virtualization-level evidence packets can flow into the main auditor.
-- [ ] **ATT-02**: Verify that containment and sandbox attestation proofs propagate and validate correctly as part of the overall trust chain.
+- [x] **ATT-01**: Implement the attestation evidence flow ensuring that virtualization-level evidence packets can flow into the main auditor.
+- [x] **ATT-02**: Verify that containment and sandbox attestation proofs propagate and validate correctly as part of the overall trust chain.
 
 ### 3. Transparency-Log Validation (TLOG)
 - [ ] **TLOG-01**: Implement transparency-log verification and validation. Make sure that inclusion proofs can be checked by the ztan-auditor.
@@ -31,8 +31,8 @@
 |-------------|--------------------|--------|
 | PEM-01 | Phase 5: Rekor PEM Resolution | Complete |
 | PEM-02 | Phase 5: Rekor PEM Resolution | Complete |
-| ATT-01 | Phase 6: Attestation Evidence Flow | Pending |
-| ATT-02 | Phase 6: Attestation Evidence Flow | Pending |
+| ATT-01 | Phase 6: Attestation Evidence Flow | Complete |
+| ATT-02 | Phase 6: Attestation Evidence Flow | Complete |
 | TLOG-01 | Phase 7: Transparency-Log Validation | Pending |
 | TLOG-02 | Phase 7: Transparency-Log Validation | Pending |
 
