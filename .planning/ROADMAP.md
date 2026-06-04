@@ -12,7 +12,7 @@
   - RFC6962 inclusion proof validation: VERIFIED
   - Cross-process verification: VERIFIED
   - Containerized portability: VERIFIED (Proven via independent execution on clean Alpine Linux Docker container)
-  - Standalone artifact portability: AWAITING CI EXECUTION
+  - Standalone artifact portability: VERIFIED (Proven via clean GitHub Actions standalone build and execution run)
   - Physical host portability: PENDING
 - Objective: Submit payload to a real Rekor instance, retrieve inclusion proof, verify proof from a separate process and establish independent-host portability evidence, export evidence, and add CI validation path.
 
