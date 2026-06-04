@@ -21,15 +21,12 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install pnpm
-        run: npm install -g pnpm
-
-      - name: Install Dependencies
-        run: pnpm install
+      - name: Install Bundler
+        run: npm install -g tsup typescript
 
       - name: Build Standalone Bundle
         run: |
-          pnpm exec tsup scripts/verify-rekor-interop.ts --tsconfig tsconfig.standalone.json --format esm --outDir dist/scripts --clean > tsup_build.log 2>&1 || {
+          tsup scripts/verify-rekor-interop.ts --tsconfig tsconfig.standalone.json --format esm --outDir dist/scripts --clean > tsup_build.log 2>&1 || {
             cat tsup_build.log
             exit 1
           }
