@@ -34,14 +34,17 @@ Nexus ZTAN is an auditable, production-oriented research platform designed for l
 - ✓ **SEC-01**: Poisoned log and desynchronized replay history quarantine — v1.6.0
 - ✓ **PEM-01/02**: Rekor PEM key decoding & submission validation — v1.8.0 (Phase 5)
 
-## Current Milestone: v1.8.0 Trust-Chain Operationalization
+## Current Milestone: Real Rekor Interoperability & Portability Validation
 
-**Goal:** Establish and validate end-to-end trust-chain operationalization, resolving the Rekor PEM submission key issue and implementing attestation evidence flow alongside transparency-log validation.
+**Goal:** Establish and validate actual interoperability evidence with a remote Rekor endpoint and verify independent host portability.
 
 **Target features:**
-- Resolve Rekor PEM public key decoding & submission issues
-- Implement attestation evidence flow
-- Integrate transparency-log validation
+- Submit payload to a real Rekor instance.
+- Retrieve inclusion proof.
+- Verify proof from a separate machine/process.
+- Export evidence artifact.
+- Document failure modes.
+- Add CI validation path.
 
 ## Current Post-Milestone Posture: Platform Stabilization Baseline
 

@@ -1,5 +1,62 @@
 # Milestones
 
+## Real Rekor Interoperability & Portability Validation (Active Milestone)
+
+**Key goals:**
+- Submit payload to a real Rekor instance.
+- Retrieve inclusion proof.
+- Verify proof from a separate machine/process.
+- Export evidence artifact.
+- Document failure modes.
+- Add CI validation path.
+
+---
+
+## Operational Evidence Collection & Production Reality Verification (Shipped: 2026-06-03)
+
+**Phases completed:** 1 phase (Production Readiness Audit)
+
+**Key accomplishments:**
+- Conducted a comprehensive Production Readiness Audit across 10 operational areas, producing 5 verification matrices, risk listings, and a prioritized remediation plan in `PRODUCTION_READINESS_AUDIT.md`.
+- Reconciled core ledgers and adjusted claims to accurately represent the software-simulated boundaries of the platform.
+
+---
+
+## Consensus Interface Reconciliation & Pipeline Integrity (Shipped: 2026-06-03)
+
+**Phases completed:** 3 phases (Consensus & Subsystem Reconciliation, CI/CD Certification, Repository Pruning)
+
+**Key accomplishments:**
+- Realigned the `ConsensusEngine` interface with its 26 integration tests and resolved database access, file parallelism, and TPM fallback constraints, resulting in a 100% test pass rate workspace-wide.
+- Repaired and validated all 12 GitHub Actions workflows under `.github/workflows/`.
+- Pruned 8 dead packages and 2 dead apps from the filesystem, and removed their registrations and dependencies.
+
+---
+
+## v1.8.0 Trust-Chain Operationalization (Shipped: 2026-06-03)
+
+**Phases completed:** 3 phases (Rekor PEM Resolution, Attestation Evidence Flow, Transparency-Log Validation)
+
+**Key accomplishments:**
+- Resolved Rekor PEM key encoding gap: client now accepts Ed25519 and P-256 PEM public keys; witness nodes propagate PEM keys dynamically.
+- Implemented TPM-style attestation evidence flow with `tpmQuote` integration in sandbox packets and auditor enforcement under Firecracker isolation.
+- Implemented RFC 6962 Merkle tree transparency-log inclusion proof generation and notary-signed checkpoint verification in the offline auditor.
+- 14/14 integration tests verify the complete cryptographic trust chain end-to-end with comprehensive negative-path coverage (tampered proofs, wrong roots, stale checkpoints, untrusted notaries, compromised TPM, missing evidence).
+- Resolved Rekor PEM decoding operational debt carried forward from v1.7.0.
+
+---
+
+## Repository Certification & Evidence Inventory (Shipped: 2026-06-03)
+
+**Phases completed:** 1 phase (Audit Execution)
+
+**Key accomplishments:**
+- Conducted a comprehensive package-by-package and claim-by-claim independent audit across the entire repository.
+- Produced the master Repository Certification Audit report mapping constitutional and security policy assertions to physical implementations and test suites.
+- Identified 8 dead packages, 2 dead apps, and 7 broken CI/CD pipelines for remediation.
+
+---
+
 ## v1.7.0 Platform Stabilization & CI Integrity (Shipped: 2026-06-03)
 
 **Phases completed:** 4 phases (CI Recovery, Frontend Test Infrastructure, Witness Fencing Repair, Verification/Validation)

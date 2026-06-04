@@ -1,0 +1,67 @@
+name: Rekor Standalone Portability Validation
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build_artifact:
+    name: Build Standalone Verifier
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Build Standalone Bundle
+        run: pnpm build
+
+      - name: Prepare Artifact Payload
+        run: |
+          mkdir payload
+          cp dist/scripts/verify-rekor-interop.js payload/
+          cp evidence/rekor-interop-evidence.json payload/
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rekor-standalone-payload
+          path: payload/
+
+  verify_independent_host:
+    name: Verify Independent Host Portability
+    runs-on: ubuntu-latest
+    needs: build_artifact
+    steps:
+      # CRITICAL: We DO NOT checkout the repository here to ensure a clean, independent host.
+      - name: Setup Node (Clean Environment)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Download Artifact Payload
+        uses: actions/download-artifact@v4
+        with:
+          name: rekor-standalone-payload
+          path: payload/
+
+      - name: Audit and Execute Standalone Verifier
+        run: |
+          echo "Performing explicit dependency audit:"
+          ls -R
+          echo "---"
+          find . -type f
+          echo "---"
+          node payload/verify-rekor-interop.js --verify --evidence payload/rekor-interop-evidence.json

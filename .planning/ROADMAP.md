@@ -6,6 +6,30 @@
 
 ## Milestones
 
+### Real Rekor Interoperability & Portability Validation
+- Status: ACTIVE
+  - Live Rekor interoperability: VERIFIED
+  - RFC6962 inclusion proof validation: VERIFIED
+  - Cross-process verification: VERIFIED
+  - Containerized portability: VERIFIED (Proven via independent execution on clean Alpine Linux Docker container)
+  - Standalone artifact portability: AWAITING CI EXECUTION
+  - Physical host portability: PENDING
+- Objective: Submit payload to a real Rekor instance, retrieve inclusion proof, verify proof from a separate process and establish independent-host portability evidence, export evidence, and add CI validation path.
+
+- ✅ **Operational Evidence Collection & Production Reality Verification** (Shipped: 2026-06-03)
+  - Objective: Audited, verified, and documented production-level operational evidence, including real telemetry, SLO measurements, TPM configs, Cosign verification, and Rekor interoperability.
+
+- ✅ **Consensus Interface Reconciliation & Pipeline Integrity** (Shipped: 2026-06-03)
+  - Objective: Aligned the `ConsensusEngine` interface with its 26 integration tests and repaired all 12 GitHub Actions CI/CD workflows.
+
+- ✅ **Repository Certification & Evidence Inventory** (Shipped: 2026-06-03)
+  - See master audit: [REPOSITORY_CERTIFICATION_AUDIT.md](file:///c:/multiagentic_project/multiAgent-main/.planning/REPOSITORY_CERTIFICATION_AUDIT.md)
+
+- ✅ **v1.8.0 Trust-Chain Operationalization** (Shipped: 2026-06-03)
+  - See archived roadmap: [v1.8.0-ROADMAP.md](file:///c:/multiagentic_project/multiAgent-main/.planning/milestones/v1.8.0-ROADMAP.md)
+  - See archived requirements: [v1.8.0-REQUIREMENTS.md](file:///c:/multiagentic_project/multiAgent-main/.planning/milestones/v1.8.0-REQUIREMENTS.md)
+  - See archived audit: [v1.8.0-MILESTONE-AUDIT.md](file:///c:/multiagentic_project/multiAgent-main/.planning/milestones/v1.8.0-MILESTONE-AUDIT.md)
+
 - ✅ **v1.7.0 Platform Stabilization & CI Integrity** (Shipped: 2026-06-03)
   - See archived roadmap: [v1.7.0-ROADMAP.md](file:///c:/multiagentic_project/multiAgent-main/.planning/milestones/v1.7.0-ROADMAP.md)
   - See archived requirements: [v1.7.0-REQUIREMENTS.md](file:///c:/multiagentic_project/multiAgent-main/.planning/milestones/v1.7.0-REQUIREMENTS.md)
@@ -15,31 +39,6 @@
   - See archived roadmap: [v1.6.0-ROADMAP.md](file:///c:/multiagentic_project/multiAgent-main/.planning/milestones/v1.6.0-ROADMAP.md)
   - See archived requirements: [v1.6.0-REQUIREMENTS.md](file:///c:/multiagentic_project/multiAgent-main/.planning/milestones/v1.6.0-REQUIREMENTS.md)
   - See archived audit: [v1.6.0-MILESTONE-AUDIT.md](file:///c:/multiagentic_project/multiAgent-main/.planning/milestones/v1.6.0-MILESTONE-AUDIT.md)
-
-## Milestone v1.8.0: Trust-Chain Operationalization
-Establish and validate end-to-end trust-chain operationalization.
-
-## Active Phases
-
-| Phase | Description | Status |
-| :--- | :--- | :--- |
-| **Phase 5** | **Rekor PEM Resolution** | **Complete** |
-| **Phase 6** | **Attestation Evidence Flow** | **Not Started** |
-| **Phase 7** | **Transparency-Log Validation** | **Not Started** |
-
-## Phase Details
-
-### Phase 5: Rekor PEM Resolution
-- **Goal:** Resolve standard PEM decoding issues of Rekor submission keys. Ensure public key parsing works correctly, verifying signatures from Rekor-compatible keys without falling back to local-only appends.
-- **Evidence:** Code changes to support PEM public key parsing, and corresponding test cases in `packages/ztan-auditor/src`.
-
-### Phase 6: Attestation Evidence Flow
-- **Goal:** Implement the virtualization-level attestation evidence flow. Ensure containment proofs and sandbox attestation results flow into the offline auditor and validate properly.
-- **Evidence:** Dynamic verification of attestation flow via tests.
-
-### Phase 7: Transparency-Log Validation
-- **Goal:** Implement and integrate transparency-log verification and validation. Allow the ztan-auditor to run local validations of transparency log inclusion proofs.
-- **Evidence:** Integration tests for inclusion proof verification.
 
 ## Next Era: Operational Consolidation & Maintenance Discipline
 
@@ -56,5 +55,15 @@ To avoid governance self-reference saturation and recursion pressure, the additi
 | **High** | **Continuous Certification** | Integrating replay harnesses and immutable corpus verification in sandboxes. |
 | **Low** | **New Features** | Banned (Stewardship freeze in place). |
 
+### Operational Debt Inventory (Post-v1.8.0)
+| # | Item | Severity |
+|---|------|----------|
+| 1 | Warning debt reduction (`any`, unused variables) | Low |
+| 2 | Independent physical host portability testing | Medium |
+| 3 | Cross-version auditor compatibility testing | Medium |
+| 4 | Real Rekor interoperability testing | Medium |
+| 5 | Independent audit execution outside test harness | Medium |
+
 ---
-*Last updated: 2026-06-03 after v1.7.0 milestone completion*
+*Last updated: 2026-06-04 during Real Rekor Interoperability & Portability Validation milestone active phase*
+
