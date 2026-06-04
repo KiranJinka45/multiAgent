@@ -3,7 +3,7 @@ name: Rekor Standalone Portability Validation
 on:
   push:
     branches:
-      - main
+      - '**'
   pull_request:
 
 jobs:
