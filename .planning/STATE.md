@@ -1,50 +1,33 @@
 ---
 gsd_state_version: 1.0
-milestone: Real Rekor Interoperability & Portability Validation
-milestone_name: Real Rekor Interoperability & Portability Validation
-status: Completed
-stopped_at: Standalone and independent host portability validated successfully (proven on AWS EC2).
-last_updated: "2026-06-04T23:25:00+05:30"
-last_activity: 2026-06-04
+milestone: v1.10.0
+milestone_name: Operational Certification & Reproducibility Validation
+status: planning
+stopped_at: Initialized milestone v1.10.0
+last_updated: "2026-06-06T08:42:00.000Z"
+last_activity: 2026-06-06
 progress:
-  total_phases: 1
-  completed_phases: 1
-  total_plans: 1
-  completed_plans: 1
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
 ---
 
-# Project State — Real Rekor Interoperability & Portability Validation
-
+# Project State — Operational Certification & Reproducibility Validation
 
 ## Project Reference
 
-See: [.planning/PROJECT.md](./PROJECT.md) (updated 2026-06-03)
+See: [.planning/PROJECT.md](./PROJECT.md) (updated 2026-06-06)
 
 **Principle:** EVIDENCE-BOUNDED TRUST: ASSERTIONS ARE FALSE UNTIL PROVEN.
-**Focus:** Establishing real interoperability evidence with a remote Rekor endpoint and validating independent host portability.
+**Focus:** Certifying operational reproducibility, infrastructure deployment, disaster recovery resilience, cross-version compatibility, and dependency cleanliness.
 
 ## Current Position
 
-Phase: Completed (Phase 1: Real Rekor & Portability Validation)
-Plan: Completed
-Status: Portability Validation Completed and Verified
-Last activity: 2026-06-04
-
-### Operational Status Boundary
-- Real Rekor Interoperability Testing: VERIFIED
-  - Live Rekor interoperability: VERIFIED
-  - RFC6962 inclusion proof validation: VERIFIED
-  - Cross-process verification: VERIFIED
-- Containerized portability: VERIFIED (Proven via independent execution on clean Alpine Linux Docker container)
-- Standalone artifact portability: VERIFIED (Proven via clean GitHub Actions standalone build and execution run 10)
-- Independent host portability: VERIFIED (Proven on AWS EC2 Ubuntu 26.04 with Node.js 22.22.1)
-
-### Portability Claim Definitions
-| Claim | Meaning | Status |
-| :--- | :--- | :--- |
-| **Containerized portability** | Artifact runs on clean container (e.g., node:20-alpine Docker container) | **VERIFIED** |
-| **Standalone artifact portability** | Artifact runs on clean, isolated GitHub runner with no repo checkout | **VERIFIED** |
-| **Independent host portability** | Artifact runs on a separate, distinct physical machine or cloud VM | **VERIFIED** |
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-06-06 — Milestone v1.10.0 started
 
 ## Performance Metrics
 
@@ -113,6 +96,6 @@ Last activity: 2026-06-04
 
 ## Session Continuity
 
-Last session: 2026-06-04
-Stopped at: Hardened Merkle proof reconstruction logic under RFC 6962 compliance and verified live Rekor interoperability.
-Resume file: scripts/verify-rekor-interop.ts
+Last session: 2026-06-06
+Stopped at: Initialized milestone v1.10.0 Operational Certification & Reproducibility Validation.
+Resume file: .planning/REQUIREMENTS.md

@@ -34,6 +34,17 @@ Nexus ZTAN is an auditable, production-oriented research platform designed for l
 - ✓ **SEC-01**: Poisoned log and desynchronized replay history quarantine — v1.6.0
 - ✓ **PEM-01/02**: Rekor PEM key decoding & submission validation — v1.8.0 (Phase 5)
 
+## Current Milestone: v1.10.0 Operational Certification & Reproducibility Validation
+
+**Goal:** Certify operational reproducibility, infrastructure deployment, disaster recovery resilience, cross-version compatibility, and dependency cleanliness.
+
+**Target features:**
+- **OPS-01**: Infrastructure Certification (Docker, K8s, Smoke tests)
+- **OPS-02**: Disaster Recovery Replay (Backup, Restore, Validate)
+- **OPS-03**: Cross-Version Compatibility Matrix (Auditor verification across versions)
+- **OPS-04**: Dependency Rationalization (Prune dead code/deps)
+- **OPS-05**: Reproducibility Bundle (verify-kit, evidence, runbooks)
+
 ## Completed Milestone: Real Rekor Interoperability & Portability Validation (Completed: 2026-06-04)
 
 **Goal:** Establish and validate actual interoperability evidence with a remote Rekor endpoint and verify independent host portability.
@@ -135,4 +146,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-03 after Phase 5 completion*
+*Last updated: 2026-06-06 after Milestone v1.10.0 initialization*
