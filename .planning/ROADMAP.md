@@ -1,72 +1,107 @@
-# Roadmap: Nexus ZTAN Production Infrastructure
+# Roadmap: Nexus ZTAN
 
-> [!IMPORTANT]
-> **CORE EXECUTION MODEL STABILIZED**
-> Bounded operational hardening and subsystem evolution continue. Focus is on maintenance, reliability, and simplification.
+## Overview
+
+Following the successful validation of live cryptographic trust-chains and multi-host portability in v1.9.0, this milestone establishes rigorous operational validation to certify the reproducibility, deployability, and survivability of Nexus ZTAN. The core focus is to ensure any third-party operator or auditor can successfully deploy, operate, recover, and verify the system from scratch.
 
 ## Milestones
 
-- ✅ **Real Rekor Interoperability & Portability Validation** (Shipped: 2026-06-04)
-  - Objective: Submit payload to a real Rekor instance, retrieve inclusion proof, verify proof from a separate process, and establish independent-host portability evidence.
-  - Portability Verification Status:
-    - Containerized Portability: **VERIFIED** (Proven via independent execution on clean Alpine Linux Docker container)
-    - Standalone Artifact Portability: **VERIFIED** (Proven via clean GitHub Actions standalone build and execution run 10)
-    - Independent Host Portability: **VERIFIED** (Proven on AWS EC2 Ubuntu 26.04 with Node.js 22.22.1)
-  - Archived Evidence:
-    - Portability bundle: [portability-bundle.zip](file:///c:/multiagentic_project/multiAgent-main/evidence/portability-bundle.zip)
-    - Standalone CI log: [rekor-portability-run10.log](file:///c:/multiagentic_project/multiAgent-main/evidence/rekor-portability-run10.log)
-    - Standalone CI summary: [rekor-portability-run10-summary.md](file:///c:/multiagentic_project/multiAgent-main/evidence/rekor-portability-run10-summary.md)
-    - Independent EC2 transcript: [rekor-portability-ec2-transcript.txt](file:///c:/multiagentic_project/multiAgent-main/evidence/rekor-portability-ec2-transcript.txt)
+- 🚧 **v1.10.0 Operational Certification & Reproducibility Validation** - Phases 3-7 (in progress)
+- ✅ **v1.9.0 Real Rekor Interoperability & Portability Validation** - Phases A-B, 1-2 (Shipped: 2026-06-04)
+- ✅ **v1.8.0 Trust-Chain Operationalization** - Phases 5-7 (Shipped: 2026-06-03)
+- ✅ **v1.7.0 Platform Stabilization & CI Integrity** - (Shipped: 2026-06-03)
+- ✅ **v1.6.0 Stewardship Engineering Era** - (Shipped: 2026-05-26)
 
+## Phases
 
-- ✅ **Operational Evidence Collection & Production Reality Verification** (Shipped: 2026-06-03)
-  - Objective: Audited, verified, and documented production-level operational evidence, including real telemetry, SLO measurements, TPM configs, Cosign verification, and Rekor interoperability.
+<details>
+<summary>✅ v1.9.0 Real Rekor Interoperability & Portability Validation (Phases A-B, 1-2) - SHIPPED 2026-06-04</summary>
 
-- ✅ **Consensus Interface Reconciliation & Pipeline Integrity** (Shipped: 2026-06-03)
-  - Objective: Aligned the `ConsensusEngine` interface with its 26 integration tests and repaired all 12 GitHub Actions CI/CD workflows.
+### Phase A: Consensus & Subsystem Reconciliation
+**Goal**: Realign and stabilize ConsensusEngine interface with test suites.
+**Plans**: 1 plan
 
-- ✅ **Repository Certification & Evidence Inventory** (Shipped: 2026-06-03)
-  - See master audit: [REPOSITORY_CERTIFICATION_AUDIT.md](file:///c:/multiagentic_project/multiAgent-main/.planning/REPOSITORY_CERTIFICATION_AUDIT.md)
+### Phase B: CI/CD Certification
+**Goal**: Repair and validate all repository-wide CI/CD pipelines.
+**Plans**: 1 plan
 
-- ✅ **v1.8.0 Trust-Chain Operationalization** (Shipped: 2026-06-03)
-  - See archived roadmap: [v1.8.0-ROADMAP.md](file:///c:/multiagentic_project/multiAgent-main/.planning/milestones/v1.8.0-ROADMAP.md)
-  - See archived requirements: [v1.8.0-REQUIREMENTS.md](file:///c:/multiagentic_project/multiAgent-main/.planning/milestones/v1.8.0-REQUIREMENTS.md)
-  - See archived audit: [v1.8.0-MILESTONE-AUDIT.md](file:///c:/multiagentic_project/multiAgent-main/.planning/milestones/v1.8.0-MILESTONE-AUDIT.md)
+### Phase 1: Production Readiness Audit
+**Goal**: Identify operational risks and posture across all subsystems.
+**Plans**: 1 plan
 
-- ✅ **v1.7.0 Platform Stabilization & CI Integrity** (Shipped: 2026-06-03)
-  - See archived roadmap: [v1.7.0-ROADMAP.md](file:///c:/multiagentic_project/multiAgent-main/.planning/milestones/v1.7.0-ROADMAP.md)
-  - See archived requirements: [v1.7.0-REQUIREMENTS.md](file:///c:/multiagentic_project/multiAgent-main/.planning/milestones/v1.7.0-REQUIREMENTS.md)
-  - See archived audit: [v1.7.0-MILESTONE-AUDIT.md](file:///c:/multiagentic_project/multiAgent-main/.planning/milestones/v1.7.0-MILESTONE-AUDIT.md)
+### Phase 2: Real Rekor & Portability Validation
+**Goal**: Establish remote Rekor validation and multi-environment execution proof.
+**Plans**: 1 plan
 
-- ✅ **v1.6.0 Stewardship Engineering Era** (Shipped: 2026-05-26)
-  - See archived roadmap: [v1.6.0-ROADMAP.md](file:///c:/multiagentic_project/multiAgent-main/.planning/milestones/v1.6.0-ROADMAP.md)
-  - See archived requirements: [v1.6.0-REQUIREMENTS.md](file:///c:/multiagentic_project/multiAgent-main/.planning/milestones/v1.6.0-REQUIREMENTS.md)
-  - See archived audit: [v1.6.0-MILESTONE-AUDIT.md](file:///c:/multiagentic_project/multiAgent-main/.planning/milestones/v1.6.0-MILESTONE-AUDIT.md)
+</details>
 
-## Next Era: Operational Consolidation & Maintenance Discipline
+### 🚧 v1.10.0 Operational Certification & Reproducibility Validation (In Progress)
 
-ZTAN has transitioned entirely away from invention and active architectural expansion. The ecosystem enforces a **Stewardship & Maintenance Era** where success is measured exclusively by stability, operational evidence, and complexity reduction.
+**Milestone Goal:** Establish clean, third-party operational evidence across deployment, recovery, auditor compatibility, dependency health, and standalone verification.
 
-### Permanent Rule: Absolute Freeze on Governance Primitives
-To avoid governance self-reference saturation and recursion pressure, the addition of any new first-class governance primitives, orchestrational layers, or active automated correction engines is strictly banned.
+#### Phase 3: Infrastructure Certification
+**Goal**: Prove a clean, reproducible deployment works from scratch under standard containerized and orchestrated environments.
+**Depends on**: Phase 2
+**Requirements**: OPS-INFRA-01, OPS-INFRA-02, OPS-INFRA-03, OPS-INFRA-04, OPS-INFRA-05
+**Success Criteria**:
+  1. Detailed clean-sheet deployment documentation exists in `INFRASTRUCTURE_CERTIFICATION.md`.
+  2. All primary and secondary Docker image builds complete successfully without errors.
+  3. Local Kubernetes deployment succeeds, yielding healthy active pods.
+  4. Core services (coordination, queues, gateways) report healthy.
+  5. Deployment-level smoke tests execute and pass successfully.
+**Plans**: TBD
 
-### Strategic Priorities Matrix
-| Priority | Focus Area | Objective |
-| :--- | :--- | :--- |
-| **Highest** | **Operational Evidence** | Accumulating real drift reports, MTTR histories, and scaling data across Target/Observed/Certified SLO bounds. |
-| **High** | **Maintenance Simplicity** | Restricting third-party dynamics, enforcing complexity budgets, and aggressive dead-code elimination. |
-| **High** | **Continuous Certification** | Integrating replay harnesses and immutable corpus verification in sandboxes. |
-| **Low** | **New Features** | Banned (Stewardship freeze in place). |
+#### Phase 4: Disaster Recovery Replay
+**Goal**: Demonstrate total recovery and deterministic replay of transactional states following state destruction.
+**Depends on**: Phase 3
+**Requirements**: OPS-DR-01, OPS-DR-02, OPS-DR-03, OPS-DR-04
+**Success Criteria**:
+  1. Stable coordination and event backups are generated successfully.
+  2. Complete simulated database and queue state destruction succeeds without system hang.
+  3. Coordination and transaction logs restore cleanly to identical epochs.
+  4. Recovery smoke tests pass and verify that active leases and witness history are intact.
+**Plans**: TBD
 
-### Operational Debt Inventory (Post-v1.8.0)
-| # | Item | Severity |
-|---|------|----------|
-| 1 | Warning debt reduction (`any`, unused variables) | Low |
-| 2 | Independent physical host portability testing | Medium |
-| 3 | Cross-version auditor compatibility testing | Medium |
-| 4 | Real Rekor interoperability testing | Medium |
-| 5 | Independent audit execution outside test harness | Medium |
+#### Phase 5: Cross-Version Compatibility Matrix
+**Goal**: Verify that the independent auditor parses and validates historical and modern evidence without compatibility regression.
+**Depends on**: Phase 4
+**Requirements**: OPS-COMPAT-01, OPS-COMPAT-02, OPS-COMPAT-03, OPS-COMPAT-04
+**Success Criteria**:
+  1. Matrix validation test suite executed covering versions v1.8, v1.9, and v1.10.
+  2. Auditor v1.9 validates evidence produced by ZTAN runtime v1.8.
+  3. Auditor v1.10 validates evidence produced by ZTAN runtime v1.8.
+  4. Auditor v1.10 validates evidence produced by ZTAN runtime v1.9.
+**Plans**: TBD
 
----
-*Last updated: 2026-06-04 during Real Rekor Interoperability & Portability Validation milestone active phase*
+#### Phase 6: Dependency Rationalization
+**Goal**: Remove dead packages, unused dependencies, and prune redundant files to minimize maintenance risk.
+**Depends on**: Phase 5
+**Requirements**: OPS-DEP-01, OPS-DEP-02, OPS-DEP-03
+**Success Criteria**:
+  1. Unused dependencies identified by `knip` are completely removed from workspace configurations.
+  2. Dead files (such as unused seeders or template scripts) are safely deleted.
+  3. Active dependency configurations locked and documented in `DEPENDENCY_AUDIT.md`.
+**Plans**: TBD
 
+#### Phase 7: Reproducibility Bundle
+**Goal**: Enable third-party validation by packaging all necessary files and scripts into a self-contained, standalone verification bundle.
+**Depends on**: Phase 6
+**Requirements**: OPS-BUNDLE-01, OPS-BUNDLE-02
+**Success Criteria**:
+  1. Self-contained verification kit created (`verify-kit/`, `evidence/`, `runbooks/`).
+  2. Standalone, third-party validation run successfully executes in an isolated environment without needing access to internal repository dependencies.
+**Plans**: TBD
+
+## Progress
+
+| Phase | Milestone | Plans Complete | Status | Completed |
+|-------|-----------|----------------|--------|-----------|
+| A. Consensus Reconciliation | v1.9.0 | 1/1 | Complete | 2026-06-03 |
+| B. CI/CD Certification | v1.9.0 | 1/1 | Complete | 2026-06-03 |
+| 1. Production Audit | v1.9.0 | 1/1 | Complete | 2026-06-03 |
+| 2. Real Rekor | v1.9.0 | 1/1 | Complete | 2026-06-04 |
+| 3. Infrastructure Certification | v1.10.0 | 0/1 | Not started | - |
+| 4. Disaster Recovery Replay | v1.10.0 | 0/1 | Not started | - |
+| 5. Compatibility Matrix | v1.10.0 | 0/1 | Not started | - |
+| 6. Dependency Rationalization | v1.10.0 | 0/1 | Not started | - |
+| 7. Reproducibility Bundle | v1.10.0 | 0/1 | Not started | - |

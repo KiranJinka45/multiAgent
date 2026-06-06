@@ -60,12 +60,30 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
+| OPS-INFRA-01 | Phase 3 | Pending |
+| OPS-INFRA-02 | Phase 3 | Pending |
+| OPS-INFRA-03 | Phase 3 | Pending |
+| OPS-INFRA-04 | Phase 3 | Pending |
+| OPS-INFRA-05 | Phase 3 | Pending |
+| OPS-DR-01 | Phase 4 | Pending |
+| OPS-DR-02 | Phase 4 | Pending |
+| OPS-DR-03 | Phase 4 | Pending |
+| OPS-DR-04 | Phase 4 | Pending |
+| OPS-COMPAT-01 | Phase 5 | Pending |
+| OPS-COMPAT-02 | Phase 5 | Pending |
+| OPS-COMPAT-03 | Phase 5 | Pending |
+| OPS-COMPAT-04 | Phase 5 | Pending |
+| OPS-DEP-01 | Phase 6 | Pending |
+| OPS-DEP-02 | Phase 6 | Pending |
+| OPS-DEP-03 | Phase 6 | Pending |
+| OPS-BUNDLE-01 | Phase 7 | Pending |
+| OPS-BUNDLE-02 | Phase 7 | Pending |
 
 **Coverage:**
-- v1 requirements: 15 total
-- Mapped to phases: 0
-- Unmapped: 15 ⚠️
+- v1 requirements: 18 total
+- Mapped to phases: 18
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-06-06*
-*Last updated: 2026-06-06 after initial definition*
+*Last updated: 2026-06-06 after roadmap creation*

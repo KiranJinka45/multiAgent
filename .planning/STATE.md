@@ -7,9 +7,9 @@ stopped_at: Initialized milestone v1.10.0
 last_updated: "2026-06-06T08:42:00.000Z"
 last_activity: 2026-06-06
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
-  total_plans: 0
+  total_plans: 5
   completed_plans: 0
 ---
 
