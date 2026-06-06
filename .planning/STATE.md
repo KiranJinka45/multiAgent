@@ -24,10 +24,10 @@ See: [.planning/PROJECT.md](./PROJECT.md) (updated 2026-06-06)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: Phase 3 (Infrastructure Certification)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-06-06 — Milestone v1.10.0 started
+Status: Ready for planning
+Last activity: 2026-06-06 — Phase 3 context gathered
 
 ## Performance Metrics
 
