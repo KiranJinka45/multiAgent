@@ -20,12 +20,6 @@ spec:
       - pause: {duration: 5m}
       - setWeight: 50
       - pause: {duration: 5m}
-      analysis:
-        templates:
-        - templateName: success-rate
-        args:
-        - name: app-name
-          value: gateway
   selector:
     matchLabels:
       app: gateway
@@ -55,13 +49,21 @@ spec:
           type: RuntimeDefault
       containers:
       - name: gateway
-        image: ghcr.io/kiran/multiagent-gateway:v1.1.0
+        image: ghcr.io/kiran/multiagent-gateway:v1.1.5
         securityContext:
+          runAsUser: 1001
           runAsNonRoot: true
           readOnlyRootFilesystem: true
           allowPrivilegeEscalation: false
           capabilities:
             drop: ["ALL"]
+        volumeMounts:
+        - name: tmp-dir
+          mountPath: /tmp
+        - name: ztan-dir
+          mountPath: /app/.ztan
+        - name: ztan-transparency-dir
+          mountPath: /app/.ztan-transparency
 
 
         imagePullPolicy: IfNotPresent
@@ -102,6 +104,13 @@ spec:
           preStop:
             exec:
               command: ["/bin/sh", "-c", "sleep 15"] # Graceful drainage
+      volumes:
+      - name: tmp-dir
+        emptyDir: {}
+      - name: ztan-dir
+        emptyDir: {}
+      - name: ztan-transparency-dir
+        emptyDir: {}
 ---
 apiVersion: v1
 kind: Service

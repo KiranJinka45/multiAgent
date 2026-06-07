@@ -21,12 +21,6 @@ spec:
       - pause: {duration: 5m}
       - setWeight: 50
       - pause: {duration: 5m}
-      analysis:
-        templates:
-        - templateName: success-rate
-        args:
-        - name: app-name
-          value: auth-service
   selector:
     matchLabels:
       app: auth-service
@@ -56,13 +50,24 @@ spec:
           type: RuntimeDefault
       containers:
       - name: auth-service
-        image: ghcr.io/kiran/multiagent-auth:v1.1.0
+        image: ghcr.io/kiran/multiagent-auth:v1.1.4
         securityContext:
+          runAsUser: 1001
           runAsNonRoot: true
           readOnlyRootFilesystem: true
           allowPrivilegeEscalation: false
           capabilities:
             drop: ["ALL"]
+        volumeMounts:
+        - name: tmp-dir
+          mountPath: /tmp
+        - name: ztan-dir
+          mountPath: /app/.ztan
+        - name: ztan-transparency-dir
+          mountPath: /app/.ztan-transparency
+        - name: tls-certs
+          mountPath: /etc/tls
+          readOnly: true
 
         imagePullPolicy: IfNotPresent
         command: ["node", "dist/index.js"]
@@ -93,24 +98,37 @@ spec:
           httpGet:
             path: /health
             port: 4002
+            scheme: HTTPS
           failureThreshold: 30 # Allow 5 minutes total for slow start (30 * 10s)
           periodSeconds: 10
         livenessProbe:
           httpGet:
             path: /health
             port: 4002
+            scheme: HTTPS
           initialDelaySeconds: 5
           periodSeconds: 15
         readinessProbe:
           httpGet:
             path: /health/ready
             port: 4002
+            scheme: HTTPS
           initialDelaySeconds: 5
           periodSeconds: 5
         lifecycle:
           preStop:
             exec:
               command: ["/bin/sh", "-c", "sleep 15"] # Allow ingress to drain during rollout
+      volumes:
+      - name: tmp-dir
+        emptyDir: {}
+      - name: ztan-dir
+        emptyDir: {}
+      - name: ztan-transparency-dir
+        emptyDir: {}
+      - name: tls-certs
+        secret:
+          secretName: auth-service-tls
 ---
 apiVersion: v1
 kind: Service

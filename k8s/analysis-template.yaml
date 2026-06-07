@@ -7,7 +7,10 @@ apiVersion: argoproj.io/v1alpha1
 kind: AnalysisTemplate
 metadata:
   name: success-rate
+  namespace: multiagent
 spec:
+  args:
+  - name: app-name
   metrics:
   - name: success-rate
     interval: 30s
