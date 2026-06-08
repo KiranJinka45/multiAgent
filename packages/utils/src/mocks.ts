@@ -7,13 +7,13 @@ export const logger = {
     error: (...args: any[]) => console.error('[BRIDGE-ERR]', ...args),
     warn: (...args: any[]) => console.warn('[BRIDGE-WARN]', ...args),
     debug: (...args: any[]) => console.debug('[BRIDGE-DEBUG]', ...args),
-    getExecutionLogger: (...args: any[]) => logger,
+    getExecutionLogger: (..._args: any[]) => logger,
 } as any;
 
 export const getExecutionLogger = logger.getExecutionLogger;
 
 export const registry = {
-    register: (...args: any[]) => {},
+    register: (..._args: any[]) => {},
     metrics: async () => '',
     contentType: 'text/plain; version=0.0.4'
 } as any;
@@ -65,9 +65,9 @@ export class DistributedExecutionContext extends RealContext {
         return {
             startActiveSpan: async (name: string, cb: (span: any) => Promise<any>) => {
                 const span = {
-                    setAttribute: (...args: any[]) => {},
-                    setStatus: (...args: any[]) => {},
-                    recordException: (...args: any[]) => {},
+                    setAttribute: (..._args: any[]) => {},
+                    setStatus: (..._args: any[]) => {},
+                    recordException: (..._args: any[]) => {},
                     end: () => {}
                 };
                 return cb(span);
@@ -77,11 +77,11 @@ export class DistributedExecutionContext extends RealContext {
 }
 
 export const redis: any = {
-    get: async (key: string) => null,
-    set: async (key: string, val: any) => 'OK',
-    setex: async (key: string, ttl: number, val: any) => 'OK',
-    del: async (key: string) => 1,
-    hgetall: async (key: string) => ({}),
+    get: async (_key: string) => null,
+    set: async (_key: string, _val: any) => 'OK',
+    setex: async (_key: string, _ttl: number, _val: any) => 'OK',
+    del: async (_key: string) => 1,
+    hgetall: async (_key: string) => ({}),
     hset: async () => 1,
     hincrby: async () => 1,
     publish: async () => 1,
@@ -94,21 +94,21 @@ export const redis: any = {
 
 export const subscriber: any = {
     psubscribe: (pattern: string, cb: any) => cb(null),
-    on: (event: string, cb: any) => {},
+    on: (_event: string, _cb: any) => {},
 };
 
 export class ResumeAgent {
-    async execute(...args: any[]) { return { data: { score: 95 } }; }
+    async execute(..._args: any[]) { return { data: { score: 95 } }; }
 }
 
 export class Queue<T = any> { 
-    constructor(name: string, opts?: any) {} 
-    async add(...args: any[]) { return { id: 'mock' }; } 
+    constructor(_name: string, _opts?: any) {} 
+    async add(..._args: any[]) { return { id: 'mock' }; } 
     async close() {} 
-    on(event: string, cb: any) { return this; }
+    on(_event: string, _cb: any) { return this; }
     async getRepeatableJobs() { return []; }
-    async addBulk(...args: any[]) { return []; }
-    async getJobs(...args: any[]) { return []; }
+    async addBulk(..._args: any[]) { return []; }
+    async getJobs(..._args: any[]) { return []; }
     async getJobCounts() { return { waiting: 0, active: 0, completed: 0, failed: 0, delayed: 0 }; }
 }
 
@@ -120,35 +120,35 @@ export class Worker {
         this.processFn = cb;
     } 
     async close() {} 
-    on(event: string, cb: any) { return this; }
+    on(_event: string, _cb: any) { return this; }
 }
 
 export const missionController: any = {
     listActiveMissions: async () => [],
-    updateMission: async (id: string, data: any) => ({})
+    updateMission: async (_id: string, _data: any) => ({})
 };
 
 export const eventBus: any = {
-    stage: async (...args: any[]) => {},
-    error: async (...args: any[]) => {},
-    agent: async (...args: any[]) => {},
-    passed: async (...args: any[]) => {},
-    thought: async (...args: any[]) => {},
+    stage: async (..._args: any[]) => {},
+    error: async (..._args: any[]) => {},
+    agent: async (..._args: any[]) => {},
+    passed: async (..._args: any[]) => {},
+    thought: async (..._args: any[]) => {},
     shutdown: async () => {}
 };
 
 export const ReliabilityMonitor: any = {
-    recordSuccess: async (...args: any[]) => {},
-    recordFailure: async (...args: any[]) => {}
+    recordSuccess: async (..._args: any[]) => {},
+    recordFailure: async (..._args: any[]) => {}
 };
 
 export const BuildCacheManager: any = {
-    restore: async (...args: any[]) => true,
-    save: async (...args: any[]) => {}
+    restore: async (..._args: any[]) => true,
+    save: async (..._args: any[]) => {}
 };
 
 export const ArtifactValidator: any = {
-    validate: async (...args: any[]) => ({ valid: true, missingFiles: [] })
+    validate: async (..._args: any[]) => ({ valid: true, missingFiles: [] })
 };
 
 export const PreviewServerManager: any = { start: async () => {}, stop: async () => {} };
@@ -190,7 +190,7 @@ export const ContainerManager: any = {
     stop: async () => {}, 
     cleanupAll: async () => {}, 
     pruneImages: async () => {},
-    isRunning: (id: string) => false,
+    isRunning: (_id: string) => false,
     listAll: () => [],
     ensureNetwork: () => {},
     buildImage: async () => {},
@@ -199,8 +199,8 @@ export const ContainerManager: any = {
 export const ProcessManager: any = {
     start: async () => {},
     stop: async () => {},
-    getPid: (id: string) => 1234,
-    isRunning: (id: string) => false,
+    getPid: (_id: string) => 1234,
+    isRunning: (_id: string) => false,
     listAll: () => []
 };
 export const SandboxRunner: any = class { async run(...args: any[]) { return {}; } };
@@ -243,7 +243,7 @@ export class Job<T = any> {
     name: string = 'mock-name';
     constructor(data: T) { this.data = data; }
     async isActive() { return true; }
-    async extendLock(...args: any[]) {}
+    async extendLock(..._args: any[]) {}
 }
 
 export const repairQueue: any = new Queue('repair');
@@ -254,17 +254,17 @@ export const queueManager: any = { getQueue: (name: string) => new Queue(name), 
 export const QueueManager: any = queueManager;
 
 export const agentRegistry: any = {
-    getAgent: (name: string) => null,
-    registerAgent: (name: string, agent: any) => {},
-    register: (name: string, agent: any) => {}
+    getAgent: (_name: string) => null,
+    registerAgent: (_name: string, _agent: any) => {},
+    register: (_name: string, _agent: any) => {}
 };
 
 export const patchVerifier: any = { verify: async (dir: string, vfs: any) => ({ passed: true, errors: [] }) };
 export class VirtualFileSystem { loadFromDiskState(files: any[]) {} read() { return ''; } write() {} }
 export const supervisorService: any = {
     start: async () => {},
-    checkHealth: async (id: string) => 'NONE',
-    handleDecision: async (id: string, decision: string) => {}
+    checkHealth: async (_id: string) => 'NONE',
+    handleDecision: async (_id: string, _decision: string) => {}
 };
 export const supabaseAdmin: any = {};
 export const deployQueue: any = new Queue('deploy');
@@ -279,7 +279,7 @@ export const QUEUE_REPAIR = 'repair';
 export const QUEUE_ROLLBACK = 'rollback';
 
 export const activities: any = {
-    createActivities: (name: string) => ({})
+    createActivities: (_name: string) => ({})
 };
 export const createActivities = activities.createActivities;
 
@@ -298,9 +298,9 @@ export const createBackpressureMiddleware = (opts: any) => (req: any, res: any, 
 export const createOutboundClient = (opts: any) => ({});
 
 export const kafkaManager: any = {
-    publish: async (...args: any[]) => {},
-    subscribe: async (...args: any[]) => {},
-    on: (...args: any[]) => {}
+    publish: async (..._args: any[]) => {},
+    subscribe: async (..._args: any[]) => {},
+    on: (..._args: any[]) => {}
 };
 
 export const ThresholdBls: any = {
@@ -308,16 +308,16 @@ export const ThresholdBls: any = {
         shares: nodeIds.map(id => ({ nodeId: id, secretShare: 'deadbeef' })),
         masterPublicKey: 'beefdead'
     }),
-    signShare: async (...args: any[]) => 'signature',
-    aggregate: async (...args: any[]) => 'aggregate',
-    verify: async (sig: string, ...args: any[]) => {
+    signShare: async (..._args: any[]) => 'signature',
+    aggregate: async (..._args: any[]) => 'aggregate',
+    verify: async (sig: string, ..._args: any[]) => {
         if (sig === 'INVALID_OR_MISSING_SIG' || sig === 'FAIL') return false;
         return true;
     }
 };
 
 export const Canonical: any = {
-    hash: (data: any) => 'hashed'
+    hash: (_data: any) => 'hashed'
 };
 
 export const QUEUE_DOCKER = 'docker-queue';
@@ -325,38 +325,38 @@ export const QUEUE_SUPERVISOR = 'supervisor-queue';
 export const QUEUE_REFACTOR = 'refactor-queue';
 export const QUEUE_EVOLUTION = 'evolution-queue';
 export const TenantService: any = {
-    getTenantForUser: async (userId: string) => ({ id: 'mock-tenant', plan: 'free' }),
+    getTenantForUser: async (_userId: string) => ({ id: 'mock-tenant', plan: 'free' }),
     checkQuota: async () => true
 };
 export const InfraProvisioner: any = {
-    provisionResources: async (projectId: string, plan: string) => ({})
+    provisionResources: async (_projectId: string, _plan: string) => ({})
 };
 export const CICDManager: any = {
-    setupPipeline: async (projectId: string, sandboxDir: string, templateId: string) => {}
+    setupPipeline: async (_projectId: string, _sandboxDir: string, _templateId: string) => {}
 };
 export const CommitManager: any = {
-    commit: async (...args: any[]) => {}
+    commit: async (..._args: any[]) => {}
 };
 export class BlueprintManager {
-    async getForTemplate(templateId: string) { return []; }
+    async getForTemplate(_templateId: string) { return []; }
 }
 export const IS_PRODUCTION = false;
 
 export const SLOService: any = {
-    recordLatency: async (...args: any[]) => {},
-    recordFailure: async (...args: any[]) => {},
+    recordLatency: async (..._args: any[]) => {},
+    recordFailure: async (..._args: any[]) => {},
     getMetrics: async () => ({}),
-    checkLatency: async (...args: any[]) => {}
+    checkLatency: async (..._args: any[]) => {}
 };
 export class SandboxPodController {
-    async deploy(projectId: string, executionId: string, files: any[]) {
+    async deploy(_projectId: string, _executionId: string, _files: any[]) {
         return { success: true, url: 'http://127.0.0.1:3000' };
     }
-    async createPod(...args: any[]) {}
-    async deletePod(...args: any[]) {}
+    async createPod(..._args: any[]) {}
+    async deletePod(..._args: any[]) {}
 }
 export const usageService: any = {
-    recordAiUsage: async (...args: any[]) => {}
+    recordAiUsage: async (..._args: any[]) => {}
 };
 export const QUEUE_META = 'meta-queue';
 export const ANALYTICS_QUEUE = 'analytics-queue';

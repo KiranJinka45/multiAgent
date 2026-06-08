@@ -1,3 +1,5 @@
+import { IncomingMessage, ServerResponse } from 'http';
+
 /**
  * 11.8 Freeze: Browser Security Policy & Isolation
  * 
@@ -5,8 +7,7 @@
  * and Trusted Types to protect the SRE Governance Console from XSS, 
  * iframe-jacking, and malicious extensions.
  */
-
-export const applyGovernanceSecurityHeaders = (req: any, res: any, next: any) => {
+export const applyGovernanceSecurityHeaders = (req: IncomingMessage, res: ServerResponse, next: (err?: unknown) => void) => {
   // 1. Content Security Policy (CSP)
   // Strictly disables inline scripts, eval, and unauthorized external assets.
   // Requires Trusted Types for DOM manipulations.

@@ -55,7 +55,7 @@ export class ReplayShrinker {
           tokenStep = Math.floor(tokenStep / 2);
         }
       }
-    } catch (e) {
+    } catch (_e) {
       // Tokenizer failed, fallback to safe byte reduction
     }
 

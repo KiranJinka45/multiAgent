@@ -1,0 +1,25 @@
+[
+  {
+    "name": "v1.5-full-dkg-sign-verify",
+    "description": "Full DKG → Sign → Aggregate → Verify cycle (ground truth)",
+    "input": {
+      "ceremonyId": "CER-VECTOR-GEN-2026",
+      "threshold": 2,
+      "messageHash": "edbd8772c45ff97a026391582efcddba0a7c2dfe0e2b2538422a97299274e741",
+      "eligiblePublicKeys": [
+        "aa5ca2e4025155c8de1826fc2044154eb2a7734efa6c71764d05a6c8e25f3f4ef9e076fc456ad5de8276e2c83126b643",
+        "b9a22c632fcf19a944eea67786d053c480f5dd9af4239c3ede7c2a17b9ec82ee6d6d967aa4b0ef153b3e694c8dcef2f3",
+        "a8c98a4949abb3614feb8044e014f5c4285ddd887c5e9c94fa848d6e63de05fc9819b3760955ff98c62d8775e8897277"
+      ],
+      "masterPublicKey": "ae964f926f790d097bf19184e4d176785b9ebd852e7311239d70983e15e9b9d1c8d18f456121eeee1a5af36cd1662a6d"
+    },
+    "expectedCanonicalLayout": "000000134345522d564543544f522d47454e2d323032360000000200000090a8c98a4949abb3614feb8044e014f5c4285ddd887c5e9c94fa848d6e63de05fc9819b3760955ff98c62d8775e8897277aa5ca2e4025155c8de1826fc2044154eb2a7734efa6c71764d05a6c8e25f3f4ef9e076fc456ad5de8276e2c83126b643b9a22c632fcf19a944eea67786d053c480f5dd9af4239c3ede7c2a17b9ec82ee6d6d967aa4b0ef153b3e694c8dcef2f300000020edbd8772c45ff97a026391582efcddba0a7c2dfe0e2b2538422a97299274e741",
+    "bindingHash": "53dbb1f2a0a55a1342c99407192b36e2aebb43108dccc092461d9bf8b2baeb7d",
+    "aggregateSignature": "8b28cc2086e61e7519e6257d0998802d38ec3706316829d3c9dbc4bf294a22c05fbb002f8d7a5bb73742ab1db5d5f5140f6f47dc3032668c31e06af943c638e8e15465cdac498399597a6bc4e0816221a7ce310dbe9918b3c793e25eca646b7d",
+    "signerIndices": [
+      1,
+      2
+    ],
+    "verified": true
+  }
+]

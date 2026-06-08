@@ -21,7 +21,7 @@ async function runPhaseADrill() {
 
     // 1. BASELINE: Healthy Evidence Stream
     console.log('\n[1] Establishing Trusted Baseline...');
-    const baselineAuditId = `AUDIT-${Date.now()}-BASE`;
+    const _baselineAuditId = `AUDIT-${Date.now()}-BASE`;
     
     // 2. STRESSOR: Evidence Duplication
     console.log('\n[2] Injecting Stressor: EVIDENCE_DUPLICATION...');

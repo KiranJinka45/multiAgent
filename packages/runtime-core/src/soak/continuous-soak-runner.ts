@@ -47,7 +47,7 @@ export class ContinuousSoakRunner {
         this.lockRecorder.start();
         this.parityWorker.start();
 
-        const startTime = Date.now();
+        const _startTime = Date.now();
         let prevHash = 'sha256:0000000000000000000000000000000000000000000000000000000000000000';
 
         // Initialize prevHash with the latest block hash
@@ -58,7 +58,7 @@ export class ContinuousSoakRunner {
             if (latest) {
                 prevHash = latest.hash;
             }
-        } catch (e) {}
+        } catch (_e) {}
 
         // 2. Continuous write loop (5 mutations per second = every 200ms)
         this.mutationTimer = setInterval(async () => {

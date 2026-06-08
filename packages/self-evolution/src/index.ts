@@ -7,8 +7,8 @@ export class SystemMetrics {
 }
 
 export class SelfEvolver {
-    constructor(opts?: any) {}
-    async evolve(metrics: SystemMetrics, logs: string[]) {
+    constructor(_opts?: any) {}
+    async evolve(_metrics: SystemMetrics, _logs: string[]) {
         return { success: true };
     }
 }

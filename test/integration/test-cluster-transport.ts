@@ -37,7 +37,7 @@ class TcpClusterTester {
 
         const portA = 40000 + Math.floor(Math.random() * 10000);
         const portB = portA + 1;
-        let portC = portA + 2;
+        const portC = portA + 2;
 
         const transportA = new TcpReplicationTransport('node-a', portA);
         const transportB = new TcpReplicationTransport('node-b', portB);

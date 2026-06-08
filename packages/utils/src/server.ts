@@ -16,7 +16,7 @@ import { BuildCache } from './build-cache.js';
 // SCOPE REDUCTION (v1.6.0 Audit): LLM orchestration is not implemented.
 // The original import was: import { llmService } from '@packages/ai';
 // If called, this will throw to prevent silent fabrication of AI capabilities.
-const llmService: any = new Proxy({}, { get(_, prop) { throw new Error(`[SCOPE_BOUNDARY] LLM orchestration is not implemented. Attempted to access llmService.${String(prop)}. See v1.6.0 audit.`); } });
+const _llmService: any = new Proxy({}, { get(_, prop) { throw new Error(`[SCOPE_BOUNDARY] LLM orchestration is not implemented. Attempted to access llmService.${String(prop)}. See v1.6.0 audit.`); } });
 // SCOPE REDUCTION (v1.6.0 Audit): Supabase integration is not implemented.
 const supabaseClient: any = new Proxy({}, { get(_, prop) { throw new Error(`[SCOPE_BOUNDARY] Supabase integration is not implemented. Attempted to access supabaseClient.${String(prop)}. See v1.6.0 audit.`); } });
 
@@ -57,14 +57,14 @@ export class VirtualFileSystem {
     }
 }
 export const ArtifactValidator: any = {
-    validate: async (...args: any[]) => ({ valid: true, missingFiles: [] })
+    validate: async (..._args: any[]) => ({ valid: true, missingFiles: [] })
 };
 export const ContainerManager: any = { 
     start: async () => ({ containerId: 'mock-container', containerName: 'mock-name' }), 
     stop: async () => {}, 
     cleanupAll: async () => {}, 
     pruneImages: async () => {},
-    isRunning: (id: string) => false,
+    isRunning: (_id: string) => false,
     listAll: () => [],
     ensureNetwork: () => {},
     buildImage: async () => {},
@@ -147,7 +147,7 @@ export const eventBus: any = {
                 if (info && info[0]) {
                     return info[0][3] || 1;
                 }
-            } catch (e) {}
+            } catch (_e) {}
             return 1;
         };
 
@@ -181,7 +181,7 @@ export const eventBus: any = {
                             }
                         }
                     }
-                } catch (err: any) {
+                } catch (_err: any) {
                     await new Promise(r => setTimeout(r, 2000));
                 }
             }
@@ -251,7 +251,7 @@ export const eventBus: any = {
         const payload = JSON.stringify({ missionId, message, level, agent_id, tenantId: tenantId || 'system', timestamp: new Date().toISOString() });
         await safePublish('log-events', payload);
     },
-    complete: async (executionId: string, payload: any = {}, projectId?: string, tenantId?: string, ...args: any[]) => {
+    complete: async (executionId: string, payload: any = {}, projectId?: string, tenantId?: string, ..._args: any[]) => {
         await eventBus.publish('complete', {
             executionId,
             message: payload.message || 'Build completed successfully',
@@ -429,7 +429,7 @@ if (!(globalThis as any).__redisClient) {
             get: async (key: string) => store.get(key) || null,
             set: async (key: string, value: string) => { store.set(key, value); },
             del: async (...keys: string[]) => { keys.forEach(k => { store.delete(k); lists.delete(k); sets.delete(k); }); },
-            keys: async (pat: string) => Array.from(store.keys()).filter(k => k.startsWith('ztan:')),
+            keys: async (_pat: string) => Array.from(store.keys()).filter(k => k.startsWith('ztan:')),
             sadd: async (key: string, val: string) => { if(!sets.has(key)) sets.set(key, new Set()); sets.get(key)!.add(val); },
             sismember: async (key: string, val: string) => sets.get(key)?.has(val) ? 1 : 0,
             lrange: async (key: string, start: number, stop: number) => lists.get(key)?.slice(start, stop === -1 ? undefined : stop + 1) || [],
@@ -446,6 +446,21 @@ if (!(globalThis as any).__redisClient) {
             }
         };
         (globalThis as any).__redisClient = mockRedis;
+    } else if (process.env.REDIS_SENTINEL_HOSTS) {
+        const sentinels = process.env.REDIS_SENTINEL_HOSTS.split(',').map(s => {
+            const [host, port] = s.split(':');
+            return { host, port: parseInt(port, 10) || 26379 };
+        });
+        const client = new Redis({
+            sentinels,
+            name: process.env.REDIS_SENTINEL_NAME || 'mymaster',
+            ...redisConfig
+        });
+        client.on('connect', () => logger.info('[Redis] Connection established successfully via Sentinel'));
+        client.on('error', (err: any) => logger.error({ err: err.message }, '[Redis] Critical connection failure'));
+        client.on('reconnecting', (ms: number) => logger.warn({ delayMs: ms }, '[Redis] Attempting reconnection...'));
+
+        (globalThis as any).__redisClient = client;
     } else if (REDIS_URL) {
         const client = new Redis(REDIS_URL, redisConfig);
         client.on('connect', () => logger.info('[Redis] Connection established successfully'));
@@ -454,7 +469,7 @@ if (!(globalThis as any).__redisClient) {
 
         (globalThis as any).__redisClient = client;
     } else {
-        const errorMsg = '[Redis] FATAL: REDIS_URL environment variable is missing. Infrastructure persistence is mandatory in Maintenance Era.';
+        const errorMsg = '[Redis] FATAL: REDIS_URL or REDIS_SENTINEL_HOSTS environment variable is missing. Infrastructure persistence is mandatory in Maintenance Era.';
         logger.error(errorMsg);
         throw new Error(errorMsg);
     }
@@ -495,7 +510,7 @@ const redisProxy = new Proxy(rawRedis, {
 
             const value = Reflect.get(target, prop, receiver);
             if (typeof value === 'function') {
-                return async function (...args: any[]) {
+                return async function (..._args: any[]) {
                     const err = new Error('Connection lost');
                     err.name = 'RedisConnectionError';
                     throw err;
@@ -589,7 +604,7 @@ export const missionController = {
         }
         return await db.mission.findFirst({ where: { id, tenantId } });
     },
-    createMission: async (mission: any, steps: any[] = []) => {
+    createMission: async (mission: any, _steps: any[] = []) => {
         const tenantId = mission.tenantId || 'system';
         
         // 🛡️ Phase 3.1: Distributed Governance Enforcement
@@ -649,7 +664,7 @@ export const missionController = {
             }
         });
     },
-    triggerDeployment: async (...args: any[]) => ({ success: true }),
+    triggerDeployment: async (..._args: any[]) => ({ success: true }),
     listActiveMissions: async (tenantId?: string) => {
         const where: any = { status: { in: ['queued', 'in-progress'] } };
         if (tenantId) where.tenantId = tenantId;
@@ -703,8 +718,8 @@ import { registry as realRegistry, Counter as RealCounter, Gauge as RealGauge } 
 
 export const AppService = { getStatus: async () => 'online' };
 export const MetricService = { record: (...args: any[]) => { } };
-export const registry = realRegistry;
-export const agentRegistry = registry;
+export const registry: any = realRegistry;
+export const agentRegistry: any = registry;
 
 export const runtimeCrashesTotal = new RealCounter({
     name: 'runtime_crashes_total_custom',
@@ -730,7 +745,7 @@ export class SandboxRunner {
     run() { }
     stop() { }
     static async listAll() { return []; }
-    static spawnLongRunning(...args: any[]) { return { on: () => { }, kill: () => { }, [Symbol.iterator]: function* () { } }; }
+    static spawnLongRunning(..._args: any[]) { return { on: () => { }, kill: () => { }, [Symbol.iterator]: function* () { } }; }
 }
 
 export const RollingRestart = { execute: async () => { }, isDraining: false };
@@ -747,7 +762,7 @@ export const QueueManager = {
             const plan = (limits as any).plan || 'free';
             if (plan === 'enterprise') priority = 1;
             if (plan === 'pro') priority = 5;
-        } catch (e) {
+        } catch (_e) {
             logger.warn({ tenantId }, '[QueueManager] Failed to fetch plan for priority, defaulting to 10');
         }
 
@@ -819,9 +834,9 @@ export const patchEngine = {
 
 // Port Manager
 export const PortManager = {
-    acquirePorts: async (...args: any[]) => [3000],
-    releasePorts: async (...args: any[]) => { },
-    acquireFreePort: async (...args: any[]) => 3000,
+    acquirePorts: async (..._args: any[]) => [3000],
+    releasePorts: async (..._args: any[]) => { },
+    acquireFreePort: async (..._args: any[]) => 3000,
 };
 
 // Bridge Export (Deprecated structure for compatibility)

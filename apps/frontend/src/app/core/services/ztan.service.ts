@@ -44,7 +44,7 @@ export class ZtanService {
     try {
       const res = await firstValueFrom(this.api.get<{ active: SessionState }>('/ztan/session/active'));
       return this.mapSession(res.active);
-    } catch (e) {
+    } catch (_e) {
       return null;
     }
   }

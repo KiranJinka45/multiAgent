@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { rekor } from './mock-rekor';
+import { rekor } from './mock-rekor.js';
 import * as crypto from 'crypto';
 
 describe('Rekor PEM Propagation & Fallback', () => {

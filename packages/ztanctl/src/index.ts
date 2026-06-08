@@ -28,7 +28,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const configPath = path.resolve(__dirname, '../../../configs/governance-stabilization/v1.json');
-const policy = JSON.parse(readFileSync(configPath, 'utf8')).policies;
+const _policy = JSON.parse(readFileSync(configPath, 'utf8')).policies;
 
 dotenv.config();
 

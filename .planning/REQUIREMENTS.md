@@ -7,8 +7,8 @@
 
 ### Technical Debt Reduction (OPS-MAINT-DEBT)
 
-- [ ] **OPS-MAINT-DEBT-01**: Resolve implicit `any` types in core engine modules.
-- [ ] **OPS-MAINT-DEBT-02**: Remove all unused local variables and dead parameters flagged by TS/ESLint.
+- [x] **OPS-MAINT-DEBT-01**: Resolve implicit `any` types in core engine modules.
+- [x] **OPS-MAINT-DEBT-02**: Remove all unused local variables and dead parameters flagged by TS/ESLint.
 
 ### Bare-Metal Portability (OPS-MAINT-PORT)
 
@@ -48,8 +48,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| OPS-MAINT-DEBT-01 | Phase 8 | Pending |
-| OPS-MAINT-DEBT-02 | Phase 8 | Pending |
+| OPS-MAINT-DEBT-01 | Phase 8 | Complete |
+| OPS-MAINT-DEBT-02 | Phase 8 | Complete |
 | OPS-MAINT-PORT-01 | Phase 9 | Pending |
 | OPS-MAINT-DRIFT-01 | Phase 10 | Pending |
 | OPS-MAINT-BACKUP-01 | Phase 11 | Pending |

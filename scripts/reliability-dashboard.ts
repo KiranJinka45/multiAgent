@@ -663,7 +663,7 @@ function calculateScorecard(current: any, baseline: any, isSegment = false): Sco
 }
 
 function resolveDefaultBaseline(current: any): any {
-  let baseline = current;
+  const baseline = current;
   const regPath = path.join(BASELINES_DIR, 'registry.json');
   if (fs.existsSync(regPath)) {
     try {

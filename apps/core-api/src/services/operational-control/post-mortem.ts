@@ -23,7 +23,7 @@ export class PostMortemService {
           findings: results,
           status: 'verified'
       };
-    } catch (error) {
+    } catch (_error) {
       return { error: 'forensics_failed' };
     }
   }
@@ -39,7 +39,7 @@ export class PostMortemService {
           drift,
           confidence: 0.95
       };
-    } catch (error) {
+    } catch (_error) {
       return { error: 'drift_analysis_failed' };
     }
   }

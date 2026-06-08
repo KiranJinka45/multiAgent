@@ -30,13 +30,13 @@ app.use(((req: Request, res: Response, next: NextFunction): void => {
 }) as RequestHandler);
 
 // Metrics
-app.get('/metrics', (async (req: Request, res: Response): Promise<void> => {
+app.get('/metrics', (async (_req: Request, res: Response): Promise<void> => {
     res.set('Content-Type', registry.contentType);
     res.end(await registry.metrics());
 }) as RequestHandler);
 
 // Health Check
-app.get('/health', ((req: Request, res: Response): void => {
+app.get('/health', ((_req: Request, res: Response): void => {
     res.json({ status: 'healthy', timestamp: Date.now(), service: 'core-api' });
 }) as RequestHandler);
 

@@ -265,7 +265,7 @@ export class FederatedGovernanceEngine {
             try {
                 const parsed = JSON.parse(proposalJson);
                 terms = { ...terms, ...parsed };
-            } catch (e) {
+            } catch {
                 console.warn(`[FEDERATION] Failed to parse proposal JSON. Using baseline treaty terms.`);
             }
         }

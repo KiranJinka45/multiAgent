@@ -9,7 +9,7 @@ const logger = {
 let telemetryMetrics: any = null;
 try {
     telemetryMetrics = await import('../../observability/src/index.js');
-} catch (e) {
+} catch (_e) {
     // Silence if direct relative path resolution fails
 }
 
@@ -89,10 +89,10 @@ export class PostgresChaosDrillOrchestrator {
         }
 
         // Attempt write after step down
-        let writeAttempted = false;
+        const writeAttempted = false;
         let writeOutcome = '';
         try {
-            writeAttempted = true;
+            _writeAttempted = true;
             if (!nodeA.writeRights) {
                 throw new Error('Strict Cluster Fencing Violation: Write blocked, node is fenced.');
             }
@@ -121,7 +121,7 @@ export class PostgresChaosDrillOrchestrator {
         const findings: string[] = [];
 
         // DB state
-        let currentDBLeaseOwner = 'node-a';
+        const currentDBLeaseOwner = 'node-a';
         let currentDBGeneration = 42;
 
         // Node-A goes to sleep (Zombie)
@@ -129,7 +129,7 @@ export class PostgresChaosDrillOrchestrator {
         
         // Timeout occurs on DB, Node-B claims the lease and increments generation
         findings.push('EVENT: DB lease expires. Node B claims authority.');
-        currentDBLeaseOwner = 'node-b';
+        _currentDBLeaseOwner = 'node-b';
         currentDBGeneration = 43;
         findings.push(`STATE: Authoritative Epoch incremented to: ${currentDBGeneration}`);
         recordMetric.gaugeSet('activeLeaseGeneration', currentDBGeneration, { node_id: 'node-b' });
@@ -216,7 +216,7 @@ export class PostgresChaosDrillOrchestrator {
         const node = {
             id: 'node-a',
             dbReachable: false,
-            write(payload: string) {
+            write(_payload: string) {
                 if (!this.dbReachable) {
                     throw new Error('Strict Cluster Fencing Violation: Database isolated. Write aborted to preserve consistency (CP mode).');
                 }
@@ -260,7 +260,7 @@ export class PostgresChaosDrillOrchestrator {
         const replicationLagBytes = (primaryDB.lastSeq - readReplica.lastSeq) * 8192; // 8KB per block
         recordMetric.gaugeSet('postgresWalReplayLagBytes', replicationLagBytes);
 
-        const requestLeaseTransfer = (nodeId: string) => {
+        const requestLeaseTransfer = (_nodeId: string) => {
             // Safe guard: check read replica lag against current gen requirements
             if (readReplica.lastSeq < primaryDB.lastSeq) {
                 throw new Error('Lease Transfer Aborted: Read replica exhibits WAL lag. Stale reads forbidden for coordination.');
@@ -372,7 +372,7 @@ export class PostgresChaosDrillOrchestrator {
         const findings: string[] = [];
 
         let outboxEventsProcessed = 0;
-        let packetsLostCount = 0;
+        const packetsLostCount = 0;
 
         const processOutbox = () => {
             outboxEventsProcessed++;
@@ -380,7 +380,7 @@ export class PostgresChaosDrillOrchestrator {
         };
 
         // Event: LISTEN/NOTIFY packet lost
-        packetsLostCount++;
+        _packetsLostCount++;
         findings.push('EVENT: PostgreSQL NOTIFY packet dropped in transit.');
         recordMetric.counterInc('replayAuditDriftsTotal', { service: 'listen_notify', severity: 'low' });
 

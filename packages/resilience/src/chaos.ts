@@ -3,7 +3,7 @@ import { promisify } from "util";
 import { logger } from "@packages/observability";
 import { redis } from "@packages/utils";
 
-const execAsync = promisify(exec);
+const _execAsync = promisify(exec);
 
 /**
  * CONTINUOUS CHAOS RUNNER

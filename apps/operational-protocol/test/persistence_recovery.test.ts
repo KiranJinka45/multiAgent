@@ -26,7 +26,7 @@ describe('ZTAN Persistence & Recovery Simulation', () => {
         for (let i = 0; i < 2; i++) {
             const share = nodeShares[i];
             const sig = await ThresholdCrypto.signPartial(msg, share.share, share.nodeId, T, NODE_IDS);
-            const res = await engine1.recordAttestation({
+            const _res = await engine1.recordAttestation({
                 eventId,
                 verifierId: share.nodeId,
                 status: 'PASS',

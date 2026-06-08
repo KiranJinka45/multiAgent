@@ -119,7 +119,7 @@ export class PersistenceArchaeologist {
     if (publicKeyPem) {
       try {
         pubKey = crypto.createPublicKey(publicKeyPem);
-      } catch (e) {}
+      } catch (_e) {}
     } else {
       // Look for default operator key
       const defaultPubKeyPath = path.join(process.cwd(), '.ztan-transparency', 'keys', 'operator.pub');
@@ -127,12 +127,12 @@ export class PersistenceArchaeologist {
         try {
           const pem = fs.readFileSync(defaultPubKeyPath, 'utf8');
           pubKey = crypto.createPublicKey(pem);
-        } catch (e) {}
+        } catch (_e) {}
       }
     }
 
     // 4. Audit Block Chain Hash and Cryptographic Signatures
-    let prevHash = entries[0] ? entries[0].prevHash : '';
+    const _prevHash = entries[0] ? entries[0].prevHash : '';
     for (let i = 0; i < entries.length; i++) {
       const entry = entries[i];
       const corruptTypes: CorruptionInspectionResult['corruptions'][0]['types'] = [];
@@ -291,7 +291,7 @@ export class PersistenceArchaeologist {
           repaired = true;
           break;
         }
-      } catch (e) {
+      } catch (_e) {
         // Continue backtracking
       }
       lastBraceIdx = content.lastIndexOf('}', lastBraceIdx - 1);
@@ -304,7 +304,7 @@ export class PersistenceArchaeologist {
           entries = parsed;
           repaired = true;
         }
-      } catch (e) {
+      } catch (_e) {
         stats.errorMessage = 'No valid JSON block sequence prefix could be extracted';
         return stats;
       }
@@ -368,7 +368,7 @@ export class PersistenceArchaeologist {
       verify.update(payload);
       verify.end();
       return verify.verify(publicKey, Buffer.from(signatureBase64, 'base64'));
-    } catch (e) {
+    } catch (_e) {
       return false;
     }
   }

@@ -9,7 +9,7 @@ const mockRedis = {
     get: vi.fn(async (key: string) => store.get(key) || null),
     set: vi.fn(async (key: string, value: string) => { store.set(key, value); }),
     del: vi.fn(async (...keys: string[]) => { keys.forEach(k => { store.delete(k); lists.delete(k); sets.delete(k); }); }),
-    keys: vi.fn(async (pat: string) => Array.from(store.keys()).filter(k => k.startsWith('ztan:'))),
+    keys: vi.fn(async (_pat: string) => Array.from(store.keys()).filter(k => k.startsWith('ztan:'))),
     sadd: vi.fn(async (key: string, val: string) => { if(!sets.has(key)) sets.set(key, new Set()); sets.get(key)!.add(val); }),
     sismember: vi.fn(async (key: string, val: string) => sets.get(key)?.has(val) ? 1 : 0),
     lrange: vi.fn(async (key: string, start: number, stop: number) => lists.get(key)?.slice(start, stop === -1 ? undefined : stop + 1) || []),

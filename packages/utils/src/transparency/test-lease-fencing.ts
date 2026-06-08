@@ -28,7 +28,7 @@ async function runLeaseFencingValidation() {
   if (fs.existsSync(LEDGER_DIR)) {
     try {
       fs.rmSync(LEDGER_DIR, { recursive: true, force: true });
-    } catch (e) {
+    } catch (_e) {
       const cleanDir = (p: string) => {
         if (fs.existsSync(p)) {
           fs.readdirSync(p).forEach(file => {

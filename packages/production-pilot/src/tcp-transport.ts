@@ -154,13 +154,13 @@ export class TcpReplicationTransport implements ReplicationTransport {
                     this.processMessage(socket, parsed).catch((err) => {
                         console.error(`[TCP Transport ${this.localNodeId}] Error processing message: ${err.message}`);
                     });
-                } catch (err) {
+                } catch (_err) {
                     // Silent ignore of framing garbage
                 }
             }
         });
 
-        socket.on('error', (err) => {
+        socket.on('error', (_err) => {
             // Ignore normal connection resets from peers
         });
     }
@@ -190,7 +190,7 @@ export class TcpReplicationTransport implements ReplicationTransport {
                     payload: responseMsg
                 };
                 this.writeToSocket(socket, JSON.stringify(responseWrap) + '\n');
-            } catch (err: any) {
+            } catch (_err: any) {
                 // Send back an error or just timeout? For replication, returning the error is fine or timeout.
                 // We'll let it timeout for simplicity if the handler fails catastrophically.
             }

@@ -123,7 +123,7 @@ try {
       const input = fixture.input;
       
       // Build 70 levels deep nested structure dynamically
-      let deepObj: any = {};
+      const deepObj: any = {};
       let current = deepObj;
       for (let depth = 0; depth < 70; depth++) {
         current.nest = {};

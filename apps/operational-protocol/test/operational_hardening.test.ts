@@ -3,7 +3,7 @@ import { ThresholdCrypto } from '../src/crypto-utils';
 import { ConsensusEngine } from '../src/consensus-engine';
 
 describe('ZTAN Phase 12: Operational Hardening & Observer Network', () => {
-    let nodeShares: any[];
+    let _nodeShares: any[];
     
     const BASE_T = 3;
     const N = 5;

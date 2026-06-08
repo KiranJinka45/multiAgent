@@ -26,7 +26,8 @@ COPY turbo.json tsconfig*.json tsup.config.base.ts ./
 
 # Generate Prisma Client (Crucial for @packages/db resolution)
 # With our new schema config, this will output to packages/db/src/generated/client
-RUN pnpm prisma generate --schema=packages/db/prisma/schema.prisma
+# Generate Prisma client using the monorepo's installer context
+RUN pnpm --filter=@packages/db exec prisma generate
 
 # Build the app and its workspace dependencies
 RUN pnpm turbo build --filter=@apps/core-api...
@@ -43,7 +44,7 @@ WORKDIR /app
 # Non-root user for security
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 runner
-USER runner
+USER 1001
 
 # Copy deployment artifact from installer
 COPY --from=installer --chown=runner:nodejs /app/deploy .

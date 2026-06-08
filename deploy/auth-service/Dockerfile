@@ -10,6 +10,7 @@ RUN corepack enable && corepack prepare pnpm@10.33.0 --activate
 
 # Copy monorepo configuration
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json .npmrc turbo.json tsconfig*.json tsup.config.base.ts ./
+COPY scripts/ ./scripts/
 COPY packages/ ./packages/
 COPY apps/auth-service/ ./apps/auth-service/
 
@@ -21,16 +22,18 @@ RUN pnpm turbo build --filter=@apps/auth-service...
 
 # Deploy the app to a separate directory for production
 # This isolates the app and its dependencies (including workspace symlinks)
-RUN pnpm --filter=@apps/auth-service deploy /prod/auth-service
+RUN pnpm --filter=@apps/auth-service deploy --legacy /prod/auth-service
+RUN cp -r node_modules/.prisma /prod/auth-service/node_modules/
 
 # -------- RUNTIME STAGE --------
 FROM node:20-alpine AS runner
+RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
 # Ensure non-root usage
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 runner
-USER runner
+USER 1001
 
 # Copy the deployed app from the builder
 COPY --from=builder --chown=runner:nodejs /prod/auth-service .

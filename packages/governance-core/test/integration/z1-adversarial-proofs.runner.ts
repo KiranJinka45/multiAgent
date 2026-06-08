@@ -4,7 +4,6 @@ import { OPAGovernanceLayer } from '../../src/opa/policy-enforcer.js';
 import { TemporalWorkflowOrchestrator } from '../../src/escalation/temporal-workflow.js';
 import { GovernanceLedger } from '../../src/ledger/ledger.js';
 import * as path from 'path';
-import * as fs from 'fs';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -31,9 +30,8 @@ async function runProofs() {
     try {
         // We bypass the actual DB connection for the proof by overriding the method directly
         // since we just need to prove the logic structure.
-        const originalFindFirst = (projectService as any).verifyProjectOwnership;
+        const _originalFindFirst = (projectService as unknown as { verifyProjectOwnership: unknown }).verifyProjectOwnership;
         
-        let threwError = false;
         try {
             // Because we don't have the real DB running in this script, we stub the internal call
             // Alternatively, we can just prove it via the source code diff, but let's try calling it.
@@ -47,8 +45,8 @@ async function runProofs() {
                 projectService.saveProjectFiles.length === 3, 
                 'projectService.saveProjectFiles requires tenantId (length === 3)'
             );
-        } catch (err: any) {
-            threwError = true;
+        } catch (_err: unknown) {
+            // ignore
         }
     } catch (e) {
         console.error(e);
@@ -74,14 +72,14 @@ async function runProofs() {
     // ────────────────────────────────────────────────────────────────────────
     try {
         // We prove this by executing the middleware with a mocked error
-        const req: any = { headers: { 'x-tenant-id': 'tenant-test' }, path: '/api/v1/resource' };
+        const req: { headers: Record<string, string>; path: string } = { headers: { 'x-tenant-id': 'tenant-test' }, path: '/api/v1/resource' };
         
         let statusCode = 0;
-        let responseJson: any = null;
+        let _responseJson: unknown = null;
         
-        const res: any = {
+        const res = {
             status: (code: number) => { statusCode = code; return res; },
-            json: (data: any) => { responseJson = data; },
+            json: (data: unknown) => { _responseJson = data; },
             setHeader: () => {}
         };
         
@@ -103,7 +101,7 @@ async function runProofs() {
                 // If Redis is up, it passes.
                 assert(nextCalled, 'tenantLimiter passed with active Redis');
             }
-        } catch (err) {
+        } catch (_err) {
             assert(false, 'tenantLimiter threw unhandled exception');
         }
     } catch (e) {
@@ -151,16 +149,16 @@ async function runProofs() {
     // ────────────────────────────────────────────────────────────────────────
     try {
         // Reset the singleton
-        (GovernanceLedger as any).entries = [];
-        (GovernanceLedger as any).isLoaded = false;
+        (GovernanceLedger as unknown as { entries: unknown[]; isLoaded: boolean }).entries = [];
+        (GovernanceLedger as unknown as { entries: unknown[]; isLoaded: boolean }).isLoaded = false;
         
         // Initialize and write an entry
         GovernanceLedger.initialize();
         const entryId = GovernanceLedger.recordEvent('USER_ACTION', 'tenant-1', { action: 'test' });
         
         // Simulate crash
-        (GovernanceLedger as any).entries = [];
-        (GovernanceLedger as any).isLoaded = false;
+        (GovernanceLedger as unknown as { entries: unknown[]; isLoaded: boolean }).entries = [];
+        (GovernanceLedger as unknown as { entries: unknown[]; isLoaded: boolean }).isLoaded = false;
         
         // Recover
         GovernanceLedger.initialize();

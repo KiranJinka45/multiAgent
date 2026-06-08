@@ -16,7 +16,7 @@ async function runPhase1SecurityTests() {
         try {
             await IdentityService.registerNode('nodeD', 'invalid-key');
             console.error('❌ FAIL: Accepted invalid public key format');
-        } catch (e) {
+        } catch (_e) {
             console.log('✔ PASS: Rejected invalid public key format');
         }
 
@@ -25,7 +25,7 @@ async function runPhase1SecurityTests() {
         try {
             await IdentityService.registerNode('nodeE', validKey);
             console.error('❌ FAIL: Accepted duplicate public key');
-        } catch (e) {
+        } catch (_e) {
             console.log('✔ PASS: Rejected duplicate public key');
         }
 
@@ -40,7 +40,7 @@ async function runPhase1SecurityTests() {
         try {
             await TssCeremonyService.submitCommitments(staleMsg);
             console.error('❌ FAIL: Accepted stale message (>30s)');
-        } catch (e) {
+        } catch (_e) {
             console.log('✔ PASS: Rejected stale message');
         }
 
@@ -50,7 +50,7 @@ async function runPhase1SecurityTests() {
         try {
             await TssCeremonyService.submitCommitments(unregisteredMsg);
             console.error('❌ FAIL: Accepted message from unregistered node');
-        } catch (e) {
+        } catch (_e) {
             console.log('✔ PASS: Rejected unregistered node identity');
         }
 

@@ -6,7 +6,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsup src/index.ts --format esm --no-dts && tsc --emitDeclarationOnly -p tsconfig.json --declarationDir ./dist",
+    "build": "tsup src/index.ts --format esm --no-dts && node -e \"try { require('fs').unlinkSync('tsconfig.tsbuildinfo') } catch (e) {}\" && tsc --emitDeclarationOnly -p tsconfig.json --declarationDir ./dist",
     "dev": "tsup src/index.ts --format esm --no-dts --watch",
     "typecheck": "tsc --noEmit"
   },

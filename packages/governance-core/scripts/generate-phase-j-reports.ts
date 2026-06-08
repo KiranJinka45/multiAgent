@@ -29,15 +29,15 @@ async function runScenario(suite: string, name: string, fn: () => void | Promise
         await fn();
         results.push({ name, suite, status: 'PASS' });
         console.log(`✅ [${suite}] ${name}`);
-    } catch (err: any) {
-        results.push({ name, suite, status: 'FAIL', error: err.message });
-        console.error(`❌ [${suite}] ${name}: ${err.message}`);
+    } catch (err: unknown) {
+        results.push({ name, suite, status: 'FAIL', error: (err as Error).message });
+        console.error(`❌ [${suite}] ${name}: ${(err as Error).message}`);
     }
 }
 
 // Global metrics
 let quorumLimit = 0;
-let totalNodes = 3;
+const totalNodes = 3;
 
 async function main() {
     // J1: Full cluster commits

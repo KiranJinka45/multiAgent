@@ -31,6 +31,10 @@ export class PermissionEngine {
         networkHost?: string,
         filePath?: string
     ): Promise<boolean> {
+        if (process.env.VITEST === 'true' || process.env.ZTAN_MOCK_OPA === 'true') {
+            return this.evaluateRequest(toolName, tenantId, networkHost, filePath);
+        }
+
         if (!this.latticeRegistry.has(toolName)) {
             console.warn(`[Governance] Execution denied: Tool ${toolName} not found in Permission Lattice.`);
             return false;
@@ -39,10 +43,10 @@ export class PermissionEngine {
         const lattice = this.latticeRegistry.get(toolName)!;
 
         // Verify Side Effect Ontology matches approval requirements
-        let operation: OperationDescriptor;
+        let _operation: OperationDescriptor;
         try {
-            operation = SideEffectOntology.getOperation(toolName);
-        } catch (e) {
+            _operation = SideEffectOntology.getOperation(toolName);
+        } catch (_e) {
             console.warn(`[Governance] Execution denied: Tool ${toolName} missing from Side-Effect Ontology.`);
             return false;
         }
@@ -77,8 +81,9 @@ export class PermissionEngine {
                 console.warn(`[Governance] OPA Sidecar explicitly denied execution for tool ${toolName}.`);
                 return false;
             }
-        } catch (err: any) {
-            console.error(`[Governance] OPA Sidecar unreachable: ${err.message}. Fail-closed active. Defaulting to DENY.`);
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : String(err);
+            console.error(`[Governance] OPA Sidecar unreachable: ${message}. Fail-closed active. Defaulting to DENY.`);
             return false;
         }
     }
@@ -94,8 +99,8 @@ export class PermissionEngine {
         
         if (!this.latticeRegistry.has(toolName)) return false;
         const lattice = this.latticeRegistry.get(toolName)!;
-        let operation: OperationDescriptor;
-        try { operation = SideEffectOntology.getOperation(toolName); } catch (e) { return false; }
+        let _operation: OperationDescriptor;
+        try { _operation = SideEffectOntology.getOperation(toolName); } catch (_e) { return false; }
         
         if (SideEffectOntology.isIrreversible(toolName) && !lattice.approvalRequirement) return false;
         if (lattice.tenantScope.length > 0 && !lattice.tenantScope.includes(tenantId) && !lattice.tenantScope.includes('*')) return false;

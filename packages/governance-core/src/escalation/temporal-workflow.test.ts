@@ -4,7 +4,7 @@ vi.mock('@temporalio/workflow', () => {
     return {
         defineSignal: () => 'mock-signal',
         setHandler: () => {},
-        condition: async (fn: any, timeout: number) => {
+        condition: async (fn: () => boolean, timeout: number) => {
             const start = Date.now();
             while (!fn() && Date.now() - start < timeout) {
                 await new Promise(r => setTimeout(r, 10));

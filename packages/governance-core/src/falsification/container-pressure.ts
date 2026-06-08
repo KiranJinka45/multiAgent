@@ -97,10 +97,11 @@ export class ContainerPressureFuzzer {
                 if (survived) survivedCount++;
                 else exhaustedCount++;
 
-            } catch (err: any) {
+            } catch (err: unknown) {
                 survived = false;
                 exhaustedCount++;
-                response = `EXHAUSTED: Test harness crashed evaluating the vector: ${err.message}`;
+                const message = err instanceof Error ? err.message : String(err);
+                response = `EXHAUSTED: Test harness crashed evaluating the vector: ${message}`;
             }
 
             results.push({

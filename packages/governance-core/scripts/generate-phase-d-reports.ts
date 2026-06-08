@@ -39,9 +39,9 @@ async function runScenario(suite: string, name: string, fn: () => void | Promise
         await fn();
         results.push({ name, suite, status: 'PASS' });
         console.log(`✅ [${suite}] ${name}`);
-    } catch (err: any) {
-        results.push({ name, suite, status: 'FAIL', error: err.message });
-        console.error(`❌ [${suite}] ${name}: ${err.message}`);
+    } catch (err: unknown) {
+        results.push({ name, suite, status: 'FAIL', error: (err as Error).message });
+        console.error(`❌ [${suite}] ${name}: ${(err as Error).message}`);
     }
 }
 
@@ -170,7 +170,7 @@ async function main() {
         const adapter = new MockFirecrackerAdapter();
         const orchestrator = new FirecrackerOrchestrator(adapter);
         
-        const orphanedVmsSet = (IsolatedExecutionRunner as any).orphanedVms as Set<string>;
+        const orphanedVmsSet = (IsolatedExecutionRunner as unknown as { orphanedVms: Set<string> }).orphanedVms as Set<string>;
         orphanedVmsSet.add('vm-leaked-audit-test');
 
         await IsolatedExecutionRunner.sweepOrphanedVms(orchestrator);
@@ -198,8 +198,8 @@ async function main() {
         let memThrew = false;
         try {
             await runner.executeIsolated('vm-mem', 'run', { memorySizeMb: 5000 });
-        } catch (e: any) {
-            if (e.message.includes('exceeds maximum 2048MB boundary')) memThrew = true;
+        } catch (e: unknown) {
+            if ((e as Error).message.includes('exceeds maximum 2048MB boundary')) memThrew = true;
         }
         if (!memThrew) throw new Error('Failed to restrict excessive memory request');
 
@@ -215,8 +215,8 @@ async function main() {
         let timeoutThrew = false;
         try {
             await hangRunner.executeIsolated('vm-hang', 'hang', { executionTimeoutMs: 10 });
-        } catch (e: any) {
-            if (e.message.includes('[VM_TIMEOUT]')) timeoutThrew = true;
+        } catch (e: unknown) {
+            if ((e as Error).message.includes('[VM_TIMEOUT]')) timeoutThrew = true;
         }
         if (!timeoutThrew) throw new Error('Failed to terminate hanging command');
     });
@@ -269,7 +269,7 @@ async function main() {
         const corruptTelemetry = { hash: 'short-hash', timestamp: Date.now(), prevTimestamp: Date.now() - 1000 };
         const revertedTelemetry = { hash: 'a'.repeat(64), timestamp: Date.now() - 5000, prevTimestamp: Date.now() };
 
-        const validate = (tel: any) => {
+        const validate = (tel: unknown) => {
             if (!tel.hash || tel.hash.length !== 64 || tel.timestamp < tel.prevTimestamp) {
                 return 'QUARANTINE_INDETERMINATE';
             }

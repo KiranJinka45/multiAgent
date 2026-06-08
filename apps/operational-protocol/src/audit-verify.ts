@@ -3,7 +3,7 @@ import { StabilityCircuit, type ZKProof } from './stability-circuit.js';
 import { notaryService } from './notary-service.js';
 import type { VerificationNarrative, TrustLevel } from './types.js';
 
-const logger = console;
+const _logger = console;
 
 export interface AuditEntry {
   sequenceId: number;
@@ -41,7 +41,7 @@ export class AuditVerifier {
    * Verifies a single audit entry and generates a human-intelligible narrative.
    */
   public static async verifyEntry(entry: AuditEntry, groupPublicKey: string): Promise<VerificationNarrative> {
-    const { sequenceId, _audit, governance, _verification_data } = entry;
+    const { sequenceId, _audit, _verification_data } = entry;
     
     const findings: string[] = [];
     const evidence = {

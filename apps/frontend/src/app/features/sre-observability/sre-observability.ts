@@ -296,7 +296,7 @@ export class SreObservabilityComponent {
     this.activeTab.set('CERTIFICATION'); 
   }
 
-  public openReplay(entry: any) {
+  public openReplay(_entry: any) {
     this.showAnalytics.set(true);
     this.activeTab.set('CERTIFICATION'); 
   }

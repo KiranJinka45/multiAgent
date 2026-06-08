@@ -218,7 +218,7 @@ export class FollowerSyncAgent<E = any> {
                 snapshotStore.writeSnapshotAtomically(snapshot);
                 return true;
             }
-        } catch (err) {
+        } catch (_err) {
             // Ignore socket/transfer failure
         }
         return false;
@@ -330,7 +330,7 @@ export class ReplicatedWalCoordinator<E = any> {
                 if (pong && pong.type === 'HEARTBEAT') {
                     this.healthManager.recordHeartbeat(peerId);
                 }
-            } catch (err) {
+            } catch (_err) {
                 // Ignore send heartbeat errors
             }
         });
@@ -433,7 +433,7 @@ export class ReplicatedWalCoordinator<E = any> {
                     if (response.success) {
                         successfulAcks++;
                     }
-                } catch (err) {
+                } catch (_err) {
                     // Network failure or partition
                 }
             });

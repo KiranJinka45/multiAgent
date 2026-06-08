@@ -19,7 +19,7 @@ async function main() {
 
     const stderrLines: string[] = [];
     const originalStderrWrite = process.stderr.write;
-    process.stderr.write = (chunk: any, encoding?: any, cb?: any) => {
+    process.stderr.write = (chunk: string | Uint8Array, _encoding?: string, _cb?: (err?: Error) => void) => {
         stderrLines.push(chunk.toString());
         return true;
     };
@@ -54,10 +54,10 @@ async function main() {
     console.log('\nSCENARIO 2: Testing Circular Object Graph Poisoning...');
     
     // Construct a circular structure
-    const circularNode: any = { nodeId: 'node-poisoned', state: 'BYZANTINE' };
+    const circularNode: Record<string, unknown> = { nodeId: 'node-poisoned', state: 'BYZANTINE' };
     circularNode.self = circularNode; // direct circle
     
-    const siblingNode: any = { nodeId: 'node-sibling' };
+    const siblingNode: Record<string, unknown> = { nodeId: 'node-sibling' };
     circularNode.sibling = siblingNode;
     siblingNode.circularRef = circularNode; // indirect circle
 
@@ -76,8 +76,9 @@ async function main() {
         } else {
             console.error('  💥 SCENARIO 2 FAIL: Circular reference not correctly indicated or counted.', { hasCircularMarker, hasCircularCount });
         }
-    } catch (err: any) {
-        console.error(`  💥 SCENARIO 2 FAIL: Serializer threw exception on circular graph: ${err.message}`);
+    } catch (err: unknown) {
+        const message = err instanceof Error ? (err as Error).message : String(err);
+        console.error(`  💥 SCENARIO 2 FAIL: Serializer threw exception on circular graph: ${message}`);
     }
 
     // -------------------------------------------------------------------------
@@ -86,7 +87,7 @@ async function main() {
     console.log('\nSCENARIO 3: Testing Pathological Runaway Depth Structure...');
     
     // Construct a structure nested 15 layers deep
-    const constructDeepObject = (currentDepth: number, max: number): any => {
+    const constructDeepObject = (currentDepth: number, max: number): unknown => {
         if (currentDepth >= max) {
             return { leaf: 'bottom' };
         }
@@ -115,8 +116,9 @@ async function main() {
         } else {
             console.error('  💥 SCENARIO 3 FAIL: Deep object was not truncated at depth 8 correctly.', { depth8Val: current, meta });
         }
-    } catch (err: any) {
-        console.error(`  💥 SCENARIO 3 FAIL: Serializer threw exception on deep object: ${err.message}`);
+    } catch (err: unknown) {
+        const message = err instanceof Error ? (err as Error).message : String(err);
+        console.error(`  💥 SCENARIO 3 FAIL: Serializer threw exception on deep object: ${message}`);
     }
 
     // -------------------------------------------------------------------------
@@ -141,8 +143,9 @@ async function main() {
         } else {
             console.error('  💥 SCENARIO 4 FAIL: Output content did not match expected structure.');
         }
-    } catch (err: any) {
-        console.error(`  💥 SCENARIO 4 FAIL: Serializer crashed on corrupted Unicode payload: ${err.message}`);
+    } catch (err: unknown) {
+        const message = err instanceof Error ? (err as Error).message : String(err);
+        console.error(`  💥 SCENARIO 4 FAIL: Serializer crashed on corrupted Unicode payload: ${message}`);
     }
 
     // -------------------------------------------------------------------------

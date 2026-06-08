@@ -26,7 +26,7 @@ async function clearAllState() {
             if (file.endsWith('.lock') || file.endsWith('.generation') || file.endsWith('.json') || file.endsWith('.log')) {
                 try {
                     fs.unlinkSync(path.join(dir, file));
-                } catch (e) {}
+                } catch (_e) {}
             }
         }
     }
@@ -65,7 +65,7 @@ async function runSyntheticTests() {
     let caughtCorruption = false;
     try {
         await GovernanceLedger.appendEntry('POLICY', 'VALID-PAYLOAD', 'OPERATOR', 'VERIFIED', '101');
-    } catch (err: any) {
+    } catch (_err: any) {
         // We might not throw here if the write succeeds but replay fails
     }
 

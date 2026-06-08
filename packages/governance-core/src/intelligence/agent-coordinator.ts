@@ -1,10 +1,8 @@
-import { DecompositionPlanner } from './task-planner.js';
 import type { TaskPlan } from './task-planner.js';
 import { ComplexityRouter } from './complexity-router.js';
 import type { RouteAttestation } from './complexity-router.js';
 import { AgnosticMultiProvider } from './model-provider.js';
 import type { ModelProviderInterface } from './model-provider.js';
-import type { CommandExecutionProposal } from '../filters/command-filter.js';
 import { SemanticInspector } from '../inspection/semantic-pipeline.js';
 import { emitGateTelemetry } from '../telemetry/governance-telemetry.js';
 

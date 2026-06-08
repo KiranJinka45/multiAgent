@@ -1,16 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { MissionOrchestrator } from './mission-orchestrator';
-import { SandboxManager } from '../../sandbox/src/manager';
-import type { SandboxProfile } from '../../sandbox/src/types';
+import { MissionOrchestrator } from './mission-orchestrator.js';
+import { SandboxManager } from '@packages/sandbox';
+import type { SandboxProfile } from '@packages/sandbox';
 
-vi.mock('../../sandbox/src/manager');
+vi.mock('@packages/sandbox');
 
 describe('MissionOrchestrator', () => {
   let orchestrator: MissionOrchestrator;
-  let mockSandboxManager: vi.Mocked<SandboxManager>;
+  let mockSandboxManager: any;
 
   beforeEach(() => {
-    mockSandboxManager = new SandboxManager() as vi.Mocked<SandboxManager>;
+    mockSandboxManager = new SandboxManager() as any;
     orchestrator = new MissionOrchestrator(mockSandboxManager);
   });
 
@@ -26,7 +26,7 @@ describe('MissionOrchestrator', () => {
   });
 
   it('mission transitions to EXECUTING when approved', async () => {
-    const mission = orchestrator.createMission('m-2');
+    const _mission = orchestrator.createMission('m-2');
     await orchestrator.processPilotGate('m-2', { decision: 'APPROVE', rationale: 'Looks good' });
     
     const updated = orchestrator.getMission('m-2');

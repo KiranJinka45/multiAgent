@@ -20,7 +20,7 @@ export class RealityDivergenceMonitor {
     /**
      * Measure the gap between simulation-based predictions and real pilot performance.
      */
-    static analyzeDivergence(pilotId: string, simData: any, realData: any): RealityDivergenceReport {
+    static analyzeDivergence(pilotId: string, _simData: any, _realData: any): RealityDivergenceReport {
         logger.info(`🔍 Analyzing Simulation-to-Reality Divergence for pilot: ${pilotId}`);
 
         const metrics: DivergenceMetrics[] = [

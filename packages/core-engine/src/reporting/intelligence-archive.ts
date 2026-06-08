@@ -74,7 +74,7 @@ export class IncidentReplayCatalog {
       }
       const file = path.join(this.archivePath, `incident_${incidentId}.json`);
       fs.writeFileSync(file, JSON.stringify(record, null, 2), 'utf8');
-    } catch (err) {
+    } catch (_err) {
       // Safe no-op
     }
 
@@ -91,7 +91,7 @@ export class IncidentReplayCatalog {
           const raw = fs.readFileSync(path.join(this.archivePath, f), 'utf8');
           return JSON.parse(raw);
         });
-    } catch (err) {
+    } catch (_err) {
       return [];
     }
   }

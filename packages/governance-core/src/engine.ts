@@ -1,5 +1,5 @@
 import { INSTITUTIONAL_CONSTITUTION } from './constitution.js';
-import type { ConstitutionalRule } from './constitution.js';
+import type { ConstitutionContext } from './constitution.js';
 
 export interface GovernanceAuditReport {
     timestamp: number;
@@ -18,7 +18,7 @@ export class GovernanceEngine {
     /**
      * Audits a deployment or mutation against the Institutional Constitution.
      */
-    public auditDeployment(context: any): GovernanceAuditReport {
+    public auditDeployment(context: ConstitutionContext): GovernanceAuditReport {
         const violations: string[] = [];
         
         for (const rule of INSTITUTIONAL_CONSTITUTION) {
@@ -40,7 +40,7 @@ export class GovernanceEngine {
     /**
      * Validates an upgrade path to ensure replay compatibility.
      */
-    public certifyRelease(manifest: any): boolean {
+    public certifyRelease(manifest: { version: string }): boolean {
         console.log(`[GOVERNANCE] Certifying Release: ${manifest.version}`);
         // In a real system, verify manifest signature and replay checksum
         return true;
@@ -49,7 +49,7 @@ export class GovernanceEngine {
     /**
      * Detects "Constitutional Drift" for the CLI audit command.
      */
-    public detectDrift(): any[] {
+    public detectDrift(): Record<string, string>[] {
         // Return dummy drift data for the demo
         return [
             { severity: 'LOW', invariant: 'Audit Frequency', expected: '100ms', actual: '110ms' }
@@ -59,7 +59,12 @@ export class GovernanceEngine {
     /**
      * Audits institutional tenant isolation.
      */
-    public auditTenant(tenantId: string): any {
+    public auditTenant(tenantId: string): {
+        tenantId: string;
+        isolationStatus: string;
+        blastRadiusLimit: number;
+        metabolismQuota: { cpu: number; mem: number };
+    } {
         return {
             tenantId,
             isolationStatus: 'STRICT_ENFORCED',
@@ -71,7 +76,14 @@ export class GovernanceEngine {
     /**
      * Generates a Stewardship Report.
      */
-    public generateStewardshipReport(institutionId: string): any {
+    public generateStewardshipReport(institutionId: string): {
+        institutionId: string;
+        stewardshipLevel: string;
+        entropyScore: number;
+        replayStability: number;
+        constitutionalCompliance: boolean;
+        regressionStatus: string;
+    } {
         return {
             institutionId,
             stewardshipLevel: 'SOVEREIGN_LTS',

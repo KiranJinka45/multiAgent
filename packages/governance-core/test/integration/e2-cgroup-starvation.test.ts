@@ -39,7 +39,7 @@ describe('Phase E2: Cgroup Starvation Tests', () => {
             expect(fs.writeFileSync).toHaveBeenCalledWith(path.normalize('/sys/fs/cgroup/ztan-sandbox/vm-cgroup-test/memory.max'), '536870912');
 
             CgroupController.applyCpuLimit('vm-cgroup-test', 0.5); // 50% CPU
-            expect(fs.writeFileSync).toHaveBeenCalledWith(path.normalize('/sys/fs/cgroup/ztan-sandbox/vm-cgroup-test/cpu.max'), '500 100000');
+            expect(fs.writeFileSync).toHaveBeenCalledWith(path.normalize('/sys/fs/cgroup/ztan-sandbox/vm-cgroup-test/cpu.max'), '50000 100000');
         } finally {
             Object.defineProperty(process, 'platform', {
                 value: originalPlatform,
@@ -51,7 +51,7 @@ describe('Phase E2: Cgroup Starvation Tests', () => {
     });
 
     it('should fail-closed under simulated cgroup CPU starvation (timeout)', async () => {
-        const registry = (SideEffectOntology as any).registry as Map<string, any>;
+        const registry = (SideEffectOntology as unknown as { registry: Map<string, unknown> }).registry;
         const originalVmExecute = registry.get('vm-execute');
         registry.set('vm-execute', { 
             name: 'vm-execute', 

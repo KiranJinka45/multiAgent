@@ -1,13 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { projectService } from '../../../../apps/core-api/src/services/project-service.js';
 import { SeccompFilterGenerator } from '../../src/isolation/seccomp.js';
-import { tenantLimiter } from '../../../../packages/utils/src/middleware/tenant-limiter.js';
 import { OPAGovernanceLayer } from '../../src/opa/policy-enforcer.js';
 import { TemporalWorkflowOrchestrator } from '../../src/escalation/temporal-workflow.js';
 import { GovernanceLedger } from '../../src/ledger/ledger.js';
-import * as crypto from 'crypto';
-import * as fs from 'fs';
-import * as path from 'path';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { tenantLimiter } from '../../../../packages/utils/src/middleware/tenant-limiter.js';
+import type { Request, Response } from 'express';
 
 // 1. Mock Prisma DB for cross-tenant tests
 const { mockDb } = vi.hoisted(() => {
@@ -91,19 +90,19 @@ describe('Adversarial Verification Proofs (ZTAN)', () => {
     // ────────────────────────────────────────────────────────────────────────
     it('should return 503 Service Unavailable (fail-closed) during rate limiter backend outage', async () => {
         // Mock Express Req/Res
-        const req: any = { 
+        const req = { 
             headers: { 'x-tenant-id': 'tenant-test' }, 
             user: { tenantId: 'tenant-test' },
             path: '/api/v1/resource' 
-        };
-        const res: any = {
+        } as unknown as Request;
+        const res = {
             status: vi.fn().mockReturnThis(),
             json: vi.fn(),
             setHeader: vi.fn()
-        };
+        } as unknown as Response;
         const next = vi.fn();
 
-        const redisClient = (globalThis as any).__redisClient;
+        const redisClient = (globalThis as unknown as { __redisClient: { incr: ReturnType<typeof vi.fn> } }).__redisClient;
         const originalIncr = redisClient.incr;
         redisClient.incr = vi.fn().mockRejectedValue(new Error('Redis connection lost'));
         try {
@@ -184,8 +183,8 @@ describe('Adversarial Verification Proofs (ZTAN)', () => {
         const entryId = GovernanceLedger.append('PROPOSAL_RECEIVED', 'tenant-1', 'dummy-hash', { action: 'test' });
         
         // Simulate Process Crash (Reset memory state)
-        (GovernanceLedger as any).entries = [];
-        (GovernanceLedger as any).isLoaded = false;
+        (GovernanceLedger as unknown as { entries: unknown[]; isLoaded: boolean }).entries = [];
+        (GovernanceLedger as unknown as { entries: unknown[]; isLoaded: boolean }).isLoaded = false;
         
         // Check recovery
         const recoveredEntries = GovernanceLedger.getEntries();

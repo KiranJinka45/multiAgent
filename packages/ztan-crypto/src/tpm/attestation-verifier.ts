@@ -36,10 +36,14 @@ export class AttestationVerifier {
     // 2. Parse the TPM2B_ATTEST structure (mocked here, in reality requires a TPM structure parser)
     // For Wave 2 Simulation, we assume the quoteBuffer contains a JSON payload 
     // wrapping the nonce and PCR digest for ease of testing without a full TPM parser library.
-    let parsedQuote: any;
+    interface ParsedQuote {
+      nonce: string;
+      pcrDigest: string;
+    }
+    let parsedQuote: ParsedQuote;
     try {
-      parsedQuote = JSON.parse(quoteBytes.toString('utf8'));
-    } catch (err) {
+      parsedQuote = JSON.parse(quoteBytes.toString('utf8')) as ParsedQuote;
+    } catch {
       console.error('[AttestationVerifier] Failed to parse quote buffer.');
       return false;
     }

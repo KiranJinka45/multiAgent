@@ -9,12 +9,12 @@ fastify.register(fastifyWebsocket);
 
 // --- STEWARDSHIP STATE ---
 let currentTrustLevel = 'FULL';
-let currentEpoch = 100;
+const currentEpoch = 100;
 let isSafeMode = false;
-let isTelemetryActive = true;
+const _isTelemetryActive = true;
 let activeDrill = 'NONE';
 
-const hsm = new HSMVault(['node-a', 'node-b', 'node-c']);
+const _hsm = new HSMVault(['node-a', 'node-b', 'node-c']);
 
 // --- DETERMINISTIC ENGINE ---
 const fixtures = {
@@ -24,7 +24,7 @@ const fixtures = {
 };
 
 fastify.register(async (fastify) => {
-    fastify.get('/ws/stewardship', { websocket: true }, (connection, req) => {
+    fastify.get('/ws/stewardship', { websocket: true }, (connection, _req) => {
         console.log('📡 [OPG] Operator Console connected.');
 
         // 1. Initial State Sync

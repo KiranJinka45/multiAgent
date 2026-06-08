@@ -3,7 +3,7 @@ import { chaosOrchestrator } from '../services/chaos-orchestrator.js';
 
 const router = express.Router();
 
-router.get('/', (req, res) => {
+router.get('/', (_req, res) => {
     res.json({
         activeScenario: chaosOrchestrator.getActiveScenario(),
         targetNode: chaosOrchestrator.getTargetNode()
@@ -24,7 +24,7 @@ router.post('/', (req, res) => {
     });
 });
 
-router.delete('/', (req, res) => {
+router.delete('/', (_req, res) => {
     chaosOrchestrator.clear();
     res.json({
         success: true,
@@ -35,7 +35,7 @@ router.delete('/', (req, res) => {
 
 import { QuarantineError } from '@packages/governance-core';
 
-router.post('/trigger-quarantine', (req, res, next) => {
+router.post('/trigger-quarantine', (_req, _res, next) => {
     // Explicitly throw a QuarantineError to test Phase 12 Tier E3 Archaeology Integration
     next(new QuarantineError('HARD QUARANTINE: Simulated infrastructure attestation failure during drill'));
 });

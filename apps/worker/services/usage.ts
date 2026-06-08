@@ -34,7 +34,7 @@ export const usageTracker = {
   /**
    * Checks if an organization has exceeded its usage limits.
    */
-  async checkLimits(orgId: string): Promise<boolean> {
+  async checkLimits(_orgId: string): Promise<boolean> {
     // Mock limit check
     return true;
   }

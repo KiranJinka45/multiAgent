@@ -70,8 +70,8 @@ export class EmergencyRecoveryCoordinator {
         };
 
         const payload = governanceSignablePayload(receipt as any);
-        const leafHash = MerkleTree.hashLeaf(payload);
-        const gTree = new MerkleTree();
+        const _leafHash = MerkleTree.hashLeaf(payload);
+        const _gTree = new MerkleTree();
         // Note: In practice, we'd need to load the full tree or use previousRoot + leaf
         // But for receipt assembly, we calculate the post-append root.
         // This logic is typically handled by the Coordinator during commit.

@@ -72,7 +72,7 @@ async function waitForCore() {
         try {
             const res = await axios.get(url);
             if (res.status === 200) break;
-        } catch (e) {}
+        } catch (_e) {}
 
         logger.info("⏳ Waiting for Core API...");
         await new Promise(r => setTimeout(r, 2000));
@@ -94,14 +94,14 @@ export async function startGatewayServer() {
     console.log('✅ [RUNTIME CHECK] @packages/config/backend loaded successfully:', backendConfig !== undefined);
 
     // Standardized Outbound Clients
-    const authClient = createOutboundClient({
+    const _authClient = createOutboundClient({
         serviceName: 'auth-service',
         baseURL: `http://127.0.0.1:${env.AUTH_SERVICE_PORT}`,
         timeout: 5000,
         retries: 2
     });
 
-    const billingClient = createOutboundClient({
+    const _billingClient = createOutboundClient({
         serviceName: 'billing-service',
         baseURL: process.env.BILLING_SERVICE_URL || 'http://127.0.0.1:4003',
         timeout: 5000,
@@ -214,7 +214,7 @@ export async function startGatewayServer() {
         }
     });
 
-    const JWT_SECRET = process.env['JWT_SECRET'];
+    const _JWT_SECRET = process.env['JWT_SECRET'];
 
     // Service URLs - SRE Hardened: Internal Mesh uses HTTPS
     const ORCHESTRATOR_URL = process.env.ORCHESTRATOR_URL || env.CORE_ENGINE_URL || 'http://127.0.0.1:3010';
@@ -408,7 +408,7 @@ export async function startGatewayServer() {
             }
 
             next();
-        } catch (err) {
+        } catch (_err) {
             next(); // fail open
         }
     }) as any;
@@ -545,14 +545,14 @@ export async function startGatewayServer() {
     }) as any;
 
     // --- SCHEMAS ---
-    const BuildRequestSchema = z.object({
+    const _BuildRequestSchema = z.object({
         prompt: z.string().min(1),
         projectId: z.string().uuid(),
         executionId: z.string().uuid().optional(),
     });
 
     // --- PROXY DEFINITION ---
-    const createServiceProxy = (target: string, basePath: string, rewriteTo: string = '') =>
+    const _createServiceProxy = (target: string, basePath: string, rewriteTo: string = '') =>
         createProxyMiddleware({
             target,
             changeOrigin: true,
@@ -682,7 +682,7 @@ export async function startGatewayServer() {
                 return;
             }
             res.status(200).json({ status: 'ok', deployable: true });
-        } catch (err) {
+        } catch (_err) {
             // Fail open on redis error to allow deployments if observability layer is down
             res.status(200).json({ status: 'unknown', deployable: true, warning: 'Redis unreachable' });
         }
@@ -698,22 +698,22 @@ export async function startGatewayServer() {
         rollingCountBuckets: 10
     };
 
-    const authBreaker = createBreaker(async (...args: any[]) => args[0], { 
+    const _authBreaker = createBreaker(async (...args: any[]) => args[0], { 
         ...breakerOptions,
         name: 'auth-service'
     } as any);
 
-    const billingBreaker = createBreaker(async (...args: any[]) => args[0], { 
+    const _billingBreaker = createBreaker(async (...args: any[]) => args[0], { 
         ...breakerOptions,
         name: 'billing-service' 
     } as any);
 
-    const coreApiBreaker = createBreaker(async (...args: any[]) => args[0], { 
+    const _coreApiBreaker = createBreaker(async (...args: any[]) => args[0], { 
         ...breakerOptions,
         name: 'core-api' 
     } as any);
 
-    const breakerMiddleware = (breaker: any) => async (req: Request, res: Response, next: NextFunction) => {
+    const _breakerMiddleware = (breaker: any) => async (req: Request, res: Response, next: NextFunction) => {
         if (breaker.opened) {
             logger.warn({ service: breaker.name }, '[Gateway] Circuit Open - Short-circuiting request');
             return res.status(503).json({
@@ -768,7 +768,7 @@ export async function startGatewayServer() {
         timeout: 5000,
         secure: false,
         on: {
-            proxyReq: (proxyReq: any, req: any, res: any, options: any) => {
+            proxyReq: (proxyReq: any, req: any, _res: any, _options: any) => {
                 const token = env.INTERNAL_SERVICE_TOKEN || '';
                 proxyReq.setHeader('x-internal-token', token);
                 
@@ -959,7 +959,7 @@ export async function startGatewayServer() {
     });
 
     // Secure Global Exception Handler (Phase 6 Security Remediation)
-    app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+    app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
         logger.error({ err, path: req.path, method: req.method }, '🚨 [Gateway] Unhandled Exception Caught & Sanitized');
         
         // Prevent disclosing raw stacks or sensitive internal details to the client
@@ -1054,7 +1054,7 @@ export async function startGatewayServer() {
         console.error('🚨 UNCAUGHT EXCEPTION:', err);
     });
 
-    process.on('unhandledRejection', (reason, promise) => {
+    process.on('unhandledRejection', (reason, _promise) => {
         console.error('🚨 UNHANDLED REJECTION:', reason);
     });
 }

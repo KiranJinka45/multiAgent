@@ -7,8 +7,8 @@ import {
 } from '@packages/observability';
 
 // Defensive metric assignments — use imported values
-let idempotencyCollisionsTotal: { inc: (labels?: any) => void } = idempotencyCollisionsTotalImport || { inc: () => {} };
-let staleLockRecoveriesTotal: { inc: () => void } = staleLockRecoveriesTotalImport || { inc: () => {} };
+const idempotencyCollisionsTotal: { inc: (labels?: any) => void } = idempotencyCollisionsTotalImport || { inc: () => {} };
+const staleLockRecoveriesTotal: { inc: () => void } = staleLockRecoveriesTotalImport || { inc: () => {} };
 
 const LOCK_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
 
@@ -176,7 +176,7 @@ export class IdempotencyManager {
                     create: { key, executionId, status: 'failed', region },
                     update: { status: 'failed', region }
                 });
-            } catch (fallbackErr) {
+            } catch (_fallbackErr) {
                 // Ignore rollback recording errors
             }
             throw error;

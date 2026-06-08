@@ -1,7 +1,7 @@
 import { logger } from '@packages/observability';
 import { db } from '@packages/db';
 
-interface NodeIdentity {
+interface _NodeIdentity {
   nodeId: string;
   publicKey: string; // 48 bytes compressed G1 hex
   status: 'ACTIVE' | 'REVOKED';

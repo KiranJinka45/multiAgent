@@ -213,10 +213,10 @@ class DistributedChaosCampaign {
 
   private cleanup() {
     console.log("\n[CAMPAIGN] Cleaning up native validator child processes...");
-    for (const [nodeId, child] of this.processes.entries()) {
+    for (const [_nodeId, child] of this.processes.entries()) {
       try {
         child.kill('SIGKILL');
-      } catch (e) {
+      } catch (_e) {
         // ignore
       }
     }

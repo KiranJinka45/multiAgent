@@ -18,6 +18,7 @@ export class PhysicalFirecrackerAdapter implements FirecrackerAdapter {
     private socketPaths = new Map<string, string>();
     private containerFallbacks = new Set<string>();
     private vsockPaths = new Map<string, string>();
+    public disableFallback = false;
 
     // Toggle to enable jailer sandboxing on native Linux hosts
     public static useJailer = true;
@@ -36,7 +37,7 @@ export class PhysicalFirecrackerAdapter implements FirecrackerAdapter {
             const binary = PhysicalFirecrackerAdapter.useJailer ? 'jailer' : 'firecracker';
             const cmd = isWindows ? `where ${binary}` : `which ${binary}`;
             execSync(cmd, { stdio: 'ignore' });
-        } catch (e) {
+        } catch (_e) {
             throw new Error(`Binary "${PhysicalFirecrackerAdapter.useJailer ? 'jailer' : 'firecracker'}" was not found in the system PATH.`);
         }
     }
@@ -69,8 +70,12 @@ export class PhysicalFirecrackerAdapter implements FirecrackerAdapter {
         // Enforce physical constraints: checkEnvironment first with dynamic fallback
         try {
             this.checkEnvironment();
-        } catch (e: any) {
-            console.warn(`[FIRECRACKER_PHYSICAL] Isolation environment constraint unmet: ${e.message}`);
+        } catch (e: unknown) {
+            if (this.disableFallback) {
+                throw e;
+            }
+            const message = e instanceof Error ? e.message : String(e);
+            console.warn(`[FIRECRACKER_PHYSICAL] Isolation environment constraint unmet: ${message}`);
             console.log('[FIRECRACKER_PHYSICAL] Initiating FAIL-CLOSED Container Fallback...');
             this.containerFallbacks.add(config.vmId);
         }
@@ -90,8 +95,9 @@ export class PhysicalFirecrackerAdapter implements FirecrackerAdapter {
                 execSync(cmd, { stdio: 'ignore' });
                 console.log(`✅ Fallback container sandbox spawned successfully as ${containerName}`);
                 return;
-            } catch (err: any) {
-                throw new Error(`[CONTAINER_FALLBACK_FAILURE] Failed to spawn fallback container sandbox: ${err.message}`);
+            } catch (err: unknown) {
+                const message = err instanceof Error ? err.message : String(err);
+                throw new Error(`[CONTAINER_FALLBACK_FAILURE] Failed to spawn fallback container sandbox: ${message}`);
             }
         }
 
@@ -113,7 +119,7 @@ export class PhysicalFirecrackerAdapter implements FirecrackerAdapter {
             }
             
             // Save original paths before we mutate config
-            let origKernelPath = config.kernelImagePath;
+            const origKernelPath = config.kernelImagePath;
             let origRootfsPath = config.rootfsPath;
 
             // Resolve directory rootfs structure (e.g., if rootfsPath is a directory, locate the real file inside it)
@@ -179,16 +185,17 @@ export class PhysicalFirecrackerAdapter implements FirecrackerAdapter {
             try {
                 fs.copyFileSync(origKernelPath, kernelDest);
                 fs.copyFileSync(origRootfsPath, rootfsDest);
-            } catch (err: any) {
+            } catch (err: unknown) {
+                const message = err instanceof Error ? err.message : String(err);
                 child.kill();
-                throw new Error(`Failed to copy virtualization assets into jailer chroot: ${err.message}`);
+                throw new Error(`Failed to copy virtualization assets into jailer chroot: ${message}`);
             }
             
             // Make sure the unprivileged user can read the files
             try {
                 fs.chmodSync(kernelDest, 0o644);
                 fs.chmodSync(rootfsDest, 0o644);
-            } catch (e) {}
+            } catch (_e) {}
             
             // Create /run dir for the vsock UDS path with permissive permissions
             try {
@@ -198,14 +205,15 @@ export class PhysicalFirecrackerAdapter implements FirecrackerAdapter {
                 try {
                     fs.chownSync(runDir, 100, 100);
                 } catch {}
-            } catch (e: any) {
-                console.warn(`[FIRECRACKER_PHYSICAL] Failed to configure chroot /run dir: ${e.message}`);
+            } catch (e: unknown) {
+                const message = e instanceof Error ? e.message : String(e);
+                console.warn(`[FIRECRACKER_PHYSICAL] Failed to configure chroot /run dir: ${message}`);
             }
         } else {
             if (fs.existsSync(socketPath)) {
                 try {
                     fs.unlinkSync(socketPath);
-                } catch (err) {
+                } catch (_err) {
                     // ignore
                 }
             }
@@ -316,7 +324,7 @@ export class PhysicalFirecrackerAdapter implements FirecrackerAdapter {
         return new Promise((resolve, reject) => {
             const socket = net.connect(hostVsockPath);
             let responseBuffer = '';
-            let isConnected = false;
+            let _isConnected = false;
 
             const onData = (chunk: Buffer) => {
                 responseBuffer += chunk.toString('utf8');
@@ -324,7 +332,7 @@ export class PhysicalFirecrackerAdapter implements FirecrackerAdapter {
                     const lines = responseBuffer.split('\n');
                     const firstLine = lines[0].trim();
                     if (/^OK \d+$/.test(firstLine)) {
-                        isConnected = true;
+                        _isConnected = true;
                         socket.off('data', onData);
                         socket.off('error', onError);
                         socket.off('end', onEnd);
@@ -358,9 +366,10 @@ export class PhysicalFirecrackerAdapter implements FirecrackerAdapter {
         for (let i = 0; i < retries; i++) {
             try {
                 return await this.connectToVsock(hostVsockPath, guestPort);
-            } catch (err: any) {
+            } catch (err: unknown) {
+                const message = err instanceof Error ? err.message : String(err);
                 if (i === retries - 1) {
-                    throw new Error(`Failed to connect to guest vsock after ${retries} attempts: ${err.message}`);
+                    throw new Error(`Failed to connect to guest vsock after ${retries} attempts: ${message}`);
                 }
                 await new Promise((resolve) => setTimeout(resolve, delayMs));
             }
@@ -374,8 +383,10 @@ export class PhysicalFirecrackerAdapter implements FirecrackerAdapter {
             try {
                 const output = execSync(`docker exec ztan-sandbox-${vmId} sh -c "${command}"`, { stdio: 'pipe', encoding: 'utf8' }).trim();
                 return output;
-            } catch (err: any) {
-                throw new Error(`[CONTAINER_EXEC_FAILURE] Failed to execute command inside fallback container: ${err.stderr || err.message}`);
+            } catch (err: unknown) {
+                const message = err instanceof Error ? err.message : String(err);
+                const stderr = typeof err === 'object' && err !== null && 'stderr' in err ? String((err as Record<string, unknown>).stderr) : '';
+                throw new Error(`[CONTAINER_EXEC_FAILURE] Failed to execute command inside fallback container: ${stderr || message}`);
             }
         }
 
@@ -387,8 +398,9 @@ export class PhysicalFirecrackerAdapter implements FirecrackerAdapter {
         let socket: net.Socket;
         try {
             socket = await this.connectToVsockWithRetry(hostVsockPath, 5005);
-        } catch (err: any) {
-            throw new Error(`[FIRECRACKER_PHYSICAL] Failed to connect to guest agent: ${err.message}`);
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : String(err);
+            throw new Error(`[FIRECRACKER_PHYSICAL] Failed to connect to guest agent: ${message}`);
         }
 
         return new Promise<string>((resolve, reject) => {
@@ -405,8 +417,9 @@ export class PhysicalFirecrackerAdapter implements FirecrackerAdapter {
                         } else {
                             reject(new Error(`[FIRECRACKER_EXEC_FAILURE] Command failed with exit code ${response.exitCode}: ${response.stderr.trim()}`));
                         }
-                    } catch (parseErr: any) {
-                        reject(new Error(`[FIRECRACKER_PHYSICAL] Failed to parse guest agent response: ${parseErr.message}. Raw output: ${buffer}`));
+                    } catch (parseErr: unknown) {
+                        const message = parseErr instanceof Error ? parseErr.message : String(parseErr);
+                        reject(new Error(`[FIRECRACKER_PHYSICAL] Failed to parse guest agent response: ${message}. Raw output: ${buffer}`));
                     }
                 }
             };
@@ -432,7 +445,7 @@ export class PhysicalFirecrackerAdapter implements FirecrackerAdapter {
         });
     }
 
-    private async sendRequest(socketPath: string, method: string, urlPath: string, body?: any): Promise<any> {
+    private async sendRequest(socketPath: string, method: string, urlPath: string, body?: unknown): Promise<unknown> {
         return new Promise((resolve, reject) => {
             const payload = body ? JSON.stringify(body) : '';
             const req = http.request({

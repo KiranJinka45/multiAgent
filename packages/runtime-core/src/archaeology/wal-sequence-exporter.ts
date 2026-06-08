@@ -30,7 +30,7 @@ export async function exportRecentSequences(prisma: PrismaClient, limit = 10): P
             walLogs,
             ledgerBlocks
         };
-    } catch (e: any) {
+    } catch (_e: any) {
         return {
             timestamp: new Date().toISOString(),
             walLogs: [],

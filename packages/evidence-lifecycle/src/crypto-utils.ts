@@ -45,7 +45,7 @@ export class CryptoUtils {
             const payloadString = JSON.stringify(payload);
             const signature = Buffer.from(signatureBase64, 'base64');
             return crypto.verify(null, Buffer.from(payloadString), publicKeyPem, signature);
-        } catch (error) {
+        } catch (_error) {
             // If the key is malformed or signature is invalid format, it fails verification.
             return false;
         }

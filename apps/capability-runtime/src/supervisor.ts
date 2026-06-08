@@ -544,7 +544,7 @@ class CapabilityRuntimeSupervisor {
           return { cpu, memoryMb: isNaN(rssKb) ? 0 : rssKb / 1024 };
         }
       }
-    } catch (e) {
+    } catch (_e) {
       // Process might have terminated
     }
     return { cpu: 0, memoryMb: 0 };

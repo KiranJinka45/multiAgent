@@ -181,7 +181,7 @@ export class TeamDriftAuditor {
     }
 
     // Find tribal knowledge islands (subsystems owned exclusively by exactly 1 operator)
-    for (const [sys, owners] of subsystemOwners.entries()) {
+    for (const [_sys, owners] of subsystemOwners.entries()) {
       if (owners.length === 1) {
         const soleOwner = owners[0];
         if (!tribalKnowledgeIslands.includes(soleOwner)) {

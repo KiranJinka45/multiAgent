@@ -93,7 +93,7 @@ export class EvidenceAuthenticator {
             sign.update(archiveHash);
             sign.end();
             return sign.sign(privateKeyPem, 'hex');
-        } catch (e) {
+        } catch (_e) {
             // Fallback to HMAC-SHA256 signature if key formats are not PEM (for drills/tests)
             return crypto.createHmac('sha256', privateKeyPem).update(archiveHash).digest('hex');
         }
@@ -108,7 +108,7 @@ export class EvidenceAuthenticator {
             verify.update(archiveHash);
             verify.end();
             return verify.verify(publicKeyPemOrSecret, signature, 'hex');
-        } catch (e) {
+        } catch (_e) {
             // Fallback to HMAC-SHA256 comparison
             const expectedSig = crypto.createHmac('sha256', publicKeyPemOrSecret).update(archiveHash).digest('hex');
             return expectedSig === signature;

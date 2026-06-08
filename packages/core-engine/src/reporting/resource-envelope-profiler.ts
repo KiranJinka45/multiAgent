@@ -140,7 +140,7 @@ export class ResourceEnvelopeProfiler {
         }
         const filepath = path.join(reportDir, `resource_report_${workflowId}.json`);
         fs.writeFileSync(filepath, JSON.stringify(report, null, 2), 'utf8');
-      } catch (err) {
+      } catch (_err) {
         // Safe no-op
       }
     }

@@ -22,13 +22,11 @@ import {
     IdempotencyManager,
     BuildCacheManager,
     BuildGraphEngine,
-    JobStage,
     MissionStatus,
     ArtifactValidator,
     WorkerClusterManager,
     FailoverManager,
     NodeRegistry,
-    EvolutionManager,
     ControlPlane,
     ControlPlaneMetrics,
     PreviewOrchestrator,
@@ -356,7 +354,7 @@ const executeBuild = async (data: { prompt: string, userId: string, projectId: s
             let currentRetryRate = 0;
             try {
                 currentRetryRate = await ControlPlaneMetrics.getRetryRate(redis, tenantId, tier);
-            } catch (err) {
+            } catch (_err) {
                 logger.warn('💥 [Worker] Redis unreachable, disabling retries locally as fallback');
                 currentRetryRate = Infinity; // Force it to drop the job
             }
@@ -381,7 +379,7 @@ const executeBuild = async (data: { prompt: string, userId: string, projectId: s
             try {
                 await ControlPlaneMetrics.recordRetry(redis);
                 await ControlPlaneMetrics.incrementRetryRate(redis, tenantId, tier);
-            } catch (err) {
+            } catch (_err) {
                 logger.warn('💥 [Worker] Failed to record retry metrics due to Redis failure, proceeding with local retry logic');
             }
             logger.warn({ executionId, attempt: job?.attemptsMade, maxAttempts: job?.opts.attempts }, 'Execution failed. Retrying via BullMQ...');
@@ -389,7 +387,7 @@ const executeBuild = async (data: { prompt: string, userId: string, projectId: s
                 await protectedUpdateMission(executionId, tenantId, { 
                     metadata: { error: `Attempt ${job?.attemptsMade} failed: ${msg}` } 
                 });
-            } catch (err) {
+            } catch (_err) {
                  logger.warn('💥 [Worker] Failed to update mission in DB due to error, but proceeding with local retry');
             }
         }

@@ -1,6 +1,6 @@
 import { tokenizeJson, validateDuplicateKeys } from './canonicalizer.js';
 
-interface ConcurrentStats {
+interface _ConcurrentStats {
     totalRequests: number;
     successfulRequests: number;
     failedRequests: number;
@@ -25,7 +25,7 @@ class ZtanConcurrentStressTester {
         const startHeap = process.memoryUsage().heapUsed;
         const startTime = performance.now();
 
-        let activeCount = 0;
+        const _activeCount = 0;
         let completedCount = 0;
         let failCount = 0;
         const taskQueue: (() => Promise<void>)[] = [];
@@ -41,14 +41,14 @@ class ZtanConcurrentStressTester {
                         for (const chunk of chunks) {
                             concatenated += chunk;
                         }
-                        const tokens = Array.from(tokenizeJson(concatenated));
+                        const _tokens = Array.from(tokenizeJson(concatenated));
                         validateDuplicateKeys(concatenated);
                     } else {
                         // Regular fast-path parse
-                        const tokens = Array.from(tokenizeJson(this.payload));
+                        const _tokens = Array.from(tokenizeJson(this.payload));
                         validateDuplicateKeys(this.payload);
                     }
-                } catch (e) {
+                } catch (_e) {
                     failCount++;
                 }
             });

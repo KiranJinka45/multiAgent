@@ -2,7 +2,7 @@ import { OPAGovernanceLayer, SemanticInspector, StaticCommandFilter, timedGateSy
 import { db } from '@packages/db';
 
 export class ArtifactValidator {
-    static validate(artifact: any) {
+    static validate(_artifact: any) {
         console.log('[ArtifactValidator] Validating artifact');
         return true;
     }

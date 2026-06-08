@@ -30,7 +30,7 @@ async function runFailureSemanticsValidation() {
   if (fs.existsSync(LEDGER_DIR)) {
     try {
       fs.rmSync(LEDGER_DIR, { recursive: true, force: true });
-    } catch (e) {
+    } catch (_e) {
       const cleanDir = (p: string) => {
         if (fs.existsSync(p)) {
           fs.readdirSync(p).forEach(file => {
@@ -103,7 +103,7 @@ async function runFailureSemanticsValidation() {
     try {
       const entry = await GovernanceLedger.appendEntry('POLICY', 'Test payload under partition', 'OPERATOR-01', 'VERIFIED');
       sequenceId = entry.sequenceId;
-    } catch (err: any) {
+    } catch (_err: any) {
       appendFailed = true;
     }
 
@@ -144,14 +144,14 @@ async function runFailureSemanticsValidation() {
     console.log('  - Triggering heartbeat tick daemon with simulated DB offline...');
     
     // We execute the inner tick logic of startHeartbeatDaemon manually
-    const hostname = os.hostname();
-    const pid = process.pid;
-    const activeGen = GovernanceLedger.activeDbGeneration;
+    const _hostname = os.hostname();
+    const _pid = process.pid;
+    const _activeGen = GovernanceLedger.activeDbGeneration;
     
     try {
       // Simulate the heartbeat UPDATE statement failing and triggering the catch block
       await db.$executeRawUnsafe(`UPDATE "ZtanActiveLease" SET heartbeat = NOW()`);
-    } catch (err: any) {
+    } catch (_err: any) {
       // Execute our custom self-fence logic block manually since we stubbed it
       const timeSinceHeartbeat = Date.now() - ((GovernanceLedger as any).lastSuccessfulHeartbeat || 0);
       if (timeSinceHeartbeat > 25000 / 2) {

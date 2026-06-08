@@ -40,7 +40,7 @@ export async function buildActivity(input: ActivityInput): Promise<BuildActivity
   logger.info({ executionId, projectId }, '[Activity] Starting Build');
   await eventBus.stage(executionId, 'build', 'in_progress', 'Building project in sandbox...', 60, projectId);
   
-  const runner = new SandboxRunner(executionId);
+  const _runner = new SandboxRunner(executionId);
   const startTime = Date.now();
   
   // In a real scenario, we'd trigger the actual build command

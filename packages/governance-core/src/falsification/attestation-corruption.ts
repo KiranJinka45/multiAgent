@@ -111,19 +111,21 @@ export class AttestationCorruptionFuzzer {
                         ProvenanceVerifier.verifyOciImage(unsignedImageRef);
                         isSecure = false;
                         response = 'ACCEPTED: Unsigned OCI image reference was accepted.';
-                    } catch (err: any) {
-                        if (err instanceof SupplyChainError || err.message.includes('No valid signature found')) {
+                    } catch (err: unknown) {
+                        const message = err instanceof Error ? err.message : String(err);
+                        if (err instanceof SupplyChainError || message.includes('No valid signature found')) {
                             isSecure = true;
-                            response = `BLOCKED: Digest substitution rejected. Message: ${err.message}`;
+                            response = `BLOCKED: Digest substitution rejected. Message: ${message}`;
                         } else {
                             isSecure = false;
-                            response = `FAILED: Verification threw unexpected error: ${err.message}`;
+                            response = `FAILED: Verification threw unexpected error: ${message}`;
                         }
                     }
                 }
-            } catch (err: any) {
+            } catch (err: unknown) {
                 isSecure = false;
-                response = `EXHAUSTED (Crash): ${err.message}`;
+                const message = err instanceof Error ? err.message : String(err);
+                response = `EXHAUSTED (Crash): ${message}`;
             }
 
             if (isSecure) {

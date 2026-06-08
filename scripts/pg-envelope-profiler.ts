@@ -43,7 +43,7 @@ async function profilePostgres() {
     // Simulate transaction processing and lock waits
     let lockWait = 0;
     let status: 'NOMINAL' | 'SATURATED' | 'PATHOLOGICAL' = 'NOMINAL';
-    let throughput = Math.max(10, 1000 - conn * 8);
+    const throughput = Math.max(10, 1000 - conn * 8);
 
     if (conn > 90) {
       lockWait = (conn - 90) * 150 + Math.random() * 200;

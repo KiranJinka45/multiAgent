@@ -1,5 +1,5 @@
 export class SurvivabilitySimEngine {
-  constructor(ops: any, graph: any) {}
+  constructor(_ops: any, _graph: any) {}
   async runDrill(category: string) { 
     return { 
       drillId: 'DRILL-' + Date.now(), 

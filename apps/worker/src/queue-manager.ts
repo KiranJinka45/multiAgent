@@ -36,7 +36,7 @@ export class TaskQueueManager {
     /**
      * Updates build telemetry allowing realtime Dashboard subscription over SSE/Websocket.
      */
-    async heartbeat(jobId: string, statusText: string, progress: number) {
+    async heartbeat(_jobId: string, _statusText: string, _progress: number) {
         // await redis.setex(`job_status:${jobId}`, 3600, JSON.stringify({ statusText, progress }));
     }
 }

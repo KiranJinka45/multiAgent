@@ -43,7 +43,7 @@ export class CryptoRegistry {
         try {
             const pubKey = crypto.createPublicKey(publicKey);
             return crypto.verify(null, data, pubKey, signature);
-        } catch (e) {
+        } catch (_e) {
             return false;
         }
     }
@@ -52,7 +52,7 @@ export class CryptoRegistry {
         try {
             const pubKey = crypto.createPublicKey(publicKey);
             return crypto.verify('sha256', data, pubKey, signature);
-        } catch (e) {
+        } catch (_e) {
             return false;
         }
     }
@@ -64,7 +64,7 @@ export class CryptoRegistry {
             
             const pubKey = crypto.createPublicKey(publicKey);
             return crypto.verify('sha256', data, pubKey, signature);
-        } catch (e) {
+        } catch (_e) {
             return false;
         }
     }

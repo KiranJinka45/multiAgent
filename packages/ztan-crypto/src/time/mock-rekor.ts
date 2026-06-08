@@ -67,7 +67,7 @@ export class RekorClient {
             inclusionProof = crypto.createHash('sha256').update(proofPreimage).digest('hex');
             console.log(`[Rekor] 📜 Appended payload locally: ${inclusionProof}`);
         }
-    } catch (e: any) {
+    } catch {
         console.warn(`[Rekor] ⚠️ Network timeout reaching rekor.sigstore.dev. Isolating state.`);
         const proofPreimage = `${logIndex}::${payloadHash}::${signature}::REKOR_ROOT`;
         inclusionProof = crypto.createHash('sha256').update(proofPreimage).digest('hex');

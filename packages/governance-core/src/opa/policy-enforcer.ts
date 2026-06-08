@@ -69,7 +69,7 @@ export class OPAGovernanceLayer {
                 };
             }
 
-            const data = (await response.json()) as any;
+            const data = (await response.json()) as { result?: { allow?: boolean; reasons?: string[] } };
             // OPA standard response: { result: { allow: true/false, reasons: [...] } }
             if (data?.result?.allow === true) {
                 return {
@@ -84,10 +84,11 @@ export class OPAGovernanceLayer {
                     matchedPolicies: []
                 };
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : String(err);
             return {
                 isAllowed: false,
-                reason: `FAIL_CLOSED: OPA Governance Server is unreachable or unavailable. Error: ${err.message}`,
+                reason: `FAIL_CLOSED: OPA Governance Server is unreachable or unavailable. Error: ${message}`,
                 matchedPolicies: []
             };
         }

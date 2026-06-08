@@ -42,8 +42,9 @@ export class CgroupController {
                 }
                 console.log(`[CGROUP Adversarial] Sandbox cgroup.subtree_control after: ${fs.readFileSync(sandboxControl, 'utf8').trim()}`);
             }
-        } catch (e: any) {
-            console.warn(`[CGROUP] Failed to delegate subtree control: ${e.message}`);
+        } catch (e: unknown) {
+            const message = e instanceof Error ? e.message : String(e);
+            console.warn(`[CGROUP] Failed to delegate subtree control: ${message}`);
         }
     }
 
@@ -61,8 +62,9 @@ export class CgroupController {
             fs.mkdirSync(path.dirname(pathMax), { recursive: true });
             fs.writeFileSync(pathMax, limitBytes.toString());
             console.log(`[CGROUP Adversarial] Successfully wrote to memory.max at ${pathMax} without EACCES`);
-        } catch (e: any) {
-            console.error(`[CGROUP] Failed to apply memory limit: ${e.message}`);
+        } catch (e: unknown) {
+            const message = e instanceof Error ? e.message : String(e);
+            console.error(`[CGROUP] Failed to apply memory limit: ${message}`);
         }
     }
 
@@ -81,8 +83,9 @@ export class CgroupController {
             const quota = Math.round(percent * 100000);
             fs.writeFileSync(pathMax, `${quota} 100000`);
             console.log(`[CGROUP Adversarial] Successfully wrote to cpu.max at ${pathMax} without EACCES`);
-        } catch (e: any) {
-            console.error(`[CGROUP] Failed to apply CPU limit: ${e.message}`);
+        } catch (e: unknown) {
+            const message = e instanceof Error ? e.message : String(e);
+            console.error(`[CGROUP] Failed to apply CPU limit: ${message}`);
         }
     }
 
@@ -99,8 +102,9 @@ export class CgroupController {
         try {
             fs.mkdirSync(path.dirname(pathMax), { recursive: true });
             fs.writeFileSync(pathMax, cpuset);
-        } catch (e: any) {
-            console.error(`[CGROUP] Failed to apply CPU affinity: ${e.message}`);
+        } catch (e: unknown) {
+            const message = e instanceof Error ? e.message : String(e);
+            console.error(`[CGROUP] Failed to apply CPU affinity: ${message}`);
         }
     }
 
@@ -117,8 +121,9 @@ export class CgroupController {
         try {
             fs.mkdirSync(path.dirname(pathMems), { recursive: true });
             fs.writeFileSync(pathMems, mems);
-        } catch (e: any) {
-            console.error(`[CGROUP] Failed to apply memory nodes: ${e.message}`);
+        } catch (e: unknown) {
+            const message = e instanceof Error ? e.message : String(e);
+            console.error(`[CGROUP] Failed to apply memory nodes: ${message}`);
         }
     }
 

@@ -1,8 +1,18 @@
 import { IsolatedExecutionRunner } from './vm-lifecycle.js';
 import { FirecrackerOrchestrator, MockFirecrackerAdapter } from './firecracker-orchestrator.js';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+import { DryRunSimulator } from '../simulation/dry-run.js';
 
 describe('Isolated Execution Runner', () => {
+    beforeEach(() => {
+        vi.spyOn(DryRunSimulator, 'simulateProposal').mockReturnValue({
+            isSafe: true,
+            requiresHumanEscalation: false,
+            forecastedEffects: []
+        });
+    });
+
     it('should guarantee destruction in finally block even if execution throws', async () => {
         const adapter = new MockFirecrackerAdapter();
         const orchestrator = new FirecrackerOrchestrator(adapter);
@@ -15,7 +25,7 @@ describe('Isolated Execution Runner', () => {
 
         try {
             await runner.executeIsolated('vm-crash-test', 'bad-command');
-        } catch (e) {
+        } catch (_e) {
             // Expected to throw
         }
 

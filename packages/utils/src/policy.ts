@@ -202,7 +202,7 @@ export class ExternalPolicyAuthority {
     private static anchoredTsrs: Record<string, string> = {}; 
     private static auditLog: any[] = [];
     
-    static async evaluateMission(mission: any, userRole: string = 'developer'): Promise<any> {
+    static async evaluateMission(mission: any, _userRole: string = 'developer'): Promise<any> {
         // ... (RBAC/Policy checks)
         const result = { action: 'APPROVE', reason: 'Verified Policies' };
         const signed = this.sign(result);

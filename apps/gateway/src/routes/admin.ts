@@ -5,7 +5,7 @@ import { logger } from '@packages/observability';
 import { AuditLogger } from '@packages/utils';
 
 const ROITracker = {
-    getMetrics: async (tenantId: string) => {
+    getMetrics: async (_tenantId: string) => {
         return {
             optimizations: 42,
             failureRate: 0.015,
@@ -16,7 +16,7 @@ const ROITracker = {
 };
 
 const PolicyManager = {
-    getPolicy: async (tenantId: string) => {
+    getPolicy: async (_tenantId: string) => {
         return {
             optimizationIntervalSeconds: 3600,
             allowAutoScaling: true,
@@ -24,7 +24,7 @@ const PolicyManager = {
             degradationThresholdPct: 15
         };
     },
-    updatePolicy: async (tenantId: string, updates: any) => {
+    updatePolicy: async (_tenantId: string, updates: any) => {
         return {
             optimizationIntervalSeconds: updates.optimizationIntervalSeconds || 3600,
             allowAutoScaling: updates.allowAutoScaling !== undefined ? updates.allowAutoScaling : true,
@@ -122,7 +122,7 @@ router.patch('/policy', async (req: Request, res: Response) => {
  * GET /api/admin/intelligence/timeline
  * Returns historical scaling decisions for visualization.
  */
-router.get('/timeline', async (req: Request, res: Response) => {
+router.get('/timeline', async (_req: Request, res: Response) => {
   try {
     const decisions = await db.scalingDecision.findMany({
       orderBy: { createdAt: 'desc' },
@@ -139,7 +139,7 @@ router.get('/timeline', async (req: Request, res: Response) => {
  * GET /api/admin/intelligence/state
  * Returns real-time strategy distribution and system health via historical Aggregation.
  */
-router.get('/state', async (req: Request, res: Response) => {
+router.get('/state', async (_req: Request, res: Response) => {
   try {
     // Aggregate real decisions from the ledger history to determine active strategy distribution
     const recentDecisions = await db.scalingDecision.findMany({
@@ -225,7 +225,7 @@ router.get('/billing/tenant/:tenantId', async (req: Request, res: Response) => {
  * GET /api/admin/tenants/summary
  * Returns aggregated stats for all tenants (Admin view).
  */
-router.get('/tenants/summary', async (req: Request, res: Response) => {
+router.get('/tenants/summary', async (_req: Request, res: Response) => {
   try {
     const tenants = await db.tenant.findMany({
       select: { id: true, name: true }
@@ -263,7 +263,7 @@ router.get('/tenants/summary', async (req: Request, res: Response) => {
  * GET /api/admin/alerts
  * Returns recent system alerts and SLA breaches.
  */
-router.get('/alerts', async (req: Request, res: Response) => {
+router.get('/alerts', async (_req: Request, res: Response) => {
   try {
     const alerts = await db.auditLog.findMany({
       where: {

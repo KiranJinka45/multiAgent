@@ -17,7 +17,7 @@ async function generateVectors() {
   console.log('Generating deterministic test vectors...');
   
   // Create deterministic node keys for testing
-  const threshold = 3;
+  const _threshold = 3;
   
   // We need a static secret share to make the signatures deterministic for the test vectors.
   const fixedShare = BigInt('123456789012345678901234567890');
@@ -132,7 +132,7 @@ async function generateVectors() {
   const errorPayload = hashPayload('error_payload');
   try {
       ThresholdCrypto.buildCanonicalPayload(errorPayload, 2, []);
-  } catch (e) {
+  } catch (_e) {
       tv013Error = true;
   }
   const tv013 = {
@@ -147,7 +147,7 @@ async function generateVectors() {
   let tv014Error = false;
   try {
       ThresholdCrypto.buildCanonicalPayload(errorPayload, 3, ['nodeA', 'nodeB']);
-  } catch (e) {
+  } catch (_e) {
       tv014Error = true;
   }
   const tv014 = {

@@ -59,7 +59,7 @@ export function startIntegrityScanner() {
                     let parsedPayload;
                     try {
                         parsedPayload = JSON.parse(event.payload);
-                    } catch (e) {
+                    } catch (_e) {
                         parsedPayload = event.payload; // Already string or invalid
                     }
                     

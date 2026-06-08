@@ -6,7 +6,7 @@ const STORE_NAME = 'forensic_events';
 const MMR_STORE_NAME = 'mmr_checkpoints';
 
 let db: IDBDatabase | null = null;
-let ingestionQueue: any[] = [];
+const ingestionQueue: any[] = [];
 let isProcessing = false;
 const BATCH_CHUNK_SIZE = 2500;
 let currentVerificationTier: 'HOT' | 'WARM' | 'COLD' = 'HOT';
@@ -259,7 +259,7 @@ async function processIngestionQueue() {
       setTimeout(processIngestionQueue, 0);
     };
 
-  } catch (err: any) {
+  } catch (_err: any) {
     self.postMessage({ type: 'INGEST_BATCH_ERROR', error: 'Ingestion queue processing failed' });
     isProcessing = false;
     setTimeout(processIngestionQueue, 0);
@@ -430,7 +430,7 @@ async function verifyEventCausalChainDirect(event: any, prevEvent: any): Promise
     }
 
     return 'VERIFIED';
-  } catch (e) {
+  } catch (_e) {
     return 'DEGRADED';
   }
 }
@@ -513,7 +513,7 @@ async function verifyEventCausalChain(event: any, prevEvent: any): Promise<'VERI
     }
 
     return 'VERIFIED';
-  } catch (e) {
+  } catch (_e) {
     return 'DEGRADED';
   }
 }

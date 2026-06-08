@@ -189,7 +189,7 @@ for (const tc of testCases) {
 
   // Perform dynamic mutation injections for triggers
   if (payload === 'DEPTH_OVERFLOW_TRIGGER') {
-    let deepObj: any = {};
+    const deepObj: any = {};
     let curr = deepObj;
     for (let d = 0; d < 70; d++) {
       curr.nest = {};

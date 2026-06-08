@@ -1,32 +1,32 @@
 import { ComplexityRouter } from './complexity-router.js';
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, afterEach } from 'vitest';
 
 describe('Complexity Router', () => {
     it('should route simple tasks to GEMINI_FLASH', () => {
         const result = ComplexityRouter.routeObjective('Read the contents of config.json');
-        expect(result.assignedTier).toBe('GEMINI_FLASH');
+        expect(result.assignedTier).toBe('FAST_TIER');
         expect(result).toHaveProperty('resolvedProvider');
     });
 
     it('should route reasoning tasks to CLAUDE_OPUS or CLAUDE_SONNET', () => {
         const result = ComplexityRouter.routeObjective('Analyze the architecture and design a system coordination strategy');
-        expect(result.assignedTier).toBe('CLAUDE_OPUS');
+        expect(result.assignedTier).toBe('STRATEGIC_TIER');
         expect(result).toHaveProperty('resolvedProvider');
     });
 
     it('should route test running tasks to CLAUDE_SONNET', () => {
         const result = ComplexityRouter.routeObjective('Execute the test suite and optimize coverage');
-        expect(result.assignedTier).toBe('CLAUDE_SONNET');
+        expect(result.assignedTier).toBe('SMART_TIER');
     });
 
     it('should route parser tasks to GEMINI_PRO', () => {
         const result = ComplexityRouter.routeObjective('Parse the XML data from config server');
-        expect(result.assignedTier).toBe('GEMINI_PRO');
+        expect(result.assignedTier).toBe('BALANCED_TIER');
     });
 
     it('should map explicit agent type directly', () => {
         const result = ComplexityRouter.routeObjective('Help with whatever', 'system-designer');
-        expect(result.assignedTier).toBe('CLAUDE_OPUS');
+        expect(result.assignedTier).toBe('STRATEGIC_TIER');
         expect(result.reason).toContain('system-designer');
     });
 

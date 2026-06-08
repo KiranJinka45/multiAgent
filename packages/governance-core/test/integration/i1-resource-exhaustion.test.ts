@@ -56,7 +56,7 @@ describe('Phase I1: Resource-Exhaustion Archaeology & Failure Diagnostics Tests'
             ffree: 100000,
             files: 1000000,
             type: 0
-        } as any);
+        } as unknown as fs.StatsFs);
 
         vi.mocked(os.totalmem).mockReturnValue(1000000000);
         vi.mocked(os.freemem).mockReturnValue(500000000); // 50% memory pressure

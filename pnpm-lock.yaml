@@ -740,6 +740,9 @@ importers:
       '@packages/observability':
         specifier: workspace:*
         version: link:../../packages/observability
+      '@packages/resilience':
+        specifier: workspace:*
+        version: link:../../packages/resilience
       '@packages/utils':
         specifier: workspace:*
         version: link:../../packages/utils
@@ -1421,6 +1424,9 @@ importers:
       '@packages/observability':
         specifier: workspace:*
         version: link:../observability
+      '@packages/sandbox':
+        specifier: workspace:*
+        version: link:../sandbox
       '@packages/utils':
         specifier: workspace:*
         version: link:../utils
@@ -1756,6 +1762,12 @@ importers:
         specifier: 5.5.4
         version: 5.5.4
 
+  packages/sandbox:
+    devDependencies:
+      typescript:
+        specifier: 5.5.4
+        version: 5.5.4
+
   packages/self-evolution:
     dependencies:
       '@packages/utils':
@@ -1883,6 +1895,9 @@ importers:
       express:
         specifier: 5.2.1
         version: 5.2.1
+      fs-extra:
+        specifier: 11.3.4
+        version: 11.3.4
       helmet:
         specifier: 8.1.0
         version: 8.1.0
@@ -1905,6 +1920,9 @@ importers:
       '@types/cookie-parser':
         specifier: 1.4.10
         version: 1.4.10(@types/express@5.0.0)
+      '@types/fs-extra':
+        specifier: 11.0.4
+        version: 11.0.4
       '@types/jsonwebtoken':
         specifier: 9.0.10
         version: 9.0.10

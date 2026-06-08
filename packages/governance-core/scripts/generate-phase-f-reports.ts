@@ -32,9 +32,9 @@ async function runScenario(suite: string, name: string, fn: () => void | Promise
         await fn();
         results.push({ name, suite, status: 'PASS' });
         console.log(`✅ [${suite}] ${name}`);
-    } catch (err: any) {
-        results.push({ name, suite, status: 'FAIL', error: err.message });
-        console.error(`❌ [${suite}] ${name}: ${err.message}`);
+    } catch (err: unknown) {
+        results.push({ name, suite, status: 'FAIL', error: (err as Error).message });
+        console.error(`❌ [${suite}] ${name}: ${(err as Error).message}`);
     }
 }
 

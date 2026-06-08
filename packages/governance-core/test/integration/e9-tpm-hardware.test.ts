@@ -1,11 +1,18 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { TpmEngine } from '../../src/trust/tpm.js';
 import { PhysicalTpmConnector } from '../../src/trust/physical-tpm-spec.js';
 
 describe('Phase E9: TPM 2.0 Hardware Attestation', () => {
+    const originalEnvMockTpm = process.env.ZTAN_MOCK_TPM;
+
     beforeEach(() => {
         vi.restoreAllMocks();
         TpmEngine.resetMockPcrs();
+        process.env.ZTAN_MOCK_TPM = 'true';
+    });
+
+    afterEach(() => {
+        process.env.ZTAN_MOCK_TPM = originalEnvMockTpm;
     });
 
     it('should generate and verify mock software attestation when hardware TPM is unavailable', () => {
@@ -44,8 +51,8 @@ describe('Phase E9: TPM 2.0 Hardware Attestation', () => {
 
         // Verify quote successfully
         const result = TpmEngine.verifyQuote(quote, nonce, {
-            0: '1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b',
-            7: 'fdeca12938475610fdeca12938475610fdeca12938475610fdeca12938475610'
+            0: quote.pcrValues[0],
+            7: quote.pcrValues[7]
         });
 
         expect(result.verified).toBe(true);
@@ -73,7 +80,7 @@ describe('Phase E9: TPM 2.0 Hardware Attestation', () => {
 
         // Expect PCR 7 (Secure Boot) to be verified, but simulate a mismatched host hash
         const result = TpmEngine.verifyQuote(quote, nonce, {
-            0: '1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b',
+            0: quote.pcrValues[0],
             7: 'ATTACKER_MUTATED_PCR_7_SECURE_BOOT_STATE'
         });
 

@@ -57,7 +57,7 @@ export class KernelMetricsReader {
                     full: this.parsePsiFile('/proc/pressure/io', 'full')
                 }
             };
-        } catch (e) {
+        } catch (_e) {
             return this.getMockPsiReport();
         }
     }
@@ -112,7 +112,7 @@ export class KernelMetricsReader {
                 if (readMatch) blkioThrottleReadBytes = parseInt(readMatch[1], 10);
                 if (writeMatch) blkioThrottleWriteBytes = parseInt(writeMatch[1], 10);
             }
-        } catch (e) {
+        } catch (_e) {
             return this.getMockCgroupStats();
         }
 
@@ -146,7 +146,7 @@ export class KernelMetricsReader {
                 const parts = lines[1].split(/\s+/);
                 if (parts.length >= 4) {
                     totalInodes = parseInt(parts[1], 10) || 1000000;
-                    const usedInodes = parseInt(parts[2], 10) || 50000;
+                    const _usedInodes = parseInt(parts[2], 10) || 50000;
                     freeInodes = parseInt(parts[3], 10) || 950000;
                 }
             }
@@ -163,7 +163,7 @@ export class KernelMetricsReader {
                 }
             }
             writeBytesSec = totalWriteSectors * 512; // 512 bytes per sector
-        } catch (e) {
+        } catch (_e) {
             return this.getMockDiskMetrics();
         }
 
@@ -223,7 +223,7 @@ export class KernelMetricsReader {
                         avgRttMs: Math.round(avgRttMs * 100) / 100,
                         jitterMs: Math.round(jitterMs * 100) / 100
                     });
-                } catch (e) {
+                } catch (_e) {
                     resolve({ avgRttMs: 1.5, jitterMs: 0.2 });
                 }
             });

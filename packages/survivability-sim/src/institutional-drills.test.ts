@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { OperatorDrillSimulator, DrillScenario } from './drill-simulator';
+import { OperatorDrillSimulator, DrillScenario } from './drill-simulator.js';
 
 // Overriding NODE_ENV for testing to prevent fatal exception in constructor
 const originalEnv = process.env.NODE_ENV;

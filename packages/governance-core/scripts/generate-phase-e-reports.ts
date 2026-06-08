@@ -71,9 +71,9 @@ async function runScenario(suite: string, name: string, fn: () => void | Promise
         await fn();
         results.push({ name, suite, status: 'PASS' });
         console.log(`✅ [${suite}] ${name}`);
-    } catch (err: any) {
-        results.push({ name, suite, status: 'FAIL', error: err.message });
-        console.error(`❌ [${suite}] ${name}: ${err.message}`);
+    } catch (err: unknown) {
+        results.push({ name, suite, status: 'FAIL', error: (err as Error).message });
+        console.error(`❌ [${suite}] ${name}: ${(err as Error).message}`);
     }
 }
 
@@ -93,7 +93,7 @@ async function main() {
         let caught = false;
         try {
             await adapter.spawnVm(config);
-        } catch (e: any) {
+        } catch (e: unknown) {
             if (e instanceof KvmAccessError) {
                 caught = true;
             }
@@ -135,8 +135,8 @@ async function main() {
         let quotaViolation = false;
         try {
             VmConstraintMonitor.assertSafeQuotas({ memorySizeMb: 4096 });
-        } catch (e: any) {
-            if (e.message.includes('exceeds maximum')) {
+        } catch (e: unknown) {
+            if ((e as Error).message.includes('exceeds maximum')) {
                 quotaViolation = true;
             }
         }
@@ -161,8 +161,8 @@ async function main() {
         let timedOut = false;
         try {
             await runner.executeIsolated('vm-starved', 'run', { executionTimeoutMs: 20 });
-        } catch (e: any) {
-            if (e.message.includes('[VM_TIMEOUT]')) {
+        } catch (e: unknown) {
+            if ((e as Error).message.includes('[VM_TIMEOUT]')) {
                 timedOut = true;
             }
         }
@@ -220,7 +220,7 @@ async function main() {
             }
         };
         const orchestrator = new FirecrackerOrchestrator(failingAdapter);
-        const orphanedVmsSet = (IsolatedExecutionRunner as any).orphanedVms as Set<string>;
+        const orphanedVmsSet = (IsolatedExecutionRunner as unknown as { orphanedVms: Set<string> }).orphanedVms as Set<string>;
         orphanedVmsSet.add('vm-leaked-oom');
 
         await IsolatedExecutionRunner.sweepOrphanedVms(orchestrator);

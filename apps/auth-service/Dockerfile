@@ -26,16 +26,16 @@ RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # Now copy the pruned source
 COPY --from=pruner /app/out/full/ .
-# Root config files are already copied from pruner/out/full
 
 # Generate Prisma client using the monorepo's installer context
 RUN pnpm --filter=@packages/db exec prisma generate
 
 # Build the app and its workspace dependencies
+RUN find . -name "tsconfig.tsbuildinfo" -exec rm -f {} +
 RUN pnpm turbo build --filter=@apps/auth-service...
 
 # Deploy production-only package to /app/deploy
-RUN pnpm --filter=@apps/auth-service deploy --legacy --prod /app/deploy
+RUN pnpm --filter=@apps/auth-service deploy --legacy --prod --ignore-scripts /app/deploy
 
 # Copy built dist artifacts into the deploy bundle
 RUN cp -r /app/apps/auth-service/dist /app/deploy/dist
@@ -48,7 +48,7 @@ WORKDIR /app
 # Hardened security: Non-root execution
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 runner
-USER runner
+USER 1001
 
 # Copy ONLY the deployed bundle
 COPY --from=installer --chown=runner:nodejs /app/deploy .

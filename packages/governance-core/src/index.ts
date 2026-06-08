@@ -4,27 +4,27 @@
 import { GovernanceEngine as RealGovernanceEngine } from './engine.js';
 
 export const sidecarVerifier = {
-    setKeyShare: (share: any) => {},
-    verifyDecision: async (decision: any) => ({ verifierId: 'ZTAN-SIDECAR-02', status: 'PASS' }),
-    processTelemetry: (data: any) => {}
+    setKeyShare: (_share: unknown) => {},
+    verifyDecision: async (_decision: unknown) => ({ verifierId: 'ZTAN-SIDECAR-02', status: 'PASS' }),
+    processTelemetry: (_data: unknown) => {}
 };
 
 // The mock consensusEngine object has been removed.
 // We export the real ConsensusEngine implementation below.
 
 export const externalVerifier = {
-    setKeyShare: (share: any) => {},
-    verifyDecision: async (decision: any, telemetry: any) => ({ verifierId: 'ZTAN-EXTERNAL-03', status: 'PASS' })
+    setKeyShare: (_share: unknown) => {},
+    verifyDecision: async (_decision: unknown, _telemetry: unknown) => ({ verifierId: 'ZTAN-EXTERNAL-03', status: 'PASS' })
 };
 
 export const notaryService = {
-    notarize: async (hash: string) => ({ sequenceId: 1234, timestamp: Date.now() })
+    notarize: async (_hash: string) => ({ sequenceId: 1234, timestamp: Date.now() })
 };
 
 import { generateKeyPairSync, sign } from 'crypto';
 
 export class ThresholdCrypto {
-    static async performDKG(nodes: string[], threshold: number) {
+    static async performDKG(nodes: string[], _threshold: number) {
         return nodes.map(id => {
             const keys = generateKeyPairSync('ed25519');
             return {
@@ -34,14 +34,14 @@ export class ThresholdCrypto {
             };
         });
     }
-    static async signPartial(payload: string, share: any, nodeId: string, threshold: number, nodes: string[]) {
+    static async signPartial(payload: string, share: unknown, _nodeId: string, _threshold: number, _nodes: string[]) {
         const payloadBuffer = Buffer.from(payload);
-        return sign(null, payloadBuffer, share).toString('base64');
+        return sign(null, payloadBuffer, share as import('crypto').KeyLike).toString('base64');
     }
 }
 
 export const StabilityCircuit = {
-    generateProof: async (...args: any[]) => {
+    generateProof: async (...args: unknown[]) => {
         // Compute a real SHA-256 hash of the arguments to simulate ZK-proof generation binding
         const { createHash } = await import('crypto');
         const proofHash = createHash('sha256').update(JSON.stringify(args)).digest('hex');
@@ -57,9 +57,9 @@ export const ZKProof = {};
 export const NotarizationAnchor = {};
 
 export class GovernanceEngine extends RealGovernanceEngine {
-    validateDeployment(manifest: any) { return { approved: true, reason: 'All governance checks passed' }; }
+    validateDeployment(_manifest: unknown) { return { approved: true, reason: 'All governance checks passed' }; }
     getComplianceStatus() { return { compliant: true, lastAudit: Date.now(), violations: [] }; }
-    enforcePolicy(policy: any) { return { enforced: true }; }
+    enforcePolicy(_policy: unknown) { return { enforced: true }; }
 }
 
 export { FederatedGovernanceEngine } from './federation.js';

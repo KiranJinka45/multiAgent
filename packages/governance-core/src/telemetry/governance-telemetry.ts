@@ -57,14 +57,15 @@ export async function timedGate<T>(
     try {
         result = await gateFn();
         verdict = verdictExtractor(result);
-    } catch (err: any) {
+    } catch (err: unknown) {
         const latencyMs = Math.round(performance.now() - t0);
+        const errorMessage = err instanceof Error ? err.message : String(err);
         emitGateTelemetry({
             layer,
             verdict: 'ERROR',
             proposalId,
             latencyMs,
-            details: { error: err.message },
+            details: { error: errorMessage },
             timestamp: new Date().toISOString()
         });
         throw err;
@@ -100,14 +101,15 @@ export function timedGateSync<T>(
     try {
         result = gateFn();
         verdict = verdictExtractor(result);
-    } catch (err: any) {
+    } catch (err: unknown) {
         const latencyMs = Math.round(performance.now() - t0);
+        const errorMessage = err instanceof Error ? err.message : String(err);
         emitGateTelemetry({
             layer,
             verdict: 'ERROR',
             proposalId,
             latencyMs,
-            details: { error: err.message },
+            details: { error: errorMessage },
             timestamp: new Date().toISOString()
         });
         throw err;

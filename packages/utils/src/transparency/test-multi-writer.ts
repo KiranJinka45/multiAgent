@@ -27,7 +27,7 @@ async function runMultiWriterContentionValidation() {
   console.log('[TEST] Initializing Governance Ledger Genesis (acquires startup lock)...');
   GovernanceLedger.init();
 
-  const LOCK_FILE = GovernanceLedger.getLockFile(0);
+  const _LOCK_FILE = GovernanceLedger.getLockFile(0);
 
   // Wait robustly for any background initialization/sync (e.g. initDbSync, processOutbox) to fully complete
   console.log('[TEST] Waiting for background sync and lock release to complete...');

@@ -30,7 +30,7 @@ export class OperatorExplainabilityEngine {
         let prevStep: typeof trace.steps[0] | null = null;
 
         for (const step of trace.steps) {
-            let description = `Step ${step.index}: Operator executed [${step.action}] resulting in state hash '${step.stateHash}'`;
+            const description = `Step ${step.index}: Operator executed [${step.action}] resulting in state hash '${step.stateHash}'`;
             
             if (prevStep) {
                 const timeDiffMs = step.timestamp - prevStep.timestamp;

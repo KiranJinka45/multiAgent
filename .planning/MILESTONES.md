@@ -1,8 +1,29 @@
 # Milestones
 
+## v1.10.0 Operational Certification & Reproducibility Validation (Shipped: 2026-06-08)
+
+**Phases completed:** 2 phases, 2 plans, 0 tasks
+
+**Key accomplishments:**
+
+- (none recorded)
+
+---
+
+## v1.9.0 Real Rekor Interoperability (Shipped: 2026-06-06)
+
+**Phases completed:** 37 phases, 43 plans, 0 tasks
+
+**Key accomplishments:**
+
+- (none recorded)
+
+---
+
 ## Real Rekor Interoperability & Portability Validation (Active Milestone)
 
 **Key goals:**
+
 - Submit payload to a real Rekor instance.
 - Retrieve inclusion proof.
 - Verify proof from a separate machine/process.
@@ -17,6 +38,7 @@
 **Phases completed:** 1 phase (Production Readiness Audit)
 
 **Key accomplishments:**
+
 - Conducted a comprehensive Production Readiness Audit across 10 operational areas, producing 5 verification matrices, risk listings, and a prioritized remediation plan in `PRODUCTION_READINESS_AUDIT.md`.
 - Reconciled core ledgers and adjusted claims to accurately represent the software-simulated boundaries of the platform.
 
@@ -27,6 +49,7 @@
 **Phases completed:** 3 phases (Consensus & Subsystem Reconciliation, CI/CD Certification, Repository Pruning)
 
 **Key accomplishments:**
+
 - Realigned the `ConsensusEngine` interface with its 26 integration tests and resolved database access, file parallelism, and TPM fallback constraints, resulting in a 100% test pass rate workspace-wide.
 - Repaired and validated all 12 GitHub Actions workflows under `.github/workflows/`.
 - Pruned 8 dead packages and 2 dead apps from the filesystem, and removed their registrations and dependencies.
@@ -38,6 +61,7 @@
 **Phases completed:** 3 phases (Rekor PEM Resolution, Attestation Evidence Flow, Transparency-Log Validation)
 
 **Key accomplishments:**
+
 - Resolved Rekor PEM key encoding gap: client now accepts Ed25519 and P-256 PEM public keys; witness nodes propagate PEM keys dynamically.
 - Implemented TPM-style attestation evidence flow with `tpmQuote` integration in sandbox packets and auditor enforcement under Firecracker isolation.
 - Implemented RFC 6962 Merkle tree transparency-log inclusion proof generation and notary-signed checkpoint verification in the offline auditor.
@@ -51,6 +75,7 @@
 **Phases completed:** 1 phase (Audit Execution)
 
 **Key accomplishments:**
+
 - Conducted a comprehensive package-by-package and claim-by-claim independent audit across the entire repository.
 - Produced the master Repository Certification Audit report mapping constitutional and security policy assertions to physical implementations and test suites.
 - Identified 8 dead packages, 2 dead apps, and 7 broken CI/CD pipelines for remediation.
@@ -62,6 +87,7 @@
 **Phases completed:** 4 phases (CI Recovery, Frontend Test Infrastructure, Witness Fencing Repair, Verification/Validation)
 
 **Key accomplishments:**
+
 - Repository-wide TypeScript typechecking completes successfully with zero reported type errors, and workspace lint execution completes successfully with zero errors and an acknowledged warning backlog across all 58 monorepo packages.
 - Pin eslint version to `^8.57.0` using root `package.json` overrides to resolve dependency resolution errors.
 - Repaired frontend unit tests by migrating to Vitest.

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { SandboxManager } from './manager';
-import type { SandboxProfile } from './types';
+import { SandboxManager } from './manager.js';
+import type { SandboxProfile } from './types.js';
 
 describe('SandboxManager', () => {
   let manager: SandboxManager;

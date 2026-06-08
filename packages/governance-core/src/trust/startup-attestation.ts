@@ -1,5 +1,6 @@
 import { createHash } from 'crypto';
 import { PhysicalTpmConnector } from './physical-tpm-spec.js';
+import type { Tpm2QuotePayload } from './physical-tpm-spec.js';
 
 export interface AttestationResult {
     isAttested: boolean;
@@ -58,23 +59,24 @@ export class StartupAttestation {
 
         // 4. Request Physical TPM 2.0 Quote (Priority 3 Hardening)
         const hasHardware = PhysicalTpmConnector.isHardwareTpmAvailable();
-        let quotePayload: any = null;
+        let _quotePayload: Tpm2QuotePayload | null = null;
 
         if (hasHardware) {
             console.log(`[STARTUP_ATTESTATION] 🛡️ Hardware TPM 2.0 detected. Generating physical quote...`);
             try {
-                quotePayload = PhysicalTpmConnector.generatePhysicalQuote(bootHash, {
+                _quotePayload = PhysicalTpmConnector.generatePhysicalQuote(bootHash, {
                     algorithm: 'sha256',
                     pcrs: [0, 1, 7] // Core measured boot PCRs
                 });
                 console.log(`[STARTUP_ATTESTATION] 🛡️ TPM Quote generated successfully.`);
-            } catch (err: any) {
-                console.error(`[STARTUP_ATTESTATION] ⚠️ Failed to generate physical TPM quote: ${err.message}`);
+            } catch (err: unknown) {
+                const message = err instanceof Error ? err.message : String(err);
+                console.error(`[STARTUP_ATTESTATION] ⚠️ Failed to generate physical TPM quote: ${message}`);
                 violations.push('Hardware TPM quote generation failed.');
             }
         } else {
             console.warn(`[STARTUP_ATTESTATION] ⚠️ CRITICAL: No Physical TPM 2.0 detected (/dev/tpm0). Falling back to software-simulated enclave.`);
-            quotePayload = PhysicalTpmConnector.generatePhysicalQuote(bootHash, { algorithm: 'sha256', pcrs: [0] });
+            _quotePayload = PhysicalTpmConnector.generatePhysicalQuote(bootHash, { algorithm: 'sha256', pcrs: [0] });
         }
 
         console.log(`[STARTUP_ATTESTATION] Boot state verified. Quote Hash: ${bootHash}`);

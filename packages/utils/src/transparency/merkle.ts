@@ -127,7 +127,7 @@ export class MerkleTree {
         if (m === n) return oldRoot === newRoot && proof.length === 0;
         if (m === 0 || m > n) return false;
 
-        let p = [...proof];
+        const p = [...proof];
         let fr: string;
         let sr: string;
 
@@ -144,7 +144,7 @@ export class MerkleTree {
         let sn = n;
 
         for (const element of p) {
-            let k = this.getK(sn);
+            const k = this.getK(sn);
             if (fn <= k) {
                 sr = this.hashNode(sr, element);
                 sn = k;

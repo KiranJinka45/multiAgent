@@ -67,7 +67,7 @@ export class ForensicResilienceEngine {
         const chainKey = `${this.CHAIN_PREFIX}${correlationId}:ledger`;
         const entryIds = await redis.lrange(chainKey, 0, -1);
         
-        const removedIds = entryIds.splice(startIndex, count);
+        const _removedIds = entryIds.splice(startIndex, count);
         
         await redis.del(chainKey);
         if (entryIds.length > 0) {

@@ -7,7 +7,7 @@ import path from 'path';
 export class PluginRunner {
   constructor(private projectPath: string) {}
 
-  async runPlugin(pluginName: string, context: any) {
+  async runPlugin(pluginName: string, _context: any) {
     console.log(`[PluginRunner] Executing plugin: ${pluginName}`);
     
     // In a real system, this would use a VM or WASM sandbox.

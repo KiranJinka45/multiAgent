@@ -1,7 +1,6 @@
 import * as crypto from 'crypto';
 import { ThresholdCrypto, type PartialSignature } from './crypto-utils.js';
 import type { 
-  GovernanceMode, 
   ConsensusResult, 
   TrustAttestation, 
   CeremonyStatus, 
@@ -156,7 +155,7 @@ export class ConsensusEngine {
       { area: 'External Audit Certification', status: 'PENDING', risk: 'Verification Third-Party Review' }
   ];
 
-  constructor(t: number = 2, n: number = 5, nodeIds: string[] = ['node-1', 'node-2', 'node-3', 'node-4', 'node-5']) {
+  constructor(t: number = 2, _n: number = 5, nodeIds: string[] = ['node-1', 'node-2', 'node-3', 'node-4', 'node-5']) {
     this.BASE_T = t;
     this.N_IDS = [...nodeIds];
     this.N_IDS.forEach(id => this.trustWeights.set(id, 100));

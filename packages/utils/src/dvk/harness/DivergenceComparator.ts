@@ -150,7 +150,7 @@ export class DivergenceComparator {
           } else {
             astEqual = proj.isEqual;
           }
-        } catch (e) {
+        } catch (_e) {
           astEqual = false;
         }
 
@@ -159,7 +159,7 @@ export class DivergenceComparator {
         } else {
           classification = 'semantic_divergence';
         }
-      } catch (err) {
+      } catch (_err) {
         classification = 'semantic_divergence';
       }
     }

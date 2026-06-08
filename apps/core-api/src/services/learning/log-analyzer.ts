@@ -18,7 +18,7 @@ export class LogAnalyzer {
    * Analyzes an SREUpdate for log-based anomalies.
    */
   public static async analyze(update: SREUpdate): Promise<LogAnomaly[]> {
-    const anomalies: LogAnomaly[] = [];
+    const _anomalies: LogAnomaly[] = [];
     
     // Extract logs from events
     // @ts-ignore
@@ -52,7 +52,7 @@ export class LogAnalyzer {
    */
   public static correlate(anomalies: LogAnomaly[], events: SREEvent[]): boolean {
     const rcas = events.filter((e: any) => e.type === 'RCA');
-    const actions = events.filter((e: any) => e.type === 'ACTION');
+    const _actions = events.filter((e: any) => e.type === 'ACTION');
 
     if (rcas.length > 0 && anomalies.length > 0) {
       logger.info({ 

@@ -30,7 +30,7 @@ export class P2pServer {
                         }
                         res.writeHead(200, { 'Content-Type': 'application/json' });
                         res.end(JSON.stringify({ success: true }));
-                    } catch (e) {
+                    } catch (_e) {
                         res.writeHead(400);
                         res.end();
                     }

@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 // Resolve working directory
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const projectRoot = path.resolve(__dirname, '..', '..', '..');
+const _projectRoot = path.resolve(__dirname, '..', '..', '..');
 
 interface GoldenFixture {
     id: string;
@@ -35,7 +35,7 @@ async function runRustDifferentialHarness() {
         execSync('cargo --version', { stdio: 'ignore' });
         hasCargo = true;
         console.log("[INIT] ✅ Rust compiler detected on host. Compiling canonicalizer.rs natively...");
-    } catch (e) {
+    } catch (_e) {
         console.log("[INIT] ⚠️ Cargo/rustc compiler not detected in system PATH.");
         console.log("[INIT] ⚙️ Falling back to Structural Parity Simulation against Rust canonicalizer code...");
     }
@@ -86,7 +86,7 @@ fn main() {
         console.log("\n--- Executing Structural Code Auditing & Static Parity Checks ---");
         
         const rustCode = fs.readFileSync(path.resolve(__dirname, 'canonicalizer.rs'), 'utf8');
-        const tsCode = fs.readFileSync(path.resolve(__dirname, 'canonicalizer.ts'), 'utf8');
+        const _tsCode = fs.readFileSync(path.resolve(__dirname, 'canonicalizer.ts'), 'utf8');
 
         // Check 1: Operational limits matching check
         const rustLimits = {

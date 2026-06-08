@@ -7,7 +7,6 @@ import {
     validatorQueue, 
     BlueprintManager, 
     VirtualFileSystem, 
-    CommitManager, 
     DistributedExecutionContext 
 } from '@packages/utils';
 import { GeneratorAgent } from '@packages/agents';

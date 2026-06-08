@@ -83,7 +83,7 @@ console.log('  ✅ PASS: InvariantGuard would halt job processing\n');
 
 // --- Test 5: Health Endpoint Would Report 503 ---
 console.log('▶ Test 5: Health Endpoint Governance Fracture Detection');
-const governanceFracture = clusterNodes.size > 0 && !quorumBroken === false;
+const _governanceFracture = clusterNodes.size > 0 && !quorumBroken === false;
 const effectiveStatus = quorumBroken ? 'governance_fracture' : 'healthy';
 const httpStatus = quorumBroken ? 503 : 200;
 console.log(`  Effective status: ${effectiveStatus}`);

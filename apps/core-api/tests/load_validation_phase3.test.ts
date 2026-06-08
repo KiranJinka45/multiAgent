@@ -24,7 +24,7 @@ async function runPhase3LoadValidation() {
             } else {
                 console.log('✔ PASS: Resource limit check available in service.');
             }
-        } catch (e) {
+        } catch (_e) {
             console.error('❌ FAIL: Error checking resource limits');
         }
 

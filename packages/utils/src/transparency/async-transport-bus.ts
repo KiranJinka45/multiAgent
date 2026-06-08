@@ -170,7 +170,7 @@ export class AsyncTransportBus {
           }
         });
 
-        socket.on('error', (err) => {
+        socket.on('error', (_err) => {
           // Socket error handled gracefully
         });
       });

@@ -6,13 +6,13 @@ import { SideEffectOntology, SideEffectClass } from '../../src/ontology/side-eff
 describe('Phase E5: Disk Full & OOM Recovery Tests', () => {
     it('should sweep and clean up orphaned VMs even when the orchestrator encounters errors', async () => {
         const failingAdapter = new class extends MockFirecrackerAdapter {
-            async killVm(vmId: string): Promise<void> {
+            async killVm(_vmId: string): Promise<void> {
                 throw new Error('Disk full: cannot write process lockfile or kill state');
             }
         };
 
         const orchestrator = new FirecrackerOrchestrator(failingAdapter);
-        const orphanedVmsSet = (IsolatedExecutionRunner as any).orphanedVms as Set<string>;
+        const orphanedVmsSet = (IsolatedExecutionRunner as unknown as { orphanedVms: Set<string> }).orphanedVms;
         
         orphanedVmsSet.add('vm-oom-test-leaked');
 
@@ -23,7 +23,7 @@ describe('Phase E5: Disk Full & OOM Recovery Tests', () => {
     });
 
     it('should fail-closed during VM startup if the rootfs path is missing/unwritable (simulated)', async () => {
-        const registry = (SideEffectOntology as any).registry as Map<string, any>;
+        const registry = (SideEffectOntology as unknown as { registry: Map<string, unknown> }).registry;
         const originalVmExecute = registry.get('vm-execute');
         registry.set('vm-execute', { 
             name: 'vm-execute', 
@@ -46,7 +46,7 @@ describe('Phase E5: Disk Full & OOM Recovery Tests', () => {
             ).rejects.toThrow('[DISK_ERROR] No space left on device');
 
             // Ensure the VM is not registered as orphaned after failing to start
-            const orphanedVmsSet = (IsolatedExecutionRunner as any).orphanedVms as Set<string>;
+            const orphanedVmsSet = (IsolatedExecutionRunner as unknown as { orphanedVms: Set<string> }).orphanedVms;
             expect(orphanedVmsSet.has('vm-disk-full')).toBe(false);
         } finally {
             if (originalVmExecute) {

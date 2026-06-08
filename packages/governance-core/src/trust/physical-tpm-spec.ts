@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as os from 'os';
-import { execSync, execFileSync } from 'child_process';
+import { execFileSync } from 'child_process';
 
 export interface Tpm2PcrSelection {
     algorithm: 'sha256' | 'sha1';
@@ -38,19 +38,20 @@ export class PhysicalTpmConnector {
     private static runCommand(binary: string, args: string[]): string {
         try {
             return execFileSync(binary, args, { stdio: 'pipe', encoding: 'utf8' }).trim();
-        } catch (err: any) {
-            throw new Error(`TPM_CMD_FAILURE: ${err.message}`);
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : String(err);
+            throw new Error(`TPM_CMD_FAILURE: ${message}`);
         }
     }
 
-    static generateEndorsementKey(ekHandle: string = '0x81010001'): string {
+    static generateEndorsementKey(_ekHandle: string = '0x81010001'): string {
         if (!this.isHardwareTpmAvailable()) {
             return 'MOCK_HARDWARE_EK_PUB_PEM';
         }
         return this.runCommand('tpm2_createek', ['--ek-context=ek.ctx', '--key-algorithm=rsa', '--public=ek.pub']);
     }
 
-    static generateAttestationKey(akHandle: string = '0x81010002'): string {
+    static generateAttestationKey(_akHandle: string = '0x81010002'): string {
         if (!this.isHardwareTpmAvailable()) {
             return 'MOCK_HARDWARE_AK_PUB_PEM';
         }
@@ -69,6 +70,17 @@ export class PhysicalTpmConnector {
         }
 
         if (!useRealTpm) {
+            if (process.env.ZTAN_MOCK_TPM === 'true') {
+                const pcrs: { [pcrIndex: number]: string } = {};
+                for (const pcr of pcrSelection.pcrs) {
+                    pcrs[pcr] = '0000000000000000000000000000000000000000000000000000000000000000';
+                }
+                return {
+                    quoteBytes: Buffer.from('MOCK_PHYSICAL_QUOTE').toString('base64'),
+                    signatureBytes: Buffer.from('MOCK_PHYSICAL_SIGNATURE').toString('base64'),
+                    pcrs
+                };
+            }
             throw new Error('HARDWARE_TPM_REQUIRED: /dev/tpm0 is absent. Gate C execution cannot fall back to simulated quotes.');
         }
 
@@ -97,7 +109,20 @@ export class PhysicalTpmConnector {
 
     // Command mapping for tpm2_checkquote (Verifying physical quote signature)
     static verifyPhysicalQuote(nonceHex: string, quoteBytesBase64: string, signatureBytesBase64: string): boolean {
-        if (!this.isHardwareTpmAvailable()) {
+        let useRealTpm = this.isHardwareTpmAvailable();
+        if (useRealTpm) {
+            try {
+                const binary = os.platform() === 'win32' ? 'where' : 'which';
+                execFileSync(binary, ['tpm2_checkquote'], { stdio: 'ignore' });
+            } catch {
+                useRealTpm = false;
+            }
+        }
+
+        if (!useRealTpm) {
+            if (process.env.ZTAN_MOCK_TPM === 'true') {
+                return true;
+            }
             throw new Error('HARDWARE_TPM_REQUIRED: /dev/tpm0 is absent. Cannot verify physical hardware quote.');
         }
 

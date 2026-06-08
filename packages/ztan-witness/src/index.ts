@@ -46,7 +46,7 @@ export class EvidenceLedgerService {
             const { publicKey } = crypto.generateKeyPairSync('ed25519', {
                 publicKeyEncoding: { type: 'spki', format: 'pem' }
             });
-            pubKey = publicKey as string;
+            pubKey = publicKey as unknown as string;
             this.keyCache.set(signerId, pubKey);
         }
         return pubKey;
@@ -1135,7 +1135,7 @@ export class EvidenceLedgerService {
                     where: { payload: { contains: entryId } }
                 });
                 if (block) data = block.payload;
-            } catch (dbErr) {
+            } catch (_dbErr) {
                 // Ignore and fall through to error check
             }
         }

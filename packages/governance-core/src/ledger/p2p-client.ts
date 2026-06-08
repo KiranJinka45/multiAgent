@@ -24,7 +24,7 @@ export class P2pClient {
                 resolve(res.statusCode === 200);
             });
 
-            req.on('error', (err) => {
+            req.on('error', (_err) => {
                 resolve(false);
             });
             

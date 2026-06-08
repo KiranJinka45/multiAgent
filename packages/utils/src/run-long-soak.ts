@@ -34,7 +34,7 @@ class ZtanLongSoakCampaign {
             const opStart = performance.now();
             try {
                 validateDuplicateKeys(this.payload);
-            } catch (e) {
+            } catch (_e) {
                 // Ignore expected parses
             }
             const opEnd = performance.now();

@@ -35,7 +35,7 @@ export class CICDManager {
         }
     }
 
-    private static generateMainWorkflow(framework: string): string {
+    private static generateMainWorkflow(_framework: string): string {
         return `name: Production Deployment
 
 on:

@@ -60,7 +60,7 @@ export function createServer() {
         res.status(503).json({ error: 'Governance Freeze Active. All operations suspended.' });
         return;
       }
-    } catch (e) {
+    } catch (_e) {
       // Allow through if redis fails
     }
     next();
@@ -91,7 +91,7 @@ export function createServer() {
   // Evaluate endpoint
   app.post('/api/v1/policy/evaluate', async (req: Request, res: Response): Promise<void> => {
     try {
-      const { token, operator, action, files = [] } = req.body;
+      const { token, operator, _action, files = [] } = req.body;
 
       if (!token) {
         res.status(200).json({

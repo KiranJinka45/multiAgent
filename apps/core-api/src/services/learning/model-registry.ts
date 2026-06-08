@@ -28,7 +28,7 @@ export class ModelRegistry {
   public getActiveVersion() { return this.activeVersion; }
   public getShadowVersion() { return this.shadowVersion; }
 
-  public createShadowModel(parentVersion: string): string {
+  public createShadowModel(_parentVersion: string): string {
     const newVersion = `v5.0-adaptive-${Date.now()}`;
     this.shadowVersion = newVersion;
     this.history.set(newVersion, {

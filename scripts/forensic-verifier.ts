@@ -19,7 +19,7 @@ async function executeForensicVerification() {
   let localOutcome: any = { valid: false, error: 'Unexecuted' };
   let dbOutcome: any = { valid: false, error: 'Unexecuted' };
   let chainParity: 'SYNCHRONIZED' | 'DIVERGED' | 'PARTITIONED' = 'PARTITIONED';
-  let discrepancies: string[] = [];
+  const discrepancies: string[] = [];
 
   // 1. Audit Local Cryptographic Ledger
   console.log("\n[1] Auditing Local Chained Ledger File...");

@@ -10,7 +10,6 @@ export * from './sigstore/mock-cosign.js';
 export * from './time/mock-tsa.js';
 export * from './time/mock-rekor.js';
 
-const DST = 'BLS_SIG_ZTAN_AUDIT_V1';
 
 export interface KeyShare {
   nodeId: string;
@@ -30,7 +29,8 @@ export interface PatchIntent {
   trustEpoch: string | number;
   environment: string;
   operatorId: string;
-  [key: string]: any;
+  signatures?: string[];
+  [key: string]: unknown;
 }
 
 export interface ProofBundle {
@@ -43,7 +43,7 @@ export interface ProofBundle {
   participants: string[];
   aggregateSignature: string;
   transcriptHash: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface AuthenticatedMessage {
@@ -131,7 +131,6 @@ export interface VerificationResult {
   }[];
 }
 
-const MAX_TIME_WINDOW_MS = 5 * 60 * 1000; // 5 min
 
 /**
  * ZTAN Canonical Cryptographic Utility
@@ -311,7 +310,7 @@ export class ThresholdCrypto {
       const publicKeys = identities.map(id => this.fromHex(this.getVerifierPublicKey(id)));
       const aggregatedPk = bls.aggregatePublicKeys(publicKeys);
       return await bls.verify(sigBytes, message, aggregatedPk);
-    } catch (e) {
+    } catch {
       return false;
     }
   }
@@ -394,7 +393,7 @@ export class ThresholdCrypto {
     
     try {
         return await bls.verify(this.fromHex(msg.signature), msgHash, this.fromHex(pk));
-    } catch (e) {
+    } catch {
         return false;
     }
   }
@@ -460,7 +459,7 @@ export class ThresholdCrypto {
       let data: AuditInput;
       try {
         data = JSON.parse(inputRaw);
-      } catch (e) {
+      } catch {
         result.errorType = 'INPUT_INVALID';
         result.reason = 'Input is not a valid JSON object';
         return result;
@@ -568,10 +567,11 @@ export class ThresholdCrypto {
       addStep('Integrity verification finalized under defined constraints');
       return result;
 
-    } catch (e: any) {
-      addStep(`FATAL: ${e.message}`);
+    } catch (e: unknown) {
+      const errMessage = e instanceof Error ? e.message : String(e);
+      addStep(`FATAL: ${errMessage}`);
       result.errorType = 'INTERNAL_ERROR';
-      result.reason = e.message;
+      result.reason = errMessage;
       return result;
     }
   }
@@ -670,8 +670,8 @@ export function buildCanonicalPayload(input: AuditInput): {
  */
 export function computeSessionHash(data: {
   canonicalHash: string,
-  logs: any[],
-  diagnostics: any
+  logs: { type: string; message?: string; step?: string }[],
+  diagnostics: DiagnosticInfo | Record<string, unknown>
 }): string {
   const hashBytes = ThresholdCrypto.fromHex(data.canonicalHash);
   const logsBytes = new TextEncoder().encode(JSON.stringify(data.logs.map(l => ({ 

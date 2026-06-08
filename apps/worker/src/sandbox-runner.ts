@@ -100,7 +100,7 @@ export class SandboxRunner {
         } else {
             adapter = new MockFirecrackerAdapter();
         }
-    } catch (err) {
+    } catch (_err) {
         adapter = new MockFirecrackerAdapter();
     }
 

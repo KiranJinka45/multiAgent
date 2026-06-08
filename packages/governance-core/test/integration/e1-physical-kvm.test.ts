@@ -4,6 +4,7 @@ import { PhysicalFirecrackerAdapter, KvmAccessError } from '../../src/isolation/
 describe('Phase E1: Physical KVM Verification', () => {
     it('should throw KvmAccessError on Windows or non-KVM host during spawnVm', async () => {
         const adapter = new PhysicalFirecrackerAdapter();
+        adapter.disableFallback = true;
         const config = {
             vmId: 'test-vm-kvm',
             kernelImagePath: '/var/lib/ztan/vmlinux',

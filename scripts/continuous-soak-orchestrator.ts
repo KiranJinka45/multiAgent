@@ -159,7 +159,7 @@ const latestOsMetrics = new Map<string, any>();
 const consecutiveHighElu = new Map<string, number>();
 
 const requestLatencies: number[] = [];
-let databaseOutboxCount = 0;
+const databaseOutboxCount = 0;
 let physicalWalByteDeltaTotal = 0n;
 let initialWalLsn: string | null = null;
 let finalWalLsn: string | null = null;
@@ -553,7 +553,7 @@ async function main() {
     }
   }
 
-  let originalDatabaseUrl = process.env.DATABASE_URL || '';
+  const originalDatabaseUrl = process.env.DATABASE_URL || '';
   if (IS_PATHOLOGY) {
     const { setupSchema, getSandboxedUrl } = await import('./pathology-isolation-manager.js');
     process.env.DATABASE_URL = getSandboxedUrl(originalDatabaseUrl);

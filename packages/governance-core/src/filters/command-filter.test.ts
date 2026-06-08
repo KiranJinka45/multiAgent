@@ -8,8 +8,8 @@ describe('Static Command Filter', () => {
         // Reset or assume isolate environment for static checks
     });
 
-    it('should deny unknown tools', () => {
-        const allowed = StaticCommandFilter.evaluateProposal({
+    it('should deny unknown tools', async () => {
+        const allowed = await StaticCommandFilter.evaluateProposal({
             toolName: 'hacker-tool',
             tenantId: 'tenant-1',
             payload: 'exploit'
@@ -18,7 +18,7 @@ describe('Static Command Filter', () => {
         expect(allowed).toBe(false);
     });
 
-    it('should allow known tools within lattice bounds', () => {
+    it('should allow known tools within lattice bounds', async () => {
         SideEffectOntology.registerOperation({
             name: 'safe-tool',
             sideEffectClass: SideEffectClass.REVERSIBLE,
@@ -38,7 +38,7 @@ describe('Static Command Filter', () => {
             environmentBoundaries: []
         });
 
-        const allowed = StaticCommandFilter.evaluateProposal({
+        const allowed = await StaticCommandFilter.evaluateProposal({
             toolName: 'safe-tool',
             tenantId: 'tenant-1',
             payload: 'run'

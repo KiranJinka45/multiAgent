@@ -1,5 +1,5 @@
-import { SandboxManager } from "../../sandbox/src/manager";
-import { SandboxProfile } from "../../sandbox/src/types";
+import { SandboxManager } from "@packages/sandbox";
+import type { SandboxProfile } from "@packages/sandbox";
 
 export interface PilotGate {
   decision: 'APPROVE' | 'REJECT';

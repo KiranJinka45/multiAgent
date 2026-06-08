@@ -87,7 +87,7 @@ class ZtanCoverageInstrumentationEngine {
         // Run validation to ensure no crashes
         try {
             validateDuplicateKeys(jsonStr);
-        } catch (e) {
+        } catch (_e) {
             // Error captured correctly
         }
     }
@@ -110,7 +110,7 @@ class ZtanCoverageInstrumentationEngine {
     private runMutationScoring() {
         console.log("\n--- Executing Mutation Scoring Analysis ---");
         // We mutate a valid payload to inject issues, verifying that the fuzzer registers it as a correct mutant death (rejection)
-        const validPayload = `{"id": "ok"}`;
+        const _validPayload = `{"id": "ok"}`;
         
         // Mutants representing syntactic errors
         const mutants = [
@@ -124,7 +124,7 @@ class ZtanCoverageInstrumentationEngine {
             try {
                 validateDuplicateKeys(mut.val);
                 console.log(`  [SURVIVED] ${mut.name} - Accepted by parser (MUTATION GAP!)`);
-            } catch (e) {
+            } catch (_e) {
                 killedCount++;
                 console.log(`  [KILLED]   ${mut.name} - Correctly rejected with error.`);
             }
@@ -146,7 +146,7 @@ class ZtanCoverageInstrumentationEngine {
         try {
             validateDuplicateKeys(minimal);
         } catch (err: any) {
-            const expectedErrorMsg = err.message;
+            const _expectedErrorMsg = err.message;
             
             // Simplified minimization loop
             minimal = `{"duplicate":1,"duplicate":2}`;

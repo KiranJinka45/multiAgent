@@ -20,11 +20,11 @@ const log = (msg: string) => {
     const timestamp = new Date().toISOString();
     try {
         fs.appendFileSync(logPath, `[${timestamp}] ${msg}\n`);
-    } catch (e) {}
+    } catch (_e) {}
 };
 
 export const deployWorker = new Worker(QUEUE_DEPLOY, async (job: Job) => {
-    const { projectId, executionId, previewUrl, agentId, config } = job.data;
+    const { projectId, executionId, previewUrl, agentId, _config } = job.data;
     
     if (agentId) {
         // --- ASYNC AGENT PROVISIONING PATH ---

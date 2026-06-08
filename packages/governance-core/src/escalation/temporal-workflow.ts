@@ -23,6 +23,15 @@
 import type { CommandExecutionProposal } from '../filters/command-filter.js';
 import * as temporalWorkflow from '@temporalio/workflow';
 
+interface TemporalClient {
+    workflow: {
+        start(workflow: unknown, options: Record<string, unknown>): Promise<unknown>;
+        getHandle(workflowId: string): {
+            signal(signalName: string, arg: unknown): Promise<void>;
+        };
+    };
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // Types (shared between workflow, client, and worker)
 // ═══════════════════════════════════════════════════════════════════════════
@@ -63,7 +72,7 @@ export async function humanEscalationWorkflow(
     timeoutMs: number = 3600000
 ): Promise<HumanEscalationWorkflowState> {
     
-    const escalationDecisionSignal = (temporalWorkflow.defineSignal as any)('escalationDecision');
+    const escalationDecisionSignal = temporalWorkflow.defineSignal<[EscalationDecisionSignal]>('escalationDecision');
     let status: EscalationStatus = 'PENDING';
 
     const state: HumanEscalationWorkflowState = {
@@ -102,8 +111,8 @@ export class TemporalWorkflowOrchestrator {
     private static activeWorkflows: Map<string, HumanEscalationWorkflowState> = new Map();
     private static decisionHandlers: Map<string, (signal: EscalationDecisionSignal) => void> = new Map();
     
-    private static connection: any = null;
-    private static client: any = null;
+    private static connection: unknown = null;
+    private static client: TemporalClient | null = null;
     private static isInitialized = false;
 
     /**
@@ -127,11 +136,12 @@ export class TemporalWorkflowOrchestrator {
             const clientPkg = '@temporalio/client';
             const { Connection, Client } = await import(clientPkg);
             this.connection = await Connection.connect({ address });
-            this.client = new Client({ connection: this.connection });
+            this.client = new Client({ connection: this.connection }) as TemporalClient;
             console.log('[TEMPORAL_WORKFLOW] Successfully connected to real Temporal server.');
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : String(err);
             console.warn(
-                `[TEMPORAL_WORKFLOW] Failed to connect to real Temporal server: ${err.message}. ` +
+                `[TEMPORAL_WORKFLOW] Failed to connect to real Temporal server: ${message}. ` +
                 `Falling back to simulated escalation engine.`
             );
             this.connection = null;
@@ -170,16 +180,17 @@ export class TemporalWorkflowOrchestrator {
                     args: [proposal, timeoutMs],
                 });
                 return workflowId;
-            } catch (err: any) {
+            } catch (err: unknown) {
+                const message = err instanceof Error ? err.message : String(err);
                 console.warn(
-                    `[TEMPORAL_WORKFLOW] Real Temporal workflow start failed: ${err.message}. ` +
+                    `[TEMPORAL_WORKFLOW] Real Temporal workflow start failed: ${message}. ` +
                     `Falling back to simulated engine for ${workflowId}.`
                 );
             }
         }
 
         // Simulated path (surviving tests and local setups without Temporal server)
-        const workflowPromise = (async () => {
+        const _workflowPromise = (async () => {
             let decisionReceived = false;
 
             this.decisionHandlers.set(workflowId, (signal: EscalationDecisionSignal) => {
@@ -247,9 +258,10 @@ export class TemporalWorkflowOrchestrator {
                 
                 state.status = decision === 'APPROVE' ? 'APPROVED' : 'REJECTED';
                 return true;
-            } catch (err: any) {
+            } catch (err: unknown) {
+                const message = err instanceof Error ? err.message : String(err);
                 console.warn(
-                    `[TEMPORAL_WORKFLOW] Real Temporal signal delivery failed: ${err.message}. ` +
+                    `[TEMPORAL_WORKFLOW] Real Temporal signal delivery failed: ${message}. ` +
                     `Falling back to simulated delivery.`
                 );
             }
@@ -329,7 +341,7 @@ export class TemporalWorkflowOrchestrator {
     }
 
     static deserialize(json: string): void {
-        const data = JSON.parse(json);
+        const data = JSON.parse(json) as [string, HumanEscalationWorkflowState][];
         this.activeWorkflows = new Map(data);
     }
 

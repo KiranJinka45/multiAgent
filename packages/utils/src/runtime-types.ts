@@ -32,9 +32,9 @@ export class DistributedExecutionContext {
         return {
             startActiveSpan: async (name: string, cb: (span: any) => Promise<any>) => {
                 const span = {
-                    setAttribute: (...args: any[]) => {},
-                    setStatus: (...args: any[]) => {},
-                    recordException: (...args: any[]) => {},
+                    setAttribute: (..._args: any[]) => {},
+                    setStatus: (..._args: any[]) => {},
+                    recordException: (..._args: any[]) => {},
                     end: () => {}
                 };
                 return cb(span);

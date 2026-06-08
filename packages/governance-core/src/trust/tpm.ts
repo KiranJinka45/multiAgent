@@ -139,11 +139,12 @@ export class TpmEngine {
                         details: 'Hardware tpm2_checkquote verification failed. Signature or quote payload is invalid.'
                     };
                 }
-            } catch (e: any) {
+            } catch (e: unknown) {
+                const message = e instanceof Error ? e.message : String(e);
                 return {
                     verified: false,
                     errorType: 'SIGNATURE_INVALID',
-                    details: `Hardware verification error: ${e.message}`
+                    details: `Hardware verification error: ${message}`
                 };
             }
 
@@ -230,11 +231,12 @@ export class TpmEngine {
                 };
             }
 
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : String(err);
             return {
                 verified: false,
                 errorType: 'SIGNATURE_INVALID',
-                details: `Attested data parsing error: ${err.message}`
+                details: `Attested data parsing error: ${message}`
             };
         }
 

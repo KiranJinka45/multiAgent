@@ -661,7 +661,7 @@ export function shrinkDivergence(
   let bestStrategy = contract.chunk_strategy;
   
   // Verify initial contract triggers divergence
-  let res = executeReplayContract({ ...contract, payload: bestPayload, chunk_strategy: bestStrategy });
+  const res = executeReplayContract({ ...contract, payload: bestPayload, chunk_strategy: bestStrategy });
   if (!res.diverged) {
     return { payload: bestPayload, chunk_strategy: bestStrategy }; // No divergence to shrink
   }
@@ -748,7 +748,7 @@ export function runHarnessTests() {
   console.log('===========================================================');
 
   let passed = 0;
-  let failed = 0;
+  const failed = 0;
 
   for (const vec of verificationVectors) {
     const baseContract: Omit<ReplayExecutionContract, 'replay_id'> = {

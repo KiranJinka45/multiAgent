@@ -3,11 +3,19 @@
  * (v2026.LTS.1)
  */
 
+export interface ConstitutionContext {
+    blastRadiusScore?: number;
+    rollbackPlan?: { method: string };
+    evidenceCount?: number;
+    epochMatch?: boolean;
+    [key: string]: unknown;
+}
+
 export interface ConstitutionalRule {
     id: string;
     description: string;
     severity: 'CRITICAL' | 'HIGH' | 'MEDIUM';
-    evaluator: (context: any) => boolean;
+    evaluator: (context: ConstitutionContext) => boolean;
 }
 
 export const INSTITUTIONAL_CONSTITUTION: ConstitutionalRule[] = [

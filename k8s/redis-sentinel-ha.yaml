@@ -114,9 +114,11 @@ spec:
         - sh
         - -c
         - |
-          until nslookup redis-0.redis-headless; do echo waiting for master dns; sleep 2; done;
-          MASTER_HOST="redis-0.redis-headless"
+          until ping -c 1 redis-0.redis-headless.multiagent.svc.cluster.local >/dev/null 2>&1; do echo waiting for master dns; sleep 2; done;
+          MASTER_HOST="redis-0.redis-headless.multiagent.svc.cluster.local"
           echo "sentinel monitor mymaster $MASTER_HOST 6379 2" > /tmp/sentinel.conf;
+          echo "sentinel resolve-hostnames yes" >> /tmp/sentinel.conf;
+          echo "sentinel announce-hostnames yes" >> /tmp/sentinel.conf;
           echo "sentinel down-after-milliseconds mymaster 15000" >> /tmp/sentinel.conf;
           echo "sentinel failover-timeout mymaster 25000" >> /tmp/sentinel.conf;
           echo "sentinel parallel-syncs mymaster 1" >> /tmp/sentinel.conf;

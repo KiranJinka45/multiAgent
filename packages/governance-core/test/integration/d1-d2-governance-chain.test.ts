@@ -13,7 +13,7 @@ describe('Phase D1 & D2: Governance Chain & Boundary Integrity', () => {
     });
 
     describe('D1: Full Governance Chain Campaigns', () => {
-        it('should allow benign tasks with pristine pass', () => {
+        it('should allow benign tasks with pristine pass', async () => {
             SideEffectOntology.registerOperation({
                 name: 'read-log',
                 sideEffectClass: SideEffectClass.REVERSIBLE,
@@ -34,7 +34,7 @@ describe('Phase D1 & D2: Governance Chain & Boundary Integrity', () => {
 
             const proposal = { toolName: 'read-log', tenantId: 'tenant-a', payload: 'run' };
             
-            const filterRes = StaticCommandFilter.evaluateProposal(proposal);
+            const filterRes = await StaticCommandFilter.evaluateProposal(proposal);
             expect(filterRes).toBe(true);
 
             const simRes = DryRunSimulator.simulateProposal(proposal);
@@ -89,9 +89,9 @@ describe('Phase D1 & D2: Governance Chain & Boundary Integrity', () => {
             chatSpy.mockRestore();
         });
 
-        it('Planner Authority Escalation Attempt: Lattice rejection', () => {
+        it('Planner Authority Escalation Attempt: Lattice rejection', async () => {
             const proposal = { toolName: 'unregistered-tool', tenantId: 'tenant-a', payload: 'run' };
-            const filterRes = StaticCommandFilter.evaluateProposal(proposal);
+            const filterRes = await StaticCommandFilter.evaluateProposal(proposal);
             
             expect(filterRes).toBe(false);
         });

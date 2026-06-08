@@ -34,7 +34,7 @@ export class FederatedReplayEngine {
     /**
      * Detects divergence in distributed evidence lineage.
      */
-    public detectLineageDivergence(logs: any[]): boolean {
+    public detectLineageDivergence(_logs: any[]): boolean {
         // Check Merkle proofs across distributed log segments
         return false; // No divergence detected
     }

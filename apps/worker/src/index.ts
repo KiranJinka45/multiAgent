@@ -13,7 +13,7 @@ const opsApp = express();
 opsApp.disable('x-powered-by');
 
 // Operational metrics endpoint (Protected)
-opsApp.get('/metrics', internalAuth(['monitoring']), async (req, res) => {
+opsApp.get('/metrics', internalAuth(['monitoring']), async (_req, res) => {
     try {
         res.set('Content-Type', registry.contentType);
         res.end(await registry.metrics());
@@ -53,16 +53,16 @@ async function waitForRedis(maxRetries = 15): Promise<void> {
  * This prevents a single failing worker from crashing the entire fleet bootstrap.
  */
 async function safeImportWorker(name: string, path: string) {
+    const importPath = path.endsWith('.js') ? path : `${path}.js`;
     try {
-        console.log(`[DEBUG] Importing worker ${name} from path: ${path}`);
-        await import(path);
+        console.log(`[DEBUG] Importing worker ${name} from path: ${importPath}`);
+        await import(importPath);
 
         logger.info(`✅ [Worker] ${name} registered`);
     } catch (err) {
-        console.error(`[DEBUG] FAILED to import worker ${name} from ${path}:`, err);
-        logger.error({ err, path }, `❌ [Worker] Failed to register ${name}`);
+        console.error(`[DEBUG] FAILED to import worker ${name} from ${importPath}:`, err);
+        logger.error({ err, path: importPath }, `❌ [Worker] Failed to register ${name}`);
     }
-
 }
 
 

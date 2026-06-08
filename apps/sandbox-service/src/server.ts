@@ -119,7 +119,7 @@ export function createServer() {
             if (systemDelta > 0 && cpuDelta > 0) {
               finalResources.cpuPercent = Math.round((cpuDelta / systemDelta) * 100 * 100) / 100;
             }
-          } catch (statErr) {
+          } catch (_statErr) {
             logger.warn({ containerId }, 'Stats retrieval failed, using fallback/supplied resource metrics');
           }
         } catch (dockErr: any) {

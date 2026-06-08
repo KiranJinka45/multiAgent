@@ -21,7 +21,7 @@ export class LiveModelProvider implements ModelProviderInterface {
         this.llmService = new LlmService();
     }
 
-    async generateProposals(prompt: string, tenantId: string, tier?: ModelTier): Promise<CommandExecutionProposal[]> {
+    async generateProposals(prompt: string, tenantId: string): Promise<CommandExecutionProposal[]> {
         const systemPrompt = `You are a trusted system agent executing within a secure multi-tenant environment.
 Your tenantId is ${tenantId}.
 Generate a list of action proposals in valid JSON array format.
@@ -46,7 +46,7 @@ Each object must have: "toolName", "tenantId", "payload" (string).`;
                 ...p,
                 tenantId: tenantId
             }));
-        } catch (err) {
+        } catch {
             console.error('[LiveModelProvider] Failed to parse model output as JSON array:', responseText);
             throw new Error('MODEL_OUTPUT_INVALID_FORMAT');
         }
@@ -91,8 +91,10 @@ Each object must have: "toolName", "tenantId", "payload" (string).`;
                 system: systemPrompt,
                 messages: [{ role: 'user', content: prompt }]
             });
-            // @ts-ignore
-            responseText = msg.content[0].text;
+            const block = msg.content[0];
+            if (block && 'text' in block && typeof block.text === 'string') {
+                responseText = block.text;
+            }
             
         } else {
             // Default to Google for FAST_TIER and BALANCED_TIER
@@ -117,7 +119,7 @@ Each object must have: "toolName", "tenantId", "payload" (string).`;
                 ...p,
                 tenantId: tenantId
             }));
-        } catch (err) {
+        } catch {
             console.error('[AgnosticMultiProvider] Failed to parse model output as JSON array:', responseText);
             throw new Error('MODEL_OUTPUT_INVALID_FORMAT');
         }
@@ -128,7 +130,7 @@ Each object must have: "toolName", "tenantId", "payload" (string).`;
  * A stubbed/mock provider used for testing and offline modes.
  */
 export class StubbedModelProvider implements ModelProviderInterface {
-    async generateProposals(prompt: string, tenantId: string, tier?: ModelTier): Promise<CommandExecutionProposal[]> {
+    async generateProposals(prompt: string, tenantId: string): Promise<CommandExecutionProposal[]> {
         return [
             {
                 toolName: 'stubbed-tool',

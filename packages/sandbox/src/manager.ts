@@ -1,4 +1,4 @@
-import { SandboxProfile, ExecutionResult } from "./types";
+import type { SandboxProfile, ExecutionResult } from "./types.js";
 import * as crypto from "crypto";
 
 export class SandboxManager {

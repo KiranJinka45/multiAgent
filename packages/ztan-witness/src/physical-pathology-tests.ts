@@ -44,7 +44,7 @@ async function clearAllState() {
             if (file.endsWith('.lock') || file.endsWith('.generation') || file.endsWith('.json') || file.endsWith('.log')) {
                 try {
                     fs.unlinkSync(path.join(dir, file));
-                } catch (e) {}
+                } catch (_e) {}
             }
         }
     }
@@ -73,7 +73,7 @@ async function runPhysicalTests() {
         runDockerCmd(`start ${POSTGRES_CONTAINER}`);
         // Give it a moment to accept connections
         await new Promise(r => setTimeout(r, 2000));
-    } catch (e) {}
+    } catch (_e) {}
 
     // =========================================================================
     // DRILL 6: Network Partition Isolation
@@ -125,7 +125,7 @@ async function runPhysicalTests() {
     } catch (err: any) {
         console.error('❌ Drill 6 threw unexpected error:', err.message);
         // Clean up network state before exiting
-        try { runDockerCmd(`network connect ${DOCKER_NETWORK} ${POSTGRES_CONTAINER}`); } catch (e) {}
+        try { runDockerCmd(`network connect ${DOCKER_NETWORK} ${POSTGRES_CONTAINER}`); } catch (_e) {}
         process.exit(1);
     }
 
@@ -175,7 +175,7 @@ async function runPhysicalTests() {
                 await db.$queryRaw`SELECT 1`;
                 dbUp = true;
                 break;
-            } catch (e) {}
+            } catch (_e) {}
         }
 
         if (!dbUp) {
@@ -190,7 +190,7 @@ async function runPhysicalTests() {
 
     } catch (err: any) {
         console.error('❌ Drill 7 threw unexpected error:', err.message);
-        try { runDockerCmd(`start ${POSTGRES_CONTAINER}`); } catch (e) {}
+        try { runDockerCmd(`start ${POSTGRES_CONTAINER}`); } catch (_e) {}
         process.exit(1);
     }
 
@@ -228,7 +228,7 @@ async function runPhysicalTests() {
         try { 
             runDockerCmd(`exec -e PGPASSWORD=password ${POSTGRES_CONTAINER} psql -U postgres -d multiagent -c "ALTER SYSTEM SET fsync = on;"`); 
             runDockerCmd(`exec -e PGPASSWORD=password ${POSTGRES_CONTAINER} psql -U postgres -d multiagent -c "SELECT pg_reload_conf();"`); 
-        } catch (e) {}
+        } catch (_e) {}
         process.exit(1);
     }
 

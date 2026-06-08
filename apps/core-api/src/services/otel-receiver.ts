@@ -35,12 +35,12 @@ export class OtelReceiver {
 
         // Register observable gauges to read from SDK meter
         // These will be read every pollingIntervalMs and fed into the SRE Engine
-        const latencyGauge = this.meter.createObservableGauge('sre.http.latency.p95', {
+        const _latencyGauge = this.meter.createObservableGauge('sre.http.latency.p95', {
             description: 'Observed P95 HTTP latency in milliseconds',
             unit: 'ms'
         });
 
-        const errorRateGauge = this.meter.createObservableGauge('sre.http.error_rate', {
+        const _errorRateGauge = this.meter.createObservableGauge('sre.http.error_rate', {
             description: 'Observed HTTP 5xx error rate',
             unit: '1'
         });

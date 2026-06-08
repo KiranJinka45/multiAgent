@@ -33,9 +33,9 @@ async function runScenario(suite: string, name: string, fn: () => void | Promise
         await fn();
         results.push({ name, suite, status: 'PASS' });
         console.log(`✅ [${suite}] ${name}`);
-    } catch (err: any) {
-        results.push({ name, suite, status: 'FAIL', error: err.message });
-        console.error(`❌ [${suite}] ${name}: ${err.message}`);
+    } catch (err: unknown) {
+        results.push({ name, suite, status: 'FAIL', error: (err as Error).message });
+        console.error(`❌ [${suite}] ${name}: ${(err as Error).message}`);
     }
 }
 
@@ -64,9 +64,9 @@ async function main() {
         try {
             DetachedWitnessNode.requestCoSign('hash-k2', quote, challenge);
             throw new Error('Expected QuarantineError but did not throw');
-        } catch (err: any) {
-            if (!(err instanceof QuarantineError) || !err.message.includes('HARD QUARANTINE')) {
-                throw new Error(`Unexpected error thrown: ${err.message}`);
+        } catch (err: unknown) {
+            if (!(err instanceof QuarantineError) || !(err as Error).message.includes('HARD QUARANTINE')) {
+                throw new Error(`Unexpected error thrown: ${(err as Error).message}`);
             }
         } finally {
             TpmEngine.resetMockPcrs();
@@ -91,9 +91,9 @@ async function main() {
         try {
             ProvenanceVerifier.verifyOciImage('ztan-worker:latest');
             throw new Error('Expected SupplyChainError but did not throw');
-        } catch (err: any) {
-            if (!(err instanceof SupplyChainError) || !err.message.includes('Digest pinning required')) {
-                throw new Error(`Unexpected error thrown: ${err.message}`);
+        } catch (err: unknown) {
+            if (!(err instanceof SupplyChainError) || !(err as Error).message.includes('Digest pinning required')) {
+                throw new Error(`Unexpected error thrown: ${(err as Error).message}`);
             }
         }
     });
@@ -104,9 +104,9 @@ async function main() {
         try {
             ProvenanceVerifier.verifyOciImage(imageRef, 'build-bot@ztan.io');
             throw new Error('Expected SupplyChainError but did not throw');
-        } catch (err: any) {
-            if (!(err instanceof SupplyChainError) || !err.message.includes('Signature identity mismatch')) {
-                throw new Error(`Unexpected error: ${err.message}`);
+        } catch (err: unknown) {
+            if (!(err instanceof SupplyChainError) || !(err as Error).message.includes('Signature identity mismatch')) {
+                throw new Error(`Unexpected error: ${(err as Error).message}`);
             }
         }
     });
@@ -116,9 +116,9 @@ async function main() {
         try {
             TimeAnchorEngine.getTsaTimestampToken('hash-k6', 15); // 15ms drift
             throw new Error('Expected QuarantineError but did not throw');
-        } catch (err: any) {
-            if (!(err instanceof QuarantineError) || !err.message.includes('CLOCK_DRIFT_EXCEEDED')) {
-                throw new Error(`Unexpected error: ${err.message}`);
+        } catch (err: unknown) {
+            if (!(err instanceof QuarantineError) || !(err as Error).message.includes('CLOCK_DRIFT_EXCEEDED')) {
+                throw new Error(`Unexpected error: ${(err as Error).message}`);
             }
         }
     });
@@ -142,9 +142,9 @@ async function main() {
         try {
             GovernanceLedger.append('EXECUTION_STARTED', 'tenant-1', 'hash-k8', {});
             throw new Error('Expected ledger write block but append succeeded');
-        } catch (err: any) {
-            if (!err.message.includes('LEDGER_LOCKDOWN')) {
-                throw new Error(`Unexpected error: ${err.message}`);
+        } catch (err: unknown) {
+            if (!(err as Error).message.includes('LEDGER_LOCKDOWN')) {
+                throw new Error(`Unexpected error: ${(err as Error).message}`);
             }
         } finally {
             GovernanceLedger.setQuarantined(false);

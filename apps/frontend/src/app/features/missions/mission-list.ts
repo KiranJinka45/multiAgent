@@ -196,7 +196,7 @@ export class MissionListComponent {
   private router = inject(Router);
 
   missions$ = this.facade.missions$;
-  isCreating$ = this.facade.missions$.pipe(map(m => false)); 
+  isCreating$ = this.facade.missions$.pipe(map(_m => false)); 
 
   isQuotaExceeded$ = this.health.metrics$.pipe(
     map(m => m ? m.queueDepth >= 20 : false)

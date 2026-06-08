@@ -77,13 +77,26 @@ export function enforceMutabilityFencing(
   return true;
 }
 
+export interface FencingRequest {
+  headers: Record<string, string | string[] | undefined>;
+  user?: {
+    role?: string;
+  };
+}
+
+export interface FencingResponse {
+  status(code: number): {
+    json(data: unknown): unknown;
+  };
+}
+
 /**
  * Example Express/Fastify Middleware Wrapper
  */
 export const mutabilityGuard = (mutabilityClass: ApiMutabilityClass) => {
-  return (req: any, res: any, next: any) => {
+  return (req: FencingRequest, res: FencingResponse, next: () => void) => {
     try {
-      const userAgent = req.headers['user-agent'] || '';
+      const userAgent = (req.headers['user-agent'] as string) || '';
       const isMobileDevice = /Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(userAgent);
       
       const context: FencingContext = {

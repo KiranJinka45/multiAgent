@@ -19,7 +19,7 @@ export class DryRunSimulator {
         try {
             const operation = SideEffectOntology.getOperation(proposal.toolName);
             sideEffectClass = operation.sideEffectClass;
-        } catch (e) {
+        } catch (_e) {
             return {
                 isSafe: false,
                 reason: `Tool ${proposal.toolName} is unknown to ontology`,

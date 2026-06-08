@@ -75,7 +75,7 @@ export class NotaryService {
       await this.s3Client.send(command);
       anchor.auditGrade = true; // UPGRADE TO AUDIT-GRADE
       logger.info({ s3Key, rootHash }, '[NOTARY] TRUE S3 WORM anchor created (COMPLIANCE mode).');
-    } catch (err) {
+    } catch (_err) {
       // FALLBACK for development environments without real S3 credentials
       anchor.auditGrade = false;
       logger.warn('[NOTARY] S3 connection failed. Falling back to non-audit local WORM simulation.');
@@ -108,7 +108,7 @@ export class NotaryService {
                 const s3Anchor = JSON.parse(body);
                 if (s3Anchor.blockHash !== blockHash) return false;
             }
-        } catch (err) {
+        } catch (_err) {
             // If S3 fails, we rely on the frozen local ledger
             logger.debug('[NOTARY] S3 verify bypass (using local frozen head).');
         }

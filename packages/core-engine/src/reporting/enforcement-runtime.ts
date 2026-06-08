@@ -48,7 +48,7 @@ export class ComplexityBudgetEvaluator {
             `DEPENDENCY_CEILING_EXCEEDED: Direct dependencies count ${dependencyCount} exceeds ceiling of ${this.dependencyCeiling}`
           );
         }
-      } catch (err) {
+      } catch (_err) {
         // Safe fallback
       }
     }
@@ -87,7 +87,7 @@ export class ComplexityBudgetEvaluator {
             `COMPLEXITY_LIMIT_EXCEEDED: Active source modules count ${srcFileCount} exceeds ceiling of ${this.complexityCeiling}`
           );
         }
-      } catch (err) {
+      } catch (_err) {
         // Safe fallback
       }
     }

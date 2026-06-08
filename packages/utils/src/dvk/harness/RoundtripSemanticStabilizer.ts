@@ -8,14 +8,14 @@ export class RoundtripSemanticStabilizer {
     if (!rawJson || !rawJson.trim()) return '';
 
     // 1. Normalize escaped slashes: \/ to /
-    let normalized = rawJson.replace(/\\\//g, '/');
+    const normalized = rawJson.replace(/\\\//g, '/');
 
     // 2. Normalize JSON trailing zeros, scientific notations, sparse arrays, and dates via parsing
     try {
       const parsed = JSON.parse(normalized);
       const stabilizedObj = this.normalizeValue(parsed);
       return JSON.stringify(stabilizedObj);
-    } catch (err) {
+    } catch (_err) {
       // If parsing fails (e.g. truncated or malformed JSON), return the partially normalized string
       return normalized;
     }

@@ -23,7 +23,7 @@ export class OfflineAuditor {
         let packet: FinalizedEnvelope;
         try {
             packet = JSON.parse(packetJson);
-        } catch (e) {
+        } catch {
             report.isValid = false;
             report.reasons.push('Invalid JSON packet format.');
             return report;

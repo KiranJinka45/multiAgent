@@ -93,7 +93,7 @@ CMD ["nginx", "-g", "daemon off;"]
                 const existing = docker.getContainer(containerName);
                 await existing.stop();
                 await existing.remove();
-            } catch (e) { /* ignore */ }
+            } catch (_e) { /* ignore */ }
 
             // Find an open port (simplified: pick random 8000-9000)
             const port = Math.floor(Math.random() * (9000 - 8000 + 1)) + 8000;

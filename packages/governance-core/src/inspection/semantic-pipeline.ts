@@ -31,7 +31,7 @@ export class SemanticInspector {
                 if (/^[\x20-\x7E\s]+$/.test(decoded)) {
                     decodedStrings.push(decoded);
                 }
-            } catch (e) {
+            } catch {
                 // Ignore invalid decodings
             }
         }

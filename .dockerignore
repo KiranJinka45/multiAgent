@@ -7,9 +7,12 @@
 **/build
 **/.generated-projects
 **/packages_OLD
+**/.angular
 **/supabase/.branches
 **/supabase/.temp
 **/*.log
+**/*.tsbuildinfo
+tsconfig.tsbuildinfo
 **/.env*
 ! .env.production
 .vscode
@@ -24,3 +27,47 @@ dist
 build
 .generated-projects
 packages_OLD
+
+# ZTAN Local Cache, Debug, and Telemetry Folders
+.gemini
+.sandbox
+.sandboxes
+.previews
+.ztan-transparency
+.ztan-witness
+eslint-report.json
+root-eslint-report-utf8.json
+root-eslint-report.json
+failures
+logs
+reliability-corpus
+test-results
+ztan_release
+*.log
+*.zip
+*.json.log
+*.txt
+
+# Ignore heavy runtime/brain directories
+brain
+.planning
+archive
+reports
+benchmarks
+fixtures
+failures
+test-results
+audit
+configs
+
+# Ignore Rust compilation targets
+target
+**/target
+build_target
+**/build_target
+terraform
+**/terraform
+terraform-local
+**/terraform-local
+auditor-rs
+**/auditor-rs

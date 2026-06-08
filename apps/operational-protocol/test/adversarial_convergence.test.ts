@@ -50,7 +50,7 @@ describe('ZTAN Phase 8: Adversarial Convergence & Upgrade Safety', () => {
 
     it('Upgrade: Rolling Protocol Version Transition', async () => {
         const eventId = 'upgrade-test-001';
-        const msg = '0'.repeat(64);
+        const _msg = '0'.repeat(64);
         const engine = new ConsensusEngine(T, N, NODE_IDS);
 
         await engine.recordAttestation({

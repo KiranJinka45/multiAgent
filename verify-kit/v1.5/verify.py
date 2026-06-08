@@ -9,6 +9,10 @@ from py_ecc.bls.ciphersuites import G2Basic
 # MUST match Node.js implementation exactly
 
 class ZTANCiphersuite(G2Basic):
+    # NOTE: The ZTAN protocol pre-hashes the binding payload with SHA-256
+    # before passing to BLS sign/verify. The hash-to-curve DST is the
+    # standard BLS12-381 DST used by @noble/bls12-381 (default G2Basic).
+    # This class attribute is retained for protocol documentation only.
     DST = b'BLS_SIG_ZTAN_AUDIT_V1'
 
     @classmethod
@@ -43,8 +47,9 @@ class ZTANCiphersuite(G2Basic):
         # 3. Final Binding Hash
         final_msg = hashlib.sha256(binding_payload).digest()
         
-        # 4. Standard BLS Verification
-        return cls.Verify(PK, final_msg, signature)
+        # 4. Standard BLS Verification (use G2Basic directly to match
+        #    @noble/bls12-381 default DST for hash-to-curve)
+        return G2Basic.Verify(PK, final_msg, signature)
 
 def encode_field(data):
     """Canonical Field Encoding: uint32BE(len) || data"""

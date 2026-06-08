@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { CryptoUtils } from '../../evidence-lifecycle/src/crypto-utils';
-import { EvidencePacketGenerator } from '../../evidence-lifecycle/src/evidence-packet';
+import { EvidencePacketGenerator, FinalizedEnvelope } from '../../evidence-lifecycle/src/evidence-packet';
 import { TrustRegistry } from '../../federation/src/trust-registry';
 import { OfflineAuditor } from './auditor';
 import { ExecutionCell } from '../../federation/src/cell';
@@ -10,7 +10,7 @@ describe('Phase 08.6 Trust Finality Audit', () => {
     let epochKeyPair: { publicKey: string; privateKey: string };
     let governanceEpoch: string;
     let rootHash: string;
-    let signedPacket: any;
+    let signedPacket: FinalizedEnvelope;
     let registry: TrustRegistry;
     let snapshotJson: string;
 

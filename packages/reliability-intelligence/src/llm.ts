@@ -27,7 +27,7 @@ export interface ILLMProvider {
  * In a real environment, this would call OpenAI, Anthropic, or Gemini APIs.
  */
 export class ReliabilityLLMProvider implements ILLMProvider {
-    async complete(request: LLMRequest): Promise<LLMResponse> {
+    async complete(_request: LLMRequest): Promise<LLMResponse> {
         // Simulate LLM latency
         await new Promise(resolve => setTimeout(resolve, 800));
 

@@ -10,6 +10,7 @@ RUN corepack enable && corepack prepare pnpm@10.33.0 --activate
 
 # Copy monorepo configuration
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json .npmrc turbo.json tsconfig*.json tsup.config.base.ts ./
+COPY scripts/ ./scripts/
 COPY packages/ ./packages/
 COPY apps/billing-service/ ./apps/billing-service/
 
@@ -20,7 +21,7 @@ RUN pnpm install --frozen-lockfile
 RUN pnpm turbo build --filter=@apps/billing-service...
 
 # Deploy the app to a separate directory
-RUN pnpm --filter=@apps/billing-service deploy /prod/billing-service
+RUN pnpm --filter=@apps/billing-service deploy --legacy /prod/billing-service
 
 # -------- RUNTIME STAGE --------
 FROM node:20-alpine AS runner
