@@ -1,0 +1,121 @@
+{
+  "blocks": [
+    {
+      "id": 1,
+      "blockId": "canonical-block-0",
+      "prevHash": "GENESIS_PREV_HASH",
+      "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1",
+      "type": "GENESIS",
+      "payload": "{\"epoch\":0,\"sequence\":0,\"txCount\":0}",
+      "operator": "ZTAN_SYSTEM",
+      "signature": "sig_block_0_aaaaaaaa",
+      "status": "VERIFIED",
+      "epoch": "0",
+      "createdAt": "2026-06-08T12:51:15.502Z"
+    },
+    {
+      "id": 2,
+      "blockId": "canonical-block-1",
+      "prevHash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1",
+      "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2",
+      "type": "TX_BATCH",
+      "payload": "{\"epoch\":0,\"sequence\":1,\"txCount\":3}",
+      "operator": "ZTAN_OPERATOR_B",
+      "signature": "sig_block_1_aaaaaaaa",
+      "status": "VERIFIED",
+      "epoch": "0",
+      "createdAt": "2026-06-08T12:52:15.502Z"
+    },
+    {
+      "id": 3,
+      "blockId": "canonical-block-2",
+      "prevHash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2",
+      "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa3",
+      "type": "TX_BATCH",
+      "payload": "{\"epoch\":0,\"sequence\":2,\"txCount\":6}",
+      "operator": "ZTAN_OPERATOR_C",
+      "signature": "sig_block_2_aaaaaaaa",
+      "status": "VERIFIED",
+      "epoch": "0",
+      "createdAt": "2026-06-08T12:53:15.502Z"
+    },
+    {
+      "id": 4,
+      "blockId": "canonical-block-3",
+      "prevHash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa3",
+      "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa4",
+      "type": "TX_BATCH",
+      "payload": "{\"epoch\":0,\"sequence\":3,\"txCount\":9}",
+      "operator": "ZTAN_OPERATOR_A",
+      "signature": "sig_block_3_aaaaaaaa",
+      "status": "VERIFIED",
+      "epoch": "0",
+      "createdAt": "2026-06-08T12:54:15.502Z"
+    },
+    {
+      "id": 5,
+      "blockId": "canonical-block-4",
+      "prevHash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa4",
+      "hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa5",
+      "type": "TX_BATCH",
+      "payload": "{\"epoch\":0,\"sequence\":4,\"txCount\":12}",
+      "operator": "ZTAN_OPERATOR_B",
+      "signature": "sig_block_4_aaaaaaaa",
+      "status": "VERIFIED",
+      "epoch": "0",
+      "createdAt": "2026-06-08T12:55:15.502Z"
+    }
+  ],
+  "walLogs": [
+    {
+      "id": 1,
+      "seq": 1,
+      "type": "OUTBOX_APPEND",
+      "payload": "{\"ref\":\"block-0\",\"action\":\"commit\"}",
+      "status": "COMMITTED",
+      "createdAt": "2026-06-08T12:51:15.503Z"
+    },
+    {
+      "id": 2,
+      "seq": 2,
+      "type": "OUTBOX_APPEND",
+      "payload": "{\"ref\":\"block-1\",\"action\":\"commit\"}",
+      "status": "COMMITTED",
+      "createdAt": "2026-06-08T12:52:15.503Z"
+    },
+    {
+      "id": 3,
+      "seq": 3,
+      "type": "OUTBOX_APPEND",
+      "payload": "{\"ref\":\"block-2\",\"action\":\"commit\"}",
+      "status": "COMMITTED",
+      "createdAt": "2026-06-08T12:53:15.503Z"
+    },
+    {
+      "id": 4,
+      "seq": 4,
+      "type": "OUTBOX_APPEND",
+      "payload": "{\"ref\":\"block-3\",\"action\":\"commit\"}",
+      "status": "COMMITTED",
+      "createdAt": "2026-06-08T12:54:15.503Z"
+    },
+    {
+      "id": 5,
+      "seq": 5,
+      "type": "OUTBOX_APPEND",
+      "payload": "{\"ref\":\"block-4\",\"action\":\"commit\"}",
+      "status": "COMMITTED",
+      "createdAt": "2026-06-08T12:55:15.503Z"
+    }
+  ],
+  "snapshots": [
+    {
+      "id": 1,
+      "epoch": 0,
+      "lastSeq": 5,
+      "lastHash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa5",
+      "stateData": "{\"totalBlocks\":5,\"integrity\":\"nominal\"}",
+      "createdAt": "2026-06-08T12:56:15.503Z"
+    }
+  ]
+}

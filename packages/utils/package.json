@@ -13,7 +13,7 @@
     }
   },
   "scripts": {
-    "build": "tsup && tsc --emitDeclarationOnly -p tsconfig.json --declarationDir ./dist",
+    "build": "tsup && node -e \"try { require('fs').unlinkSync('tsconfig.tsbuildinfo') } catch (e) {}\" && tsc --emitDeclarationOnly -p tsconfig.json --declarationDir ./dist",
     "dev": "tsup --format esm --no-dts --watch",
     "phase16": "tsx src/run-phase-16-compatibility.ts",
     "phase17": "tsx src/run-phase-17-morphodynamics.ts"

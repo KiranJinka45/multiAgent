@@ -20,11 +20,11 @@
 
 ### Backup Integrity (OPS-MAINT-BACKUP)
 
-- [ ] **OPS-MAINT-BACKUP-01**: Verify graceful recovery pipeline failures and clear diagnostics under corrupted DB/queue backups.
+- [x] **OPS-MAINT-BACKUP-01**: Verify graceful recovery pipeline failures and clear diagnostics under corrupted DB/queue backups.
 
 ### Sentinel Resilience (OPS-MAINT-SENTINEL)
 
-- [ ] **OPS-MAINT-SENTINEL-01**: Verify lease-fencing state recovery and step-down behavior under active Redis Sentinel quorum-loss simulations.
+- [x] **OPS-MAINT-SENTINEL-01**: Verify lease-fencing state recovery and step-down behavior under active Redis Sentinel quorum-loss simulations.
 
 ## v2 Requirements
 
@@ -52,8 +52,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | OPS-MAINT-DEBT-02 | Phase 8 | Complete |
 | OPS-MAINT-PORT-01 | Phase 9 | Complete |
 | OPS-MAINT-DRIFT-01 | Phase 10 | Complete |
-| OPS-MAINT-BACKUP-01 | Phase 11 | Pending |
-| OPS-MAINT-SENTINEL-01 | Phase 12 | Pending |
+| OPS-MAINT-BACKUP-01 | Phase 11 | Complete |
+| OPS-MAINT-SENTINEL-01 | Phase 12 | Complete |
 
 **Coverage:**
 - v1 requirements: 6 total

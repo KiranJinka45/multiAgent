@@ -427,7 +427,13 @@ if (!(globalThis as any).__redisClient) {
         
         const mockRedis = {
             get: async (key: string) => store.get(key) || null,
-            set: async (key: string, value: string) => { store.set(key, value); },
+            set: async (key: string, value: string, ...args: any[]) => {
+                if (args.includes('NX') || args.includes('nx')) {
+                    if (store.has(key)) return null;
+                }
+                store.set(key, value);
+                return 'OK';
+            },
             del: async (...keys: string[]) => { keys.forEach(k => { store.delete(k); lists.delete(k); sets.delete(k); }); },
             keys: async (_pat: string) => Array.from(store.keys()).filter(k => k.startsWith('ztan:')),
             sadd: async (key: string, val: string) => { if(!sets.has(key)) sets.set(key, new Set()); sets.get(key)!.add(val); },
@@ -436,6 +442,23 @@ if (!(globalThis as any).__redisClient) {
             rpush: async (key: string, ...vals: string[]) => { if(!lists.has(key)) lists.set(key, []); lists.get(key)!.push(...vals); },
             lpush: async (key: string, ...vals: string[]) => { if(!lists.has(key)) lists.set(key, []); lists.get(key)!.unshift(...vals); },
             incr: async (key: string) => { seq++; store.set(key, String(seq)); return seq; },
+            expire: async (key: string, seconds: number) => 1,
+            eval: async (script: string, numKeys: number, key: string, arg: string) => {
+                if (store.get(key) === arg) {
+                    store.delete(key);
+                    return 1;
+                }
+                return 0;
+            },
+            watch: async (..._args: any[]) => 'OK',
+            unwatch: async (..._args: any[]) => 'OK',
+            multi: () => {
+                const multiInstance = {
+                    set: (k: string, v: string) => { store.set(k, v); return multiInstance; },
+                    exec: async () => []
+                };
+                return multiInstance;
+            },
             pipeline: () => {
                 const pipelineInstance = {
                     set: (k: string, v: string) => { store.set(k, v); return pipelineInstance; },

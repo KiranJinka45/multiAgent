@@ -45,6 +45,9 @@ export class FirecrackerOrchestrator {
     private adapter: FirecrackerAdapter;
 
     constructor(adapter: FirecrackerAdapter = new MockFirecrackerAdapter()) {
+        if (adapter instanceof MockFirecrackerAdapter && process.env.NODE_ENV === 'production' && process.env.ALLOW_MOCK_FIRECRACKER !== 'true') {
+            throw new Error('[SECURITY_VIOLATION] MockFirecrackerAdapter must not be used as a default or fallback in production mode (OPS-MAINT-OBS-01).');
+        }
         this.adapter = adapter;
     }
 
