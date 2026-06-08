@@ -1,0 +1,40 @@
+{
+  "missionId": "mission-repro-v1.9",
+  "version": "v1.9",
+  "timestamp": 1780904239998,
+  "governanceEpoch": "epoch-v1.9",
+  "merkleLineage": {
+    "rootHash": "0xroot18",
+    "inclusionHash": "0xinc18",
+    "siblings": []
+  },
+  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAYkEonQgAjRVXGeWtIbIJxM665e8ivLSud1G6ifYYSMc=\n-----END PUBLIC KEY-----\n",
+  "containmentProof": {
+    "locDelta": 0,
+    "fileGlobs": [],
+    "pathTraversalDetected": false,
+    "signature": "VR5KIZFX7MTFqrnuAa6p7LqAWBJkIKA0w8+BsC9wEM3an4d6hsY+Dbj4X0bUMPK/OBgU0EYDNV4NMZ/M0J95BQ=="
+  },
+  "recoveryAssurance": {
+    "preMutationSnapshotId": "snap-v1.8",
+    "revertHash": "0xrev18",
+    "engineSignature": "tm10U79jcYQKdTEz4ggaVxvhla31xAzIvHErLlO5z5TSMAcXxB6mzIgixYt8j8Rsy5Qu2xqGYLJKRTwczzVCAA=="
+  },
+  "sandboxAttestation": {
+    "isolationLevel": "native",
+    "providerSignature": "xz8OoY+CIRsRxE9mXcpVzhy5clZDKxrts1WqhP2eLRM+PIHWsv7gfUgQencf6ih2V7C8iZxXtU81+OWxwm0eAQ=="
+  },
+  "economicRationality": {
+    "tokenConsumption": 5,
+    "costCeiling": 50,
+    "withinBudget": true
+  },
+  "_audit": {
+    "hash": "212b1d2b4c3696bdacae522b1a579e240cc29842745ff2910a4cc7ce78531c9c",
+    "prevHash": "0x0",
+    "ts": 1780904240018,
+    "ztan_consensus": false,
+    "notarized": true,
+    "notarySeq": 101
+  }
+}

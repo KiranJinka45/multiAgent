@@ -1,0 +1,69 @@
+{
+  "sequenceId": 2026,
+  "version": "v1.10",
+  "timestamp": 1780904243700,
+  "elite": {
+    "multiAgent": {
+      "consensus": {
+        "action": "RESTART"
+      }
+    }
+  },
+  "governance": {
+    "isCertified": true,
+    "mode": "AUTONOMOUS",
+    "attestations": []
+  },
+  "_audit": {
+    "hash": "a843fac9203eb07671b5575aa7c890b3c9bea03ad2f77b5c0a029251f641d52d",
+    "prevHash": "0xabc123",
+    "ts": 1780904243700,
+    "ztan_consensus": true,
+    "aggregatedSignature": "928f1d8c228a506016bf6f8fed120794daf2853191b12807ea0701880420177cce4706b5fcd032a51459eb7e24a0e673139f914035169f9216060cf99b277120a5aaf6ada44bf38a8e5051e596641b073e02474dfb7f3caf1aa8a0a6d2d66749",
+    "zkProof": {
+      "pi_a": [
+        "30e89d988ebb224970c9162a6a66d7266d059523fad7ad43510460852caa41b4",
+        "d65b92f70799cc4a9dfaffa082c6e4a8098c8637190b80712dd7c5895f08512f"
+      ],
+      "pi_b": [
+        [
+          "4d057b9dedbe14f5e08e232866d04a78",
+          "236641a9e4ef8e3b98d750831a0b97c2"
+        ],
+        [
+          "7070b124698d6697d4cb9227f280d956",
+          "7fdcb289e48a22bac0cb01e3ead972fa"
+        ]
+      ],
+      "pi_c": [
+        "0e8b21e5c62da982de22e2c32c85572299ab5d125c5bad24ba0a6d30e28af9be",
+        "f969bde730233d42bce9ff3bd138a9624abec04e45ab25200a240a412d0254d1"
+      ],
+      "publicSignals": [
+        "850",
+        "8413050720324187957482783277179409815112402270946032042479586169815677230396"
+      ]
+    },
+    "notarized": true,
+    "notarySeq": 202
+  },
+  "_verification_data": {
+    "acc": 1,
+    "ldet": 120,
+    "lsla": 15000
+  },
+  "masterPublicKey": "8026bc475d51829be5eed5152d6349163fa71800ca9948b71eb168889cec23b30042320d8975dd1717c044a1e8413f59",
+  "threshold": 2,
+  "eligiblePublicKeys": [
+    "b5b1112adaa831140deb449c95cbfa00a802c98082b7e34df91225fd9c7457c724ee0eaac65987e177c711f965fbbb16",
+    "a49b0448d1106415dcdc747a31ff92b55c3d10e326c9ecece19ed50473668c4093f446c0ff0e182b9f6c40d256a8dece",
+    "b16fde29257c6029269e91b04b62c365194339045eeee625fa4be0fce39925c443912757b1091bff90cb550d43387c13"
+  ],
+  "signers": [
+    "SRE-ENGINE-01",
+    "ZTAN-SIDECAR-02"
+  ],
+  "ceremonyId": "ceremony-gov",
+  "messageHash": "9f635ec77533e3a270b4943b02a69e10bd3573d993efdfe9a36dca5c0e0f4592",
+  "payload": "2026|PASS|node-a"
+}
