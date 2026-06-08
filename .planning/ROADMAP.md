@@ -6,6 +6,7 @@ Following the successful validation of live cryptographic trust-chains and multi
 
 ## Milestones
 
+- 🚧 **v1.11.0 Maintenance, Debt Reduction & Portability Validation** - Phases 8-12 (in progress)
 - ✅ **v1.10.0 Operational Certification & Reproducibility Validation** - Phases 3-7 (Shipped: 2026-06-08)
 - ✅ **v1.9.0 Real Rekor Interoperability & Portability Validation** - Phases A-B, 1-2 (Shipped: 2026-06-04)
 - ✅ **v1.8.0 Trust-Chain Operationalization** - Phases 5-7 (Shipped: 2026-06-03)
@@ -13,6 +14,40 @@ Following the successful validation of live cryptographic trust-chains and multi
 - ✅ **v1.6.0 Stewardship Engineering Era** - (Shipped: 2026-05-26)
 
 ## Phases
+
+### 🚧 v1.11.0 Maintenance, Debt Reduction & Portability Validation (In Progress)
+
+**Milestone Goal:** Focus on platform stabilization, warning-debt reduction, independent bare-metal host validation, drift detection, and resilience drills.
+
+#### Phase 8: Technical Debt Reduction
+**Goal**: Resolve implicit `any` compiler warnings and unused local variables.
+**Success Criteria**:
+  1. Compiles cleanly with zero implicit `any` warnings in core packages.
+  2. Workspace lint checking reports zero unused local variable warnings.
+
+#### Phase 9: Bare-Metal Portability Validation
+**Goal**: Run the reproducibility verification kit on a physical bare-metal host.
+**Success Criteria**:
+  1. Verification scripts run end-to-end on non-virtualized hardware.
+  2. All evidence checks yield successful validation outputs.
+
+#### Phase 10: Drift Prevention Run Infrastructure
+**Goal**: Implement an automated test runner script to periodically run compatibility and reproducibility checks.
+**Success Criteria**:
+  1. Cron script regularly checks generated evidence.
+  2. Alerts trigger upon validation mismatch.
+
+#### Phase 11: Backup Corruption & Recovery Integrity
+**Goal**: Verify recovery behavior and diagnostics under corrupted backup imports.
+**Success Criteria**:
+  1. Graceful import aborts upon detecting corrupt DB/queue dumps.
+  2. System raises clean diagnostic alerts without silent crashes.
+
+#### Phase 12: Sentinel Resilience Drills
+**Goal**: Verify lease-fencing state recovery and step-down under Redis Sentinel quorum-loss simulations.
+**Success Criteria**:
+  1. Active lease step-downs trigger during network partition.
+  2. Failover operates without split-brain or data corruption.
 
 <details>
 <summary>✅ v1.10.0 Operational Certification & Reproducibility Validation (Phases 3-7) - SHIPPED 2026-06-08</summary>
@@ -92,4 +127,8 @@ Following the successful validation of live cryptographic trust-chains and multi
 | 5. Compatibility Matrix | v1.10.0 | 1/1 | Complete | 2026-06-08 |
 | 6. Dependency Rationalization | v1.10.0 | 1/1 | Complete | 2026-06-08 |
 | 7. Reproducibility Bundle | v1.10.0 | 1/1 | Complete | 2026-06-08 |
-
+| 8. Technical Debt Reduction | v1.11.0 | 0/1 | Not started | - |
+| 9. Bare-Metal Portability | v1.11.0 | 0/1 | Not started | - |
+| 10. Drift Prevention | v1.11.0 | 0/1 | Not started | - |
+| 11. Backup Corruption | v1.11.0 | 0/1 | Not started | - |
+| 12. Sentinel Resilience | v1.11.0 | 0/1 | Not started | - |

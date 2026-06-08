@@ -1,33 +1,33 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.10.0
-milestone_name: Operational Certification & Reproducibility Validation
-status: complete
-stopped_at: Completed Milestone v1.10.0 Operational Certification & Reproducibility Validation.
-last_updated: "2026-06-08T07:50:00.000Z"
-last_activity: 2026-06-08 -- Milestone v1.10.0 complete and certified
+milestone: v1.11.0
+milestone_name: Maintenance, Debt Reduction & Portability Validation
+status: active
+stopped_at: Initialized milestone v1.11.0 Maintenance, Debt Reduction & Portability Validation.
+last_updated: "2026-06-08T13:35:00.000Z"
+last_activity: 2026-06-08 -- Milestone v1.11.0 started
 progress:
   total_phases: 5
-  completed_phases: 5
-  total_plans: 5
-  completed_plans: 5
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
 ---
 
-# Project State — Operational Certification & Reproducibility Validation
+# Project State — Maintenance, Debt Reduction & Portability Validation
 
 ## Project Reference
 
-See: [.planning/PROJECT.md](./PROJECT.md) (updated 2026-06-06)
+See: [.planning/PROJECT.md](./PROJECT.md) (updated 2026-06-08)
 
 **Principle:** EVIDENCE-BOUNDED TRUST: ASSERTIONS ARE FALSE UNTIL PROVEN.
-**Focus:** Certifying operational reproducibility, infrastructure deployment, disaster recovery resilience, cross-version compatibility, and dependency cleanliness.
+**Focus:** Technical warning debt reduction, independent bare-metal host verification, drift detection runners, backup corruption tests, and Sentinel failover drills.
 
 ## Current Position
 
-Phase: None
-Plan: None
-Status: Milestone v1.10.0 fully completed, verified, and certified.
-Last activity: 2026-06-08 -- Milestone complete
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-06-08 -- Milestone v1.11.0 started
 
 
 ## Performance Metrics
@@ -81,10 +81,11 @@ Last activity: 2026-06-08 -- Milestone complete
 
 ### Pending Todos
 
-- [x] Investigate PEM encoding of Rekor submission keys. (Trust-path gap — resolved in Phase 5)
 - [ ] Warning Debt Reduction (backlog of unused variables and implicit `any` types).
-- [ ] Independent physical host portability validation. (Active in current milestone)
-- [x] Real Rekor interoperability testing. (Active in current milestone)
+- [ ] Independent physical host portability validation.
+- [ ] Implement periodic reproducibility checks to prevent drift.
+- [ ] Test restore integrity and recovery behavior under corrupted backups.
+- [ ] Validate PostgreSQL failover recovery and Sentinel behavior under quorum-loss scenarios.
 
 ## Operational Maintenance Surface
 

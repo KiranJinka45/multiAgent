@@ -34,6 +34,17 @@ Nexus ZTAN is an auditable, production-oriented research platform designed for l
 - ✓ **SEC-01**: Poisoned log and desynchronized replay history quarantine — v1.6.0
 - ✓ **PEM-01/02**: Rekor PEM key decoding & submission validation — v1.8.0 (Phase 5)
 
+## Current Milestone: v1.11.0 Maintenance, Debt Reduction & Portability Validation
+
+**Goal:** Focus on platform stabilization, warning-debt reduction, independent bare-metal host validation, drift detection, and resilience drills.
+
+**Target features:**
+- **OPS-MAINT-01**: Resolve implicit `any` types and unused variables across the workspace packages.
+- **OPS-MAINT-02**: Validate the reproducibility verification kit on a physical bare-metal host.
+- **OPS-MAINT-03**: Implement periodic reproducibility checks to prevent drift.
+- **OPS-MAINT-04**: Test restore integrity and recovery behavior under corrupted backups.
+- **OPS-MAINT-05**: Validate PostgreSQL failover recovery and Sentinel behavior under quorum-loss scenarios.
+
 ## Completed Milestone: v1.10.0 Operational Certification & Reproducibility Validation (Completed: 2026-06-08)
 
 **Goal:** Certify operational reproducibility, infrastructure deployment, disaster recovery resilience, cross-version compatibility, and dependency cleanliness.
@@ -146,4 +157,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-08 after Milestone v1.10.0 completion*
+*Last updated: 2026-06-08 after Milestone v1.11.0 initialization*
