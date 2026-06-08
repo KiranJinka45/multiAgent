@@ -13,7 +13,7 @@ import { RepairAgent } from '@packages/agents';
 
 import path from 'path';
 import fs from 'fs';
-const logPath = path.join(process.cwd(), 'repair_direct.log');
+const logPath = path.join('/tmp', 'repair_direct.log');
 const log = (msg: string) => fs.appendFileSync(logPath, `[${new Date().toISOString()}] ${msg}\n`);
 
 log('Repair Worker script started');

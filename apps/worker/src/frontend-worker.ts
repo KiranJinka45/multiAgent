@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { BaseWorker } from './base-worker';
+import { BaseWorker } from './base-worker.js';
 import { Job } from '@packages/utils';
 import type { JobPayload } from '@packages/utils';
 import { logger } from '@packages/observability';

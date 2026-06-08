@@ -8,16 +8,15 @@ import {
     usageService, 
     TenantService, 
     SLOService,
-    contextStorage,
-    BaseExecutionError
+    contextStorage
 } from '@packages/utils';
 import { DEFAULT_RETRY_OPTIONS, DEAD_LETTER_QUEUE_NAME, createBreaker } from '@packages/resilience';
 import crypto from 'crypto';
 import { ConsensusEngine } from '@packages/governance-core';
 
 // Mock metrics for now if they are not in @packages/utils or use a generic one
-const workerTaskDurationSeconds = { observe: (...args: any[]) => {} };
-const agentFailuresTotal = { inc: (...args: any[]) => {} };
+const workerTaskDurationSeconds = { observe: (..._args: any[]) => {} };
+const agentFailuresTotal = { inc: (..._args: any[]) => {} };
 
 /**
  * BaseWorker

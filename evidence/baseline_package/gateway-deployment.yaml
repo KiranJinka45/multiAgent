@@ -1,28 +1,32 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
-  name: worker
+  name: gateway
   namespace: multiagent
   labels:
-    app: worker
+    app: gateway
   annotations:
-    reloader.stakater.com/auto: "true"
+    v1.0.0-final: "true"
 spec:
   replicas: 2
   strategy:
     canary:
+      maxUnavailable: 0
+      maxSurge: 1
       steps:
-      - setWeight: 20
+      - setWeight: 10
+      - pause: {duration: 2m}
+      - setWeight: 25
       - pause: {duration: 5m}
       - setWeight: 50
-      - pause: {duration: 10m}
+      - pause: {duration: 5m}
   selector:
     matchLabels:
-      app: worker
+      app: gateway
   template:
     metadata:
       labels:
-        app: worker
+        app: gateway
         telemetry: "enabled"
     spec:
       enableServiceLinks: false
@@ -32,14 +36,20 @@ spec:
         whenUnsatisfiable: DoNotSchedule
         labelSelector:
           matchLabels:
-            app: worker
+            app: gateway
+      - maxSkew: 1
+        topologyKey: "topology.kubernetes.io/zone"
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app: gateway
       securityContext:
         runAsNonRoot: true
         seccompProfile:
           type: RuntimeDefault
       containers:
-      - name: worker
-        image: multiagent-worker:v1.1.6-fix-v4
+      - name: gateway
+        image: ghcr.io/kiran/multiagent-gateway:v1.1.5
         securityContext:
           runAsUser: 1001
           runAsNonRoot: true
@@ -58,38 +68,42 @@ spec:
 
         imagePullPolicy: IfNotPresent
         command: ["node", "dist/index.js"]
+        # SRE Hardening: Transition from static env-vars to Secret references
         envFrom:
         - secretRef:
-            name: multiagent-core-secrets
+            name: multiagent-gateway-secrets
+        ports:
+        - containerPort: 4081
         resources:
           requests:
-            cpu: "100m"
+            cpu: "150m"
             memory: "256Mi"
           limits:
             cpu: "500m"
-            memory: "1Gi" # Increased for build/git heavy operations
+            memory: "512Mi"
+        # ── Scaling Shock Absorption Capstone ──────────────────────────────
         startupProbe:
           httpGet:
             path: /health
-            port: 8082
+            port: 4081
           failureThreshold: 30
           periodSeconds: 10
         livenessProbe:
           httpGet:
             path: /health
-            port: 8082
+            port: 4081
           initialDelaySeconds: 10
-          periodSeconds: 20
+          periodSeconds: 15
         readinessProbe:
           httpGet:
             path: /health/ready
-            port: 8082
+            port: 4081
           initialDelaySeconds: 5
-          periodSeconds: 10
+          periodSeconds: 5
         lifecycle:
           preStop:
             exec:
-              command: ["/bin/sh", "-c", "sleep 15"]
+              command: ["/bin/sh", "-c", "sleep 15"] # Graceful drainage
       volumes:
       - name: tmp-dir
         emptyDir: {}
@@ -97,4 +111,17 @@ spec:
         emptyDir: {}
       - name: ztan-transparency-dir
         emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway
+  namespace: multiagent
+spec:
+  ports:
+  - port: 4081
+    targetPort: 4081
+    protocol: TCP
+  selector:
+    app: gateway
 
