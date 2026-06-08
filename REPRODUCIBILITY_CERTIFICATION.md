@@ -106,7 +106,20 @@ Empirical verification of these proof envelopes guarantees the following propert
 
 ## 5. Certification Declaration
 
-Based on the isolated execution records and mathematical checks, we certify the out-of-band reproducibility and independent verifiability of ZTAN v1.8, v1.9, and v1.10 proof envelopes.
+Based on the isolated execution records and mathematical checks, we define the following certification boundaries:
+
+### 5.1. Certified Scope
+- **Infrastructure reproducibility**: Deterministic builds, configurations, and isolated sandboxing setups.
+- **Disaster recovery replay**: Full state destruction and recovery from backup snapshots.
+- **Dependency rationalization**: Audit and elimination of unused dependencies and dead code.
+- **Compatibility validation**: Versioned proof matrix verification (under simulated runtime parameters).
+- **Reproducibility bundle generation**: Out-of-band validation kit assembly and execution.
+
+### 5.2. Not Independently Proven (Excluded from Scope)
+- **Historical binary compatibility**: The matrix was verified using programmatic models of the v1.8/v1.9 auditors rather than checking out historical Git release tags to execute legacy binaries directly.
+- **All operational failure classes**: Split-brain, multi-node PostgreSQL failover, sentinel quorum loss, and network partition behavior were not demonstrated under active runtime faults.
+- **Universal production survivability & corrupted backup recovery**: Integrity of restoration under corrupted media or general hardware root failure is unproven.
 
 **Certified by**: Antigravity AI SRE Agent
 **Date of Certification**: June 8, 2026
+
