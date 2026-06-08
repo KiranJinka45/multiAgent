@@ -6,7 +6,7 @@ Following the successful validation of live cryptographic trust-chains and multi
 
 ## Milestones
 
-- 🚧 **v1.11.0 Maintenance, Debt Reduction & Portability Validation** - Phases 8-12 (in progress)
+- ✅ **v1.11.0 Maintenance, Debt Reduction & Portability Validation** - Phases 8-12 (Shipped: 2026-06-08)
 - ✅ **v1.10.0 Operational Certification & Reproducibility Validation** - Phases 3-7 (Shipped: 2026-06-08)
 - ✅ **v1.9.0 Real Rekor Interoperability & Portability Validation** - Phases A-B, 1-2 (Shipped: 2026-06-04)
 - ✅ **v1.8.0 Trust-Chain Operationalization** - Phases 5-7 (Shipped: 2026-06-03)
@@ -15,7 +15,8 @@ Following the successful validation of live cryptographic trust-chains and multi
 
 ## Phases
 
-### 🚧 v1.11.0 Maintenance, Debt Reduction & Portability Validation (In Progress)
+<details>
+<summary>✅ v1.11.0 Maintenance, Debt Reduction & Portability Validation (Phases 8-12) - SHIPPED 2026-06-08</summary>
 
 **Milestone Goal:** Focus on platform stabilization, warning-debt reduction, independent bare-metal host validation, drift detection, and resilience drills.
 
@@ -48,6 +49,8 @@ Following the successful validation of live cryptographic trust-chains and multi
 **Success Criteria**:
   1. Active lease step-downs trigger during network partition.
   2. Failover operates without split-brain or data corruption.
+
+</details>
 
 <details>
 <summary>✅ v1.10.0 Operational Certification & Reproducibility Validation (Phases 3-7) - SHIPPED 2026-06-08</summary>
