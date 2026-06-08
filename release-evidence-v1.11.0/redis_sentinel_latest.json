@@ -1,0 +1,11 @@
+{
+  "timestamp": "2026-06-08T13:43:30.655Z",
+  "metrics": {
+    "step1_baselineHealthy": true,
+    "step2_chaosInjected": true,
+    "step3_fencingEnforced": true,
+    "step4_recoverySucceeded": true,
+    "finalVerdict": "PASSED",
+    "mode": "PROXY_SIMULATED"
+  }
+}

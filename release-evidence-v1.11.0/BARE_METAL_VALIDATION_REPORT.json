@@ -1,0 +1,41 @@
+{
+  "timestamp": "2026-06-08T10:24:05.840Z",
+  "host": {
+    "platform": "win32",
+    "release": "10.0.26200",
+    "arch": "x64",
+    "cpus": 12,
+    "totalMemoryGb": "31.53"
+  },
+  "environment": {
+    "kvmExists": false,
+    "kvmWritable": false,
+    "nodeVersion": "v20.20.0",
+    "pythonVersion": "Python 3.14.2",
+    "pyEccInstalled": true,
+    "cryptographyInstalled": true
+  },
+  "stages": [
+    {
+      "stage": "Vector Generation",
+      "success": true,
+      "output": "=== ZTAN v1.5 Ground-Truth Vector Generator ===\n\n[1/6] Running DKG (2-of-3)...\n  Master PK: b369e38426b0c3f81d630ec80080b857...\n[2/6] Message Hash: edbd8772c45ff97a026391582efcddba...\n[3/6] Signing with 2 shares...\n  Node Auditor-A (idx=1): 828430ff76e4980c6107cb8b485a6fc6...\n  Node Auditor-B (idx=2): b123f2254868383ac9228ff042207831...\n[4/6] Aggregating 2 partial signatures...\n  Aggregate: 901cc6347781a11d402b6f8ccb2c1489...\n[5/6] Verifying against master PK...\n  Result: ✅ VALID\n[6/6] Computing canonical binding payload...\n  Canonical Layout: 000000134345522d564543544f522d47454e2d32303236000000020000009089...\n  Binding Hash: 44a0c42df81ced5b5192e705dd4ea6f3bc118b6b3429743fd54e28f92e2f832b\n\n✅ Vectors written to: C:\\multiagentic_project\\multiAgent-main\\verify-kit\\v1.5\\vectors.json\n✅ Bundle written to:  C:\\multiagentic_project\\multiAgent-main\\verify-kit\\v1.5\\bundle.json\n\nTo cross-validate with Python:\n  python verify-kit/v1.5/verify.py --test verify-kit/v1.5/vectors.json\n  python verify-kit/v1.5/verify.py --bundle verify-kit/v1.5/bundle.json"
+    },
+    {
+      "stage": "Python Test Vector Verification",
+      "success": true,
+      "output": "[*] Running formal test vectors: verify-kit/v1.5/vectors.json\r\n\r\n[TEST] v1.5-full-dkg-sign-verify\r\n  [OK] Canonical Layout Matched.\r\n  [OK] Binding Hash Matched.\r\n\r\n--- TEST SUMMARY: 1/1 PASSED ---"
+    },
+    {
+      "stage": "Python Proof Bundle Verification",
+      "success": true,
+      "output": "[*] Loading proof bundle: verify-kit/v1.5/bundle.json\r\n[*] Verifying RFC v1.5 Binding (Ceremony: CER-VECTOR-GEN-2026, Threshold: 2)...\r\n[SUCCESS] Proof is valid and non-repudiable."
+    },
+    {
+      "stage": "Portable Auditor CLI Verification",
+      "success": true,
+      "output": "==========================================\r\n   ZTAN PROOF VERIFICATION KIT (v1.10)\r\n==========================================\r\n\r\nFile Path:    verify-kit/v1.5/bundle.json\r\nSchema:       ZTAN_V1.5\r\nCeremony ID:  CER-VECTOR-GEN-2026\r\nThreshold:    2\r\nSigners:      Auditor-A, Auditor-B\r\n[*] Performing BLS12-381 context-bound threshold signature check...\r\n\r\n[SUCCESS] VERIFICATION SUCCESSFUL\r\nStatus: The signature is cryptographically valid and bound to this exact context."
+    }
+  ],
+  "verdict": "SUCCESS"
+}
