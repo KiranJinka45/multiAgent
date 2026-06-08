@@ -24,6 +24,7 @@
     "test:infra-chaos": "node scripts/run-infra-chaos-soak.js --duration 25",
     "test:stateful-chaos": "node scripts/run-stateful-chaos-soak.js --duration 45",
     "stewardship:audit": "npx tsx scripts/stewardship-drift-detector.ts",
+    "stewardship:drift:check": "npx tsx scripts/periodic-drift-runner.ts",
     "start:api": "node apps/api/dist/index.js",
     "start:worker": "node apps/worker/dist/index.js",
     "db:push": "npx prisma db push --schema=packages/db/prisma/schema.prisma --accept-data-loss",

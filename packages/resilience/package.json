@@ -26,7 +26,7 @@
     "@types/node": "22.13.9",
     "@types/opossum": "8.1.7",
     "tsup": "8.5.1",
-    "typescript": "5.9.3"
+    "typescript": "5.5.4"
   },
   "exports": {
     ".": {
