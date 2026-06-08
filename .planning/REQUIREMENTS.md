@@ -12,7 +12,7 @@
 
 ### Bare-Metal Portability (OPS-MAINT-PORT)
 
-- [ ] **OPS-MAINT-PORT-01**: Validate reproducibility verification kit on a true physical bare-metal host.
+- [x] **OPS-MAINT-PORT-01**: Validate reproducibility verification kit on a true physical bare-metal host.
 
 ### Drift Prevention (OPS-MAINT-DRIFT)
 
@@ -50,7 +50,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | OPS-MAINT-DEBT-01 | Phase 8 | Complete |
 | OPS-MAINT-DEBT-02 | Phase 8 | Complete |
-| OPS-MAINT-PORT-01 | Phase 9 | Pending |
+| OPS-MAINT-PORT-01 | Phase 9 | Complete |
 | OPS-MAINT-DRIFT-01 | Phase 10 | Pending |
 | OPS-MAINT-BACKUP-01 | Phase 11 | Pending |
 | OPS-MAINT-SENTINEL-01 | Phase 12 | Pending |

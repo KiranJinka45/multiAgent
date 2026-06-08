@@ -4,13 +4,13 @@ milestone: v1.11.0
 milestone_name: Maintenance, Debt Reduction & Portability Validation
 status: active
 stopped_at: Initialized milestone v1.11.0 Maintenance, Debt Reduction & Portability Validation.
-last_updated: "2026-06-08T13:35:00.000Z"
-last_activity: 2026-06-08 -- Milestone v1.11.0 started
+last_updated: "2026-06-08T15:56:00.000Z"
+last_activity: 2026-06-08 -- Phase 9 complete
 progress:
   total_phases: 5
-  completed_phases: 1
-  total_plans: 1
-  completed_plans: 1
+  completed_phases: 2
+  total_plans: 2
+  completed_plans: 2
 ---
 
 # Project State — Maintenance, Debt Reduction & Portability Validation
@@ -24,10 +24,10 @@ See: [.planning/PROJECT.md](./PROJECT.md) (updated 2026-06-08)
 
 ## Current Position
 
-Phase: Phase 8: Technical Debt Reduction
-Plan: 08-01-PLAN.md
-Status: Phase 8 complete
-Last activity: 2026-06-08 -- Phase 8 (Technical Debt Reduction) complete
+Phase: Phase 9: Bare-Metal Portability Validation
+Plan: 09-01-PLAN.md
+Status: Phase 9 complete
+Last activity: 2026-06-08 -- Phase 9 (Bare-Metal Portability Validation) complete
 
 
 ## Performance Metrics
@@ -81,8 +81,8 @@ Last activity: 2026-06-08 -- Phase 8 (Technical Debt Reduction) complete
 
 ### Pending Todos
 
-- [ ] Warning Debt Reduction (backlog of unused variables and implicit `any` types).
-- [ ] Independent physical host portability validation.
+- [x] Warning Debt Reduction (backlog of unused variables and implicit `any` types).
+- [x] Independent physical host portability validation.
 - [ ] Implement periodic reproducibility checks to prevent drift.
 - [ ] Test restore integrity and recovery behavior under corrupted backups.
 - [ ] Validate PostgreSQL failover recovery and Sentinel behavior under quorum-loss scenarios.
