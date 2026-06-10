@@ -21,7 +21,7 @@ progress:
 
 ## Project Reference
 
-See: [.planning/PROJECT.md](./PROJECT.md) (updated 2026-06-08)
+See: [.planning/PROJECT.md](./PROJECT.md) (updated 2026-07-10)
 
 **Principle:** EVIDENCE-BOUNDED TRUST: ASSERTIONS ARE FALSE UNTIL PROVEN.
 **Focus:** Physical host TPM/KVM validation, multi-node Sentinel chaos failover, real Firecracker microVM execution stability, longitudinal 30-day reliability monitoring, security posture audits, and third-party operator reproduction.
@@ -38,7 +38,7 @@ Last activity: 2026-07-10 -- Initialized Milestone v1.13.0 (Operational Hardenin
 **Velocity:**
 
 - Historical milestones completed: 7
-- Historical phases completed: 57
+- Historical phases completed: 57 (cumulative roadmap phases and certified milestone phases through v1.12.0)
 - Platform Status: TypeScript typechecking baseline clean; linting warning debt remains; test suites green.
 - Active Validation Scope: Telemetry, SLOs, and trust boundaries verification.
 
