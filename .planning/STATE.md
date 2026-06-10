@@ -1,19 +1,19 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.12.0
-milestone_name: Physical Runtime & Operational Verification
+milestone: v1.13.0
+milestone_name: Operational Hardening & Long-Term Stewardship
 status: active
-stopped_at: "Phase 16 campaign execution completed successfully. Reliability campaign PASSED."
-last_updated: "2026-07-10T23:00:00.000Z"
+stopped_at: "v1.12.0 milestone archive and transition completed. Ready for v1.13.0 active planning."
+last_updated: "2026-07-10T23:30:00.000Z"
 last_activity: 2026-07-10
 progress:
-  total_phases: 6
-  completed_phases: 4
-  qualified_phases: 2
+  total_phases: 0
+  completed_phases: 0
+  qualified_phases: 0
   in_progress_phases: 0
-  total_plans: 6
-  completed_plans: 4
-  qualified_plans: 2
+  total_plans: 0
+  completed_plans: 0
+  qualified_plans: 0
   in_progress_plans: 0
 ---
 
@@ -28,10 +28,10 @@ See: [.planning/PROJECT.md](./PROJECT.md) (updated 2026-06-08)
 
 ## Current Position
 
-Phase: Phase 16: Continuous Reliability Campaign
-Plan: RELIABILITY_CAMPAIGN_PLAN.md
-Status: Completed
-Last activity: 2026-07-10 -- 30-Day continuous reliability campaign completed successfully. Final verdict: PASSED.
+Phase: None Active
+Plan: None Active
+Status: Planning
+Last activity: 2026-07-10 -- Initialized Milestone v1.13.0 (Operational Hardening & Long-Term Stewardship) active planning.
 
 ## Performance Metrics
 
@@ -86,12 +86,9 @@ Last activity: 2026-07-10 -- 30-Day continuous reliability campaign completed su
 
 ### Pending Todos
 
-- [Q] Validate execution on physical Linux host with active TPM quote verification (Complete with Qualifications: validated on WSL2 KVM with simulated TPM).
-- [x] Validate Sentinel failover recovery under actual multi-node quorum loss.
-- [Q] Certify real Firecracker microVM launch and teardown over 100 iterations (Complete with Qualifications: validated on WSL2 KVM).
-- [x] Conduct comprehensive security threat model and privilege containment audit.
-- [x] Demonstrate and document independent operator verification kit reproduction (SIMULATED: automated operator simulation, not genuine third-party audit).
-- [x] Perform 30-day continuous reliability monitoring and log MTTR/failures (Completed: All 30 days verified, SLOs passed).
+- [ ] Transition platform to post-campaign maintenance mode.
+- [ ] Establish long-term operational health telemetry checkpoints.
+- [ ] Review and refine virtualization boundaries.
 
 ## Operational Maintenance Surface
 
@@ -105,5 +102,5 @@ Last activity: 2026-07-10 -- 30-Day continuous reliability campaign completed su
 ## Session Continuity
 
 Last session: 2026-07-10
-Stopped at: Phase 16 Continuous Reliability Campaign completed successfully. Next: Milestone review and archiving.
+Stopped at: Transitioned to v1.13.0 active planning. Next: Define requirements and phases for v1.13.0.
 Resume file: .planning/STATE.md

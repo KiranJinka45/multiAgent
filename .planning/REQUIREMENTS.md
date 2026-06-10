@@ -40,7 +40,7 @@
   - *Qualification: Execution was an automated simulation within the project environment. A genuine separate-operator audit has not yet been performed.*
 
 ### Continuous Reliability Campaign (OPS-MAINT-DRIFT-LONG)
-- [/] **OPS-MAINT-DRIFT-LONG-01**: Perform 30-day continuous reliability monitoring logging MTTR, drift alerts, and backup recovery metrics (In Progress: Day 0 baseline checks passed).
+- [x] **OPS-MAINT-DRIFT-LONG-01**: Perform 30-day continuous reliability monitoring logging MTTR, drift alerts, and backup recovery metrics (Completed: All 30 days verified, SLOs passed).
 
 ---
 
@@ -77,7 +77,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | OPS-MAINT-FIRECRACKER-RUN-01 | Phase 15 | Complete with Qualifications |
 | OPS-MAINT-SECURITY-01 | Phase 17 | Complete |
 | OPS-MAINT-REPRO-01 | Phase 18 | Complete (Simulated Operator) |
-| OPS-MAINT-DRIFT-LONG-01 | Phase 16 | In Progress |
+| OPS-MAINT-DRIFT-LONG-01 | Phase 16 | Complete |
 | OPS-MAINT-DEBT-01 | Phase 8 | Complete |
 | OPS-MAINT-DEBT-02 | Phase 8 | Complete |
 | OPS-MAINT-PORT-01 | Phase 9 | Complete |

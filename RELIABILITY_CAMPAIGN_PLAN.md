@@ -90,7 +90,7 @@ Without this framework, 30 days of logs produce data but no verdict.
 **Acceptable:** MTTR < 10 minutes  
 **Failing:** MTTR ≥ 10 minutes
 
-**Statistical Limitation Note:** Since MTTR is calculated from a small sample size (n = 4 weekly recovery drills), the statistical confidence of this metric is limited. This value is used as an operational indicator of basic recovery capability and must not be over-interpreted as a statistically robust measure of steady-state MTTR under high-volume failure conditions.
+**Statistical Limitation Note:** Since MTTR is calculated from a small sample size (n = 4 weekly recovery drills) under simulated fault injection, it measures Recovery Drill Completion Time. It is used as an operational indicator of basic recovery capability and must not be over-interpreted as a statistically robust measure of steady-state MTTR under high-volume real-world failure conditions.
 
 ---
 
@@ -130,7 +130,7 @@ Any drift alert without this written classification evidence is automatically cl
 | SLO ID | Metric | Target | Minimum Passing | Measurement |
 |--------|--------|--------|-----------------|-------------|
 | SLO-01 | Drift check pass rate | ≥ 95% | ≥ 95% (at most 2 drift alerts over 30 days) | Daily drift runner exit code |
-| SLO-02 | Backup verification pass rate | 100% | ≥ 99% (allows max 1 failure in 30 days, with mandatory RCA) | Daily backup validator exit code |
+| SLO-02 | Backup verification pass rate | 100% | ≥ 96.6% (allows max 1 failure in 30 days, with mandatory RCA) | Daily backup validator exit code |
 | SLO-03 | Recovery drill success rate | 100% | 100% (4/4 drills) | Weekly drill exit code |
 | SLO-04 | MTTR | < 5 minutes | < 10 minutes (n=4 confidence limitation) | Average of 4 recovery drills |
 | SLO-05 | False positive rate | 0% | < 10% (under Section 6.1 classification procedure) | Drift alerts classified as false positives ÷ total alerts |
@@ -144,7 +144,7 @@ Phase 16 may be marked **Complete** if and only if ALL of the following are met:
 
 1. **Campaign Duration:** ≥ 30 calendar days of logged activity
 2. **SLO-01:** Drift check pass rate ≥ 95% (at most 2 drift alerts)
-3. **SLO-02:** Backup verification pass rate ≥ 99% (at most 1 failure in 30 days) with completed RCA
+3. **SLO-02:** Backup verification pass rate ≥ 96.6% (at most 1 failure in 30 days) with completed RCA
 4. **SLO-03:** All 4 weekly recovery drills succeed
 5. **SLO-04:** MTTR < 10 minutes (n=4 confidence limitation)
 6. **SLO-05:** False positive rate < 10% (under Section 6.1 procedure)

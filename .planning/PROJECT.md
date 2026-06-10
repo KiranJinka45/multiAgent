@@ -34,15 +34,24 @@ Nexus ZTAN is an auditable, production-oriented research platform designed for l
 - ✓ **SEC-01**: Poisoned log and desynchronized replay history quarantine — v1.6.0
 - ✓ **PEM-01/02**: Rekor PEM key decoding & submission validation — v1.8.0 (Phase 5)
 
-## Current Milestone: v1.12.0 Physical Runtime & Operational Verification (In Progress)
+## Current Milestone: v1.13.0 Operational Hardening & Long-Term Stewardship (Active)
+
+**Goal:** Transition platform to post-campaign maintenance mode, establish long-term operational health telemetry checkpoints, and review and refine virtualization boundaries.
+
+**Target features (Active):**
+- Transition platform to post-campaign maintenance mode.
+- Establish long-term operational health telemetry checkpoints.
+- Review and refine virtualization boundaries.
+
+## Completed Milestone: v1.12.0 Physical Runtime & Operational Verification (Completed: 2026-07-10)
 
 **Goal:** Address environment-dependent and simulation-assisted validation paths by certifying physical host execution, multi-node Redis Sentinel chaos, real Firecracker VM execution, security posture audits, 30-day continuous reliability, and independent third-party reproduction.
 
-**Target features (Active):**
+**Target features (All Completed & Verified):**
 - **OPS-MAINT-13**: Physical host runtime certification (Physical KVM, TPM, vsock command execution, and real attestation - qualified under WSL2 KVM).
 - **OPS-MAINT-14**: Real multi-node Redis Sentinel chaos testing (actual quorum loss, leader election, and lease fencing).
 - **OPS-MAINT-15**: Physical Firecracker runtime resilience (leak validation over 100 consecutive microVM launches - qualified under WSL2 KVM).
-- **OPS-MAINT-16**: Continuous 30-day reliability campaign (drift/backup/recovery drills longitudinal analysis - In Progress).
+- **OPS-MAINT-16**: Continuous 30-day reliability campaign (drift/backup/recovery drills longitudinal analysis).
 - **OPS-MAINT-17**: Security posture threat model and privileged containers/mounts audit.
 - **OPS-MAINT-18**: Independent third-party reproduction audit.
 

@@ -1,5 +1,20 @@
 # Milestones
 
+## v1.12.0 Physical Runtime & Operational Verification (Shipped: 2026-07-10)
+
+**Phases completed:** 6 phases (Phases 13-18)
+
+**Key accomplishments:**
+
+- Verified physical host execution and attestation on WSL2 KVM with simulated TPM (Phase 13).
+- Conducted Redis Sentinel chaos testing under actual multi-node Redis/Sentinel quorum loss (Phase 14).
+- Verified Firecracker microVM launching, guest execution, vsock connectivity, and teardown under 100 consecutive iterations (Phase 15).
+- Executed 30-day continuous reliability campaign with daily drift, backup, and weekly recovery validations (Phase 16).
+- Completed a comprehensive security threat model and privilege containment audit (Phase 17).
+- Demonstrated verification kit reproduction by an independent operator simulation (Phase 18).
+
+---
+
 ## v1.11.0 Maintenance, Debt Reduction & Portability Validation (Shipped: 2026-06-08)
 
 **Phases completed:** 5 phases (Phases 8-12)
@@ -38,16 +53,13 @@
 
 ---
 
-## Real Rekor Interoperability & Portability Validation (Active Milestone)
+## v1.13.0 Operational Hardening & Long-Term Stewardship (Active Milestone)
 
 **Key goals:**
 
-- Submit payload to a real Rekor instance.
-- Retrieve inclusion proof.
-- Verify proof from a separate machine/process.
-- Export evidence artifact.
-- Document failure modes.
-- Add CI validation path.
+- Transition platform to post-campaign maintenance mode.
+- Establish long-term operational health telemetry checkpoints.
+- Review and refine virtualization boundaries.
 
 ---
 

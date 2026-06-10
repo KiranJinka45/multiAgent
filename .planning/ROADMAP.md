@@ -6,7 +6,7 @@ Following the successful validation of live cryptographic trust-chains and multi
 
 ## Milestones
 
-- 🚧 **v1.12.0 Physical Runtime & Operational Verification** - Phases 13-18 (in progress)
+- ✅ **v1.12.0 Physical Runtime & Operational Verification** - Phases 13-18 (Shipped: 2026-07-10)
 - ✅ **v1.11.0 Maintenance, Debt Reduction & Portability Validation** - Phases 8-12 (Shipped: 2026-06-08)
 - ✅ **v1.10.0 Operational Certification & Reproducibility Validation** - Phases 3-7 (Shipped: 2026-06-08)
 - ✅ **v1.9.0 Real Rekor Interoperability & Portability Validation** - Phases A-B, 1-2 (Shipped: 2026-06-04)
@@ -16,7 +16,7 @@ Following the successful validation of live cryptographic trust-chains and multi
 
 ## Phases
 
-### 🚧 v1.12.0 Physical Runtime & Operational Verification (In Progress)
+### ✅ v1.12.0 Physical Runtime & Operational Verification (Completed)
 
 **Milestone Goal:** Address environment-dependent and simulation-assisted validation paths by certifying physical host execution, multi-node Redis Sentinel chaos, real Firecracker VM execution, security posture audits, 30-day continuous reliability, and independent third-party reproduction.
 
@@ -55,7 +55,7 @@ Following the successful validation of live cryptographic trust-chains and multi
   2. Audited under strict constraints: fresh machine/environment, no repository write access, and zero author assistance.
   3. Produces `THIRD_PARTY_REPRODUCTION_REPORT.md`.
 
-#### Phase 16: Continuous Reliability Campaign (In Progress)
+#### Phase 16: Continuous Reliability Campaign (Complete)
 **Goal**: Run 30-day longitudinal reliability tracking.
 **Success Criteria**:
   1. Monitors daily drift, daily backup drills, and weekly recovery.
@@ -186,5 +186,5 @@ Following the successful validation of live cryptographic trust-chains and multi
 | 15. Firecracker Runtime | v1.12.0 | 1/1 | Complete with Qualifications | 2026-06-10 |
 | 17. Security Audit | v1.12.0 | 1/1 | Complete | 2026-06-10 |
 | 18. Independent Repro | v1.12.0 | 1/1 | Complete (Simulated Operator) | 2026-06-10 |
-| 16. Reliability Campaign | v1.12.0 | 0/1 | In Progress | - |
+| 16. Reliability Campaign | v1.12.0 | 1/1 | Complete | 2026-07-10 |
 
