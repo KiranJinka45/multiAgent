@@ -12,7 +12,7 @@
 ## v1.12.0 Requirements (Completed)
 
 ### Physical Host Validation (OPS-MAINT-PHYS)
-- [x] **OPS-MAINT-PHYS-01**: Validate execution on non-virtualized physical Linux host with active TPM quote verification (Complete: qualifications retired via Phase 21 attestation evidence).
+- [Q] **OPS-MAINT-PHYS-01**: Validate execution on non-virtualized physical Linux host with active TPM quote verification (Complete with Qualifications: validated on WSL2 KVM with simulated TPM).
   - *Remaining work requirements:*
     - Host OS: Confirmed physical non-virtualized Ubuntu/RHEL/Debian install.
     - Presence of `/dev/kvm` and `/dev/tpm0` verified.
@@ -25,14 +25,19 @@
   - Must trigger real network partition/outage, real failover, and real lease fencing (container pauses, mock outages, and proxy simulated outages are banned).
 
 ### Firecracker microVM Certification (OPS-MAINT-FIRECRACKER-RUN)
-- [x] **OPS-MAINT-FIRECRACKER-RUN-01**: Certify Firecracker runtime microVM launching, guest execution, vsock connectivity, and teardown under 100 consecutive iterations, outputting statistical metrics: (Complete: qualifications retired via Phase 22 endurance campaign).
+- [Q] **OPS-MAINT-FIRECRACKER-RUN-01**: Certify Firecracker runtime microVM launching, guest execution, vsock connectivity, and teardown under 100 consecutive iterations, outputting statistical metrics: (Complete with Qualifications: validated on WSL2 KVM).
   - `success_rate`, `mean_launch_ms`, `p95_launch_ms`, `mean_teardown_ms`, and `resource_leaks` (monitoring memory, CPU, and file descriptor leaks across iterations).
 
 ### Security Posture Audit (OPS-MAINT-SECURITY)
 - [x] **OPS-MAINT-SECURITY-01**: Execute comprehensive threat model and privilege containment audit covering privileged containers, host mounts, KVM/TPM access, mock bypasses, supply chain vulnerability, dependency trust, container escape paths, secret management, SBOM review, and container image signing verification.
 
 ### Independent Reproducibility Audit (OPS-MAINT-REPRO)
-- [x] **OPS-MAINT-REPRO-01**: Demonstrate and document verification kit reproduction by an independent operator (Complete: qualifications retired via Phase 23 independent reproduction audit).
+- [x] **OPS-MAINT-REPRO-01**: Demonstrate and document verification kit reproduction by an independent operator (SIMULATED: automated operator simulation, not genuine third-party audit):
+  - Must be run by an independent operator.
+  - Must execute on a fresh machine/environment.
+  - Must have no repository write access.
+  - Must have no author assistance during setup and run.
+  - *Qualification: Execution was an automated simulation within the project environment. A genuine separate-operator audit has not yet been performed.*
 
 ### Continuous Reliability Campaign (OPS-MAINT-DRIFT-LONG)
 - [x] **OPS-MAINT-DRIFT-LONG-01**: Perform 30-day continuous reliability monitoring logging MTTR, drift alerts, and backup recovery metrics (Completed: All 30 days verified, SLOs passed).
@@ -85,11 +90,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| OPS-MAINT-PHYS-01 | Phase 13 | Complete |
+| OPS-MAINT-PHYS-01 | Phase 13 | Complete with Qualifications |
 | OPS-MAINT-SENTINEL-CHAOS-01 | Phase 14 | Complete |
-| OPS-MAINT-FIRECRACKER-RUN-01 | Phase 15 | Complete |
+| OPS-MAINT-FIRECRACKER-RUN-01 | Phase 15 | Complete with Qualifications |
 | OPS-MAINT-SECURITY-01 | Phase 17 | Complete |
-| OPS-MAINT-REPRO-01 | Phase 18 | Complete |
+| OPS-MAINT-REPRO-01 | Phase 18 | Complete (Simulated Operator) |
 | OPS-MAINT-DRIFT-LONG-01 | Phase 16 | Complete |
 | OPS-MAINT-DEBT-01 | Phase 8 | Complete |
 | OPS-MAINT-DEBT-02 | Phase 8 | Complete |

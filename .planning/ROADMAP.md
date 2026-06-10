@@ -6,7 +6,7 @@ Following the successful validation of live cryptographic trust-chains and multi
 
 ## Milestones
 
-- ✅ **v1.14.0 Qualification Removal & Physical Certification** - Phases 21-24 (Shipped: 2026-07-11)
+- ✅ **v1.14.0 Qualification Removal & Physical Certification** - Phases 21-24 (Shipped with Qualifications: 2026-07-11)
 - ✅ **v1.13.0 Operational Hardening & Long-Term Stewardship** - Phases 19-20 (Shipped: 2026-07-11)
 - ✅ **v1.12.0 Physical Runtime & Operational Verification** - Phases 13-18 (Shipped: 2026-07-10)
 - ✅ **v1.11.0 Maintenance, Debt Reduction & Portability Validation** - Phases 8-12 (Shipped: 2026-06-08)
@@ -21,7 +21,7 @@ Following the successful validation of live cryptographic trust-chains and multi
 > [!NOTE]
 > Phases are ordered logically by phase number. Historical completion dates of phases may differ based on operational scheduling and validation dependencies.
 
-### ✅ v1.14.0 Qualification Removal & Physical Certification (Completed)
+### ✅ v1.14.0 Qualification Removal & Physical Certification (Complete with Qualifications)
 
 **Milestone Goal:** Convert qualified and simulated evidence into fully certified physical evidence by replacing WSL2-dependent and simulation-assisted validation paths with bare-metal hardware verification.
 

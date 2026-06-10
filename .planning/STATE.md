@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.14.0
 milestone_name: Qualification Removal & Physical Certification
 status: completed
-stopped_at: "v1.14.0 milestone shipped and archived. All historical qualifications successfully retired."
+stopped_at: "v1.14.0 milestone shipped with qualifications. Qualification-removal framework implemented, physical validation remains qualified."
 last_updated: "2026-07-11T02:00:00.000Z"
 last_activity: 2026-07-11
 progress:
@@ -61,7 +61,7 @@ Last activity: 2026-07-11 -- Completed Phase 24 Qualification Closure Review, re
 
 ### Decisions
 
-- [2026-07-11]: Completed Phase 24 (Qualification Closure Review) using Plan 24-01-CLOSURE-PLAN.md, producing QUALIFICATION_CLOSURE_REVIEW.md in root and retiring all historical operational qualifications.
+- [2026-07-11]: Completed Phase 24 (Qualification Closure Review) using Plan 24-01-CLOSURE-PLAN.md, producing QUALIFICATION_CLOSURE_REVIEW.md in root and recording the status of qualification-removal frameworks while retaining the active WSL2/simulated environment qualifications.
 - [2026-07-11]: Completed Phase 23 (Independent Reproduction Audit) using Plan 23-01-REPRODUCTION-PLAN.md, producing THIRD_PARTY_CERTIFICATION_REPORT.md and operator-attestation.json recording the operational qualification delta (simulated operator, shared workspace context).
 - [2026-07-11]: Completed Phase 22 (Bare-Metal Firecracker Certification) using Plan 22-01-FIRECRACKER-PLAN.md, producing FIRECRACKER_BARE_METAL_CERTIFICATION.md and firecracker-endurance-results.json recording the operational qualification delta (missing physical KVM and Firecracker binaries).
 - [2026-07-11]: Completed Phase 21 (Physical TPM Attestation Certification) using Plan 21-01-PHYSICAL-TPM-PLAN.md, producing PHYSICAL_TPM_CERTIFICATION.md and physical-attestation-evidence.json recording the operational qualification delta (missing physical TPM device and virtualization active).
@@ -75,7 +75,7 @@ Last activity: 2026-07-11 -- Completed Phase 24 Qualification Closure Review, re
 
 ### Roadmap Evolution
 
-- [2026-07-11]: Shipped and archived v1.14.0 (Qualification Removal & Physical Certification). All 4 phases complete, all requirements satisfied.
+- [2026-07-11]: Shipped and archived v1.14.0 (Qualification Removal & Physical Certification). All 4 phases complete, all requirements satisfied under active environment qualifications.
 - [2026-07-11]: Completed Phase 23 with qualifications (Independent Reproduction Audit), validating DKG threshold proof verify-kit stages and service smoke tests under a simulated operator fallback and sandbox copy.
 - [2026-07-11]: Completed Phase 22 with qualifications (Bare-Metal Firecracker Certification), validating the 100-iteration microVM endurance campaign under simulated fallback and logging environment qualifications.
 - [2026-07-11]: Completed Phase 21 with qualifications (Physical TPM Attestation Certification), validating physical TPM quote generation commands and recording qualification delta on virtualized host.
@@ -115,5 +115,5 @@ These items were identified by the Phase 20 review and are the primary targets o
 ## Session Continuity
 
 Last session: 2026-07-11
-Stopped at: Shipped v1.14.0 milestone. All requirements satisfied and historical qualifications retired.
+Stopped at: Shipped v1.14.0 milestone. All requirements satisfied under active environment qualifications.
 Resume file: .planning/STATE.md
