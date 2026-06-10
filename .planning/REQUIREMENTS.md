@@ -47,7 +47,7 @@
 ## v1.13.0 Requirements (Active)
 
 ### Post-Campaign Telemetry Checkpoints (OPS-MAINT-POST)
-- [ ] **OPS-MAINT-POST-01**: Define and monitor long-term operational health telemetry checkpoints.
+- [x] **OPS-MAINT-POST-01**: Define and monitor long-term operational health telemetry checkpoints.
 - [ ] **OPS-MAINT-POST-02**: Establish virtualization boundaries review and report.
 
 ---
@@ -92,7 +92,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | OPS-MAINT-DRIFT-01 | Phase 10 | Complete |
 | OPS-MAINT-BACKUP-01 | Phase 11 | Complete |
 | OPS-MAINT-SENTINEL-01 | Phase 12 | Complete |
-| OPS-MAINT-POST-01 | Phase 19 | Pending |
+| OPS-MAINT-POST-01 | Phase 19 | Complete |
 | OPS-MAINT-POST-02 | Phase 20 | Pending |
 
 **Coverage:**
