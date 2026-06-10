@@ -45,7 +45,8 @@
     "dev:all": "tsx scripts/start-dev.ts",
     "validate:cloud": "tsx scripts/validate-cloud.ts",
     "stewardship:physical:validate": "npx tsx scripts/validate-physical-hardware.ts",
-    "stewardship:firecracker:endurance": "npx tsx scripts/firecracker-endurance-campaign.ts"
+    "stewardship:firecracker:endurance": "npx tsx scripts/firecracker-endurance-campaign.ts",
+    "stewardship:reproduction:audit": "npx tsx scripts/independent-reproduction-audit.ts"
   },
   "prisma": {
     "schema": "packages/db/prisma/schema.prisma"

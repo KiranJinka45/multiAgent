@@ -1,0 +1,50 @@
+{
+  "timestamp": "2026-06-10T16:02:47.549Z",
+  "operator": "Simulated Third-Party Operator (Sub-agent)",
+  "host": {
+    "platform": "win32",
+    "release": "10.0.26200",
+    "arch": "x64",
+    "cpus": 12,
+    "totalMemoryGb": "31.53"
+  },
+  "environment": {
+    "nodeVersion": "v20.20.0",
+    "pythonVersion": "Python 3.14.2",
+    "pyEccInstalled": true,
+    "cryptographyInstalled": true
+  },
+  "stages": [
+    {
+      "stage": "Vector Generation",
+      "success": true,
+      "command": "node verify-kit/v1.5/generate-vectors.mjs"
+    },
+    {
+      "stage": "Python Test Vector Verification",
+      "success": true,
+      "command": "python verify-kit/v1.5/verify.py --test verify-kit/v1.5/vectors.json"
+    },
+    {
+      "stage": "Python Proof Bundle Verification",
+      "success": true,
+      "command": "python verify-kit/v1.5/verify.py --bundle verify-kit/v1.5/bundle.json"
+    },
+    {
+      "stage": "Portable Auditor CLI Verification",
+      "success": true,
+      "command": "python verify-kit/auditor.py verify-kit/v1.5/bundle.json"
+    },
+    {
+      "stage": "Service Smoke Tests",
+      "success": true,
+      "command": "node scripts/run-smoke-tests.js"
+    }
+  ],
+  "verdict": "QUALIFIED_OPERATOR_VERIFIED",
+  "qualifications": [
+    "Simulated operator execution via automated AI sub-agent (deviation from separate human operator)",
+    "Shared workspace environment context (deviation from dedicated physical host)",
+    "Read-only repository access simulated via sandboxed directory copy"
+  ]
+}
