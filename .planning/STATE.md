@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.13.0
 milestone_name: Operational Hardening & Long-Term Stewardship
-status: active
-stopped_at: "v1.13.0 milestone execution completed. Ready for milestone review."
-last_updated: "2026-07-11T00:45:00.000Z"
+status: completed
+stopped_at: "v1.13.0 milestone shipped. All phases complete, all requirements satisfied."
+last_updated: "2026-07-11T01:15:00.000Z"
 last_activity: 2026-07-11
 progress:
   total_phases: 2
@@ -37,8 +37,8 @@ Last activity: 2026-07-11 -- Completed Phase 20 (Virtualization Boundaries Revie
 
 **Velocity:**
 
-- Historical milestones completed: 7
-- Historical phases completed: 57 (cumulative roadmap phases, certified milestone phases, and legacy stewardship phases through v1.12.0)
+- Historical milestones completed: 8 (v1.6.0 through v1.13.0)
+- Historical phases completed: 59 (cumulative roadmap phases, certified milestone phases, and legacy stewardship phases through v1.13.0)
 - Platform Status: TypeScript typechecking baseline clean; linting warning debt remains; test suites green.
 - Active Validation Scope: Telemetry, SLOs, and trust boundaries verification.
 
@@ -66,6 +66,7 @@ Last activity: 2026-07-11 -- Completed Phase 20 (Virtualization Boundaries Revie
 
 ### Decisions
 
+- [2026-07-11]: Shipped v1.13.0 milestone. All phases (19, 20) complete, all requirements (OPS-MAINT-POST-01, OPS-MAINT-POST-02) satisfied. Qualification debt from v1.12.0 (physical TPM, bare-metal Firecracker, independent reproduction) remains open and is documented as future certification work.
 - [2026-07-11]: Completed Phase 20 (Virtualization Boundaries Review) using Plan 20-01-VIRTUALIZATION-BOUNDARIES-PLAN.md, producing a comprehensive guest-host isolation audit report at VIRTUALIZATION_BOUNDARIES_REVIEW.md.
 - [2026-07-10]: Completed Phase 19 (Long-Term Telemetry Checkpoints) using Plan 19-01-TELEMETRY-CHECKPOINTS-PLAN.md, validating WAL growth (<50MB/hour), lease transaction latency (<200ms), and backup validation success rate (>=96.6%) via scripts/long-term-telemetry-checker.ts.
 - [2026-06-08]: Completed Phase 13 with qualifications (WSL Certified): Physical Runtime Certification under WSL2, verifying real KVM microVM execution, vsock command execution, and simulated TPM quote generation/verification.
@@ -79,6 +80,7 @@ Last activity: 2026-07-11 -- Completed Phase 20 (Virtualization Boundaries Revie
 
 ### Roadmap Evolution
 
+- [2026-07-11]: Shipped and archived v1.13.0 (Operational Hardening & Long-Term Stewardship). Both phases complete.
 - [2026-06-08]: Completed Phase 13 with qualifications (Physical Runtime Certification), validating execution and attestation on WSL2 KVM environment.
 - [2026-06-03]: Initialized Milestone "Real Rekor Interoperability & Portability Validation" with success criteria focusing on live Rekor API submission and separate-process proof verification.
 - [2026-06-03]: Certified and Completed Milestone "Operational Evidence Collection & Production Reality Verification", establishing a clean baseline of production posture, security realities, and remediation paths.
@@ -89,9 +91,18 @@ Last activity: 2026-07-11 -- Completed Phase 20 (Virtualization Boundaries Revie
 
 ### Pending Todos
 
-- [ ] Transition platform to post-campaign maintenance mode.
 - [x] Establish long-term operational health telemetry checkpoints. (Phase 19)
 - [x] Review and refine virtualization boundaries. (Phase 20)
+
+### Outstanding Qualification Debt (Future Certification Work)
+
+These items were identified by the Phase 20 review but are explicitly **not** v1.13.0 deliverables. They represent qualification-removal work for future milestones.
+
+| Qualification | Source Phase | What Remains |
+|---|---|---|
+| Physical TPM Attestation | Phase 13 (v1.12.0) | `/dev/tpm0` access, `tpm2_quote` evidence, manufacturer EK chain validation on non-virtualized host |
+| Bare-Metal Firecracker | Phase 15 (v1.12.0) | 100-run endurance campaign on non-WSL2 host with resource leak measurements |
+| Independent Reproduction | Phase 18 (v1.12.0) | Separate operator, fresh environment, no author assistance, no repository write access |
 
 ## Operational Maintenance Surface
 
@@ -105,5 +116,5 @@ Last activity: 2026-07-11 -- Completed Phase 20 (Virtualization Boundaries Revie
 ## Session Continuity
 
 Last session: 2026-07-11
-Stopped at: Completed v1.13.0 milestone execution (Phases 19 and 20). Next: v1.13.0 milestone review and archiving.
+Stopped at: v1.13.0 shipped and archived. No active milestone. Next milestone would target qualification-removal work.
 Resume file: .planning/STATE.md
