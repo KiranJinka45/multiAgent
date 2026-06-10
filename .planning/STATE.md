@@ -10,9 +10,11 @@ progress:
   total_phases: 6
   completed_phases: 3
   qualified_phases: 2
+  in_progress_phases: 1
   total_plans: 6
   completed_plans: 3
   qualified_plans: 2
+  in_progress_plans: 1
 ---
 
 # Project State — Physical Runtime & Operational Verification
@@ -35,7 +37,7 @@ Last activity: 2026-06-11 -- Day 1 campaign checks completed successfully (no dr
 
 **Velocity:**
 
-- Total milestones completed: 50
+- Historical milestones completed: 50
 - Platform Status: TypeScript typechecking baseline clean; linting warning debt remains; test suites green.
 - Active Validation Scope: Telemetry, SLOs, and trust boundaries verification.
 
