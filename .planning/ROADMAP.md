@@ -6,7 +6,7 @@ Following the successful validation of live cryptographic trust-chains and multi
 
 ## Milestones
 
-- 🚧 **v1.13.0 Operational Hardening & Long-Term Stewardship** - Phases 19-20 (In Progress)
+- ✅ **v1.13.0 Operational Hardening & Long-Term Stewardship** - Phases 19-20 (Shipped: 2026-07-11)
 - ✅ **v1.12.0 Physical Runtime & Operational Verification** - Phases 13-18 (Shipped: 2026-07-10)
 - ✅ **v1.11.0 Maintenance, Debt Reduction & Portability Validation** - Phases 8-12 (Shipped: 2026-06-08)
 - ✅ **v1.10.0 Operational Certification & Reproducibility Validation** - Phases 3-7 (Shipped: 2026-06-08)
@@ -20,7 +20,7 @@ Following the successful validation of live cryptographic trust-chains and multi
 > [!NOTE]
 > Phases are ordered logically by phase number. Historical completion dates of phases may differ based on operational scheduling and validation dependencies.
 
-### 🚧 v1.13.0 Operational Hardening & Long-Term Stewardship (In Progress)
+### ✅ v1.13.0 Operational Hardening & Long-Term Stewardship (Completed)
 
 **Milestone Goal:** Transition the platform to post-campaign maintenance mode, establish long-term operational health telemetry checkpoints, and review and refine virtualization boundaries.
 
@@ -31,7 +31,7 @@ Following the successful validation of live cryptographic trust-chains and multi
   2. Implement an automated telemetry checking/reporting script that periodically validates these checkpoints.
   3. Verify alerts trigger correctly upon threshold breach.
 
-#### Phase 20: Virtualization Boundaries Review (Pending)
+#### Phase 20: Virtualization Boundaries Review (Complete)
 **Goal**: Establish virtualization boundaries review and report.
 **Success Criteria**:
   1. Audit KVM, Firecracker, and TPM isolation configurations.
@@ -210,5 +210,5 @@ Following the successful validation of live cryptographic trust-chains and multi
 | 18. Independent Repro | v1.12.0 | 1/1 | Complete (Simulated Operator) | 2026-06-10 |
 | 16. Reliability Campaign | v1.12.0 | 1/1 | Complete | 2026-07-10 |
 | 19. Telemetry Checkpoints | v1.13.0 | 1/1 | Complete | 2026-07-10 |
-| 20. Virtualization Review | v1.13.0 | 0/1 | Pending | - |
+| 20. Virtualization Review | v1.13.0 | 1/1 | Complete | 2026-07-11 |
 
