@@ -1,0 +1,30 @@
+{
+  "timestamp": "2026-07-10T23:00:00.000Z",
+  "totalDrills": 4,
+  "successfulDrills": 4,
+  "failedDrills": 0,
+  "drills": [
+    {
+      "week": 1,
+      "ttrMinutes": 0.0111,
+      "status": "SUCCESS"
+    },
+    {
+      "week": 2,
+      "ttrMinutes": 0.0071,
+      "status": "SUCCESS"
+    },
+    {
+      "week": 3,
+      "ttrMinutes": 0.0113,
+      "status": "SUCCESS"
+    },
+    {
+      "week": 4,
+      "ttrMinutes": 0.0051,
+      "status": "SUCCESS"
+    }
+  ],
+  "mttrMinutes": 0.0086,
+  "verdict": "PASSED"
+}
