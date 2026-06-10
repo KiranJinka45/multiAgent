@@ -5,14 +5,14 @@
 
 **Status Taxonomy Reference:**
 - `[x] Complete` — Requirement execution completed and verified with no outstanding constraints.
-- `[x] Complete with Qualifications` — Requirement execution completed and verified, but platform/environmental constraints limit full physical certification scope (e.g., WSL2 virtualization boundaries). *Remaining work requirements* document what is needed to fully lift the qualification in future cycles.
+- `[Q] Complete with Qualifications` — Requirement execution completed and verified, but platform/environmental constraints limit full physical certification scope (e.g., WSL2 virtualization boundaries). *Remaining work requirements* document what is needed to fully lift the qualification in future cycles.
 - `[/] In Progress` — Requirement execution is currently active and has not yet completed.
 - `[ ] Pending` — Requirement execution is not yet started.
 
 ## v1.12.0 Requirements (Active)
 
 ### Physical Host Validation (OPS-MAINT-PHYS)
-- [x] **OPS-MAINT-PHYS-01**: Validate execution on non-virtualized physical Linux host with active TPM quote verification (Complete with Qualifications: validated on WSL2 KVM with simulated TPM).
+- [Q] **OPS-MAINT-PHYS-01**: Validate execution on non-virtualized physical Linux host with active TPM quote verification (Complete with Qualifications: validated on WSL2 KVM with simulated TPM).
   - *Remaining work requirements:*
     - Host OS: Confirmed physical non-virtualized Ubuntu/RHEL/Debian install.
     - Presence of `/dev/kvm` and `/dev/tpm0` verified.
@@ -25,7 +25,7 @@
   - Must trigger real network partition/outage, real failover, and real lease fencing (container pauses, mock outages, and proxy simulated outages are banned).
 
 ### Firecracker microVM Certification (OPS-MAINT-FIRECRACKER-RUN)
-- [x] **OPS-MAINT-FIRECRACKER-RUN-01**: Certify Firecracker runtime microVM launching, guest execution, vsock connectivity, and teardown under 100 consecutive iterations, outputting statistical metrics: (Complete with Qualifications: validated on WSL2 KVM).
+- [Q] **OPS-MAINT-FIRECRACKER-RUN-01**: Certify Firecracker runtime microVM launching, guest execution, vsock connectivity, and teardown under 100 consecutive iterations, outputting statistical metrics: (Complete with Qualifications: validated on WSL2 KVM).
   - `success_rate`, `mean_launch_ms`, `p95_launch_ms`, `mean_teardown_ms`, and `resource_leaks` (monitoring memory, CPU, and file descriptor leaks across iterations).
 
 ### Security Posture Audit (OPS-MAINT-SECURITY)

@@ -82,9 +82,9 @@ Last activity: 2026-06-10 -- Day 0 baseline checks completed successfully
 
 ### Pending Todos
 
-- [x] Validate execution on physical Linux host with active TPM quote verification (Complete with Qualifications: validated on WSL2 KVM with simulated TPM).
+- [Q] Validate execution on physical Linux host with active TPM quote verification (Complete with Qualifications: validated on WSL2 KVM with simulated TPM).
 - [x] Validate Sentinel failover recovery under actual multi-node quorum loss.
-- [x] Certify real Firecracker microVM launch and teardown over 100 iterations (Complete with Qualifications: validated on WSL2 KVM).
+- [Q] Certify real Firecracker microVM launch and teardown over 100 iterations (Complete with Qualifications: validated on WSL2 KVM).
 - [x] Conduct comprehensive security threat model and privilege containment audit.
 - [x] Demonstrate and document independent operator verification kit reproduction (SIMULATED: automated operator simulation, not genuine third-party audit).
 - [/] Perform 30-day continuous reliability monitoring and log MTTR/failures (In Progress: Day 0 baseline checks passed).
