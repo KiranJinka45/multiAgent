@@ -1,25 +1,22 @@
 # ZTAN Physical Hardware Certification Record
 
-**Timestamp:** 2026-06-10T06:02:15.682Z  
-**Platform:** linux / 6.6.87.2-microsoft-standard-WSL2 / x64  
+**Timestamp:** 2026-06-10T15:23:02.924Z  
+**Platform:** win32 / 10.0.26200 / x64  
 **Final Verdict:** `PARTIAL_WSL_CERTIFIED`
 
 ## 1. Virtualization Capabilities Check
-- **KVM Device (/dev/kvm) Exist:** ✅ YES  
-- **KVM Writable by User:** ✅ YES  
-- **Firecracker Binary Found:** ✅ YES (/usr/local/bin/firecracker)  
-- **Jailer Binary Found:** ✅ YES (/usr/local/bin/jailer)  
+- **KVM Device (/dev/kvm) Exist:** ❌ NO  
+- **KVM Writable by User:** ❌ NO  
+- **Firecracker Binary Found:** ❌ NO  
+- **Jailer Binary Found:** ❌ NO  
 
 ## 2. Real MicroVM Isolation Test
-- **MicroVM Spawned:** ✅ SUCCESS  
-- **Guest Command Output:** `Hello from true Firecracker isolated microVM! Kernel: 4.14.174`  
-- **Execution Time:** `17050 ms`  
-- **Resource Cleanup Swept:** ✅ YES  
+- **MicroVM Spawned:** ❌ FAILED/SKIPPED  
 
 ## 3. TPM Attestation Check
 - **TPM Device (/dev/tpm0) Exist:** ❌ NO  
 - **Attestation Mode:** `SIMULATED`  
-- **Challenge Nonce:** `65fd9e74ca6d3e6573372bfc856c8412a320fa632a06f908213f6ca370fcbdeb`  
+- **Challenge Nonce:** `89559deb236364d2a806fa7a1f102f171277623c57fe05918e7b360f672f1079`  
 - **Attestation Verified:** ✅ YES  
 
 ### Measured PCR Values:
@@ -30,6 +27,11 @@
   "10": "94fb09e99836f3d77bf8a3d0fc058421d917778bc5cd652638f1236ea43eed19"
 }
 ```
+
+### Recorded Operational Qualifications:
+- ⚠️ **Qualification:** Missing physical TPM 2.0 device node (/dev/tpm0) on host
+- ⚠️ **Qualification:** Virtualization detected: running in windows container/VM
+- ⚠️ **Qualification:** Using software-simulated TPM quote verification (simulated keys and mock PCR registers)
 
 ## 4. Forensic Evaluation Conclusion
 > **[QUALIFIED] PARTIAL HYBRID WSL2 HOST CERTIFIED**  

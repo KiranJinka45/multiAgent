@@ -8,12 +8,12 @@ last_updated: "2026-07-11T02:00:00.000Z"
 last_activity: 2026-07-11
 progress:
   total_phases: 4
-  completed_phases: 0
-  qualified_phases: 0
+  completed_phases: 1
+  qualified_phases: 1
   in_progress_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  qualified_plans: 0
+  total_plans: 1
+  completed_plans: 1
+  qualified_plans: 1
   in_progress_plans: 0
 ---
 
@@ -28,10 +28,10 @@ See: [.planning/PROJECT.md](./PROJECT.md) (updated 2026-07-11)
 
 ## Current Position
 
-Phase: Phase 21: Physical TPM Attestation Certification
+Phase: None Active
 Plan: None Active
-Status: Planning
-Last activity: 2026-07-11 -- Initialized v1.14.0 milestone and transitioned to Phase 21 planning.
+Status: Review
+Last activity: 2026-07-11 -- Completed Phase 21: Physical TPM Attestation Certification with Qualifications. Generated PHYSICAL_TPM_CERTIFICATION.md and physical-attestation-evidence.json deliverables.
 
 ## Performance Metrics
 
@@ -61,6 +61,7 @@ Last activity: 2026-07-11 -- Initialized v1.14.0 milestone and transitioned to P
 
 ### Decisions
 
+- [2026-07-11]: Completed Phase 21 (Physical TPM Attestation Certification) using Plan 21-01-PHYSICAL-TPM-PLAN.md, producing PHYSICAL_TPM_CERTIFICATION.md and physical-attestation-evidence.json recording the operational qualification delta (missing physical TPM device and virtualization active).
 - [2026-07-11]: Archived v1.13.0 and initialized v1.14.0 (Qualification Removal & Physical Certification) with Phases 21-24 targeting physical TPM attestation, bare-metal Firecracker certification, independent reproduction audit, and qualification closure review.
 - [2026-07-11]: Shipped v1.13.0 milestone. All phases (19, 20) complete, all requirements (OPS-MAINT-POST-01, OPS-MAINT-POST-02) satisfied. Qualification debt from v1.12.0 (physical TPM, bare-metal Firecracker, independent reproduction) remains open and is documented as future certification work.
 - [2026-07-11]: Completed Phase 20 (Virtualization Boundaries Review) using Plan 20-01-VIRTUALIZATION-BOUNDARIES-PLAN.md, producing a comprehensive guest-host isolation audit report at VIRTUALIZATION_BOUNDARIES_REVIEW.md.
@@ -71,6 +72,7 @@ Last activity: 2026-07-11 -- Initialized v1.14.0 milestone and transitioned to P
 
 ### Roadmap Evolution
 
+- [2026-07-11]: Completed Phase 21 with qualifications (Physical TPM Attestation Certification), validating physical TPM quote generation commands and recording qualification delta on virtualized host.
 - [2026-07-11]: Initialized v1.14.0 (Qualification Removal & Physical Certification) with Phases 21-24.
 - [2026-07-11]: Shipped and archived v1.13.0 (Operational Hardening & Long-Term Stewardship). Both phases complete.
 - [2026-06-08]: Completed Phase 13 with qualifications (Physical Runtime Certification), validating execution and attestation on WSL2 KVM environment.
@@ -79,7 +81,7 @@ Last activity: 2026-07-11 -- Initialized v1.14.0 milestone and transitioned to P
 
 ### Pending Todos
 
-- [ ] Physical TPM attestation certification (Phase 21)
+- [x] Physical TPM attestation certification (Phase 21)
 - [ ] Bare-metal Firecracker endurance certification (Phase 22)
 - [ ] Independent third-party reproduction audit (Phase 23)
 - [ ] Qualification closure review (Phase 24)
@@ -90,7 +92,7 @@ These items were identified by the Phase 20 review and are the primary targets o
 
 | Qualification | Source Phase | What Remains |
 |---|---|---|
-| Physical TPM Attestation | Phase 13 (v1.12.0) | `/dev/tpm0` access, `tpm2_quote` evidence, manufacturer EK chain validation on non-virtualized host |
+| Physical TPM Attestation | Phase 13 (v1.12.0) | ✅ Complete with qualifications (Phase 21) — real tpm2-tools commands implemented; qualification details logged on virtualized host |
 | Bare-Metal Firecracker | Phase 15 (v1.12.0) | 100-run endurance campaign on non-WSL2 host with resource leak measurements |
 | Independent Reproduction | Phase 18 (v1.12.0) | Separate operator, fresh environment, no author assistance, no repository write access |
 

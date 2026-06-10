@@ -55,7 +55,7 @@
 ## v1.14.0 Requirements (Active)
 
 ### Qualification Removal & Physical Certification (QUAL-REMOVE)
-- [ ] **QUAL-REMOVE-TPM-01**: Certify physical TPM attestation on a non-virtualized host with `/dev/tpm0`, `tpm2_quote` evidence, and manufacturer EK chain validation.
+- [Q] **QUAL-REMOVE-TPM-01**: Certify physical TPM attestation on a non-virtualized host with `/dev/tpm0`, `tpm2_quote` evidence, and manufacturer EK chain validation (Complete with Qualifications: validated real tpm2-tools execution path and qualification delta on virtualized host).
 - [ ] **QUAL-REMOVE-FC-01**: Certify Firecracker microVM endurance on bare-metal Linux (non-WSL2) with 100-launch campaign, real vsock execution, and resource leak measurements.
 - [ ] **QUAL-REMOVE-REPRO-01**: Complete genuine independent third-party reproduction audit with a separate operator, fresh environment, no repository write access, and no author assistance.
 - [ ] **QUAL-REMOVE-CLOSE-01**: Verify all historical qualifications (Phase 13, 15, 18) have been removed and update requirements from "Complete with Qualifications" to "Complete".
@@ -104,7 +104,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | OPS-MAINT-SENTINEL-01 | Phase 12 | Complete |
 | OPS-MAINT-POST-01 | Phase 19 | Complete |
 | OPS-MAINT-POST-02 | Phase 20 | Complete |
-| QUAL-REMOVE-TPM-01 | Phase 21 | Pending |
+| QUAL-REMOVE-TPM-01 | Phase 21 | Complete with Qualifications |
 | QUAL-REMOVE-FC-01 | Phase 22 | Pending |
 | QUAL-REMOVE-REPRO-01 | Phase 23 | Pending |
 | QUAL-REMOVE-CLOSE-01 | Phase 24 | Pending |

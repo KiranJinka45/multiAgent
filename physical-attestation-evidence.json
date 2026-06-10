@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-06-10T15:23:02.924Z",
+  "attestationMode": "SIMULATED",
+  "nonce": "89559deb236364d2a806fa7a1f102f171277623c57fe05918e7b360f672f1079",
+  "quoteBase64": "eyJtYWdpYyI6IkZGNTQ0MzQ3IiwidHlwZSI6IlRQTV9TVF9BVFRFU1RfUVVPVEUiLCJub25jZSI6Ijg5NTU5ZGViMjM2MzY0ZDJhODA2ZmE3YTFmMTAyZjE3MTI3NzYyM2M1N2ZlMDU5MThlN2IzNjBmNjcyZjEwNzkiLCJwY3JEaWdlc3QiOiJmZjRjNmExZjllYWI2YmZmMWNkMmFhNzAwNjc1OTgyNjEyZjBjNjllZjYxMTYxMzNhMGY0ODlhOWQ5OTUzMmRhIn0=",
+  "signatureBase64": "FasGlD2x/DI8HBo1ssfpyOHTuBGEIMJJeF5AWLY25FhOxUY/AHmkLegbQPNi2o8FOQrqqHvXnDvZwbkE9bLC+uaoj1cT8/079pJcDEjz7g+6xyJcdEXvqYYgEqK3i/awITCLxjK0xrB1jf12S7xpxLHPrz+L4dVzrETx8MDwlC4hiZ1mRenrflc2xEbvAn8ywNCbazW/k1CkLZYvVV0cgq6GCZXUc/Vzd3lDpn1RD6xPo5lnf4BKtfwlaErupXJazsEffu+cPewkEZ5usDFex59nV7xPhogvrJwfUZQ29+4Ak/0o2ExaODQZyLjr3tZ01sEmxoWiu75EAYOeWeDv7A==",
+  "pcrValues": {
+    "0": "e4e06e4a0053362c00510c4eff5c9797c76b0e2d236c966378c6b74220dcf1c9",
+    "7": "5e4311ee3d5d5d386f1a6a59edb321545be255dbd128fe668b20c3643f29ed4a",
+    "10": "94fb09e99836f3d77bf8a3d0fc058421d917778bc5cd652638f1236ea43eed19"
+  },
+  "verified": true,
+  "ekCertificateBase64": null,
+  "qualifications": [
+    "Missing physical TPM 2.0 device node (/dev/tpm0) on host",
+    "Virtualization detected: running in windows container/VM",
+    "Using software-simulated TPM quote verification (simulated keys and mock PCR registers)"
+  ]
+}
