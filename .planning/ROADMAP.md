@@ -6,6 +6,7 @@ Following the successful validation of live cryptographic trust-chains and multi
 
 ## Milestones
 
+- 🚧 **v1.13.0 Operational Hardening & Long-Term Stewardship** - Phases 19-20 (In Progress)
 - ✅ **v1.12.0 Physical Runtime & Operational Verification** - Phases 13-18 (Shipped: 2026-07-10)
 - ✅ **v1.11.0 Maintenance, Debt Reduction & Portability Validation** - Phases 8-12 (Shipped: 2026-06-08)
 - ✅ **v1.10.0 Operational Certification & Reproducibility Validation** - Phases 3-7 (Shipped: 2026-06-08)
@@ -15,6 +16,24 @@ Following the successful validation of live cryptographic trust-chains and multi
 - ✅ **v1.6.0 Stewardship Engineering Era** - (Shipped: 2026-05-26)
 
 ## Phases
+
+### 🚧 v1.13.0 Operational Hardening & Long-Term Stewardship (In Progress)
+
+**Milestone Goal:** Transition the platform to post-campaign maintenance mode, establish long-term operational health telemetry checkpoints, and review and refine virtualization boundaries.
+
+#### Phase 19: Long-Term Telemetry Checkpoints (In Progress)
+**Goal**: Define and monitor long-term operational health telemetry checkpoints.
+**Success Criteria**:
+  1. Define core operational health indicators (WAL growth, lease renewal latency, backup success rates).
+  2. Implement an automated telemetry checking/reporting script that periodically validates these checkpoints.
+  3. Verify alerts trigger correctly upon threshold breach.
+
+#### Phase 20: Virtualization Boundaries Review (Pending)
+**Goal**: Establish virtualization boundaries review and report.
+**Success Criteria**:
+  1. Audit KVM, Firecracker, and TPM isolation configurations.
+  2. Map namespace and privilege containment boundaries.
+  3. Produce a formal Virtualization Boundaries Review Report detailing security posture and isolation limits.
 
 ### ✅ v1.12.0 Physical Runtime & Operational Verification (Completed)
 
@@ -187,4 +206,6 @@ Following the successful validation of live cryptographic trust-chains and multi
 | 17. Security Audit | v1.12.0 | 1/1 | Complete | 2026-06-10 |
 | 18. Independent Repro | v1.12.0 | 1/1 | Complete (Simulated Operator) | 2026-06-10 |
 | 16. Reliability Campaign | v1.12.0 | 1/1 | Complete | 2026-07-10 |
+| 19. Telemetry Checkpoints | v1.13.0 | 0/1 | In Progress | - |
+| 20. Virtualization Review | v1.13.0 | 0/1 | Pending | - |
 

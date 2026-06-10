@@ -92,10 +92,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | OPS-MAINT-DRIFT-01 | Phase 10 | Complete |
 | OPS-MAINT-BACKUP-01 | Phase 11 | Complete |
 | OPS-MAINT-SENTINEL-01 | Phase 12 | Complete |
+| OPS-MAINT-POST-01 | Phase 19 | Pending |
+| OPS-MAINT-POST-02 | Phase 20 | Pending |
 
 **Coverage:**
 - Completed v1.12.0 requirements: 6 total
-- Mapped to phases: 6
+- Active v1.13.0 requirements: 2 total
+- Mapped to phases: 8
 - Unmapped: 0 ✓
 
 ---
