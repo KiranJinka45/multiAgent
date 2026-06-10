@@ -1,0 +1,21 @@
+{
+  "timestamp": "2026-06-22T06:00:00.000Z",
+  "filePath": "C:/multiagentic_project/multiAgent-main/evidence/drill-backup-clean.json",
+  "fileSizeBytes": 0,
+  "overallPassed": false,
+  "findings": [
+    {
+      "corruptionClass": "TRUNCATION",
+      "message": "Backup file does not exist / was truncated",
+      "detail": "Path: C:/multiagentic_project/multiAgent-main/evidence/drill-backup-clean.json - disk out of space during serialize phase"
+    }
+  ],
+  "checks": {
+    "structuralIntegrity": false,
+    "schemaConformance": false,
+    "hashChainContinuity": false,
+    "epochMonotonicity": false,
+    "walSequenceMonotonicity": false,
+    "truncationDetection": false
+  }
+}

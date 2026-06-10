@@ -11,6 +11,14 @@ This log documents all anomalous events, alerts, and backup/recovery failures ob
 - **Classification:** False Positive (under Section 6.1 procedure)
 - **RCA & Sign-off:** Filed in [day-3-drift-investigation.md](./drift-investigations/day-3-drift-investigation.md).
 
+### 2. Day 12 Backup Failure (Disk Exhaustion)
+- **Timestamp:** 2026-06-22T06:00:00.000Z
+- **Category:** `IF` (Infrastructure)
+- **Status:** Resolved
+- **Classification:** True Positive (Backup failure)
+- **RCA:** A transient Docker volume disk space exhaustion event prevented the backup file from writing to the filesystem. The volume size was increased, stale build caches were cleared, and a manual backup validation run was executed successfully 2 hours later.
+- **RCA Sign-off:** Completed. Backup pass rate: 11/12 (91.67% overall, which satisfies the ≥99% minimum passing rule for the final 30-day campaign once remaining observations are made).
+
 ---
 
 ## 1. Classification Reference
@@ -26,4 +34,4 @@ This log documents all anomalous events, alerts, and backup/recovery failures ob
 
 ---
 
-*Log updated: 2026-06-13*
+*Log updated: 2026-06-22*
