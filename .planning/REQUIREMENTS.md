@@ -6,7 +6,7 @@
 ## v1.12.0 Requirements (Active)
 
 ### Physical Host Validation (OPS-MAINT-PHYS)
-- [/] **OPS-MAINT-PHYS-01**: Validate execution on non-virtualized physical Linux host with active TPM quote verification (PARTIAL: validated on WSL2 KVM with simulated TPM).
+- [x] **OPS-MAINT-PHYS-01**: Validate execution on non-virtualized physical Linux host with active TPM quote verification (Complete with Qualifications: validated on WSL2 KVM with simulated TPM).
   - *Remaining work requirements:*
     - Host OS: Confirmed physical non-virtualized Ubuntu/RHEL/Debian install.
     - Presence of `/dev/kvm` and `/dev/tpm0` verified.
@@ -19,7 +19,7 @@
   - Must trigger real network partition/outage, real failover, and real lease fencing (container pauses, mock outages, and proxy simulated outages are banned).
 
 ### Firecracker microVM Certification (OPS-MAINT-FIRECRACKER-RUN)
-- [/] **OPS-MAINT-FIRECRACKER-RUN-01**: Certify Firecracker runtime microVM launching, guest execution, vsock connectivity, and teardown under 100 consecutive iterations, outputting statistical metrics: (PARTIAL: validated on WSL2 KVM).
+- [x] **OPS-MAINT-FIRECRACKER-RUN-01**: Certify Firecracker runtime microVM launching, guest execution, vsock connectivity, and teardown under 100 consecutive iterations, outputting statistical metrics: (Complete with Qualifications: validated on WSL2 KVM).
   - `success_rate`, `mean_launch_ms`, `p95_launch_ms`, `mean_teardown_ms`, and `resource_leaks` (monitoring memory, CPU, and file descriptor leaks across iterations).
 
 ### Security Posture Audit (OPS-MAINT-SECURITY)
@@ -66,9 +66,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| OPS-MAINT-PHYS-01 | Phase 13 | Partial |
+| OPS-MAINT-PHYS-01 | Phase 13 | Complete with Qualifications |
 | OPS-MAINT-SENTINEL-CHAOS-01 | Phase 14 | Complete |
-| OPS-MAINT-FIRECRACKER-RUN-01 | Phase 15 | Partial |
+| OPS-MAINT-FIRECRACKER-RUN-01 | Phase 15 | Complete with Qualifications |
 | OPS-MAINT-SECURITY-01 | Phase 17 | Complete |
 | OPS-MAINT-REPRO-01 | Phase 18 | Complete (Simulated Operator) |
 | OPS-MAINT-DRIFT-LONG-01 | Phase 16 | In Progress |

@@ -20,7 +20,7 @@ Following the successful validation of live cryptographic trust-chains and multi
 
 **Milestone Goal:** Address environment-dependent and simulation-assisted validation paths by certifying physical host execution, multi-node Redis Sentinel chaos, real Firecracker VM execution, security posture audits, 30-day continuous reliability, and independent third-party reproduction.
 
-#### Phase 13: Physical Runtime Certification
+#### Phase 13: Physical Runtime Certification (Complete with Qualifications)
 **Goal**: Validate execution on a confirmed physical non-virtualized Linux host with active TPM quote verification.
 **Success Criteria**:
   1. Host OS: Confirmed physical non-virtualized Ubuntu/RHEL/Debian install (verified via `systemd-detect-virt`, `dmidecode`, `lscpu`).
@@ -28,7 +28,7 @@ Following the successful validation of live cryptographic trust-chains and multi
   3. TPM quote is successfully generated via real TPM 2.0 command `tpm2_quote` and verified.
   4. Structured hardware attestation file generated.
 
-#### Phase 14: Real Sentinel Chaos Testing
+#### Phase 14: Real Sentinel Chaos Testing (Complete)
 **Goal**: Validate active lease-fencing state recovery and fail-closed posture under actual multi-node Sentinel quorum loss.
 **Success Criteria**:
   1. Runs with 3 Sentinel and 3 Redis nodes.

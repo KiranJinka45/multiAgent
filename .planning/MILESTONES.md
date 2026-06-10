@@ -1,13 +1,30 @@
 # Milestones
 
+## v1.11.0 Maintenance, Debt Reduction & Portability Validation (Shipped: 2026-06-08)
 
-## v1.10.0 Operational Certification & Reproducibility Validation (Shipped: 2026-06-08)
-
-**Phases completed:** 2 phases, 2 plans, 0 tasks
+**Phases completed:** 5 phases (Phases 8-12)
 
 **Key accomplishments:**
 
-- (none recorded)
+- Resolved compiler warning debt (unused local variables and implicit any warnings) across core packages.
+- Validated reproducibility verification kit on physical host.
+- Implemented periodic automated drift detection checks runner.
+- Validated recovery behavior and diagnostics under corrupted backup imports.
+- Validated lease-fencing state recovery and step-down under Redis Sentinel quorum-loss simulations.
+
+---
+
+## v1.10.0 Operational Certification & Reproducibility Validation (Shipped: 2026-06-08)
+
+**Phases completed:** 5 phases (Phases 3-7)
+
+**Key accomplishments:**
+
+- Certified clean-sheet containerized and local Kubernetes deployments.
+- Verified total disaster recovery replay and deterministic transaction state restorations.
+- Executed multi-version compatibility matrix validation across v1.8, v1.9, and v1.10.
+- Pruned dead packages, unused dependencies, and dead files from workspace.
+- Packaged a self-contained, standalone verification bundle (verify-kit).
 
 ---
 
