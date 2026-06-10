@@ -17,6 +17,9 @@ Following the successful validation of live cryptographic trust-chains and multi
 
 ## Phases
 
+> [!NOTE]
+> Phases are ordered logically by phase number. Historical completion dates of phases may differ based on operational scheduling and validation dependencies.
+
 ### 🚧 v1.13.0 Operational Hardening & Long-Term Stewardship (In Progress)
 
 **Milestone Goal:** Transition the platform to post-campaign maintenance mode, establish long-term operational health telemetry checkpoints, and review and refine virtualization boundaries.

@@ -4,8 +4,8 @@ milestone: v1.13.0
 milestone_name: Operational Hardening & Long-Term Stewardship
 status: active
 stopped_at: "v1.12.0 milestone archive and transition completed. Ready for v1.13.0 active planning."
-last_updated: "2026-07-10T23:30:00.000Z"
-last_activity: 2026-07-10
+last_updated: "2026-07-11T00:15:00.000Z"
+last_activity: 2026-07-11
 progress:
   total_phases: 2
   completed_phases: 1
@@ -38,7 +38,7 @@ Last activity: 2026-07-10 -- Completed Phase 19 (Long-Term Telemetry Checkpoints
 **Velocity:**
 
 - Historical milestones completed: 7
-- Historical phases completed: 57 (cumulative roadmap phases and certified milestone phases through v1.12.0)
+- Historical phases completed: 57 (cumulative roadmap phases, certified milestone phases, and legacy stewardship phases through v1.12.0)
 - Platform Status: TypeScript typechecking baseline clean; linting warning debt remains; test suites green.
 - Active Validation Scope: Telemetry, SLOs, and trust boundaries verification.
 
