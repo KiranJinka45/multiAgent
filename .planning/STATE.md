@@ -11,10 +11,10 @@ progress:
   completed_phases: 0
   qualified_phases: 0
   in_progress_phases: 1
-  total_plans: 0
+  total_plans: 1
   completed_plans: 0
   qualified_plans: 0
-  in_progress_plans: 0
+  in_progress_plans: 1
 ---
 
 # Project State — Operational Hardening & Long-Term Stewardship
