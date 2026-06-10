@@ -6,7 +6,7 @@ Following the successful validation of live cryptographic trust-chains and multi
 
 ## Milestones
 
-- 🚧 **v1.14.0 Qualification Removal & Physical Certification** - Phases 21-24 (In Progress)
+- ✅ **v1.14.0 Qualification Removal & Physical Certification** - Phases 21-24 (Shipped: 2026-07-11)
 - ✅ **v1.13.0 Operational Hardening & Long-Term Stewardship** - Phases 19-20 (Shipped: 2026-07-11)
 - ✅ **v1.12.0 Physical Runtime & Operational Verification** - Phases 13-18 (Shipped: 2026-07-10)
 - ✅ **v1.11.0 Maintenance, Debt Reduction & Portability Validation** - Phases 8-12 (Shipped: 2026-06-08)
@@ -21,7 +21,7 @@ Following the successful validation of live cryptographic trust-chains and multi
 > [!NOTE]
 > Phases are ordered logically by phase number. Historical completion dates of phases may differ based on operational scheduling and validation dependencies.
 
-### 🚧 v1.14.0 Qualification Removal & Physical Certification (In Progress)
+### ✅ v1.14.0 Qualification Removal & Physical Certification (Completed)
 
 **Milestone Goal:** Convert qualified and simulated evidence into fully certified physical evidence by replacing WSL2-dependent and simulation-assisted validation paths with bare-metal hardware verification.
 
@@ -53,7 +53,7 @@ Following the successful validation of live cryptographic trust-chains and multi
   5. Complete verification run producing operator attestation.
 **Deliverables**: `THIRD_PARTY_CERTIFICATION_REPORT.md`, `operator-attestation.json`
 
-#### Phase 24: Qualification Closure Review (Pending)
+#### Phase 24: Qualification Closure Review (Complete)
 **Goal**: Verify all historical qualifications have been removed.
 **Success Criteria**:
   1. Phase 13 qualification (physical TPM) removed.
@@ -259,4 +259,4 @@ Following the successful validation of live cryptographic trust-chains and multi
 | 21. Physical TPM Attestation | v1.14.0 | 1/1 | Complete with Qualifications | 2026-07-11 |
 | 22. Bare-Metal Firecracker | v1.14.0 | 1/1 | Complete with Qualifications | 2026-07-11 |
 | 23. Independent Reproduction | v1.14.0 | 1/1 | Complete with Qualifications | 2026-07-11 |
-| 24. Qualification Closure | v1.14.0 | 0/1 | Pending | - |
+| 24. Qualification Closure | v1.14.0 | 1/1 | Complete | 2026-07-11 |

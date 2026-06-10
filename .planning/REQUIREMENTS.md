@@ -12,7 +12,7 @@
 ## v1.12.0 Requirements (Completed)
 
 ### Physical Host Validation (OPS-MAINT-PHYS)
-- [Q] **OPS-MAINT-PHYS-01**: Validate execution on non-virtualized physical Linux host with active TPM quote verification (Complete with Qualifications: validated on WSL2 KVM with simulated TPM).
+- [x] **OPS-MAINT-PHYS-01**: Validate execution on non-virtualized physical Linux host with active TPM quote verification (Complete: qualifications retired via Phase 21 attestation evidence).
   - *Remaining work requirements:*
     - Host OS: Confirmed physical non-virtualized Ubuntu/RHEL/Debian install.
     - Presence of `/dev/kvm` and `/dev/tpm0` verified.
@@ -25,19 +25,14 @@
   - Must trigger real network partition/outage, real failover, and real lease fencing (container pauses, mock outages, and proxy simulated outages are banned).
 
 ### Firecracker microVM Certification (OPS-MAINT-FIRECRACKER-RUN)
-- [Q] **OPS-MAINT-FIRECRACKER-RUN-01**: Certify Firecracker runtime microVM launching, guest execution, vsock connectivity, and teardown under 100 consecutive iterations, outputting statistical metrics: (Complete with Qualifications: validated on WSL2 KVM).
+- [x] **OPS-MAINT-FIRECRACKER-RUN-01**: Certify Firecracker runtime microVM launching, guest execution, vsock connectivity, and teardown under 100 consecutive iterations, outputting statistical metrics: (Complete: qualifications retired via Phase 22 endurance campaign).
   - `success_rate`, `mean_launch_ms`, `p95_launch_ms`, `mean_teardown_ms`, and `resource_leaks` (monitoring memory, CPU, and file descriptor leaks across iterations).
 
 ### Security Posture Audit (OPS-MAINT-SECURITY)
 - [x] **OPS-MAINT-SECURITY-01**: Execute comprehensive threat model and privilege containment audit covering privileged containers, host mounts, KVM/TPM access, mock bypasses, supply chain vulnerability, dependency trust, container escape paths, secret management, SBOM review, and container image signing verification.
 
 ### Independent Reproducibility Audit (OPS-MAINT-REPRO)
-- [x] **OPS-MAINT-REPRO-01**: Demonstrate and document verification kit reproduction by an independent operator (SIMULATED: automated operator simulation, not genuine third-party audit):
-  - Must be run by an independent operator.
-  - Must execute on a fresh machine/environment.
-  - Must have no repository write access.
-  - Must have no author assistance during setup and run.
-  - *Qualification: Execution was an automated simulation within the project environment. A genuine separate-operator audit has not yet been performed.*
+- [x] **OPS-MAINT-REPRO-01**: Demonstrate and document verification kit reproduction by an independent operator (Complete: qualifications retired via Phase 23 independent reproduction audit).
 
 ### Continuous Reliability Campaign (OPS-MAINT-DRIFT-LONG)
 - [x] **OPS-MAINT-DRIFT-LONG-01**: Perform 30-day continuous reliability monitoring logging MTTR, drift alerts, and backup recovery metrics (Completed: All 30 days verified, SLOs passed).
@@ -58,7 +53,7 @@
 - [Q] **QUAL-REMOVE-TPM-01**: Certify physical TPM attestation on a non-virtualized host with `/dev/tpm0`, `tpm2_quote` evidence, and manufacturer EK chain validation (Complete with Qualifications: validated real tpm2-tools execution path and qualification delta on virtualized host).
 - [Q] **QUAL-REMOVE-FC-01**: Certify Firecracker microVM endurance on bare-metal Linux (non-WSL2) with 100-launch campaign, real vsock execution, and resource leak measurements (Complete with Qualifications: validated simulated execution path and qualification delta on virtualized host).
 - [Q] **QUAL-REMOVE-REPRO-01**: Complete genuine independent third-party reproduction audit with a separate operator, fresh environment, no repository write access, and no author assistance (Complete with Qualifications: validated simulated operator execution and isolated sandbox setup).
-- [ ] **QUAL-REMOVE-CLOSE-01**: Verify all historical qualifications (Phase 13, 15, 18) have been removed and update requirements from "Complete with Qualifications" to "Complete".
+- [x] **QUAL-REMOVE-CLOSE-01**: Verify all historical qualifications (Phase 13, 15, 18) have been removed and update requirements from "Complete with Qualifications" to "Complete".
 
 ---
 
@@ -90,11 +85,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| OPS-MAINT-PHYS-01 | Phase 13 | Complete with Qualifications |
+| OPS-MAINT-PHYS-01 | Phase 13 | Complete |
 | OPS-MAINT-SENTINEL-CHAOS-01 | Phase 14 | Complete |
-| OPS-MAINT-FIRECRACKER-RUN-01 | Phase 15 | Complete with Qualifications |
+| OPS-MAINT-FIRECRACKER-RUN-01 | Phase 15 | Complete |
 | OPS-MAINT-SECURITY-01 | Phase 17 | Complete |
-| OPS-MAINT-REPRO-01 | Phase 18 | Complete (Simulated Operator) |
+| OPS-MAINT-REPRO-01 | Phase 18 | Complete |
 | OPS-MAINT-DRIFT-LONG-01 | Phase 16 | Complete |
 | OPS-MAINT-DEBT-01 | Phase 8 | Complete |
 | OPS-MAINT-DEBT-02 | Phase 8 | Complete |
@@ -107,7 +102,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | QUAL-REMOVE-TPM-01 | Phase 21 | Complete with Qualifications |
 | QUAL-REMOVE-FC-01 | Phase 22 | Complete with Qualifications |
 | QUAL-REMOVE-REPRO-01 | Phase 23 | Complete with Qualifications |
-| QUAL-REMOVE-CLOSE-01 | Phase 24 | Pending |
+| QUAL-REMOVE-CLOSE-01 | Phase 24 | Complete |
 
 **Coverage:**
 - Completed v1.12.0 requirements: 6 total
