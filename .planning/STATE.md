@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.12.0
 milestone_name: Physical Runtime & Operational Verification
 status: active
-stopped_at: "Day 27 campaign execution completed successfully (drift and backup validation verified)."
-last_updated: "2026-07-07T12:00:00.000Z"
-last_activity: 2026-07-07
+stopped_at: "Day 28 campaign execution and Week 4 recovery drill completed successfully."
+last_updated: "2026-07-08T12:00:00.000Z"
+last_activity: 2026-07-08
 progress:
   total_phases: 6
   completed_phases: 3
@@ -31,7 +31,7 @@ See: [.planning/PROJECT.md](./PROJECT.md) (updated 2026-06-08)
 Phase: Phase 16: Continuous Reliability Campaign
 Plan: RELIABILITY_CAMPAIGN_PLAN.md
 Status: In Progress
-Last activity: 2026-07-07 -- Day 27 campaign checks completed successfully (no drift, clean backup)
+Last activity: 2026-07-08 -- Day 28 campaign checks and Week 4 recovery drill completed successfully
 
 ## Performance Metrics
 
@@ -91,7 +91,7 @@ Last activity: 2026-07-07 -- Day 27 campaign checks completed successfully (no d
 - [Q] Certify real Firecracker microVM launch and teardown over 100 iterations (Complete with Qualifications: validated on WSL2 KVM).
 - [x] Conduct comprehensive security threat model and privilege containment audit.
 - [x] Demonstrate and document independent operator verification kit reproduction (SIMULATED: automated operator simulation, not genuine third-party audit).
-- [/] Perform 30-day continuous reliability monitoring and log MTTR/failures (In Progress: Day 27 campaign checks passed).
+- [/] Perform 30-day continuous reliability monitoring and log MTTR/failures (In Progress: Day 28 campaign checks passed).
 
 ## Operational Maintenance Surface
 
@@ -104,6 +104,6 @@ Last activity: 2026-07-07 -- Day 27 campaign checks completed successfully (no d
 
 ## Session Continuity
 
-Last session: 2026-07-07
-Stopped at: Phase 16 Day 27 campaign execution completed. Next: Day 28 campaign execution and Week 4 recovery drill.
+Last session: 2026-07-08
+Stopped at: Phase 16 Day 28 campaign execution and Week 4 recovery drill completed. Next: Day 29 campaign execution.
 Resume file: .planning/STATE.md
