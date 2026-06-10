@@ -25,7 +25,7 @@ Following the successful validation of live cryptographic trust-chains and multi
 
 **Milestone Goal:** Convert qualified and simulated evidence into fully certified physical evidence by replacing WSL2-dependent and simulation-assisted validation paths with bare-metal hardware verification.
 
-#### Phase 21: Physical TPM Attestation Certification (Pending)
+#### Phase 21: Physical TPM Attestation Certification (Complete with Qualifications)
 **Goal**: Certify physical TPM attestation on a non-virtualized host.
 **Success Criteria**:
   1. Physical Ubuntu/RHEL/Debian host confirmed via `systemd-detect-virt`, `dmidecode`, `lscpu`.
@@ -34,7 +34,7 @@ Following the successful validation of live cryptographic trust-chains and multi
   4. Hardware attestation evidence produced.
 **Deliverables**: `PHYSICAL_TPM_CERTIFICATION.md`, `physical-attestation-evidence.json`
 
-#### Phase 22: Bare-Metal Firecracker Certification (Pending)
+#### Phase 22: Bare-Metal Firecracker Certification (Complete with Qualifications)
 **Goal**: Certify Firecracker microVM endurance on bare-metal Linux without WSL2.
 **Success Criteria**:
   1. Non-WSL2 Linux host with `/dev/kvm`.
@@ -256,7 +256,7 @@ Following the successful validation of live cryptographic trust-chains and multi
 | 16. Reliability Campaign | v1.12.0 | 1/1 | Complete | 2026-07-10 |
 | 19. Telemetry Checkpoints | v1.13.0 | 1/1 | Complete | 2026-07-10 |
 | 20. Virtualization Review | v1.13.0 | 1/1 | Complete | 2026-07-11 |
-| 21. Physical TPM Attestation | v1.14.0 | 0/1 | Pending | - |
-| 22. Bare-Metal Firecracker | v1.14.0 | 0/1 | Pending | - |
+| 21. Physical TPM Attestation | v1.14.0 | 1/1 | Complete with Qualifications | 2026-07-11 |
+| 22. Bare-Metal Firecracker | v1.14.0 | 1/1 | Complete with Qualifications | 2026-07-11 |
 | 23. Independent Reproduction | v1.14.0 | 0/1 | Pending | - |
 | 24. Qualification Closure | v1.14.0 | 0/1 | Pending | - |

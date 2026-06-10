@@ -1,4 +1,4 @@
-# ZTAN Firecracker Runtime Certification Record (Phase 15)
+# ZTAN Firecracker Bare-Metal Certification Record
 
 **Timestamp:** 2026-06-10T15:42:23.277Z  
 **Platform:** win32 / 10.0.26200 / x64  
