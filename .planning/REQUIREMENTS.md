@@ -44,7 +44,7 @@
 
 ---
 
-## v1.13.0 Requirements (Active)
+## v1.13.0 Requirements (Completed)
 
 ### Post-Campaign Telemetry Checkpoints (OPS-MAINT-POST)
 - [x] **OPS-MAINT-POST-01**: Define and monitor long-term operational health telemetry checkpoints.
