@@ -1,0 +1,939 @@
+{
+  "timestamp": "2026-06-10T06:31:22.443Z",
+  "total_iterations": 100,
+  "success_rate": 1,
+  "durations": {
+    "total_duration_ms": 1687346,
+    "launch": {
+      "mean_ms": 2548,
+      "p50_ms": 2256,
+      "p95_ms": 5417,
+      "p99_ms": 8504,
+      "min_ms": 1269,
+      "max_ms": 11453
+    },
+    "teardown": {
+      "mean_ms": 2,
+      "p50_ms": 1,
+      "p95_ms": 5,
+      "p99_ms": 17,
+      "min_ms": 0,
+      "max_ms": 85
+    },
+    "exec": {
+      "mean_ms": 13801,
+      "p50_ms": 12923,
+      "p95_ms": 20112,
+      "p99_ms": 26094
+    }
+  },
+  "resource_leaks": {
+    "fd_leaks": -4,
+    "memory_growth_mb": 0,
+    "cpu_usage_user_ms": 150750,
+    "cpu_usage_system_ms": 362012,
+    "orphan_processes": 0
+  },
+  "results": [
+    {
+      "iteration": 1,
+      "success": true,
+      "launchMs": 3885,
+      "teardownMs": 0,
+      "execMs": 10986,
+      "openFds": 33,
+      "nodeRssMb": 70
+    },
+    {
+      "iteration": 2,
+      "success": true,
+      "launchMs": 2500,
+      "teardownMs": 6,
+      "execMs": 17009,
+      "openFds": 33,
+      "nodeRssMb": 68
+    },
+    {
+      "iteration": 3,
+      "success": true,
+      "launchMs": 2532,
+      "teardownMs": 2,
+      "execMs": 15896,
+      "openFds": 33,
+      "nodeRssMb": 68
+    },
+    {
+      "iteration": 4,
+      "success": true,
+      "launchMs": 2168,
+      "teardownMs": 0,
+      "execMs": 10136,
+      "openFds": 33,
+      "nodeRssMb": 69
+    },
+    {
+      "iteration": 5,
+      "success": true,
+      "launchMs": 1387,
+      "teardownMs": 1,
+      "execMs": 14715,
+      "openFds": 33,
+      "nodeRssMb": 69
+    },
+    {
+      "iteration": 6,
+      "success": true,
+      "launchMs": 2157,
+      "teardownMs": 0,
+      "execMs": 10544,
+      "openFds": 33,
+      "nodeRssMb": 68
+    },
+    {
+      "iteration": 7,
+      "success": true,
+      "launchMs": 1310,
+      "teardownMs": 85,
+      "execMs": 9430,
+      "openFds": 33,
+      "nodeRssMb": 70
+    },
+    {
+      "iteration": 8,
+      "success": true,
+      "launchMs": 5832,
+      "teardownMs": 0,
+      "execMs": 12545,
+      "openFds": 33,
+      "nodeRssMb": 69
+    },
+    {
+      "iteration": 9,
+      "success": true,
+      "launchMs": 2932,
+      "teardownMs": 1,
+      "execMs": 16279,
+      "openFds": 33,
+      "nodeRssMb": 69
+    },
+    {
+      "iteration": 10,
+      "success": true,
+      "launchMs": 2568,
+      "teardownMs": 1,
+      "execMs": 12923,
+      "openFds": 33,
+      "nodeRssMb": 69
+    },
+    {
+      "iteration": 11,
+      "success": true,
+      "launchMs": 2405,
+      "teardownMs": 0,
+      "execMs": 14634,
+      "openFds": 33,
+      "nodeRssMb": 70
+    },
+    {
+      "iteration": 12,
+      "success": true,
+      "launchMs": 3355,
+      "teardownMs": 5,
+      "execMs": 20064,
+      "openFds": 33,
+      "nodeRssMb": 69
+    },
+    {
+      "iteration": 13,
+      "success": true,
+      "launchMs": 3572,
+      "teardownMs": 1,
+      "execMs": 14011,
+      "openFds": 33,
+      "nodeRssMb": 69
+    },
+    {
+      "iteration": 14,
+      "success": true,
+      "launchMs": 1702,
+      "teardownMs": 0,
+      "execMs": 14592,
+      "openFds": 33,
+      "nodeRssMb": 69
+    },
+    {
+      "iteration": 15,
+      "success": true,
+      "launchMs": 1721,
+      "teardownMs": 0,
+      "execMs": 13665,
+      "openFds": 33,
+      "nodeRssMb": 69
+    },
+    {
+      "iteration": 16,
+      "success": true,
+      "launchMs": 2067,
+      "teardownMs": 1,
+      "execMs": 12382,
+      "openFds": 33,
+      "nodeRssMb": 69
+    },
+    {
+      "iteration": 17,
+      "success": true,
+      "launchMs": 2180,
+      "teardownMs": 0,
+      "execMs": 13638,
+      "openFds": 33,
+      "nodeRssMb": 69
+    },
+    {
+      "iteration": 18,
+      "success": true,
+      "launchMs": 1761,
+      "teardownMs": 0,
+      "execMs": 12577,
+      "openFds": 33,
+      "nodeRssMb": 69
+    },
+    {
+      "iteration": 19,
+      "success": true,
+      "launchMs": 1424,
+      "teardownMs": 1,
+      "execMs": 12181,
+      "openFds": 33,
+      "nodeRssMb": 69
+    },
+    {
+      "iteration": 20,
+      "success": true,
+      "launchMs": 1721,
+      "teardownMs": 0,
+      "execMs": 12315,
+      "openFds": 33,
+      "nodeRssMb": 69
+    },
+    {
+      "iteration": 21,
+      "success": true,
+      "launchMs": 1598,
+      "teardownMs": 1,
+      "execMs": 11740,
+      "openFds": 33,
+      "nodeRssMb": 70
+    },
+    {
+      "iteration": 22,
+      "success": true,
+      "launchMs": 3106,
+      "teardownMs": 3,
+      "execMs": 13307,
+      "openFds": 33,
+      "nodeRssMb": 70
+    },
+    {
+      "iteration": 23,
+      "success": true,
+      "launchMs": 1860,
+      "teardownMs": 0,
+      "execMs": 11774,
+      "openFds": 33,
+      "nodeRssMb": 70
+    },
+    {
+      "iteration": 24,
+      "success": true,
+      "launchMs": 1927,
+      "teardownMs": 0,
+      "execMs": 13562,
+      "openFds": 33,
+      "nodeRssMb": 69
+    },
+    {
+      "iteration": 25,
+      "success": true,
+      "launchMs": 1654,
+      "teardownMs": 1,
+      "execMs": 11422,
+      "openFds": 33,
+      "nodeRssMb": 70
+    },
+    {
+      "iteration": 26,
+      "success": true,
+      "launchMs": 2306,
+      "teardownMs": 0,
+      "execMs": 11779,
+      "openFds": 33,
+      "nodeRssMb": 69
+    },
+    {
+      "iteration": 27,
+      "success": true,
+      "launchMs": 1600,
+      "teardownMs": 0,
+      "execMs": 13787,
+      "openFds": 33,
+      "nodeRssMb": 69
+    },
+    {
+      "iteration": 28,
+      "success": true,
+      "launchMs": 3167,
+      "teardownMs": 0,
+      "execMs": 24481,
+      "openFds": 33,
+      "nodeRssMb": 69
+    },
+    {
+      "iteration": 29,
+      "success": true,
+      "launchMs": 8504,
+      "teardownMs": 2,
+      "execMs": 17759,
+      "openFds": 33,
+      "nodeRssMb": 69
+    },
+    {
+      "iteration": 30,
+      "success": true,
+      "launchMs": 3339,
+      "teardownMs": 3,
+      "execMs": 15987,
+      "openFds": 33,
+      "nodeRssMb": 69
+    },
+    {
+      "iteration": 31,
+      "success": true,
+      "launchMs": 3095,
+      "teardownMs": 7,
+      "execMs": 10290,
+      "openFds": 33,
+      "nodeRssMb": 70
+    },
+    {
+      "iteration": 32,
+      "success": true,
+      "launchMs": 1489,
+      "teardownMs": 1,
+      "execMs": 12939,
+      "openFds": 33,
+      "nodeRssMb": 70
+    },
+    {
+      "iteration": 33,
+      "success": true,
+      "launchMs": 1897,
+      "teardownMs": 0,
+      "execMs": 12036,
+      "openFds": 33,
+      "nodeRssMb": 70
+    },
+    {
+      "iteration": 34,
+      "success": true,
+      "launchMs": 1339,
+      "teardownMs": 1,
+      "execMs": 12822,
+      "openFds": 33,
+      "nodeRssMb": 70
+    },
+    {
+      "iteration": 35,
+      "success": true,
+      "launchMs": 1723,
+      "teardownMs": 1,
+      "execMs": 12362,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 36,
+      "success": true,
+      "launchMs": 2114,
+      "teardownMs": 0,
+      "execMs": 12545,
+      "openFds": 33,
+      "nodeRssMb": 70
+    },
+    {
+      "iteration": 37,
+      "success": true,
+      "launchMs": 2325,
+      "teardownMs": 0,
+      "execMs": 11461,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 38,
+      "success": true,
+      "launchMs": 2382,
+      "teardownMs": 0,
+      "execMs": 14352,
+      "openFds": 33,
+      "nodeRssMb": 70
+    },
+    {
+      "iteration": 39,
+      "success": true,
+      "launchMs": 3151,
+      "teardownMs": 2,
+      "execMs": 20721,
+      "openFds": 33,
+      "nodeRssMb": 69
+    },
+    {
+      "iteration": 40,
+      "success": true,
+      "launchMs": 3415,
+      "teardownMs": 0,
+      "execMs": 9327,
+      "openFds": 33,
+      "nodeRssMb": 70
+    },
+    {
+      "iteration": 41,
+      "success": true,
+      "launchMs": 1637,
+      "teardownMs": 1,
+      "execMs": 10711,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 42,
+      "success": true,
+      "launchMs": 2511,
+      "teardownMs": 0,
+      "execMs": 12630,
+      "openFds": 33,
+      "nodeRssMb": 70
+    },
+    {
+      "iteration": 43,
+      "success": true,
+      "launchMs": 1691,
+      "teardownMs": 0,
+      "execMs": 12175,
+      "openFds": 33,
+      "nodeRssMb": 70
+    },
+    {
+      "iteration": 44,
+      "success": true,
+      "launchMs": 2313,
+      "teardownMs": 0,
+      "execMs": 14973,
+      "openFds": 33,
+      "nodeRssMb": 70
+    },
+    {
+      "iteration": 45,
+      "success": true,
+      "launchMs": 1803,
+      "teardownMs": 1,
+      "execMs": 16023,
+      "openFds": 33,
+      "nodeRssMb": 70
+    },
+    {
+      "iteration": 46,
+      "success": true,
+      "launchMs": 4647,
+      "teardownMs": 1,
+      "execMs": 14873,
+      "openFds": 33,
+      "nodeRssMb": 70
+    },
+    {
+      "iteration": 47,
+      "success": true,
+      "launchMs": 2352,
+      "teardownMs": 0,
+      "execMs": 15715,
+      "openFds": 33,
+      "nodeRssMb": 70
+    },
+    {
+      "iteration": 48,
+      "success": true,
+      "launchMs": 3200,
+      "teardownMs": 1,
+      "execMs": 20277,
+      "openFds": 33,
+      "nodeRssMb": 70
+    },
+    {
+      "iteration": 49,
+      "success": true,
+      "launchMs": 11453,
+      "teardownMs": 0,
+      "execMs": 20112,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 50,
+      "success": true,
+      "launchMs": 3982,
+      "teardownMs": 17,
+      "execMs": 29673,
+      "openFds": 33,
+      "nodeRssMb": 70
+    },
+    {
+      "iteration": 51,
+      "success": true,
+      "launchMs": 5417,
+      "teardownMs": 7,
+      "execMs": 15037,
+      "openFds": 33,
+      "nodeRssMb": 70
+    },
+    {
+      "iteration": 52,
+      "success": true,
+      "launchMs": 2256,
+      "teardownMs": 1,
+      "execMs": 14913,
+      "openFds": 33,
+      "nodeRssMb": 70
+    },
+    {
+      "iteration": 53,
+      "success": true,
+      "launchMs": 1755,
+      "teardownMs": 1,
+      "execMs": 13092,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 54,
+      "success": true,
+      "launchMs": 2710,
+      "teardownMs": 1,
+      "execMs": 15653,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 55,
+      "success": true,
+      "launchMs": 2322,
+      "teardownMs": 1,
+      "execMs": 14456,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 56,
+      "success": true,
+      "launchMs": 2947,
+      "teardownMs": 1,
+      "execMs": 12889,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 57,
+      "success": true,
+      "launchMs": 2023,
+      "teardownMs": 1,
+      "execMs": 13972,
+      "openFds": 33,
+      "nodeRssMb": 72
+    },
+    {
+      "iteration": 58,
+      "success": true,
+      "launchMs": 2871,
+      "teardownMs": 0,
+      "execMs": 11062,
+      "openFds": 33,
+      "nodeRssMb": 72
+    },
+    {
+      "iteration": 59,
+      "success": true,
+      "launchMs": 1794,
+      "teardownMs": 1,
+      "execMs": 12439,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 60,
+      "success": true,
+      "launchMs": 2825,
+      "teardownMs": 1,
+      "execMs": 13141,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 61,
+      "success": true,
+      "launchMs": 1906,
+      "teardownMs": 0,
+      "execMs": 14831,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 62,
+      "success": true,
+      "launchMs": 2545,
+      "teardownMs": 0,
+      "execMs": 12216,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 63,
+      "success": true,
+      "launchMs": 1269,
+      "teardownMs": 1,
+      "execMs": 13501,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 64,
+      "success": true,
+      "launchMs": 2286,
+      "teardownMs": 0,
+      "execMs": 10308,
+      "openFds": 33,
+      "nodeRssMb": 72
+    },
+    {
+      "iteration": 65,
+      "success": true,
+      "launchMs": 1592,
+      "teardownMs": 0,
+      "execMs": 12851,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 66,
+      "success": true,
+      "launchMs": 2659,
+      "teardownMs": 1,
+      "execMs": 12357,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 67,
+      "success": true,
+      "launchMs": 1980,
+      "teardownMs": 0,
+      "execMs": 14504,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 68,
+      "success": true,
+      "launchMs": 2376,
+      "teardownMs": 1,
+      "execMs": 11366,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 69,
+      "success": true,
+      "launchMs": 1534,
+      "teardownMs": 1,
+      "execMs": 26094,
+      "openFds": 33,
+      "nodeRssMb": 70
+    },
+    {
+      "iteration": 70,
+      "success": true,
+      "launchMs": 2588,
+      "teardownMs": 1,
+      "execMs": 14366,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 71,
+      "success": true,
+      "launchMs": 2487,
+      "teardownMs": 0,
+      "execMs": 11786,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 72,
+      "success": true,
+      "launchMs": 1564,
+      "teardownMs": 1,
+      "execMs": 13317,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 73,
+      "success": true,
+      "launchMs": 2265,
+      "teardownMs": 0,
+      "execMs": 11948,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 74,
+      "success": true,
+      "launchMs": 1481,
+      "teardownMs": 1,
+      "execMs": 12927,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 75,
+      "success": true,
+      "launchMs": 2984,
+      "teardownMs": 0,
+      "execMs": 18991,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 76,
+      "success": true,
+      "launchMs": 6926,
+      "teardownMs": 0,
+      "execMs": 18721,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 77,
+      "success": true,
+      "launchMs": 7101,
+      "teardownMs": 0,
+      "execMs": 15522,
+      "openFds": 33,
+      "nodeRssMb": 72
+    },
+    {
+      "iteration": 78,
+      "success": true,
+      "launchMs": 2653,
+      "teardownMs": 1,
+      "execMs": 14703,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 79,
+      "success": true,
+      "launchMs": 2518,
+      "teardownMs": 0,
+      "execMs": 14147,
+      "openFds": 33,
+      "nodeRssMb": 72
+    },
+    {
+      "iteration": 80,
+      "success": true,
+      "launchMs": 2099,
+      "teardownMs": 0,
+      "execMs": 11659,
+      "openFds": 33,
+      "nodeRssMb": 72
+    },
+    {
+      "iteration": 81,
+      "success": true,
+      "launchMs": 1826,
+      "teardownMs": 1,
+      "execMs": 10326,
+      "openFds": 33,
+      "nodeRssMb": 72
+    },
+    {
+      "iteration": 82,
+      "success": true,
+      "launchMs": 1744,
+      "teardownMs": 1,
+      "execMs": 7549,
+      "openFds": 33,
+      "nodeRssMb": 73
+    },
+    {
+      "iteration": 83,
+      "success": true,
+      "launchMs": 1492,
+      "teardownMs": 1,
+      "execMs": 17748,
+      "openFds": 33,
+      "nodeRssMb": 72
+    },
+    {
+      "iteration": 84,
+      "success": true,
+      "launchMs": 2118,
+      "teardownMs": 2,
+      "execMs": 10712,
+      "openFds": 33,
+      "nodeRssMb": 72
+    },
+    {
+      "iteration": 85,
+      "success": true,
+      "launchMs": 1469,
+      "teardownMs": 0,
+      "execMs": 12477,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 86,
+      "success": true,
+      "launchMs": 1845,
+      "teardownMs": 0,
+      "execMs": 13385,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 87,
+      "success": true,
+      "launchMs": 1361,
+      "teardownMs": 1,
+      "execMs": 12510,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 88,
+      "success": true,
+      "launchMs": 2671,
+      "teardownMs": 1,
+      "execMs": 10257,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 89,
+      "success": true,
+      "launchMs": 1427,
+      "teardownMs": 1,
+      "execMs": 11749,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 90,
+      "success": true,
+      "launchMs": 2093,
+      "teardownMs": 1,
+      "execMs": 11200,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 91,
+      "success": true,
+      "launchMs": 1296,
+      "teardownMs": 0,
+      "execMs": 11723,
+      "openFds": 33,
+      "nodeRssMb": 72
+    },
+    {
+      "iteration": 92,
+      "success": true,
+      "launchMs": 1565,
+      "teardownMs": 0,
+      "execMs": 11422,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 93,
+      "success": true,
+      "launchMs": 2530,
+      "teardownMs": 1,
+      "execMs": 11818,
+      "openFds": 33,
+      "nodeRssMb": 72
+    },
+    {
+      "iteration": 94,
+      "success": true,
+      "launchMs": 2223,
+      "teardownMs": 0,
+      "execMs": 15484,
+      "openFds": 33,
+      "nodeRssMb": 72
+    },
+    {
+      "iteration": 95,
+      "success": true,
+      "launchMs": 2274,
+      "teardownMs": 1,
+      "execMs": 13921,
+      "openFds": 33,
+      "nodeRssMb": 71
+    },
+    {
+      "iteration": 96,
+      "success": true,
+      "launchMs": 1777,
+      "teardownMs": 1,
+      "execMs": 12848,
+      "openFds": 33,
+      "nodeRssMb": 72
+    },
+    {
+      "iteration": 97,
+      "success": true,
+      "launchMs": 2484,
+      "teardownMs": 0,
+      "execMs": 13215,
+      "openFds": 33,
+      "nodeRssMb": 72
+    },
+    {
+      "iteration": 98,
+      "success": true,
+      "launchMs": 2269,
+      "teardownMs": 1,
+      "execMs": 12477,
+      "openFds": 33,
+      "nodeRssMb": 72
+    },
+    {
+      "iteration": 99,
+      "success": true,
+      "launchMs": 2267,
+      "teardownMs": 1,
+      "execMs": 12864,
+      "openFds": 33,
+      "nodeRssMb": 72
+    },
+    {
+      "iteration": 100,
+      "success": true,
+      "launchMs": 1531,
+      "teardownMs": 1,
+      "execMs": 11487,
+      "openFds": 33,
+      "nodeRssMb": 72
+    }
+  ]
+}

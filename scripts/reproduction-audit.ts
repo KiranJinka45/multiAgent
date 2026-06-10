@@ -1,6 +1,7 @@
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
+import os from 'node:os';
 
 /**
  * ZTAN REPRODUCTION AUDIT (NUCLEAR CLEAN DRILL)
@@ -59,21 +60,12 @@ interface RecoveryMetric {
 function killStaleProcesses() {
     if (process.platform !== 'win32') return;
     
-    console.log('   - Terminating locking processes (esbuild, node, pnpm, npm, git)...');
-    const targets = ['esbuild.exe', 'node.exe', 'git.exe'];
-    const currentPid = process.pid;
+    console.log('   - Terminating locking processes (esbuild, git)...');
+    const targets = ['esbuild.exe', 'git.exe'];
 
     for (const target of targets) {
         try {
-            if (target === 'node.exe') {
-                const output = execSync(`wmic process where "name='node.exe' and ProcessId<>${currentPid}" get ProcessId`, { encoding: 'utf8' });
-                const pids = output.split('\n').map(l => l.trim()).filter(l => l && !isNaN(Number(l)));
-                for (const pid of pids) {
-                    execSync(`taskkill /F /PID ${pid} /T`, { stdio: 'ignore' });
-                }
-            } else {
-                execSync(`taskkill /F /IM ${target} /T`, { stdio: 'ignore' });
-            }
+            execSync(`taskkill /F /IM ${target} /T`, { stdio: 'ignore' });
         } catch (e) {
             // Process not found or access denied
         }
@@ -297,7 +289,6 @@ function recordMetrics(metric: RecoveryMetric) {
  * Captures the environment fingerprint for this runner context.
  */
 function getEnvFingerprint() {
-    const os = require('node:os');
     let pnpm = 'unknown';
     try {
         pnpm = execSync('pnpm -v', { encoding: 'utf8' }).trim();

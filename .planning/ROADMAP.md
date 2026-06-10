@@ -6,6 +6,7 @@ Following the successful validation of live cryptographic trust-chains and multi
 
 ## Milestones
 
+- 🚧 **v1.12.0 Physical Runtime & Operational Verification** - Phases 13-18 (in progress)
 - ✅ **v1.11.0 Maintenance, Debt Reduction & Portability Validation** - Phases 8-12 (Shipped: 2026-06-08)
 - ✅ **v1.10.0 Operational Certification & Reproducibility Validation** - Phases 3-7 (Shipped: 2026-06-08)
 - ✅ **v1.9.0 Real Rekor Interoperability & Portability Validation** - Phases A-B, 1-2 (Shipped: 2026-06-04)
@@ -14,6 +15,51 @@ Following the successful validation of live cryptographic trust-chains and multi
 - ✅ **v1.6.0 Stewardship Engineering Era** - (Shipped: 2026-05-26)
 
 ## Phases
+
+### 🚧 v1.12.0 Physical Runtime & Operational Verification (In Progress)
+
+**Milestone Goal:** Address environment-dependent and simulation-assisted validation paths by certifying physical host execution, multi-node Redis Sentinel chaos, real Firecracker VM execution, security posture audits, 30-day continuous reliability, and independent third-party reproduction.
+
+#### Phase 13: Physical Runtime Certification
+**Goal**: Validate execution on a confirmed physical non-virtualized Linux host with active TPM quote verification.
+**Success Criteria**:
+  1. Host OS: Confirmed physical non-virtualized Ubuntu/RHEL/Debian install (verified via `systemd-detect-virt`, `dmidecode`, `lscpu`).
+  2. `/dev/kvm` and `/dev/tpm0` exist and are accessible.
+  3. TPM quote is successfully generated via real TPM 2.0 command `tpm2_quote` and verified.
+  4. Structured hardware attestation file generated.
+
+#### Phase 14: Real Sentinel Chaos Testing
+**Goal**: Validate active lease-fencing state recovery and fail-closed posture under actual multi-node Sentinel quorum loss.
+**Success Criteria**:
+  1. Runs with 3 Sentinel and 3 Redis nodes.
+  2. Verifies failover, leader election, and lease fencing under real network partition/outage, without proxy simulation or mock fallbacks.
+
+#### Phase 15: Physical Firecracker Runtime Certification (Complete with Qualifications)
+**Goal**: Verify Firecracker microVM launching, guest command execution, vsock connectivity, and teardown under 100 consecutive iterations.
+**Success Criteria**:
+  1. VM executes commands and returns output via vsock.
+  2. 100 consecutive launches execute successfully without process or VM leaks.
+  3. Outputs statistical metrics: `success_rate`, `mean_launch_ms`, `p95_launch_ms`, `mean_teardown_ms`, and `resource_leaks` (memory, CPU, and file descriptor growth).
+
+#### Phase 17: Security Posture Audit (Complete)
+**Goal**: Perform comprehensive threat model and privilege containment audit.
+**Success Criteria**:
+  1. Reviews privileged containers, host mounts, KVM/TPM access, and mock bypass paths.
+  2. Audit covers supply chain security, dependency trust, container escape paths, secret management, SBOM review, and container image signing verification.
+  3. Produces `THREAT_MODEL.md` and `SECURITY_REVIEW.md`.
+
+#### Phase 18: Independent Reproducibility Audit (Complete — Simulated Operator)
+**Goal**: Demonstrate third-party operators can reproduce deployment and verification using the verification kit.
+**Success Criteria**:
+  1. Independent operator runs verify-kit and validates release evidence.
+  2. Audited under strict constraints: fresh machine/environment, no repository write access, and zero author assistance.
+  3. Produces `THIRD_PARTY_REPRODUCTION_REPORT.md`.
+
+#### Phase 16: Continuous Reliability Campaign (In Progress)
+**Goal**: Run 30-day longitudinal reliability tracking.
+**Success Criteria**:
+  1. Monitors daily drift, daily backup drills, and weekly recovery.
+  2. Logs MTTR, failures, and false positives.
 
 <details>
 <summary>✅ v1.11.0 Maintenance, Debt Reduction & Portability Validation (Phases 8-12) - SHIPPED 2026-06-08</summary>
@@ -135,3 +181,10 @@ Following the successful validation of live cryptographic trust-chains and multi
 | 10. Drift Prevention | v1.11.0 | 1/1 | Complete | 2026-06-08 |
 | 11. Backup Corruption | v1.11.0 | 1/1 | Complete | 2026-06-08 |
 | 12. Sentinel Resilience | v1.11.0 | 1/1 | Complete | 2026-06-08 |
+| 13. Physical Runtime | v1.12.0 | 1/1 | Complete with Qualifications | 2026-06-08 |
+| 14. Sentinel Chaos | v1.12.0 | 1/1 | Complete | 2026-06-09 |
+| 15. Firecracker Runtime | v1.12.0 | 1/1 | Complete with Qualifications | 2026-06-10 |
+| 17. Security Audit | v1.12.0 | 1/1 | Complete | 2026-06-10 |
+| 18. Independent Repro | v1.12.0 | 1/1 | Complete (Simulated Operator) | 2026-06-10 |
+| 16. Reliability Campaign | v1.12.0 | 0/1 | In Progress | - |
+

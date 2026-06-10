@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-08T10:24:05.840Z",
+  "timestamp": "2026-06-10T04:32:58.856Z",
   "host": {
     "platform": "win32",
     "release": "10.0.26200",
@@ -19,7 +19,7 @@
     {
       "stage": "Vector Generation",
       "success": true,
-      "output": "=== ZTAN v1.5 Ground-Truth Vector Generator ===\n\n[1/6] Running DKG (2-of-3)...\n  Master PK: b369e38426b0c3f81d630ec80080b857...\n[2/6] Message Hash: edbd8772c45ff97a026391582efcddba...\n[3/6] Signing with 2 shares...\n  Node Auditor-A (idx=1): 828430ff76e4980c6107cb8b485a6fc6...\n  Node Auditor-B (idx=2): b123f2254868383ac9228ff042207831...\n[4/6] Aggregating 2 partial signatures...\n  Aggregate: 901cc6347781a11d402b6f8ccb2c1489...\n[5/6] Verifying against master PK...\n  Result: ✅ VALID\n[6/6] Computing canonical binding payload...\n  Canonical Layout: 000000134345522d564543544f522d47454e2d32303236000000020000009089...\n  Binding Hash: 44a0c42df81ced5b5192e705dd4ea6f3bc118b6b3429743fd54e28f92e2f832b\n\n✅ Vectors written to: C:\\multiagentic_project\\multiAgent-main\\verify-kit\\v1.5\\vectors.json\n✅ Bundle written to:  C:\\multiagentic_project\\multiAgent-main\\verify-kit\\v1.5\\bundle.json\n\nTo cross-validate with Python:\n  python verify-kit/v1.5/verify.py --test verify-kit/v1.5/vectors.json\n  python verify-kit/v1.5/verify.py --bundle verify-kit/v1.5/bundle.json"
+      "output": "=== ZTAN v1.5 Ground-Truth Vector Generator ===\n\n[1/6] Running DKG (2-of-3)...\n  Master PK: 897c8f6409a15e39a8a174b62452b04b...\n[2/6] Message Hash: edbd8772c45ff97a026391582efcddba...\n[3/6] Signing with 2 shares...\n  Node Auditor-A (idx=1): 83eda8060d715a8d89c3e6fc73e49fd9...\n  Node Auditor-B (idx=2): 875ab9ce602d182b88921e347444e395...\n[4/6] Aggregating 2 partial signatures...\n  Aggregate: 973b2cdf647374199f780985d960a736...\n[5/6] Verifying against master PK...\n  Result: ✅ VALID\n[6/6] Computing canonical binding payload...\n  Canonical Layout: 000000134345522d564543544f522d47454e2d32303236000000020000009091...\n  Binding Hash: 7e64f76abba20c27376caef705b62f7ab9a1e0c802dbd92ec2ab58eceb87618e\n\n✅ Vectors written to: C:\\multiagentic_project\\multiAgent-main\\verify-kit\\v1.5\\vectors.json\n✅ Bundle written to:  C:\\multiagentic_project\\multiAgent-main\\verify-kit\\v1.5\\bundle.json\n\nTo cross-validate with Python:\n  python verify-kit/v1.5/verify.py --test verify-kit/v1.5/vectors.json\n  python verify-kit/v1.5/verify.py --bundle verify-kit/v1.5/bundle.json"
     },
     {
       "stage": "Python Test Vector Verification",

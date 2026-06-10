@@ -1,0 +1,41 @@
+{
+  "timestamp": "2026-06-10T06:02:15.682Z",
+  "host": {
+    "platform": "linux",
+    "release": "6.6.87.2-microsoft-standard-WSL2",
+    "arch": "x64",
+    "cpus": 12,
+    "totalMemoryGb": "15.38"
+  },
+  "virtualization": {
+    "kvmExists": true,
+    "kvmWritable": true,
+    "firecrackerPath": "/usr/local/bin/firecracker",
+    "jailerPath": "/usr/local/bin/jailer",
+    "microVmSpawned": true,
+    "guestCommandOutput": "Hello from true Firecracker isolated microVM! Kernel: 4.14.174",
+    "executionTimeMs": 17050,
+    "vmCleanupSuccess": true
+  },
+  "tpm": {
+    "tpmDeviceExists": false,
+    "attestationMode": "SIMULATED",
+    "nonce": "65fd9e74ca6d3e6573372bfc856c8412a320fa632a06f908213f6ca370fcbdeb",
+    "quoteBase64": "eyJtYWdpYyI6IkZGNTQ0MzQ3IiwidHlwZSI6IlRQTV9TVF9BVFRFU1RfUVVPVEUiLCJub25jZSI6IjY1ZmQ5ZTc0Y2E2ZDNlNjU3MzM3MmJmYzg1NmM4NDEyYTMyMGZhNjMyYTA2ZjkwODIxM2Y2Y2EzNzBmY2JkZWIiLCJwY3JEaWdlc3QiOiJmZjRjNmExZjllYWI2YmZmMWNkMmFhNzAwNjc1OTgyNjEyZjBjNjllZjYxMTYxMzNhMGY0ODlhOWQ5OTUzMmRhIn0=",
+    "signatureBase64": "C2BfGeRvzFNLpkmFKfY5bCTfaxVHBBVjY+wX2eFFPqQishmFeGEuB+O9wSCILBEX0rIvElYK0XDu9jv0S3VD6junxD6ltso1oNer5bTE3rsukGUC9X2CHaV8gw0muvSqkWg9ltqOU4i30xKnFuFV3G/s5ZxltqZzxnE0DRK/YLDRp056K3uUG05fBCg5NiZnyxdY3EK9qTStdEUMg6U1jse6gMu8uufGGNd/5p94Xy6n7gjlWN90Pm0ZFl6uJRU+7u05ODVBhGhxVrzA18QmRCvYJVugXJf8QMsx0n7xI3RN5dusWgy+C5f3jpZu78/x0kmvcfriR19bw3yP7IlT+w==",
+    "pcrValues": {
+      "0": "e4e06e4a0053362c00510c4eff5c9797c76b0e2d236c966378c6b74220dcf1c9",
+      "7": "5e4311ee3d5d5d386f1a6a59edb321545be255dbd128fe668b20c3643f29ed4a",
+      "10": "94fb09e99836f3d77bf8a3d0fc058421d917778bc5cd652638f1236ea43eed19"
+    },
+    "verified": true
+  },
+  "verdict": "PARTIAL_WSL_CERTIFIED",
+  "firecracker_version": "Firecracker v1.7.0",
+  "launch_duration_ms": 4872,
+  "vsock_command": "echo \"Hello from true Firecracker isolated microVM! Kernel: $(uname -r)\"",
+  "vsock_response": "Hello from true Firecracker isolated microVM! Kernel: 4.14.174",
+  "guest_kernel": "4.14.174",
+  "teardown_duration_ms": 17,
+  "orphan_processes": 0
+}

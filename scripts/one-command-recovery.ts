@@ -49,13 +49,12 @@ async function runRecovery() {
         // 5. Service Warmup
         console.log('\n🔥 STEP 5: Service Warmup...');
         console.log('   - Building services (Parallel)...');
-        // We use pnpm's built-in filtering and concurrency
-        execSync('pnpm --filter "@packages/api-gateway..." --filter "frontend..." run build', { stdio: 'inherit' });
+        execSync('pnpm run build', { stdio: 'inherit' });
 
         // 6. Verification
         console.log('\n✅ STEP 6: Final Verification...');
         console.log('   - Running Gateway smoke tests...');
-        execSync('pnpm exec vitest run packages/api-gateway/test/smoke.test.ts', { stdio: 'inherit' });
+        execSync('pnpm run test:smoke', { stdio: 'inherit' });
 
         console.log('\n✨ RECOVERY COMPLETE: ZTAN is operational.');
     } catch (err) {

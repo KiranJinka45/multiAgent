@@ -1,0 +1,17 @@
+{
+  "timestamp": "2026-06-10T05:27:30.000Z",
+  "overallPassed": true,
+  "faultDetected": true,
+  "recoverySucceeded": true,
+  "metrics": {
+    "replayAmplification": 3,
+    "queueDebt": 0,
+    "recoveryLatencyMs": 574.81,
+    "walExpansionBytes": 13208,
+    "resourceRebound": {
+      "handles": 20,
+      "establishedSockets": 9
+    },
+    "memoryFragmentationRatio": 0.5774
+  }
+}

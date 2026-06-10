@@ -413,6 +413,8 @@ const redisConfig: any = {
     maxRetriesPerRequest: null,
     enableReadyCheck: false,
     autoResubscribe: true,
+    commandTimeout: process.env.REDIS_COMMAND_TIMEOUT ? parseInt(process.env.REDIS_COMMAND_TIMEOUT, 10) : undefined,
+    enableOfflineQueue: process.env.REDIS_ENABLE_OFFLINE_QUEUE !== 'false',
     retryStrategy(times: number) {
         return Math.min(times * 200, 10000);
     }

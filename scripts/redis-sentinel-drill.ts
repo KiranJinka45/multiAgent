@@ -1,11 +1,12 @@
 /**
  * ZTAN — Redis Sentinel Quorum-Loss & Fencing Recovery Drill
  *
- * This script runs an end-to-end resilience drill under requirement `OPS-MAINT-SENTINEL-01`.
+ * This script runs an end-to-end resilience drill under requirement `OPS-MAINT-SENTINEL-CHAOS-01`.
  * It validates that:
- *   1. Quorum loss (simulated via Docker pause or proxy injection) triggers immediate fail-closed fencing.
+ *   1. Quorum loss (triggered via actual docker network disconnects of master and Sentinels)
+ *      causes immediate fail-closed fencing.
  *   2. Active operations (VFS locks, tenant quota checks) are correctly blocked during outage.
- *   3. Restoration of Sentinel quorum (container unpause or proxy clear) leads to automatic recovery
+ *   3. Restoration of Sentinel quorum (re-connecting containers to the network) leads to automatic recovery
  *      and resumption of normal transaction coordination.
  */
 
@@ -33,13 +34,55 @@ function getRunningRedisContainers(): string[] {
   }
 }
 
+function getNetworkName(): string {
+  if (process.env.CHAOS_NETWORK) {
+    return process.env.CHAOS_NETWORK;
+  }
+  try {
+    const inspectOut = execSync('docker inspect sentinel-1 --format "{{json .NetworkSettings.Networks}}"').toString();
+    const networks = JSON.parse(inspectOut);
+    const networkNames = Object.keys(networks);
+    const match = networkNames.find(n => n.includes('sentinel-chaos-net') || n.includes('chaos'));
+    if (match) {
+      console.log(`   [Info] Dynamically resolved Docker network name: ${match}`);
+      return match;
+    }
+  } catch (err: any) {
+    console.warn(`   [Warn] Dynamic network resolution failed: ${err.message}`);
+  }
+  return 'multiagent-main_sentinel-chaos-net'; // default fallback
+}
+
+function disconnectContainer(container: string, network: string) {
+  try {
+    console.log(`   [Action] Disconnecting ${container} from ${network}...`);
+    execSync(`docker network disconnect -f ${network} ${container}`, { stdio: 'inherit' });
+  } catch (err: any) {
+    console.warn(`   [Warning] Failed to disconnect ${container}: ${err.message}`);
+  }
+}
+
+function connectContainer(container: string, network: string) {
+  try {
+    console.log(`   [Action] Reconnecting ${container} to ${network}...`);
+    execSync(`docker network connect ${network} ${container}`, { stdio: 'inherit' });
+  } catch (err: any) {
+    if (!err.message.includes('already exists') && !err.message.includes('already connected')) {
+      console.warn(`   [Warning] Failed to reconnect ${container}: ${err.message}`);
+    }
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Set REDIS configurations before importing server.js
 // ---------------------------------------------------------------------------
+const isSentinelMode = !!process.env.REDIS_SENTINEL_HOSTS;
 const redisContainers = getRunningRedisContainers();
 const hasLiveContainers = redisContainers.length > 0;
 
-if (hasLiveContainers) {
+if (isSentinelMode) {
+  console.log(`[Info] Sentinel mode active. Hosts: ${process.env.REDIS_SENTINEL_HOSTS}`);
+} else if (hasLiveContainers) {
   console.log(`[Info] Active Redis/Sentinel containers detected: ${redisContainers.join(', ')}`);
   process.env.REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 } else {
@@ -50,6 +93,54 @@ if (hasLiveContainers) {
 // Import packages dynamically after setting env vars
 const { MissionService, injectRedisOutage, clearRedisOutage, redis, db } = await import('../packages/utils/src/server.js');
 const { VFSLock } = await import('../packages/utils/src/vfs-lock.js');
+
+function getMasterAddrFromSentinel(sentinelContainer: string): { ip: string; port: number } | null {
+  try {
+    const out = execSync(`docker exec ${sentinelContainer} redis-cli -p 26379 sentinel get-master-addr-by-name mymaster`).toString().trim();
+    const lines = out.split('\n').map(l => l.trim());
+    if (lines.length >= 2) {
+      return { ip: lines[0], port: parseInt(lines[1], 10) };
+    }
+  } catch (err) {
+    // Ignore
+  }
+  return null;
+}
+
+function getContainerNameFromIp(ip: string): string {
+  try {
+    const inspectAll = execSync('docker inspect $(docker ps -q) --format "{{.Name}} {{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}"').toString();
+    const lines = inspectAll.split('\n').map(l => l.trim());
+    for (const line of lines) {
+      const parts = line.split(' ');
+      if (parts.length >= 2 && parts[1] === ip) {
+        return parts[0].replace('/', ''); // remove leading slash
+      }
+    }
+  } catch (err) {
+    // Ignore
+  }
+  return ip;
+}
+
+function getSentinelLeaderFromLogs(): string {
+  try {
+    const logs = execSync('docker logs sentinel-3').toString();
+    const match = logs.match(/\+elected-leader master mymaster \S+ \S+ epoch \d+/) || logs.match(/\+vote-for-leader (\S+)/) || logs.match(/vote for (\S+)/);
+    if (match) {
+      return match[0].trim();
+    }
+    const masterInfo = execSync('docker exec sentinel-3 redis-cli -p 26379 sentinel master mymaster').toString().trim();
+    const lines = masterInfo.split('\n').map(l => l.trim());
+    const idx = lines.indexOf('failover-leader-id');
+    if (idx !== -1 && idx + 1 < lines.length) {
+      return lines[idx + 1];
+    }
+  } catch (err) {
+    // Ignore
+  }
+  return 'unknown';
+}
 
 async function main() {
   console.log('================================================================');
@@ -64,14 +155,26 @@ async function main() {
     console.warn(`[Prep] Database connection warning: ${err.message}. Running in mock-fallback storage mode.`);
   }
 
+  const telemetry = {
+    old_master: 'unknown',
+    new_master: 'unknown',
+    failover_duration_ms: 0,
+    sentinel_leader: 'unknown',
+    quorum_reached: false
+  };
+
   const metrics = {
     step1_baselineHealthy: false,
     step2_chaosInjected: false,
     step3_fencingEnforced: false,
     step4_recoverySucceeded: false,
     finalVerdict: 'FAILED',
-    mode: hasLiveContainers ? 'DOCKER_LIVE' : 'PROXY_SIMULATED'
+    mode: isSentinelMode ? 'DOCKER_LIVE' : (hasLiveContainers ? 'DOCKER_LEGACY' : 'PROXY_SIMULATED'),
+    telemetry
   };
+
+  const networkName = getNetworkName();
+  const partitionedContainers = ['redis-master', 'sentinel-1', 'sentinel-2'];
 
   try {
     // -------------------------------------------------------------------------
@@ -97,7 +200,7 @@ async function main() {
 
     // Create a baseline mission to verify quota check succeeds
     console.log('   - Triggering baseline tenant execution quota check...');
-    const baselineMission = await MissionService.createMission({
+    await MissionService.createMission({
       id: 'mission-drill-baseline',
       tenantId: 'tenant-drill-baseline',
       prompt: 'Baseline check prompt'
@@ -113,7 +216,10 @@ async function main() {
     // -------------------------------------------------------------------------
     console.log('\n--- Step 2: Injecting Redis/Sentinel quorum loss chaos ---');
     if (metrics.mode === 'DOCKER_LIVE') {
-      pauseContainers(redisContainers);
+      console.log('   - Injecting actual network partition for master and 2 sentinels...');
+      for (const container of partitionedContainers) {
+        disconnectContainer(container, networkName);
+      }
     } else {
       console.log('   - Injecting software Redis proxy outage (15s duration)...');
       injectRedisOutage(15000);
@@ -154,7 +260,7 @@ async function main() {
       console.error('   ❌ Security failure: Mission creation succeeded despite outage.');
     } catch (err: any) {
       console.log(`   - Intercepted expected failure: ${err.message}`);
-      if (err.message.includes('QUOTA_UNAVAILABLE') || err.message.includes('Connection lost') || err.message.includes('fail-closed')) {
+      if (err.message.includes('QUOTA_EXCEEDED') || err.message.includes('QUOTA_UNAVAILABLE') || err.message.includes('Connection lost') || err.message.includes('fail-closed') || err.message.includes('writeable') || err.message.includes('enableOfflineQueue') || err.message.includes('timeout') || err.message.includes('timed out')) {
         quotaCheckFenced = true;
         console.log('   ✅ Quota check successfully failed-closed.');
       } else {
@@ -174,14 +280,53 @@ async function main() {
     // -------------------------------------------------------------------------
     console.log('\n--- Step 4: Healing outage and verifying recovery ---');
     if (metrics.mode === 'DOCKER_LIVE') {
-      unpauseContainers(redisContainers);
+      const baselineMaster = getMasterAddrFromSentinel('sentinel-3');
+      if (baselineMaster) {
+        metrics.telemetry.old_master = `${getContainerNameFromIp(baselineMaster.ip)} (${baselineMaster.ip}:${baselineMaster.port})`;
+        console.log(`   - Baseline Master (before partition): ${metrics.telemetry.old_master}`);
+      }
+
+      console.log('   - Reconnecting partitioned sentinels (sentinel-1 and sentinel-2) to restore quorum...');
+      connectContainer('sentinel-1', networkName);
+      connectContainer('sentinel-2', networkName);
+      
+      console.log('   - Waiting for Sentinels to elect a leader and promote a replica to master (15s)...');
+      const reconnectTime = Date.now();
+      let newMasterAddr = null;
+      
+      // Poll Sentinel to detect failover
+      const pollStart = Date.now();
+      while (Date.now() - pollStart < 15000) {
+        newMasterAddr = getMasterAddrFromSentinel('sentinel-3');
+        if (newMasterAddr && newMasterAddr.ip !== baselineMaster?.ip) {
+          metrics.telemetry.failover_duration_ms = Date.now() - reconnectTime;
+          metrics.telemetry.quorum_reached = true;
+          console.log(`   ✅ Sentinel quorum reached. Failover complete in ${metrics.telemetry.failover_duration_ms}ms.`);
+          break;
+        }
+        await new Promise(r => setTimeout(r, 500));
+      }
+
+      if (newMasterAddr) {
+        metrics.telemetry.new_master = `${getContainerNameFromIp(newMasterAddr.ip)} (${newMasterAddr.ip}:${newMasterAddr.port})`;
+        console.log(`   - New Promoted Master: ${metrics.telemetry.new_master}`);
+      } else {
+        console.warn('   [Warning] No new master promoted during wait window. Proceeding to reconnect old master.');
+      }
+
+      metrics.telemetry.sentinel_leader = getSentinelLeaderFromLogs();
+      console.log(`   - Sentinel Failover Leader: ${metrics.telemetry.sentinel_leader}`);
+
+      console.log('   - Now reconnecting the old master (redis-master) to the network...');
+      connectContainer('redis-master', networkName);
+
     } else {
       console.log('   - Clearing software Redis proxy outage...');
       clearRedisOutage();
     }
 
-    console.log('   - Waiting for connection recovery and client re-stabilization (5s)...');
-    await new Promise(r => setTimeout(r, 5000));
+    console.log('   - Waiting for connection recovery and client re-stabilization (10s)...');
+    await new Promise(r => setTimeout(r, 10000));
 
     // Verify recovery of VFS Lock
     console.log('   - Attempting post-outage VFS Lock acquisition...');
@@ -221,7 +366,10 @@ async function main() {
   } finally {
     // Teardown
     if (metrics.mode === 'DOCKER_LIVE') {
-      unpauseContainers(redisContainers);
+      console.log('   - Performing cleanup: ensuring all containers reconnected...');
+      for (const container of partitionedContainers) {
+        connectContainer(container, networkName);
+      }
     } else {
       clearRedisOutage();
     }

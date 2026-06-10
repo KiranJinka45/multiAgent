@@ -34,16 +34,29 @@ Nexus ZTAN is an auditable, production-oriented research platform designed for l
 - ✓ **SEC-01**: Poisoned log and desynchronized replay history quarantine — v1.6.0
 - ✓ **PEM-01/02**: Rekor PEM key decoding & submission validation — v1.8.0 (Phase 5)
 
-## Current Milestone: v1.11.0 Maintenance, Debt Reduction & Portability Validation
+## Current Milestone: v1.12.0 Physical Runtime & Operational Verification (In Progress)
+
+**Goal:** Address environment-dependent and simulation-assisted validation paths by certifying physical host execution, multi-node Redis Sentinel chaos, real Firecracker VM execution, security posture audits, 30-day continuous reliability, and independent third-party reproduction.
+
+**Target features (Active):**
+- **OPS-MAINT-13**: Physical host runtime certification (Physical KVM, TPM, vsock command execution, and real attestation - qualified under WSL2 KVM).
+- **OPS-MAINT-14**: Real multi-node Redis Sentinel chaos testing (actual quorum loss, leader election, and lease fencing).
+- **OPS-MAINT-15**: Physical Firecracker runtime resilience (leak validation over 100 consecutive microVM launches - qualified under WSL2 KVM).
+- **OPS-MAINT-16**: Continuous 30-day reliability campaign (drift/backup/recovery drills longitudinal analysis - In Progress).
+- **OPS-MAINT-17**: Security posture threat model and privileged containers/mounts audit.
+- **OPS-MAINT-18**: Independent third-party reproduction audit.
+
+## Completed Milestone: v1.11.0 Maintenance, Debt Reduction & Portability Validation (Completed: 2026-06-08)
 
 **Goal:** Focus on platform stabilization, warning-debt reduction, independent bare-metal host validation, drift detection, and resilience drills.
 
-**Target features:**
+**Target features (All Completed & Verified):**
 - **OPS-MAINT-01**: Resolve implicit `any` types and unused variables across the workspace packages.
 - **OPS-MAINT-02**: Validate the reproducibility verification kit on a physical bare-metal host.
 - **OPS-MAINT-03**: Implement periodic reproducibility checks to prevent drift.
 - **OPS-MAINT-04**: Test restore integrity and recovery behavior under corrupted backups.
 - **OPS-MAINT-05**: Validate PostgreSQL failover recovery and Sentinel behavior under quorum-loss scenarios.
+
 
 ## Completed Milestone: v1.10.0 Operational Certification & Reproducibility Validation (Completed: 2026-06-08)
 
