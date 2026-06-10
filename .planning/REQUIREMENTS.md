@@ -3,6 +3,12 @@
 **Defined:** 2026-06-08
 **Core Value:** Focus on platform stabilization, warning-debt reduction, independent bare-metal host validation, drift detection, and resilience drills.
 
+**Status Taxonomy Reference:**
+- `[x] Complete` — Requirement execution completed and verified with no outstanding constraints.
+- `[x] Complete with Qualifications` — Requirement execution completed and verified, but platform/environmental constraints limit full physical certification scope (e.g., WSL2 virtualization boundaries). *Remaining work requirements* document what is needed to fully lift the qualification in future cycles.
+- `[/] In Progress` — Requirement execution is currently active and has not yet completed.
+- `[ ] Pending` — Requirement execution is not yet started.
+
 ## v1.12.0 Requirements (Active)
 
 ### Physical Host Validation (OPS-MAINT-PHYS)
