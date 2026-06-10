@@ -16,7 +16,7 @@ Define and implement long-term operational health telemetry checkpoints and aler
 ### Telemetry Checkpoints & Thresholds
 - **D-01 (WAL Growth Threshold):** Defined as `< 50 MB / hour` under normal standby/witness replica workload.
 - **D-02 (Lease-Renewal Latency Threshold):** Defined as p95 lease transaction execution latency `< 200 ms`.
-- **D-03 (Backup Success-Rate Threshold):** Defined as `100%` success rate (0 failed runs in the active check window).
+- **D-03 (Backup Success-Rate Threshold):** Defined as ≥ 96.6% success rate (no more than 1 failed run in 30 days, matching campaign SLO).
 
 ### Telemetry Checker Script
 - **D-04:** Implement a standalone TypeScript checker script at `scripts/long-term-telemetry-checker.ts`.

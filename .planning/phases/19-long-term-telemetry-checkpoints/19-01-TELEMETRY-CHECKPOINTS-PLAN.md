@@ -21,7 +21,7 @@ Create the telemetry checker script at `scripts/long-term-telemetry-checker.ts`.
 - Configure the three key thresholds:
   - **WAL Growth:** `< 50 MB / hour` under normal witness/replica workload.
   - **Lease Renewal Latency:** p95 transaction latency `< 200 ms`.
-  - **Backup Success Rate:** `100%` success (0 failed runs in check window).
+  - **Backup Success Rate:** `≥ 96.6%` success (no more than 1 failed run in 30 days, matching campaign SLO).
 - Calculate current metrics from logs and compare them against the thresholds.
 - Implement `--simulate-alert [wal|lease|backup]` command-line flag to inject simulated breaches and print clear warning alert logs to stdout/stderr.
 - Generate a structured JSON report at `telemetry-history/long-term-telemetry-status.json` containing the status of all checks.
