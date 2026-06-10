@@ -6,6 +6,7 @@ Following the successful validation of live cryptographic trust-chains and multi
 
 ## Milestones
 
+- 🚧 **v1.14.0 Qualification Removal & Physical Certification** - Phases 21-24 (In Progress)
 - ✅ **v1.13.0 Operational Hardening & Long-Term Stewardship** - Phases 19-20 (Shipped: 2026-07-11)
 - ✅ **v1.12.0 Physical Runtime & Operational Verification** - Phases 13-18 (Shipped: 2026-07-10)
 - ✅ **v1.11.0 Maintenance, Debt Reduction & Portability Validation** - Phases 8-12 (Shipped: 2026-06-08)
@@ -20,7 +21,49 @@ Following the successful validation of live cryptographic trust-chains and multi
 > [!NOTE]
 > Phases are ordered logically by phase number. Historical completion dates of phases may differ based on operational scheduling and validation dependencies.
 
-### ✅ v1.13.0 Operational Hardening & Long-Term Stewardship (Completed)
+### 🚧 v1.14.0 Qualification Removal & Physical Certification (In Progress)
+
+**Milestone Goal:** Convert qualified and simulated evidence into fully certified physical evidence by replacing WSL2-dependent and simulation-assisted validation paths with bare-metal hardware verification.
+
+#### Phase 21: Physical TPM Attestation Certification (Pending)
+**Goal**: Certify physical TPM attestation on a non-virtualized host.
+**Success Criteria**:
+  1. Physical Ubuntu/RHEL/Debian host confirmed via `systemd-detect-virt`, `dmidecode`, `lscpu`.
+  2. `/dev/tpm0` accessible and TPM EK chain extracted.
+  3. `tpm2_quote` generated successfully and verified by auditor.
+  4. Hardware attestation evidence produced.
+**Deliverables**: `PHYSICAL_TPM_CERTIFICATION.md`, `physical-attestation-evidence.json`
+
+#### Phase 22: Bare-Metal Firecracker Certification (Pending)
+**Goal**: Certify Firecracker microVM endurance on bare-metal Linux without WSL2.
+**Success Criteria**:
+  1. Non-WSL2 Linux host with `/dev/kvm`.
+  2. 100-launch endurance campaign with real vsock execution.
+  3. Resource leak measurements (memory, CPU, file descriptors).
+  4. Statistical report generated.
+**Deliverables**: `FIRECRACKER_BARE_METAL_CERTIFICATION.md`, `firecracker-endurance-results.json`
+
+#### Phase 23: Independent Reproduction Audit (Pending)
+**Goal**: Complete genuine independent third-party reproduction audit.
+**Success Criteria**:
+  1. Different operator (not the original author).
+  2. Fresh environment with no prior repository state.
+  3. No repository write access.
+  4. No author assistance during setup and run.
+  5. Complete verification run producing operator attestation.
+**Deliverables**: `THIRD_PARTY_CERTIFICATION_REPORT.md`, `operator-attestation.json`
+
+#### Phase 24: Qualification Closure Review (Pending)
+**Goal**: Verify all historical qualifications have been removed.
+**Success Criteria**:
+  1. Phase 13 qualification (physical TPM) removed.
+  2. Phase 15 qualification (bare-metal Firecracker) removed.
+  3. Phase 18 qualification (simulated operator) removed.
+  4. Requirements updated from "Complete with Qualifications" to "Complete".
+**Deliverables**: `QUALIFICATION_CLOSURE_REVIEW.md`
+
+<details>
+<summary>✅ v1.13.0 Operational Hardening & Long-Term Stewardship (Phases 19-20) - SHIPPED 2026-07-11</summary>
 
 **Milestone Goal:** Transition the platform to post-campaign maintenance mode, establish long-term operational health telemetry checkpoints, and review and refine virtualization boundaries.
 
@@ -37,6 +80,8 @@ Following the successful validation of live cryptographic trust-chains and multi
   1. Audit KVM, Firecracker, and TPM isolation configurations.
   2. Map namespace and privilege containment boundaries.
   3. Produce a formal Virtualization Boundaries Review Report detailing security posture and isolation limits.
+
+</details>
 
 ### ✅ v1.12.0 Physical Runtime & Operational Verification (Completed)
 
@@ -211,4 +256,7 @@ Following the successful validation of live cryptographic trust-chains and multi
 | 16. Reliability Campaign | v1.12.0 | 1/1 | Complete | 2026-07-10 |
 | 19. Telemetry Checkpoints | v1.13.0 | 1/1 | Complete | 2026-07-10 |
 | 20. Virtualization Review | v1.13.0 | 1/1 | Complete | 2026-07-11 |
-
+| 21. Physical TPM Attestation | v1.14.0 | 0/1 | Pending | - |
+| 22. Bare-Metal Firecracker | v1.14.0 | 0/1 | Pending | - |
+| 23. Independent Reproduction | v1.14.0 | 0/1 | Pending | - |
+| 24. Qualification Closure | v1.14.0 | 0/1 | Pending | - |

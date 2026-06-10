@@ -34,14 +34,23 @@ Nexus ZTAN is an auditable, production-oriented research platform designed for l
 - ✓ **SEC-01**: Poisoned log and desynchronized replay history quarantine — v1.6.0
 - ✓ **PEM-01/02**: Rekor PEM key decoding & submission validation — v1.8.0 (Phase 5)
 
-## Current Milestone: v1.13.0 Operational Hardening & Long-Term Stewardship (Active)
+## Current Milestone: v1.14.0 Qualification Removal & Physical Certification (Active)
+
+**Goal:** Convert qualified and simulated evidence into fully certified physical evidence by replacing WSL2-dependent and simulation-assisted validation paths with bare-metal hardware verification.
+
+**Target features (Active):**
+- Physical TPM attestation certification on non-virtualized host.
+- Bare-metal Firecracker endurance certification without WSL2.
+- Genuine independent third-party reproduction audit.
+- Qualification closure review confirming all historical qualifications removed.
+
+## Completed Milestone: v1.13.0 Operational Hardening & Long-Term Stewardship (Completed: 2026-07-11)
 
 **Goal:** Transition platform to post-campaign maintenance mode, establish long-term operational health telemetry checkpoints, and review and refine virtualization boundaries.
 
-**Target features (Active):**
-- Transition platform to post-campaign maintenance mode.
-- Establish long-term operational health telemetry checkpoints.
-- Review and refine virtualization boundaries.
+**Target features (All Completed & Verified):**
+- **OPS-MAINT-POST-01**: Long-term telemetry checkpoints (WAL growth, lease latency, backup success rates).
+- **OPS-MAINT-POST-02**: Virtualization boundaries review and isolation audit report.
 
 ## Completed Milestone: v1.12.0 Physical Runtime & Operational Verification (Completed: 2026-07-10)
 
@@ -179,4 +188,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-08 after Milestone v1.11.0 initialization*
+*Last updated: 2026-07-11 after v1.13.0 archival and v1.14.0 initialization*

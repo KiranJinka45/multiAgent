@@ -53,13 +53,15 @@
 
 ---
 
-## v1.13.0 Operational Hardening & Long-Term Stewardship (Active Milestone)
+## v1.13.0 Operational Hardening & Long-Term Stewardship (Shipped: 2026-07-11)
 
-**Key goals:**
+**Phases completed:** 2 phases (Phases 19-20)
 
-- Transition platform to post-campaign maintenance mode.
-- Establish long-term operational health telemetry checkpoints.
-- Review and refine virtualization boundaries.
+**Key accomplishments:**
+
+- Implemented automated long-term telemetry checkpoint script validating WAL growth, lease latency, and backup success rates against campaign SLOs (Phase 19).
+- Produced comprehensive virtualization boundaries review auditing guest-host isolation, TPM trust boundaries, WSL2 qualification impacts, Firecracker containment, and a residual-risk register with qualification-removal roadmap (Phase 20).
+- Explicitly documented outstanding qualification debt (physical TPM, bare-metal Firecracker, independent reproduction) as future certification work.
 
 ---
 

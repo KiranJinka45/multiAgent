@@ -52,6 +52,16 @@
 
 ---
 
+## v1.14.0 Requirements (Active)
+
+### Qualification Removal & Physical Certification (QUAL-REMOVE)
+- [ ] **QUAL-REMOVE-TPM-01**: Certify physical TPM attestation on a non-virtualized host with `/dev/tpm0`, `tpm2_quote` evidence, and manufacturer EK chain validation.
+- [ ] **QUAL-REMOVE-FC-01**: Certify Firecracker microVM endurance on bare-metal Linux (non-WSL2) with 100-launch campaign, real vsock execution, and resource leak measurements.
+- [ ] **QUAL-REMOVE-REPRO-01**: Complete genuine independent third-party reproduction audit with a separate operator, fresh environment, no repository write access, and no author assistance.
+- [ ] **QUAL-REMOVE-CLOSE-01**: Verify all historical qualifications (Phase 13, 15, 18) have been removed and update requirements from "Complete with Qualifications" to "Complete".
+
+---
+
 ## v1.11.0 Requirements (Completed)
 - [x] **OPS-MAINT-DEBT-01**: Resolve implicit `any` types in core engine modules (Phase 8).
 - [x] **OPS-MAINT-DEBT-02**: Remove unused local variables and dead parameters (Phase 8).
@@ -94,14 +104,19 @@ Which phases cover which requirements. Updated during roadmap creation.
 | OPS-MAINT-SENTINEL-01 | Phase 12 | Complete |
 | OPS-MAINT-POST-01 | Phase 19 | Complete |
 | OPS-MAINT-POST-02 | Phase 20 | Complete |
+| QUAL-REMOVE-TPM-01 | Phase 21 | Pending |
+| QUAL-REMOVE-FC-01 | Phase 22 | Pending |
+| QUAL-REMOVE-REPRO-01 | Phase 23 | Pending |
+| QUAL-REMOVE-CLOSE-01 | Phase 24 | Pending |
 
 **Coverage:**
 - Completed v1.12.0 requirements: 6 total
-- Active v1.13.0 requirements: 2 total
-- Mapped to phases: 8
+- Completed v1.13.0 requirements: 2 total
+- Active v1.14.0 requirements: 4 total
+- Mapped to phases: 18
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-06-08*
-*Last updated: 2026-07-10 after v1.12.0 closure and v1.13.0 initialization*
+*Last updated: 2026-07-11 after v1.13.0 archival and v1.14.0 initialization*
 
