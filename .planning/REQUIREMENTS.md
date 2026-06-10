@@ -9,7 +9,7 @@
 - `[/] In Progress` — Requirement execution is currently active and has not yet completed.
 - `[ ] Pending` — Requirement execution is not yet started.
 
-## v1.12.0 Requirements (Active)
+## v1.12.0 Requirements (Completed)
 
 ### Physical Host Validation (OPS-MAINT-PHYS)
 - [Q] **OPS-MAINT-PHYS-01**: Validate execution on non-virtualized physical Linux host with active TPM quote verification (Complete with Qualifications: validated on WSL2 KVM with simulated TPM).
@@ -41,6 +41,14 @@
 
 ### Continuous Reliability Campaign (OPS-MAINT-DRIFT-LONG)
 - [x] **OPS-MAINT-DRIFT-LONG-01**: Perform 30-day continuous reliability monitoring logging MTTR, drift alerts, and backup recovery metrics (Completed: All 30 days verified, SLOs passed).
+
+---
+
+## v1.13.0 Requirements (Active)
+
+### Post-Campaign Telemetry Checkpoints (OPS-MAINT-POST)
+- [ ] **OPS-MAINT-POST-01**: Define and monitor long-term operational health telemetry checkpoints.
+- [ ] **OPS-MAINT-POST-02**: Establish virtualization boundaries review and report.
 
 ---
 
@@ -86,7 +94,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | OPS-MAINT-SENTINEL-01 | Phase 12 | Complete |
 
 **Coverage:**
-- Active v1.12.0 requirements: 6 total
+- Completed v1.12.0 requirements: 6 total
 - Mapped to phases: 6
 - Unmapped: 0 ✓
 
