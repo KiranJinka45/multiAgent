@@ -34,15 +34,15 @@ Nexus ZTAN is an auditable, production-oriented research platform designed for l
 - ✓ **SEC-01**: Poisoned log and desynchronized replay history quarantine — v1.6.0
 - ✓ **PEM-01/02**: Rekor PEM key decoding & submission validation — v1.8.0 (Phase 5)
 
-## Current Milestone: v1.14.0 Qualification Removal & Physical Certification (Active)
+## Completed Milestone: v1.14.0 Qualification Removal Framework Implementation (Completed with Qualifications: 2026-07-11)
 
-**Goal:** Convert qualified and simulated evidence into fully certified physical evidence by replacing WSL2-dependent and simulation-assisted validation paths with bare-metal hardware verification.
+**Goal:** Convert qualified and simulated evidence into qualification-removal frameworks, mapping validation paths for bare-metal hardware verification while documenting open qualifications.
 
-**Target features (Active):**
-- Physical TPM attestation certification on non-virtualized host.
-- Bare-metal Firecracker endurance certification without WSL2.
-- Genuine independent third-party reproduction audit.
-- Qualification closure review confirming all historical qualifications removed.
+**Target features (Completed & Verified with Qualifications):**
+- Physical TPM attestation certification framework implementation on non-virtualized host.
+- Bare-metal Firecracker endurance certification framework implementation without WSL2.
+- Genuine independent third-party reproduction audit framework implementation.
+- Qualification status reconciliation review tracking unresolved gaps.
 
 ## Completed Milestone: v1.13.0 Operational Hardening & Long-Term Stewardship (Completed: 2026-07-11)
 

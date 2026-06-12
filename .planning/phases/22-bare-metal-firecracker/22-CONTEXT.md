@@ -1,4 +1,4 @@
-# Phase 22: Bare-Metal Firecracker Certification - Context
+# Phase 22: Bare-Metal Firecracker Endurance Framework - Context
 
 **Gathered:** 2026-07-11
 **Status:** Ready for planning
@@ -6,7 +6,7 @@
 <domain>
 ## Phase Boundary
 
-Certify Firecracker microVM endurance on a bare-metal Linux host without WSL2. This phase addresses the qualification on OPS-MAINT-FIRECRACKER-RUN-01 (Phase 15, v1.12.0) where the 100-iteration endurance campaign was executed under WSL2 KVM rather than native bare-metal hardware.
+Implement and validate Firecracker microVM endurance framework on a bare-metal Linux host without WSL2. This phase addresses the qualification on OPS-MAINT-FIRECRACKER-RUN-01 (Phase 15, v1.12.0) where the 100-iteration endurance campaign was executed under WSL2 KVM rather than native bare-metal hardware.
 
 </domain>
 

@@ -1,4 +1,4 @@
-# Phase 21: Physical TPM Attestation Certification - Context
+# Phase 21: Physical TPM Attestation Framework - Context
 
 **Gathered:** 2026-07-11
 **Status:** Ready for planning
@@ -6,7 +6,7 @@
 <domain>
 ## Phase Boundary
 
-Certify physical TPM attestation on a confirmed non-virtualized Linux host. This phase addresses the qualification on OPS-MAINT-PHYS-01 (Phase 13, v1.12.0) where TPM quote verification was performed using a software mock under WSL2 rather than a hardware TPM 2.0 module.
+Implement and validate physical TPM attestation framework on a confirmed non-virtualized Linux host. This phase addresses the qualification on OPS-MAINT-PHYS-01 (Phase 13, v1.12.0) where TPM quote verification was performed using a software mock under WSL2 rather than a hardware TPM 2.0 module.
 
 </domain>
 

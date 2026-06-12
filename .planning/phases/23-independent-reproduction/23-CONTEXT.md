@@ -1,4 +1,4 @@
-# Phase 23: Independent Reproduction Audit - Context
+# Phase 23: Independent Reproduction Audit Framework - Context
 
 **Gathered:** 2026-07-11
 **Status:** Ready for planning
@@ -6,7 +6,7 @@
 <domain>
 ## Phase Boundary
 
-Complete a genuine independent third-party reproduction audit. This phase addresses the qualification on OPS-MAINT-REPRO-01 (Phase 18, v1.12.0) where the reproduction was performed via automated operator simulation within the project environment rather than by a genuinely separate operator.
+Implement and validate independent reproduction audit framework. This phase addresses the qualification on OPS-MAINT-REPRO-01 (Phase 18, v1.12.0) where the reproduction was performed via automated operator simulation within the project environment rather than by a genuinely separate operator.
 
 </domain>
 

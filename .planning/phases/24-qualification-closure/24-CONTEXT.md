@@ -1,4 +1,4 @@
-# Phase 24: Qualification Closure Review - Context
+# Phase 24: Qualification Status Reconciliation Review - Context
 
 **Gathered:** 2026-07-11
 **Status:** Ready for planning
@@ -6,7 +6,7 @@
 <domain>
 ## Phase Boundary
 
-Verify that all historical qualifications from v1.12.0 have been successfully removed by the preceding phases (21-23). Update all planning documents to reflect fully certified status. This is a documentation and verification phase — no new code or infrastructure is required.
+Reconcile and assess qualification status and track unresolved gaps. Update all planning documents to accurately reflect that qualifications remain open under environmental constraints. This is a documentation and verification phase — no new code or infrastructure is required.
 
 </domain>
 
@@ -14,21 +14,21 @@ Verify that all historical qualifications from v1.12.0 have been successfully re
 ## Implementation Decisions
 
 ### Verification Scope
-- **D-01:** Confirm Phase 13 qualification (physical TPM) has been removed by Phase 21 evidence.
-- **D-02:** Confirm Phase 15 qualification (bare-metal Firecracker) has been removed by Phase 22 evidence.
-- **D-03:** Confirm Phase 18 qualification (simulated operator) has been removed by Phase 23 evidence.
+- **D-01:** Confirm Phase 13 qualification (physical TPM) status is accurately documented under Phase 21 evidence.
+- **D-02:** Confirm Phase 15 qualification (bare-metal Firecracker) status is accurately documented under Phase 22 evidence.
+- **D-03:** Confirm Phase 18 qualification (simulated operator) status is accurately documented under Phase 23 evidence.
 
 ### Requirements Updates
-- **D-04:** Update `OPS-MAINT-PHYS-01` from "Complete with Qualifications" to "Complete" in REQUIREMENTS.md.
-- **D-05:** Update `OPS-MAINT-FIRECRACKER-RUN-01` from "Complete with Qualifications" to "Complete" in REQUIREMENTS.md.
-- **D-06:** Update `OPS-MAINT-REPRO-01` from "Complete (Simulated Operator)" to "Complete" in REQUIREMENTS.md.
-- **D-07:** Update the corresponding traceability table entries.
+- **D-04:** Preserve `OPS-MAINT-PHYS-01` as "Complete with Qualifications" in REQUIREMENTS.md.
+- **D-05:** Preserve `OPS-MAINT-FIRECRACKER-RUN-01` as "Complete with Qualifications" in REQUIREMENTS.md.
+- **D-06:** Preserve `OPS-MAINT-REPRO-01` as "Complete (Simulated Operator)" in REQUIREMENTS.md.
+- **D-07:** Update the corresponding traceability table entries and ensure unresolved qualifications are tracked explicitly.
 
 ### Evidence Artifacts
-- **D-08:** Produce `QUALIFICATION_CLOSURE_REVIEW.md` documenting the evidence chain from each qualification to its resolution, confirming all gaps are closed.
+- **D-08:** Produce `QUALIFICATION_CLOSURE_REVIEW.md` documenting the evidence chain, existing frameworks, and outstanding gaps.
 
 ### Discretionary
-- Format and structure of the closure review document.
+- Format and structure of the reconciliation review document.
 
 </decisions>
 
