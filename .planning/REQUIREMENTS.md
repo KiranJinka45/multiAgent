@@ -62,7 +62,7 @@
 
 ---
 
-## v1.15.0 Requirements (In Progress)
+## v1.15.0 Requirements (Awaiting Environment Provisioning)
 
 ### Pilot Environment Verification (EVIDENCE-PILOT)
 - [x] **EVIDENCE-PILOT-01**: Deploy the ZTAN control plane under a local pilot environment to verify live tenant capability (validated via local Kubernetes pilot validation).

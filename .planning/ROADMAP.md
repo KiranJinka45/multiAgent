@@ -6,7 +6,7 @@ Following the successful validation of live cryptographic trust-chains and multi
 
 ## Milestones
 
-- ⏳ **v1.15.0 Evidence Accumulation Campaign** - Phases 25-27 (In Progress: 2026-06-12)
+- ⏳ **v1.15.0 Evidence Accumulation Campaign** - Phases 25-27 (Awaiting Environment Provisioning: 2026-06-12)
 - ✅ **v1.14.0 Qualification Removal Framework Implementation** - Phases 21-24 (Shipped with Qualifications: 2026-07-11)
 - ✅ **v1.13.0 Operational Hardening & Long-Term Stewardship** - Phases 19-20 (Shipped: 2026-07-11)
 - ✅ **v1.12.0 Physical Runtime & Operational Verification** - Phases 13-18 (Shipped: 2026-07-10)

@@ -117,13 +117,13 @@ updateFileContent('.planning/STATE.md', /\| 2 \| Bare-Metal Firecracker \| `\[OP
 
 
 // B. Update ROADMAP.md
-updateFileContent('.planning/ROADMAP.md', /- ⏳ \*\*v1.15.0 Evidence Accumulation Campaign\*\* - Phases 25-27 \(In Progress: 2026-06-12\)/, '- ✅ **v1.15.0 Evidence Accumulation Campaign** - Phases 25-27 (Shipped: 2026-06-12)');
+updateFileContent('.planning/ROADMAP.md', /- ⏳ \*\*v1.15.0 Evidence Accumulation Campaign\*\* - Phases 25-27 \(Awaiting Environment Provisioning: 2026-06-12\)/, '- ✅ **v1.15.0 Evidence Accumulation Campaign** - Phases 25-27 (Shipped: 2026-06-12)');
 updateFileContent('.planning/ROADMAP.md', /#### Phase 27: Physical Hardware Qualification \(Not Started\)/, '#### Phase 27: Physical Hardware Qualification (Complete)');
 updateFileContent('.planning/ROADMAP.md', /\| 27. Physical Hardware Qualification \| v1.15.0 \| 1\/1 \| Awaiting Provisioning \| — \|/, '| 27. Physical Hardware Qualification | v1.15.0 | 1/1 | Complete | 2026-06-12 |');
 
 
 // C. Update REQUIREMENTS.md
-updateFileContent('.planning/REQUIREMENTS.md', /## v1.15.0 Requirements \(In Progress\)/, '## v1.15.0 Requirements (Completed)');
+updateFileContent('.planning/REQUIREMENTS.md', /## v1.15.0 Requirements \(Awaiting Environment Provisioning\)/, '## v1.15.0 Requirements (Completed)');
 updateFileContent('.planning/REQUIREMENTS.md', /- \[ \] \*\*EVIDENCE-HARDWARE-01\*\*[\s\S]*?Hardware attestation evidence produced with real PCR values./, `- [x] **EVIDENCE-HARDWARE-01**: Execute existing validation scripts on physical bare-metal Linux hardware with real TPM 2.0 (\`/dev/tpm0\`) and KVM (\`/dev/kvm\`), retiring hardware qualifications.
   - *Success criteria:*
     - \`systemd-detect-virt\` returns \`none\` (Completed: verified bare-metal execution).
