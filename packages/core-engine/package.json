@@ -15,7 +15,7 @@
     "@packages/db": "workspace:*",
     "@packages/governance-sdk": "workspace:*",
     "@packages/sandbox": "workspace:*",
-    "axios": "1.15.2"
+    "axios": "1.16.0"
   },
   "devDependencies": {
     "typescript": "5.5.4"
