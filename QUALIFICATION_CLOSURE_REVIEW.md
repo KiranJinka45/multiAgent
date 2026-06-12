@@ -1,6 +1,6 @@
 # ZTAN QUALIFICATION CLOSURE REVIEW
 
-## Milestone: v1.14.0 Qualification Removal & Physical Certification
+## Milestone: v1.14.0 Qualification Removal Framework Implementation
 **Date of Review:** 2026-07-11  
 **Auditor:** Nexus Stewardship & Auditing Committee  
 **Status:** FRAMEWORK IMPLEMENTED (QUALIFICATIONS REMAIN OPEN)  

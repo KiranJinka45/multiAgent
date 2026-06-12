@@ -3,7 +3,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 const LEDGER_DIR = path.join(process.cwd(), '.ztan-transparency');
-const LEDGER_FILE = path.join(LEDGER_DIR, 'audit_ledger.json');
+const isTest = process.env.NODE_ENV === 'test' || !!process.env.VITEST;
+const LEDGER_FILE = isTest
+    ? path.join(LEDGER_DIR, `audit_ledger_test_${process.pid}.json`)
+    : path.join(LEDGER_DIR, 'audit_ledger.json');
 
 function ensureDirExists() {
     if (!fs.existsSync(LEDGER_DIR)) {

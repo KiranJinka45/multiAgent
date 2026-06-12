@@ -1,0 +1,35 @@
+{
+  "pilotId": "tenant_pilot_alpha_01",
+  "deploymentEpoch": "2026-06-12T07:21:30.699Z",
+  "softwareRelease": "v1.18.0",
+  "metrics": {
+    "reproducibilityRate": 1,
+    "driftScore": 0,
+    "activeTenantIsolationEscapes": 0,
+    "telemetryToRuntimeLocRatio": 0.18,
+    "witnessSignaturesCollected": 142,
+    "policyEngineViolationsBlocked": 0,
+    "tpmAttestationsSecured": 10
+  },
+  "governanceCompliance": {
+    "authoritativeLedgerConstraintEnforced": true,
+    "constitutionRemainsNormative": true,
+    "separationOfAdvisoryAndExecutionEnforced": true
+  },
+  "telemetry": {
+    "totalMissionsExecuted": 10,
+    "meanLatencyMs": 1039.54,
+    "latenciesMs": [
+      4062.2,
+      696.71,
+      650.74,
+      675.33,
+      631.43,
+      947.18,
+      633.28,
+      751.06,
+      680.26,
+      667.24
+    ]
+  }
+}

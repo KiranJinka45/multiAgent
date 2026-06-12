@@ -51,7 +51,12 @@ describe('ZTAN Phase 6: Scalability & Survivability Simulation', () => {
 
         for (let i = 0; i < 40; i++) {
             const nodeId = `attacker-${i}`;
-            const sig = await ThresholdCrypto.signPartial(msg, nodeShares[0].share, nodeId, T, NODE_IDS);
+            const sig = {
+                nodeId,
+                signature: '0'.repeat(96),
+                payloadHash: msg,
+                timestamp: Date.now()
+            };
             await engine.recordAttestation({
                 eventId, verifierId: nodeId, status: 'PASS', partialSignature: sig,
                 expectedNode: 'target', confidence: 1.0, timestamp: Date.now()

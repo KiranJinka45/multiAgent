@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { ml_dsa65 } from '@noble/post-quantum/ml-dsa';
 
 /**
  * ─── Cryptographic Registry ────────────────────────────────────────────────
@@ -34,8 +35,19 @@ export class CryptoRegistry {
                 return this.verifyRSA(publicKey, sigBuffer, data);
             case SignatureAlgorithm.ECDSA_P256:
                 return this.verifyECDSA(publicKey, sigBuffer, data);
+            case SignatureAlgorithm.DILITHIUM2:
+                return this.verifyDilithium(publicKey, sigBuffer, data);
             default:
                 throw new Error(`UNSUPPORTED_ALGORITHM: ${algorithm} is not supported by this institutional runtime.`);
+        }
+    }
+
+    private static verifyDilithium(publicKey: string, signature: Buffer, data: Buffer): boolean {
+        try {
+            const pubKeyBytes = Buffer.from(publicKey, publicKey.startsWith('0x') || /^[0-9a-fA-F]+$/.test(publicKey) ? 'hex' : 'base64');
+            return ml_dsa65.verify(pubKeyBytes, data, signature);
+        } catch (_e) {
+            return false;
         }
     }
 

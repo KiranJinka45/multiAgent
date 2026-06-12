@@ -19,6 +19,7 @@
     "phase17": "tsx src/run-phase-17-morphodynamics.ts"
   },
   "dependencies": {
+    "@noble/post-quantum": "^0.2.0",
     "@aws-sdk/client-secrets-manager": "3.1038.0",
     "@packages/config": "workspace:*",
     "@packages/db": "workspace:*",

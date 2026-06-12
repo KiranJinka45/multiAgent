@@ -1,6 +1,6 @@
 # ZTAN Firecracker Bare-Metal Certification Record
 
-**Timestamp:** 2026-06-10T15:42:23.277Z  
+**Timestamp:** 2026-06-12T06:40:53.093Z  
 **Platform:** win32 / 10.0.26200 / x64  
 **Total Iterations:** `100`  
 **Success Rate:** `100%`  
@@ -10,16 +10,16 @@
 
 | Metric | Mean (ms) | p50 (ms) | p95 (ms) | p99 (ms) | Min (ms) | Max (ms) |
 |---|---|---|---|---|---|---|
-| **Launch Duration** | 145 | 145 | 167 | 168 | 121 | 169 |
-| **Teardown Duration** | 19 | 19 | 24 | 25 | 15 | 25 |
-| **Guest Execution** | 6 | 6 | 8 | 9 | - | - |
+| **Launch Duration** | 147 | 148 | 167 | 170 | 120 | 170 |
+| **Teardown Duration** | 20 | 20 | 24 | 25 | 15 | 25 |
+| **Guest Execution** | 6 | 6 | 9 | 9 | - | - |
 
 ## 2. Resource Leakage Check
 
 - **File Descriptor Net Leak:** `0` (Threshold: `0`)  
 - **Runner Memory Growth:** `0 MB`  
 - **Orphan `firecracker` Processes:** `0` (Threshold: `0`)  
-- **Runner CPU Usage:** `User: 0 ms, System: 0 ms`  
+- **Runner CPU Usage:** `User: 16 ms, System: 0 ms`  
 
 ## 3. Environment Qualification Delta (Active Deviations)
 

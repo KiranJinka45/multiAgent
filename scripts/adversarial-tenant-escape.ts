@@ -44,10 +44,13 @@ async function runAdversarialDrill() {
 
     // Connect using the restricted application user to ensure Postgres enforces RLS
     // (Superusers bypass RLS by design in Postgres)
+    const dbUrl = new URL(process.env.DATABASE_URL!);
+    dbUrl.username = 'ztan_app_user';
+    dbUrl.password = 'app_password';
     const appPrisma = new PrismaClient({
         datasources: {
             db: {
-                url: process.env.DATABASE_URL!.replace('postgres:password', 'ztan_app_user:app_password')
+                url: dbUrl.toString()
             }
         }
     });

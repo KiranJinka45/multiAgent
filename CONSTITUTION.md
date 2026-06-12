@@ -108,6 +108,19 @@ The technical implementation of the ZTAN runtime MUST adhere to the **Institutio
 ### 14.2 Supremacy Clause
 In the event of a conflict between the high-level constitutional narrative and the formal Safety Specification, the **formal specification SHALL prevail** as the machine-enforceable definition of institutional truth.
 
+### 14.3 Claims Drift Prevention & Authoritative Ledger
+To prevent future claims drift and ensure that all security, compliance, and architectural assertions are backed by machine-enforceable evidence, the repository enforces a strict ledger constraint:
+
+No claim may be added to:
+- `SECURITY.md`
+- `CONSTITUTION.md`
+- Website content
+- Investor decks
+- Sales collateral
+
+unless a corresponding entry exists in [CLAIMS_VERIFICATION.md](file:///c:/multiagentic_project/multiAgent-main/CLAIMS_VERIFICATION.md).
+
+
 ## 15. External Reality Anchoring
 
 ### 15.1 Civilization-Scale Time

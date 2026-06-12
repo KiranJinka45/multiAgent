@@ -12,6 +12,10 @@
   "dependencies": {
     "@packages/utils": "workspace:*",
     "@noble/bls12-381": "1.4.0",
+    "@noble/post-quantum": "^0.2.0",
+    "@sigstore/sign": "^3.0.0",
+    "@sigstore/verify": "^3.0.0",
+    "sigstore": "^3.1.0",
     "uuid": "11.0.3"
   },
   "devDependencies": {

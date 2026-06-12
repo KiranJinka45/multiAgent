@@ -17,7 +17,7 @@ describe('ZTAN Operational Ceremony Simulation', () => {
     let consensus: ConsensusEngine;
     let masterPk: string;
     let nodeShares: any[];
-    let _eligiblePks: string[];
+    let eligiblePks: string[];
     
     const T = 3;
     const N = 5;

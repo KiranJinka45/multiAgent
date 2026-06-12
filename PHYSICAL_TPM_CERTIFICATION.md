@@ -1,9 +1,9 @@
 # ZTAN Physical TPM Attestation Record
 
-**Timestamp:** 2026-06-10T15:23:02.924Z  
+**Timestamp:** 2026-06-12T06:40:26.307Z  
 **Platform:** win32 / 10.0.26200 / x64  
 **Attestation Mode:** `SIMULATED`  
-**TPM Nonce:** `89559deb236364d2a806fa7a1f102f171277623c57fe05918e7b360f672f1079`  
+**TPM Nonce:** `71f24aa4aac6ab0d5665d356d041e64ce54188a4634227c6bbbf124d8d927c22`  
 **TPM Quote Verified:** ✅ YES  
 
 ## Verification Details

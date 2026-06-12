@@ -159,5 +159,6 @@ services:
   redis:
     image: redis:7
     container_name: multiagent_redis
+    command: ["redis-server", "--appendonly", "yes", "--appendfsync", "everysec"]
     ports:
       - "6379:6379"

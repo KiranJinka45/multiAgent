@@ -6,6 +6,9 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     pool: 'forks',
+    env: {
+      ZTAN_MOCK_TPM: 'true'
+    },
     server: {
       deps: {
         inline: [/@temporalio/]

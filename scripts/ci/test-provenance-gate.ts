@@ -12,7 +12,7 @@ async function runTests() {
 
   console.log(`[CI] Building image ${legitimateImage}`);
   console.log(`[CI] Signing digest ${legitimateDigest} with identity ${ciIdentity}`);
-  sigstore.signImage(legitimateImage, legitimateDigest, ciIdentity);
+  await sigstore.signImage(legitimateImage, legitimateDigest, ciIdentity);
 
   // Start the Host Daemon
   const daemon = new HostDaemon();
@@ -25,7 +25,7 @@ async function runTests() {
     // TEST 1: Legitimate Spawning
     console.log('\n[Test 1] Attempting to spawn legitimate signed image...');
     try {
-      daemon.spawnEnclave({ imageName: legitimateImage, digest: legitimateDigest });
+      await daemon.spawnEnclave({ imageName: legitimateImage, digest: legitimateDigest });
       console.log('✅ [Test 1 Passed] Legitimate image spawned successfully.');
       successCount++;
     } catch (e) {
@@ -37,7 +37,7 @@ async function runTests() {
     const spoofedDigest = 'sha256:' + crypto.createHash('sha256').update('malicious-code').digest('hex');
     console.log('\n[Test 2] Attempting to spawn un-signed spoofed digest...');
     try {
-      daemon.spawnEnclave({ imageName: legitimateImage, digest: spoofedDigest });
+      await daemon.spawnEnclave({ imageName: legitimateImage, digest: spoofedDigest });
       console.error('❌ [Test 2 Failed] Spoofed image was incorrectly allowed!');
       failCount++;
     } catch (e: any) {
@@ -53,11 +53,11 @@ async function runTests() {
     const devSignedDigest = 'sha256:' + crypto.createHash('sha256').update('dev-experiment').digest('hex');
     const devIdentity = 'developer@ztan.io';
     console.log(`\n[CI] Signing dev digest ${devSignedDigest} with identity ${devIdentity}`);
-    sigstore.signImage(legitimateImage, devSignedDigest, devIdentity);
+    await sigstore.signImage(legitimateImage, devSignedDigest, devIdentity);
 
     console.log('\n[Test 3] Attempting to spawn image signed by unauthorized developer identity...');
     try {
-      daemon.spawnEnclave({ imageName: legitimateImage, digest: devSignedDigest });
+      await daemon.spawnEnclave({ imageName: legitimateImage, digest: devSignedDigest });
       console.error('❌ [Test 3 Failed] Developer-signed image was incorrectly allowed!');
       failCount++;
     } catch (e: any) {

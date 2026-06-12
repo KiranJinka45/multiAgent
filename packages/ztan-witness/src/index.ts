@@ -374,7 +374,7 @@ export class EvidenceLedgerService {
                         scope: 'entry'
                     };
 
-                    const tst = tsa.generateTimeStampToken(hash);
+                    const tst = await tsa.generateTimeStampToken(hash);
 
                     const entryObj: EvidenceEntry = {
                         id,
@@ -612,7 +612,7 @@ export class EvidenceLedgerService {
                         scope: 'entry'
                     };
 
-                    const tst = tsa.generateTimeStampToken(hash);
+                    const tst = await tsa.generateTimeStampToken(hash);
 
                     const entryObj: EvidenceEntry = {
                         id,
@@ -696,7 +696,7 @@ export class EvidenceLedgerService {
                     scope: 'entry'
                 };
 
-                const tst = tsa.generateTimeStampToken(hash);
+                const tst = await tsa.generateTimeStampToken(hash);
 
                 entry = {
                     id,

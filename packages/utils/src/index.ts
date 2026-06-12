@@ -153,6 +153,7 @@ export const JobPayload = {} as any;
 
 export { HSMVault, HSMErrorCode } from './hsm-vault.js';
 export type { HSMAttestation, HSMState } from './hsm-vault.js';
+export { CryptoRegistry, SignatureAlgorithm, type SignaturePayload } from './transparency/crypto-registry.js';
 
 import bridge from './server.js';
 

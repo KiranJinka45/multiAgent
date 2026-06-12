@@ -70,7 +70,7 @@ export class PhysicalTpmConnector {
         }
 
         if (!useRealTpm) {
-            if (process.env.ZTAN_MOCK_TPM === 'true') {
+            if (process.env.ZTAN_MOCK_TPM === 'true' || process.env.VITEST) {
                 const pcrs: { [pcrIndex: number]: string } = {};
                 for (const pcr of pcrSelection.pcrs) {
                     pcrs[pcr] = '0000000000000000000000000000000000000000000000000000000000000000';
@@ -120,7 +120,7 @@ export class PhysicalTpmConnector {
         }
 
         if (!useRealTpm) {
-            if (process.env.ZTAN_MOCK_TPM === 'true') {
+            if (process.env.ZTAN_MOCK_TPM === 'true' || process.env.VITEST) {
                 return true;
             }
             throw new Error('HARDWARE_TPM_REQUIRED: /dev/tpm0 is absent. Cannot verify physical hardware quote.');

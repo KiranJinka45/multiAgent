@@ -339,6 +339,12 @@ export class ThresholdCrypto {
     return this.toHex(hash);
   }
 
+  public static getProtocolMessagePublicKey(nodeId: string): string {
+    const signingKey = this.toHex(this.safeEncode(`IDENTITY_SK_${nodeId}`)).padEnd(64, '0');
+    const publicKey = bls.getPublicKey(this.fromHex(signingKey));
+    return this.toHex(publicKey);
+  }
+
   public static async signProtocolMessage(
     nodeId: string, 
     ceremonyId: string, 
@@ -732,3 +738,33 @@ export class MemoryReplayGuard implements ReplayGuard {
     this.seen.set(auditId, Date.now() + (ttlSeconds * 1000));
   }
 }
+
+import { ml_dsa65 } from '@noble/post-quantum/ml-dsa';
+import { ml_kem768 } from '@noble/post-quantum/ml-kem';
+import * as nodeCrypto from 'crypto';
+
+export const pqc = {
+  mldsa: {
+    generateKeyPair: () => {
+      const seed = nodeCrypto.randomBytes(32);
+      const keys = ml_dsa65.keygen(seed);
+      return {
+        publicKey: keys.publicKey,
+        privateKey: keys.secretKey
+      };
+    },
+    sign: (privateKey: Uint8Array, message: Uint8Array) => ml_dsa65.sign(privateKey, message),
+    verify: (publicKey: Uint8Array, message: Uint8Array, signature: Uint8Array) => ml_dsa65.verify(publicKey, message, signature)
+  },
+  mlkem: {
+    generateKeyPair: () => {
+      const keys = ml_kem768.keygen();
+      return {
+        publicKey: keys.publicKey,
+        privateKey: keys.secretKey
+      };
+    },
+    encapsulate: (publicKey: Uint8Array) => ml_kem768.encapsulate(publicKey),
+    decapsulate: (ciphertext: Uint8Array, privateKey: Uint8Array) => ml_kem768.decapsulate(ciphertext, privateKey)
+  }
+};
