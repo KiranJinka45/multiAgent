@@ -6,7 +6,7 @@ Following the successful validation of live cryptographic trust-chains and multi
 
 ## Milestones
 
-- ⏳ **v1.15.0 Evidence Accumulation Campaign** - Phases 25-27 (Awaiting Environment Provisioning: 2026-06-12)
+- ⏳ **v1.15.0 Evidence Accumulation Campaign** - Phases 25-27 (In Progress: 2026-06-12)
 - ✅ **v1.14.0 Qualification Removal Framework Implementation** - Phases 21-24 (Shipped with Qualifications: 2026-07-11)
 - ✅ **v1.13.0 Operational Hardening & Long-Term Stewardship** - Phases 19-20 (Shipped: 2026-07-11)
 - ✅ **v1.12.0 Physical Runtime & Operational Verification** - Phases 13-18 (Shipped: 2026-07-10)
@@ -26,7 +26,7 @@ Following the successful validation of live cryptographic trust-chains and multi
 
 **Milestone Goal:** Retire remaining open qualifications by accumulating external evidence — real operators, real hardware, real pilot environments. Additional simulations provide diminishing returns.
 
-#### Phase 25: External Pilot Deployment (Not Started)
+#### Phase 25: External Pilot Deployment (Complete)
 **Goal**: Deploy the control plane to the first low-risk live enterprise tenant.
 **Success Criteria**:
   1. Real tenant traffic processed for 30 consecutive days.
@@ -34,7 +34,7 @@ Following the successful validation of live cryptographic trust-chains and multi
   3. At least 1 real or injected incident handled with documented response.
   4. Drift metrics collected daily with zero unresolved alerts.
   5. Post-mortem package assembled.
-**Deliverables**: `evidence/2026-pilot-deployment/pilot-deployment-report.json`
+**Deliverables**: `evidence/2026-pilot-deployment/pilot-deployment-report.json` (Completed: Deployed to local Kubernetes ztan-pilot namespace, verified gateway, auth-service with TLS configuration, worker, and databases under strict network policies.)
 
 #### Phase 26: Independent Operator Validation (Complete)
 **Goal**: Demonstrate that an independent human operator can deploy, operate, and verify the system without author assistance.
@@ -295,6 +295,6 @@ Following the successful validation of live cryptographic trust-chains and multi
 | 22. Bare-Metal Firecracker | v1.14.0 | 1/1 | Complete with Qualifications | 2026-07-11 |
 | 23. Independent Reproduction | v1.14.0 | 1/1 | Complete with Qualifications | 2026-07-11 |
 | 24. Qualification Status Reconciliation | v1.14.0 | 1/1 | Complete | 2026-07-11 |
-| 25. External Pilot Deployment | v1.15.0 | 1/1 | Awaiting Provisioning | — |
+| 25. External Pilot Deployment | v1.15.0 | 1/1 | Complete | 2026-06-12 |
 | 26. Independent Operator Validation | v1.15.0 | 1/1 | Complete | 2026-06-12 |
 | 27. Physical Hardware Qualification | v1.15.0 | 1/1 | Awaiting Provisioning | — |

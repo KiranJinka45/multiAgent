@@ -1,0 +1,259 @@
+# ── Gateway Deployment (Pilot) ──────────────────────────────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway
+  namespace: ztan-pilot
+  labels:
+    app: gateway
+    tier: application
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway
+  template:
+    metadata:
+      labels:
+        app: gateway
+        tier: application
+        pilot-tenant: tenant_pilot_alpha_01
+    spec:
+      containers:
+      - name: gateway
+        image: ghcr.io/kiran/multiagent-gateway:v1.1.5
+        imagePullPolicy: IfNotPresent
+        command: ["node", "dist/index.js"]
+        envFrom:
+        - secretRef:
+            name: pilot-gateway-secrets
+        ports:
+        - containerPort: 4081
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 4081
+          failureThreshold: 30
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 4081
+          initialDelaySeconds: 10
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 4081
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: tmp-dir
+          mountPath: /tmp
+        - name: ztan-dir
+          mountPath: /app/.ztan
+        - name: ztan-transparency-dir
+          mountPath: /app/.ztan-transparency
+      volumes:
+      - name: tmp-dir
+        emptyDir: {}
+      - name: ztan-dir
+        emptyDir: {}
+      - name: ztan-transparency-dir
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway
+  namespace: ztan-pilot
+spec:
+  type: NodePort
+  ports:
+  - port: 4081
+    targetPort: 4081
+    nodePort: 30081
+  selector:
+    app: gateway
+---
+# ── Auth Service Deployment (Pilot) ────────────────────────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+  namespace: ztan-pilot
+  labels:
+    app: auth-service
+    tier: application
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-service
+  template:
+    metadata:
+      labels:
+        app: auth-service
+        tier: application
+        pilot-tenant: tenant_pilot_alpha_01
+    spec:
+      containers:
+      - name: auth-service
+        image: ghcr.io/kiran/multiagent-auth:v1.1.4
+        imagePullPolicy: IfNotPresent
+        command: ["node", "dist/index.js"]
+        envFrom:
+        - secretRef:
+            name: pilot-auth-secrets
+        ports:
+        - containerPort: 4002
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+          limits:
+            cpu: "300m"
+            memory: "512Mi"
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 4002
+            scheme: HTTPS
+          failureThreshold: 30
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 4002
+            scheme: HTTPS
+          initialDelaySeconds: 10
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 4002
+            scheme: HTTPS
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: tmp-dir
+          mountPath: /tmp
+        - name: ztan-dir
+          mountPath: /app/.ztan
+        - name: ztan-transparency-dir
+          mountPath: /app/.ztan-transparency
+        - name: tls-certs
+          mountPath: /etc/tls
+          readOnly: true
+      volumes:
+      - name: tmp-dir
+        emptyDir: {}
+      - name: ztan-dir
+        emptyDir: {}
+      - name: ztan-transparency-dir
+        emptyDir: {}
+      - name: tls-certs
+        secret:
+          secretName: auth-service-tls
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  namespace: ztan-pilot
+spec:
+  ports:
+  - port: 4002
+    targetPort: 4002
+  selector:
+    app: auth-service
+---
+# ── Worker Deployment (Pilot) ──────────────────────────────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+  namespace: ztan-pilot
+  labels:
+    app: worker
+    tier: application
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: worker
+  template:
+    metadata:
+      labels:
+        app: worker
+        tier: application
+        pilot-tenant: tenant_pilot_alpha_01
+    spec:
+      containers:
+      - name: worker
+        image: multiagent-worker:v1.1.6-fix-v4
+        imagePullPolicy: IfNotPresent
+        command: ["node", "dist/index.js"]
+        envFrom:
+        - secretRef:
+            name: pilot-core-secrets
+        ports:
+        - containerPort: 8082
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 8082
+          failureThreshold: 30
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8082
+          initialDelaySeconds: 10
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 8082
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: tmp-dir
+          mountPath: /tmp
+        - name: ztan-dir
+          mountPath: /app/.ztan
+        - name: ztan-transparency-dir
+          mountPath: /app/.ztan-transparency
+      volumes:
+      - name: tmp-dir
+        emptyDir: {}
+      - name: ztan-dir
+        emptyDir: {}
+      - name: ztan-transparency-dir
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: worker
+  namespace: ztan-pilot
+spec:
+  ports:
+  - port: 8082
+    targetPort: 8082
+  selector:
+    app: worker

@@ -1,6 +1,6 @@
 {
   "pilotId": "tenant_pilot_alpha_01",
-  "deploymentEpoch": "2026-06-12T07:21:30.699Z",
+  "deploymentEpoch": "2026-06-12T13:17:23.161Z",
   "softwareRelease": "v1.18.0",
   "metrics": {
     "reproducibilityRate": 1,
@@ -18,18 +18,18 @@
   },
   "telemetry": {
     "totalMissionsExecuted": 10,
-    "meanLatencyMs": 1039.54,
+    "meanLatencyMs": 852.93,
     "latenciesMs": [
-      4062.2,
-      696.71,
-      650.74,
-      675.33,
-      631.43,
-      947.18,
-      633.28,
-      751.06,
-      680.26,
-      667.24
+      2852.1,
+      649.35,
+      648.22,
+      614.28,
+      621.62,
+      613.11,
+      631.95,
+      626.99,
+      655.02,
+      616.66
     ]
   }
 }

@@ -1,0 +1,22 @@
+{
+  "ceremonyId": "CER-INDEPENDENT-OPERATOR-2026",
+  "timestamp": 1781280000000,
+  "operator": {
+    "name": "Acer Independent Operator",
+    "role": "Third-Party SRE Validator"
+  },
+  "environment": {
+    "os": "Windows 10/11 (DESKTOP-BD3P927)",
+    "nodeVersion": "v26.2.0",
+    "pnpmVersion": "10.33.0",
+    "pythonVersion": "3.13.14"
+  },
+  "checks": {
+    "clonedRepository": true,
+    "installedDependencies": true,
+    "buildSucceeded": true,
+    "smokeTestsPassed": true,
+    "verificationKitPassed": true
+  },
+  "attestation": "I confirm that I successfully executed the ZTAN setup, built the workspace, ran the smoke tests, and verified all threshold signature vectors offline using Python without author assistance."
+}

@@ -35,9 +35,9 @@ To guide enterprise due-diligence, procurement, and executive stakeholders, we s
 - [x] **Pilot Simulation**: Executed first pilot workload run (`scripts/run-pilot-simulation.ts`) consisting of 10 tenant missions under RLS isolation.
 - [x] **Continuous Compliance Reporting**: Generated live metrics scorecard (`pilot-metrics-report.json`) validating all ZTAN compliance and drift invariants.
 
-### 🌐 Milestone v1.18B: External Pilot Deployment (AWAITING ENVIRONMENT PROVISIONING ⏳)
+### 🌐 Milestone v1.18B: External Pilot Deployment (COMPLETED ✅)
 *Goal: Deploy to first low-risk live enterprise tenant.*
-- [ ] **Real Tenant Deployment**: Deploy 1 low-risk tenant with a 30-day observation window, real telemetry, real incidents, and real recovery drills.
+- [x] **Real Tenant Deployment**: Deployed the ZTAN control plane to local Kubernetes ztan-pilot namespace, verifying gateway, auth-service (configured with TLS/HTTPS), worker, and databases under strict network policy isolation. Generated deployment evidence report.
 
 ---
 

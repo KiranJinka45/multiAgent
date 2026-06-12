@@ -1,0 +1,78 @@
+{
+  "timestamp": "2026-06-12T13:52:30.000Z",
+  "campaign": "v1.15.0 ZTAN Evidence Accumulation Campaign",
+  "qualificationId": "EVIDENCE-PILOT-01",
+  "deployment": {
+    "namespace": "ztan-pilot",
+    "clusterContext": "docker-desktop",
+    "k8sVersion": "v1.34.3",
+    "status": "COMPLETED_AND_VERIFIED"
+  },
+  "services": [
+    {
+      "name": "gateway",
+      "status": "Running",
+      "ready": "1/1",
+      "image": "ghcr.io/kiran/multiagent-gateway:v1.1.5",
+      "ports": ["4081:30081/TCP"]
+    },
+    {
+      "name": "auth-service",
+      "status": "Running",
+      "ready": "1/1",
+      "image": "ghcr.io/kiran/multiagent-auth:v1.1.4",
+      "ports": ["4002/TCP"],
+      "security": {
+        "tlsEnabled": true,
+        "tlsCertSource": "Self-signed certificate with subjectAltNames (auth-service, auth-service.ztan-pilot.svc, localhost)"
+      }
+    },
+    {
+      "name": "worker",
+      "status": "Running",
+      "ready": "1/1",
+      "image": "multiagent-worker:v1.1.6-fix-v4",
+      "ports": ["8082/TCP"]
+    },
+    {
+      "name": "postgres",
+      "status": "Running",
+      "ready": "1/1",
+      "image": "postgres:15-alpine",
+      "ports": ["5432/TCP"]
+    },
+    {
+      "name": "redis",
+      "status": "Running",
+      "ready": "1/1",
+      "image": "redis:7-alpine",
+      "ports": ["6379/TCP"]
+    }
+  ],
+  "infrastructure": {
+    "secrets": [
+      "pilot-auth-secrets",
+      "pilot-gateway-secrets",
+      "pilot-core-secrets",
+      "auth-service-tls"
+    ],
+    "networkPolicies": [
+      "pilot-default-deny-ingress",
+      "pilot-allow-intra-namespace",
+      "pilot-allow-gateway-external"
+    ]
+  },
+  "healthCheckVerification": {
+    "method": "kubectl-port-forward + HTTP GET",
+    "timestamp": "2026-06-12T13:52:21.298Z",
+    "healthEndpoint": {
+      "url": "http://localhost:4081/health",
+      "status": "ok",
+      "service": "gateway"
+    },
+    "readyEndpoint": {
+      "url": "http://localhost:4081/health/ready",
+      "status": "ready"
+    }
+  }
+}

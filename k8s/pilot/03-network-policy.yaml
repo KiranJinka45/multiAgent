@@ -1,0 +1,46 @@
+# ── Network Isolation Policy for Pilot Namespace ───────────────────────────
+# Enforces that only ztan-pilot pods can communicate with each other.
+# External ingress is only allowed to the gateway service.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: pilot-default-deny-ingress
+  namespace: ztan-pilot
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  ingress: []
+---
+# Allow intra-namespace communication
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: pilot-allow-intra-namespace
+  namespace: ztan-pilot
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: ztan-pilot
+---
+# Allow external access to gateway only
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: pilot-allow-gateway-external
+  namespace: ztan-pilot
+spec:
+  podSelector:
+    matchLabels:
+      app: gateway
+  policyTypes:
+  - Ingress
+  ingress:
+  - ports:
+    - port: 4081
+      protocol: TCP
