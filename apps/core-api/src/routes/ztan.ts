@@ -8,7 +8,7 @@ const router = express.Router();
  * GET /api/v1/ztan/session/active
  * Returns the current active session state if it exists.
  */
-router.get('/session/active', async (req, res) => {
+router.get('/session/active', async (_req, res) => {
     try {
         const active = await TssSessionService.getActive();
         res.json({ active });
@@ -110,7 +110,7 @@ router.get('/session/:id', async (req, res) => {
  * GET /api/v1/ztan/identities
  * Returns the current node registry (Public keys and status).
  */
-router.get('/identities', async (req, res) => {
+router.get('/identities', async (_req, res) => {
     try {
         const { db } = await import('@packages/db');
         const identities = await db.ztanIdentity.findMany();
@@ -124,7 +124,7 @@ router.get('/identities', async (req, res) => {
  * GET /api/v1/ztan/metrics
   * Returns ZTAN performance and reliability metrics.
  */
-router.get('/metrics', async (req, res) => {
+router.get('/metrics', async (_req, res) => {
     try {
         const { db } = await import('@packages/db');
         const totalSessions = await db.ztanProof.count();
@@ -152,7 +152,7 @@ router.get('/metrics', async (req, res) => {
 /**
  * GET /api/v1/ztan/recovery/summary
  */
-router.get('/recovery/summary', async (req, res) => {
+router.get('/recovery/summary', async (_req, res) => {
     try {
         const summary = RecoveryHistoryEngine.loadIndex();
         res.json(summary);
@@ -199,12 +199,12 @@ router.post('/recovery/forecast/validate', async (req, res) => {
     res.json({ success: true });
 });
 
-router.get('/recovery/forecast/metrics', async (req, res) => {
+router.get('/recovery/forecast/metrics', async (_req, res) => {
     const metrics = RecoveryHistoryEngine.getPredictionMetrics();
     res.json(metrics);
 });
 
-router.get('/recovery/warnings', async (req, res) => {
+router.get('/recovery/warnings', async (_req, res) => {
     const warnings = RecoveryHistoryEngine.getInstabilityWarnings();
     res.json(warnings);
 });
@@ -220,7 +220,7 @@ router.get('/recovery/chain/:id', async (req, res) => {
     res.json(results);
 });
 
-router.get('/recovery/stewardship/audit', async (req, res) => {
+router.get('/recovery/stewardship/audit', async (_req, res) => {
     const report = RecoveryHistoryEngine.getApprovalAuditReport();
     res.json(report);
 });
@@ -237,88 +237,88 @@ router.post('/recovery/rollback', async (req, res) => {
     res.json({ success: true });
 });
 
-router.get('/recovery/certifications/expired', async (req, res) => {
+router.get('/recovery/certifications/expired', async (_req, res) => {
     const expired = RecoveryHistoryEngine.getExpiredCertifications();
     res.json(expired);
 });
 
-router.get('/recovery/stewardship/behavior', async (req, res) => {
+router.get('/recovery/stewardship/behavior', async (_req, res) => {
     res.json(RecoveryHistoryEngine.auditOperatorBehavior());
 });
 
-router.get('/recovery/stewardship/prediction', async (req, res) => {
+router.get('/recovery/stewardship/prediction', async (_req, res) => {
     res.json(RecoveryHistoryEngine.calibratePredictionAccuracy());
 });
 
-router.get('/recovery/stewardship/lineage', async (req, res) => {
+router.get('/recovery/stewardship/lineage', async (_req, res) => {
     res.json(RecoveryHistoryEngine.compressOperationalLineage());
 });
 
-router.get('/recovery/archive/verify', async (req, res) => {
+router.get('/recovery/archive/verify', async (_req, res) => {
     res.json(RecoveryHistoryEngine.verifyArchiveIntegrity());
 });
 
-router.post('/recovery/archive/compact', async (req, res) => {
+router.post('/recovery/archive/compact', async (_req, res) => {
     res.json(RecoveryHistoryEngine.compactReplays());
 });
 
-router.get('/recovery/stewardship/narrative', async (req, res) => {
+router.get('/recovery/stewardship/narrative', async (_req, res) => {
     res.json(RecoveryHistoryEngine.generateOperationalNarrative());
 });
 
-router.get('/recovery/stewardship/velocity', async (req, res) => {
+router.get('/recovery/stewardship/velocity', async (_req, res) => {
     res.json(RecoveryHistoryEngine.auditReviewVelocity());
 });
 
-router.get('/recovery/stewardship/handoff', async (req, res) => {
+router.get('/recovery/stewardship/handoff', async (_req, res) => {
     res.json(RecoveryHistoryEngine.verifyOperationalTransfer());
 });
 
-router.get('/recovery/archive/recoverability', async (req, res) => {
+router.get('/recovery/archive/recoverability', async (_req, res) => {
     res.json(RecoveryHistoryEngine.verifyArchiveRecoverability());
 });
 
-router.get('/recovery/prediction/history', async (req, res) => {
+router.get('/recovery/prediction/history', async (_req, res) => {
     res.json(RecoveryHistoryEngine.getPredictionAccuracyHistory());
 });
 
-router.get('/recovery/stewardship/noise', async (req, res) => {
+router.get('/recovery/stewardship/noise', async (_req, res) => {
     res.json(RecoveryHistoryEngine.auditTelemetryNoise());
 });
 
-router.get('/recovery/stewardship/growth', async (req, res) => {
+router.get('/recovery/stewardship/growth', async (_req, res) => {
     res.json(RecoveryHistoryEngine.forecastStorageGrowth());
 });
 
-router.get('/recovery/stewardship/drill', async (req, res) => {
+router.get('/recovery/stewardship/drill', async (_req, res) => {
     res.json(RecoveryHistoryEngine.performLongHorizonDrill());
 });
 
-router.get('/recovery/stewardship/decay', async (req, res) => {
+router.get('/recovery/stewardship/decay', async (_req, res) => {
     res.json(RecoveryHistoryEngine.analyzeOperationalDecay());
 });
 
-router.get('/recovery/stewardship/rigor', async (req, res) => {
+router.get('/recovery/stewardship/rigor', async (_req, res) => {
     res.json(RecoveryHistoryEngine.auditApprovalQuality());
 });
 
-router.get('/recovery/stewardship/freshness', async (req, res) => {
+router.get('/recovery/stewardship/freshness', async (_req, res) => {
     res.json(RecoveryHistoryEngine.validateRunbookFreshness());
 });
 
-router.get('/recovery/stewardship/stability', async (req, res) => {
+router.get('/recovery/stewardship/stability', async (_req, res) => {
     res.json(RecoveryHistoryEngine.calculateStabilityIndex());
 });
 
-router.get('/recovery/stewardship/simplicity', async (req, res) => {
+router.get('/recovery/stewardship/simplicity', async (_req, res) => {
     res.json(RecoveryHistoryEngine.auditOperationalStability());
 });
 
-router.get('/recovery/stewardship/observation', async (req, res) => {
+router.get('/recovery/stewardship/observation', async (_req, res) => {
     res.json(RecoveryHistoryEngine.monitorOperatorFriction());
 });
 
-router.get('/recovery/stats', async (req, res) => {
+router.get('/recovery/stats', async (_req, res) => {
     try {
         const stats = RecoveryHistoryEngine.getEnvironmentStats();
         res.json({ stats });
@@ -327,15 +327,15 @@ router.get('/recovery/stats', async (req, res) => {
     }
 });
 
-router.get('/recovery/stewardship/economics', async (req, res) => {
+router.get('/recovery/stewardship/economics', async (_req, res) => {
     res.json(RecoveryHistoryEngine.auditStewardshipEconomics());
 });
 
-router.get('/recovery/stewardship/founder-absence', async (req, res) => {
+router.get('/recovery/stewardship/founder-absence', async (_req, res) => {
     res.json(RecoveryHistoryEngine.simulateFounderAbsence());
 });
 
-router.post('/recovery/stewardship/fold', async (req, res) => {
+router.post('/recovery/stewardship/fold', async (_req, res) => {
     res.json(RecoveryHistoryEngine.foldSimilarReplays());
 });
 

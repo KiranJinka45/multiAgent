@@ -37,7 +37,7 @@ export class StateReconciler {
     private async handleEvent(message: string) {
         try {
             const event: BuildEvent = JSON.parse(message);
-            const { executionId, type, projectId, payload } = event;
+            const { type, projectId, payload } = event;
 
             if (!projectId) return;
 
@@ -75,7 +75,7 @@ export class StateReconciler {
         }
     }
 
-    private async updateMissionStatus(id: string, status: 'completed' | 'failed', error?: string) {
+    private async updateMissionStatus(id: string, status: 'completed' | 'failed', _error?: string) {
         try {
             // Note: Project model in schema.prisma corresponds to a "Mission" in this context
             await db.project.update({

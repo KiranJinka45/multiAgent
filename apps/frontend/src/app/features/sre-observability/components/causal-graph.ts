@@ -1,7 +1,7 @@
 import { Component, Input, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-interface CausalNode {
+interface _CausalNode {
   id: string;
   type: string;
   status: 'HEALTHY' | 'ANOMALY' | 'ROOT_CAUSE';

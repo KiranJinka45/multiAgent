@@ -62,7 +62,7 @@ async function verifyVector(filePath: string) {
     let errorThrown = false;
     try {
         ThresholdCrypto.buildCanonicalPayload(vector.input.payload.toString(), vector.input.threshold, vector.input.participants);
-    } catch (e) {
+    } catch (_e) {
         errorThrown = true;
     }
     const match = errorThrown === vector.expected.error;

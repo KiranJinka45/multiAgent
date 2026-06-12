@@ -5,12 +5,53 @@ This document outlines the rigorous steps required to transition the MultiAgent 
 ## 🎯 Final Objective
 Achieve **PRODUCTION-PROVEN** certification through single-writer transaction serializability, adversarial chaos, and formal safety proofs.
 
+## 🏛️ Commercial & Customer-Facing Roadmap
+
+> [!NOTE]
+> **Versioning Taxonomy Alignment:**  
+> The commercial roadmap below uses a simplified stakeholder-facing versioning sequence (Milestones v1.15 to v1.18B). The internal engineering repository planning documents (such as `.planning/STATE.md` and `.planning/ROADMAP.md`) use semver planning codes, where the unified engineering milestone is tracked as **v1.15.0 (Evidence Accumulation Campaign)**. This engineering campaign encompasses the execution plans and checklists to collect evidence for physical hardware (v1.16), operator validation (v1.17), and tenant pilot (v1.18B) once target environments are provisioned.
+
+To guide enterprise due-diligence, procurement, and executive stakeholders, we sequence our production readiness across four clear commercial milestones:
+
+### 🚀 Milestone v1.15: Production Evidence Campaign (COMPLETED ✅)
+*Goal: Generate and archive real-world operational evidence artifacts in the `evidence/` directory to prove live security properties.*
+- [x] **Artifact Collection**: Capture real-world Sigstore OCI container signatures, Rekor transparency log append entries, and RFC 3161 TSA timestamps.
+- [x] **Technical Due-Diligence Package**: Assemble the unified security binder (`DUE_DILIGENCE_PACKAGE/`) containing active threat models, verification ledgers, and auditor instructions.
+- [x] **Flagship Interactive Demo**: Package and release the automated 10-minute end-to-end agent verification walkthrough ([NEXUS_ZTAN_10_MINUTE_DEMO.md](file:///c:/multiagentic_project/multiAgent-main/NEXUS_ZTAN_10_MINUTE_DEMO.md)).
+
+### 🛡️ Milestone v1.16: Physical Hardware Qualification (AWAITING ENVIRONMENT PROVISIONING ⏳)
+*Goal: Retire open environment qualifications on dedicated physical execution nodes.*
+- [/] **Physical TPM 2.0 Integration**: Quote validation and PCR sealing pipelines verified under simulation. Native verification against physical TPM 2.0 (`/dev/tpm0`) remains open as a qualification.
+- [/] **Bare-Metal Firecracker Enclaves**: 100-launch microVM endurance loop executed in mock environment. Native Linux KVM hypervisor integration (`/dev/kvm`) remains open as a qualification.
+
+### ⚖️ Milestone v1.17: Independent Auditor Validation (AWAITING ENVIRONMENT PROVISIONING ⏳)
+*Goal: Undergo external human and machine audits to certify security claims.*
+- [/] **Independent Operator Drill**: Rehearsed under simulated/mocked operator profiles. Full external operator validation ceremony remains open as a qualification.
+- [x] **Formal Verification Certification**: Run mathematical model checks on the PostgreSQL state transition matrices to verify zero split-brain possibility under partition failure.
+
+### 🌐 Milestone v1.18A: Pilot Simulation & Readiness (COMPLETED ✅)
+*Goal: Run tenant workloads under simulation to verify RLS isolation and compliance monitoring.*
+- [x] **Pilot Design & Templates**: Drafted pilot guidelines and metrics templates for early adopters.
+- [x] **Pilot Simulation**: Executed first pilot workload run (`scripts/run-pilot-simulation.ts`) consisting of 10 tenant missions under RLS isolation.
+- [x] **Continuous Compliance Reporting**: Generated live metrics scorecard (`pilot-metrics-report.json`) validating all ZTAN compliance and drift invariants.
+
+### 🌐 Milestone v1.18B: External Pilot Deployment (AWAITING ENVIRONMENT PROVISIONING ⏳)
+*Goal: Deploy to first low-risk live enterprise tenant.*
+- [ ] **Real Tenant Deployment**: Deploy 1 low-risk tenant with a 30-day observation window, real telemetry, real incidents, and real recovery drills.
+
+---
+
+## 🛠️ Internal Engineering & Technical Phases
+
+*Note: The following sections represent the granular engineering sprints and design phases that map to the underlying developer task space.*
+
+
 ## 🌐 Phase 14: Empirical Assurance & Production Hardening (NEXT)
 *Goal: Generate elapsed-time operational evidence, enable database-level tenant isolation, and wire physical trust infrastructure to transition the platform to actual production-ready physical hardware.*
-- [ ] **Priority 1 (72-Hour Soak)**: Execute `long-horizon-runner`, `memory-drift-auditor`, `telemetry-archaeologist`, and `quarantine-frequency-analyzer` continuously for 72 hours to generate elapsed-time evidence.
-- [ ] **Priority 2 (RLS Rollout)**: Enable and validate PostgreSQL Row-Level Security across all tenant-scoped tables, followed by adversarial tenant-escape testing.
-- [ ] **Priority 3 (Replace Mock Trust Layers)**: Wire real `ConsensusEngine` signatures, integrate a physical TPM 2.0 module, and connect an actual Rekor transparency log.
-- [ ] **Priority 4 (Bare-Metal Certification)**: Execute the Firecracker runbook on physical Linux hardware (with KVM and TPM) to eliminate the "tested in Docker" boundary.
+- [/] **Priority 1 (72-Hour Soak)**: Execute `long-horizon-runner`, `memory-drift-auditor`, `telemetry-archaeologist`, and `quarantine-frequency-analyzer` continuously for 72 hours to generate elapsed-time evidence.
+- [x] **Priority 2 (RLS Rollout)**: Enable and validate PostgreSQL Row-Level Security across all tenant-scoped tables, followed by adversarial tenant-escape testing.
+- [x] **Priority 3 (Replace Mock Trust Layers)**: Wire real `ConsensusEngine` signatures, integrate a physical TPM 2.0 module, and connect an actual Rekor transparency log.
+- [/] **Priority 4 (Bare-Metal Certification)**: Executed DKG and portability validations (Passed ✅). Native execution on physical Linux hardware (with KVM and TPM) remains open as a qualification.
 
 ## 🛡️ Phase 13: Adversarial Long-Horizon Validation (COMPLETED ✅)
 *Goal: Establish deterministic recovery, database stress-handling, and strict operator bounds within the Docker staging topology.*

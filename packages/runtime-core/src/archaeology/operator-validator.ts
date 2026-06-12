@@ -41,7 +41,7 @@ export class OperatorValidator {
             }
             
             return false;
-        } catch (e) {
+        } catch (_e) {
             return false;
         }
     }

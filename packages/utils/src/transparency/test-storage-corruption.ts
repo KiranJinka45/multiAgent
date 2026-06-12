@@ -77,7 +77,7 @@ async function runStorageCorruptionValidation() {
   // Directly mock saveLedger to simulate absolute disk write failure
   const originalSaveLedger = GovernanceLedger.saveLedger;
   
-  GovernanceLedger.saveLedger = (entries: any) => {
+  GovernanceLedger.saveLedger = (_entries: any) => {
     const err = new Error('ENOSPC: no space left on device, write');
     (err as any).code = 'ENOSPC';
     throw err;

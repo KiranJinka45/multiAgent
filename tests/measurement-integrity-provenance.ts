@@ -210,7 +210,7 @@ async function run() {
     };
 
     let prevHash = 'ZTAN_TELEMETRY_GENESIS';
-    let baseTime = Date.now();
+    const baseTime = Date.now();
     let nominalErrors: string[] = [];
 
     for (let i = 0; i < 5; i++) {

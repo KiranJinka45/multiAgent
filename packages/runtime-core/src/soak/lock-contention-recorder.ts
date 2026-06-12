@@ -25,7 +25,7 @@ export class LockContentionRecorder {
                 await this.prisma.$executeRawUnsafe('SELECT 1;');
                 const duration = Date.now() - start;
                 this.lockWaitTimes.push(duration);
-            } catch (e) {
+            } catch (_e) {
                 // Ignore temporary failures during injected chaos dropouts
             }
         }, 500);

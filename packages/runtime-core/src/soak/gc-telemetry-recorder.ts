@@ -48,7 +48,7 @@ export class GcTelemetryRecorder {
                 }
             });
             this.observer.observe({ entryTypes: ['gc'] });
-        } catch (e) {
+        } catch (_e) {
             // Observer not supported or fails gracefully in restricted sandboxes
         }
     }

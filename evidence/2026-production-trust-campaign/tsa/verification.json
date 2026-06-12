@@ -1,0 +1,9 @@
+{
+  "status": "VERIFIED",
+  "timeServer": "http://timestamp.digicert.com",
+  "authoritativeTime": 1781246281000,
+  "authoritativeTimeISO": "2026-06-12T06:38:01.000Z",
+  "hashAlgorithm": "sha256",
+  "targetHash": "6608b1efedb8b933e17e9ad04c6eae090319ad2e8d8100f2044edccb12e32a60",
+  "signatureFormat": "DER/CMS/RFC3161"
+}

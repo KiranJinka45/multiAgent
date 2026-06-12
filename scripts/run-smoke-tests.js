@@ -45,6 +45,7 @@ async function runSmokeTest(service) {
             cwd: rootDir,
             env: {
                 ...process.env,
+                JWT_SECRET: 'smoke-test-jwt-secret-key-at-least-32-chars-long',
                 ...service.env,
                 NODE_ENV: 'test',
                 LOG_LEVEL: 'debug'

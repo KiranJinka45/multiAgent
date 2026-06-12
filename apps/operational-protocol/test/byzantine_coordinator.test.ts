@@ -6,7 +6,7 @@ import { ConsensusEngine } from '../src/consensus-engine';
 import { TrustAttestation } from '../src/types';
 
 // Deterministic Simulation Helper
-function getSeededRandom(seed: string) {
+function _getSeededRandom(seed: string) {
     return () => {
         const hash = crypto.createHash('sha256').update(seed).digest();
         seed = hash.toString('hex');
@@ -21,7 +21,7 @@ describe('ZTAN Byzantine Coordinator Resilience Simulation', () => {
     const T = 3;
     const N = 5;
     const NODE_IDS = ['node-1', 'node-2', 'node-3', 'node-4', 'node-5'];
-    const SEED = 'ZTAN_AUDIT_SEED_COORD_001';
+    const _SEED = 'ZTAN_AUDIT_SEED_COORD_001';
 
     beforeAll(async () => {
         // Use deterministic random for noble-bls if possible, 

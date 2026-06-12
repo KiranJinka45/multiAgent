@@ -7,7 +7,7 @@ export interface SeccompFilter {
     syscalls: Array<{
         name: string;
         action: string;
-        args?: any[];
+        args?: unknown[];
     }>;
 }
 
@@ -100,8 +100,9 @@ export class SeccompFilterGenerator {
                 const data = fs.readFileSync(resolvedPath, 'utf8');
                 return JSON.parse(data);
             }
-        } catch (e: any) {
-            console.error(`[SECCOMP] Failed to load static profile from ${filePath}: ${e.message}`);
+        } catch (e: unknown) {
+            const message = e instanceof Error ? e.message : String(e);
+            console.error(`[SECCOMP] Failed to load static profile from ${filePath}: ${message}`);
         }
         return this.generateProfile();
     }
@@ -126,8 +127,9 @@ export class SeccompFilterGenerator {
         try {
             fs.mkdirSync(path.dirname(filePath), { recursive: true });
             fs.writeFileSync(filePath, JSON.stringify(profile, null, 2));
-        } catch (e: any) {
-            console.error(`[SECCOMP] Failed to write profile: ${e.message}`);
+        } catch (e: unknown) {
+            const message = e instanceof Error ? e.message : String(e);
+            console.error(`[SECCOMP] Failed to write profile: ${message}`);
         }
     }
 }

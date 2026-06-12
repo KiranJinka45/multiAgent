@@ -14,7 +14,7 @@ export class Backtester {
     const traces = await IncidentReplayService.getReplay(incidentId);
 
     // 2. Simulate strategy against each trace step
-    for (const step of traces) {
+    for (const _step of traces) {
       // In a real system, we would pipe 'step' into the candidate strategy
       // For now, we simulate a perfect prediction
       operationalAudit.verify(`backtest-${strategyId}`, 100, 95, 0.9);

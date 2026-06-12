@@ -10,6 +10,7 @@ RUN corepack enable && corepack prepare pnpm@10.33.0 --activate
 
 # Copy monorepo configuration
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json .npmrc turbo.json tsconfig*.json tsup.config.base.ts ./
+COPY scripts/ ./scripts/
 COPY packages/ ./packages/
 COPY apps/gateway/ ./apps/gateway/
 
@@ -20,16 +21,18 @@ RUN pnpm install --frozen-lockfile
 RUN pnpm turbo build --filter=@apps/gateway...
 
 # Deploy the app to a separate directory
-RUN pnpm --filter=@apps/gateway deploy /prod/gateway
+RUN pnpm --filter=@apps/gateway deploy --legacy /prod/gateway
+RUN cp -r node_modules/.prisma /prod/gateway/node_modules/
 
 # -------- RUNTIME STAGE --------
 FROM node:20-alpine AS runner
+RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
 # Ensure non-root usage
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 runner
-USER runner
+USER 1001
 
 # Copy the deployed app
 COPY --from=builder --chown=runner:nodejs /prod/gateway .

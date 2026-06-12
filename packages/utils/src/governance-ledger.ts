@@ -15,8 +15,8 @@ import { dbHealthMonitor } from './health.js';
 import { StartupAttestationService } from './startup-attestation.js';
 
 const LEDGER_DIR = path.join(process.cwd(), '.ztan-transparency');
-const LEDGER_FILE = path.join(LEDGER_DIR, 'governance_ledger.json');
-const OUTBOX_FILE = path.join(LEDGER_DIR, 'outbox_queue.json');
+const _LEDGER_FILE = path.join(LEDGER_DIR, 'governance_ledger.json');
+const _OUTBOX_FILE = path.join(LEDGER_DIR, 'outbox_queue.json');
 
 function getLeaseDb() {
   return getSharedClient(DbClientRole.LEASE);
@@ -87,7 +87,7 @@ export function sanitizeAndAttest(str: string, epochId: string = "1"): {
   return { sanitized, attestation, wasSanitized };
 }
 
-function sanitizePayloadString(str: string): string {
+function _sanitizePayloadString(str: string): string {
   return sanitizeAndAttest(str).sanitized;
 }
 
@@ -108,7 +108,7 @@ const KEYS_DIR = path.join(LEDGER_DIR, 'keys');
 const OPERATOR_PRIV_FILE = path.join(KEYS_DIR, 'operator.key');
 const OPERATOR_PUB_FILE = path.join(KEYS_DIR, 'operator.pub');
 
-const LOCK_FILE = path.join(LEDGER_DIR, 'ledger.lock');
+const _LOCK_FILE = path.join(LEDGER_DIR, 'ledger.lock');
 const LOCK_TIMEOUT_MS = 25000;
 const LOCK_LEASE_MS = 30000;
 const LOCK_RETRY_INTERVAL_MS = 50;
@@ -650,7 +650,7 @@ export const GovernanceLedger = {
         if (partition === 0) {
           fs.writeFileSync(path.join(LEDGER_DIR, 'liveness.json'), JSON.stringify(livenessData), 'utf8');
         }
-      } catch (livenessErr) {
+      } catch (_livenessErr) {
         // ignore
       }
     }, 500);
@@ -985,7 +985,7 @@ export const GovernanceLedger = {
           fs.writeFileSync(lockFile, JSON.stringify(updatedMeta), 'utf8');
         }
       }
-    } catch (e) {
+    } catch (_e) {
       // ignore write race
     }
   },
@@ -1032,7 +1032,7 @@ export const GovernanceLedger = {
     try {
       const { healthy } = await dbHealthMonitor.isHealthy();
       return healthy;
-    } catch (e) {
+    } catch (_e) {
       return false;
     }
   },
@@ -1318,7 +1318,7 @@ export const GovernanceLedger = {
 
       logger.info(`[GovernanceLedger] Outbox worker processing ${queue.length} pending entries for partition ${partition}...`);
       
-      let batchSize = outboxBatchSizes.get(partition) || 1;
+      const batchSize = outboxBatchSizes.get(partition) || 1;
       const batch = queue.slice(0, batchSize);
       
       const ledger = this.loadLedger(partition);
@@ -1374,7 +1374,7 @@ export const GovernanceLedger = {
                   regKey = await tx.ztanRegisteredKey.create({
                     data: { actorId: entry.operatorId, publicKey: pem }
                   });
-                } catch (regErr) {
+                } catch (_regErr) {
                   throw new Error(`[INTEGRITY_ERROR] Operator ${entry.operatorId} is not registered in ZtanRegisteredKey.`);
                 }
               }
@@ -1634,7 +1634,7 @@ export const GovernanceLedger = {
             if (dbQ) {
               restoredEntry.quarantineBlob = dbQ.rawBlob;
             }
-          } catch (attErr) {}
+          } catch (_attErr) {}
 
           const expectedHash = this.computeHash(restoredEntry);
           if (expectedHash !== restoredEntry.hash) {
@@ -1730,7 +1730,7 @@ export const GovernanceLedger = {
       verify.update(payload);
       verify.end();
       return verify.verify(publicKey, Buffer.from(signatureBase64, 'base64'));
-    } catch (e) {
+    } catch (_e) {
       return false;
     }
   },
@@ -1741,7 +1741,7 @@ export const GovernanceLedger = {
       verify.update(payload);
       verify.end();
       return verify.verify(publicKeyPem, Buffer.from(signatureBase64, 'base64'));
-    } catch (e) {
+    } catch (_e) {
       return false;
     }
   },
@@ -1754,7 +1754,7 @@ export const GovernanceLedger = {
       }
       const content = fs.readFileSync(ledgerFile, 'utf8');
       return JSON.parse(content);
-    } catch (e) {
+    } catch (_e) {
       logger.error(`[GovernanceLedger] Failed to read ledger file for partition ${partition}, returning empty array`);
       return [];
     }
@@ -1840,7 +1840,7 @@ export const GovernanceLedger = {
             verdict: dbBlock.status as any
           };
         }
-      } catch (dbErr) {
+      } catch (_dbErr) {
         // Ignore DB query errors in case DB is offline/partitioned
       }
     }
@@ -1878,7 +1878,7 @@ export const GovernanceLedger = {
           }
         }
       }
-    } catch (err) {
+    } catch (_err) {
       // Ignore in case DB is offline/partitioned
     }
 
@@ -1911,7 +1911,7 @@ export const GovernanceLedger = {
             }
           }
         }
-      } catch (err) {
+      } catch (_err) {
         // Ignore
       }
 
@@ -1981,7 +1981,7 @@ export const GovernanceLedger = {
                 regKey = await tx.ztanRegisteredKey.create({
                   data: { actorId: entry.operatorId, publicKey: pem }
                 });
-              } catch (regErr) {
+              } catch (_regErr) {
                 throw new Error(`[INTEGRITY_ERROR] Operator ${entry.operatorId} is not registered in ZtanRegisteredKey.`);
               }
             }

@@ -55,7 +55,7 @@ async function main() {
   let stdin = '';
   try {
     stdin = fs.readFileSync(0, 'utf-8');
-  } catch (e) {
+  } catch (_e) {
     // If stdin read fails, we can't do anything meaningful
     process.exit(1);
   }
@@ -67,7 +67,7 @@ async function main() {
   let envelope: any;
   try {
     envelope = JSON.parse(stdin);
-  } catch (e) {
+  } catch (_e) {
     process.exit(1);
   }
 

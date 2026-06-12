@@ -11,8 +11,7 @@ export * from './vfs-lock.js';
 export * from './lifecycle.js';
 export * from './health.js';
 export * from './middleware/security.js';
-export * from './context.js';
-export * from './request-context.js';
+export { contextStorage, getRequestId, getTenantId, type RequestContext } from '@packages/observability';
 export * from './audit.js';
 export * from './idempotency.js';
 export * from './errors.js';
@@ -154,6 +153,7 @@ export const JobPayload = {} as any;
 
 export { HSMVault, HSMErrorCode } from './hsm-vault.js';
 export type { HSMAttestation, HSMState } from './hsm-vault.js';
+export { CryptoRegistry, SignatureAlgorithm, type SignaturePayload } from './transparency/crypto-registry.js';
 
 import bridge from './server.js';
 

@@ -212,7 +212,7 @@ export class ReplayEntropyAuditor {
 
     const childCounts = new Map<string, number>();
 
-    for (const [id, node] of graph.nodes.entries()) {
+    for (const [_id, node] of graph.nodes.entries()) {
       const parentId = hashToNodeId.get(node.prevHash);
       if (parentId) {
         node.parentIds.push(parentId);
@@ -224,7 +224,7 @@ export class ReplayEntropyAuditor {
     }
 
     // Resolve fork points (nodes with multiple children) and leaf nodes (nodes with 0 children)
-    for (const [id, node] of graph.nodes.entries()) {
+    for (const [id, _node] of graph.nodes.entries()) {
       const children = childCounts.get(id) ?? 0;
       if (children > 1) {
         graph.forkPoints.push(id);
@@ -283,8 +283,8 @@ export class ReplayEntropyAuditor {
 
       // Track back to find the root fork point (last parent that is in the mainChain)
       let rootForkId = 'UNKNOWN';
-      let path: string[] = [node.blockId];
-      let queue = [...node.parentIds];
+      const _path: string[] = [node.blockId];
+      const queue = [...node.parentIds];
       const visited = new Set<string>();
 
       while (queue.length > 0) {

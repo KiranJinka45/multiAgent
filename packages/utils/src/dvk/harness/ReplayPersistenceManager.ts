@@ -38,7 +38,7 @@ export class ReplayPersistenceManager {
           console.warn(`[Persistence Governance] Observability Recursion Ceiling reached (DB size: ${(stats.size / 1024 / 1024).toFixed(2)} MB >= 10MB). Suppressing telemetry persist.`);
           return;
         }
-      } catch (err) {
+      } catch (_err) {
         // Ignore stats check errors
       }
     }

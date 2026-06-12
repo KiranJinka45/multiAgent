@@ -67,6 +67,6 @@ export class MetaAgent {
 }
 
 export const AgentMemory = {
-    set: async (missionId: string, key: string, value: any) => {},
-    appendTranscript: async (missionId: string, name: string, text: string) => {}
+    set: async (_missionId: string, _key: string, _value: any) => {},
+    appendTranscript: async (_missionId: string, _name: string, _text: string) => {}
 };

@@ -12,3 +12,5 @@
 | 2026-05-13T19:48:47.050Z | FAILED | NUCLEAR_CLEAN | 897.47s | pnpm install failed: Command failed: pnpm install |
 | 2026-05-13T19:53:45.545Z | FAILED | NUCLEAR_CLEAN | 819.76s | pnpm install failed: Command failed: pnpm install |
 | 2026-05-13T20:13:16.957Z | FAILED | NUCLEAR_CLEAN | N/A | OCR execution failed: Command failed: pnpm exec tsx scripts/one-command-recovery.ts |
+| 2026-06-10T03:57:41.047Z | FAILED | NUCLEAR_CLEAN | N/A | OCR execution failed: Command failed: pnpm exec tsx scripts/one-command-recovery.ts |
+| 2026-06-10T04:24:33.409Z | SUCCESS | NUCLEAR_CLEAN | 1462.90s | Full reconstruction successful |

@@ -1,5 +1,5 @@
 class IncidentCorrelationEngine {
-    static async analyzeTrace(traceId: string) {
+    static async analyzeTrace(_traceId: string) {
         return {
             rootCauseService: 'auth-service',
             confidence: 0.9,

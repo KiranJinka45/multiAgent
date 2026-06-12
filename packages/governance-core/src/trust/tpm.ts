@@ -128,6 +128,26 @@ export class TpmEngine {
                 };
             }
 
+            // Cryptographically verify hardware signature using tpm2_checkquote
+            try {
+                const parsed = JSON.parse(quote.attestedData);
+                const sigValid = PhysicalTpmConnector.verifyPhysicalQuote(nonce, parsed.quoteBytes, quote.signature);
+                if (!sigValid) {
+                    return {
+                        verified: false,
+                        errorType: 'SIGNATURE_INVALID',
+                        details: 'Hardware tpm2_checkquote verification failed. Signature or quote payload is invalid.'
+                    };
+                }
+            } catch (e: unknown) {
+                const message = e instanceof Error ? e.message : String(e);
+                return {
+                    verified: false,
+                    errorType: 'SIGNATURE_INVALID',
+                    details: `Hardware verification error: ${message}`
+                };
+            }
+
             // Verify PCR measurements matching expected physical baseline
             for (const [idxStr, expectedVal] of Object.entries(expectedPcrs)) {
                 const idx = parseInt(idxStr, 10);
@@ -211,11 +231,12 @@ export class TpmEngine {
                 };
             }
 
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : String(err);
             return {
                 verified: false,
                 errorType: 'SIGNATURE_INVALID',
-                details: `Attested data parsing error: ${err.message}`
+                details: `Attested data parsing error: ${message}`
             };
         }
 

@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-06-13T06:00:00.000Z",
+  "filePath": "C:/multiagentic_project/multiAgent-main/evidence/drill-backup-clean.json",
+  "fileSizeBytes": 3850,
+  "overallPassed": true,
+  "findings": [],
+  "checks": {
+    "structuralIntegrity": true,
+    "schemaConformance": true,
+    "hashChainContinuity": true,
+    "epochMonotonicity": true,
+    "walSequenceMonotonicity": true,
+    "truncationDetection": true
+  }
+}

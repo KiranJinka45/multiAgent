@@ -20,7 +20,7 @@ const dlq = new Queue(DEAD_LETTER_QUEUE_NAME, { connection: redis }) as any;
  * GET /api/admin/dlq
  * List failed jobs in the DLQ with failure classification.
  */
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', async (_req: Request, res: Response) => {
     try {
         const jobs = await dlq.getJobs(['waiting', 'active', 'completed', 'failed', 'delayed']);
         res.json({
@@ -111,7 +111,7 @@ router.delete('/:jobId', async (req: Request, res: Response) => {
  * POST /api/admin/dlq/replay-all
  * Replay all jobs classified as TRANSIENT.
  */
-router.post('/replay-all-transient', async (req: Request, res: Response) => {
+router.post('/replay-all-transient', async (_req: Request, res: Response) => {
     try {
         const jobs = await dlq.getJobs(['waiting', 'active', 'completed', 'failed', 'delayed']);
         let replayedCount = 0;

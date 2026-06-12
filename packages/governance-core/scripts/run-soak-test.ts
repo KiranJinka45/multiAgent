@@ -32,7 +32,7 @@ console.log(`Target: Memory leak detection, invariant stability across rolling r
 
 let successfulCommits = 0;
 let quorumLosses = 0;
-let leaderId = 'node-1';
+const leaderId = 'node-1';
 
 for (let i = 1; i <= ITERATION_COUNT; i++) {
     // 1. Inject Rolling Restarts
@@ -100,8 +100,9 @@ for (let i = 1; i <= ITERATION_COUNT; i++) {
         } else {
             quorumLosses++;
         }
-    } catch (e: any) {
-        console.error(`\n[CRITICAL FAILURE] Invariant breached at iteration ${i}: ${e.message}`);
+    } catch (e: unknown) {
+        const message = e instanceof Error ? (e as Error).message : String(e);
+        console.error(`\n[CRITICAL FAILURE] Invariant breached at iteration ${i}: ${message}`);
         process.exit(1);
     }
 

@@ -136,7 +136,7 @@ export class InputPanelComponent {
     try {
       const parsed = JSON.parse(this.inputJson);
       this.run.emit(parsed);
-    } catch (e) {
+    } catch (_e) {
       alert("Invalid JSON");
     }
   }
@@ -173,7 +173,7 @@ export class InputPanelComponent {
     try {
       const parsed = JSON.parse(this.inputJson);
       this.verifyBackend.emit(parsed);
-    } catch (e) {
+    } catch (_e) {
       alert("Invalid JSON");
     }
   }
@@ -190,7 +190,7 @@ export class InputPanelComponent {
       try {
         const session = JSON.parse(e.target.result);
         this.importSession.emit(session);
-      } catch (err) {
+      } catch (_err) {
         alert("Invalid Session File");
       }
     };

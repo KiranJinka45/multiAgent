@@ -24,7 +24,7 @@ recoveryRouter.post('/replay/:correlationId', async (req: Request, res: Response
         let payloadData;
         try {
             payloadData = JSON.parse(initialEvent.payload);
-        } catch (e) {
+        } catch (_e) {
             payloadData = initialEvent.payload;
         }
 

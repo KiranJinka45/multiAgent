@@ -45,7 +45,7 @@ export class OffHeapIndexedStore {
                 if (key) {
                     this.index.set(key, { offset: pos, length });
                 }
-            } catch (err) {
+            } catch (_err) {
                 // Ignore corrupt entry
             }
             pos += length;
@@ -82,7 +82,7 @@ export class OffHeapIndexedStore {
         try {
             const record = JSON.parse(buffer.toString('utf8'));
             return record.value;
-        } catch (err) {
+        } catch (_err) {
             return null;
         }
     }

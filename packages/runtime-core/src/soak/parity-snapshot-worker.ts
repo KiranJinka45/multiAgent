@@ -52,7 +52,7 @@ export class ParitySnapshotWorker {
                 }
             }
             return { success: true, totalChecked: blocks.length };
-        } catch (e) {
+        } catch (_e) {
             return { success: false, totalChecked: 0 };
         }
     }

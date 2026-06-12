@@ -34,7 +34,7 @@ export class WasmSandbox {
         this.scheduler = undefined;
         this.journal = undefined;
         this.clockCallback = undefined;
-        this.ingressCallback = options => {};
+        this.ingressCallback = _options => {};
     }
 
     /**

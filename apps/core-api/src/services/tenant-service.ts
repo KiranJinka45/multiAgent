@@ -53,7 +53,7 @@ export class TenantService {
 
             if (error) throw error;
             return data.tokens_used_this_month < data.max_tokens_monthly;
-        } catch (e) {
+        } catch (_e) {
             return false;
         }
     }

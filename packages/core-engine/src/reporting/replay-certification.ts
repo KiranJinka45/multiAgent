@@ -40,7 +40,7 @@ export class HistoricalReplayCorpus {
           this.corpus.set(session.workflowId, session);
         }
       }
-    } catch (err) {
+    } catch (_err) {
       // Bounded fallback: if load fails, start with an empty corpus
       this.corpus.clear();
     }
@@ -54,7 +54,7 @@ export class HistoricalReplayCorpus {
         fs.mkdirSync(dir, { recursive: true });
       }
       fs.writeFileSync(this.corpusPath, JSON.stringify(list, null, 2), 'utf8');
-    } catch (err) {
+    } catch (_err) {
       // Safe no-op on failure
     }
   }

@@ -207,7 +207,7 @@ export class WitnessFederation {
                         if (crypto.verify(null, payloadBuffer, pubKey, Buffer.from(sig.signature, 'base64'))) {
                             validAuditors.push(sig.signerKeyId);
                         }
-                    } catch (e) {}
+                    } catch (_e) {}
                 }
 
                 if (validAuditors.length < auditorState.threshold) {
@@ -246,7 +246,7 @@ export class WitnessFederation {
                         if (crypto.verify(null, payloadBuffer, pubKey, Buffer.from(sig.signature, 'base64'))) {
                             validSigners.push(sig.signerKeyId);
                         }
-                    } catch (e) {}
+                    } catch (_e) {}
                 }
 
                 if (validSigners.length < witnessThreshold) {
@@ -342,7 +342,7 @@ export class WitnessFederation {
         console.log(`[GOVERNANCE] EMERGENCY RECOVERY RECORDED. Pending until ${expiresAt}.`);
     }
 
-    private handleRecoveryChallenge(receipt: GovernanceReceipt) {
+    private handleRecoveryChallenge(_receipt: GovernanceReceipt) {
         if (!this.pendingRecovery) return;
         this.pendingRecovery = null;
         this.currentState = InstitutionalState.QUIESCENT;
@@ -403,7 +403,7 @@ export class WitnessFederation {
         this.constitution = new InstitutionalConstitution(receipt.newConstitution);
     }
 
-    private handleProtocolUpgrade(receipt: GovernanceReceipt) {
+    private handleProtocolUpgrade(_receipt: GovernanceReceipt) {
         this.currentEpochId++;
     }
 
@@ -460,7 +460,7 @@ export class WitnessFederation {
                     if (crypto.verify(null, payloadBuffer, pubKey, Buffer.from(sig.signature, 'base64'))) {
                         validAuditors.push(sig.signerKeyId);
                     }
-                } catch (e) {}
+                } catch (_e) {}
             }
         }
 

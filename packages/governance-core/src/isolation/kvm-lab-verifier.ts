@@ -30,7 +30,7 @@ export class KvmLabVerifier {
         let seccompAuditEnabled = false;
         let virtiofsPerformanceScore = 0;
         let ioLatencyMs = 0;
-        let hostKernelVersion = os.release();
+        const hostKernelVersion = os.release();
         
         const devKvmPath = '/dev/kvm';
         const procNamespaces: string[] = [];

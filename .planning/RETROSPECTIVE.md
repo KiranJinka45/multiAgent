@@ -32,7 +32,6 @@
 - Sessions: 1
 - Notable: Completed milestone v1.6.0 audit and transitioned to maintenance epoch.
 
----
 
 ## Cross-Milestone Trends
 

@@ -1,0 +1,18 @@
+{
+  "runtime": "gvisor",
+  "mounts": [
+    {
+      "source": "vfs://src",
+      "target": "/app",
+      "mode": "ro"
+    }
+  ],
+  "network": {
+    "outbound": true
+  },
+  "resources": {
+    "cpu": "500m",
+    "memory": "512Mi",
+    "timeoutSeconds": 300
+  }
+}

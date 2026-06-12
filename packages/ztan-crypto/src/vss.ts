@@ -52,7 +52,7 @@ export class VSS {
             }
 
             return lhs.equals(rhs);
-        } catch (e) {
+        } catch {
             return false;
         }
     }

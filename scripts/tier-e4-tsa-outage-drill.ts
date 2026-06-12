@@ -78,7 +78,7 @@ async function main() {
     // 1. Normal Operations
     console.log('\n[1] Normal Operations: TSA is online.');
     outbox.setTsaStatus(false);
-    let token = await outbox.processEvent('hash_event_1_normal');
+    const token = await outbox.processEvent('hash_event_1_normal');
     console.log(`    ✅ Event 1 processed synchronously. Token: ${token}`);
 
     // 2. TSA Network Partition

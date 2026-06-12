@@ -25,7 +25,7 @@ export function userAuth() {
             const decoded = jwt.verify(token, serverConfig.JWT_SECRET);
             (req as any).user = decoded;
             next();
-        } catch (err) {
+        } catch (_err) {
             res.status(401).json({ error: 'Invalid Token' });
             return;
         }

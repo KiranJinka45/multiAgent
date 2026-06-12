@@ -66,7 +66,7 @@ export class HSMVault {
             this.kmsClient = new KMSClient({
                 region: process.env.AWS_REGION || 'us-east-1'
             });
-        } catch (err) {
+        } catch (_err) {
             console.warn('[HSMVault] AWS KMS SDK not available, falling back to local keypair.');
             this.mode = 'LOCAL';
             this.generateLocalKeyPair();
@@ -168,7 +168,7 @@ export class HSMVault {
                 valid: isValid,
                 errorCode: isValid ? HSMErrorCode.SUCCESS : HSMErrorCode.SIGNATURE_FAILED
             };
-        } catch (err) {
+        } catch (_err) {
             return { valid: false, errorCode: HSMErrorCode.SIGNATURE_FAILED };
         }
     }

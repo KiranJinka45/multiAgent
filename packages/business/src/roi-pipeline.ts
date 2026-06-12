@@ -169,7 +169,7 @@ export class RoiPipeline {
       console.log(logMsg);
       try {
         require('fs').appendFileSync('roi_debug.log', logMsg + '\n');
-      } catch (e) {}
+      } catch (_e) {}
 
       // Signal Quality Gate
       if (Math.abs(observedSavings) < MIN_SIGNAL_THRESHOLD) {

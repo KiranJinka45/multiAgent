@@ -32,10 +32,11 @@ COPY --from=pruner /app/out/full/ .
 RUN pnpm --filter=@packages/db exec prisma generate
 
 # Build the app and its workspace dependencies
+RUN find . -name "tsconfig.tsbuildinfo" -exec rm -f {} +
 RUN pnpm turbo build --filter=@apps/worker...
 
 # Standardized build and deployment pattern
-RUN pnpm --filter=@apps/worker deploy --legacy --prod /app/deploy
+RUN pnpm --filter=@apps/worker deploy --legacy --prod --ignore-scripts /app/deploy
 RUN cp -r apps/worker/dist /app/deploy/dist
 
 # ── Stage 3: Runner ──────────────────────────────────────────────────────────
@@ -46,7 +47,7 @@ WORKDIR /app
 # Non-root user for security
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 runner
-USER runner
+USER 1001
 
 # Copy deployment artifact from installer
 COPY --from=installer --chown=runner:nodejs /app/deploy .

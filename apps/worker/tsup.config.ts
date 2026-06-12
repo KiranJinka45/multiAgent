@@ -3,9 +3,10 @@ import { baseConfig } from '../../tsup.config.base';
 import fs from 'fs';
 
 export default defineConfig({
-  external: [/^@packages\/.*/],
   ...baseConfig,
-  dts: false,
-  entry: ["src/index.ts"],
+  external: [/^@packages\/.*/],
+  entry: ["src/**/*.ts", "!src/**/*.test.ts"],
+  bundle: false,
+  splitting: false,
 });
 

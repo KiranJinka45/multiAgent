@@ -1,30 +1,37 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-const store = new Map<string, string>();
-const lists = new Map<string, string[]>();
-const sets = new Map<string, Set<string>>();
-let seq = 0;
-
-const mockRedis = {
-    get: vi.fn(async (key: string) => store.get(key) || null),
-    set: vi.fn(async (key: string, value: string) => { store.set(key, value); }),
-    del: vi.fn(async (...keys: string[]) => { keys.forEach(k => { store.delete(k); lists.delete(k); sets.delete(k); }); }),
-    keys: vi.fn(async (pat: string) => Array.from(store.keys()).filter(k => k.startsWith('ztan:'))),
-    sadd: vi.fn(async (key: string, val: string) => { if(!sets.has(key)) sets.set(key, new Set()); sets.get(key)!.add(val); }),
-    sismember: vi.fn(async (key: string, val: string) => sets.get(key)?.has(val) ? 1 : 0),
-    lrange: vi.fn(async (key: string, start: number, stop: number) => lists.get(key)?.slice(start, stop === -1 ? undefined : stop + 1) || []),
-    rpush: vi.fn(async (key: string, ...vals: string[]) => { if(!lists.has(key)) lists.set(key, []); lists.get(key)!.push(...vals); }),
-    lpush: vi.fn(async (key: string, ...vals: string[]) => { if(!lists.has(key)) lists.set(key, []); lists.get(key)!.unshift(...vals); }),
-    incr: vi.fn(async (key: string) => { seq++; store.set(key, String(seq)); return seq; }),
-    pipeline: vi.fn(() => {
-        const pipelineInstance = {
-            set: vi.fn((k: string, v: string) => { store.set(k, v); return pipelineInstance; }),
-            rpush: vi.fn((k: string, ...vs: string[]) => { if(!lists.has(k)) lists.set(k, []); lists.get(k)!.push(...vs); return pipelineInstance; }),
-            exec: vi.fn(async () => [])
-        };
-        return pipelineInstance;
-    })
-};
+const { mockRedis } = vi.hoisted(() => {
+    const store = new Map<string, string>();
+    const lists = new Map<string, string[]>();
+    const sets = new Map<string, Set<string>>();
+    return {
+        mockRedis: {
+            get: vi.fn(async (key: string) => store.get(key) || null),
+            set: vi.fn(async (key: string, value: string) => { store.set(key, value); return 'OK'; }),
+            del: vi.fn(async (...keys: string[]) => { keys.forEach(k => { store.delete(k); lists.delete(k); sets.delete(k); }); }),
+            keys: vi.fn(async (_pat: string) => Array.from(store.keys()).filter(k => k.startsWith('ztan:'))),
+            sadd: vi.fn(async (key: string, val: string) => { if(!sets.has(key)) sets.set(key, new Set()); sets.get(key)!.add(val); }),
+            sismember: vi.fn(async (key: string, val: string) => sets.get(key)?.has(val) ? 1 : 0),
+            lrange: vi.fn(async (key: string, start: number, stop: number) => lists.get(key)?.slice(start, stop === -1 ? undefined : stop + 1) || []),
+            rpush: vi.fn(async (key: string, ...vals: string[]) => { if(!lists.has(key)) lists.set(key, []); lists.get(key)!.push(...vals); }),
+            lpush: vi.fn(async (key: string, ...vals: string[]) => { if(!lists.has(key)) lists.set(key, []); lists.get(key)!.unshift(...vals); }),
+            incr: vi.fn(async (key: string) => {
+                const current = Number(store.get(key) || '0');
+                const next = current + 1;
+                store.set(key, String(next));
+                return next;
+            }),
+            pipeline: vi.fn(() => {
+                const pipelineInstance = {
+                    set: vi.fn((k: string, v: string) => { store.set(k, v); return pipelineInstance; }),
+                    rpush: vi.fn((k: string, ...vs: string[]) => { if(!lists.has(k)) lists.set(k, []); lists.get(k)!.push(...vs); return pipelineInstance; }),
+                    exec: vi.fn(async () => [])
+                };
+                return pipelineInstance;
+            })
+        }
+    };
+});
 
 vi.mock('@packages/utils', () => {
     return { redis: mockRedis };

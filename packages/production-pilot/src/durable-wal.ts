@@ -25,7 +25,7 @@ export function fsyncDirectory(dirPath: string): void {
             fs.fsyncSync(fd);
             fs.closeSync(fd);
         }
-    } catch (err) {
+    } catch (_err) {
         // Safe platform-aware fallback for Windows
     }
 }
@@ -165,7 +165,7 @@ export class DurableSegmentedWal<E = any> {
                         startFromGenesis = false;
                     }
                 }
-            } catch (e) {
+            } catch (_e) {
                 startFromGenesis = false;
             }
         } else if (lastSnapshot) {
@@ -189,7 +189,7 @@ export class DurableSegmentedWal<E = any> {
                 let block: any;
                 try {
                     block = JSON.parse(lines[i]);
-                } catch (err) {
+                } catch (_err) {
                     // Truncation detected at the end of the last segment log
                     if (filePath === path.join(this.walDir, files[files.length - 1])) {
                         console.warn(`[WAL::RECOVERY] Truncated / malformed trailing write detected. Repairing segment file.`);
@@ -314,7 +314,7 @@ export class AtomicSnapshotStore {
         try {
             const content = fs.readFileSync(this.snapshotPath, 'utf8');
             return JSON.parse(content);
-        } catch (err) {
+        } catch (_err) {
             console.error('[SNAPSHOT::READ_ERR] Core snapshot corrupted or missing.');
             return null;
         }

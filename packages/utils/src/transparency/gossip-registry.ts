@@ -25,8 +25,19 @@ export class GossipRegistry {
     private registryDir: string;
 
     constructor() {
-        // Use relative path from this file to reach project root
-        this.registryDir = path.resolve(__dirname, '../../../../.ztan-transparency/gossip');
+        const envDir = process.env.ZTAN_TRANSPARENCY_DIR;
+        if (envDir) {
+            this.registryDir = path.resolve(envDir, 'gossip');
+        } else {
+            // Check standard container mount first, then fallback to relative path
+            const containerDir = '/app/.ztan-transparency/gossip';
+            const relativeDir = path.resolve(__dirname, '../../../../.ztan-transparency/gossip');
+            if (fs.existsSync('/app/.ztan-transparency')) {
+                this.registryDir = containerDir;
+            } else {
+                this.registryDir = relativeDir;
+            }
+        }
         if (!fs.existsSync(this.registryDir)) {
             fs.mkdirSync(this.registryDir, { recursive: true });
         }

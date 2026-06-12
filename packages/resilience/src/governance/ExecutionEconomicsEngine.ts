@@ -75,7 +75,7 @@ export class ExecutionEconomicsEngine {
     /**
      * Gets total ROI metrics for a tenant (Simulated).
      */
-    getTenantROI(tenantId: string) {
+    getTenantROI(_tenantId: string) {
         // In a real system, this would aggregate across all tenant missions
         return {
             totalCostUSD: 42.50,

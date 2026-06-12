@@ -21,10 +21,10 @@ import {
 } from '@packages/observability';
 
 // Defensive metric assignments — use imported values
-let jobTotal: any = jobTotalImport;
-let jobRetriesTotal: any = jobRetriesTotalImport;
-let queueDepth: any = queueDepthImport;
-let activeWorkers: any = activeWorkersImport;
+const _jobTotal: any = jobTotalImport;
+const _jobRetriesTotal: any = jobRetriesTotalImport;
+const _queueDepth: any = queueDepthImport;
+const _activeWorkers: any = activeWorkersImport;
 
 // ── System Modes ─────────────────────────────────────────────────────────────
 export type SystemMode = 'NORMAL' | 'DEGRADED' | 'PROTECT' | 'EMERGENCY';

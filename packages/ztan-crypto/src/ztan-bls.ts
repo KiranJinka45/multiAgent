@@ -31,7 +31,7 @@ export class ThresholdBls {
             let r: Uint8Array;
             try {
                 r = bls.utils.randomPrivateKey();
-            } catch (e) {
+            } catch {
                 // Fallback for environments where noble-bls random is broken
                 const nodeCrypto = await import('crypto');
                 r = new Uint8Array(nodeCrypto.randomBytes(32));

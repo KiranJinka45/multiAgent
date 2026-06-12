@@ -10,7 +10,6 @@ export * from './sigstore/mock-cosign.js';
 export * from './time/mock-tsa.js';
 export * from './time/mock-rekor.js';
 
-const DST = 'BLS_SIG_ZTAN_AUDIT_V1';
 
 export interface KeyShare {
   nodeId: string;
@@ -30,7 +29,8 @@ export interface PatchIntent {
   trustEpoch: string | number;
   environment: string;
   operatorId: string;
-  [key: string]: any;
+  signatures?: string[];
+  [key: string]: unknown;
 }
 
 export interface ProofBundle {
@@ -43,7 +43,7 @@ export interface ProofBundle {
   participants: string[];
   aggregateSignature: string;
   transcriptHash: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface AuthenticatedMessage {
@@ -131,7 +131,6 @@ export interface VerificationResult {
   }[];
 }
 
-const MAX_TIME_WINDOW_MS = 5 * 60 * 1000; // 5 min
 
 /**
  * ZTAN Canonical Cryptographic Utility
@@ -311,7 +310,7 @@ export class ThresholdCrypto {
       const publicKeys = identities.map(id => this.fromHex(this.getVerifierPublicKey(id)));
       const aggregatedPk = bls.aggregatePublicKeys(publicKeys);
       return await bls.verify(sigBytes, message, aggregatedPk);
-    } catch (e) {
+    } catch {
       return false;
     }
   }
@@ -338,6 +337,12 @@ export class ThresholdCrypto {
   public static hashPayload(data: { boundPayloadBytes: Uint8Array }): string {
     const hash = sha256(data.boundPayloadBytes);
     return this.toHex(hash);
+  }
+
+  public static getProtocolMessagePublicKey(nodeId: string): string {
+    const signingKey = this.toHex(this.safeEncode(`IDENTITY_SK_${nodeId}`)).padEnd(64, '0');
+    const publicKey = bls.getPublicKey(this.fromHex(signingKey));
+    return this.toHex(publicKey);
   }
 
   public static async signProtocolMessage(
@@ -394,7 +399,7 @@ export class ThresholdCrypto {
     
     try {
         return await bls.verify(this.fromHex(msg.signature), msgHash, this.fromHex(pk));
-    } catch (e) {
+    } catch {
         return false;
     }
   }
@@ -460,7 +465,7 @@ export class ThresholdCrypto {
       let data: AuditInput;
       try {
         data = JSON.parse(inputRaw);
-      } catch (e) {
+      } catch {
         result.errorType = 'INPUT_INVALID';
         result.reason = 'Input is not a valid JSON object';
         return result;
@@ -568,10 +573,11 @@ export class ThresholdCrypto {
       addStep('Integrity verification finalized under defined constraints');
       return result;
 
-    } catch (e: any) {
-      addStep(`FATAL: ${e.message}`);
+    } catch (e: unknown) {
+      const errMessage = e instanceof Error ? e.message : String(e);
+      addStep(`FATAL: ${errMessage}`);
       result.errorType = 'INTERNAL_ERROR';
-      result.reason = e.message;
+      result.reason = errMessage;
       return result;
     }
   }
@@ -670,8 +676,8 @@ export function buildCanonicalPayload(input: AuditInput): {
  */
 export function computeSessionHash(data: {
   canonicalHash: string,
-  logs: any[],
-  diagnostics: any
+  logs: { type: string; message?: string; step?: string }[],
+  diagnostics: DiagnosticInfo | Record<string, unknown>
 }): string {
   const hashBytes = ThresholdCrypto.fromHex(data.canonicalHash);
   const logsBytes = new TextEncoder().encode(JSON.stringify(data.logs.map(l => ({ 
@@ -732,3 +738,33 @@ export class MemoryReplayGuard implements ReplayGuard {
     this.seen.set(auditId, Date.now() + (ttlSeconds * 1000));
   }
 }
+
+import { ml_dsa65 } from '@noble/post-quantum/ml-dsa';
+import { ml_kem768 } from '@noble/post-quantum/ml-kem';
+import * as nodeCrypto from 'crypto';
+
+export const pqc = {
+  mldsa: {
+    generateKeyPair: () => {
+      const seed = nodeCrypto.randomBytes(32);
+      const keys = ml_dsa65.keygen(seed);
+      return {
+        publicKey: keys.publicKey,
+        privateKey: keys.secretKey
+      };
+    },
+    sign: (privateKey: Uint8Array, message: Uint8Array) => ml_dsa65.sign(privateKey, message),
+    verify: (publicKey: Uint8Array, message: Uint8Array, signature: Uint8Array) => ml_dsa65.verify(publicKey, message, signature)
+  },
+  mlkem: {
+    generateKeyPair: () => {
+      const keys = ml_kem768.keygen();
+      return {
+        publicKey: keys.publicKey,
+        privateKey: keys.secretKey
+      };
+    },
+    encapsulate: (publicKey: Uint8Array) => ml_kem768.encapsulate(publicKey),
+    decapsulate: (ciphertext: Uint8Array, privateKey: Uint8Array) => ml_kem768.decapsulate(ciphertext, privateKey)
+  }
+};

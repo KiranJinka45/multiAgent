@@ -39,7 +39,7 @@ async function main() {
   // Step 1: Boot the independent Temporal Worker process
   // -------------------------------------------------------------------------
   console.log('\nStep 1: Booting independent Temporal Worker process...');
-  let workerProcess = child_process.spawn(npmCmd, ['tsx', 'scripts/resilience-worker.ts'], {
+  const workerProcess = child_process.spawn(npmCmd, ['tsx', 'scripts/resilience-worker.ts'], {
     stdio: 'pipe',
     shell: true,
     cwd: rootDir
@@ -112,7 +112,7 @@ async function main() {
   // Step 5: Restart the Worker process
   // -------------------------------------------------------------------------
   console.log('\nStep 5: Restarting Worker process from scratch...');
-  let restartedWorkerProcess = child_process.spawn(npmCmd, ['tsx', 'scripts/resilience-worker.ts'], {
+  const restartedWorkerProcess = child_process.spawn(npmCmd, ['tsx', 'scripts/resilience-worker.ts'], {
     stdio: 'pipe',
     shell: true,
     cwd: rootDir

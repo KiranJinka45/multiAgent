@@ -15,7 +15,7 @@ export class LongitudinalAnalyzer {
   /**
    * Performs longitudinal trend analysis over campaign telemetry packets.
    */
-  static analyze(packets: any[], baselinePackets?: any[]): LongitudinalTrend {
+  static analyze(packets: any[], _baselinePackets?: any[]): LongitudinalTrend {
     if (!packets || packets.length === 0) {
       return {
         status: 'BORING',

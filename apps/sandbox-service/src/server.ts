@@ -84,7 +84,7 @@ export function createServer() {
         isolationProfile 
       } = req.body;
 
-      let finalResources = {
+      const finalResources = {
         cpuPercent: 0,
         memoryMb: 0,
         maxMemoryLimitMb: 512,
@@ -92,7 +92,7 @@ export function createServer() {
         ...resources
       };
 
-      let violations: string[] = [];
+      const violations: string[] = [];
       let quarantineTriggered = false;
 
       // Real Docker Integration: If containerId is provided, attempt to inspect it using dockerode
@@ -119,7 +119,7 @@ export function createServer() {
             if (systemDelta > 0 && cpuDelta > 0) {
               finalResources.cpuPercent = Math.round((cpuDelta / systemDelta) * 100 * 100) / 100;
             }
-          } catch (statErr) {
+          } catch (_statErr) {
             logger.warn({ containerId }, 'Stats retrieval failed, using fallback/supplied resource metrics');
           }
         } catch (dockErr: any) {

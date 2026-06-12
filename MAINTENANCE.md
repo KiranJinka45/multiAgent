@@ -77,4 +77,12 @@ Log all recovery times in `docs/stewardship/RECOVERY_LOG.md` to monitor timing v
 
 ---
 
+## 7. Maintenance Backlog (Observations)
+
+### OPS-MAINT-OBS-01: FirecrackerOrchestrator Default Constructor Behavior
+*   **Observation**: `MockFirecrackerAdapter` remains the default parameter in the constructor of `FirecrackerOrchestrator`. While production entrypoints (e.g., daemon, CLI, RPC controllers) explicitly instantiate and pass the `PhysicalFirecrackerAdapter`, there is currently no runtime protection preventing a future entrypoint or configuration path from accidentally falling back to the mock.
+*   **Proposed Hardening**: Require explicit adapter injection in production mode and fail startup if a mock adapter is instantiated outside approved test/simulation contexts (e.g., `VITEST === 'true'` or `ZTAN_MOCK_FIRECRACKER === 'true'`).
+
+---
+
 **Nexus ZTAN: Reliability through Simplicity.**

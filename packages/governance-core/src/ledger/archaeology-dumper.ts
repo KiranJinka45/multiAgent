@@ -6,12 +6,12 @@ export class FailureArchaeologyDumper {
      * Traverses an object graph recursively up to a depth limit, detecting and breaking cycles.
      */
     static cycleSafeDepthLimitedClone(
-        val: any,
+        val: unknown,
         depth: number,
         maxDepth: number,
-        visited: Set<any>,
+        visited: Set<unknown>,
         meta: { truncatedCount: number; circularCount: number; maxDepthReached: number }
-    ): any {
+    ): unknown {
         if (depth > meta.maxDepthReached) {
             meta.maxDepthReached = depth;
         }
@@ -34,7 +34,8 @@ export class FailureArchaeologyDumper {
         }
 
         if (type === 'function') {
-            return `[Function: ${val.name || 'anonymous'}]`;
+            const funcName = (val as { name?: string }).name || 'anonymous';
+            return `[Function: ${funcName}]`;
         }
 
         if (val instanceof Error) {
@@ -117,13 +118,14 @@ export class FailureArchaeologyDumper {
         }
 
         visited.add(val);
-        const objClone: Record<string, any> = {};
+        const objClone: Record<string, unknown> = {};
 
         try {
-            const keys = Object.keys(val).sort();
+            const objVal = val as Record<string, unknown>;
+            const keys = Object.keys(objVal).sort();
             for (const key of keys) {
                 try {
-                    objClone[key] = this.cycleSafeDepthLimitedClone(val[key], depth + 1, maxDepth, visited, meta);
+                    objClone[key] = this.cycleSafeDepthLimitedClone(objVal[key], depth + 1, maxDepth, visited, meta);
                 } catch (err) {
                     objClone[key] = `[Serialization Error: ${(err as Error).message}]`;
                 }
@@ -140,7 +142,7 @@ export class FailureArchaeologyDumper {
     /**
      * Serializes any payload safely by cloning it first with circular and depth checks.
      */
-    static safeJsonStringify(val: any, maxDepth: number = 8): { json: string; meta: any } {
+    static safeJsonStringify(val: unknown, maxDepth: number = 8): { json: string; meta: { truncatedCount: number; circularCount: number; maxDepthReached: number } } {
         const meta = { truncatedCount: 0, circularCount: 0, maxDepthReached: 0 };
         const cleanObj = this.cycleSafeDepthLimitedClone(val, 0, maxDepth, new Set(), meta);
         return {
@@ -152,13 +154,13 @@ export class FailureArchaeologyDumper {
     static dumpDiagnosticSnapshot(
         term: number,
         reason: string,
-        nodes: any,
-        prepares: any,
-        wal: any,
-        fuzzSchedule: any = null
+        nodes: unknown,
+        prepares: unknown,
+        wal: unknown,
+        fuzzSchedule: unknown = null
     ) {
         const originalWalSize = Array.isArray(wal) ? wal.length : 0;
-        const trimmedWal = Array.isArray(wal) ? wal.slice(-1000) : wal;
+        const trimmedWal: unknown[] = Array.isArray(wal) ? wal.slice(-1000) : [];
         const timestamp = Date.now();
 
         try {
@@ -168,7 +170,7 @@ export class FailureArchaeologyDumper {
             }
 
             // Helper for atomic writing using safe cycle-safe depth-limited serialization
-            const writeAtomicSync = (targetPath: string, rawData: any) => {
+            const writeAtomicSync = (targetPath: string, rawData: unknown) => {
                 const tmpPath = `${targetPath}.tmp`;
                 const { json, meta } = this.safeJsonStringify(rawData, 8);
                 
@@ -230,7 +232,7 @@ export class FailureArchaeologyDumper {
             const brainArtifactsDir = 'C:/Users/Kiran/.gemini/antigravity-ide/brain/4aa3d588-0fed-4894-99f3-d48acfe95376';
             if (fs.existsSync(brainArtifactsDir)) {
                 try {
-                    const saveBrain = (name: string, data: any) => {
+                    const saveBrain = (name: string, data: unknown) => {
                         const { json, meta } = this.safeJsonStringify(data, 8);
                         const finalData = JSON.parse(json);
                         finalData.__serialization_metadata__ = {
@@ -254,13 +256,14 @@ export class FailureArchaeologyDumper {
                     saveBrain('ztan-nodes-crash.json', { term, timestamp, reason, nodes });
                     saveBrain('ztan-fuzz-schedule-crash.json', scheduleData);
                     console.log('[ZTAN ARCHAEOLOGY] Copied crash snapshots to brain artifacts directory.');
-                } catch (err) {
+                } catch (_err) {
                     // ignore
                 }
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : String(err);
             // SECOND-ORDER FAILURE DETECTED: FALLBACK TO STDERR AND MEMORY BUFFER
-            console.error(`[ZTAN CRASH-DURING-CRASH WARNING] Disk write failed: ${err.message}. Falling back to process.stderr direct dump!`);
+            console.error(`[ZTAN CRASH-DURING-CRASH WARNING] Disk write failed: ${message}. Falling back to process.stderr direct dump!`);
             
             // Cycle-safe stringification for fallback telemetry to avoid throw-in-catch
             let nodesSummaryStr = 'N/A';
@@ -268,15 +271,15 @@ export class FailureArchaeologyDumper {
             let walSummaryStr = 'N/A';
 
             try {
-                nodesSummaryStr = Array.isArray(nodes) ? nodes.map((n: any) => `${n.nodeId}:${n.state}:term=${n.currentTerm}`).join(',') : 'N/A';
-                preparesSummaryStr = Array.isArray(prepares) ? `Count: ${prepares.flat().length}` : 'N/A';
+                nodesSummaryStr = Array.isArray(nodes) ? (nodes as Record<string, unknown>[]).map((n) => `${n.nodeId}:${n.state}:term=${n.currentTerm}`).join(',') : 'N/A';
+                preparesSummaryStr = Array.isArray(prepares) ? `Count: ${(prepares as unknown[][]).flat().length}` : 'N/A';
                 walSummaryStr = Array.isArray(trimmedWal) ? `Size: ${trimmedWal.length}` : 'N/A';
-            } catch (sumErr) {
+            } catch (_sumErr) {
                 // ignore
             }
 
             const fallbackTelemetry = {
-                diagnosticsError: err.message,
+                diagnosticsError: message,
                 term,
                 reason,
                 nodesSummary: nodesSummaryStr,

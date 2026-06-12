@@ -69,7 +69,7 @@ describe('ZTAN Phase 7: Distributed Persistence Simulation', () => {
         // PARTITION: Node B missed Attestation 1 but later receives Attestation 2
         const s2 = nodeShares[1];
         const sig2 = await ThresholdCrypto.signPartial(msg, s2.share, s2.nodeId, T, NODE_IDS);
-        const att2 = {
+        const _att2 = {
             eventId, verifierId: s2.nodeId, status: 'PASS', partialSignature: sig2,
             expectedNode: 'target', confidence: 1.0, timestamp: Date.now()
         };
@@ -89,7 +89,7 @@ describe('ZTAN Phase 7: Distributed Persistence Simulation', () => {
         const eventId = 'version-test-001';
         const engine = new ConsensusEngine(T, N, NODE_IDS);
         
-        const event = (engine as any).addEvent(eventId, 'CREATED', {});
+        const _event = (engine as any).addEvent(eventId, 'CREATED', {});
         // In reality, this would be serialized from the JSON in addEvent
         // We check that the protocol version is tracked
         expect((engine as any).PROTOCOL_VERSION).toBe('v1.5.0');

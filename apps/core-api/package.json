@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsup src/index.ts --no-dts && del /q tsconfig.tsbuildinfo 2>nul & tsc --emitDeclarationOnly -p tsconfig.json --declarationDir ./dist",
+    "build": "tsup src/index.ts --no-dts && node -e \"try { require('fs').unlinkSync('tsconfig.tsbuildinfo') } catch (e) {}\" && tsc --emitDeclarationOnly -p tsconfig.json --declarationDir ./dist",
     "dev": "tsup src/index.ts --no-dts --watch",
     "start": "node dist/index.js",
     "start:dev": "tsx -r tsconfig-paths/register src/index.ts",

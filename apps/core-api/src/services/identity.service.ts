@@ -1,7 +1,8 @@
 import { logger } from '@packages/observability';
 import { db } from '@packages/db';
+import { ThresholdCrypto } from '@packages/ztan-crypto';
 
-interface NodeIdentity {
+interface _NodeIdentity {
   nodeId: string;
   publicKey: string; // 48 bytes compressed G1 hex
   status: 'ACTIVE' | 'REVOKED';
@@ -86,9 +87,9 @@ export class IdentityService {
    */
   public static async bootstrap(): Promise<void> {
     const defaults = [
-      { nodeId: 'nodeA', publicKey: 'b14972e3917822b3780a4a6e7275727931322d333831204731204b657920412e2e2e' },
-      { nodeId: 'nodeB', publicKey: 'b14972e3917822b3780a4a6e7275727931322d333831204731204b657920422e2e2e' },
-      { nodeId: 'nodeC', publicKey: 'b14972e3917822b3780a4a6e7275727931322d333831204731204b657920432e2e2e' },
+      { nodeId: 'nodeA', publicKey: ThresholdCrypto.getProtocolMessagePublicKey('nodeA') },
+      { nodeId: 'nodeB', publicKey: ThresholdCrypto.getProtocolMessagePublicKey('nodeB') },
+      { nodeId: 'nodeC', publicKey: ThresholdCrypto.getProtocolMessagePublicKey('nodeC') },
       { nodeId: 'CFO-01', publicKey: 'b14972e3917822b3780a4a6e7275727931322d333831204731204b65792043464f' },
       { nodeId: 'COMPLIANCE-02', publicKey: 'b14972e3917822b3780a4a6e7275727931322d333831204731204b657920434d50' },
       { nodeId: 'CEO-03', publicKey: 'b14972e3917822b3780a4a6e7275727931322d333831204731204b65792043454f' },
@@ -98,7 +99,10 @@ export class IdentityService {
       for (const d of defaults) {
         await db.ztanIdentity.upsert({
           where: { nodeId: d.nodeId },
-          update: {},
+          update: {
+            publicKey: d.publicKey,
+            status: 'ACTIVE'
+          },
           create: {
             nodeId: d.nodeId,
             publicKey: d.publicKey,
@@ -110,5 +114,16 @@ export class IdentityService {
     } catch (err: any) {
       logger.error({ err: err.message }, '[IDENTITY] Bootstrap seeding failed');
     }
+  }
+
+  public static async registerNode(nodeId: string, publicKey: string): Promise<void> {
+    if (publicKey.length !== 96 || !/^[0-9a-fA-F]+$/.test(publicKey)) {
+      throw new Error('Invalid public key format');
+    }
+    await db.ztanIdentity.upsert({
+      where: { nodeId },
+      update: { publicKey, status: 'ACTIVE' },
+      create: { nodeId, publicKey, status: 'ACTIVE' }
+    });
   }
 }

@@ -33,7 +33,7 @@ export class RuntimeImageRegistry {
       if (fs.existsSync(filePath)) {
         return fs.readFileSync(filePath, 'utf8').trim();
       }
-    } catch (e) {}
+    } catch (_e) {}
     
     // If the file doesn't exist, we seal it by writing the current runtime image hash!
     const current = this.computeCurrent(
@@ -46,7 +46,7 @@ export class RuntimeImageRegistry {
         fs.mkdirSync(ztanDir, { recursive: true });
       }
       fs.writeFileSync(filePath, current.runtimeImageHash, 'utf8');
-    } catch (e) {}
+    } catch (_e) {}
     return current.runtimeImageHash;
   }
 
@@ -62,12 +62,12 @@ export class RuntimeImageRegistry {
       if (fs.existsSync(preloadPath)) {
         preloadHash = crypto.createHash('sha256').update(fs.readFileSync(preloadPath)).digest('hex');
       }
-    } catch (e) {}
+    } catch (_e) {}
     try {
       if (fs.existsSync(supervisorPath)) {
         supervisorHash = crypto.createHash('sha256').update(fs.readFileSync(supervisorPath)).digest('hex');
       }
-    } catch (e) {}
+    } catch (_e) {}
     const nodeVersion = process.version;
     const rawImage = `${preloadHash}:${supervisorHash}:${nodeVersion}`;
     const runtimeImageHash = crypto.createHash('sha256').update(rawImage).digest('hex');
@@ -116,7 +116,7 @@ export class EnvironmentFingerprint {
         const content = fs.readFileSync(preloadPath);
         preloadHash = crypto.createHash('sha256').update(content).digest('hex');
       }
-    } catch (e) {}
+    } catch (_e) {}
 
     // Read supervisor contents safely
     let supervisorHash = '0'.repeat(64);
@@ -125,7 +125,7 @@ export class EnvironmentFingerprint {
         const content = fs.readFileSync(supervisorPath);
         supervisorHash = crypto.createHash('sha256').update(content).digest('hex');
       }
-    } catch (e) {}
+    } catch (_e) {}
 
     // Policy constraints (capability token manifest)
     const sortedCaps = [...capabilities].sort();
@@ -194,7 +194,7 @@ export class DependencyProvenance {
           ...(pkg.devDependencies || {})
         };
       }
-    } catch (e) {}
+    } catch (_e) {}
 
     try {
       if (fs.existsSync(pnpmLockPath)) {
@@ -204,7 +204,7 @@ export class DependencyProvenance {
         const content = fs.readFileSync(packageLockPath);
         packageLockFingerprint = crypto.createHash('sha256').update(content).digest('hex');
       }
-    } catch (e) {}
+    } catch (_e) {}
 
     // Sort dependencies key alphabetically
     const sortedDeps: Record<string, string> = {};
@@ -227,7 +227,7 @@ export class DependencyProvenance {
     let sbomSignature = '';
     try {
       sbomSignature = await ThresholdCrypto.signAnchor(sbomHash, 'RUNTIME-NODE-01');
-    } catch (e) {}
+    } catch (_e) {}
 
     return {
       sbom,

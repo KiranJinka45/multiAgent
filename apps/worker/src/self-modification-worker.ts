@@ -3,7 +3,7 @@ import { Worker, Job } from '@packages/utils';
 import { redis, QUEUE_SELF_MODIFICATION } from '@packages/utils';
 import { logger } from '@packages/observability';
 import { db } from '@packages/db';
-import { SandboxRunner } from './sandbox-runner';
+import { SandboxRunner } from './sandbox-runner.js';
 import * as path from 'path';
 import * as fs from 'fs';
 

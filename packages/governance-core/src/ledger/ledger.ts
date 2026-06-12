@@ -3,7 +3,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 const LEDGER_DIR = path.join(process.cwd(), '.ztan-transparency');
-const LEDGER_FILE = path.join(LEDGER_DIR, 'audit_ledger.json');
+const isTest = process.env.NODE_ENV === 'test' || !!process.env.VITEST;
+const LEDGER_FILE = isTest
+    ? path.join(LEDGER_DIR, `audit_ledger_test_${process.pid}.json`)
+    : path.join(LEDGER_DIR, 'audit_ledger.json');
 
 function ensureDirExists() {
     if (!fs.existsSync(LEDGER_DIR)) {
@@ -12,7 +15,7 @@ function ensureDirExists() {
 }
 
 export interface LedgerEntry {
-    id: any;
+    id: unknown;
     entryId: string;
     timestamp: number;
     eventType: 'PROPOSAL_RECEIVED' | 'INSPECTION_FAILED' | 'LATTICE_DENIED' | 'SIMULATION_BLOCKED' | 'ESCALATION_TRIGGERED' | 'OPA_DENIED' | 'EXECUTION_STARTED' | 'EXECUTION_COMPLETED' | 'ISOLATION_FAULT' | 'LLM_TRANSACTION_LOG';
@@ -44,8 +47,9 @@ export class GovernanceLedger {
                 this.compactedCount = data.compactedCount || 0;
                 this.quarantined = data.quarantined || false;
             }
-        } catch (e: any) {
-            console.error(`[AUDIT_LEDGER] Failed to load ledger from file: ${e.message}`);
+        } catch (e: unknown) {
+            const message = e instanceof Error ? e.message : String(e);
+            console.error(`[AUDIT_LEDGER] Failed to load ledger from file: ${message}`);
         } finally {
             this.isLoaded = true;
         }
@@ -61,8 +65,9 @@ export class GovernanceLedger {
                 quarantined: this.quarantined
             };
             fs.writeFileSync(LEDGER_FILE, JSON.stringify(data, null, 2), 'utf8');
-        } catch (e: any) {
-            console.error(`[AUDIT_LEDGER] Failed to save ledger to file: ${e.message}`);
+        } catch (e: unknown) {
+            const message = e instanceof Error ? e.message : String(e);
+            console.error(`[AUDIT_LEDGER] Failed to save ledger to file: ${message}`);
         }
     }
 
@@ -205,7 +210,7 @@ export class GovernanceLedger {
             if (fs.existsSync(LEDGER_FILE)) {
                 fs.unlinkSync(LEDGER_FILE);
             }
-        } catch (e: any) {
+        } catch (_e: unknown) {
             // ignore
         }
         this.isLoaded = false;

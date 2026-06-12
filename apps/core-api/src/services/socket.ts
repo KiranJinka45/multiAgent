@@ -180,7 +180,7 @@ app.use('/preview/:projectId', async (req: Request, res: Response) => {
 });
 
 // Health Check (Deep) - MUST come before global auth
-app.get('/api/v1/system-health', async (req, res) => {
+app.get('/api/v1/system-health', async (_req, res) => {
     const checks = {
         db: false,
         redis: false,
@@ -190,12 +190,12 @@ app.get('/api/v1/system-health', async (req, res) => {
     try {
         await db.$queryRaw`SELECT 1`;
         checks.db = true;
-    } catch (e) {}
+    } catch (_e) {}
 
     try {
         await redis.ping();
         checks.redis = true;
-    } catch (e) {}
+    } catch (_e) {}
 
     let mode = 'NORMAL';
     let confidence = 1.0;
@@ -298,7 +298,7 @@ app.get('/health/ready', async (_req, res) => {
 });
 
 // --- SRE VALIDATION ENDPOINTS (PUBLIC FOR STRESS TEST) ---
-app.get('/api/v1/sre/state', async (req, res) => {
+app.get('/api/v1/sre/state', async (_req, res) => {
     try {
         const state = await sreEngine.getCurrentState();
         res.json(state);
@@ -308,7 +308,7 @@ app.get('/api/v1/sre/state', async (req, res) => {
     }
 });
 
-app.get('/api/v1/sre/audit', async (req, res) => {
+app.get('/api/v1/sre/audit', async (_req, res) => {
     try {
         const logs = await db.auditLog.findMany({
             orderBy: { createdAt: 'desc' },
@@ -375,7 +375,7 @@ app.use((req, res, next) => {
 });
 
 // Metrics Endpoint
-app.get('/metrics', (async (req: Request, res: Response) => {
+app.get('/metrics', (async (_req: Request, res: Response) => {
     try {
         res.set('Content-Type', registry.contentType);
         res.end(await registry.metrics());
@@ -413,12 +413,12 @@ app.post('/api/v1/missions', express.json(), (async (req: Request, res: Response
             }
         });
         res.json({ success: true, missionId, data: { id: missionId, status: 'PENDING' } });
-    } catch (e) {
+    } catch (_e) {
         res.status(500).json({ success: false, error: 'Database error' });
     }
 }) as RequestHandler);
 
-app.get('/api/v1/missions', (async (req: Request, res: Response) => {
+app.get('/api/v1/missions', (async (_req: Request, res: Response) => {
     try {
         const missions = await db.mission.findMany({
             orderBy: { createdAt: 'desc' },
@@ -434,7 +434,7 @@ app.get('/api/v1/missions', (async (req: Request, res: Response) => {
 // Policy Engine Management Routes
 import { policyEngine } from './policy-engine.js';
 
-app.get('/api/v1/sre/policies', ((req: Request, res: Response) => {
+app.get('/api/v1/sre/policies', ((_req: Request, res: Response) => {
     res.json(policyEngine.getRules());
 }) as RequestHandler);
 
@@ -496,7 +496,7 @@ async function bootstrap() {
         */
 
         const PORT = parseInt(process.env.PORT || '3010', 10);
-        const YJS_PORT = 3011;
+        const _YJS_PORT = 3011;
 
         console.log("➡️ [CoreAPI] Creating Server...");
         const server = useHttps

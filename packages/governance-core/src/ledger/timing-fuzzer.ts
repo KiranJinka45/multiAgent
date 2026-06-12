@@ -1,5 +1,4 @@
 import { ConsensusEngine, NodeState } from './consensus.js';
-import type { ConsensusNode, PrepareMessage } from './consensus.js';
 import { SeededPRNG } from './prng.js';
 
 export interface FuzzScenarioResult {
@@ -34,7 +33,7 @@ export class AdversarialNetworkScheduler {
         ];
         ConsensusEngine.configurePartitions(partitions);
 
-        let preventedEquivocations = 0;
+        const preventedEquivocations = 0;
         let successfulCommits = 0;
 
         // Try to commit a log entry
@@ -111,7 +110,7 @@ export class AdversarialNetworkScheduler {
         const nodes = ConsensusEngine.getClusterNodes();
 
         let termRollbacks = 0;
-        let totalRounds = 5;
+        const totalRounds = 5;
 
         for (let i = 0; i < totalRounds; i++) {
             // Induce connection jitters by randomly dropping reachable nodes

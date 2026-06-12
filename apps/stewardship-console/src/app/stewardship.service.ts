@@ -324,7 +324,7 @@ export class StewardshipService {
         const store = tx.objectStore('forensic_events');
         
         const events: any[] = [];
-        let cursorRequest = store.openCursor(null, 'prev'); // Get newest first
+        const cursorRequest = store.openCursor(null, 'prev'); // Get newest first
         let count = 0;
         let skipped = 0;
         
@@ -506,7 +506,7 @@ export class StewardshipService {
         const store = tx.objectStore('forensic_events');
 
         const entries: any[] = [];
-        let cursorReq = store.openCursor(null, 'prev');
+        const cursorReq = store.openCursor(null, 'prev');
         let count = 0;
 
         await new Promise<void>((resolve) => {

@@ -34,7 +34,7 @@ export class ProcurementFramework {
     /**
      * Validates procurement friction reduction.
      */
-    public measureFriction(prospectId: string): number {
+    public measureFriction(_prospectId: string): number {
         return 0.15; // 15% friction (low for institutional infrastructure)
     }
 }

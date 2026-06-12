@@ -27,7 +27,7 @@ export function reconstructIncidentTimeline(errors: string[], generatedAt: Date)
     for (let idx = 0; idx < errors.length; idx++) {
         const err = errors[idx];
         let stage = 'SAFETY_VERIFIER';
-        let status: 'ALERT' | 'INFO' | 'FATAL' = 'ALERT';
+        const status: 'ALERT' | 'INFO' | 'FATAL' = 'ALERT';
 
         if (err.includes('ENV_AUDIT_ERROR') || err.includes('unledgered') || err.includes('shadow')) {
             stage = 'ENV_COMPLIANCE_AUDITOR';

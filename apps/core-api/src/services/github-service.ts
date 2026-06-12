@@ -17,10 +17,10 @@ export const githubService = {
         return true;
     },
     getRepositories: async (): Promise<GithubRepo[]> => [],
-    createRepository: async (name: string, isPrivate: boolean) => {
+    createRepository: async (name: string, _isPrivate: boolean) => {
         return { success: true, url: `https://github.com/mock/${name}` };
     },
-    pushProject: async (projectId: string, repoName: string, isPrivate: boolean) => {
+    pushProject: async (projectId: string, repoName: string, _isPrivate: boolean) => {
         return { success: true, url: `https://github.com/mock/${repoName}` };
     }
 };

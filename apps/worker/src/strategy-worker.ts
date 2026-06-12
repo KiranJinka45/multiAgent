@@ -6,7 +6,7 @@ import { db } from '@packages/db';
 
 if (!QUEUE_STRATEGY) throw new Error("FATAL: QUEUE_STRATEGY name must be provided");
 
-const strategyWorker = new Worker(QUEUE_STRATEGY, async (job: Job) => {
+const strategyWorker = new Worker(QUEUE_STRATEGY, async (_job: Job) => {
   logger.info('[StrategyWorker] Evaluating business performance...');
 
   // 1. Fetch latest metrics (hourly aggregation)
@@ -57,7 +57,7 @@ const strategyWorker = new Worker(QUEUE_STRATEGY, async (job: Job) => {
 
     // 4. LEVEL-4 ADAPTATION: Strategy Evolution
     const agents = ['PlannerAgent', 'CoderAgent', 'CriticAgent'];
-    for (const agentName of agents) {
+    for (const _agentName of agents) {
         // Strategy model doesn't exist in Prisma schema? checking...
         // ... assuming we track this in metadata of other models for now ...
     }

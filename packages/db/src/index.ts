@@ -1,4 +1,5 @@
-import { PrismaClient, Prisma } from '@prisma/client';
+import pkg from '@prisma/client';
+const { PrismaClient, Prisma } = pkg;
 import fs from 'fs';
 import path from 'path';
 
@@ -25,7 +26,7 @@ export function injectDbOutage(durationMs: number, type: DbOutageType = 'db') {
             durationMs,
             injectedAt: dbOutageStart
         }), 'utf8');
-    } catch (e) {}
+    } catch (_e) {}
 }
 
 export function clearDbOutage() {
@@ -37,7 +38,7 @@ export function clearDbOutage() {
         if (fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
         }
-    } catch (e) {}
+    } catch (_e) {}
 }
 
 export function getActiveDbOutage(): DbOutageType | null {
@@ -55,12 +56,12 @@ export function getActiveDbOutage(): DbOutageType | null {
             const raw = fs.readFileSync(filePath, 'utf8');
             const data = JSON.parse(raw);
             if (Date.now() - data.injectedAt > data.durationMs) {
-                try { fs.unlinkSync(filePath); } catch (e) {}
+                try { fs.unlinkSync(filePath); } catch (_e) {}
                 return null;
             }
             return data.type;
         }
-    } catch (e) {}
+    } catch (_e) {}
 
     return null;
 }
@@ -72,7 +73,7 @@ export function getActivePathologyConfig(): any {
             const raw = fs.readFileSync(filePath, 'utf8');
             return JSON.parse(raw);
         }
-    } catch (e) {}
+    } catch (_e) {}
     return null;
 }
 
@@ -126,7 +127,7 @@ if (process.env.MOCK_DB === 'true') {
                 blocks.splice(idx, 1);
             }
         },
-        deleteMany: async (args?: any) => {
+        deleteMany: async (_args?: any) => {
             blocks.length = 0;
             return { count: 0 };
         },
@@ -147,10 +148,10 @@ if (process.env.MOCK_DB === 'true') {
             snapshots.set(epoch, data);
             return data;
         },
-        findFirst: async (args?: any) => {
+        findFirst: async (_args?: any) => {
             return Array.from(snapshots.values())[0] || null;
         },
-        deleteMany: async (args?: any) => {
+        deleteMany: async (_args?: any) => {
             snapshots.clear();
             return { count: 0 };
         }
@@ -170,7 +171,7 @@ if (process.env.MOCK_DB === 'true') {
             }
             return log;
         },
-        deleteMany: async (args?: any) => {
+        deleteMany: async (_args?: any) => {
             walLogs.length = 0;
             return { count: 0 };
         }
@@ -314,6 +315,37 @@ if (process.env.MOCK_DB === 'true') {
         }
     };
 
+    const identities: any[] = [];
+    const mockZtanIdentity = {
+        findUnique: async (args: any) => {
+            const nodeId = args?.where?.nodeId;
+            return identities.find(i => i.nodeId === nodeId) || null;
+        },
+        create: async (args: any) => {
+            identities.push(args.data);
+            return args.data;
+        },
+        upsert: async (args: any) => {
+            const nodeId = args.where.nodeId;
+            let id = identities.find(i => i.nodeId === nodeId);
+            if (id) {
+                Object.assign(id, args.update);
+            } else {
+                id = args.create;
+                identities.push(id);
+            }
+            return id;
+        },
+        update: async (args: any) => {
+            const nodeId = args.where.nodeId;
+            const id = identities.find(i => i.nodeId === nodeId);
+            if (id) {
+                Object.assign(id, args.data);
+            }
+            return id;
+        }
+    };
+
     prismaInstance = {
         ztanLedgerBlock: mockZtanLedgerBlock,
         ztanSnapshot: mockZtanSnapshot,
@@ -322,6 +354,7 @@ if (process.env.MOCK_DB === 'true') {
         idempotencyRecord: mockIdempotencyRecord,
         governanceEvent: mockGovernanceEvent,
         proposedChange: mockProposedChange,
+        ztanIdentity: mockZtanIdentity,
         $queryRawUnsafe: mockQueryRawUnsafe,
         $executeRawUnsafe: mockExecuteRawUnsafe,
         $transaction: async (cb: any) => {
@@ -333,6 +366,7 @@ if (process.env.MOCK_DB === 'true') {
                 idempotencyRecord: mockIdempotencyRecord,
                 governanceEvent: mockGovernanceEvent,
                 proposedChange: mockProposedChange,
+                ztanIdentity: mockZtanIdentity,
                 $queryRawUnsafe: mockQueryRawUnsafe,
                 $executeRawUnsafe: mockExecuteRawUnsafe
             });
@@ -340,14 +374,18 @@ if (process.env.MOCK_DB === 'true') {
     };
 } else {
     const dbUrl = process.env.DATABASE_URL;
-    const urlWithLimit = getUrlWithConnectionLimit(dbUrl, 50);
-    prismaInstance = new PrismaClient({
-        datasources: {
-            db: {
-                url: urlWithLimit
+    if (dbUrl) {
+        const urlWithLimit = getUrlWithConnectionLimit(dbUrl, 50);
+        prismaInstance = new PrismaClient({
+            datasources: {
+                db: {
+                    url: urlWithLimit
+                }
             }
-        }
-    });
+        });
+    } else {
+        prismaInstance = new PrismaClient();
+    }
 }
 
 export function getUrlWithConnectionLimit(baseUrl: string | undefined, limit: number): string | undefined {
@@ -357,7 +395,7 @@ export function getUrlWithConnectionLimit(baseUrl: string | undefined, limit: nu
         const urlObj = new URL(cleanUrl);
         urlObj.searchParams.set('connection_limit', limit.toString());
         return urlObj.toString();
-    } catch (e) {
+    } catch (_e) {
         if (cleanUrl.includes('?')) {
             if (cleanUrl.includes('connection_limit=')) {
                 return cleanUrl.replace(/connection_limit=\d+/, `connection_limit=${limit}`);
@@ -454,12 +492,14 @@ export function getSharedClient(role: DbClientRole): any {
     };
 
     const startWait = performance.now();
+    // @ts-ignore — optional telemetry; resolution may fail in pruned Docker builds
     import('@packages/observability').then(obs => {
         if (obs && obs.prismaActiveWaiters) obs.prismaActiveWaiters.labels(role).inc();
     }).catch(() => {});
 
     const clientInstance = createClient();
     
+    // @ts-ignore — optional telemetry; resolution may fail in pruned Docker builds
     import('@packages/observability').then(obs => {
         if (obs && obs.prismaActiveWaiters) obs.prismaActiveWaiters.labels(role).dec();
         if (obs && obs.prismaWaitDurationSeconds) obs.prismaWaitDurationSeconds.labels(role).observe((performance.now() - startWait) / 1000);
@@ -540,6 +580,7 @@ function createModelProxy(target: any, prop: string | symbol, receiver: any) {
                         // Execute original
                         const result = await original.apply(modelTarget, args);
                         const durQ = (performance.now() - startQ) / 1000;
+                        // @ts-ignore — optional telemetry; resolution may fail in pruned Docker builds
                         import('@packages/observability').then(obs => {
                             if (obs && obs.prismaQueryDurationSeconds) {
                                 obs.prismaQueryDurationSeconds.labels(prop as string, modelProp as string).observe(durQ);
@@ -612,6 +653,7 @@ function createModelProxy(target: any, prop: string | symbol, receiver: any) {
             const startQ = performance.now();
             const result = await value.apply(target, args);
             const durQ = (performance.now() - startQ) / 1000;
+            // @ts-ignore — optional telemetry; resolution may fail in pruned Docker builds
             import('@packages/observability').then(obs => {
                 if (obs && obs.prismaQueryDurationSeconds) {
                     obs.prismaQueryDurationSeconds.labels('ROOT', prop as string).observe(durQ);
@@ -636,6 +678,7 @@ setInterval(async () => {
             if (client && typeof client.$metrics?.json === 'function') {
                 const metrics = await client.$metrics.json();
                 
+                // @ts-ignore — optional telemetry; resolution may fail in pruned Docker builds
                 import('@packages/observability').then(obs => {
                     if (!obs) return;
                     
@@ -659,7 +702,7 @@ setInterval(async () => {
                     }
                 }).catch(() => {});
             }
-        } catch (e) {}
+        } catch (_e) {}
     }
 }, 2000).unref();
 

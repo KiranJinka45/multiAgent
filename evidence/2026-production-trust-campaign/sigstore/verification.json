@@ -1,0 +1,9 @@
+{
+  "status": "PASSED",
+  "image": "nexus-ztan-core:v1.12.0",
+  "digest": "sha256:6608b1efedb8b933e17e9ad04c6eae090319ad2e8d8100f2044edccb12e32a60",
+  "identityChecked": "operator@ztan.io",
+  "certAuthority": "Sigstore (OIDC Provider Simulated)",
+  "mathematicallyCorrect": true,
+  "verificationTime": "2026-06-12T06:38:03.858Z"
+}

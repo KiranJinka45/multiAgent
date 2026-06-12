@@ -29,40 +29,44 @@ Perform a REAL end-to-end operational validation of the entire Nexus ZTAN platfo
 - [ ] **GOV-03**: Attempt invalid mutations and governance bypasses.
 - [ ] **GOV-04**: Verify split-brain handling and governance synchronization.
 
-### 4. Multi-Region Federation Validation (FED)
-- [ ] **FED-01**: Perform regional failovers and network partitioning.
-- [ ] **FED-02**: Validate distributed rollback testing across regions.
-- [ ] **FED-03**: Verify federated governance synchronization consistency.
-- [ ] **FED-04**: Test replay divergence and resolution.
-
-### 5. Tenant Isolation Validation (TENANT)
-- [ ] **TENANT-01**: Attempt cross-tenant access and blast-radius leakage.
-- [ ] **TENANT-02**: Test governance inheritance abuse.
-- [ ] **TENANT-03**: Verify infrastructure mutation isolation across tenants.
-- [ ] **TENANT-04**: Certify complete isolation integrity.
-
-### 6. Real-Time Observability & Visibility (OBS)
+### 4. Real-Time Observability & Visibility (OBS)
 - [ ] **OBS-01**: Validate dashboards and replay timelines under stress.
 - [ ] **OBS-02**: Verify trust lineage visibility and rollback evidence.
 - [ ] **OBS-03**: Ensure operators can understand incidents within minutes.
 - [ ] **OBS-04**: Validate incident explainability and causal clarity.
 
-### 7. Support & Incident Response Validation (INCIDENT)
+## Deferred Requirements (Future Production/Federation)
+The following domains are deferred until real production customers and operators exist to avoid certifying theoretical capabilities.
+
+### 1. Multi-Region Federation Validation (FED) [DEFERRED]
+- [ ] **FED-01**: Perform regional failovers and network partitioning.
+- [ ] **FED-02**: Validate distributed rollback testing across regions.
+- [ ] **FED-03**: Verify federated governance synchronization consistency.
+- [ ] **FED-04**: Test replay divergence and resolution.
+
+### 2. Tenant Isolation Validation (TENANT) [DEFERRED]
+- [ ] **TENANT-01**: Attempt cross-tenant access and blast-radius leakage.
+- [ ] **TENANT-02**: Test governance inheritance abuse.
+- [ ] **TENANT-03**: Verify infrastructure mutation isolation across tenants.
+- [ ] **TENANT-04**: Certify complete isolation integrity.
+
+### 3. Support & Incident Response Validation (INCIDENT) [DEFERRED]
 - [ ] **INCIDENT-01**: Execute REAL S1 incident drills and escalation workflows.
 - [ ] **INCIDENT-02**: Measure MTTR and operator cognitive load.
 - [ ] **INCIDENT-03**: Validate replay-assisted incident reconstruction.
 - [ ] **INCIDENT-04**: Verify support response coordination efficiency.
 
-### 8. Economic & Operational Reality Validation (ECON)
+### 4. Economic & Operational Reality Validation (ECON) [DEFERRED]
 - [ ] **ECON-01**: Measure REAL infrastructure cost impact and deployment velocity.
 - [ ] **ECON-02**: Measure rollback frequency and operational burden reduction.
 - [ ] **ECON-03**: Validate replay utilization and support efficiency.
 - [ ] **ECON-04**: Document measurable operational advantage.
 
 ## Success Criteria
-- **Minimum Threshold**: ≥95% verification status across all categories.
-- **Evidence**: Must use real workloads, infrastructure, operators, and telemetry.
+- **Minimum Threshold**: ≥95% verification status across all active categories.
+- **Evidence**: Must use real workloads, infrastructure, operators, and telemetry for active categories.
 
 ## Constraints
 - **STRICTLY FORBIDDEN**: Mock infrastructure, simulated success, synthetic certification.
 - **REQUIRED**: Live Infrastructure Validation Report, Replayability Integrity Report, Governance Security Audit, etc.
+

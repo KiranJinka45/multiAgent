@@ -39,7 +39,7 @@ async function clearLeases(): Promise<void> {
   await db.$executeRawUnsafe(`TRUNCATE TABLE "ZtanActiveLease" RESTART IDENTITY CASCADE;`);
 }
 
-async function waitForSettled(): Promise<boolean> {
+async function _waitForSettled(): Promise<boolean> {
   for (let i = 0; i < 150; i++) {
     const state = GovernanceLedger.getState(0);
     if (state === 'ACTIVE' || state === 'DEGRADED') {
@@ -270,7 +270,7 @@ async function testConcurrentReplayRace(): Promise<void> {
   }
 
   // Launch all children simultaneously
-  const promises = Array.from({ length: concurrency }, (_, i) =>
+  const promises = Array.from({ length: concurrency }, (_, _i) =>
     spawnRecoveryChild({
       killPoint: 'NONE',
       requestUuid: ids.requestUuid,

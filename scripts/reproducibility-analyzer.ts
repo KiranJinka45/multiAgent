@@ -161,7 +161,7 @@ function computeStats(metricName: string, values: number[]): Stats {
   }
 
   let dispersion = 0;
-  let dispersionType: 'rCV' | 'SND' = meta.metricClass === 'SEMI_STOCHASTIC' ? 'rCV' : 'SND';
+  const dispersionType: 'rCV' | 'SND' = meta.metricClass === 'SEMI_STOCHASTIC' ? 'rCV' : 'SND';
 
   if (!isBelowNoiseFloor && n >= 2) {
     if (meta.metricClass === 'SEMI_STOCHASTIC') {

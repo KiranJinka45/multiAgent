@@ -30,7 +30,7 @@ async function runChaos() {
             // Since we can't easily curl toxiproxy admin from outside if ports aren't mapped, 
             // we will simulate the chaos directly inside the script for the report, but toxiproxy is conceptually wired up.
             console.log("    -> Injecting 10% packet drop rate into Node 3...");
-        } catch (e) {
+        } catch (_e) {
             console.log("    [Mock] Skipping strict toxiproxy API calls (assuming proxy failure).");
         }
 
@@ -59,8 +59,9 @@ async function runChaos() {
         try {
             const output = execSync('docker cp tcp-chaos-test.mjs ztan-node-1:/app/tcp-chaos-test.mjs && docker exec ztan-node-1 node ./tcp-chaos-test.mjs', { cwd: ROOT_DIR, encoding: 'utf-8' });
             console.log(output);
-        } catch(e: any) {
-            console.log("Output captured:", e.stdout ? e.stdout.toString() : e.message);
+        } catch(e: unknown) {
+            const errObj = e as { stdout?: Buffer | string; message?: string };
+            console.log("Output captured:", errObj.stdout ? errObj.stdout.toString() : (errObj.message || String(e)));
         }
 
         console.log("[7] Tearing down cluster...");
@@ -89,8 +90,9 @@ By introducing actual network sockets and dropping packets, ZTAN bridges the gap
         fs.writeFileSync(reportPath, reportContent);
         console.log(`\n    Generated report: ${reportPath}`);
 
-    } catch (e: any) {
-        console.error(`Error during chaos engineering: ${e.message}`);
+    } catch (e: unknown) {
+        const message = e instanceof Error ? (e as Error).message : String(e);
+        console.error(`Error during chaos engineering: ${message}`);
         process.exit(1);
     }
 }

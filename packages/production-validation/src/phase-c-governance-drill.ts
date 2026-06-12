@@ -32,7 +32,7 @@ async function runPhaseCGovernanceDrill() {
     const payload = '101|PASS|node-a';
     const attestation = await hsmA.attest(payload);
 
-    const evidenceFromA: AuditEntry = {
+    const _evidenceFromA: AuditEntry = {
         sequenceId: 501,
         governance: { isCertified: true, mode: 'NORMAL', attestations: [] },
         _audit: {

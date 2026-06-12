@@ -1,8 +1,9 @@
-import { BaseWorker } from '../apps/worker/src/base-worker';
+import { describe, it, expect } from 'vitest';
+import { BaseWorker } from '../../../apps/worker/src/base-worker.js';
 import { Job, Queue } from '@packages/utils';
 import { DEAD_LETTER_QUEUE_NAME, FailureClassifier } from '@packages/resilience';
 
-class TestWorker extends BaseWorker {
+class _TestWorker extends BaseWorker {
   getName() { return 'test-worker'; }
   getWorkerId() { return 'test-1'; }
   async processJob(job: Job) {

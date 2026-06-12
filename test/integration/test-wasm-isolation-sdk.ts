@@ -163,7 +163,7 @@ class WasmWorkflowTester {
             });
 
             // Enqueue workflow definition run
-            let resultPromise = processOrder.definitionFn('order-500');
+            const resultPromise = processOrder.definitionFn('order-500');
 
             // Flush scheduler steps
             await scheduler.flush();

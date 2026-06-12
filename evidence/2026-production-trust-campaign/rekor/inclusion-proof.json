@@ -1,0 +1,35 @@
+{
+  "logIndex": 1799560355,
+  "integratedTime": "2026-06-12T06:38:02.000Z",
+  "verification": {
+    "inclusionProof": {
+      "checkpoint": "rekor.sigstore.dev - 1193050959916656506\n1677656251\na7ZO8Msz3FfRMAupF+mqfpWYy53ABnQONdfY6zxTMJE=\n\n— rekor.sigstore.dev wNI9ajBEAiBoVTICd6UgH3RB/WH1Di9OIYyK7BGOC2+K1nwwSSiRTQIgXMpnqfhqDxWVIbKk8lF9ZZrn6OIaHCy2xq24vAT7Gn8=\n",
+      "hashes": [
+        "1a5d2954b755cd7cdb3d7e924ef9348074521fd02142e68899c4f54de85f9f9d",
+        "6ea331b5728d52dda923502b897b2731920a2ef53e2dd30fbf3797cce0909fcc",
+        "8853d1a8303b3c3d1b9c7495e4c41098a0e2f60e75c22e6dcf2758fc9c3c6049",
+        "83f165be59fb2fdb0ee6a794511770abc430497d66c3ff566e9411684cdc9fd6",
+        "2efab904c5dd20132308fad6b3849fc79509e5abf4120e864f2612e86678f337",
+        "83f064407f7336bc3a09faef1647fedc0143d04dc941e171709b937c456b55ea",
+        "7e2b9b73c17d21865472819a4857f7e333c201afc39794b397b9250eefa20e8e",
+        "0fcde58d433b19a94131161341a02807e2f1b1b104c70f62d89dda8845d5a8cc",
+        "e9302128d83bff5f92bee0b404a565b0e94ad973779fd06da0ea2aef41ca4545",
+        "c941f74d67ec738ba6d628477e2a9998ca07e42796c202ff13da4ef3fe86046a",
+        "6ce4d06fd5e36654c7aa23b4e1bd78d850068008bd6ef9c97f1689fee1328f89",
+        "96fd28e06556d116358c2b3fbca928801a12e3462ee53fcb7a4d9f79f0e99c09",
+        "266b852e981b9d0b752a315cb21938a09312977a438c0cce73f2ba3108a3c47f",
+        "2d25ce5d446579351e98e3475d2ff8da7ddcc4476e7c4c6750fb449dc6c6a6b4",
+        "3dac6fbbe4556369f302f65f2f1c3360c49e432d509dd03fbcb5e5e7895aa9fd",
+        "9b0ae94ff5ba07d0a84ecad92a50a070ecf950242b551d19c4bd7a4d6efc03f1",
+        "1662ef931b998ff9de4327a91325e13968b7980834d90228869db39381c358af",
+        "98309d03cb7f2c673e86a895d123b2a8f5e53983f25a96ac45a0c3bc20bc2401",
+        "75ac6665a6a3469655f89c4788e61984906248a379b9caa38765a719b1e18abc",
+        "0ce09ea12328bc8bcb13192122f8aca30f40b8d5e0796b3810293247a11ca985"
+      ],
+      "logIndex": 1677656093,
+      "rootHash": "6bb64ef0cb33dc57d1300ba917e9aa7e9598cb9dc006740e35d7d8eb3c533091",
+      "treeSize": 1677656251
+    },
+    "signedEntryTimestamp": "MEUCIF8mXq59OJmgFClpGUtixtVoDjihzDAqwVUp1T9pLZAcAiEAgVAdZnr31vPsvujI2yhbfdLsVGCOxH02hGAQH64MzDU="
+  }
+}

@@ -43,7 +43,7 @@ export class ConsensusExhaustionFuzzer {
                         // All nodes increment terms continuously without completing election
                         const nodeIds = ['node-1', 'node-2', 'node-3'];
                         for (const id of nodeIds) {
-                            const node = (ConsensusEngine as any).nodes.get(id);
+                            const node = ConsensusEngine.getClusterNodes().get(id);
                             if (node) {
                                 node.state = NodeState.CANDIDATE;
                                 node.currentTerm += 1;
@@ -59,10 +59,8 @@ export class ConsensusExhaustionFuzzer {
                     const payload = Array(1000).fill({ operation: 'stress-test', timestamp: Date.now() });
                     
                     const start = Date.now();
-                    let successCount = 0;
                     for (let i = 0; i < 5000; i++) {
-                        const res = ConsensusEngine.appendEntries('node-1', 2, payload);
-                        if (res.success) successCount++;
+                        ConsensusEngine.appendEntries('node-1', 2, payload);
                     }
                     const duration = Date.now() - start;
                     
@@ -78,7 +76,7 @@ export class ConsensusExhaustionFuzzer {
                     
                     for (let i = 0; i < 5000; i++) {
                         // Flap node-1's connectivity
-                        const n1 = (ConsensusEngine as any).nodes.get('node-1');
+                        const n1 = ConsensusEngine.getClusterNodes().get('node-1');
                         if (n1) {
                             if (i % 2 === 0) {
                                 n1.reachablePeers = ['node-1']; // Partitioned
@@ -94,10 +92,11 @@ export class ConsensusExhaustionFuzzer {
                 if (survived) survivedCount++;
                 else exhaustedCount++;
 
-            } catch (err: any) {
+            } catch (err: unknown) {
+                const message = err instanceof Error ? err.message : String(err);
                 survived = false;
                 exhaustedCount++;
-                response = `EXHAUSTED: (Crash/OOM) ${err.message}`;
+                response = `EXHAUSTED: (Crash/OOM) ${message}`;
             }
 
             results.push({

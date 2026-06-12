@@ -1,7 +1,6 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "baseUrl": ".",
     "ignoreDeprecations": "5.0",
     "outDir": "dist",
     "composite": true,
@@ -24,9 +23,6 @@
     },
     {
       "path": "../observability"
-    },
-    {
-      "path": "../runtime-core"
     }
   ]
 }

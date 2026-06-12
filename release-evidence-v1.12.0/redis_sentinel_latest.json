@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-06-09T05:56:24.533Z",
+  "metrics": {
+    "step1_baselineHealthy": true,
+    "step2_chaosInjected": true,
+    "step3_fencingEnforced": true,
+    "step4_recoverySucceeded": true,
+    "finalVerdict": "PASSED",
+    "mode": "DOCKER_LIVE",
+    "telemetry": {
+      "old_master": "172.19.0.2 (172.19.0.2:6379)",
+      "new_master": "redis-replica-1 (172.19.0.5:6379)",
+      "failover_duration_ms": 2659,
+      "sentinel_leader": "+vote-for-leader c241538f0fead826d641a05f1b2affc43fa214ab",
+      "quorum_reached": true
+    }
+  }
+}

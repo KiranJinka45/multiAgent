@@ -14,6 +14,7 @@
     "@packages/utils": "workspace:*",
     "@packages/db": "workspace:*",
     "@packages/governance-sdk": "workspace:*",
+    "@packages/sandbox": "workspace:*",
     "axios": "1.15.2"
   },
   "devDependencies": {

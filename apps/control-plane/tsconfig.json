@@ -1,18 +1,11 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "baseUrl": ".",
     "outDir": "dist",
     "composite": true,
     "incremental": true,
     "skipLibCheck": true,
     "paths": {
-      "@packages/observability": [
-        "../../packages/observability/src"
-      ],
-      "@packages/utils": [
-        "../../packages/utils/src"
-      ],
       "@packages/resilience": [
         "../../packages/resilience/src/index.ts"
       ]

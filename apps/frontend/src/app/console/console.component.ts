@@ -14,14 +14,14 @@ const buildCanonicalPayload = (input: any): any => ({
   sortedNodeIds: input.nodeIds || [],
   diagnostics: { fieldBreakdown: [], normalizationMap: {} }
 });
-const hashPayload = (payload: any): string => 'stub-hash-' + Math.random().toString(16).slice(2, 10);
-const computeSessionHash = (ctx: any): string => 'stub-session-' + Math.random().toString(16).slice(2, 10);
+const hashPayload = (_payload: any): string => 'stub-hash-' + Math.random().toString(16).slice(2, 10);
+const computeSessionHash = (_ctx: any): string => 'stub-session-' + Math.random().toString(16).slice(2, 10);
 const ThresholdBls = {
-  verify: async (...args: any[]): Promise<boolean> => true,
-  signShare: async (...args: any[]): Promise<string> => 'stub-sig-share'
+  verify: async (..._args: any[]): Promise<boolean> => true,
+  signShare: async (..._args: any[]): Promise<string> => 'stub-sig-share'
 };
 const Frost = {
-  generateRound1: (t: number, n: number): any => ({ commitments: [] })
+  generateRound1: (_t: number, _n: number): any => ({ commitments: [] })
 };
 
 @Component({
@@ -316,7 +316,7 @@ echo "${this.output.hex.slice(2)}" | xxd -r -p | sha256sum
     
     try {
       const eligiblePks = this.ceremonyParticipants.map(p => p.publicKey);
-      const signersPks = this.ceremonyParticipants
+      const _signersPks = this.ceremonyParticipants
         .filter(p => p.status === 'SIGNED')
         .map(p => p.publicKey);
       
@@ -524,7 +524,7 @@ echo "${this.output.hex.slice(2)}" | xxd -r -p | sha256sum
     const ceremonyId = this.ceremonyState.ceremonyId;
     const nodeId = this.ceremonyParticipants[0].nodeId; // Use first node as attacker
     
-    let payload: any = { nodeId, ceremonyId };
+    const payload: any = { nodeId, ceremonyId };
     
     try {
       switch (attack.id) {

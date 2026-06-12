@@ -14,7 +14,7 @@ async function runPhaseDAdversarialDrill() {
 
     const initialSigners = ['node-a', 'node-b', 'node-c'];
     const hsm = new HSMVault(initialSigners);
-    const groupPublicKey = await (hsm as any).generateGroupPublicKey?.(2, initialSigners) || 'beefdead';
+    const _groupPublicKey = await (hsm as any).generateGroupPublicKey?.(2, initialSigners) || 'beefdead';
 
     console.log('[SCENARIO A] Replay Poisoning Attempt');
     console.log('Description: Attacker attempts to inject a forged entry with an invalid hash chain.');

@@ -124,7 +124,7 @@ async function runLedgerCompactionValidation() {
   // 7. Inject Mutation to Verify Tamper-Resistance over compacted range
   console.log('\n[TEST] Injecting block payload mutation to confirm ongoing tamper-resistance...');
   const targetEntry = compactedLedger[2]; // Target sequence 1004
-  const originalPayload = targetEntry.payload;
+  const _originalPayload = targetEntry.payload;
   targetEntry.payload = 'ZTAN-BLOCK-04: Operator session D [MUTATED BY ADVERSARY]';
   
   // Temporarily bypass saveLedger swap to write the mutation directly

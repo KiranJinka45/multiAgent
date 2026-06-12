@@ -31,7 +31,7 @@ async function runFormalVerification() {
         console.log("[1] Checking Java Runtime...");
         execSync('java -version', { stdio: 'ignore' });
         console.log("    Java is installed and available.\n");
-    } catch (e) {
+    } catch (_e) {
         console.log("    [WARNING] Java is not installed in the current environment.");
         console.log("    TLC Model Checker requires Java to execute.");
         console.log("    The TLA+ models (.tla, .cfg) have been successfully written to /formal-specs.");
@@ -50,8 +50,9 @@ async function runFormalVerification() {
         try {
             output = execSync(`java -jar "${JAR_PATH}" tlc2.TLC "${path.join(SPECS_DIR, 'ZtanConsensus.tla')}"`, { encoding: 'utf-8' });
             console.log(output);
-        } catch (execErr: any) {
-            output = execErr.stdout ? execErr.stdout.toString() : execErr.message;
+        } catch (execErr: unknown) {
+            const errObj = execErr as { stdout?: Buffer | string; message?: string };
+            output = errObj.stdout ? errObj.stdout.toString() : (errObj.message || String(execErr));
             console.error(output);
             console.error("💥 VULNERABLE: Model Checker found an invariant violation or syntax error!");
             process.exit(1);
@@ -81,8 +82,9 @@ By introducing TLA+ formal modeling, ZTAN bridges the gap between *empirical tes
             console.log(`    Generated report: ${reportPath}`);
         }
 
-    } catch (e: any) {
-        console.error(`Error during formal verification: ${e.message}`);
+    } catch (e: unknown) {
+        const message = e instanceof Error ? (e as Error).message : String(e);
+        console.error(`Error during formal verification: ${message}`);
         process.exit(1);
     }
 }

@@ -17,7 +17,7 @@ export class KubernetesActuator {
       this.appsApi = kc.makeApiClient(k8s.AppsV1Api);
       this.coreApi = kc.makeApiClient(k8s.CoreV1Api);
       logger.info('[K8S] Actuator initialized with local KubeConfig');
-    } catch (e) {
+    } catch (_e) {
       logger.warn('[K8S] KubeConfig not found. Running in MOCK mode.');
       this.appsApi = null as any;
       this.coreApi = null as any;

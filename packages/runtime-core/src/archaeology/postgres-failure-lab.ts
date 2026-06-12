@@ -85,7 +85,7 @@ export class PostgresFailureLab {
 
         await sleep(50);
 
-        const abandonedXids = Array.from({ length: txCount }, (_, i) => `xid_prep_${200 + i}`);
+        const _abandonedXids = Array.from({ length: txCount }, (_, i) => `xid_prep_${200 + i}`);
         const observedMetrics = {
             leaked2pcCount: txCount,
             oldestPreparedTxAgeSec: 7200, // 2 hours

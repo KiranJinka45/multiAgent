@@ -1,0 +1,268 @@
+{
+  "timestamp": "2026-06-10T06:00:00.418Z",
+  "overallPassed": true,
+  "cleanBaselineValid": true,
+  "totalCases": 7,
+  "passedCases": 7,
+  "failedCases": 0,
+  "results": [
+    {
+      "name": "Truncated File",
+      "filename": "drill-backup-truncated.json",
+      "expectedCorruptionClass": "TRUNCATION",
+      "passed": true,
+      "detectedCorruptionClasses": [
+        "TRUNCATION"
+      ],
+      "validatorReport": {
+        "timestamp": "2026-06-10T06:00:00.353Z",
+        "filePath": "C:\\multiagentic_project\\multiAgent-main\\evidence\\drill-backup-truncated.json",
+        "fileSizeBytes": 2310,
+        "overallPassed": false,
+        "findings": [
+          {
+            "corruptionClass": "TRUNCATION",
+            "message": "Backup file appears truncated (JSON parse failed at end of input)",
+            "detail": "Unterminated string in JSON at position 2310"
+          }
+        ],
+        "checks": {
+          "structuralIntegrity": false,
+          "schemaConformance": true,
+          "hashChainContinuity": true,
+          "epochMonotonicity": true,
+          "walSequenceMonotonicity": true,
+          "truncationDetection": true
+        }
+      }
+    },
+    {
+      "name": "Malformed JSON",
+      "filename": "drill-backup-malformed-json.json",
+      "expectedCorruptionClass": "MALFORMED_JSON",
+      "passed": true,
+      "detectedCorruptionClasses": [
+        "MALFORMED_JSON"
+      ],
+      "validatorReport": {
+        "timestamp": "2026-06-10T06:00:00.360Z",
+        "filePath": "C:\\multiagentic_project\\multiAgent-main\\evidence\\drill-backup-malformed-json.json",
+        "fileSizeBytes": 67,
+        "overallPassed": false,
+        "findings": [
+          {
+            "corruptionClass": "MALFORMED_JSON",
+            "message": "Backup file contains invalid JSON",
+            "detail": "Expected property name or '}' in JSON at position 1"
+          }
+        ],
+        "checks": {
+          "structuralIntegrity": false,
+          "schemaConformance": true,
+          "hashChainContinuity": true,
+          "epochMonotonicity": true,
+          "walSequenceMonotonicity": true,
+          "truncationDetection": true
+        }
+      }
+    },
+    {
+      "name": "Missing Schema Fields",
+      "filename": "drill-backup-missing-fields.json",
+      "expectedCorruptionClass": "SCHEMA_VIOLATION",
+      "passed": true,
+      "detectedCorruptionClasses": [
+        "SCHEMA_VIOLATION",
+        "SCHEMA_VIOLATION",
+        "HASH_CHAIN_BREAK"
+      ],
+      "validatorReport": {
+        "timestamp": "2026-06-10T06:00:00.369Z",
+        "filePath": "C:\\multiagentic_project\\multiAgent-main\\evidence\\drill-backup-missing-fields.json",
+        "fileSizeBytes": 3666,
+        "overallPassed": false,
+        "findings": [
+          {
+            "corruptionClass": "SCHEMA_VIOLATION",
+            "message": "block[0] is missing required fields: hash, signature",
+            "detail": "Present fields: id, blockId, prevHash, type, payload, operator, status, epoch, createdAt"
+          },
+          {
+            "corruptionClass": "SCHEMA_VIOLATION",
+            "message": "block[1] is missing required fields: operator, epoch",
+            "detail": "Present fields: id, blockId, prevHash, hash, type, payload, signature, status, createdAt"
+          },
+          {
+            "corruptionClass": "HASH_CHAIN_BREAK",
+            "message": "Hash-chain fracture at block index 1",
+            "detail": "Block \"canonical-block-1\": expected prevHash \"\", actual \"0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1\""
+          }
+        ],
+        "checks": {
+          "structuralIntegrity": true,
+          "schemaConformance": false,
+          "hashChainContinuity": false,
+          "epochMonotonicity": true,
+          "walSequenceMonotonicity": true,
+          "truncationDetection": true
+        }
+      }
+    },
+    {
+      "name": "Broken Hash Chain",
+      "filename": "drill-backup-broken-hash-chain.json",
+      "expectedCorruptionClass": "HASH_CHAIN_BREAK",
+      "passed": true,
+      "detectedCorruptionClasses": [
+        "HASH_CHAIN_BREAK",
+        "HASH_CHAIN_BREAK"
+      ],
+      "validatorReport": {
+        "timestamp": "2026-06-10T06:00:00.382Z",
+        "filePath": "C:\\multiagentic_project\\multiAgent-main\\evidence\\drill-backup-broken-hash-chain.json",
+        "fileSizeBytes": 3769,
+        "overallPassed": false,
+        "findings": [
+          {
+            "corruptionClass": "HASH_CHAIN_BREAK",
+            "message": "Hash-chain fracture at block index 2",
+            "detail": "Block \"canonical-block-2\": expected prevHash \"0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2\", actual \"0xSCRAMBLED_CORRUPT_HASH_VALUE\""
+          },
+          {
+            "corruptionClass": "HASH_CHAIN_BREAK",
+            "message": "Hash-chain fracture at block index 3",
+            "detail": "Block \"canonical-block-3\": expected prevHash \"0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa3\", actual \"0xANOTHER_BROKEN_LINK\""
+          }
+        ],
+        "checks": {
+          "structuralIntegrity": true,
+          "schemaConformance": true,
+          "hashChainContinuity": false,
+          "epochMonotonicity": true,
+          "walSequenceMonotonicity": true,
+          "truncationDetection": true
+        }
+      }
+    },
+    {
+      "name": "Epoch Regression",
+      "filename": "drill-backup-epoch-regression.json",
+      "expectedCorruptionClass": "EPOCH_REGRESSION",
+      "passed": true,
+      "detectedCorruptionClasses": [
+        "EPOCH_REGRESSION",
+        "EPOCH_REGRESSION"
+      ],
+      "validatorReport": {
+        "timestamp": "2026-06-10T06:00:00.397Z",
+        "filePath": "C:\\multiagentic_project\\multiAgent-main\\evidence\\drill-backup-epoch-regression.json",
+        "fileSizeBytes": 3850,
+        "overallPassed": false,
+        "findings": [
+          {
+            "corruptionClass": "EPOCH_REGRESSION",
+            "message": "Epoch regression at block index 3",
+            "detail": "Block \"canonical-block-3\": epoch 2 < previous epoch 5"
+          },
+          {
+            "corruptionClass": "EPOCH_REGRESSION",
+            "message": "Epoch regression at block index 4",
+            "detail": "Block \"canonical-block-4\": epoch 1 < previous epoch 2"
+          }
+        ],
+        "checks": {
+          "structuralIntegrity": true,
+          "schemaConformance": true,
+          "hashChainContinuity": true,
+          "epochMonotonicity": false,
+          "walSequenceMonotonicity": true,
+          "truncationDetection": true
+        }
+      }
+    },
+    {
+      "name": "Duplicate WAL Sequence",
+      "filename": "drill-backup-duplicate-wal-seq.json",
+      "expectedCorruptionClass": "WAL_SEQUENCE_VIOLATION",
+      "passed": true,
+      "detectedCorruptionClasses": [
+        "WAL_SEQUENCE_VIOLATION",
+        "WAL_SEQUENCE_VIOLATION",
+        "WAL_SEQUENCE_VIOLATION",
+        "WAL_SEQUENCE_VIOLATION"
+      ],
+      "validatorReport": {
+        "timestamp": "2026-06-10T06:00:00.406Z",
+        "filePath": "C:\\multiagentic_project\\multiAgent-main\\evidence\\drill-backup-duplicate-wal-seq.json",
+        "fileSizeBytes": 3850,
+        "overallPassed": false,
+        "findings": [
+          {
+            "corruptionClass": "WAL_SEQUENCE_VIOLATION",
+            "message": "Duplicate WAL sequence number: 2",
+            "detail": "WAL entry at index 2 has seq=2 which already appeared"
+          },
+          {
+            "corruptionClass": "WAL_SEQUENCE_VIOLATION",
+            "message": "WAL sequence not strictly increasing at index 2",
+            "detail": "seq 2 <= previous seq 2"
+          },
+          {
+            "corruptionClass": "WAL_SEQUENCE_VIOLATION",
+            "message": "Duplicate WAL sequence number: 4",
+            "detail": "WAL entry at index 4 has seq=4 which already appeared"
+          },
+          {
+            "corruptionClass": "WAL_SEQUENCE_VIOLATION",
+            "message": "WAL sequence not strictly increasing at index 4",
+            "detail": "seq 4 <= previous seq 4"
+          }
+        ],
+        "checks": {
+          "structuralIntegrity": true,
+          "schemaConformance": true,
+          "hashChainContinuity": true,
+          "epochMonotonicity": true,
+          "walSequenceMonotonicity": false,
+          "truncationDetection": true
+        }
+      }
+    },
+    {
+      "name": "Null-Padded File",
+      "filename": "drill-backup-null-padded.json",
+      "expectedCorruptionClass": "NULL_PADDING",
+      "passed": true,
+      "detectedCorruptionClasses": [
+        "NULL_PADDING",
+        "MALFORMED_JSON"
+      ],
+      "validatorReport": {
+        "timestamp": "2026-06-10T06:00:00.415Z",
+        "filePath": "C:\\multiagentic_project\\multiAgent-main\\evidence\\drill-backup-null-padded.json",
+        "fileSizeBytes": 4106,
+        "overallPassed": false,
+        "findings": [
+          {
+            "corruptionClass": "NULL_PADDING",
+            "message": "Backup file contains 256 trailing null byte(s)",
+            "detail": "Total file size: 4106 bytes, null-padded region: last 256 bytes"
+          },
+          {
+            "corruptionClass": "MALFORMED_JSON",
+            "message": "Backup file contains invalid JSON",
+            "detail": "Unexpected non-whitespace character after JSON at position 3850"
+          }
+        ],
+        "checks": {
+          "structuralIntegrity": false,
+          "schemaConformance": true,
+          "hashChainContinuity": true,
+          "epochMonotonicity": true,
+          "walSequenceMonotonicity": true,
+          "truncationDetection": false
+        }
+      }
+    }
+  ]
+}

@@ -161,7 +161,7 @@ class RuntimeOwnershipTester {
             assert(epoch.hasActiveEpoch() === true, 'Epoch checkpoint must be registered active');
 
             // Mutate state during epoch execution
-            let currentState = { ...state };
+            const currentState = { ...state };
             currentState.balance = 200;
             currentState.status = 'DIRTY';
 

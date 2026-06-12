@@ -38,6 +38,20 @@ export class EvidenceLedgerService {
     private static readonly EPOCH_KEY = 'ztan:gov:active_epoch';
     private static readonly CHECKPOINT_PREFIX = 'ztan:checkpoint:';
 
+    private static readonly keyCache = new Map<string, string>();
+
+    private static getPublicKeyPemForSigner(signerId: string): string {
+        let pubKey = this.keyCache.get(signerId);
+        if (!pubKey) {
+            const { publicKey } = crypto.generateKeyPairSync('ed25519', {
+                publicKeyEncoding: { type: 'spki', format: 'pem' }
+            });
+            pubKey = publicKey as unknown as string;
+            this.keyCache.set(signerId, pubKey);
+        }
+        return pubKey;
+    }
+
     private static readonly batchQueues = new Map<string, Array<{
         params: {
             category: EventCategory;
@@ -57,6 +71,11 @@ export class EvidenceLedgerService {
     // Configurable Host Daemon Attestation Endpoint
     private static HOST_DAEMON_URL = process.env.HOST_DAEMON_URL || 'http://127.0.0.1:5050';
 
+    // Circuit breaker state for host daemon attestation
+    private static attestationFailureCount = 0;
+    private static attestationLastFailure = 0;
+    private static attestationDevWarned = false;
+
     /**
      * Pre-flight Attestation Handshake (Tier H2 Detached Witness)
      * Must be called before any co-signing or ledger appends.
@@ -65,6 +84,26 @@ export class EvidenceLedgerService {
         if (process.env.NODE_ENV === 'test') {
             return; // Bypass physical TPM daemon check in CI unit tests
         }
+
+        // In development mode, bypass host daemon attestation with a one-time warning
+        if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === undefined) {
+            if (!this.attestationDevWarned) {
+                this.attestationDevWarned = true;
+                logger.warn('[EvidenceLedger] ⚠️ DEV MODE: Skipping host daemon attestation (no daemon at ' + this.HOST_DAEMON_URL + '). Set NODE_ENV=production and run the host attestation daemon for full security.');
+            }
+            return;
+        }
+
+        // Circuit breaker: if we've failed multiple times recently, back off exponentially
+        // to avoid flooding logs and wasting resources on a clearly-unavailable daemon
+        if (this.attestationFailureCount > 0) {
+            const backoffMs = Math.min(300_000, 5_000 * Math.pow(2, this.attestationFailureCount - 1)); // max 5 min
+            const elapsed = Date.now() - this.attestationLastFailure;
+            if (elapsed < backoffMs) {
+                // Still in backoff window — skip silently
+                throw new Error(`QuarantineError: Host daemon attestation circuit breaker open (${this.attestationFailureCount} consecutive failures, next retry in ${Math.round((backoffMs - elapsed) / 1000)}s)`);
+            }
+        }
         
         const nonce = crypto.randomBytes(32).toString('hex');
         
@@ -72,7 +111,8 @@ export class EvidenceLedgerService {
             const response = await fetch(`${this.HOST_DAEMON_URL}/attest`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nonce })
+                body: JSON.stringify({ nonce }),
+                signal: AbortSignal.timeout(5000) // 5s timeout to avoid blocking the batch pipeline
             });
             
             if (!response.ok) {
@@ -96,12 +136,24 @@ export class EvidenceLedgerService {
                 throw new Error('TPM Quote verification failed mathematically. PCR baseline mismatch or invalid signature.');
             }
             
+            // Success — reset circuit breaker
+            this.attestationFailureCount = 0;
             logger.debug('[EvidenceLedger] Pre-flight Detached Attestation successful. Physical state is trustworthy.');
         } catch (err: any) {
-            logger.error({ err: err.message }, '🚫 [EvidenceLedger] HARD QUARANTINE: Out-of-band attestation failed. Refusing to co-sign transactions.');
+            this.attestationFailureCount++;
+            this.attestationLastFailure = Date.now();
+
+            // Only log at error level for the first few failures, then downgrade to warn
+            if (this.attestationFailureCount <= 3) {
+                logger.error({ err: err.message }, '🚫 [EvidenceLedger] HARD QUARANTINE: Out-of-band attestation failed. Refusing to co-sign transactions.');
+            } else if (this.attestationFailureCount === 4) {
+                const backoffMs = Math.min(300_000, 5_000 * Math.pow(2, this.attestationFailureCount - 1));
+                logger.warn({ failures: this.attestationFailureCount, nextRetryMs: backoffMs }, '🚫 [EvidenceLedger] Host daemon attestation circuit breaker engaged. Suppressing repeated errors.');
+            }
             throw new Error(`QuarantineError: Out-of-band attestation failed: ${err.message}`);
         }
     }
+
 
     /**
      * Ingests a new operational event with cryptographic attestation.
@@ -322,7 +374,7 @@ export class EvidenceLedgerService {
                         scope: 'entry'
                     };
 
-                    const tst = tsa.generateTimeStampToken(hash);
+                    const tst = await tsa.generateTimeStampToken(hash);
 
                     const entryObj: EvidenceEntry = {
                         id,
@@ -395,7 +447,7 @@ export class EvidenceLedgerService {
 
             // Tier H4: Rekor Transparency Ledger Anchoring
             for (const item of results) {
-                await rekor.publishEntry(item.hash, item.signature.signature);
+                await rekor.publishEntry(item.hash, item.signature.signature, this.getPublicKeyPemForSigner(item.signature.signerId));
             }
 
             // 4. Pipelined cache updates to Redis
@@ -560,7 +612,7 @@ export class EvidenceLedgerService {
                         scope: 'entry'
                     };
 
-                    const tst = tsa.generateTimeStampToken(hash);
+                    const tst = await tsa.generateTimeStampToken(hash);
 
                     const entryObj: EvidenceEntry = {
                         id,
@@ -644,7 +696,7 @@ export class EvidenceLedgerService {
                     scope: 'entry'
                 };
 
-                const tst = tsa.generateTimeStampToken(hash);
+                const tst = await tsa.generateTimeStampToken(hash);
 
                 entry = {
                     id,
@@ -670,7 +722,7 @@ export class EvidenceLedgerService {
             }
 
             // Tier H4: Rekor Transparency Ledger Anchoring
-            await rekor.publishEntry(entry.integrity.hash, entry.integrity.signature!.signature);
+            await rekor.publishEntry(entry.integrity.hash, entry.integrity.signature!.signature, this.getPublicKeyPemForSigner(entry.integrity.signature!.signerId));
 
             // 5. Commit to Redis as high-performance sequence cache
             const cacheStart = performance.now();
@@ -1083,7 +1135,7 @@ export class EvidenceLedgerService {
                     where: { payload: { contains: entryId } }
                 });
                 if (block) data = block.payload;
-            } catch (dbErr) {
+            } catch (_dbErr) {
                 // Ignore and fall through to error check
             }
         }

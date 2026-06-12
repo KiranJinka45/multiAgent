@@ -42,7 +42,7 @@ export interface AuditInput {
 
 // Stub for ThresholdCrypto until architecture is cleaned up
 const ThresholdCrypto = {
-  verifyAudit: async (input: string, options?: any): Promise<VerificationResult> => {
+  verifyAudit: async (_input: string, _options?: any): Promise<VerificationResult> => {
     return {
       status: 'VERIFIED',
       inputHash: 'stub-hash',
@@ -58,9 +58,9 @@ const ThresholdCrypto = {
       finalAnchor: 'stub-anchor'
     };
   },
-  signAnchor: (anchor: string, id: string): string => 'stub-signature',
-  signProtocolMessage: async (nodeId: string, ceremonyId: string, round: string, data: string): Promise<string> => 'stub-auth-msg',
-  hashPayload: async (payload: any): Promise<string> => 'stub-hash'
+  signAnchor: (_anchor: string, _id: string): string => 'stub-signature',
+  signProtocolMessage: async (_nodeId: string, _ceremonyId: string, _round: string, _data: string): Promise<string> => 'stub-auth-msg',
+  hashPayload: async (_payload: any): Promise<string> => 'stub-hash'
 };
 import { ZtanService, CeremonyState, Metrics } from '../../core/services/ztan.service';
 
@@ -287,7 +287,7 @@ export class AuditVerifierComponent implements AfterViewChecked {
           this.addLog(`Node ${p.nodeId}: Generating polynomial & commitments...`, 'info');
           // In simulation, the backend handles the "generation" when we submit.
           // We'll just send dummy but valid commitments for the simulation.
-          const dummyCommitments = [
+          const _dummyCommitments = [
             '0000000000000000000000000000000000000000000000000000000000000000', // This is actually invalid for real bls but simulation is okay
           ];
           // Wait, the backend requires real bls points if it validates.
@@ -515,7 +515,7 @@ export class AuditVerifierComponent implements AfterViewChecked {
       this.addLog(`Total Ceremonies    : ${metrics.totalCeremonies}`, 'info');
       this.addLog(`Verification Success: ${(metrics.successRate * 100).toFixed(1)}%`, 'success');
       this.addLog(`System Status       : ${metrics.status}`, 'success');
-    } catch (e) {
+    } catch (_e) {
       this.addLog('Replay Resistance   : ACTIVE (DATABASE_PERSISTENT)', 'info');
       this.addLog('Consensus Model     : VALIDATED_COORDINATED_MPC (FROST/DKG)', 'info');
     }
@@ -624,6 +624,6 @@ export class AuditVerifierComponent implements AfterViewChecked {
   private scrollToBottom(): void {
     try {
       this.terminalBody.nativeElement.scrollTop = this.terminalBody.nativeElement.scrollHeight;
-    } catch (err) {}
+    } catch (_err) {}
   }
 }

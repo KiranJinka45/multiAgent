@@ -69,7 +69,7 @@ export const RecoveryHistoryEngine = {
             try {
                 indexCache = JSON.parse(fs.readFileSync(INDEX_FILE, 'utf8'));
                 return indexCache!;
-            } catch (e) {
+            } catch (_e) {
                 logger.warn('[Archaeology] Index corrupted, resetting');
             }
         }
@@ -274,7 +274,7 @@ export const RecoveryHistoryEngine = {
             const ageDays = (Date.now() - new Date(s.timestamp).getTime()) / (24 * 60 * 60 * 1000);
             if (ageDays > 180 && s.replayFile) {
                 compactedCount++;
-                const { replayFile, ...lightReplay } = s;
+                const { _replayFile, ...lightReplay } = s;
                 return { ...lightReplay, tags: [...(s.tags || []), 'COMPACTED'] };
             }
             return s;
@@ -509,7 +509,7 @@ export const RecoveryHistoryEngine = {
      * Record current prediction accuracy to historical log
      */
     trackPredictionAccuracy(): void {
-        const index = this.loadIndex();
+        const _index = this.loadIndex();
         const accuracy = this.calibratePredictionAccuracy();
         
         const historyPath = path.join(process.cwd(), 'PREDICTION_ACCURACY_HISTORY.json');
@@ -660,7 +660,7 @@ export const RecoveryHistoryEngine = {
      */
     forecastStorageGrowth(years: number = 3): any {
         const index = this.loadIndex();
-        const now = Date.now();
+        const _now = Date.now();
         const snapshots = index.snapshots;
         if (snapshots.length < 2) return { growthRate: 0 };
 
@@ -838,7 +838,7 @@ export const RecoveryHistoryEngine = {
      */
     foldSimilarReplays(): { foldedCount: number } {
         const index = this.loadIndex();
-        const initialCount = index.snapshots.length;
+        const _initialCount = index.snapshots.length;
         const uniqueSnapshots: any[] = [];
         const foldedIds: string[] = [];
 

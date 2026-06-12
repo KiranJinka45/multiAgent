@@ -113,5 +113,57 @@
       "cpuCount": 12,
       "totalMemoryGb": 32
     }
+  },
+  {
+    "timestamp": "2026-06-10T03:57:41.047Z",
+    "type": "NUCLEAR_CLEAN",
+    "success": false,
+    "durationMs": 1088460,
+    "failureReason": "OCR execution failed: Command failed: pnpm exec tsx scripts/one-command-recovery.ts",
+    "failureCategory": "unknown",
+    "purgedArtifacts": [
+      "all node_modules",
+      "all dist",
+      "all .tsbuildinfo",
+      "all pnpm-lock.yaml"
+    ],
+    "stepTimings": {
+      "purgeMs": 306547,
+      "reinstallMs": 561743,
+      "ocrMs": 219198
+    },
+    "envFingerprint": {
+      "os": "win32 10.0.26200",
+      "node": "v20.20.0",
+      "pnpm": "10.33.0",
+      "arch": "x64",
+      "cpuCount": 12,
+      "totalMemoryGb": 32
+    }
+  },
+  {
+    "timestamp": "2026-06-10T04:24:33.409Z",
+    "type": "NUCLEAR_CLEAN",
+    "success": true,
+    "durationMs": 1462905,
+    "purgedArtifacts": [
+      "all node_modules",
+      "all dist",
+      "all .tsbuildinfo",
+      "all pnpm-lock.yaml"
+    ],
+    "stepTimings": {
+      "purgeMs": 469212,
+      "reinstallMs": 419497,
+      "ocrMs": 572138
+    },
+    "envFingerprint": {
+      "os": "win32 10.0.26200",
+      "node": "v20.20.0",
+      "pnpm": "10.33.0",
+      "arch": "x64",
+      "cpuCount": 12,
+      "totalMemoryGb": 32
+    }
   }
 ]

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsup src/index.ts --no-dts --watch",
-    "build": "tsup src/index.ts --no-dts && del /q tsconfig.tsbuildinfo 2>nul & tsc --emitDeclarationOnly -p tsconfig.json --declarationDir ./dist",
+    "build": "tsup src/index.ts --no-dts && node -e \"try { require('fs').unlinkSync('tsconfig.tsbuildinfo') } catch (e) {}\" && tsc --emitDeclarationOnly -p tsconfig.json --declarationDir ./dist",
     "start": "tsx -r tsconfig-paths/register src/index.ts",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"

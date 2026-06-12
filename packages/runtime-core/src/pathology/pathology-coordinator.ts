@@ -87,7 +87,7 @@ export class PathologyCoordinator {
                 }
                 return parsed;
             }
-        } catch (e) {
+        } catch (_e) {
             // Fallback under storage exhaustion or file lock contention
         }
         return { ...DEFAULT_CONFIG };
@@ -118,6 +118,6 @@ export class PathologyCoordinator {
             if (fs.existsSync(this.stateFilePath)) {
                 fs.unlinkSync(this.stateFilePath);
             }
-        } catch (e) {}
+        } catch (_e) {}
     }
 }

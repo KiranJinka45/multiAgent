@@ -88,7 +88,7 @@ export class HistoricalReplayCompatibility {
         }
         try {
             return validator.validate(inputs);
-        } catch (err) {
+        } catch (_err) {
             return false;
         }
     }

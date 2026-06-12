@@ -24,7 +24,7 @@ async function runExternalValidation() {
         execSync('docker --version', { stdio: 'ignore' });
         execSync('docker compose version', { stdio: 'ignore' });
         console.log("    Docker is available.\n");
-    } catch (e) {
+    } catch (_e) {
         console.log("    [WARNING] Docker is not available in the current environment.");
         console.log("    To run this cluster natively, please install Docker and execute:");
         console.log("    $ docker compose -f ztan-docker-compose.yml up --build");
@@ -50,8 +50,9 @@ async function runExternalValidation() {
         execSync(`docker compose -f ${composeFile} down`, { stdio: 'inherit' });
 
         console.log("\n    🛡️ SECURE: External reproducibility validation succeeded.");
-    } catch (e: any) {
-        console.error(`💥 VULNERABLE: Validation harness failed: ${e.message}`);
+    } catch (e: unknown) {
+        const message = e instanceof Error ? (e as Error).message : String(e);
+        console.error(`💥 VULNERABLE: Validation harness failed: ${message}`);
         try {
             execSync(`docker compose -f ${composeFile} down`);
         } catch { /* ignore cleanup error */ }

@@ -224,7 +224,7 @@ export class SystemHealthService {
           activeIncident: this.activeIncident,
           infrastructure: { database: { status: 'ONLINE' }, redis: { status: 'ONLINE' } }
         });
-      } catch (e) {}
+      } catch (_e) {}
     }
   }
 
@@ -248,7 +248,7 @@ export class SystemHealthService {
       this.lastMode = mode;
       this.saveState();
       this.updateActionState('MODE', 'SUCCESS');
-    } catch (e) {
+    } catch (_e) {
       this.updateActionState('MODE', 'ERROR');
     }
   }
@@ -259,7 +259,7 @@ export class SystemHealthService {
       this.addLog('SUCCESS', 'Manual recovery signal dispatched to fleet');
       this.recoveryStartTime = null;
       this.updateActionState('RECOVER', 'SUCCESS');
-    } catch (e) {
+    } catch (_e) {
       this.updateActionState('RECOVER', 'ERROR');
     }
   }

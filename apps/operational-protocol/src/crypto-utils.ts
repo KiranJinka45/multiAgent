@@ -69,7 +69,7 @@ export class ThresholdCrypto {
     if (partials.length < threshold) return null;
     
     const signatures = partials.map(p => p.signature);
-    const pks = await this.getEligiblePublicKeys(allNodeIds);
+    const _pks = await this.getEligiblePublicKeys(allNodeIds);
     
     // Convert nodeIds to indices (1-based for Lagrange)
     const indices = partials.map(p => allNodeIds.indexOf(p.nodeId) + 1);

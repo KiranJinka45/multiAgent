@@ -11,7 +11,6 @@ import { sidecarVerifier, consensusEngine, externalVerifier, notaryService, Thre
 const elog = pino({ level: 'info' });
 
 export async function initSocket(server: http.Server, app?: express.Application): Promise<any> {
-    const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
     const redisOptions = {
         maxRetriesPerRequest: null,
         retryStrategy(times: number) {
@@ -20,7 +19,21 @@ export async function initSocket(server: http.Server, app?: express.Application)
             return Math.round(delay + jitter);
         }
     };
-    const pubClient = new Redis(REDIS_URL, redisOptions);
+    let pubClient: Redis;
+    if (process.env.REDIS_SENTINEL_HOSTS) {
+        const sentinels = process.env.REDIS_SENTINEL_HOSTS.split(',').map(s => {
+            const [host, port] = s.split(':');
+            return { host, port: parseInt(port, 10) || 26379 };
+        });
+        pubClient = new Redis({
+            sentinels,
+            name: process.env.REDIS_SENTINEL_NAME || 'mymaster',
+            ...redisOptions
+        });
+    } else {
+        const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
+        pubClient = new Redis(REDIS_URL, redisOptions);
+    }
     pubClient.on('error', (err: any) => elog.error({ err: err.message }, '[Socket] Redis pubClient connection error'));
     pubClient.on('connect', () => elog.info('[Socket] Redis pubClient connected successfully'));
 
@@ -43,9 +56,8 @@ export async function initSocket(server: http.Server, app?: express.Application)
     // --- PILLAR 1: BACKPRESSURE-AWARE STREAMING ---
     const connectedSockets = new Set<any>();
     let latestState: any = null;
-    let lastHash: string = '0'.repeat(64); // Genesis hash
     const REDIS_AUDIT_KEY = 'sre:audit:log';
-    const MAX_AUDIT_LOG = 1000;
+    const _MAX_AUDIT_LOG = 1000;
 
     if (app) {
         app.get('/api/v1/replay', async (req, res) => {
@@ -244,6 +256,7 @@ export async function initSocket(server: http.Server, app?: express.Application)
             const serializedPayload = JSON.stringify(latestState);
             const serLatency = (performance.now() - startSer) / 1000;
             
+            // @ts-ignore — optional telemetry; resolution may fail in pruned Docker builds
             import('@packages/observability').then(obs => {
                 if (obs && obs.websocketSerializationLatency) {
                     obs.websocketSerializationLatency.observe(serLatency);
@@ -284,6 +297,7 @@ export async function initSocket(server: http.Server, app?: express.Application)
                 }
             });
             
+            // @ts-ignore — optional telemetry; resolution may fail in pruned Docker builds
             import('@packages/observability').then(obs => {
                 if (obs && obs.websocketOutboundQueueDepth) {
                     obs.websocketOutboundQueueDepth.set(totalQueueDepth);
@@ -319,7 +333,7 @@ export async function initSocket(server: http.Server, app?: express.Application)
             } 
             
             else if (channel === 'log-events') {
-                const { missionId, type } = event;
+                const { missionId, _type } = event;
                 // Broadcast to mission or global log room
                 const room = missionId ? `logs:${missionId}` : 'logs:global';
                 io.to(room).emit('log-update', event);

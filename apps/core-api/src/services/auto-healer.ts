@@ -116,7 +116,7 @@ export class DevinAutoHealer {
                             console.error(`[AutoHealer] SECURITY ALERT: Symlink escape detected and blocked: ${patch.path} -> ${realPath}`);
                             continue;
                         }
-                    } catch (e) {
+                    } catch (_e) {
                         // If file doesn't exist yet, we check the directory
                         const parentDir = path.dirname(resolvedPath);
                         if (fs.existsSync(parentDir)) {

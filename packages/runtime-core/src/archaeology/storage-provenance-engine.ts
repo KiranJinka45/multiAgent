@@ -22,7 +22,7 @@ export class StorageConfidenceProvenanceEngine {
     }): StorageProvenanceReport {
         let confidenceLevel: StorageConfidenceLevel = 'STRONG_PARITY';
         let storageTruthConfidence = 1.0;
-        let unverifiableWindowMs = profile.unverifiableDelayMs;
+        const unverifiableWindowMs = profile.unverifiableDelayMs;
         const anomalies: string[] = [];
 
         // 1. Evaluate firmware warnings or severe corruptions

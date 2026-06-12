@@ -5,7 +5,7 @@ import { logger } from '@packages/observability';
 import { AuditLogger } from '@packages/utils';
 
 const ROITracker = {
-    getMetrics: async (tenantId: string) => {
+    getMetrics: async (_tenantId: string) => {
         return {
             optimizations: 42,
             failureRate: 0.015,
@@ -16,7 +16,7 @@ const ROITracker = {
 };
 
 const PolicyManager = {
-    getPolicy: async (tenantId: string) => {
+    getPolicy: async (_tenantId: string) => {
         return {
             optimizationIntervalSeconds: 3600,
             allowAutoScaling: true,
@@ -24,7 +24,7 @@ const PolicyManager = {
             degradationThresholdPct: 15
         };
     },
-    updatePolicy: async (tenantId: string, updates: any) => {
+    updatePolicy: async (_tenantId: string, updates: any) => {
         return {
             optimizationIntervalSeconds: updates.optimizationIntervalSeconds || 3600,
             allowAutoScaling: updates.allowAutoScaling !== undefined ? updates.allowAutoScaling : true,
@@ -122,7 +122,7 @@ router.patch('/policy', async (req: Request, res: Response) => {
  * GET /api/admin/intelligence/timeline
  * Returns historical scaling decisions for visualization.
  */
-router.get('/timeline', async (req: Request, res: Response) => {
+router.get('/timeline', async (_req: Request, res: Response) => {
   try {
     const decisions = await db.scalingDecision.findMany({
       orderBy: { createdAt: 'desc' },
@@ -139,7 +139,7 @@ router.get('/timeline', async (req: Request, res: Response) => {
  * GET /api/admin/intelligence/state
  * Returns real-time strategy distribution and system health via historical Aggregation.
  */
-router.get('/state', async (req: Request, res: Response) => {
+router.get('/state', async (_req: Request, res: Response) => {
   try {
     // Aggregate real decisions from the ledger history to determine active strategy distribution
     const recentDecisions = await db.scalingDecision.findMany({
@@ -186,7 +186,14 @@ router.get('/billing/tenant/:tenantId', async (req: Request, res: Response) => {
   const { tenantId } = req.params;
   
   try {
-    const missions = await db.mission.findMany({
+    const agg = await db.mission.aggregate({
+      where: { tenantId, status: 'complete' },
+      _sum: { totalCostUsd: true },
+      _avg: { computeDurationMs: true },
+      _count: true
+    });
+
+    const history = await db.mission.findMany({
       where: { tenantId, status: 'complete' },
       select: {
         totalCostUsd: true,
@@ -195,20 +202,17 @@ router.get('/billing/tenant/:tenantId', async (req: Request, res: Response) => {
         createdAt: true
       },
       orderBy: { createdAt: 'desc' },
-      take: 100
+      take: 20
     });
-
-    const totalCost = missions.reduce((sum: number, m: any) => sum + (m.totalCostUsd || 0), 0);
-    const avgCompute = missions.length ? missions.reduce((sum: number, m: any) => sum + (m.computeDurationMs || 0), 0) / missions.length : 0;
     
     res.json({
       success: true,
       data: {
         tenantId,
-        totalCost,
-        avgComputeTimeMs: avgCompute,
-        missionCount: missions.length,
-        history: missions
+        totalCost: agg._sum.totalCostUsd || 0,
+        avgComputeTimeMs: agg._avg.computeDurationMs || 0,
+        missionCount: agg._count || 0,
+        history: history
       }
     });
   } catch (err) {
@@ -221,25 +225,27 @@ router.get('/billing/tenant/:tenantId', async (req: Request, res: Response) => {
  * GET /api/admin/tenants/summary
  * Returns aggregated stats for all tenants (Admin view).
  */
-router.get('/tenants/summary', async (req: Request, res: Response) => {
+router.get('/tenants/summary', async (_req: Request, res: Response) => {
   try {
     const tenants = await db.tenant.findMany({
-      include: {
-        _count: { select: { missions: true } },
-        missions: {
-          where: { status: 'complete' },
-          select: { totalCostUsd: true, margin: true }
-        }
-      }
+      select: { id: true, name: true }
+    });
+
+    const missionStats = await db.mission.groupBy({
+      by: ['tenantId'],
+      where: { status: 'complete' },
+      _sum: { totalCostUsd: true, margin: true },
+      _count: true
     });
 
     const summary = tenants.map((t: any) => {
-      const totalCost = t.missions.reduce((sum: number, m: any) => sum + (m.totalCostUsd || 0), 0);
-      const totalMargin = t.missions.reduce((sum: number, m: any) => sum + (m.margin || 0), 0);
+      const stats = missionStats.find((s: any) => s.tenantId === t.id);
+      const totalCost = stats?._sum?.totalCostUsd || 0;
+      const totalMargin = stats?._sum?.margin || 0;
       return {
         id: t.id,
         name: t.name,
-        missionCount: t._count.missions,
+        missionCount: stats?._count || 0,
         totalCost,
         totalMargin,
         avgMarginPct: totalCost > 0 ? (totalMargin / totalCost) * 100 : 0
@@ -257,7 +263,7 @@ router.get('/tenants/summary', async (req: Request, res: Response) => {
  * GET /api/admin/alerts
  * Returns recent system alerts and SLA breaches.
  */
-router.get('/alerts', async (req: Request, res: Response) => {
+router.get('/alerts', async (_req: Request, res: Response) => {
   try {
     const alerts = await db.auditLog.findMany({
       where: {
@@ -290,7 +296,7 @@ router.post('/provision', async (req: Request, res: Response) => {
   }
 
   try {
-    // @ts-ignore
+    // @ts-expect-error: ProvisioningService might not be fully typed during import
     const { ProvisioningService } = await import('../services/ProvisioningService');
     const result = await ProvisioningService.provisionTenant(orgName, ownerId);
     

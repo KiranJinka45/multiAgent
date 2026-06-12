@@ -17,7 +17,7 @@ function runSeededCrashAndCapture(seed: number): string {
     const prng = new SeededPRNG(seed);
     try {
         AdversarialNetworkScheduler.runViewChangeFlappingFuzz(prng);
-    } catch (err) {
+    } catch (_err) {
         // Expected invariant breach due to deterministic fuzzing edges
     }
     

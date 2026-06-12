@@ -9,13 +9,13 @@ describe('Phase D4: Isolation Escape & Runtime Containment', () => {
     it('VM Leak Campaign: should teardown in finally and allow sweeper to clean up orphaned VMs', async () => {
         const adapter = new MockFirecrackerAdapter();
         const orchestrator = new FirecrackerOrchestrator(adapter);
-        const runner = new IsolatedExecutionRunner(orchestrator);
+        const _runner = new IsolatedExecutionRunner(orchestrator);
 
         const killSpy = vi.spyOn(adapter, 'killVm');
 
         // Execute a command, verifying it adds and removes from orphanedVms.
         // Also simulate an orphan by manually injecting into the private static set.
-        const orphanedVmsSet = (IsolatedExecutionRunner as any).orphanedVms as Set<string>;
+        const orphanedVmsSet = (IsolatedExecutionRunner as unknown as { orphanedVms: Set<string> }).orphanedVms;
         orphanedVmsSet.add('vm-leaked-123');
 
         expect(orphanedVmsSet.has('vm-leaked-123')).toBe(true);
@@ -44,7 +44,7 @@ describe('Phase D4: Isolation Escape & Runtime Containment', () => {
     });
 
     it('Quota Exhaustion: should abort memory spikes, vcpu count overages, and timeout infinite loops', async () => {
-        const registry = (SideEffectOntology as any).registry as Map<string, any>;
+        const registry = (SideEffectOntology as unknown as { registry: Map<string, unknown> }).registry;
         const originalVmExecute = registry.get('vm-execute');
         registry.set('vm-execute', { 
             name: 'vm-execute', 
@@ -70,7 +70,7 @@ describe('Phase D4: Isolation Escape & Runtime Containment', () => {
             // Timeout infinite loop simulator
             // Mock executeCommand to hang forever
             vi.spyOn(adapter, 'executeCommand').mockImplementation(async () => {
-                return new Promise((resolve) => {
+                return new Promise((_resolve) => {
                     // Hang forever
                 });
             });

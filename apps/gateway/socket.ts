@@ -8,8 +8,20 @@ import { eventBus } from '@packages/utils';
 const elog = pino({ level: 'info' });
 
 export function initSocket(server: http.Server) {
-    const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
-    const pubClient = new Redis(REDIS_URL);
+    let pubClient: Redis;
+    if (process.env.REDIS_SENTINEL_HOSTS) {
+        const sentinels = process.env.REDIS_SENTINEL_HOSTS.split(',').map(s => {
+            const [host, port] = s.split(':');
+            return { host, port: parseInt(port, 10) || 26379 };
+        });
+        pubClient = new Redis({
+            sentinels,
+            name: process.env.REDIS_SENTINEL_NAME || 'mymaster'
+        });
+    } else {
+        const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
+        pubClient = new Redis(REDIS_URL);
+    }
     const subClient = pubClient.duplicate();
 
     const io = new Server(server, {

@@ -35,11 +35,17 @@ function runInvariantAudit() {
     console.log('🔍 Audit 2: Verifying Evidence Engine Isolation...');
     // In a real audit, we'd check for module resolution isolation.
     // For this drill, we verify it doesn't import external cognitive agents.
-    const evidenceEngineContent = fs.readFileSync(path.join(coreEnginePath, 'evidence-engine.ts'), 'utf8');
-    if (evidenceEngineContent.includes('@packages/ai-agents')) {
-         console.error('   ❌ CRITICAL FAILURE: Evidence Engine depends on Cognitive Agents.');
-         process.exit(1);
-    }
+    const reportingPath = path.join(coreEnginePath, 'reporting');
+    const evidenceLifecyclePath = path.join(process.cwd(), 'packages/evidence-lifecycle/src');
+    
+    const evidenceFiles = walkDir(reportingPath).concat(walkDir(evidenceLifecyclePath));
+    evidenceFiles.forEach(file => {
+        const content = fs.readFileSync(file, 'utf8');
+        if (content.includes('@packages/ai-agents') || content.includes('@packages/agents')) {
+             console.error(`   ❌ CRITICAL FAILURE: Evidence/Reporting file ${path.relative(process.cwd(), file)} depends on Cognitive Agents.`);
+             process.exit(1);
+        }
+    });
 
     if (bypassCount === 0) {
         console.log('\n✅ INVARIANT AUDIT SUCCESSFUL:');

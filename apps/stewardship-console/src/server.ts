@@ -33,12 +33,12 @@ try {
     if (fs.existsSync(preloadPath)) {
         expectedPreloadHash = crypto.createHash('sha256').update(fs.readFileSync(preloadPath)).digest('hex');
     }
-} catch (e) {}
+} catch (_e) {}
 try {
     if (fs.existsSync(supervisorPath)) {
         expectedSupervisorHash = crypto.createHash('sha256').update(fs.readFileSync(supervisorPath)).digest('hex');
     }
-} catch (e) {}
+} catch (_e) {}
 
 
 export async function startServer() {
@@ -113,7 +113,7 @@ export async function startServer() {
                 blockedIntents,
                 policyDenials
             });
-        } catch (err: any) {
+        } catch (_err: any) {
             res.status(500).json({ error: 'Internal server error' });
         }
     });
@@ -153,7 +153,7 @@ export async function startServer() {
                         let expectedRuntimeImageHash = '';
                         try {
                             expectedRuntimeImageHash = RuntimeImageRegistry.getSealedImageHash();
-                        } catch (e) {}
+                        } catch (_e) {}
 
                         if (!receivedPreload || receivedPreload.length !== 64 || !receivedSupervisor || receivedSupervisor.length !== 64 || !receivedRuntimeImage || receivedRuntimeImage.length !== 64) {
                             integrityValid = false;

@@ -14,7 +14,7 @@ export class Frost {
      * @param n Total participants
      * @returns Coefficients (private) and Commitments (public)
      */
-    static generateRound1(t: number, n: number): {
+    static generateRound1(t: number): {
         coeffs: bigint[];
         commitments: string[];
     } {

@@ -19,7 +19,7 @@ async function runOutboxSelfHealingValidation() {
   if (fs.existsSync(ledgerDir)) {
     try {
       fs.rmSync(ledgerDir, { recursive: true, force: true });
-    } catch (e) {
+    } catch (_e) {
       const cleanDir = (p: string) => {
         if (fs.existsSync(p)) {
           fs.readdirSync(p).forEach(file => {
@@ -91,13 +91,13 @@ async function runOutboxSelfHealingValidation() {
     throw new Error('PostgreSQL consensus layer is unreachable.');
   };
 
-  const entry1 = await GovernanceLedger.appendEntry(
+  const _entry1 = await GovernanceLedger.appendEntry(
     'POLICY',
     'ZTAN-RESOLUTION: Cognitive Saturation Override Ceremony Authorized by Operator.',
     'ZTAN-OPERATOR-01',
     'VERIFIED'
   );
-  const entry2 = await GovernanceLedger.appendEntry(
+  const _entry2 = await GovernanceLedger.appendEntry(
     'TELEMETRY',
     'ZTAN-HEARTBEAT: Health metrics checked.',
     'SYSTEM',

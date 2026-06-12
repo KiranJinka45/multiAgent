@@ -16,7 +16,7 @@ export class BusinessOptimizer {
    */
   public async generateProposals(
     currentInfra: { latency: number, cost: number, reliability: number },
-    biz: BusinessHealth
+    _biz: BusinessHealth
   ): Promise<StrategyProposal[]> {
     const proposals: StrategyProposal[] = [];
 

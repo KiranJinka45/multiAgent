@@ -47,7 +47,7 @@ export const projectService = {
         }
     },
 
-    async createProject(name: string, tenantId: string, description?: string, type?: string) {
+    async createProject(name: string, tenantId: string, description?: string, _type?: string) {
         try {
             const data = await db.project.create({
                 data: {
@@ -141,7 +141,7 @@ export const projectService = {
                 select: { tenantId: true }
             });
             return data?.tenantId === tenantId;
-        } catch (error) {
+        } catch (_error) {
             return false;
         }
     },

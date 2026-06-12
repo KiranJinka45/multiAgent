@@ -1,4 +1,5 @@
-import { Etcd3 } from 'etcd3';
+import { Etcd3, Lease } from 'etcd3';
+import type { IOptions } from 'etcd3';
 import { PrismaClient } from '@packages/db';
 import { PerformanceObserver } from 'perf_hooks';
 import os from 'os';
@@ -34,12 +35,12 @@ export class ZtanLeaseManager {
     private heartbeatInterval: NodeJS.Timeout | null = null;
     private lagInterval: NodeJS.Timeout | null = null;
     private gcObserver: PerformanceObserver | null = null;
-    private etcdLease: any = null;
+    private etcdLease: Lease | null = null;
     private dbConnectionActive = true;
 
     constructor(etcdEndpoints = process.env.ETCD_ENDPOINTS || 'http://localhost:2379') {
         const hosts = etcdEndpoints.split(',').map(h => h.trim());
-        const options: any = { hosts };
+        const options: IOptions = { hosts };
 
         if (etcdEndpoints.includes('https')) {
             try {
@@ -48,8 +49,9 @@ export class ZtanLeaseManager {
                     privateKey: fs.readFileSync('/certs/client.key'),
                     certChain: fs.readFileSync('/certs/client.crt')
                 };
-            } catch (e: any) {
-                console.error(`[Lease Engine] Failed to load mTLS credentials: ${e.message}`);
+            } catch (e: unknown) {
+                const message = e instanceof Error ? e.message : String(e);
+                console.error(`[Lease Engine] Failed to load mTLS credentials: ${message}`);
                 throw new Error('ETCD_ENDPOINTS requested https but mTLS certificates were not found in /certs.');
             }
         }
@@ -72,8 +74,9 @@ export class ZtanLeaseManager {
         this.heartbeatInterval = setInterval(async () => {
             try {
                 await this.acquireOrRenewLease();
-            } catch (err: any) {
-                console.error(`[Lease Engine] Heartbeat failure: ${err.message}`);
+            } catch (err: unknown) {
+                const message = err instanceof Error ? err.message : String(err);
+                console.error(`[Lease Engine] Heartbeat failure: ${message}`);
             }
         }, 2000);
     }
@@ -91,13 +94,13 @@ export class ZtanLeaseManager {
         if (this.gcObserver) {
             try {
                 this.gcObserver.disconnect();
-            } catch (e) {}
+            } catch (_e) {}
             this.gcObserver = null;
         }
         if (this.etcdLease) {
             try {
                 await this.etcdLease.revoke();
-            } catch (e) {}
+            } catch (_e) {}
         }
         await this.prisma.$disconnect();
         this.etcd.close();
@@ -136,7 +139,7 @@ export class ZtanLeaseManager {
 
             // Atomic set-if-not-exists using transaction
             const txResult = await this.etcd.if(leaseKey, 'Create', '==', 0)
-                .then(this.etcd.put(leaseKey).value(clientVal).lease(lease as any))
+                .then(this.etcd.put(leaseKey).value(clientVal).lease(lease.grant()))
                 .commit();
             
             let putResult = txResult.succeeded;
@@ -180,8 +183,9 @@ export class ZtanLeaseManager {
                 }
                 this.isLeader = false;
             }
-        } catch (err: any) {
-            console.error(`[Lease Engine] Failed to coordinate etcd single-writer lease: ${err.message}`);
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : String(err);
+            console.error(`[Lease Engine] Failed to coordinate etcd single-writer lease: ${message}`);
             this.isLeader = false;
             throw err;
         }
@@ -209,8 +213,9 @@ export class ZtanLeaseManager {
                 }
             });
             this.gcObserver.observe({ entryTypes: ['gc'] });
-        } catch (e: any) {
-            console.warn(`[GC Warning] Failed to initialize Native V8 GC Observer: ${e.message}`);
+        } catch (e: unknown) {
+            const message = e instanceof Error ? e.message : String(e);
+            console.warn(`[GC Warning] Failed to initialize Native V8 GC Observer: ${message}`);
         }
 
         // Unconditional Event Loop Lag Tracker (monitors CPU scheduling starvation & freeze pathologies)

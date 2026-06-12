@@ -13,7 +13,7 @@ let manifest: {
 
 try {
   manifest = JSON.parse(rawManifest);
-} catch (e) {
+} catch (_e) {
   console.error('[Preload] Failed to parse CAPABILITY_MANIFEST_JSON');
 }
 
@@ -46,7 +46,7 @@ function matchGlob(pattern: string, filePath: string): boolean {
   const normalizedPattern = pattern.replace(/\\/g, '/');
 
   // Simple glob to regex conversion
-  let regexStr = '^' + normalizedPattern
+  const regexStr = '^' + normalizedPattern
     .replace(/[-\/\\^$+?.()|[\]{}]/g, '\\$&') // escape regex symbols
     .replace(/\*\*/g, '.*')                  // match any character including slashes for **
     .replace(/\*(?!\*)/g, '[^/]*')           // match any character except slash for *
@@ -55,7 +55,7 @@ function matchGlob(pattern: string, filePath: string): boolean {
   try {
     const regex = new RegExp(regexStr);
     return regex.test(normalizedPath);
-  } catch (e) {
+  } catch (_e) {
     return false;
   }
 }
@@ -103,7 +103,7 @@ function checkNetworkAccess(host: string, port: number) {
     try {
       const regex = new RegExp(regexStr);
       return regex.test(host);
-    } catch (e) {
+    } catch (_e) {
       return false;
     }
   });
@@ -259,7 +259,7 @@ if (globalThis.fetch) {
     try {
       const url = new URL(urlString);
       checkNetworkAccess(url.hostname, url.port ? parseInt(url.port, 10) : (url.protocol === 'https:' ? 443 : 80));
-    } catch (e) {
+    } catch (_e) {
       // Fall through, let the socket connect intercept it if it parses dynamically
     }
 

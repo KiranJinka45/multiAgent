@@ -421,7 +421,7 @@ export class ReplayExplorerComponent implements OnInit, AfterViewInit {
         this.selectedMethod = data.method || 'rebuild';
         this.justification = data.justification || '';
       }
-    } catch (e) { }
+    } catch (_e) { }
 
     this.stewardship.evidence$.subscribe((events) => {
       if (events && events.length > 0) {
@@ -433,7 +433,7 @@ export class ReplayExplorerComponent implements OnInit, AfterViewInit {
               if (matched) this.selectedEntry = matched;
             }
           }
-        } catch (e) { }
+        } catch (_e) { }
       }
       this.loadAllAndDraw();
     });
@@ -447,7 +447,7 @@ export class ReplayExplorerComponent implements OnInit, AfterViewInit {
         method: this.selectedMethod,
         justification: this.justification
       });
-    } catch (e) { }
+    } catch (_e) { }
   }
 
   ngAfterViewInit() {
@@ -483,8 +483,8 @@ export class ReplayExplorerComponent implements OnInit, AfterViewInit {
     ctx.clearRect(0, 0, width, height);
 
     const margin = { top: 15, right: 20, bottom: 20, left: 80 };
-    const chartWidth = width - margin.left - margin.right;
-    const chartHeight = height - margin.top - margin.bottom;
+    const _chartWidth = width - margin.left - margin.right;
+    const _chartHeight = height - margin.top - margin.bottom;
 
     const xExtent = d3.extent(events, (d: EvidenceEntry) => d.sequenceId) as [number, number];
     const xMin = xExtent[0] || 0;
@@ -661,7 +661,7 @@ export class ReplayExplorerComponent implements OnInit, AfterViewInit {
       }
       const rawStr = new TextDecoder('utf-16le').decode(bytes);
       return rawStr.replace(/\u0000/g, '␀');
-    } catch (e) {
+    } catch (_e) {
       return 'Failed to decode: ' + base64;
     }
   }

@@ -395,7 +395,7 @@ export async function startAuthServer() {
                 }
             });
             res.json(users);
-        } catch (err: any) {
+        } catch (_err: any) {
             res.status(500).json({ error: 'Service internal error' });
         }
     });
@@ -422,7 +422,7 @@ export async function startAuthServer() {
             }
 
             res.json({ success: true, role });
-        } catch (err: any) {
+        } catch (_err: any) {
             res.status(500).json({ error: 'Service internal error' });
         }
     });
@@ -469,7 +469,7 @@ export async function startAuthServer() {
         await db.$queryRaw`SELECT 1`;
         await redis.ping();
         logger.info('[AuthService] Warm-up successful. Mesh connectivity verified.');
-    } catch (e) {
+    } catch (_e) {
         logger.warn('[AuthService] Warm-up encountered jitter. Proceeding with caution.');
     }
 
@@ -512,7 +512,7 @@ export async function startAuthServer() {
         setInterval(() => {
             try {
                 const stats = fs.statSync(certPath);
-                const now = new Date();
+                const _now = new Date();
                 const cert = fs.readFileSync(certPath);
 
                 // Log periodic health

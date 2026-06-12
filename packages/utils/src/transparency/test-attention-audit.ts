@@ -63,11 +63,11 @@ async function runAttentionAuditValidation() {
         gRoot: crypto.createHash('sha256').update('new_root_1').digest('hex')
     };
 
-    let payload = governanceSignablePayload(dummyReceipt as any);
-    let sig1 = await signer1.sign(Buffer.from(payload, 'utf8'));
-    let sig2 = await signer2.sign(Buffer.from(payload, 'utf8'));
+    const payload = governanceSignablePayload(dummyReceipt as any);
+    const sig1 = await signer1.sign(Buffer.from(payload, 'utf8'));
+    const sig2 = await signer2.sign(Buffer.from(payload, 'utf8'));
 
-    let nominalReceipt: GovernanceReceipt = {
+    const nominalReceipt: GovernanceReceipt = {
         ...dummyReceipt,
         signatures: [
             { signerKeyId: signer1.getKeyId(), signature: sig1 },
@@ -75,14 +75,14 @@ async function runAttentionAuditValidation() {
         ]
     };
 
-    let evalResult = engine.evaluateOperatorResponse(nominalReceipt, true);
+    const evalResult = engine.evaluateOperatorResponse(nominalReceipt, true);
     console.log(`  - Attention evaluation of nominal receipt: ${evalResult} (Expected: NOMINAL)`);
     if (evalResult !== 'NOMINAL') {
         console.error("[FAIL] Nominal receipt flagged as anomaly!");
         process.exit(1);
     }
 
-    let verified = verifyGovernanceReceiptMultiSig(nominalReceipt, baseCouncil);
+    const verified = verifyGovernanceReceiptMultiSig(nominalReceipt, baseCouncil);
     console.log(`  - Multi-sig verification: ${verified.valid ? "✅ PASSED" : "❌ FAILED"}`);
     if (!verified.valid) {
         console.error("[FAIL] Legitimate multi-sig failed verification!");
@@ -97,12 +97,12 @@ async function runAttentionAuditValidation() {
     
     // Simulate vigilant operator reviewing the payload, noticing the mutated previousGRoot,
     // and choosing to quarantine/reject the proposal (submitting approved = false).
-    let poisonReceiptForRejection: GovernanceReceipt = {
+    const poisonReceiptForRejection: GovernanceReceipt = {
         ...poisonedReceiptDraft,
         signatures: [] // No signatures collected since it was rejected immediately
     };
 
-    let evalResult2 = engine.evaluateOperatorResponse(poisonReceiptForRejection, false);
+    const evalResult2 = engine.evaluateOperatorResponse(poisonReceiptForRejection, false);
     console.log(`  - Attention evaluation of rejected poison: ${evalResult2} (Expected: PASSED)`);
     if (evalResult2 !== 'PASSED') {
         console.error("[FAIL] Rejection of poison drill was not logged as a success!");
@@ -136,7 +136,7 @@ async function runAttentionAuditValidation() {
     };
 
     // Operator submits approval (approved = true)
-    let evalResult3 = engine.evaluateOperatorResponse(blindApprovedReceipt, true);
+    const evalResult3 = engine.evaluateOperatorResponse(blindApprovedReceipt, true);
     console.log(`  - Attention evaluation of blind approved poison: ${evalResult3} (Expected: FAILED)`);
     if (evalResult3 !== 'FAILED') {
         console.error("[FAIL] Blind approval of poisoned payload did not trigger a fail status!");
@@ -204,11 +204,11 @@ async function runAttentionAuditValidation() {
     }
 
     // Re-verify a new nominal receipt using the newly restored council quorum (needs 2 signatures from active members: signer1 and signer3)
-    let restoredPayload = governanceSignablePayload(nominalReceipt);
-    let restoredSig1 = await signer1.sign(Buffer.from(restoredPayload, 'utf8'));
-    let restoredSig3 = await signer3.sign(Buffer.from(restoredPayload, 'utf8'));
+    const restoredPayload = governanceSignablePayload(nominalReceipt);
+    const restoredSig1 = await signer1.sign(Buffer.from(restoredPayload, 'utf8'));
+    const restoredSig3 = await signer3.sign(Buffer.from(restoredPayload, 'utf8'));
 
-    let restoredNominalReceipt: GovernanceReceipt = {
+    const restoredNominalReceipt: GovernanceReceipt = {
         ...nominalReceipt,
         signatures: [
             { signerKeyId: signer1.getKeyId(), signature: restoredSig1 },

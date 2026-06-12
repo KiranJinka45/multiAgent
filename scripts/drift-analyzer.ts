@@ -11,7 +11,7 @@ import path from 'node:path';
  * - Dependency graph entropy
  */
 
-const BASELINE_TS = '5.9.3';
+const BASELINE_TS = '5.5.4';
 const WORKSPACE_DIRS = ['apps', 'packages'];
 
 async function analyze() {

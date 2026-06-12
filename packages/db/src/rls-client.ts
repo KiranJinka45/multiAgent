@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import type { PrismaClient } from '@prisma/client';
 
 /**
  * ZTAN PHASE 14 TIER P0: RLS-AWARE PRISMA CLIENT

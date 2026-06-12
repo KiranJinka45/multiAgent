@@ -59,7 +59,7 @@ export class DistributedLeaseManager {
         } else {
             try {
                 this.client = new Etcd3({ hosts: etcdHosts });
-            } catch (err) {
+            } catch (_err) {
                 console.log('[CONSENSUS] etcd client connection failed. Falling back to high-fidelity mock client.');
                 this.client = this.createMockEtcdClient();
             }
@@ -101,7 +101,7 @@ export class DistributedLeaseManager {
             if (nextEpoch === undefined) {
                 throw new Error('[CONSENSUS] Monotonic epoch CAS increment exhausted retries.');
             }
-        } catch (err) {
+        } catch (_err) {
             // Fallback for simple/unsupported configurations
             this.currentEpoch++;
             nextEpoch = this.currentEpoch;
@@ -147,7 +147,7 @@ export class DistributedLeaseManager {
                     // Renew lease lifetime
                     await this.activeLease.grant();
                 }
-            } catch (err) {
+            } catch (_err) {
                 console.error('[CONSENSUS] Background keep-alive heartbeat failed! Initiating self-fencing.');
                 this.selfFence();
             }
@@ -198,11 +198,11 @@ export class DistributedLeaseManager {
                 }
             }),
             identity: () => ({
-                put: (key: string) => ({
+                put: (_key: string) => ({
                     value: async () => true
                 })
             }),
-            lease: (ttl: number) => ({
+            lease: (_ttl: number) => ({
                 key: 'mock-lease-id',
                 grant: async () => true,
                 revoke: async () => {

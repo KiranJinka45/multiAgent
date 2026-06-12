@@ -10,7 +10,7 @@ export class CommandDepthAuditor {
         }
 
         // Standard command separators and pipelines
-        const operators = [';', '&&', '||', '|'];
+        const _operators = [';', '&&', '||', '|'];
         
         let depth = 1;
         let inQuotes = false;

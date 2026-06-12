@@ -47,7 +47,7 @@ export class DAGExplosionFuzzer {
                     
                     const blueprint: SimulationBlueprint = { expectedOperations, expectedDurationMs: size };
                     const start = Date.now();
-                    const drift = ReplayDriftAnalyzer.calculateDrift(blueprint, actualSteps);
+                    ReplayDriftAnalyzer.calculateDrift(blueprint, actualSteps);
                     const duration = Date.now() - start;
 
                     if (duration > 1000) {
@@ -65,7 +65,7 @@ export class DAGExplosionFuzzer {
 
                     const blueprint: SimulationBlueprint = { expectedOperations, expectedDurationMs: size };
                     const start = Date.now();
-                    const drift = ReplayDriftAnalyzer.calculateDrift(blueprint, actualSteps);
+                    ReplayDriftAnalyzer.calculateDrift(blueprint, actualSteps);
                     const duration = Date.now() - start;
 
                     if (duration > 1000) {
@@ -79,10 +79,11 @@ export class DAGExplosionFuzzer {
                 if (survived) survivedCount++;
                 else exhaustedCount++;
 
-            } catch (err: any) {
+            } catch (err: unknown) {
+                const message = err instanceof Error ? err.message : String(err);
                 survived = false;
                 exhaustedCount++;
-                response = `EXHAUSTED: (Crash/OOM) ${err.message}`;
+                response = `EXHAUSTED: (Crash/OOM) ${message}`;
             }
 
             results.push({

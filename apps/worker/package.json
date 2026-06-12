@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsup src/index.ts --no-dts && tsc --emitDeclarationOnly -p tsconfig.json --declarationDir ./dist",
-    "dev": "tsup src/index.ts --no-dts --watch",
+    "build": "tsup --no-dts && tsc --emitDeclarationOnly -p tsconfig.json --declarationDir ./dist",
+    "dev": "tsup --no-dts --watch",
     "crsi:init": "tsx src/crsi-init.ts",
     "start": "tsx -r tsconfig-paths/register src/index.ts",
     "lint": "eslint .",

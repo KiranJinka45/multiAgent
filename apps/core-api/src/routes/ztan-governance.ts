@@ -181,7 +181,7 @@ function loadState(): StewardshipState {
   if (fs.existsSync(STATE_FILE)) {
     try {
       return JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
-    } catch (e) {
+    } catch (_e) {
       logger.warn('[GovernanceState] State file corrupted, resetting to defaults');
     }
   }
@@ -201,12 +201,12 @@ function saveState(state: StewardshipState) {
 GovernanceLedger.init();
 
 // GET /api/v1/ztan/governance/state
-router.get('/state', (req, res) => {
+router.get('/state', (_req, res) => {
   res.json(loadState());
 });
 
 // GET /api/v1/ztan/governance/ledger
-router.get('/ledger', (req, res) => {
+router.get('/ledger', (_req, res) => {
   const verifyResult = GovernanceLedger.verifyLedger();
   const entries = GovernanceLedger.loadLedger();
   res.json({
@@ -475,7 +475,7 @@ router.post('/drill/resolve', async (req, res) => {
     if (operatorSignature && !operatorSignature.startsWith('ZTAN_SIG_')) {
       isVerifiedCryptographically = GovernanceLedger.verifySignature(actionsTaken || '', operatorSignature);
     }
-  } catch (e) {
+  } catch (_e) {
     isVerifiedCryptographically = false;
   }
 
@@ -680,7 +680,7 @@ router.post('/aging', (req, res) => {
 });
 
 // POST /api/v1/ztan/governance/reset
-router.post('/reset', (req, res) => {
+router.post('/reset', (_req, res) => {
   // Restore initial baseline
   saveState(DEFAULT_STATE);
   // Re-initialize ledger

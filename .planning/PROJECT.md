@@ -32,16 +32,81 @@ Nexus ZTAN is an auditable, production-oriented research platform designed for l
 - ✓ **PERF-01**: Recovery replay throughput performance mapping — v1.6.0
 - ✓ **PERF-02**: Lease acquisition contention latency limits — v1.6.0
 - ✓ **SEC-01**: Poisoned log and desynchronized replay history quarantine — v1.6.0
+- ✓ **PEM-01/02**: Rekor PEM key decoding & submission validation — v1.8.0 (Phase 5)
 
-## Current Post-Milestone Posture: Long-Term Maintenance Epoch
+## Completed Milestone: v1.14.0 Qualification Removal Framework Implementation (Completed with Qualifications: 2026-07-11)
 
-Following the completion of **Milestone 36: Stewardship Engineering Era (v1.6.0)**, the platform is in a long-term maintenance posture with an absolute freeze on new feature development or active architectural expansion.
+**Goal:** Convert qualified and simulated evidence into qualification-removal frameworks, mapping validation paths for bare-metal hardware verification while documenting open qualifications.
 
-### Key accomplishments for v1.6.0:
-1. **Operational Soak Validation**: Confirmed memory stability (peak RSS 47.28 MB) and WAL growth bounds.
-2. **Observability Hardening**: Integrated high-fidelity causal lineage tracking and replica lag instrumentation.
-3. **PostgreSQL Pathology Hardening**: Validated fencing and fail-closed lease states under WAL corruption.
-4. **Complexity Budgeting Gates**: Enforced strict rules in PROJECT.md and CI checkers.
+**Target features (Completed & Verified with Qualifications):**
+- Physical TPM attestation certification framework implementation on non-virtualized host.
+- Bare-metal Firecracker endurance certification framework implementation without WSL2.
+- Genuine independent third-party reproduction audit framework implementation.
+- Qualification status reconciliation review tracking unresolved gaps.
+
+## Completed Milestone: v1.13.0 Operational Hardening & Long-Term Stewardship (Completed: 2026-07-11)
+
+**Goal:** Transition platform to post-campaign maintenance mode, establish long-term operational health telemetry checkpoints, and review and refine virtualization boundaries.
+
+**Target features (All Completed & Verified):**
+- **OPS-MAINT-POST-01**: Long-term telemetry checkpoints (WAL growth, lease latency, backup success rates).
+- **OPS-MAINT-POST-02**: Virtualization boundaries review and isolation audit report.
+
+## Completed Milestone: v1.12.0 Physical Runtime & Operational Verification (Completed: 2026-07-10)
+
+**Goal:** Address environment-dependent and simulation-assisted validation paths by certifying physical host execution, multi-node Redis Sentinel chaos, real Firecracker VM execution, security posture audits, 30-day continuous reliability, and independent third-party reproduction.
+
+**Target features (All Completed & Verified):**
+- **OPS-MAINT-13**: Physical host runtime certification (Physical KVM, TPM, vsock command execution, and real attestation - qualified under WSL2 KVM).
+- **OPS-MAINT-14**: Real multi-node Redis Sentinel chaos testing (actual quorum loss, leader election, and lease fencing).
+- **OPS-MAINT-15**: Physical Firecracker runtime resilience (leak validation over 100 consecutive microVM launches - qualified under WSL2 KVM).
+- **OPS-MAINT-16**: Continuous 30-day reliability campaign (drift/backup/recovery drills longitudinal analysis).
+- **OPS-MAINT-17**: Security posture threat model and privileged containers/mounts audit.
+- **OPS-MAINT-18**: Independent third-party reproduction audit.
+
+## Completed Milestone: v1.11.0 Maintenance, Debt Reduction & Portability Validation (Completed: 2026-06-08)
+
+**Goal:** Focus on platform stabilization, warning-debt reduction, independent bare-metal host validation, drift detection, and resilience drills.
+
+**Target features (All Completed & Verified):**
+- **OPS-MAINT-01**: Resolve implicit `any` types and unused variables across the workspace packages.
+- **OPS-MAINT-02**: Validate the reproducibility verification kit on a physical bare-metal host.
+- **OPS-MAINT-03**: Implement periodic reproducibility checks to prevent drift.
+- **OPS-MAINT-04**: Test restore integrity and recovery behavior under corrupted backups.
+- **OPS-MAINT-05**: Validate PostgreSQL failover recovery and Sentinel behavior under quorum-loss scenarios.
+
+
+## Completed Milestone: v1.10.0 Operational Certification & Reproducibility Validation (Completed: 2026-06-08)
+
+**Goal:** Certify operational reproducibility, infrastructure deployment, disaster recovery resilience, cross-version compatibility, and dependency cleanliness.
+
+**Target features (All Completed & Verified):**
+- **OPS-01**: Infrastructure Certification (Docker, K8s, Smoke tests)
+- **OPS-02**: Disaster Recovery Replay (Backup, Restore, Validate)
+- **OPS-03**: Cross-Version Compatibility Matrix (Auditor verification across versions)
+- **OPS-04**: Dependency Rationalization (Prune dead code/deps)
+- **OPS-05**: Reproducibility Bundle (verify-kit, evidence, runbooks)
+
+## Completed Milestone: Real Rekor Interoperability & Portability Validation (Completed: 2026-06-04)
+
+**Goal:** Establish and validate actual interoperability evidence with a remote Rekor endpoint and verify independent host portability.
+
+**Target features (All Completed & Verified):**
+- Submit payload to a real Rekor instance (Sigstore public log).
+- Retrieve inclusion proof (RFC 6962 compliant).
+- Verify proof from a separate machine/process.
+- Export evidence artifacts (Durable logs, tree audit, and metadata JSON).
+- Add CI validation path (Clean GitHub Actions runner verification job).
+- Verify independent host portability (AWS EC2 Ubuntu 26.04 instance).
+
+## Current Post-Milestone Posture: Evidence-Ready, Awaiting External Provisioning
+
+Following the completion of **Milestone v1.14.0: Qualification Removal Framework Implementation**, the repository has reached an "evidence-ready, externally blocked" state. All internal verification, architecture stabilization, and validation frameworks are fully complete. The next status change requires external provisioning of real target environments rather than additional repository development.
+
+### Key accomplishments for v1.14.0:
+1. **Qualification Frameworks**: Built native physical validation frameworks for TPM 2.0 attestation, bare-metal Firecracker microVM execution, and third-party reproduction.
+2. **State & Requirements Reconciliation**: Closed historical discrepancies and mapped all 21 system requirements cleanly to active phases.
+3. **Governance & Execution Verification**: Validated full build reproducibility and verified smoke test compliance across all ZTAN services.
 
 ### Out of Scope
 
@@ -98,5 +163,22 @@ The platform has reached **Core Architectural Stability**. The focus has shifted
 | Complete Freeze on Governance Primitives | Avoid governance self-reference saturation and recursion pressure. | ✓ Enforced |
 | Single Oracle Distributed Coordination | PostgreSQL acts as the existential coordination oracle for leases. | ✓ Confirmed |
 
+## Evolution
+
+This document evolves at phase transitions and milestone boundaries.
+
+**After each phase transition** (via `/gsd-transition`):
+1. Requirements invalidated? → Move to Out of Scope with reason
+2. Requirements validated? → Move to Validated with phase reference
+3. New requirements emerged? → Add to Active
+4. Decisions to log? → Add to Key Decisions
+5. "What This Is" still accurate? → Update if drifted
+
+**After each milestone** (via `/gsd-complete-milestone`):
+1. Full review of all sections
+2. Core Value check — still the right priority?
+3. Audit Out of Scope — reasons still valid?
+4. Update Context with current state
+
 ---
-*Last updated: 2026-05-26 after v1.6.0 milestone completion*
+*Last updated: 2026-06-12 after v1.14.0 closure and v1.15.0 evidence readiness campaign initialization*

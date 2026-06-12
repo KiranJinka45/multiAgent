@@ -74,9 +74,10 @@ async function main() {
     try {
         ConsensusEngine.appendEntries('node-1', 1, [entry1], correctRoot, null);
         console.log('💥 VULNERABLE: Divergent view did not trigger invariant crash.');
-    } catch (err: any) {
-        if (err.message.includes('ZTAN_INVARIANT_VIOLATION')) {
-            console.log(`\n🛡️ [SECURE] Invariant Breached: ${err.message}`);
+    } catch (err: unknown) {
+        const message = err instanceof Error ? (err as Error).message : String(err);
+        if (message.includes('ZTAN_INVARIANT_VIOLATION')) {
+            console.log(`\n🛡️ [SECURE] Invariant Breached: ${message}`);
             console.log('Checking generated forensic crash artifacts...\n');
 
             const expectedFiles = [

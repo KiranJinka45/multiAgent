@@ -42,7 +42,7 @@ export class ResourcePressurePathology {
         // Release allocated memory buffers
         this.memoryHogs = [];
         if (global.gc) {
-            try { global.gc(); } catch (e) {}
+            try { global.gc(); } catch (_e) {}
         }
 
         // Terminate CPU spinning interval

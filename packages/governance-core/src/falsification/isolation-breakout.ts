@@ -1,7 +1,5 @@
 import { ContainerOrchestrator } from '../isolation/container-orchestrator.js';
-import { FirecrackerOrchestrator } from '../isolation/firecracker-orchestrator.js';
 import { PhysicalFirecrackerAdapter } from '../isolation/physical-firecracker.js';
-import { randomUUID } from 'crypto';
 
 export interface IsolationTest {
     name: string;
@@ -54,7 +52,7 @@ export class IsolationBreakoutFuzzer {
             const adapter = new PhysicalFirecrackerAdapter();
             adapter.checkEnvironment();
             hasPhysicalFirecracker = true;
-        } catch (e) {
+        } catch {
             hasPhysicalFirecracker = false;
         }
 
@@ -65,18 +63,6 @@ export class IsolationBreakoutFuzzer {
             if (hasPhysicalFirecracker) {
                 // Real Linux/KVM Firecracker Isolation Boundary
                 try {
-                    const adapter = new PhysicalFirecrackerAdapter();
-                    const orchestrator = new FirecrackerOrchestrator(adapter);
-                    const vmId = `fuzz-vm-${randomUUID().substring(0, 8)}`;
-
-                    const vmConfig = {
-                        vmId,
-                        kernelImagePath: '/var/lib/firecracker/vmlinux',
-                        rootfsPath: '/var/lib/firecracker/rootfs.ext4',
-                        memorySizeMb: 50,
-                        vcpuCount: 1
-                    };
-
                     const runOutput = ContainerOrchestrator.runIsolated({
                         image: 'python:3.10-alpine',
                         command: ['sh', '-c', test.vector],
@@ -94,9 +80,10 @@ export class IsolationBreakoutFuzzer {
                         response = `CONTAINED (SECCOMP_SYSCALL_BLOCKED: eBPF trapped in Firecracker guest VM kernel)`;
                     }
 
-                } catch (err: any) {
+                } catch (err: unknown) {
+                    const message = err instanceof Error ? err.message : String(err);
                     isDetected = true;
-                    response = `CONTAINED (KVM Fail-Closed: ${err.message})`;
+                    response = `CONTAINED (KVM Fail-Closed: ${message})`;
                 }
             } else {
                 // Hardened Container Orchestrator with Custom seccomp-bpf Fallback (Windows/Non-KVM hosts)

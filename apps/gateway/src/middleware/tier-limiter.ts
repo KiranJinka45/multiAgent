@@ -7,13 +7,13 @@ const BillingEnforcer = {
         pro: { points: 100, duration: 60 },
         enterprise: { points: 1000, duration: 60 }
     } as Record<string, { points: number; duration: number }>,
-    getPlan: async (tenantId: string): Promise<string> => {
+    getPlan: async (_tenantId: string): Promise<string> => {
         return 'free';
     }
 };
 
 const tierRateLimiter = {
-    consume: async (tenantId: string, plan: string, points: number, duration: number): Promise<void> => {
+    consume: async (_tenantId: string, _plan: string, _points: number, _duration: number): Promise<void> => {
         return Promise.resolve();
     }
 };

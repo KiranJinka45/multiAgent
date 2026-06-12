@@ -91,7 +91,7 @@ export class NodeValidatorNode {
         const walContent = fs.readFileSync(this.walPath, 'utf-8');
         const lines = walContent.split('\n');
         let fastForwardCount = 0;
-        let validLines: string[] = [];
+        const validLines: string[] = [];
         let logTornDetected = false;
 
         for (let i = 0; i < lines.length; i++) {
@@ -351,7 +351,7 @@ export class NodeValidatorNode {
 
         try {
           const msg = JSON.parse(line);
-          const currentClock = this.incrementClock(msg.logicalClock || 0);
+          const _currentClock = this.incrementClock(msg.logicalClock || 0);
           const currentHlc = this.updateHlc(msg.hlc);
 
           if (msg.type === "CRASH_TRIGGER") {

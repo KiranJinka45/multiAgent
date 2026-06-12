@@ -26,7 +26,7 @@ async function startValidationLoop() {
             logger.info('[ValidationDaemon] --- New Validation Cycle Started ---');
 
             // 1. Inject Controlled Chaos
-            const chaosResult = await runChaosCycle();
+            const _chaosResult = await runChaosCycle();
             
             // Wait for system to react (e.g. 30s)
             await new Promise(resolve => setTimeout(resolve, 30000));
@@ -35,7 +35,7 @@ async function startValidationLoop() {
             const metrics = { failureRate: 0.02, latencyP95: 120 };
 
             // 3. Compute Confidence Score (Simplified for now)
-            const confidence = 0.98;
+            const _confidence = 0.98;
 
             // 4. Update Live Certification State
             const state = { status: 'healthy', confidence: 0.98 };

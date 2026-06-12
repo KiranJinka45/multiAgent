@@ -65,7 +65,7 @@ export class ConsensusPartitionFuzzer {
             const res = ConsensusEngine.proposeCommit('fuzz-commit', 'node-1');
 
             let isSecure = false;
-            let response = res.reason;
+            const response = res.reason;
 
             // In our hardened logic, ALL of these should fail to commit and thus be SECURE against bad writes.
             if (!res.committed) {

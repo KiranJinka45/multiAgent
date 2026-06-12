@@ -1,4 +1,3 @@
-import { sha256 } from '@noble/hashes/sha256';
 
 /**
  * ZTAN Canonical Utilities (Binary CER Style)
@@ -8,14 +7,14 @@ export class Canonical {
 
     public static encodeUint32BE(value: number): Uint8Array {
         const arr = new Uint8Array(4);
-        const view = new DataView(arr.buffer as any);
+        const view = new DataView(arr.buffer);
         view.setUint32(0, value, false);
         return arr;
     }
 
     public static encodeUint64BE(value: number): Uint8Array {
         const arr = new Uint8Array(8);
-        const view = new DataView(arr.buffer as any);
+        const view = new DataView(arr.buffer);
         const big = BigInt(value);
         view.setUint32(0, Number(big >> 32n), false);
         view.setUint32(4, Number(big & 0xffffffffn), false);

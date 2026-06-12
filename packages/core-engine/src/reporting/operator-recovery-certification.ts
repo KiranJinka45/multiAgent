@@ -96,7 +96,7 @@ export class OperatorRecoveryCertification {
       }
       const filepath = path.join(this.reportDir, `operator_drill_${report.scenario}_${Date.now()}.json`);
       fs.writeFileSync(filepath, JSON.stringify(report, null, 2), 'utf8');
-    } catch (err) {
+    } catch (_err) {
       // Safe fallback
     }
   }

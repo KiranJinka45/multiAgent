@@ -44,7 +44,7 @@ export const safetyService = {
   /**
    * Calculates a risk score for an agentic operation.
    */
-  calculateRiskScore(action: string, context: any): number {
+  calculateRiskScore(action: string, _context: any): number {
     let score = 0;
     
     if (action.includes('delete') || action.includes('filesystem')) score += 0.5;

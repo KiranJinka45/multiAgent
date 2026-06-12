@@ -25,7 +25,7 @@ export function createServer() {
         res.status(503).json({ error: 'Governance Freeze Active. All operations suspended.' });
         return;
       }
-    } catch (e) {
+    } catch (_e) {
       // Allow through if redis fails (fail-open or fail-closed based on policy, but usually we don't want to crash on redis timeout)
     }
     next();

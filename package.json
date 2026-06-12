@@ -24,6 +24,10 @@
     "test:infra-chaos": "node scripts/run-infra-chaos-soak.js --duration 25",
     "test:stateful-chaos": "node scripts/run-stateful-chaos-soak.js --duration 45",
     "stewardship:audit": "npx tsx scripts/stewardship-drift-detector.ts",
+    "stewardship:drift:check": "npx tsx scripts/periodic-drift-runner.ts",
+    "stewardship:backup:validate": "npx tsx scripts/backup-integrity-validator.ts",
+    "stewardship:backup:drill": "npx tsx scripts/backup-corruption-drill.ts",
+    "stewardship:sentinel:drill": "npx tsx scripts/redis-sentinel-drill.ts",
     "start:api": "node apps/api/dist/index.js",
     "start:worker": "node apps/worker/dist/index.js",
     "db:push": "npx prisma db push --schema=packages/db/prisma/schema.prisma --accept-data-loss",
@@ -39,7 +43,10 @@
     "audit:cost": "tsx scripts/audit-cost-roi.ts",
     "orchestrate": "tsx scripts/start-dev.ts",
     "dev:all": "tsx scripts/start-dev.ts",
-    "validate:cloud": "tsx scripts/validate-cloud.ts"
+    "validate:cloud": "tsx scripts/validate-cloud.ts",
+    "stewardship:physical:validate": "npx tsx scripts/validate-physical-hardware.ts",
+    "stewardship:firecracker:endurance": "npx tsx scripts/firecracker-endurance-campaign.ts",
+    "stewardship:reproduction:audit": "npx tsx scripts/independent-reproduction-audit.ts"
   },
   "prisma": {
     "schema": "packages/db/prisma/schema.prisma"
@@ -70,6 +77,7 @@
   },
   "pnpm": {
     "overrides": {
+      "eslint": "^8.57.0",
       "follow-redirects": "1.16.0",
       "axios": "1.15.2",
       "zod": "3.23.3",
@@ -96,7 +104,6 @@
       "express": "5.2.1",
       "fastify": "5.8.5",
       "sandbox": "npm:is-plain-obj",
-      "ajv": "^8.20.0",
       "esbuild@<=0.24.2": ">=0.25.0",
       "@smithy/config-resolver@<4.4.0": ">=4.4.0",
       "rollup@>=4.0.0 <4.59.0": ">=4.59.0",
@@ -145,6 +152,7 @@
     "@angular/platform-browser": "19.2.19",
     "@angular/platform-browser-dynamic": "19.2.19",
     "@angular/router": "19.2.19",
+    "@esbuild/linux-x64": "^0.27.7",
     "@packages/observability": "workspace:*",
     "@packages/utils": "workspace:*",
     "@types/cookie-parser": "1.4.10",
@@ -156,7 +164,10 @@
     "@types/uuid": "10.0.0",
     "autoprefixer": "^10.4.20",
     "cross-env": "^10.1.0",
+    "eslint-config-next": "15.1.7",
+    "eslint-plugin-boundaries": "^3.4.1",
     "jest": "^30.4.2",
+    "next": "15.5.18",
     "nock": "14.0.12",
     "npm-run-all": "4.1.5",
     "pino-pretty": "13.1.3",

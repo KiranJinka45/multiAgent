@@ -4,8 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { ZtanService, CeremonyState } from '../../core/services/ztan.service';
 // import { ThresholdCrypto } from '@packages/ztan-crypto';
 const ThresholdCrypto = {
-  hashPayload: async (payload: any): Promise<string> => 'stub-hash-' + Math.random().toString(16).slice(2, 10),
-  signProtocolMessage: async (nodeId: string, ceremonyId: string, round: string, data: string): Promise<string> => 'stub-auth-msg'
+  hashPayload: async (_payload: any): Promise<string> => 'stub-hash-' + Math.random().toString(16).slice(2, 10),
+  signProtocolMessage: async (_nodeId: string, _ceremonyId: string, _round: string, _data: string): Promise<string> => 'stub-auth-msg'
 };
 
 interface ApprovalRole {

@@ -1,0 +1,2325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexus ZTAN Executive & Technical Presentations</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Mermaid.js CDN for live diagrams -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      theme: 'dark',
+      startOnLoad: false,
+      securityLevel: 'loose',
+      themeVariables: {
+        background: '#1f2937',
+        primaryColor: '#3b82f6',
+        primaryTextColor: '#f3f4f6',
+        lineColor: '#60a5fa'
+      }
+    });
+  </script>
+
+  <style>
+    /* Design Tokens */
+    :root {
+      --bg-main: #0a0f1d;
+      --bg-card: rgba(17, 24, 39, 0.75);
+      --bg-control: #111827;
+      --border-color: rgba(59, 130, 246, 0.2);
+      --border-focus: rgba(59, 130, 246, 0.6);
+      
+      --text-primary: #f3f4f6;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+      
+      --accent-blue: #3b82f6;
+      --accent-teal: #14b8a6;
+      --accent-gold: #fbbf24;
+      --accent-red: #ef4444;
+      
+      --font-display: 'Outfit', sans-serif;
+      --font-sans: 'Inter', sans-serif;
+      --font-mono: 'Fira Code', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header Styling */
+    header {
+      background: var(--bg-control);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .brand-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-teal));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-family: var(--font-display);
+      color: white;
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+    }
+
+    .title-area h1 {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .title-area p {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .deck-selector {
+      display: flex;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .deck-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-family: var(--font-display);
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: 0.5rem 1.25rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .deck-btn.active {
+      background: var(--accent-blue);
+      color: white;
+      box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+    }
+
+    .controls-top {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .btn-action {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-action:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--accent-blue);
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Sidebar Index */
+    aside {
+      width: 280px;
+      background: rgba(17, 24, 39, 0.5);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      transition: transform 0.3s ease;
+    }
+
+    .aside-header {
+      padding: 1rem;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .slide-list {
+      list-style: none;
+    }
+
+    .slide-item {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      transition: all 0.15s;
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .slide-item:hover {
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text-primary);
+    }
+
+    .slide-item.active {
+      background: rgba(59, 130, 246, 0.1);
+      border-left: 3px solid var(--accent-blue);
+      color: white;
+      font-weight: 500;
+    }
+
+    .slide-num {
+      color: var(--accent-blue);
+      font-weight: 600;
+      min-width: 20px;
+    }
+
+    /* Slide Arena */
+    .slide-arena {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 3rem;
+      background: radial-gradient(circle at center, #111827 0%, #070a13 100%);
+      position: relative;
+      overflow-y: auto;
+    }
+
+    .slide-wrapper {
+      width: 100%;
+      max-width: 1000px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      padding: 3.5rem;
+      min-height: 550px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    /* Slide Content Typo */
+    .slide-header {
+      margin-bottom: 2rem;
+    }
+
+    .slide-header h2 {
+      font-family: var(--font-display);
+      font-size: 2.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, white, var(--text-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+
+    .slide-header h3 {
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var(--accent-teal);
+      letter-spacing: 0.02em;
+    }
+
+    .slide-body {
+      flex: 1;
+      font-size: 1.1rem;
+      line-height: 1.7;
+      color: var(--text-primary);
+    }
+
+    .slide-body ul {
+      margin-left: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .slide-body li {
+      margin-bottom: 0.75rem;
+    }
+
+    .slide-body strong {
+      color: var(--accent-blue);
+      font-weight: 600;
+    }
+
+    /* Custom Presentation Elements */
+    .highlight-card {
+      background: rgba(59, 130, 246, 0.05);
+      border-left: 4px solid var(--accent-blue);
+      padding: 1.25rem;
+      border-radius: 0 8px 8px 0;
+      margin: 1.5rem 0;
+    }
+
+    .warning-card {
+      background: rgba(239, 68, 68, 0.05);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-left: 4px solid var(--accent-red);
+      padding: 1.25rem;
+      border-radius: 8px;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+
+    .warning-card strong {
+      color: var(--accent-red);
+    }
+
+    code {
+      font-family: var(--font-mono);
+      background: rgba(0, 0, 0, 0.3);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    pre {
+      background: #0f172a;
+      padding: 1.25rem;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      overflow-x: auto;
+      margin: 1.5rem 0;
+    }
+
+    pre code {
+      background: transparent;
+      border: none;
+      padding: 0;
+      font-size: 0.85rem;
+      color: #38bdf8;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-top: 1rem;
+    }
+
+    .grid-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 1.25rem;
+      border-radius: 8px;
+    }
+
+    .grid-card h4 {
+      font-family: var(--font-display);
+      margin-bottom: 0.5rem;
+      color: var(--accent-blue);
+      font-size: 1rem;
+    }
+
+    /* Mermaid Canvas */
+    .diagram-container {
+      background: #1f2937;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Slide Footer */
+    .slide-footer {
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .principle-footer {
+      font-weight: 600;
+      color: var(--accent-teal);
+    }
+
+    /* Bottom Control Bar */
+    .controls-bottom {
+      background: var(--bg-control);
+      border-top: 1px solid var(--border-color);
+      padding: 0.75rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-nav {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      transition: all 0.2s;
+    }
+
+    .btn-nav:hover {
+      background: var(--accent-blue);
+      border-color: var(--accent-blue);
+      color: white;
+    }
+
+    .progress-container {
+      flex: 1;
+      max-width: 400px;
+      margin: 0 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .progress-bar-bg {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      overflow: hidden;
+      width: 100%;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-teal));
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .progress-text {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Collapsible Speaker Notes Panel */
+    .speaker-notes-toggle {
+      background: rgba(251, 191, 36, 0.1);
+      border: 1px solid rgba(251, 191, 36, 0.2);
+      color: var(--accent-gold);
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .speaker-notes-toggle:hover {
+      background: rgba(251, 191, 36, 0.2);
+    }
+
+    .notes-drawer {
+      position: absolute;
+      bottom: 56px; /* above control bar */
+      left: 0;
+      right: 0;
+      background: #111827;
+      border-top: 1px solid var(--accent-gold);
+      padding: 1.5rem 2.5rem;
+      max-height: 200px;
+      overflow-y: auto;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 5;
+      box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+    }
+
+    .notes-drawer.open {
+      transform: translateY(0);
+    }
+
+    .notes-header {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--accent-gold);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .notes-content {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: var(--text-primary);
+    }
+
+    .notes-content ul {
+      margin-left: 1.25rem;
+      margin-top: 0.5rem;
+    }
+
+    .notes-content li {
+      margin-bottom: 0.25rem;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      aside {
+        display: none;
+      }
+      .slide-arena {
+        padding: 1rem;
+      }
+      .slide-wrapper {
+        padding: 2rem;
+        min-height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header>
+    <div class="brand-container">
+      <div class="logo">Z</div>
+      <div class="title-area">
+        <h1>Nexus ZTAN</h1>
+        <p>Evidence-Bounded Infrastructure presentations</p>
+      </div>
+    </div>
+    
+    <div class="deck-selector">
+      <button class="deck-btn active" id="btn-exec" onclick="switchDeck('exec')">Executive / Investor</button>
+      <button class="deck-btn" id="btn-tech" onclick="switchDeck('tech')">Technical Due-Diligence</button>
+      <button class="deck-btn" id="btn-flagship" onclick="switchDeck('flagship')">Flagship Architecture & Demo</button>
+    </div>
+    
+    <div class="controls-top">
+      <button class="btn-action" onclick="toggleSidebar()">
+        <span id="sidebar-toggle-text">Hide Index</span>
+      </button>
+      <button class="btn-action" onclick="toggleFullscreen()">Fullscreen</button>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main>
+    <!-- Left index sidebar -->
+    <aside id="sidebar">
+      <div class="aside-header" id="aside-title">Slides</div>
+      <ul class="slide-list" id="slide-index-list">
+        <!-- populated dynamically -->
+      </ul>
+    </aside>
+    
+    <!-- Slide execution arena -->
+    <div class="slide-arena">
+      <div class="slide-wrapper" id="slide-element">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </main>
+
+  <!-- Collapsible Speaker Notes Drawer -->
+  <div class="notes-drawer" id="notes-drawer">
+    <div class="notes-header">
+      <span>Speaker Notes</span>
+      <span style="cursor: pointer; font-size: 0.8rem;" onclick="toggleNotes(false)">Minimize</span>
+    </div>
+    <div class="notes-content" id="notes-content">
+      <!-- Rendered dynamically -->
+    </div>
+  </div>
+
+  <!-- Bottom Control Bar -->
+  <div class="controls-bottom">
+    <button class="speaker-notes-toggle" onclick="toggleNotes()">
+      💡 Speaker Notes
+    </button>
+    
+    <div class="progress-container">
+      <div class="progress-text">
+        <span id="current-slide-label">Slide 1 of 1</span>
+        <span id="percentage-label">0%</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-fill"></div>
+      </div>
+    </div>
+    
+    <div class="nav-buttons">
+      <button class="btn-nav" onclick="prevSlide()">←</button>
+      <button class="btn-nav" onclick="nextSlide()">→</button>
+    </div>
+  </div>
+
+  <!-- Raw Slide Deck Content Embedded Directly to support offline loading -->
+  <script type="text/markdown" id="raw-exec-markdown">
+# Nexus ZTAN — Executive & Investor Presentation Slide Deck
+
+**Deck Version:** 2.0  
+**Target Audience:** Enterprise CIOs, CISOs, Strategic Investors, and Enterprise Procurement Leads.  
+**Evidentiary Standard:** Bounded strictly by repository evidence. "Assertions are false until proven."
+
+---
+
+## Slide 1: Title Slide
+### Slide Header: Nexus ZTAN
+### Subtitle: Evidence-Bounded Zero Trust Infrastructure for Autonomous Operations
+### Slide Content:
+* **The Vision:** A replayable, auditable infrastructure orchestration platform built on deterministic execution and cryptographic witness verification.
+* **Core Value Proposition:** Transitioning enterprise trust from unverified assertions to continuous, machine-verifiable cryptographic evidence.
+* **Status:** Milestone v1.14.0 Shipped (Frameworks Implemented; Environment Qualifications Open).
+* **Key Principle:** "Assertions are false until proven."
+
+### Speaker Notes:
+* Welcome everyone. Today we are presenting Nexus ZTAN, an infrastructure platform designed for the era of autonomous workloads and strict regulatory compliance.
+* The core thesis of Nexus ZTAN is that traditional zero trust has a major weakness: it relies on static policies and unverified assumptions. We replace this with a model where every operational claim must be backed by a dynamic cryptographic proof.
+* Today we will discuss the business value, architecture, and current execution reality of this platform.
+
+---
+
+## Slide 2: Why Existing Trust Models Fail
+### Slide Header: Why Existing Trust Models Fail
+### Subtitle: The Vulnerability of Implicit Trust and Manual Audit Cycles
+### Slide Content:
+* **Implicit Trust:** Traditional networks assume components are secure based on IP, service account, or location.
+* **Supply-Chain Uncertainty:** Third-party libraries and modules are executed with zero runtime verification of their build integrity.
+* **Infrastructure Drift:** Systems diverge from their declared design state, creating silent security holes.
+* **AI Autonomy Risk:** As autonomous agents gain database and API write access, static rules fail to bound their actions.
+* **Compliance Burden:** Manual evidence collection is retrospective, labor-intensive, and prone to manipulation.
+* <div class="diagram-container"><pre class="mermaid" style="background:transparent; border:none; margin:0; padding:0;">
+graph LR
+    subgraph Traditional Trust
+        Policy[Static Policy] -->|Assumed Correct| Deploy[Production Deployment]
+        Deploy -->|Drift/Compromise| Risk((Unmonitored Risk))
+    end
+    subgraph Evidence-Bounded Trust
+        Code[Design Invariants] -->|Continuous Verification| Proof[Signed Evidence]
+        Proof -->|Witness Attestation| Gov[Governance Decision]
+    end
+</pre></div>
+
+### Speaker Notes:
+* The modern cloud environment is increasingly complex and fragile. 
+* Traditional audits are retrospective. A human auditor reviews logs weeks after an event occurred. This is slow, expensive, and fails to prevent active compromises.
+* Furthermore, with AI agents beginning to operate infrastructure autonomously, we can no longer rely on human accountability alone. We need machine-speed, machine-verifiable constraints.
+
+---
+
+## Slide 3: Evidence-Bounded Trust
+### Slide Header: Evidence-Bounded Trust
+### Subtitle: The Core Mechanics of Verifiable Systems
+### Slide Content:
+* **Trust is Never Assumed:** Security claims are treated as non-existent unless accompanied by a cryptographically signed proof.
+* **Continuous Proof Generation:** Every transaction must generate an immutable, structured trace of its execution.
+* **Verification Portability:** The verification kit allows any customer, partner, or auditor to verify system integrity offline.
+* **Trust Lifecycle:**
+* <div class="diagram-container"><pre class="mermaid" style="background:transparent; border:none; margin:0; padding:0;">
+graph TD
+    Assertion[1. System Assertion] -->|Checked by Runner| Verification[2. Active Verification]
+    Verification -->|Outputs Hash-Chain| Evidence[3. Evidence Ledger]
+    Evidence -->|Signed by Notary| Attestation[4. Attestation Seal]
+    Attestation -->|Evaluated| Gov[5. Governance Decision]
+</pre></div>
+
+### Speaker Notes:
+* Our guiding principle is: "Assertions are false until proven."
+* In Nexus ZTAN, we do not trust the database coordinator, the hypervisor, or even the operating system. Each must output cryptographic evidence of its operations.
+* This shifts the burden of proof. The system is auditable by default, and verification does not require access to private key material or proprietary configurations.
+
+---
+
+## Slide 4: Nexus ZTAN Philosophy
+### Slide Header: Nexus ZTAN Core Philosophy
+### Subtitle: Operational Guarantees for Mission-Critical Environments
+### Slide Content:
+* **Verify Continuously:** Validate state invariants on every transaction, not during scheduled audit windows.
+* **Fail Closed:** Default to quarantine and lock down write paths under network partitions or validation mismatches.
+* **Track Uncertainty:** Explicitly record environmental constraints and simulation fallbacks in a qualification ledger.
+* **Preserve Qualification Status:** Block claims of "fully certified" status until the physical hardware execution matches validation.
+* **Cryptographic Evidence over Claims:** Rely on BLS threshold signatures and Merkle trees rather than dashboard metrics.
+* **Reproducibility over Assumption:** Every execution state must be rebuildable and verifiable from cold-start WAL replay.
+
+### Speaker Notes:
+* We believe that security claims without cryptographic proof are liabilities.
+* By enforcing a "fail-closed" posture, we prioritize system safety and correctness over temporary availability.
+* Furthermore, by tracking uncertainty, we ensure that the system transparently documents its own limitations.
+
+---
+
+## Slide 5: Problems Solved Matrix
+### Slide Header: Problems Solved Matrix
+### Subtitle: Comparing Traditional Approaches with Nexus ZTAN
+### Slide Content:
+* **Supply Chain Risk:** Traditional approach relies on manual review of source code; ZTAN enforces cryptographic verification of build integrity.
+* **Infrastructure Drift:** Traditional approach uses reactive scanning; ZTAN utilizes continuous validation of state invariants.
+* **Audit Readiness:** Traditional approach requires manual logs and screenshots; ZTAN generates automated evidence dynamically.
+* **AI Trust:** Traditional approach relies on policy documents; ZTAN enforces mechanical trust-boundaries at the virtualization layer.
+* **Compliance:** Traditional approach is documentation-heavy; ZTAN is evidence-driven and machine-verifiable.
+
+### Speaker Notes:
+* This slide maps typical enterprise problems to our architectural solutions.
+* Instead of collecting compliance evidence manually, our platform builds it directly into the execution loop.
+* We change compliance from a static, checkbox exercise to an active, real-time proof of correctness.
+
+---
+
+## Slide 6: High-Level Platform Architecture
+### Slide Header: High-Level Platform Architecture
+### Subtitle: Decoupled Subsystems and Clear Security Boundaries
+### Slide Content:
+* **Gateway Service:** The entry point managing external requests, applying tenant partitioning, and enforcing connection isolation.
+* **Control Plane Daemon:** Orchestrates tasks, schedules microVM execution, and maintains the authoritative database states.
+* **Core API:** Exposes interfaces for clients, operators, and witness nodes.
+* **Verification & Attestation:** Consensus modules validating database locks, generating BLS signatures, and archiving evidence.
+* <div class="diagram-container"><pre class="mermaid" style="background:transparent; border:none; margin:0; padding:0;">
+graph TD
+    Users[Users / Agents] -->|Request| GW[Gateway]
+    GW -->|Authorized Task| CP[Control Plane]
+    CP -->|Lock/Lease| Gov[Governance / Fencing]
+    CP -->|Task Exec| Ver[Verification Engine]
+    Ver -->|Attestation Quote| Att[Attestation Layer]
+    Att -->|Seal Receipt| Audit[Audit / Logs]
+</pre></div>
+
+### Speaker Notes:
+* The ZTAN architecture is split into clean, modular layers.
+* The Gateway handles traffic and isolation, the Control Plane handles state and hypervisor orchestration, and the Core API coordinates operations.
+* Crucially, the Verification Kit and the Auditor CLI run completely independently of these components. This means the entity verifying the platform does not need to trust the platform's active running code.
+
+---
+
+## Slide 7: Enterprise Benefits
+### Slide Header: Enterprise Benefits
+### Subtitle: Strategic Advantages Across the Organization
+### Slide Content:
+* **Security:** Replaces perimeter trust with micro-segmented, hardware-attested execution boundaries.
+* **Governance:** Restricts administrative override capabilities, enforcing strict multi-signature release workflows.
+* **Compliance:** Delivers continuous compliance reporting with pre-packaged cryptographic proofs for regulators.
+* **Operations:** Prevents configuration drift and split-brain state divergence under network stress.
+* **Platform Engineering:** Standardizes tenant sandbox environments with predictable performance and isolation bounds.
+* **AI Safety:** Strictly gates autonomous write paths with deterministic state-machine invariants.
+* **Supply Chain Security:** Verifies third-party builds and pins dependencies dynamically.
+
+### Speaker Notes:
+* What does this mean for the enterprise buyer?
+* It means your CISO can view the live evidence ledger and confirm that the infrastructure is operating within safety invariants at this exact second.
+* It means your compliance team has pre-packaged evidence bundles ready for regulators, significantly reducing the manual labor associated with standard certifications.
+
+---
+
+## Slide 8: Business Value Realization
+### Slide Header: Business Value Realization
+### Subtitle: Driving Down Compliance Costs and Eliminating Operational Risk
+### Slide Content:
+* **Reduced Audit Preparation Effort:** Automatically archives cryptographic proofs of system states, minimizing manual file collection.
+* **Instant Evidence Retrieval:** Auditor CLI processes transaction logs in seconds, bypassing search and retrieval loops.
+* **High-Fidelity Traceability:** Leverages hash-chained logs to locate the exact transaction and state of a failure.
+* **Accelerated Incident Investigation:** Slices root-cause analysis time by identifying drift as soon as it occurs.
+* **Elimination of Governance Blind Spots:** Explicitly logs all virtualized fallbacks and simulation states.
+
+### Speaker Notes:
+* We focus on creating measurable business outcomes.
+* By building compliance evidence directly into the platform, we eliminate the need for costly post-hoc audit prep.
+* Incident triage is transformed because the audit logs are cryptographically bound to their causal history.
+
+---
+
+## Slide 9: Cost Impact Framework
+### Slide Header: Cost Impact Framework
+### Subtitle: Operational Economics of Evidence-First Architecture
+### Slide Content:
+* **Capital & Operational Savings:**
+  * Reduction in third-party consultant costs for manual evidence collection and audit reporting.
+  * Prevention of costly compliance penalties through continuous validation.
+  * Minimization of post-incident recovery costs due to high-fidelity causal tracing.
+* **Implementation Cost Considerations (Investments Required):**
+  * Initial engineering overhead to integrate local TPM 2.0 and KVM hypervisors.
+  * Operational costs of maintaining independent witness nodes.
+* **Savings Formula:**
+  * `Annual Audit Cost - Automated Evidence Collection Savings = Potential Savings`
+
+### Speaker Notes:
+* Implementing ZTAN requires an upfront investment in engineering and hardware configuration.
+* However, the long-term payoff is a significant reduction in the recurring cost of manual compliance audits and post-incident investigation.
+* When a failure occurs, the causal lineage allows engineers to pinpoint the exact epoch and transaction of failure, avoiding days of root-cause analysis.
+
+---
+
+## Slide 10: Time Impact Framework
+### Slide Header: Time Impact Framework
+### Subtitle: Distinguishing Measured Verification Speed from Expected Efficiency
+### Slide Content:
+* **Measured Verification Speed (Demonstrated):**
+  * Offline cryptographic proof verification completes in **under 2 seconds** using the Auditor CLI.
+  * Self-contained verify-kit setup and execution takes **under 15 minutes** in clean environments.
+* **Expected Operational Efficiencies (Unmeasured/Qualitative):**
+  * Potential reduction in audit preparation hours by automating the collection of system logs.
+  * Anticipated decrease in incident triage time through tamper-evident chronological lineage analysis.
+
+### Speaker Notes:
+* We are committed to absolute accuracy regarding our numbers.
+* We have measured the offline verification speed. The Auditor CLI can parse and cryptographically verify a transaction bundle in less than two seconds.
+* What we have *not* yet measured empirically is the exact reduction in compliance labor hours. While we expect significant time savings during audit prep, those figures will depend on each enterprise's existing processes.
+
+---
+
+## Slide 11: Risk Reduction Framework
+### Slide Header: Qualitative Risk Mitigation
+### Subtitle: Eliminating Blind Spots and Verification Gaps
+### Slide Content:
+* **Mitigating Undocumented Modifications:** Any out-of-band configuration change breaks the cryptographic witness chain and triggers immediate alerting.
+* **Resolving Supply Chain Gaps:** Relies on strict package overrides, frozen monorepo dependency locks, and static binary verification.
+* **Reducing Evidence Falsification Risk:** Use of public-log compliant transparency trees makes historical ledger modification computationally impossible.
+* **Preventing Split-Brain Operations:** Multi-node consensus fencing guarantees state-machine determinism under network stress.
+
+### Speaker Notes:
+* Let's talk about risk. We do not attach arbitrary percentages to risk reduction because risk is environmental.
+* Instead, we focus on structural risk mitigation. For example, if a bad actor modifies a production binary, the lack of a matching signature in the witness chain immediately quarantines that node.
+* We eliminate the risk of log alteration. Because we use a Merkle tree ledger, logs cannot be modified retroactively without breaking the tree root certificate.
+
+---
+
+## Slide 12: Competitive Landscape
+### Slide Header: Competitive Landscape
+### Subtitle: How Nexus ZTAN Stands Apart
+### Slide Content:
+* **Traditional Zero Trust:** Focuses on identity and network access control. ZTAN focuses on **cryptographic execution lineage**.
+* **Compliance Platforms:** Focus on static documents and manual screenshots. ZTAN provides **continuous, automated proof generation**.
+* **Proprietary Hardware Enclaves:** Lock organizations into single-vendor hardware. ZTAN uses **open, portable hypervisor and TPM standards**.
+* **Verifiability:** Traditional logs are easily deleted by root users. ZTAN logs are **tamper-evident and verified by independent consensus**.
+
+### Speaker Notes:
+* Traditional zero trust is about "who has access." ZTAN is about "what did the execution cell actually do."
+* We move away from the checkbox compliance model. Instead of showing an auditor a screenshot of a firewall rule, we show them a cryptographic proof of the system's runtime state.
+* This represents a generational shift in security engineering.
+
+---
+
+## Slide 13: Current Platform Status
+### Slide Header: Milestone v1.14.0 Delivery Reality
+### Subtitle: Transparent Accounting of Implemented Frameworks and Open Qualifications
+### Slide Content:
+* **What Has Been Proven (Verified):**
+  * The **Physical TPM Attestation Framework** is implemented and verified under virtualized host constraints.
+  * The **Bare-Metal Firecracker Endurance Framework** is implemented and validated over 100-iteration simulated runs.
+  * The **Independent Reproduction Audit Framework** is verified via isolated sandbox testing.
+* **What Remains Open (Qualifications Open):**
+  * Verification on a host with physical TPM 2.0 hardware.
+  * Execution on a native, non-virtualized Linux/KVM host.
+  * Reproduction by a separate human operator (simulated via AI agent).
+
+### Speaker Notes:
+* Let's look at the current reality of our v1.14.0 milestone.
+* In line with our core principle, we explicitly state that we have implemented the *frameworks* for hardware attestation and bare-metal execution.
+* However, because our test environment was virtualized, the physical TPM, bare-metal Firecracker, and independent human operator certifications remain open qualifications. The pipelines are written, tested, and ready—but they await qualifying bare-metal hardware.
+
+---
+
+## Slide 14: Future Roadmap
+### Slide Header: The Path to Unqualified Certification
+### Subtitle: Operational Milestones for Future Deployment Cycles
+### Slide Content:
+* **Step 1: Physical Hardware Provisioning**  
+  * Secure access to non-virtualized bare-metal servers equipped with hardware TPM 2.0 modules and KVM support.
+* **Step 2: Native Execution Campaign**  
+  * Run the implemented validation scripts directly on the native hardware, retiring the virtualization qualifications.
+* **Step 3: Multi-Operator Attestation Ceremony**  
+  * Conduct a live, multi-party deployment ceremony where independent human operators run the verification kit, retiring the simulated operator qualification.
+
+### Speaker Notes:
+* Our future roadmap is simple: we need to run our existing validation suite on matching physical hardware.
+* Because the frameworks are already fully written and validated under simulation, this transition is a deployment exercise, not a software development exercise.
+* Once native execution is complete, the qualifications will be officially retired, moving the requirements status from "Complete with Qualifications" to "Complete."
+
+---
+
+## Slide 15: Summary & Call to Action
+### Slide Header: Evidenced, Not Assumed
+### Subtitle: Establishing the New Standard for Infrastructure Governance
+### Slide Content:
+* **The New Baseline:** Infrastructure state is an empirical claim that must be cryptographically proven.
+* **Operational Integrity:** Modular, auditable orchestration that respects and documents its own environmental limits.
+* **Call to Action:** Implement the ZTAN Verification Kit within your pipeline to validate software integrity before execution.
+* **Final Thought:** *"Trust should be evidenced, not assumed."*
+
+### Speaker Notes:
+* Thank you for your time.
+* We believe the future of infrastructure belongs to evidence-bounded systems. "Trust but verify" is no longer enough; we must "Verify first, trust never."
+* I invite you to review our repository, download the verification kit, and run the Auditor CLI against our evidence logs.
+* I will now take any questions you may have.
+
+</script>
+
+  <script type="text/markdown" id="raw-tech-markdown">
+# Nexus ZTAN — Technical Due-Diligence Slide Deck
+
+**Deck Version:** 2.0  
+**Target Audience:** CISOs, Technical Due-Diligence Auditors, Lead Security Engineers, Cryptographers, and Infrastructure Architects.  
+**Evidentiary Standard:** Bounded by current repository evidence (Frameworks implemented, environment qualifications open).
+
+---
+
+# Part I: Foundational Concepts & Architecture (Slides 1–10)
+
+## Slide 1: Technical Deck Title
+### Slide Header: Nexus ZTAN: Technical Due-Diligence & Deep Dive
+### Subtitle: Cryptographic Proof Architecture and Virtualization Boundaries
+### Slide Content:
+* **The Goal:** A complete technical audit and deep-dive into the consensus engine, cryptographic proofs, isolated hypervisor runtimes, and validation frameworks of Nexus ZTAN.
+* **Scope:** 35 technical slides covering system internals, the 9 architectural layers, technology decisions, workflows, and active qualifications.
+* **Audit Position:** Assertions are false until proven. Environmental limitations are explicitly cataloged in the qualification ledger.
+
+### Speaker Notes:
+* Welcome to the technical deep-dive of Nexus ZTAN.
+* This deck is designed specifically for technical due-diligence auditors, security architects, and cryptographers.
+* We will cover the database locks, state machines, cryptographic primitives, virtualized isolation boundaries, and the validation frameworks we engineered to check these structures.
+
+---
+
+## Slide 2: Core Architectural Principles
+### Slide Header: Core Architectural Principles
+### Subtitle: Evidence-Bounded Trust and Zero Trust Substrates
+### Slide Content:
+* **Evidence-Bounded Trust:** Security posture is determined strictly by the verification of structured cryptographic proof packets, rather than implicit system parameters.
+* **Replay Determinism:** Subsystems are designed to operate deterministically, allowing auditors to replay transactional logs from scratch and verify final state convergence.
+* **Isolation of Subsystems:** Decoupled Gateway, Control Plane, and Core APIs to bound blast-radius and privilege creep.
+* **Fail-Closed Default:** If any environment verification or trace signature check fails, the system immediately quarantines the node and locks the write paths.
+
+### Speaker Notes:
+* The platform stands on two main pillars: evidence-bounded trust and replay determinism.
+* The system is built under the assumption that the host environment, database, and operators are untrusted until they present signed, verifiable evidence of their correct operation.
+* Every operation in the monorepo is structured as a transition on a deterministic state machine.
+
+---
+
+## Slide 3: Subsystem Topology & Boundaries
+### Slide Header: Subsystem Topology & Boundaries
+### Subtitle: Gateway, Control Plane, Core API, and Client Interactions
+### Slide Content:
+* **Gateway Service (`apps/gateway`):** Managing external entry points, applying network-level tenant partitioning and routing.
+* **Control Plane Daemon (`apps/control-plane`):** Manages task scheduling, state machine verification, and microVM orchestration.
+* **Core API (`apps/core-api`):** Serves witness nodes, manages transactional Outbox tables, and interfaces with the PostgreSQL database.
+* **ZTAN CLI (`packages/ztanctl`):** Direct operator client tool for administrative task submission and telemetry viewing.
+* <div class="diagram-container"><pre class="mermaid" style="background:transparent; border:none; margin:0; padding:0;">
+graph LR
+    Client[ZTAN CLI] -->|Tenant API| GW[Gateway]
+    GW -->|Isolated Task| CP[Control Plane]
+    CP -->|Lease Request| API[Core API]
+    API -->|Epoch Verification| DB[(PostgreSQL)]
+    API -->|Heartbeat Sync| Sentinel[(Redis Sentinel)]
+    CP -->|Isolated Exec| VM[Firecracker MicroVM]
+</pre></div>
+
+### Speaker Notes:
+* Nexus ZTAN is structured as a monorepo consisting of distinct applications and shared packages.
+* The Gateway acts as the external gatekeeper, decoupling request handling from state logic.
+* The Control Plane daemon processes the core loop and manages hypervisor coordination, while the Core API handles data storage and witness synchronization.
+
+---
+
+## Slide 4: High-Level Platform Architecture
+### Slide Header: High-Level Platform Architecture
+### Subtitle: Subsystem Components and Structural Topology
+### Slide Content:
+* **Modular Segregation:**Decouples external users, gateway services, backend state controllers, and execution runtimes.
+* **Flow Separation:**Separates advisory loops (e.g. LLM inputs or user commands) from deterministic execution and logging.
+* <div class="diagram-container"><pre class="mermaid" style="background:transparent; border:none; margin:0; padding:0;">
+graph TD
+    User[Users / Agents] -->|1. Request| GW[Gateway]
+    GW -->|2. Route Task| CP[Control Plane]
+    CP -->|3. Check Policy| Gov[Governance Core]
+    CP -->|4. Request Lease| API[Core API]
+    API -->|5. Verify Epoch| DB[(PostgreSQL)]
+    CP -->|6. Boot VM| VM[Firecracker Guest]
+    VM -->|7. Attest Boot| TPM[TPM 2.0 / Mock]
+    VM -->|8. Push Evidence| Ledger[Evidence Ledger]
+    Ledger -->|9. Inclusion Proof| Rekor[Sigstore / Rekor]
+</pre></div>
+
+### Speaker Notes:
+* Here we see the complete blueprint of ZTAN.
+* The request moves from left to right, going through authentication, lease acquisition, hypervisor sandbox launch, measured boot attestation, and evidence sealing.
+* This modular design prevents a compromise of one layer from immediately collapsing the entire trust model.
+
+---
+
+## Slide 5: The 9 Architectural Layers Overview
+### Slide Header: The 9 Architectural Layers Overview
+### Subtitle: Separating Responsibilities and Enforcing Boundaries
+### Slide Content:
+* **The Layer Stack:**
+  1. *Gateway Layer* — Connection routing and tenant network partitioning.
+  2. *Control Plane Layer* — Orchestration, task queuing, and hypervisor management.
+  3. *Core API Layer* — Database coordination and transactional outbox.
+  4. *Consensus & Fencing Layer* — Epoch locking and Redis Sentinel heartbeats.
+  5. *Virtualization Boundary Layer* — Firecracker sandbox containment.
+  6. *Communications Layer* — Virtio-vsock isolated guest/host messaging.
+  7. *Attestation Layer* — TPM measured boot validation.
+  8. *Evidence Ledger Layer* — Append-only Merkle tree logs.
+  9. *Verification Layer* — Standalone offline Auditor CLI.
+
+### Speaker Notes:
+* To maintain strict verifiability, ZTAN formalizes its system architecture into 9 distinct layers.
+* Each layer has defined inputs, outputs, technologies, and trust assumptions.
+* This layer-by-layer isolation ensures that single-point failures are contained within their specific boundaries.
+
+---
+
+## Slide 6: Layer 1 — Gateway Layer
+### Slide Header: Layer 1 — Gateway Layer
+### Subtitle: Tenant Partitioning and Isolation Boundaries
+### Slide Content:
+* **Purpose:** Acts as the external firewall, route controller, and tenant-boundary validator.
+* **Responsibilities:** Decouples external API requests, enforces tenant namespaces, and drops unauthorized traffic.
+* **Inputs & Outputs:** Inputs: HTTP/gRPC requests. Outputs: Authenticated tasks routed to the Control Plane.
+* **Trust Assumptions:** Assumes the OIDC provider and gateway certificates are secure.
+* **Technologies:** Node.js, Express, mTLS.
+* **Benefits & Tradeoffs:** High isolation but introduces minor network routing overhead.
+* **Alternatives & Reason Selected:** Alternatives: Direct API exposure (rejected due to blast radius risk). Reason: Absolute partition isolation.
+
+### Speaker Notes:
+* The Gateway is Layer 1. It provides tenant-level isolation before the control plane processes any inputs.
+* It mitigates the risk of direct denial of service attacks on the database or hypervisor layers by enforcing strict limits and auth validation at the border.
+
+---
+
+## Slide 7: Layer 2 — Control Plane Layer
+### Slide Header: Layer 2 — Control Plane Layer
+### Subtitle: Orchestration and Task Scheduling Engine
+### Slide Content:
+* **Purpose:** Handles job routing, sandbox lifecycle management, and telemetry gathering.
+* **Responsibilities:** Orchestrates Firecracker boots, processes BullMQ tasks, and logs execution.
+* **Inputs & Outputs:** Inputs: Routed tasks from Gateway. Outputs: Firecracker command executions.
+* **Trust Assumptions:** Assumes the local hypervisor host has not been compromised prior to startup.
+* **Technologies:** BullMQ, Node.js.
+* **Benefits & Tradeoffs:** Scalable job execution, but adds message serialization latency.
+* **Alternatives & Reason Selected:** Alternatives: Raw spawn loops (rejected due to queue starvation). Reason: Bounded task scheduling.
+
+### Speaker Notes:
+* Layer 2 is the Control Plane. It manages the execution queues and controls hypervisor sandboxing.
+* By separating the task scheduling from the actual execution VM, we ensure that a guest exploit cannot compromise the scheduler's host configurations.
+
+---
+
+## Slide 8: Layer 3 — Core API Layer
+### Slide Header: Layer 3 — Core API Layer
+### Subtitle: State Synchronization and Outbox Persistence
+### Slide Content:
+* **Purpose:** Validates and commits state transitions to the authoritative storage layer.
+* **Responsibilities:** Enforces transactional outbox patterns and checks state transition models.
+* **Inputs & Outputs:** Inputs: Task state payloads from Control Plane. Outputs: Commits to PostgreSQL.
+* **Trust Assumptions:** Assumes database schema integrity and local Postgres reliability.
+* **Technologies:** Prisma ORM, PostgreSQL.
+* **Benefits & Tradeoffs:** Atomic state writes, but creates a single-database write path bottleneck.
+* **Alternatives & Reason Selected:** Alternatives: Decentralized write loops (rejected due to split-brain risks). Reason: Single-writer transactional authority.
+
+### Speaker Notes:
+* The Core API is Layer 3. It manages the transactional write path.
+* We utilize the Transactional Outbox pattern to ensure that state updates and evidence generation occur within the same atomic database transaction.
+
+---
+
+## Slide 9: Layer 4 — Consensus & Fencing Layer
+### Slide Header: Layer 4 — Consensus & Fencing Layer
+### Subtitle: Active Epoch Locking and Fencing Protocols
+### Slide Content:
+* **Purpose:** Prevents split-brain execution across multiple controllers.
+* **Responsibilities:** Manages row-level lease locks, Redis heartbeats, and fails closed under network partitions.
+* **Inputs & Outputs:** Inputs: Node heartbeats and epoch numbers. Outputs: Active lease fencing state.
+* **Trust Assumptions:** Assumes Redis Sentinel replica alignment.
+* **Technologies:** Redis Sentinel, Postgres row-level locks.
+* **Benefits & Tradeoffs:** Implements strong write fencing; tradeoffs include loss of liveness during network partitions.
+* **Alternatives & Reason Selected:** Alternatives: Raft/Paxos (rejected due to configuration complexity). Reason: Simple, Postgres-authoritative lock engine.
+
+### Speaker Notes:
+* Layer 4 manages consensus and active fencing.
+* If a network partition occurs, Sentinel replica lag is detected immediately, and the node step-down mechanism forces a fail-closed transition rather than risking duplicate writes.
+
+---
+
+## Slide 10: Layer 5 — Virtualization Boundary Layer
+### Slide Header: Layer 5 — Virtualization Boundary Layer
+### Subtitle: Firecracker microVM Isolation Bounds
+### Slide Content:
+* **Purpose:** Sandboxes tenant tasks inside secure, lightweight VMs.
+* **Responsibilities:** Restricts CPU/RAM footprints and applies Jailer namespace restrictions.
+* **Inputs & Outputs:** Inputs: RootFS and Kernel configurations. Outputs: Execution trace files.
+* **Trust Assumptions:** Assumes KVM security and guest kernel isolation guarantees.
+* **Technologies:** AWS Firecracker, Jailer, Linux KVM.
+* **Benefits & Tradeoffs:** Hardware-virtualized security with minimal overhead, but requires nested virtualization configuration in virtual environments.
+* **Alternatives & Reason Selected:** Alternatives: Docker containers (rejected due to host kernel sharing). Reason: Hard hypervisor boundaries.
+
+### Speaker Notes:
+* Layer 5 is the Virtualization Boundary.
+* Workloads are executed inside individual AWS Firecracker microVMs.
+* The Jailer wrapper applies namespaces, chroot, and cgroups, meaning the guest application runs with zero host privileges and cannot read the host filesystem.
+
+---
+
+# Part II: Technology Decisions & Primitives (Slides 11–20)
+
+## Slide 11: Layer 6 — Communications Layer
+### Slide Header: Layer 6 — Communications Layer
+### Subtitle: VSock Isolated Messaging Protocols
+### Slide Content:
+* **Purpose:** Creates a private communication channel between guest and host.
+* **Responsibilities:** Routes control loops and streams outputs without exposing network sockets.
+* **Inputs & Outputs:** Inputs: Guest execution streams. Outputs: Host trace records.
+* **Trust Assumptions:** Assumes virtual socket device integrity in the hypervisor.
+* **Technologies:** Virtio-vsock, Unix domain sockets.
+* **Benefits & Tradeoffs:** Eliminates IP-based network scanning and data exfiltration paths, but limits guest communication to the local host.
+* **Alternatives & Reason Selected:** Alternatives: Virtual bridge adapters (rejected due to TCP/IP exposure). Reason: Network-free point-to-point quarantine.
+
+### Speaker Notes:
+* Layer 6 manages Communications.
+* By disabling standard network adapters and using vsocks, guest environments cannot scan the local network or exfiltrate data to the internet.
+
+---
+
+## Slide 12: Layer 7 — Attestation Layer
+### Slide Header: Layer 7 — Attestation Layer
+### Subtitle: TPM Measured Boot and Signature Generation
+### Slide Content:
+* **Purpose:** Cryptographically proves host platform and boot-state integrity.
+* **Responsibilities:** Captures PCR measurements, generates random nonces, and signs quotes with AIK.
+* **Inputs & Outputs:** Inputs: Hardware state measurements. Outputs: Signed attestation quotes.
+* **Trust Assumptions:** Assumes physical TPM 2.0 silicon integrity.
+* **Technologies:** TPM 2.0, `tpm2-tools`, `validate-physical-hardware.ts`.
+* **Benefits & Tradeoffs:** Unforgeable hardware-rooted proof, but requires physical hardware access (falls back to simulation in VM).
+* **Alternatives & Reason Selected:** Alternatives: Software-only agents (rejected due to forgeability). Reason: Non-repudiable hardware roots.
+
+### Speaker Notes:
+* Layer 7 is the Attestation Layer.
+* It uses the TPM 2.0 module to sign PCR registers. This ensures that the boot loader, kernel, and system binaries have not been altered.
+
+---
+
+## Slide 13: Layer 8 — Evidence Ledger Layer
+### Slide Header: Layer 8 — Evidence Ledger Layer
+### Subtitle: Append-Only Merkle Tree Verification and Public Logs
+### Slide Content:
+* **Purpose:** Creates a public, tamper-evident record of all platform transactions.
+* **Responsibilities:** Compiles SHA-256 hash chains and retrieves inclusion proofs.
+* **Inputs & Outputs:** Inputs: Signed execution traces. Outputs: RFC 6962 inclusion proofs.
+* **Trust Assumptions:** Assumes Sigstore/Rekor service availability and notary key integrity.
+* **Technologies:** Sigstore, Rekor API, RFC 6962 Merkle trees.
+* **Benefits & Tradeoffs:** Publicly verifiable historical integrity, but depends on external API endpoints.
+* **Alternatives & Reason Selected:** Alternatives: Private database logs (rejected due to deletion risk). Reason: Tamper-evident transparency log compliance.
+
+### Speaker Notes:
+* Layer 8 compiles the evidence ledger.
+* Every trace is hash-chained. The final seal is submitted to the Sigstore Rekor transparency log, generating a Merkle inclusion proof that prevents historical log deletion or alteration.
+
+---
+
+## Slide 14: Layer 9 — Verification Layer
+### Slide Header: Layer 9 — Verification Layer
+### Subtitle: Standalone Offline Auditor CLI Engine
+### Slide Content:
+* **Purpose:** Empowers independent third parties to verify system integrity offline.
+* **Responsibilities:** Parses evidence bundles, checks BLS curves, and verifies Merkle roots.
+* **Inputs & Outputs:** Inputs: Proof JSON bundles. Outputs: Success/Failure verification states.
+* **Trust Assumptions:** Assumes the auditor runs in a clean, untrusted operator environment.
+* **Technologies:** Python, `auditor.py`, verify-kit.
+* **Benefits & Tradeoffs:** Zero external database dependencies; requires manual command-line execution by auditors.
+* **Alternatives & Reason Selected:** Alternatives: Online checking APIs (rejected due to caller trust assumptions). Reason: Zero-dependency offline verification.
+
+### Speaker Notes:
+* Layer 9 is the Verification Layer, implemented via the Auditor CLI.
+* It allows an auditor to verify the cryptographic proofs offline. The auditor does not need to access the database or trust the running system code.
+
+---
+
+## Slide 15: Technology Decision — Node.js & TypeScript
+### Slide Header: Technology Decision: Node.js & TypeScript
+### Subtitle: Rationale, Benefits, and Operational Tradeoffs
+### Slide Content:
+* **Why Selected:** Chosen for monorepo development speed, JSON parsing performance, and type-safe backend abstractions.
+* **Benefits:**
+  * Strict compile-time type-safety across monorepos using TypeScript.
+  * Massive package ecosystem for database connection, routing, and cryptography.
+  * Event-driven, non-blocking runtime suited for handling asynchronous outbox tasks.
+* **Tradeoffs:**
+  * Lacks low-level memory control (garbage collection latency).
+  * High peak memory footprint compared to Rust or Go runtimes.
+  * Requires strict dependency pinning to block npm supply-chain compromise.
+
+### Speaker Notes:
+* We selected Node.js and TypeScript to balance development speed with code readability and safety.
+* The TypeScript compiler prevents type-coercion bugs, and the event loop handles database polling and task coordination efficiently.
+* However, we must manage garbage collection overhead and enforce strict dependency pinning to block package poisoning.
+
+---
+
+## Slide 16: Technology Decision — AWS Firecracker Isolation
+### Slide Header: Technology Decision: AWS Firecracker
+### Subtitle: Hardware-Assisted Virtualization vs. Container Sandboxing
+### Slide Content:
+* **Why Selected:** Provides hard hypervisor-level isolation with the startup speed and memory footprint of traditional containers.
+* **Benefits:**
+  * Workloads run in dedicated guest microVMs, preventing host kernel namespace escapes.
+  * Minimal device model (serial console, vsock, block, net) limits the attack surface.
+  * VMM processes execute inside unprivileged Jailer chroots, dropping all system capabilities.
+* **Why Not Containers Only:** Containers share the host kernel; a privilege escalation exploit in a shared kernel compromises the entire host.
+* **Tradeoffs:** Introduces initialization overhead and requires nested virtualization support in cloud environments.
+
+### Speaker Notes:
+* Traditional containers share the host OS kernel, making them vulnerable to kernel escapes.
+* Firecracker uses KVM to boot a dedicated, minimalist Linux kernel for each tenant execution cell.
+* This delivers virtual machine isolation at container speeds.
+
+---
+
+## Slide 17: Technology Decision — TPM 2.0 Hardware Roots of Trust
+### Slide Header: Technology Decision: TPM 2.0 Hardware
+### Subtitle: Grounding Platform Identity in Silicon
+### Slide Content:
+* **Why Selected:** Replaces software key storage with uncopyable, hardware-protected cryptographic credentials.
+* **Benefits:**
+  * Attestation Identity Key (AIK) is generated internally and cannot be extracted or copied by administrators.
+  * Platform Configuration Registers (PCRs) measure boot files and block quote forgery.
+  * Hardens against identity spoofing and unauthorized system cloning.
+* **Tradeoffs:**
+  * Direct hardware dependency restricts virtual deployment portability.
+  * Commands (`tpm2-tools`) require specific OS configuration and setup.
+  * Simulated fallbacks are required in testing environments.
+
+### Speaker Notes:
+* Traditional software certificates can be copied or stolen by root users.
+* TPM 2.0 anchors our platform identity in silicon. The private keys never leave the hardware module, providing absolute non-repudiation.
+
+---
+
+## Slide 18: Technology Decision — Redis & Sentinel Coordination
+### Slide Header: Technology Decision: Redis Sentinel
+### Subtitle: Distributed Lease Fencing and High Availability
+### Slide Content:
+* **Why Selected:** Managed distributed locks and heartbeats to coordinate leader nodes and prevent split-brain writes.
+* **Benefits:**
+  * Sentinel cluster provides automated failover and node health tracking.
+  * High-performance, in-memory lease checking handles high-frequency task allocation.
+  * Strong write-fencing: clients verify epoch numbers before mutations.
+* **Tradeoffs:**
+  * Network partitions trigger immediate write lockouts, sacrificing liveness for consistency.
+  * Sentinel deployment requires a minimum of 3 independent nodes for quorum.
+
+### Speaker Notes:
+* To coordinate leader leases without writing a custom Paxos implementation, we use Redis Sentinel.
+* It tracks node health and manages the operational leases. If a Sentinel node falls out of quorum, the system defaults to "fail-closed," preventing duplicate active writers.
+
+---
+
+## Slide 19: Technology Decision — Cryptographic Components
+### Slide Header: Cryptographic Primitive Implementations
+### Subtitle: Curve Selections, BLS Signatures, and Attestation Workflows
+### Slide Content:
+* **Curve Selections:**
+  * **BLS12-381 Elliptic Curves:** Used for threshold signature schemes (2-of-3 signatures for witness consensus).
+  * **NIST P-256 (ECDSA):** Default curve for identity certificates and public log Rekor submissions.
+  * **Ed25519:** Low-latency asymmetric signatures for node-to-node operational verification.
+* **BLS Verification Workflow:**
+  1. Witness nodes verify execution trace payload.
+  2. Each witness signs the trace hash using their private BLS share.
+  3. The controller aggregates individual signatures into a single threshold proof.
+  4. The auditor verifies the aggregated signature against the group public key.
+
+### Speaker Notes:
+* We leverage BLS12-381 elliptic curves to enable threshold cryptography.
+* This allows multiple independent witness nodes to sign a single execution record.
+* The signatures are aggregated into a single proof, keeping our evidence ledger size compact and verifying consensus offline in a single curve pairing check.
+
+---
+
+## Slide 20: Technology Decision — CI/CD Pipeline & Supply Chain
+### Slide Header: CI/CD & Supply Chain Verification
+### Subtitle: Preventing Dependency Poisoning and Enforcing Invariants
+### Slide Content:
+* **Why Selected:** Enforces automated, non-bypassable quality-gates on all source code modifications.
+* **Core Mechanisms:**
+  * **Lockfile Integrity:** Strict pnpm workspace structures with frozen lockfiles block ad-hoc dependency injections.
+  * **Governance Freeze Runner:** CI checks block any modification to core consensus, cryptographic, or state transition modules.
+  * **Reproducibility Checks:** Automated scripts build and run package tests inside isolated sandboxes on every pull request.
+  * **AST Parsing:** Automatically audits import statements to prevent layer-bleed between modules.
+
+### Speaker Notes:
+* Supply chain compromises often occur during the build process.
+* To protect ZTAN, our CI/CD pipeline enforces strict workspace overrides, dependency locks, and static AST parsing.
+* Any pull request that alters our core state machine or leaks layer imports is rejected automatically.
+
+---
+
+# Part III: Workflows, Lifecycles & Economics (Slides 21–30)
+
+## Slide 21: End-to-End Task Workflow Sequence
+### Slide Header: End-to-End Task Workflow Sequence
+### Subtitle: The Lifecycle of a Request Ingestion to Audit Submission
+### Slide Content:
+* **Execution Flow:**
+* <div class="diagram-container"><pre class="mermaid" style="background:transparent; border:none; margin:0; padding:0;">
+sequenceDiagram
+    participant U as ZTAN Client
+    participant GW as Gateway Layer
+    participant CP as Control Plane
+    participant DB as Postgres DB
+    participant VM as Firecracker VM
+    participant W as Witness Nodes
+    participant R as Rekor Log
+    U->>GW: 1. Task Request
+    GW->>CP: 2. Authenticate & Queue
+    CP->>DB: 3. Lock Lease Row
+    CP->>VM: 4. Launch Sandbox
+    VM->>CP: 5. Stream Stdout & PCR Quote
+    CP->>W: 6. Broadcast Execution Trace
+    W->>CP: 7. Sign Trace (BLS Share)
+    CP->>R: 8. Submit Aggregated Proof
+    R->>CP: 9. Inclusion Receipt
+    CP->>DB: 10. Complete Task & Seal Trace
+    CP->>U: 11. Success Response + Receipt
+</pre></div>
+
+### Speaker Notes:
+* Here is the sequence of a single task execution.
+* The gateway validates the request, the control plane acquires a Postgres write lease, launches the sandbox, collects the hardware attestation quote, and broadcasts the trace to witnesses.
+* Once the witnesses sign and the Rekor entry is confirmed, the client receives the success response along with the cryptographic receipt.
+
+---
+
+## Slide 22: Trust Lifecycle Visual Flow
+### Slide Header: The Trust Lifecycle
+### Subtitle: Transitioning from Assertion to Non-Repudiable Evidence
+### Slide Content:
+* **The Progression of Trust:**
+* <div class="diagram-container"><pre class="mermaid" style="background:transparent; border:none; margin:0; padding:0;">
+graph TD
+    Claim[1. Assertion / Claim] -->|Verify state invariants| Ver[2. Active Verification]
+    Ver -->|Write hash-chained log| Ev[3. Cryptographic Evidence]
+    Ev -->|Sign with notary / AIK| Att[4. Hardware Attestation]
+    Att -->|Submit to transparency tree| Gov[5. Governance Decision]
+    Gov -->|Audit offline via verify-kit| Aud[6. Public Auditability]
+</pre>
+</div>
+* **Verification Rules:**
+  * *Claim:* The system state is declared correct.
+  * *Evidence:* Chronological hashes prove that no state changes were skipped.
+  * *Attestation:* TPM quote proves the code ran inside a verified hardware module.
+  * *Governance:* Consensus checks block out-of-order execution.
+
+### Speaker Notes:
+* The trust lifecycle defines how we process claims.
+* An assertion is treated as false until it is verified, chained as evidence, attested by hardware, approved by governance, and written to a public audit log.
+
+---
+
+## Slide 23: Qualification Management Lifecycle
+### Slide Header: Qualification Management Lifecycle
+### Subtitle: Defining the Path from Simulation to Physical Attestation
+### Slide Content:
+* **Lifecycle Stages:**
+* <div class="diagram-container"><pre class="mermaid" style="background:transparent; border:none; margin:0; padding:0;">
+graph TD
+    Unverified[1. Unverified Concept] -->|Code Implemented| Impl[2. Framework Implemented]
+    Impl -->|Simulated Fallback Run| Qual[3. Qualified Validation]
+    Qual -->|Physical Host Exec| Phys[4. Physical Validation]
+    Phys -->|Third-Party Audit| Cert[5. Certified Evidence]
+</pre>
+</div>
+* **Defining the Stages:**
+  * **Unverified:** Design assumptions without matching validation code.
+  * **Framework Implemented:** Validation script command chains are written and passing tests.
+  * **Qualified Validation:** Validation scripts ran under virtualized constraints (e.g. WSL2/mock TPM).
+  * **Physical Validation:** Validation scripts executed on bare-metal hardware with physical TPM.
+  * **Certified Evidence:** Third-party operator reproduces verification offline.
+
+### Speaker Notes:
+* We explicitly trace our validation status.
+* A requirement is not "complete" just because the code is written. It remains "Complete with Qualifications" until we run it on bare-metal hardware and verify it.
+
+---
+
+## Slide 24: Qualification Registry & Gaps
+### Slide Header: Active Qualifications Registry
+### Subtitle: Transparent Accounting of System Environmental Gaps
+### Slide Content:
+* **`QUAL-REMOVE-TPM-01` (Complete with Qualifications):**
+  * *Gap:* Host environment runs inside virtualized containers lacking `/dev/tpm0` access.
+  * *Fallback:* Script automatically detects WSL2/virtualization and generates mock TPM quotes.
+* **`QUAL-REMOVE-FC-01` (Complete with Qualifications):**
+  * *Gap:* Target host lacks KVM acceleration `/dev/kvm` and pre-compiled Firecracker binaries.
+  * *Fallback:* Endurance campaign runner logs simulated microVM timing metrics.
+* **`QUAL-REMOVE-REPRO-01` (Complete with Qualifications):**
+  * *Gap:* Audit verification executed by an automated AI sub-agent, not a human operator.
+  * *Fallback:* Sub-agent runs reproduction script in a sandboxed directory copy.
+
+### Speaker Notes:
+* This registry list records the exact gaps between our test environments and production bare-metal.
+* In line with our core values, we do not hide these fallbacks. We document them so that auditors know which systems are simulated.
+
+---
+
+## Slide 25: Enterprise Value Flow
+### Slide Header: Enterprise Value Flow
+### Subtitle: Translating Verification into Operational Confidence
+### Slide Content:
+* **The Value Journey:**
+* <div class="diagram-container"><pre class="mermaid" style="background:transparent; border:none; margin:0; padding:0;">
+graph TD
+    Manual[1. Manual Trust] -->|Automated Runner| Continuous[2. Continuous Verification]
+    Continuous -->|Hash-chained JSON| Evidence[3. Evidence Generation]
+    Evidence -->|Merkle Inclusion Proofs| Gov[4. Governance Visibility]
+    Gov -->|Failsafe execution| Conf[5. Operational Confidence]
+</pre>
+</div>
+* **Key Milestones:**
+  * *Continuous Verification:* Eliminates configuration drift.
+  * *Evidence Generation:* Cuts down manual log aggregation.
+  * *Governance Visibility:* Grants CISOs a real-time proof of platform compliance.
+
+### Speaker Notes:
+* The value flow shows how continuous verification translates directly into business confidence.
+* By moving from manual audits to evidence-based execution, we eliminate the blind spots that lead to compliance failures.
+
+---
+
+## Slide 26: Qualitative Business Value Map
+### Slide Header: Qualitative Business Value Map
+### Subtitle: Potential Operational Savings and Efficiencies
+### Slide Content:
+* **Reduced Audit Preparation Effort:** Bypasses manual evidence collection by archiving signed traces automatically.
+* **Accelerated Forensic Timelines:** Vector clocks and hash-chains allow SREs to reconstruct event histories during incident triages.
+* **Frictionless Supplier Audits:** Enterprise clients verify software build integrity using self-contained verification kits.
+* **Elimination of Governance Blind Spots:** System logs every virtualized fallback, ensuring complete visibility of system risk profiles.
+
+### Speaker Notes:
+* We mapping our technical features directly to corporate value.
+* We do not claim arbitrary ROI statistics. Instead, we show how our architecture reduces labor and improves security.
+
+---
+
+## Slide 27: Cost Impact Framework (Formula & Economics)
+### Slide Header: Cost Impact Framework
+### Subtitle: Qualitative Economics of Continuous Proofs
+### Slide Content:
+* **Potential Capital & Operational Savings:**
+  * Eliminates recurring costs of third-party audit collection.
+  * Reduces incident response resource allocation by providing deterministic execution traces.
+  * Avoids regulatory penalties by enforcing continuous validation.
+* **Investment Required:**
+  * High-security bare-metal hardware provisioning costs.
+  * Engineering integration overhead for TPM and KVM setup.
+* **Formula:**
+  * `Annual Audit Cost - Automated Evidence Collection Savings = Potential Savings`
+
+### Speaker Notes:
+* While implementing ZTAN requires capital investment in hardware and engineering, the operational savings scale with the complexity of your compliance requirements.
+* We provide this formula as an estimation framework for your financial analysts.
+
+---
+
+## Slide 28: Time Impact Framework (Estimation Methodology)
+### Slide Header: Time Impact Framework
+### Subtitle: Projecting Operational Verification Efficiencies
+### Slide Content:
+* **Evidence Collection Time:** Traditional: Hours/Days (manual log extraction). ZTAN: Instant (automated JSON database outbox sync).
+* **Verification Time:** Traditional: Weeks (manual audit reviews). ZTAN: **<2 seconds** (offline Auditor CLI parser).
+* **Investigation Time:** Traditional: Days (manual log correlation). ZTAN: Minutes (causal trace history replay).
+* **Audit Preparation Time:** Traditional: Weeks. ZTAN: **<15 minutes** (verify-kit bootstrap).
+* **Methodology:** Compare baseline manual labor hours against ZTAN automated trace generation times.
+
+### Speaker Notes:
+* This table compares typical time allocations for compliance tasks.
+* Our offline auditor script takes less than two seconds to parse and cryptographically verify trace files.
+* Setting up the verify-kit in a clean sandbox takes under fifteen minutes, demonstrating the portability of our verification.
+
+---
+
+## Slide 29: Risk Reduction Matrix
+### Slide Header: Risk Reduction Matrix
+### Subtitle: Mapping Vulnerabilities to Structural Mitigations
+### Slide Content:
+* **Trust Assumptions:** Traditional: high (unmonitored configurations). ZTAN: Low (state verified on every transaction).
+* **Missing Evidence:** Traditional: High (partial logs, rotation policies). ZTAN: Zero (hash-chained traces cannot be deleted without breaking validation).
+* **Configuration Drift:** Traditional: High (manual checks, drift checks on schedules). ZTAN: Low (continuous runner verification).
+* **Supply-chain Uncertainty:** Traditional: High (dynamic package updates). ZTAN: Low (frozen monorepo dependency locks and override constraints).
+
+### Speaker Notes:
+* Risk reduction in ZTAN is structural, not statistical.
+* We address the key threat vectors identified in our STRIDE threat model.
+* For example, we eliminate the risk of missing evidence by enforcing hash-chains over all logs.
+
+---
+
+## Slide 30: Competitive Landscape Analysis
+### Slide Header: Competitive Landscape Analysis
+### Subtitle: How Nexus ZTAN Redefines Infrastructure Security
+### Slide Content:
+* **Traditional Zero Trust:** Relies on identity checks and firewall boundaries. *ZTAN difference:* Verifies cryptographic execution lineage inside sandboxes.
+* **Compliance Platforms:** Rely on static questionnaires and dashboard snapshots. *ZTAN difference:* Emits continuous, machine-verifiable evidence.
+* **Manual Governance:** Relies on human documentation and retrospective checklists. *ZTAN difference:* Enforces automated, fail-closed state machines.
+* **Supply Chain Tools:** Rely on build-time SBOMs. *ZTAN difference:* Validates build integrity at runtime via TPM attestations.
+
+### Speaker Notes:
+* ZTAN does not compete with standard identity providers or firewalls.
+* We provide the execution substrate that zero trust networks assume exists.
+* By combining runtime isolation with cryptographic proof logs, we establish a new standard for infrastructure governance.
+
+---
+
+# Part IV: Future Path to Full Certification (Slides 31–35)
+
+## Slide 31: Platform Status (v1.14.0 Delivery Reality)
+### Slide Header: Platform Status: Milestone v1.14.0
+### Subtitle: Transparent Accounting of Implemented Frameworks and Open Qualifications
+### Slide Content:
+* **What Has Been Proven (Verified):**
+  * The **Physical TPM Attestation Framework** is implemented and verified under virtualized host constraints.
+  * The **Bare-Metal Firecracker Endurance Framework** is implemented and validated over 100-iteration simulated runs.
+  * The **Independent Reproduction Audit Framework** is verified via isolated sandbox testing.
+* **What Remains Open (Qualifications Open):**
+  * Verification on a host with physical TPM 2.0 hardware.
+  * Execution on a native, non-virtualized Linux/KVM host.
+  * Reproduction by a separate human operator (simulated via AI agent).
+
+### Speaker Notes:
+* Let's look at the current reality of our v1.14.0 milestone.
+* In line with our core principle, we explicitly state that we have implemented the *frameworks* for hardware attestation and bare-metal execution.
+* However, because our test environment was virtualized, the physical TPM, bare-metal Firecracker, and independent human operator certifications remain open qualifications. The pipelines are written, tested, and ready—but they await qualifying bare-metal hardware.
+
+---
+
+## Slide 32: Future Roadmap: Physical Attestation
+### Slide Header: Future Roadmap: Physical TPM Attestation
+### Subtitle: Provisioning, Configuration, and Attestation Commands
+### Slide Content:
+* **Objective:** Remove the qualification on `QUAL-REMOVE-TPM-01`.
+* **Action Plan:**
+  1. Provision a physical bare-metal host (RHEL/Debian/Ubuntu).
+  2. Confirm TPM 2.0 active via `/sys/class/tpm/tpm0/`.
+  3. Run the validation runner:
+     `npx ts-node scripts/validate-physical-hardware.ts`
+  4. Generate and sign a new `physical-attestation-evidence.json` using the hardware key.
+
+### Speaker Notes:
+* To retire the first qualification, we need a physical host with an active TPM 2.0 module.
+* We will run our existing `validate-physical-hardware.ts` script on this host.
+* Since the command chains are already implemented, the script will execute natively and output the final attestation JSON.
+
+---
+
+## Slide 33: Future Roadmap: Bare-Metal Hypervisor Execution
+### Slide Header: Future Roadmap: Bare-Metal Firecracker
+### Subtitle: KVM Configuration, Binary Verification, and Endurance Runs
+### Slide Content:
+* **Objective:** Remove the qualification on `QUAL-REMOVE-FC-01`.
+* **Action Plan:**
+  1. Provision a native Linux host with KVM enabled (`/dev/kvm`).
+  2. Install the Firecracker and Jailer binaries.
+  3. Execute the endurance script:
+     `npx ts-node scripts/firecracker-endurance-campaign.ts`
+  4. Extract timings and resource stats to `firecracker-endurance-results.json`.
+
+### Speaker Notes:
+* For the Firecracker qualification, the process is similar.
+* We require a host with native KVM access.
+* Running the script will execute the 100 microVM launches using the actual Firecracker hypervisor, writing the execution metrics to the repository root.
+
+---
+
+## Slide 34: Future Roadmap: Independent Operator Ceremony
+### Slide Header: Future Roadmap: Multi-Operator Attestation
+### Subtitle: Independent Validation and Verification Ceremonies
+### Slide Content:
+* **Objective:** Remove the qualification on `QUAL-REMOVE-REPRO-01`.
+* **Action Plan:**
+  1. Distribute the `verify-kit/` bundle to a separate engineering group.
+  2. Enforce zero repository write access and no developer contact.
+  3. The external operator runs the verification kit on an isolated machine.
+  4. Collect and sign the resulting `operator-attestation.json`.
+
+### Speaker Notes:
+* The final qualification requires a separate operator.
+* We will distribute the verify-kit to an independent third-party team.
+* They will run the validation, verify the Merkle trees, and sign the attestation file, completing the independent audit validation.
+
+---
+
+## Slide 35: Closing & Verifiability Guarantee
+### Slide Header: Evidence-Bounded Trust
+### Subtitle: Verifiable Verification for Modern Orchestration
+### Slide Content:
+* **Verifiable Verification:** Every infrastructure assertion must be backed by a verifiable, cryptographic proof.
+* **Logical Coherence:** Ledgers, requirements, and codebase states are fully reconciled and consistent.
+* **Open Repository:** All code, verification scripts, and evidence files are open for independent review.
+* **Final Verdict:** *Verification is an ongoing activity, not a static certificate.*
+
+### Speaker Notes:
+* We conclude this technical deep-dive.
+* The platform's documentation, code, and evidence are now fully reconciled and consistent.
+* We invite you to inspect the code, review our qualification ledger, and verify the evidence.
+* Thank you, and I am open to any technical questions.
+
+</script>
+
+  <script type="text/markdown" id="raw-flagship-markdown">
+# Generate Flagship Architecture & Demo Presentation for Nexus ZTAN
+
+## Section 1 — Executive Vision
+
+### Slide 1: Title
+# Nexus ZTAN
+### Evidence-Bounded Trust, Verification, Governance, Attestation, and Autonomous Operations Infrastructure Platform
+
+---
+
+### Slide 2: Vision
+# The Vision
+**Transforming assumptions into cryptographic reality.**
+* Nexus ZTAN is not just a security layer; it is an infrastructure orchestration platform.
+* Our vision is a world where no autonomous agent, application, or operator is trusted by default.
+* Every operation must be grounded in continuous, unforgeable hardware-backed evidence.
+* **Core Principle:** "Assertions are false until proven."
+
+---
+
+### Slide 3: Executive Summary
+# Executive Summary
+**What is Nexus ZTAN?**
+* An evidence-bounded trust infrastructure platform for autonomous operations.
+* Combines zero trust networking with hardware attestation, explicit governance, and continuous verification.
+* Validates every claim, executes it inside hardened Firecracker microVM boundaries, and records an immutable Merkle-tree evidence trace.
+* Protects the supply chain, ensures AI agent safety, and slashes audit preparation overhead.
+
+---
+
+### Slide 4: Why Existing Trust Models Fail
+# The Failure of Implicit Trust
+* **Implicit Trust:** Networks assume inside traffic is safe.
+* **Manual Audits:** Evidence is gathered retrospectively, creating massive compliance burdens.
+* **Supply-Chain Uncertainty:** Ad-hoc package dependencies poison application builds.
+* **Infrastructure Drift:** Runtime configurations silently drift from policy intentions.
+* **Missing Evidence:** Logs are fragmented, deleted, or incomplete during forensic investigations.
+* **AI Autonomy Risk:** Agents act on assumed permissions without verifiable execution lineage.
+
+---
+
+### Slide 5: Why Now?
+# The Urgency of Verifiable Infrastructure
+* AI-driven automation is accelerating infrastructure modifications.
+* Perimeter-based security models are obsolete in multi-tenant, autonomous environments.
+* Regulatory compliance demands proof, not policy.
+* If you cannot cryptographically prove an operation happened exactly as intended, you cannot trust the result.
+
+---
+
+## Section 2 — Core Idea
+
+### Slide 6: Evidence-Bounded Trust
+# Evidence-Bounded Trust
+**Trust is not assumed. Trust must be continuously proven.**
+<div class="diagram-container"><pre class="mermaid" style="background:transparent; border:none; margin:0; padding:0;">
+graph TD
+    Claim[1. Assertion / Claim] -->|Verify state invariants| Ver[2. Active Verification]
+    Ver -->|Write hash-chained log| Ev[3. Cryptographic Evidence]
+    Ev -->|Sign with notary / AIK| Att[4. Hardware Attestation]
+    Att -->|Evaluate policy logic| Gov[5. Governance Decision]
+    Gov -->|Audit offline| Aud[6. Public Auditability]
+</pre></div>
+
+---
+
+### Slide 7: Nexus ZTAN Philosophy
+# The Nexus ZTAN Philosophy
+* **Verify Continuously:** No cached trust. Re-verify per transaction.
+* **Fail Closed:** On partition or error, deny execution. Safety over liveness.
+* **Track Uncertainty:** Qualify all simulation environments.
+* **Preserve Qualification Status:** Never present simulated hardware as certified evidence.
+* **Cryptographic Evidence over Claims:** Hashes and signatures beat configuration files.
+* **Reproducibility over Assumption:** Offline auditors must be able to reproduce identical outcomes.
+
+---
+
+## Section 3 — Business Problems Solved
+
+### Slide 8: The Problems Solved
+# Bridging the Trust Gap
+
+| Problem | Traditional Approach | Nexus ZTAN Approach |
+| --- | --- | --- |
+| **Supply Chain Risk** | Manual review and SBOM scanning | Cryptographic runtime verification |
+| **Infrastructure Drift** | Reactive anomaly detection | Continuous validation & active fencing |
+| **Audit Readiness** | Manual, weeks-long evidence collection | Automated evidence generation via outbox |
+| **AI Trust** | Trust by human-defined policy | Trust by unforgeable execution proof |
+| **Compliance** | Documentation-heavy snapshot audits | Evidence-driven continuous compliance |
+
+---
+
+## Section 4 — Complete Platform Architecture
+
+### Slide 9: Full Architecture Overview
+# Complete Platform Architecture
+<div class="diagram-container"><pre class="mermaid" style="background:transparent; border:none; margin:0; padding:0;">
+graph TD
+    Users[Users / AI Agents / Operators] --> GW[Gateway Layer]
+    GW --> CP[Control Plane]
+    CP --> Core[Core Trust Infrastructure]
+    Core --> GOV[Governance Layer]
+    Core --> EV[Evidence Layer]
+    Core --> VER[Verification Engine]
+    Core --> ATT[Attestation Layer]
+    Core --> AUD[Audit Layer]
+    Core --> STO[Storage / Ledger]
+</pre></div>
+
+---
+
+## Section 5 — Multi-Layer Architecture Deep Dive
+
+### Slide 10: Layer 1 — Gateway Layer
+# Layer 1: Gateway Layer
+* **Purpose:** Traffic control, authentication, and routing.
+* **Responsibilities:** Validates JWTs, enforces tenant namespace bounds, rate limits inputs.
+* **Inputs/Outputs:** Inputs: API calls. Outputs: Routed messages to the Control Plane.
+* **Trust Boundary:** External internet to internal orchestrator.
+* **Technologies:** Node.js, Express, mTLS.
+* **Evidence Generated:** Access logs.
+* **Why it exists:** Provides a centralized, defensible perimeter before deep execution begins.
+* **Alternatives rejected:** Exposing Core API directly (rejected due to blast radius risk).
+
+---
+
+### Slide 11: Layer 2 — Control Plane
+# Layer 2: Control Plane
+* **Purpose:** System orchestration and task scheduling.
+* **Responsibilities:** Dispatches workloads, tracks execution lifecycle, manages VM boots.
+* **Inputs/Outputs:** Inputs: Validated commands. Outputs: Execution requests to sandbox.
+* **Trust Boundary:** Scheduler to Hypervisor.
+* **Technologies:** BullMQ, Node.js event loops.
+* **Evidence Generated:** Job transition states.
+* **Why it exists:** Coordinates asynchronous, distributed execution without blocking APIs.
+
+---
+
+### Slide 12: Layer 3 — Core API Layer
+# Layer 3: Core API Layer
+* **Purpose:** State synchronization and authority.
+* **Responsibilities:** Implements the Transactional Outbox pattern to atomically commit intent.
+* **Inputs/Outputs:** Inputs: Transition signals. Outputs: PostgreSQL commits.
+* **Trust Boundary:** Memory state to persistent state.
+* **Technologies:** PostgreSQL, Prisma ORM.
+* **Why it exists:** Enforces single-writer consistency.
+
+---
+
+### Slide 13: Layer 4 — Consensus & Fencing Layer
+# Layer 4: Consensus & Fencing Layer
+* **Purpose:** Prevents split-brain execution logic.
+* **Responsibilities:** Manages leader leases and distributed locking.
+* **Technologies:** Redis Sentinel, PostgreSQL row-level locks.
+* **Business Value:** Prevents duplicate task executions that could corrupt compliance ledgers.
+
+---
+
+### Slide 14: Layer 5 — Virtualization Boundary Layer
+# Layer 5: Virtualization Boundary Layer
+* **Purpose:** Isolate execution environments physically.
+* **Responsibilities:** Sandboxes tasks using hardware KVM boundaries and Jailer cgroups.
+* **Technologies:** AWS Firecracker, Linux KVM.
+* **Evidence Generated:** Pure stdout/stderr traces.
+* **Why it exists:** Containers share the host kernel. Firecracker provides hardware isolation.
+
+---
+
+### Slide 15: Layer 6 — Communications Layer
+# Layer 6: Communications Layer
+* **Purpose:** Secure point-to-point guest data streams.
+* **Responsibilities:** Replaces standard networking with isolated sockets.
+* **Technologies:** Virtio-vsock.
+* **Why it exists:** Prevents data exfiltration and internal network scanning from compromised workloads.
+
+---
+
+### Slide 16: Layer 7 — Attestation Layer
+# Layer 7: Attestation Layer
+* **Purpose:** Hardware cryptographic proof.
+* **Responsibilities:** Signs boot measurements (PCRs).
+* **Technologies:** TPM 2.0, tpm2-tools.
+* **Evidence Generated:** Signed hardware quotes.
+* **Why it exists:** Ensures software wasn't altered prior to boot.
+
+---
+
+### Slide 17: Layer 8 — Evidence Ledger Layer
+# Layer 8: Evidence Ledger Layer
+* **Purpose:** Tamper-evident transparency logging.
+* **Responsibilities:** Compiles RFC 6962 hash chains.
+* **Technologies:** Sigstore, Rekor API.
+* **Business Value:** Eradicates the possibility of silently deleted logs.
+
+---
+
+### Slide 18: Layer 9 — Verification Layer
+# Layer 9: Verification Layer
+* **Purpose:** Offline, 3rd-party validation.
+* **Responsibilities:** Parses trace bundles and BLS signatures without trusting the runtime DB.
+* **Technologies:** Python `auditor.py`, BLS cryptography.
+* **Why it exists:** Prevent trust-by-assumption; allow external auditors to reproduce proofs.
+
+---
+
+## Section 6 — Technology Stack
+
+### Slide 19: Technology Stack: Language & Execution
+# Technology Stack
+* **Node.js & TypeScript:** 
+  * *Why selected:* Fast development iteration, vast ecosystem, non-blocking I/O ideal for polling.
+  * *Benefits:* Compile-time type safety preventing coercion attacks.
+  * *Tradeoffs:* Higher memory footprint; requires strict lockfiles to avoid supply-chain poisoning.
+* **AWS Firecracker:**
+  * *Why selected:* Fast startup times (~125ms) with hardware VM security.
+  * *Benefits:* Defense in depth—stops host kernel escapes.
+  * *Why not containers:* Docker shares the host kernel; a zero-day kernel exploit compromises all tenants.
+
+---
+
+### Slide 20: Technology Stack: Storage & Cryptography
+# Storage & Cryptography
+* **PostgreSQL & Prisma:**
+  * *Why selected:* ACID compliance and row-level locks. Provides the single source of truth.
+* **Redis Sentinel:**
+  * *Why selected:* Distributed, high-availability lease fencing.
+  * *Benefits:* Automated failover, preventing split-brain without Paxos complexity.
+* **TPM 2.0:**
+  * *Why selected:* Roots platform identity in unextractable silicon keys.
+* **BLS Signatures:**
+  * *Why selected:* Enables threshold cryptography (e.g. 2-of-3 witness signatures) that aggregate into a single efficient proof.
+
+---
+
+## Section 7 — End-to-End Platform Workflow
+
+### Slide 21: End-to-End Workflow Sequence
+# Complete Workflow Execution
+<div class="diagram-container"><pre class="mermaid" style="background:transparent; border:none; margin:0; padding:0;">
+sequenceDiagram
+    participant O as Operator / Agent
+    participant GW as Gateway
+    participant CP as Control Plane
+    participant DB as Postgres/Redis
+    participant VM as Firecracker
+    participant W as Witnesses
+    participant R as Rekor Log
+    O->>GW: 1. Ingest Task Request
+    GW->>CP: 2. Auth & Route
+    CP->>DB: 3. Lock State
+    CP->>VM: 4. Execute Sandbox
+    VM->>CP: 5. Return Trace & TPM Quote
+    CP->>W: 6. Request BLS Witness Signatures
+    W->>CP: 7. Return Aggregated Signature
+    CP->>R: 8. Publish Evidence to Transparency Log
+    CP->>O: 9. Final Decision & Receipt
+</pre></div>
+
+---
+
+## Section 8 — Trust Chain Workflow
+
+### Slide 22: Trust Chain Workflow
+# The Trust Chain
+* **Claim:** An operator requests an action.
+* **Evidence:** The action executes and generates a deterministic hash trace.
+* **Verification:** The trace is matched against known good states.
+* **Attestation:** The host TPM signs the hardware state.
+* **Governance:** The threshold protocol aggregates approvals.
+* **Audit Trail:** The final Rekor receipt is stored forever.
+
+---
+
+## Section 9 — Qualification Management System
+
+### Slide 23: Qualification Management System
+# Tracking Uncertainty Transparently
+* **Why qualifications exist:** To document the gap between test environments and certified production hardware.
+* **Stages of Proof:**
+  * *Unverified:* Design without code.
+  * *Framework Implemented:* Logic exists.
+  * *Qualified Validation:* Passes in simulated environment (e.g. WSL2, mock TPM).
+  * *Physically Verified:* Executes on bare-metal hardware.
+  * *Retired Qualification:* Gap permanently closed.
+* We actively track `QUAL-REMOVE-TPM-01` (mock TPMs) and `QUAL-REMOVE-FC-01` (simulated virtualization).
+
+---
+
+
+## Section 10 — Enterprise Benefits
+
+### Slide 24: Enterprise Benefits
+# Enterprise Benefits
+* **Security:** Defends against host-kernel escapes and unauthorized memory access.
+* **Governance:** Explicitly maps all state transitions; blocks unauthorized configurations.
+* **Audit:** Eliminates manual evidence hunting. Hashes provide instantaneous verification.
+* **Compliance:** Proves historical integrity automatically using public transparency logs.
+* **Platform Engineering:** Reduces the operational friction of securing isolated tenant workloads.
+* **AI Governance:** Ensures that AI agents act strictly within provable, sandboxed guardrails.
+* **Supply Chain:** Validates workload execution integrity at runtime, closing the loop on build-time SBOMs.
+
+---
+
+## Section 11 — Value Creation Framework
+
+### Slide 25: Value Creation Framework
+# Qualitative Value Creation
+* **Potentially Faster Audits:** Replaces manual artifact collation with automated JSON payloads.
+* **Reduced Manual Evidence Collection:** System emits verifiable traces on every transaction.
+* **Improved Traceability:** Every API request is linked cryptographically to a hardware TPM quote.
+* **Improved Incident Investigation:** Vector clocks and hash chains recreate exact historical states.
+* **Reduced Governance Blind Spots:** Unverified systems are explicitly tracked in the qualification registry.
+* **Improved Operational Confidence:** Trust is mathematically enforced rather than assumed by policy.
+
+---
+
+## Section 12 — Cost & Time Framework
+
+### Slide 26: Cost & Time Impact Framework
+# Measuring Impact
+**Cost Estimation Formula:**
+`Annual Audit Cost - Automated Evidence Collection Savings = Potential Savings`
+
+**Time Impact Estimation Methodology:**
+* *Evidence Collection Time:* Drops from days to the time required to sync the DB outbox.
+* *Verification Time:* Time to run `python auditor.py` against the trace file.
+* *Investigation Time:* Time to query the hash chain vs. parsing thousands of raw splunk logs.
+* *Audit Preparation Time:* Reduced to bootstrapping the verification kit.
+
+*(Note: We do not claim arbitrary percentage reductions. Real savings depend on the deployment scale and baseline manual audit hours.)*
+
+---
+
+## Section 13 — Competitive Positioning
+
+### Slide 27: Competitive Positioning
+# Competitive Positioning
+* **vs. Traditional Zero Trust:** ZTAN verifies cryptographic execution lineage inside hardware sandboxes, going beyond simple identity checks.
+* **vs. Compliance Platforms:** ZTAN emits continuous runtime proofs rather than static dashboard questionnaires.
+* **vs. SIEM Platforms:** ZTAN provides causal, cryptographically linked execution chains rather than heuristic log aggregation.
+* **vs. Supply Chain Tools:** ZTAN validates integrity at runtime, preventing live memory tampering that static SBOMs miss.
+
+---
+
+## Section 14 — Current Status
+
+### Slide 28: Current Status & Transparency
+# Current Milestone Status
+**Implemented & Validated:**
+* Core API, outbox architecture, routing, verification scripts, and offline auditor kit.
+
+**Qualified Validation (Simulated):**
+* `QUAL-REMOVE-TPM-01`: Mock TPM quotes (awaiting physical hardware).
+* `QUAL-REMOVE-FC-01`: Simulated hypervisor timing (awaiting KVM bare-metal).
+* `QUAL-REMOVE-REPRO-01`: Automated AI verification (awaiting external human operator).
+
+**Why this matters:** We do not claim full certification until these hardware gaps are permanently closed. Transparency builds trust.
+
+---
+
+## Section 15 — Future Roadmap
+
+### Slide 29: Future Roadmap
+# The Path to Certification
+* **Phase 1: Physical Hardware Validation:**
+  * Provision bare-metal hosts.
+  * Execute validation scripts against a physical TPM 2.0 module.
+* **Phase 2: Native Firecracker Validation:**
+  * Execute endurance campaigns natively over KVM without nested virtualization performance penalties.
+* **Phase 3: Independent Operator Validation:**
+  * Hand off the `verify-kit` to a segregated engineering team to prove offline reproducibility.
+* **Result:** Retirement of the simulated qualifications, achieving true Certified Evidence.
+
+---
+
+## Section 16 — Live Demo Script
+
+### Slide 30: Live Demo Walkthrough
+# Live Demo
+**1. Platform Startup:**
+* "We begin by initializing the Gateway and Control Plane. Notice the Redis Sentinel fencing locks engaging."
+**2. Verification Flow & Evidence Generation:**
+* "We submit a job. The Firecracker VM boots, executes the code, and emits a secure trace."
+**3. Trust-Chain & Governance:**
+* "The witness nodes evaluate the trace and apply BLS threshold signatures. The policy engine approves the transaction."
+**4. Audit Trail & Attestation:**
+* "A physical TPM quote is appended. The aggregate proof is submitted to Rekor, returning an immutable inclusion receipt."
+**5. Final Decision:**
+* "The client receives the final JSON receipt. If you run our offline auditor script against it, verification passes instantly."
+
+---
+
+## Section 17 — Technical Appendix
+
+### Slide 31: Qualification Lifecycle Diagram
+# Appendix: Qualification Lifecycle
+<div class="diagram-container"><pre class="mermaid" style="background:transparent; border:none; margin:0; padding:0;">
+graph TD
+    Unverified[Unverified] -->|Code Written| FI[Framework Implemented]
+    FI -->|Simulated Tests Pass| QV[Qualified Validation]
+    QV -->|Bare-Metal Executed| PV[Physical Validation]
+    PV -->|External Audit| CE[Certified Evidence]
+</pre></div>
+
+### Slide 32: Enterprise Value Flow Diagram
+# Appendix: Enterprise Value Flow
+<div class="diagram-container"><pre class="mermaid" style="background:transparent; border:none; margin:0; padding:0;">
+graph TD
+    MT[Manual Trust] --> CV[Continuous Verification]
+    CV --> EG[Evidence Generation]
+    EG --> GV[Governance Visibility]
+    GV --> OC[Operational Confidence]
+</pre></div>
+
+---
+*End of Flagship Architecture & Demo Presentation*
+
+</script>
+
+  <!-- Viewer Script Logic -->
+  <script>
+    // Global State
+    let currentDeck = 'exec'; // 'exec' or 'tech'
+    let currentSlideIndex = 0;
+    let slides = [];
+    let isNotesOpen = false;
+
+    // DOM Elements
+    const slideIndexList = document.getElementById('slide-index-list');
+    const slideElement = document.getElementById('slide-element');
+    const notesDrawer = document.getElementById('notes-drawer');
+    const notesContent = document.getElementById('notes-content');
+    const currentSlideLabel = document.getElementById('current-slide-label');
+    const percentageLabel = document.getElementById('percentage-label');
+    const progressFill = document.getElementById('progress-fill');
+    const asideTitle = document.getElementById('aside-title');
+
+    // Parse Markdown text into structured Slides objects
+    function parseSlides(markdownText) {
+      const rawSlides = markdownText.split('---');
+      const parsed = [];
+
+      rawSlides.forEach((rawSlide, index) => {
+        const lines = rawSlide.split('\n');
+        let slideNum = index + 1;
+        let slideHeader = `Slide ${slideNum}`;
+        let subtitle = '';
+        let contentHtml = '';
+        let speakerNotes = '';
+        let mode = 'content'; // 'content' or 'notes'
+
+        lines.forEach(line => {
+          const trimmed = line.trim();
+          if (!trimmed) return;
+
+          // Parse Header
+          if (trimmed.startsWith('# Slide')) {
+            // e.g. # Slide 1: Title Slide
+            return;
+          } else if (trimmed.startsWith('## Slide Header:')) {
+            slideHeader = trimmed.replace('## Slide Header:', '').trim();
+          } else if (trimmed.startsWith('### Subtitle:')) {
+            subtitle = trimmed.replace('### Subtitle:', '').trim();
+          } else if (trimmed.startsWith('### Slide Content:')) {
+            mode = 'content';
+          } else if (trimmed.startsWith('### Speaker Notes:')) {
+            mode = 'notes';
+          } else {
+            // Append line based on mode
+            if (mode === 'content') {
+              if (trimmed.startsWith('*')) {
+                contentHtml += `<li>${parseMarkdownInLine(trimmed.substring(1).trim())}</li>`;
+              } else if (trimmed.startsWith('-')) {
+                contentHtml += `<li>${parseMarkdownInLine(trimmed.substring(1).trim())}</li>`;
+              } else {
+                contentHtml += `<p style="margin-bottom: 0.5rem;">${parseMarkdownInLine(trimmed)}</p>`;
+              }
+            } else if (mode === 'notes') {
+              if (trimmed.startsWith('*') || trimmed.startsWith('-')) {
+                speakerNotes += `<li>${parseMarkdownInLine(trimmed.substring(1).trim())}</li>`;
+              } else {
+                speakerNotes += `<p style="margin-bottom: 0.25rem;">${parseMarkdownInLine(trimmed)}</p>`;
+              }
+            }
+          }
+        });
+
+        // Wrap list tags if list elements exist
+        if (contentHtml.includes('<li>') && !contentHtml.startsWith('<ul>')) {
+          contentHtml = `<ul>${contentHtml}</ul>`;
+        }
+        if (speakerNotes.includes('<li>') && !speakerNotes.startsWith('<ul>')) {
+          speakerNotes = `<ul>${speakerNotes}</ul>`;
+        }
+
+        parsed.push({
+          num: slideNum,
+          header: slideHeader,
+          subtitle: subtitle,
+          content: contentHtml,
+          notes: speakerNotes || '<p>No speaker notes for this slide.</p>'
+        });
+      });
+
+      return parsed;
+    }
+
+    // Helper to parse simple markdown bold, links, code, etc.
+    function parseMarkdownInLine(text) {
+      return text
+        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" style="color:var(--accent-blue); text-decoration:none;" target="_blank">$1</a>');
+    }
+
+    // Switch between Exec and Tech Decks
+    function switchDeck(deckType) {
+      currentDeck = deckType;
+      currentSlideIndex = 0;
+      
+      // Update toggle buttons class
+      document.getElementById('btn-exec').classList.toggle('active', deckType === 'exec');
+      document.getElementById('btn-tech').classList.toggle('active', deckType === 'tech');
+      document.getElementById('btn-flagship').classList.toggle('active', deckType === 'flagship');
+      
+      loadDeck();
+    }
+
+    // Load active deck data and render
+    function loadDeck() {
+      let markdownId = 'raw-exec-markdown';
+      if (currentDeck === 'tech') markdownId = 'raw-tech-markdown';
+      else if (currentDeck === 'flagship') markdownId = 'raw-flagship-markdown';
+      
+      const rawMarkdown = document.getElementById(markdownId).textContent.trim();
+      
+      slides = parseSlides(rawMarkdown);
+      
+      if (currentDeck === 'exec') asideTitle.textContent = 'Executive Index';
+      else if (currentDeck === 'tech') asideTitle.textContent = 'Technical Index';
+      else if (currentDeck === 'flagship') asideTitle.textContent = 'Flagship Index';
+      
+      renderIndex();
+      renderSlide();
+    }
+
+    // Render left index list
+    function renderIndex() {
+      slideIndexList.innerHTML = '';
+      slides.forEach((slide, index) => {
+        const li = document.createElement('li');
+        li.className = 'slide-item';
+        if (index === currentSlideIndex) li.classList.add('active');
+        
+        li.innerHTML = `<span class="slide-num">${slide.num}</span> <span>${slide.header}</span>`;
+        li.onclick = () => jumpToSlide(index);
+        slideIndexList.appendChild(li);
+      });
+    }
+
+    // Render active slide view
+    function renderSlide() {
+      const slide = slides[currentSlideIndex];
+      if (!slide) return;
+      
+      // Apply fade effect
+      slideElement.style.opacity = '0';
+      slideElement.style.transform = 'translateY(10px)';
+      
+      setTimeout(() => {
+        slideElement.innerHTML = `
+          <div>
+            <div class="slide-header">
+              <h2>${slide.header}</h2>
+              <h3>${slide.subtitle}</h3>
+            </div>
+            <div class="slide-body">
+              ${slide.content}
+            </div>
+          </div>
+          <div class="slide-footer">
+            <span>Nexus ZTAN Platform Presentation</span>
+            <span class="principle-footer">EVIDENCE-BOUNDED TRUST: ASSERTIONS ARE FALSE UNTIL PROVEN</span>
+            <span>Slide ${slide.num} of ${slides.length}</span>
+          </div>
+        `;
+        
+        // Render Mermaid Diagrams if present
+        const mermaidBlocks = slideElement.querySelectorAll('.mermaid');
+        if (mermaidBlocks.length > 0) {
+          mermaid.run({
+            nodes: mermaidBlocks
+          });
+        }
+        
+        // Update notes
+        notesContent.innerHTML = slide.notes;
+        
+        // Update Progress bar
+        const total = slides.length;
+        const current = currentSlideIndex + 1;
+        const progressPercentage = Math.round((current / total) * 100);
+        
+        currentSlideLabel.textContent = `Slide ${current} of ${total}`;
+        percentageLabel.textContent = `${progressPercentage}%`;
+        progressFill.style.width = `${progressPercentage}%`;
+        
+        // Highlight active index item
+        const listItems = slideIndexList.querySelectorAll('.slide-item');
+        listItems.forEach((item, idx) => {
+          item.classList.toggle('active', idx === currentSlideIndex);
+        });
+        
+        // Restore opacity
+        slideElement.style.opacity = '1';
+        slideElement.style.transform = 'translateY(0)';
+      }, 150);
+    }
+
+    // Slide navigation logic
+    function prevSlide() {
+      if (currentSlideIndex > 0) {
+        currentSlideIndex--;
+        renderSlide();
+      }
+    }
+
+    function nextSlide() {
+      if (currentSlideIndex < slides.length - 1) {
+        currentSlideIndex++;
+        renderSlide();
+      }
+    }
+
+    function jumpToSlide(index) {
+      currentSlideIndex = index;
+      renderSlide();
+    }
+
+    // Toggle Sidebar Index visibility
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const btnText = document.getElementById('sidebar-toggle-text');
+      
+      if (sidebar.style.display === 'none') {
+        sidebar.style.display = 'flex';
+        btnText.textContent = 'Hide Index';
+      } else {
+        sidebar.style.display = 'none';
+        btnText.textContent = 'Show Index';
+      }
+    }
+
+    // Toggle Collapsible Speaker Notes drawer
+    function toggleNotes(forceState) {
+      if (forceState !== undefined) {
+        isNotesOpen = forceState;
+      } else {
+        isNotesOpen = !isNotesOpen;
+      }
+      notesDrawer.classList.toggle('open', isNotesOpen);
+    }
+
+    // Fullscreen Mode Toggle
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          alert(`Error attempting to enable full-screen mode: ${err.message}`);
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    // Keyboard controls listener
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowRight' || event.key === ' ') {
+        nextSlide();
+      } else if (event.key === 'ArrowLeft') {
+        prevSlide();
+      }
+    });
+
+    // Initial load
+    window.onload = () => {
+      loadDeck();
+    };
+  </script>
+</body>
+</html>

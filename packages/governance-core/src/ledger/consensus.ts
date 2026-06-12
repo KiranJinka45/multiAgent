@@ -47,8 +47,8 @@ export interface QuorumCertificate {
 export class ConsensusEngine {
     private static nodes: Map<string, ConsensusNode> = new Map();
     private static totalClusterSize = 3;
-    private static keyCache = new Map<string, any>();
-    private static syncInterval: any = null;
+    private static keyCache = new Map<string, ReturnType<typeof generateKeyPairSync>>();
+    private static syncInterval: NodeJS.Timeout | null = null;
 
     static getClusterNodes(): Map<string, ConsensusNode> {
         return this.nodes;
@@ -99,9 +99,9 @@ export class ConsensusEngine {
             });
             
             // Reconstruct log from verified blocks
-            const replicatedLog: LogEntry[] = verifiedBlocks.map((b: any) => ({
-                term: parseInt(b.epoch, 10) || 0,
-                command: b.payload
+            const replicatedLog: LogEntry[] = (verifiedBlocks as Record<string, unknown>[]).map((b) => ({
+                term: parseInt(b.epoch as string, 10) || 0,
+                command: b.payload as string
             }));
 
             // Sync active lease to find leader and term
@@ -115,16 +115,16 @@ export class ConsensusEngine {
                 }
 
                 // Check leaseholder heartbeats to determine leader status
-                const matchingLease = activeLeases.find((l: any) => 
-                    l.owner_host.includes(nodeId) || 
-                    (nodeId === 'node-1' && l.id.includes('partition-0')) ||
+                const matchingLease = (activeLeases as Record<string, unknown>[]).find((l) => 
+                    (l.owner_host as string).includes(nodeId) || 
+                    (nodeId === 'node-1' && (l.id as string).includes('partition-0')) ||
                     (nodeId === 'node-1' && l.id === 'ztan-master-lease')
                 );
                 if (matchingLease) {
-                    const heartbeatAge = Date.now() - new Date(matchingLease.heartbeat).getTime();
+                    const heartbeatAge = Date.now() - new Date(matchingLease.heartbeat as string).getTime();
                     const isAlive = heartbeatAge < 25000;
                     node.isAlive = isAlive;
-                    node.currentTerm = matchingLease.generation;
+                    node.currentTerm = matchingLease.generation as number;
                     if (isAlive) {
                         node.state = NodeState.LEADER;
                     } else {
@@ -132,7 +132,7 @@ export class ConsensusEngine {
                     }
                 }
             }
-        } catch (e) {
+        } catch (_e) {
             // Silence background sync errors to preserve fail-safe simulation execution
         }
     }
@@ -388,11 +388,31 @@ export class ConsensusEngine {
                         const persistTask = async () => {
                             const os = await import('os');
                             const { db } = await import('@packages/db');
-                            await db.$transaction(async (tx: any) => {
-                                await tx.$executeRawUnsafe(`SET LOCAL ztan.active_writer_pid = '${process.pid}';`);
-                                await tx.$executeRawUnsafe(`SET LOCAL ztan.active_writer_host = '${os.hostname()}';`);
+                            await db.$transaction(async (tx: unknown) => {
+                                const transactionClient = tx as {
+                                    $executeRawUnsafe(query: string): Promise<unknown>;
+                                    ztanLedgerBlock: {
+                                        upsert(args: {
+                                            where: { blockId: string };
+                                            update: Record<string, unknown>;
+                                            create: {
+                                                blockId: string;
+                                                prevHash: string;
+                                                hash: string;
+                                                type: string;
+                                                payload: string;
+                                                operator: string;
+                                                signature: string;
+                                                status: string;
+                                                epoch: string;
+                                            };
+                                        }): Promise<unknown>;
+                                    };
+                                };
+                                await transactionClient.$executeRawUnsafe(`SET LOCAL ztan.active_writer_pid = '${process.pid}';`);
+                                await transactionClient.$executeRawUnsafe(`SET LOCAL ztan.active_writer_host = '${os.hostname()}';`);
                                 
-                                await tx.ztanLedgerBlock.upsert({
+                                await transactionClient.ztanLedgerBlock.upsert({
                                     where: { blockId: `block-${term}-${tempRoot}` },
                                     update: {},
                                     create: {
@@ -434,8 +454,9 @@ export class ConsensusEngine {
                 return { success: true, term, certificate };
             }
             return { success: false, term, reason: 'QUORUM_LOSS_OR_BFT_REJECT' };
-        } catch (err: any) {
-            if (err.message && err.message.startsWith('ZTAN_INVARIANT_VIOLATION')) {
+        } catch (err: unknown) {
+            const errMessage = err instanceof Error ? err.message : String(err);
+            if (errMessage.startsWith('ZTAN_INVARIANT_VIOLATION')) {
                 // Collect detailed crash telemetry
                 const allNodes = Array.from(this.nodes.entries()).map(([id, n]) => ({
                     nodeId: id,
@@ -448,8 +469,8 @@ export class ConsensusEngine {
                 const allPrepares = Array.from(this.nodes.values()).map(n => n.preparePool);
                 const firstNodeLog = this.nodes.get('node-1')?.log || [];
 
-                FailureArchaeologyDumper.dumpDiagnosticSnapshot(term, err.message, allNodes, allPrepares, firstNodeLog);
-                console.error(`[ZTAN FAIL-CLOSED HALT] Invariant breached: ${err.message}. Shutting down process to preserve forensic state.`);
+                FailureArchaeologyDumper.dumpDiagnosticSnapshot(term, errMessage, allNodes, allPrepares, firstNodeLog);
+                console.error(`[ZTAN FAIL-CLOSED HALT] Invariant breached: ${errMessage}. Shutting down process to preserve forensic state.`);
                 
                 if (process.env.ZTAN_TEST_NO_EXIT !== 'true') {
                     process.exit(1);

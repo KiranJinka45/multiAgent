@@ -59,8 +59,9 @@ export class ContainerOrchestrator {
             // Normalize path separators to forward slashes for WSL2/Docker Windows daemon compatibility
             const normalizedPath = seccompPath.replace(/\\/g, '/');
             dockerCmd += ` --security-opt seccomp=${normalizedPath}`;
-        } catch (e: any) {
-            console.warn(`[ZTAN CONTAINER] Could not write custom seccomp profile: ${e.message}`);
+        } catch (e: unknown) {
+            const message = e instanceof Error ? e.message : String(e);
+            console.warn(`[ZTAN CONTAINER] Could not write custom seccomp profile: ${message}`);
         }
 
         // Mount protections
@@ -74,11 +75,15 @@ export class ContainerOrchestrator {
         try {
             const output = execSync(dockerCmd, { stdio: 'pipe', encoding: 'utf8' });
             return { success: true, output };
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const hasStdoutStderr = typeof err === 'object' && err !== null && 'stdout' in err && 'stderr' in err;
+            const stdout = hasStdoutStderr ? String((err as Record<string, unknown>).stdout) : '';
+            const stderr = hasStdoutStderr ? String((err as Record<string, unknown>).stderr) : '';
+            const message = err instanceof Error ? err.message : String(err);
             return { 
                 success: false, 
-                output: err.stdout || '',
-                error: err.stderr || err.message
+                output: stdout,
+                error: stderr || message
             };
         }
     }

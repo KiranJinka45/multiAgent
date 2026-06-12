@@ -1,5 +1,4 @@
 import { describe, it, expect } from 'vitest';
-import { SideEffectOntology, SideEffectClass } from '../../src/ontology/side-effects.js';
 import { CommandSemanticParser } from '../../src/ontology/parser.js';
 import { PermissionEngine } from '../../src/permissions/lattice.js';
 import { StaticCommandFilter } from '../../src/filters/command-filter.js';
@@ -24,7 +23,7 @@ describe('Phase F1: Ontology Surface Expansion & Semantic Parsing Tests', () => 
         expect(ops).toContain('write-file');
     });
 
-    it('should enforce default-deny for parsed operations lacking lattice authorization', () => {
+    it('should enforce default-deny for parsed operations lacking lattice authorization', async () => {
         // Register lattice for tenant-b allowing only read-file
         PermissionEngine.registerLattice({
             toolName: 'read-file',
@@ -45,7 +44,7 @@ describe('Phase F1: Ontology Surface Expansion & Semantic Parsing Tests', () => 
             tenantId: 'tenant-b',
             payload: 'cat /var/log/syslog'
         };
-        expect(StaticCommandFilter.evaluateProposal(proposalSafe)).toBe(true);
+        expect(await StaticCommandFilter.evaluateProposal(proposalSafe)).toBe(true);
 
         // Proposal containing cat and reboot should fail-closed because reboot-system operation is not authorized
         const proposalUnsafe = {
@@ -53,6 +52,6 @@ describe('Phase F1: Ontology Surface Expansion & Semantic Parsing Tests', () => 
             tenantId: 'tenant-b',
             payload: 'cat /var/log/syslog && reboot'
         };
-        expect(StaticCommandFilter.evaluateProposal(proposalUnsafe)).toBe(false);
+        expect(await StaticCommandFilter.evaluateProposal(proposalUnsafe)).toBe(false);
     });
 });

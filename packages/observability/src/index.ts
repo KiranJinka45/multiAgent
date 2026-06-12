@@ -585,11 +585,11 @@ setInterval(() => {
     if (typeof (process as any)._getActiveHandles === 'function') {
         try {
             activeHandles.set((process as any)._getActiveHandles().length);
-        } catch (e) {}
+        } catch (_e) {}
     }
     if (typeof (process as any)._getActiveRequests === 'function') {
         try {
             activeRequests.set((process as any)._getActiveRequests().length);
-        } catch (e) {}
+        } catch (_e) {}
     }
 }, 2000).unref();export { Counter, Gauge, Histogram };

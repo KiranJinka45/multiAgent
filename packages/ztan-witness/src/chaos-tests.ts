@@ -28,7 +28,7 @@ async function clearAllState() {
             if (file.endsWith('.lock') || file.endsWith('.generation') || file.endsWith('.json') || file.endsWith('.log')) {
                 try {
                     fs.unlinkSync(path.join(dir, file));
-                } catch (e) {}
+                } catch (_e) {}
             }
         }
     }
@@ -332,7 +332,7 @@ main().catch(err => {
     if (fs.existsSync(watchdogLogPath)) {
         try {
             fs.unlinkSync(watchdogLogPath);
-        } catch (e) {}
+        } catch (_e) {}
     }
 
     // 2. Spawn the child coordinator
@@ -370,7 +370,7 @@ main().catch(err => {
                 if (data.pid === childPid3) {
                     break;
                 }
-            } catch (e) {}
+            } catch (_e) {}
         }
         await new Promise(r => setTimeout(r, 200));
     }
@@ -492,8 +492,8 @@ main().catch(err => {
     // 2. Trigger concurrent acquire commands on Node A and Node B at the exact same time
     console.log('[ChaosTest] Triggering simultaneous lease promotion race...');
     
-    let aResult = '';
-    let bResult = '';
+    const _aResult = '';
+    const _bResult = '';
 
     nodeA.stdout.on('data', (data) => {
         const output = data.toString();
@@ -539,15 +539,15 @@ main().catch(err => {
     if (winnerPid === nodeAPid) {
         console.log('✅ SUCCESS: Node A successfully acquired the lease!');
         if (nodeBPid) {
-            try { process.kill(nodeBPid, 'SIGKILL'); } catch (e) {}
+            try { process.kill(nodeBPid, 'SIGKILL'); } catch (_e) {}
         }
-        try { nodeB.kill('SIGKILL'); } catch (e) {}
+        try { nodeB.kill('SIGKILL'); } catch (_e) {}
     } else if (winnerPid === nodeBPid) {
         console.log('✅ SUCCESS: Node B successfully acquired the lease!');
         if (nodeAPid) {
-            try { process.kill(nodeAPid, 'SIGKILL'); } catch (e) {}
+            try { process.kill(nodeAPid, 'SIGKILL'); } catch (_e) {}
         }
-        try { nodeA.kill('SIGKILL'); } catch (e) {}
+        try { nodeA.kill('SIGKILL'); } catch (_e) {}
     } else {
         console.error('❌ FAILURE: Dual Promotion Storm Drill failed! Neither Node A nor Node B owns the lease.');
         process.exit(1);
@@ -555,13 +555,13 @@ main().catch(err => {
 
     // Clean up nodes
     if (nodeAPid) {
-        try { process.kill(nodeAPid, 'SIGKILL'); } catch (e) {}
+        try { process.kill(nodeAPid, 'SIGKILL'); } catch (_e) {}
     }
     if (nodeBPid) {
-        try { process.kill(nodeBPid, 'SIGKILL'); } catch (e) {}
+        try { process.kill(nodeBPid, 'SIGKILL'); } catch (_e) {}
     }
-    try { nodeA.kill('SIGKILL'); } catch (e) {}
-    try { nodeB.kill('SIGKILL'); } catch (e) {}
+    try { nodeA.kill('SIGKILL'); } catch (_e) {}
+    try { nodeB.kill('SIGKILL'); } catch (_e) {}
     console.log('✅ SUCCESS: Drill 4 passed. Concurrent lease promotion serialized cleanly, guaranteeing a single winner!');
 
     // =========================================================================
@@ -603,7 +603,7 @@ main().catch(err => {
                 if (data.pid === childAPid) {
                     break;
                 }
-            } catch (e) {}
+            } catch (_e) {}
         }
         await new Promise(r => setTimeout(r, 200));
     }
@@ -668,14 +668,14 @@ main().catch(err => {
 
     // Clean up
     if (childAPid) {
-        try { process.kill(childAPid, 'SIGKILL'); } catch (e) {}
+        try { process.kill(childAPid, 'SIGKILL'); } catch (_e) {}
     }
     if (childBPid) {
-        try { process.kill(childBPid, 'SIGKILL'); } catch (e) {}
+        try { process.kill(childBPid, 'SIGKILL'); } catch (_e) {}
     }
-    try { childA.kill('SIGKILL'); } catch (e) {}
-    try { childB.kill('SIGKILL'); } catch (e) {}
-    try { watchdog5.kill('SIGKILL'); } catch (e) {}
+    try { childA.kill('SIGKILL'); } catch (_e) {}
+    try { childB.kill('SIGKILL'); } catch (_e) {}
+    try { watchdog5.kill('SIGKILL'); } catch (_e) {}
 
     console.log('✅ SUCCESS: Drill 5 passed. Watchdog kill + immediate restart prevents stale resurrection and allows clean preemption.');
 
@@ -744,9 +744,9 @@ main().catch(err => {
     }
 
     if (childB6Pid) {
-        try { process.kill(childB6Pid, 'SIGKILL'); } catch (e) {}
+        try { process.kill(childB6Pid, 'SIGKILL'); } catch (_e) {}
     }
-    try { childB6.kill('SIGKILL'); } catch (e) {}
+    try { childB6.kill('SIGKILL'); } catch (_e) {}
 
     if (!fenceCaught) {
         console.error('❌ FAILURE: Resumed Node A write was NOT fenced! Monotonic integrity breached.');
@@ -768,7 +768,7 @@ main().catch(err => {
         env: { ...process.env, ZTAN_INJECT_TX_STALL: 'true', tsconfig: undefined }
     });
 
-    let nodeA7TimedOut = false;
+    const _nodeA7TimedOut = false;
     childA7.stdout.on('data', data => {
         const out = data.toString();
         // console.log(`[Node A7] ${out.trim()}`);
@@ -808,10 +808,10 @@ main().catch(err => {
     console.log('✅ SUCCESS: Drill 7 passed. Partial transaction stall was rolled back cleanly, freeing the lock.');
 
     if (childB7Pid) {
-        try { process.kill(childB7Pid, 'SIGKILL'); } catch (e) {}
+        try { process.kill(childB7Pid, 'SIGKILL'); } catch (_e) {}
     }
-    try { childA7.kill('SIGKILL'); } catch (e) {}
-    try { childB7.kill('SIGKILL'); } catch (e) {}
+    try { childA7.kill('SIGKILL'); } catch (_e) {}
+    try { childB7.kill('SIGKILL'); } catch (_e) {}
 
     // -------------------------------------------------------------------------
     console.log('\n👉 DRILL 8: Abandoned FOR UPDATE Lock (Process Death Mid-Transaction)...');
@@ -851,10 +851,10 @@ main().catch(err => {
     console.log('✅ SUCCESS: Drill 8 passed. Abandoned FOR UPDATE lock was cleaned up immediately by OS/Postgres.');
 
     if (childB8Pid) {
-        try { process.kill(childB8Pid, 'SIGKILL'); } catch (e) {}
+        try { process.kill(childB8Pid, 'SIGKILL'); } catch (_e) {}
     }
-    try { childA8.kill('SIGKILL'); } catch (e) {}
-    try { childB8.kill('SIGKILL'); } catch (e) {}
+    try { childA8.kill('SIGKILL'); } catch (_e) {}
+    try { childB8.kill('SIGKILL'); } catch (_e) {}
 
     // -------------------------------------------------------------------------
     console.log('\n👉 DRILL 9: Deadlock / Lock Timeout Fencing...');
@@ -871,7 +871,7 @@ main().catch(err => {
     childA9.stderr.on('data', data => console.error(`[Node A9 Error] ${data.toString().trim()}`));
 
     let childA9Pid: number | null = null;
-    await new Promise<void>((resolve, reject) => {
+    await new Promise<void>((resolve, _reject) => {
         childA9.stdout.on('data', (data) => {
             const out = data.toString();
             const match = out.match(/Ready\. Local Gen: (\d+)\. PID: (\d+)/);
@@ -918,7 +918,7 @@ main().catch(err => {
     childB9.stdin.write('write:NODE-B\n');
 
     let nodeA9CaughtFence = false;
-    let nodeB9CaughtFence = false;
+    const _nodeB9CaughtFence = false;
 
     childA9.stdout.on('data', data => {
         if (data.toString().includes('Fencing Distributed Lease Violation')) nodeA9CaughtFence = true;
@@ -936,13 +936,13 @@ main().catch(err => {
     }
 
     if (childA9Pid) {
-        try { process.kill(childA9Pid, 'SIGKILL'); } catch (e) {}
+        try { process.kill(childA9Pid, 'SIGKILL'); } catch (_e) {}
     }
     if (childB9Pid) {
-        try { process.kill(childB9Pid, 'SIGKILL'); } catch (e) {}
+        try { process.kill(childB9Pid, 'SIGKILL'); } catch (_e) {}
     }
-    try { childA9.kill('SIGKILL'); } catch (e) {}
-    try { childB9.kill('SIGKILL'); } catch (e) {}
+    try { childA9.kill('SIGKILL'); } catch (_e) {}
+    try { childB9.kill('SIGKILL'); } catch (_e) {}
 
     // -------------------------------------------------------------------------
     console.log('\n👉 DRILL 10: Connection Pool Exhaustion / Database Outage...');
@@ -994,18 +994,18 @@ main().catch(err => {
     console.log('✅ SUCCESS: Drill 10 passed. Node survived connection pool exhaustion and eventually acquired lease.');
     
     if (childA10Pid) {
-        try { process.kill(childA10Pid, 'SIGKILL'); } catch (e) {}
+        try { process.kill(childA10Pid, 'SIGKILL'); } catch (_e) {}
     }
-    try { childA10.kill('SIGKILL'); } catch (e) {}
+    try { childA10.kill('SIGKILL'); } catch (_e) {}
 
     // Clean up
     console.log('\n[ChaosTest] Cleaning up and shutting down background resources...');
     try {
         watchdog.kill('SIGTERM');
-    } catch (e) {}
+    } catch (_e) {}
     try {
         fs.unlinkSync(childCoordinatorPath);
-    } catch (e) {}
+    } catch (_e) {}
 
     console.log('\n==================================================');
     console.log('🎉 ALL DISTRIBUTED CHAOS & SURVIVABILITY SUITES PASSED!');

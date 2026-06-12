@@ -5,7 +5,7 @@ export function maskSensitiveData(text: string): string {
   let masked = text;
   
   // Basic regex for API keys/tokens (example: key-xxxxxxxx)
-  masked = masked.replace(/(api[_-]?key|password|secret|token)["\s:]+["']?([a-zA-Z0-9_\-]{8,})["']?/gi, (match, p1, p2) => {
+  masked = masked.replace(/(api[_-]?key|password|secret|token)["\s:]+["']?([a-zA-Z0-9_\-]{8,})["']?/gi, (match, p1, _p2) => {
     return `${p1}: ********`;
   });
 

@@ -28,7 +28,7 @@ debugRouter.get('/latency', (req: Request, res: Response) => {
 /**
  * Simulates telemetry data loss.
  */
-debugRouter.get('/drop-telemetry', (req: Request, res: Response) => {
+debugRouter.get('/drop-telemetry', (_req: Request, res: Response) => {
   try {
     logger.warn('[DEBUG] Simulating telemetry data loss');
     
@@ -110,7 +110,7 @@ debugRouter.get('/chaos', (req: Request, res: Response) => {
 /**
  * Resets the SRE Control Plane state for a clean certification run.
  */
-debugRouter.post('/reset', (req: Request, res: Response) => {
+debugRouter.post('/reset', (_req: Request, res: Response) => {
   try {
     if (!sreEngine) throw new Error('SRE Engine not initialized');
     
@@ -163,7 +163,7 @@ debugRouter.get('/inject-failure', (req: Request, res: Response) => {
 /**
  * Manually clears all simulated failures.
  */
-debugRouter.get('/clear-failure', (req: Request, res: Response) => {
+debugRouter.get('/clear-failure', (_req: Request, res: Response) => {
   try {
     logger.info('[DEBUG] Clearing all injected failures');
     clearDbOutage();

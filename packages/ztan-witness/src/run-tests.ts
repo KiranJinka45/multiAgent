@@ -42,6 +42,7 @@ async function runAllTests() {
             await tx.ztanLedgerBlock.deleteMany({});
             await tx.ztanWalLog.deleteMany({});
             await tx.ztanSnapshot.deleteMany({});
+            await tx.$executeRawUnsafe('TRUNCATE TABLE "ZtanActiveLease" RESTART IDENTITY CASCADE;');
         });
     };
 
@@ -56,7 +57,7 @@ async function runAllTests() {
             source: { service: 'auth-service', node: 'node-1', version: '2.4.0' },
             payload: { action: 'deploy', version: '2.4.0' },
             correlationId: correlationId1,
-            signerId: 'operator-alice'
+            signerId: 'signer-hsm-alice'
         });
 
         const entry2 = await EvidenceLedgerService.append({
@@ -65,7 +66,7 @@ async function runAllTests() {
             payload: { cpu: 92 },
             correlationId: correlationId1,
             parentEventId: entry1.id,
-            signerId: 'operator-alice'
+            signerId: 'signer-hsm-alice'
         });
 
         assert(entry1.sequence === 1, 'Entry 1 sequence must be 1');
@@ -89,7 +90,7 @@ async function runAllTests() {
             source: { service: 'auth-service', node: 'node-1', version: '2.4.0' },
             payload: { action: 'deploy' },
             correlationId: correlationId2,
-            signerId: 'operator-alice'
+            signerId: 'signer-hsm-alice'
         });
 
         const cEntry2 = await EvidenceLedgerService.append({
@@ -98,7 +99,7 @@ async function runAllTests() {
             payload: { cpu: 45 },
             correlationId: correlationId2,
             parentEventId: cEntry1.id,
-            signerId: 'operator-alice'
+            signerId: 'signer-hsm-alice'
         });
 
         // Corrupt the second entry
@@ -119,14 +120,14 @@ async function runAllTests() {
             source: { service: 'gateway-service', node: 'node-2', version: '2.4.0' },
             payload: { action: 'config_change' },
             correlationId: correlationId3,
-            signerId: 'compromised-signer-id'
+            signerId: 'signer-hsm-compromised'
         });
 
         let signerChain = await EvidenceLedgerService.getChain(correlationId3);
         assert(signerChain.verificationState === VerificationState.VERIFIED, 'Initial chain must be VERIFIED');
 
         // Revoke the signer
-        await ForensicResilienceEngine.revokeSigner('compromised-signer-id');
+        await ForensicResilienceEngine.revokeSigner('signer-hsm-compromised');
 
         signerChain = await EvidenceLedgerService.getChain(correlationId3);
         assert(signerChain.verificationState === VerificationState.DEGRADED, 'Revoked signer chain must be DEGRADED');
@@ -142,7 +143,7 @@ async function runAllTests() {
             source: { service: 'auth-service', node: 'node-1', version: '2.3.9' }, // below 2.4.0
             payload: { version: '2.3.9', action: 'rollback_target' },
             correlationId: correlationId4,
-            signerId: 'operator-alice'
+            signerId: 'signer-hsm-alice'
         });
 
         const assessment1 = await EvidenceLedgerService.assessRollbackImpact(unsafeEntry.id);
@@ -155,7 +156,7 @@ async function runAllTests() {
             source: { service: 'auth-service', node: 'node-1', version: '2.4.0' },
             payload: { version: '2.4.0', dependency_health: 'MISSING' },
             correlationId: correlationId4,
-            signerId: 'operator-alice'
+            signerId: 'signer-hsm-alice'
         });
 
         const assessment2 = await EvidenceLedgerService.assessRollbackImpact(telemetryMissingEntry.id);
@@ -174,7 +175,7 @@ async function runAllTests() {
                 source: { service: 'load-balancer', node: `node-${i}`, version: '2.4.0' },
                 payload: { requestId: `req-${i}` },
                 correlationId: correlationId5,
-                signerId: 'operator-alice'
+                signerId: 'signer-hsm-alice'
             })
         );
 

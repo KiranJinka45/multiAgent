@@ -104,10 +104,10 @@ export class HostDaemon {
    * Deployment Gatekeeper:
    * Validates the OCI provenance before allowing the enclave to spawn.
    */
-  public spawnEnclave(imageConfig: { imageName: string; digest: string }) {
+  public async spawnEnclave(imageConfig: { imageName: string; digest: string }) {
     console.log(`[HostDaemon] Intercepted spawn request for ${imageConfig.imageName}@${imageConfig.digest}`);
     
-    const isVerified = sigstore.verifyImage(imageConfig.imageName, imageConfig.digest, 'build-bot@ztan.io');
+    const isVerified = await sigstore.verifyImage(imageConfig.imageName, imageConfig.digest, 'build-bot@ztan.io');
     if (!isVerified) {
       console.error(`[HostDaemon] 🚫 FATAL: Image provenance verification failed! Refusing to spawn untrusted image.`);
       throw new Error(`SupplyChainError: Unverified OCI digest ${imageConfig.digest}`);

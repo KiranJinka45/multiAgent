@@ -1,0 +1,105 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ZTANPilotMetricsReport",
+  "description": "Formal telemetry reporting schema for Nexus ZTAN pilot deployments.",
+  "type": "object",
+  "required": [
+    "pilotId",
+    "deploymentEpoch",
+    "softwareRelease",
+    "metrics",
+    "governanceCompliance"
+  ],
+  "properties": {
+    "pilotId": {
+      "type": "string",
+      "description": "Unique identifier of the enterprise pilot environment."
+    },
+    "deploymentEpoch": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when this telemetry snapshot was captured."
+    },
+    "softwareRelease": {
+      "type": "string",
+      "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+(-[a-z0-9.]+)?$",
+      "description": "The exact software release version of ZTAN core deployed."
+    },
+    "metrics": {
+      "type": "object",
+      "required": [
+        "reproducibilityRate",
+        "driftScore",
+        "activeTenantIsolationEscapes",
+        "telemetryToRuntimeLocRatio",
+        "witnessSignaturesCollected",
+        "policyEngineViolationsBlocked",
+        "tpmAttestationsSecured"
+      ],
+      "properties": {
+        "reproducibilityRate": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Rate of deterministic transactional replay reproducibility (target: 1.0)."
+        },
+        "driftScore": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 100.0,
+          "description": "Calculated state drift score across nodes (target: 0.0)."
+        },
+        "activeTenantIsolationEscapes": {
+          "type": "integer",
+          "const": 0,
+          "description": "Must be exactly 0. Any horizontal escape triggers immediate hypervisor freeze."
+        },
+        "telemetryToRuntimeLocRatio": {
+          "type": "number",
+          "maximum": 0.3,
+          "description": "Ratio of telemetry code to total runtime LOC to verify low cognitive complexity."
+        },
+        "witnessSignaturesCollected": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of state mutation notarization signatures gathered during epoch."
+        },
+        "policyEngineViolationsBlocked": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Count of unauthorized state transitions intercepted and blocked by the policy agent."
+        },
+        "tpmAttestationsSecured": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of successful TPM 2.0 PCR quote signatures validated."
+        }
+      }
+    },
+    "governanceCompliance": {
+      "type": "object",
+      "required": [
+        "authoritativeLedgerConstraintEnforced",
+        "constitutionRemainsNormative",
+        "separationOfAdvisoryAndExecutionEnforced"
+      ],
+      "properties": {
+        "authoritativeLedgerConstraintEnforced": {
+          "type": "boolean",
+          "const": true,
+          "description": "Ensures no claim is listed in security/governance docs without claims verification ledger backing."
+        },
+        "constitutionRemainsNormative": {
+          "type": "boolean",
+          "const": true,
+          "description": "Ensures the constitution contains only normative rules, not implementation/roadmap details."
+        },
+        "separationOfAdvisoryAndExecutionEnforced": {
+          "type": "boolean",
+          "const": true,
+          "description": "Ensures advisory cognitive components are not in the execution path."
+        }
+      }
+    }
+  }
+}

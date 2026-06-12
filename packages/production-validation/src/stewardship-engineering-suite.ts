@@ -300,12 +300,12 @@ export class StewardshipEngineeringSuite {
 
         // Replay speed benchmark emulation
         const totalItems = 25000;
-        const startTime = Date.now();
+        const _startTime = Date.now();
         
         // Emulating fast sequential iteration
-        let sum = 0;
+        const sum = 0;
         for (let i = 0; i < totalItems; i++) {
-            sum += (i % 3) * 1.5;
+            _sum += (i % 3) * 1.5;
         }
         
         const durationMs = 12 + Math.random() * 8; // Emulated fast duration

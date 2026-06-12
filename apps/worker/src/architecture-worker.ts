@@ -3,7 +3,6 @@ import { redis } from '@packages/utils';
 import { logger } from '@packages/observability';
 import { 
     runWithTracing, 
-    missionController, 
     eventBus, 
     QUEUE_ARCH
 } from '@packages/utils';
@@ -15,7 +14,7 @@ import * as fs from 'fs-extra';
  * Handles high-level system design and multi-node orchestration logic.
  */
 export const architectureWorker = new Worker(QUEUE_ARCH, async (job: Job) => {
-    const { executionId, projectId, prompt } = job.data;
+    const { executionId, projectId, _prompt } = job.data;
 
     return await runWithTracing(executionId, async () => {
         logger.info({ executionId, projectId }, '[Arch-Worker] Starting architecture synthesis');

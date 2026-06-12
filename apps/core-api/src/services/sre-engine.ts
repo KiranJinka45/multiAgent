@@ -8,8 +8,7 @@ import type {
   SRETuningParams, 
   SREEvent,
   SREPerception,
-  SREOperationalControl,
-  SREReliability
+  SREOperationalControl
 } from '@packages/contracts';
 import { CausalityMapper } from './learning/causality-mapper.js';
 import { ConvergenceMonitor } from './learning/convergence-monitor.js';
@@ -488,7 +487,7 @@ export class SreEngine extends EventEmitter {
         // Create new approval if stability is low and no pending request
         // --- ADAPTIVE INTELLIGENCE: Policy Refinement ---
         const stats = operationalAudit.getStats();
-        const refinedPolicy = await policyOptimizer.optimize(stats.avgRegret || 0, stats.avgBrier || 0);
+        const _refinedPolicy = await policyOptimizer.optimize(stats.avgRegret || 0, stats.avgBrier || 0);
         const policy = policyOptimizer.getPolicy();
 
         const isApprovedInThisCycle = this.approvedActions.has(actionKey) && (this.approvedActions.get(actionKey) || 0) > Date.now();
@@ -638,7 +637,7 @@ export class SreEngine extends EventEmitter {
     // 🔥 PILLAR 1: Real-time telemetry publication for Gateway/UI
     try {
       await redis.publish('sre:telemetry:update', JSON.stringify(update));
-    } catch (err) {
+    } catch (_err) {
       // Ignore publish failures during transient Redis outages
     }
 

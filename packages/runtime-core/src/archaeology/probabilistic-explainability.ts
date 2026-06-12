@@ -75,9 +75,9 @@ export class ProbabilisticExplainabilityEngine {
         }
 
         // Formulate Hypotheses with weight parameters
-        let rawClockWeight = clockEvidence.length > 0 ? (0.6 + clockEvidence.length * 0.1) : 0.05;
-        let rawGapWeight = gapEvidence.length > 0 ? (0.5 + gapEvidence.length * 0.1) : 0.05;
-        let rawContentionWeight = contentionEvidence.length > 0 ? (0.4 + contentionEvidence.length * 0.1) : 0.05;
+        const rawClockWeight = clockEvidence.length > 0 ? (0.6 + clockEvidence.length * 0.1) : 0.05;
+        const rawGapWeight = gapEvidence.length > 0 ? (0.5 + gapEvidence.length * 0.1) : 0.05;
+        const rawContentionWeight = contentionEvidence.length > 0 ? (0.4 + contentionEvidence.length * 0.1) : 0.05;
 
         // Default baseline weight if no errors exist
         if (clockEvidence.length === 0 && gapEvidence.length === 0 && contentionEvidence.length === 0) {

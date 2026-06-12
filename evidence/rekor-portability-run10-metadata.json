@@ -1,0 +1,17 @@
+{
+  "run_id": "26936440481",
+  "run_number": 10,
+  "workflow": "Rekor Standalone Portability Validation",
+  "branch": "dvk/snapshot-infrastructure",
+  "commit_sha": "0808efc7eab01c10a3c90070c685e8ab94ab9bba",
+  "timestamp": "2026-06-04T07:05:23Z",
+  "status": "completed",
+  "conclusion": "success",
+  "job_id": 79467296473,
+  "job_name": "Verify Independent Host Portability",
+  "verifier_file": "verify-rekor-interop.js",
+  "evidence_file": "rekor-interop-evidence.json",
+  "reconstructed_root": "7bbab95e3184df5b9f71d884f10026c8840ff4ab36d53b7c794af98a0af85b0d",
+  "expected_root": "7bbab95e3184df5b9f71d884f10026c8840ff4ab36d53b7c794af98a0af85b0d",
+  "match": true
+}
