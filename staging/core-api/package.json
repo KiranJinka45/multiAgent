@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@kubernetes/client-node": "0.22.0",
+    "@kubernetes/client-node": "0.22.1",
     "@packages/db": "workspace:*",
     "@packages/auth-internal": "workspace:*",
     "@packages/memory": "workspace:*",
@@ -22,7 +22,7 @@
     "@temporalio/client": "1.15.0",
     "@temporalio/worker": "1.15.0",
     "archiver": "7.0.1",
-    "axios": "1.7.0",
+    "axios": "1.16.0",
     "bullmq": "5.70.1",
     "cors": "2.8.6",
     "dotenv": "17.3.1",
@@ -30,7 +30,7 @@
     "fs-extra": "11.3.4",
     "ioredis": "5.10.1",
     "jsonwebtoken": "9.0.3",
-    "next": "16.2.0",
+    "next": "16.2.5",
     "pino": "10.3.1",
     "prom-client": "15.1.0",
     "react": "19.2.4",
