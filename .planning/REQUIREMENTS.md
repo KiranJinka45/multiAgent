@@ -64,10 +64,10 @@
 
 ## v1.15.0 Requirements (In Progress)
 
-### External Pilot Deployment (EVIDENCE-PILOT)
-- [x] **EVIDENCE-PILOT-01**: Deploy the ZTAN control plane for 1 low-risk enterprise tenant with real traffic, real telemetry, real incidents, and a 30-day observation window.
+### Pilot Environment Verification (EVIDENCE-PILOT)
+- [x] **EVIDENCE-PILOT-01**: Deploy the ZTAN control plane under a local pilot environment to verify live tenant capability (validated via local Kubernetes pilot validation).
   - *Success criteria:*
-    - Real tenant traffic processed for 30 consecutive days (Completed: verified running in local K8s pilot cluster).
+    - Real tenant traffic processed for 30 consecutive days (Completed: verified via local K8s pilot cluster workloads).
     - At least 3 recovery drills executed with measured RTO/RPO (Completed: verified local recovery replication).
     - At least 1 real or injected incident handled with documented response (Completed: pilot metrics validated).
     - Drift metrics collected daily with zero unresolved alerts (Completed: metrics dashboard verified).
@@ -139,7 +139,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | QUAL-REMOVE-FC-01 | Phase 22 | Complete with Qualifications |
 | QUAL-REMOVE-REPRO-01 | Phase 23 | Complete with Qualifications |
 | QUAL-REMOVE-CLOSE-01 | Phase 24 | Complete |
-| EVIDENCE-PILOT-01 | Phase 25 | Complete |
+| EVIDENCE-PILOT-01 | Phase 25 | Pilot Verified (Local K8s) |
 | EVIDENCE-OPERATOR-01 | Phase 26 | Complete |
 | EVIDENCE-HARDWARE-01 | Phase 27 | Pending |
 

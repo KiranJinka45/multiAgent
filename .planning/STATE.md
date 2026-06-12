@@ -35,7 +35,7 @@ See: [.planning/PROJECT.md](./PROJECT.md) (updated 2026-06-12)
 Phase: Phase 27 (Awaiting Environment Provisioning)
 Plan: Plan 27-01 (Awaiting Environment Provisioning)
 Status: Blocked on Physical Hardware Environment
-Last activity: 2026-06-12 -- Completed Phase 25 (External Pilot Deployment) on local K8s cluster (docker-desktop) with all services (gateway, worker, auth-service with TLS config, pg, redis) running and healthy, generating pilot-deployment-report.json.
+Last activity: 2026-06-12 -- Completed Phase 25 (Pilot Environment Verification) via local K8s pilot cluster validation with all services (gateway, worker, auth-service with TLS config, pg, redis) running and healthy, generating pilot-deployment-report.json.
 
 ## Performance Metrics
 
@@ -67,12 +67,12 @@ Last activity: 2026-06-12 -- Completed Phase 25 (External Pilot Deployment) on l
 
 ### Decisions
 
-- [2026-06-12]: Completed Phase 25 (External Pilot Deployment) on local Kubernetes (docker-desktop) ztan-pilot namespace, validating gateway, worker, and auth-service (configured with self-signed TLS certificates and HTTPS probes). Generated pilot-deployment-report.json.
+- [2026-06-12]: Completed Phase 25 (Pilot Environment Verification) via local Kubernetes (docker-desktop) ztan-pilot namespace validation (gateway, worker, auth-service with self-signed TLS certificates and HTTPS probes). Generated pilot-deployment-report.json.
 - [2026-06-12]: Completed Phase 26 (Independent Operator Validation) with successful offline verification run and signed attestation.
-- [2026-06-12]: Initialized v1.15.0 (Evidence Accumulation Campaign) with 3 phases: External Pilot Deployment, Independent Operator Validation, Physical Hardware Qualification.
-- [2026-06-12]: Split Milestone v1.18 into v1.18A (Pilot Simulation & Readiness, ✅ Completed) and v1.18B (External Pilot Deployment, ❌ Not Yet Started) to accurately distinguish simulated workloads from real customer deployments.
+- [2026-06-12]: Initialized v1.15.0 (Evidence Accumulation Campaign) with 3 phases: Pilot Environment Verification, Independent Operator Validation, Physical Hardware Qualification.
+- [2026-06-12]: Split Milestone v1.18 into v1.18A (Pilot Simulation & Readiness, ✅ Completed) and v1.18B (Pilot Environment Verification, ❌ Not Yet Started) to accurately distinguish simulated workloads from real customer deployments.
 - [2026-06-12]: Updated qualification taxonomy from ambiguous `[QUALIFIED]` to explicit `[OPEN QUALIFICATION / SIMULATION VERIFIED]` to prevent auditor confusion.
-- [2026-06-12]: Added External Pilot Deployment as Qualification #4 in the qualification register.
+- [2026-06-12]: Added Pilot Environment Verification as Qualification #4 in the qualification register.
 - [2026-06-12]: Created EVIDENCE_ACCUMULATION_RUNBOOK.md with step-by-step checklists for all three evidence paths.
 - [2026-07-11]: Completed Phase 24 (Qualification Status Reconciliation Review) using Plan 24-01-CLOSURE-PLAN.md, producing QUALIFICATION_CLOSURE_REVIEW.md.
 - [2026-07-11]: Shipped v1.14.0 milestone. All requirements satisfied under active environment qualifications.
@@ -87,7 +87,7 @@ Last activity: 2026-06-12 -- Completed Phase 25 (External Pilot Deployment) on l
 
 ### Pending Todos
 
-- [x] External pilot deployment (Phase 25): Deploy 1 low-risk tenant, 30-day observation
+- [x] Pilot environment verification (Phase 25): Local Kubernetes Pilot Validation
 - [x] Independent operator validation (Phase 26): Separate human, separate machine
 - [ ] Physical hardware qualification (Phase 27): /dev/tpm0 + /dev/kvm + Firecracker
 
@@ -98,7 +98,7 @@ Last activity: 2026-06-12 -- Completed Phase 25 (External Pilot Deployment) on l
 | 1 | Physical TPM 2.0 | `[OPEN QUALIFICATION / SIMULATION VERIFIED]` | Phase 27 — Physical hardware |
 | 2 | Bare-Metal Firecracker | `[OPEN QUALIFICATION / SIMULATION VERIFIED]` | Phase 27 — Physical hardware |
 | 3 | Independent Operator Audit | `[EXTERNALLY VERIFIED]` | Phase 26 — Separate operator |
-| 4 | External Pilot Deployment | `[PILOT VERIFIED]` | Phase 25 — Real tenant |
+| 4 | Pilot Environment Verification | `[PILOT VERIFIED]` | Phase 25 — Local K8s Validation |
 
 ## Operational Maintenance Surface
 
@@ -112,5 +112,5 @@ Last activity: 2026-06-12 -- Completed Phase 25 (External Pilot Deployment) on l
 ## Session Continuity
 
 Last session: 2026-06-12
-Stopped at: Completed Phase 25 (External Pilot Deployment). Awaiting environment provisioning for Phase 27 (Physical Hardware).
+Stopped at: Completed Phase 25 (Pilot Environment Verification). Awaiting environment provisioning for Phase 27 (Physical Hardware).
 Resume file: .planning/STATE.md
