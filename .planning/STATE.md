@@ -1,46 +1,46 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.14.0
-milestone_name: Qualification Removal & Physical Certification
-status: completed
-stopped_at: "v1.14.0 milestone shipped with qualifications. Qualification-removal framework implemented, physical validation remains qualified."
-last_updated: "2026-07-11T02:00:00.000Z"
-last_activity: 2026-07-11
+milestone: v1.15.0
+milestone_name: Evidence Accumulation Campaign
+status: in_progress
+stopped_at: "v1.15.0 milestone initialized. Roadmap, qualification register, and due-diligence package updated. Evidence accumulation runbook created."
+last_updated: "2026-06-12T08:30:00.000Z"
+last_activity: 2026-06-12
 progress:
-  total_phases: 4
-  completed_phases: 4
-  qualified_phases: 3
-  in_progress_phases: 0
-  total_plans: 4
-  completed_plans: 4
-  qualified_plans: 3
-  in_progress_plans: 0
+  total_phases: 3
+  completed_phases: 0
+  qualified_phases: 0
+  in_progress_phases: 3
+  total_plans: 3
+  completed_plans: 0
+  qualified_plans: 0
+  in_progress_plans: 3
 ---
 
-# Project State — Qualification Removal & Physical Certification
+# Project State — Evidence Accumulation Campaign
 
 ## Project Reference
 
-See: [.planning/PROJECT.md](./PROJECT.md) (updated 2026-07-11)
+See: [.planning/PROJECT.md](./PROJECT.md) (updated 2026-06-12)
 
 **Principle:** EVIDENCE-BOUNDED TRUST: ASSERTIONS ARE FALSE UNTIL PROVEN.
-**Focus:** Convert qualified and simulated evidence into fully certified physical evidence by replacing WSL2-dependent and simulation-assisted validation paths with bare-metal hardware verification.
+**Focus:** Accumulate external evidence (real operators, real hardware, real pilot environments) to retire remaining open qualifications. Additional simulations provide diminishing returns.
 
 ## Current Position
 
-Phase: None Active
-Plan: None Active
-Status: Review
-Last activity: 2026-07-11 -- Completed Phase 24 Qualification Closure Review, retiring all historical operational qualifications and finalizing milestone v1.14.0.
+Phase: Phase 25, 26, 27 (Awaiting Environment Provisioning)
+Plan: Plan 25-01, 26-01, 27-01 (Awaiting Environment Provisioning)
+Status: Planned
+Last activity: 2026-06-12 -- Planned all three evidence accumulation campaign phases (25-01, 26-01, and 27-01) on disk. Updated requirements traceability and resolved legacy directory conflicts. Ready for external environment provisioning.
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Historical milestones completed: 8 (v1.6.0 through v1.13.0)
-- Historical phases completed: 59 (cumulative roadmap phases, certified milestone phases, and legacy stewardship phases through v1.13.0)
-- Platform Status: TypeScript typechecking baseline clean; linting warning debt remains; test suites green.
-- Active Validation Scope: Physical TPM attestation, bare-metal Firecracker endurance, independent reproduction, qualification closure.
+- Historical milestones completed: 9 (v1.6.0 through v1.14.0)
+- Historical phases completed: 63 (cumulative roadmap phases through v1.14.0)
+- Platform Status: TypeScript typechecking baseline clean; build passes; 4/4 smoke tests pass; linting warning debt remains.
+- Active Validation Scope: External pilot deployment, independent operator audit, physical hardware qualification.
 
 **By Focus Area:**
 
@@ -48,59 +48,51 @@ Last activity: 2026-07-11 -- Completed Phase 24 Qualification Closure Review, re
 |-------|-------|----------|
 | Architecture | Stabilized | FINALITY_DECLARATION.md |
 | Governance | Hardened / Frozen | INVARIANT_GOVERNANCE_CHARTER.md & packages/governance-core freeze |
-| Forensic Trust | Operationalized | PEM keys resolved (Phase 5), TPM attestation verified (Phase 6), Transparency-log proofs verified (Phase 7) |
-| Operations | Repository Verified | 74/74 test files passing (270 tests); 12/12 CI/CD workflows repaired and validated |
+| Forensic Trust | Operationalized | PEM keys resolved, TPM attestation verified (simulated), Transparency-log proofs verified |
+| Operations | Repository Verified | 74/74 test files passing (270 tests); 12/12 CI/CD workflows repaired; build + smoke tests clean |
 | Virtualization | Reviewed | VIRTUALIZATION_BOUNDARIES_REVIEW.md (Phase 20) |
+| Roadmap Accuracy | Corrected | v1.18 split into v1.18A/v1.18B; qualification taxonomy clarified |
+| Due Diligence | Regenerated | DUE_DILIGENCE_PACKAGE/ with 4-qualification register |
 
 **Recent Trend:**
 
-- Strategy: Qualification Removal & Physical Certification
-- Trend: Converting qualified evidence to certified evidence
+- Strategy: Evidence Accumulation (stop simulating, start proving)
+- Trend: Transitioning from documentation accuracy to external evidence generation
 
 ## Accumulated Context
 
 ### Decisions
 
-- [2026-07-11]: Completed Phase 24 (Qualification Closure Review) using Plan 24-01-CLOSURE-PLAN.md, producing QUALIFICATION_CLOSURE_REVIEW.md in root and recording the status of qualification-removal frameworks while retaining the active WSL2/simulated environment qualifications.
-- [2026-07-11]: Completed Phase 23 (Independent Reproduction Audit) using Plan 23-01-REPRODUCTION-PLAN.md, producing THIRD_PARTY_CERTIFICATION_REPORT.md and operator-attestation.json recording the operational qualification delta (simulated operator, shared workspace context).
-- [2026-07-11]: Completed Phase 22 (Bare-Metal Firecracker Certification) using Plan 22-01-FIRECRACKER-PLAN.md, producing FIRECRACKER_BARE_METAL_CERTIFICATION.md and firecracker-endurance-results.json recording the operational qualification delta (missing physical KVM and Firecracker binaries).
-- [2026-07-11]: Completed Phase 21 (Physical TPM Attestation Certification) using Plan 21-01-PHYSICAL-TPM-PLAN.md, producing PHYSICAL_TPM_CERTIFICATION.md and physical-attestation-evidence.json recording the operational qualification delta (missing physical TPM device and virtualization active).
-- [2026-07-11]: Archived v1.13.0 and initialized v1.14.0 (Qualification Removal & Physical Certification) with Phases 21-24 targeting physical TPM attestation, bare-metal Firecracker certification, independent reproduction audit, and qualification closure review.
-- [2026-07-11]: Shipped v1.13.0 milestone. All phases (19, 20) complete, all requirements (OPS-MAINT-POST-01, OPS-MAINT-POST-02) satisfied. Qualification debt from v1.12.0 (physical TPM, bare-metal Firecracker, independent reproduction) remains open and is documented as future certification work.
-- [2026-07-11]: Completed Phase 20 (Virtualization Boundaries Review) using Plan 20-01-VIRTUALIZATION-BOUNDARIES-PLAN.md, producing a comprehensive guest-host isolation audit report at VIRTUALIZATION_BOUNDARIES_REVIEW.md.
-- [2026-07-10]: Completed Phase 19 (Long-Term Telemetry Checkpoints) using Plan 19-01-TELEMETRY-CHECKPOINTS-PLAN.md, validating WAL growth (<50MB/hour), lease transaction latency (<200ms), and backup validation success rate (>=96.6%) via scripts/long-term-telemetry-checker.ts.
-- [2026-06-08]: Completed Phase 13 with qualifications (WSL Certified): Physical Runtime Certification under WSL2, verifying real KVM microVM execution, vsock command execution, and simulated TPM quote generation/verification.
-- [2026-06-03]: v1.8.0 milestone certified — All 6 trust-chain requirements satisfied with 14/14 integration tests demonstrating end-to-end cryptographic trust chain verification.
-- [2026-05-19]: Stewardship Engineering Handoff — Formally transitioned the post-LTS roadmap completely away from core consensus complexity and toward operational stabilization under modeled failure classes.
+- [2026-06-12]: Initialized v1.15.0 (Evidence Accumulation Campaign) with 3 phases: External Pilot Deployment, Independent Operator Validation, Physical Hardware Qualification.
+- [2026-06-12]: Split Milestone v1.18 into v1.18A (Pilot Simulation & Readiness, ✅ Completed) and v1.18B (External Pilot Deployment, ❌ Not Yet Started) to accurately distinguish simulated workloads from real customer deployments.
+- [2026-06-12]: Updated qualification taxonomy from ambiguous `[QUALIFIED]` to explicit `[OPEN QUALIFICATION / SIMULATION VERIFIED]` to prevent auditor confusion.
+- [2026-06-12]: Added External Pilot Deployment as Qualification #4 in the qualification register.
+- [2026-06-12]: Created EVIDENCE_ACCUMULATION_RUNBOOK.md with step-by-step checklists for all three evidence paths.
+- [2026-07-11]: Completed Phase 24 (Qualification Status Reconciliation Review) using Plan 24-01-CLOSURE-PLAN.md, producing QUALIFICATION_CLOSURE_REVIEW.md.
+- [2026-07-11]: Shipped v1.14.0 milestone. All requirements satisfied under active environment qualifications.
+- [2026-06-03]: v1.8.0 milestone certified — All 6 trust-chain requirements satisfied.
+- [2026-05-19]: Stewardship Engineering Handoff — Formally transitioned to operational stabilization.
 
 ### Roadmap Evolution
 
-- [2026-07-11]: Shipped and archived v1.14.0 (Qualification Removal & Physical Certification). All 4 phases complete, all requirements satisfied under active environment qualifications.
-- [2026-07-11]: Completed Phase 23 with qualifications (Independent Reproduction Audit), validating DKG threshold proof verify-kit stages and service smoke tests under a simulated operator fallback and sandbox copy.
-- [2026-07-11]: Completed Phase 22 with qualifications (Bare-Metal Firecracker Certification), validating the 100-iteration microVM endurance campaign under simulated fallback and logging environment qualifications.
-- [2026-07-11]: Completed Phase 21 with qualifications (Physical TPM Attestation Certification), validating physical TPM quote generation commands and recording qualification delta on virtualized host.
-- [2026-07-11]: Initialized v1.14.0 (Qualification Removal & Physical Certification) with Phases 21-24.
+- [2026-06-12]: Initialized v1.15.0 (Evidence Accumulation Campaign). Split v1.18 into v1.18A/v1.18B. Created evidence runbook.
+- [2026-07-11]: Shipped and archived v1.14.0 (Qualification Removal Framework Implementation). All 4 phases complete.
 - [2026-07-11]: Shipped and archived v1.13.0 (Operational Hardening & Long-Term Stewardship). Both phases complete.
-- [2026-06-08]: Completed Phase 13 with qualifications (Physical Runtime Certification), validating execution and attestation on WSL2 KVM environment.
-- [2026-06-03]: Certified Milestone v1.8.0 (Trust-Chain Operationalization), completing PEM resolution, attestation evidence flow, and transparency-log validation.
-- [2026-05-19]: Initialized and certified Milestone 36 (v1.6.0 Stewardship Engineering Era).
 
 ### Pending Todos
 
-- [x] Physical TPM attestation certification (Phase 21)
-- [x] Bare-metal Firecracker endurance certification (Phase 22)
-- [x] Independent third-party reproduction audit (Phase 23)
-- [x] Qualification closure review (Phase 24)
+- [ ] External pilot deployment (Phase 25): Deploy 1 low-risk tenant, 30-day observation
+- [ ] Independent operator validation (Phase 26): Separate human, separate machine
+- [ ] Physical hardware qualification (Phase 27): /dev/tpm0 + /dev/kvm + Firecracker
 
 ### Outstanding Qualification Debt (Target of This Milestone)
 
-These items were identified by the Phase 20 review and are the primary targets of v1.14.0.
-
-| Qualification | Source Phase | What Remains |
-|---|---|---|
-| Physical TPM Attestation | Phase 13 (v1.12.0) | ✅ Complete with qualifications (Phase 21) — real tpm2-tools commands implemented; qualification details logged on virtualized host |
-| Bare-Metal Firecracker | Phase 15 (v1.12.0) | ✅ Complete with qualifications (Phase 22) — 100-run endurance campaign simulated; qualification details logged on virtualized host |
-| Independent Reproduction | Phase 18 (v1.12.0) | ✅ Complete with qualifications (Phase 23) — verify-kit executed in isolated directory copy by simulated operator; qualification details logged |
+| # | Qualification | Status | Retirement Path |
+|---|---|---|---|
+| 1 | Physical TPM 2.0 | `[OPEN QUALIFICATION / SIMULATION VERIFIED]` | Phase 27 — Physical hardware |
+| 2 | Bare-Metal Firecracker | `[OPEN QUALIFICATION / SIMULATION VERIFIED]` | Phase 27 — Physical hardware |
+| 3 | Independent Operator Audit | `[OPEN QUALIFICATION / SIMULATION VERIFIED]` | Phase 26 — Separate operator |
+| 4 | External Pilot Deployment | `[NOT YET STARTED]` | Phase 25 — Real tenant |
 
 ## Operational Maintenance Surface
 
@@ -109,11 +101,12 @@ These items were identified by the Phase 20 review and are the primary targets o
 
 ### Blockers/Concerns
 
-- **Hardware Dependency**: Phases 21-22 require access to a physical bare-metal Linux host with `/dev/tpm0` and `/dev/kvm`.
-- **Operator Dependency**: Phase 23 requires a genuinely separate operator.
+- **Tenant Dependency**: Phase 25 requires an external enterprise tenant willing to participate in a pilot.
+- **Operator Dependency**: Phase 26 requires a genuinely separate human operator.
+- **Hardware Dependency**: Phase 27 requires access to a physical bare-metal Linux host with `/dev/tpm0` and `/dev/kvm`.
 
 ## Session Continuity
 
-Last session: 2026-07-11
-Stopped at: Shipped v1.14.0 milestone. All requirements satisfied under active environment qualifications.
+Last session: 2026-06-12
+Stopped at: Initialized v1.15.0 Evidence Accumulation Campaign. All governance documents updated. Runbook created. Build + smoke tests passing.
 Resume file: .planning/STATE.md

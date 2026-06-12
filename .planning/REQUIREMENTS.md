@@ -12,7 +12,7 @@
 ## v1.12.0 Requirements (Completed)
 
 ### Physical Host Validation (OPS-MAINT-PHYS)
-- [Q] **OPS-MAINT-PHYS-01**: Validate execution on non-virtualized physical Linux host with active TPM quote verification (Complete with Qualifications: validated on WSL2 KVM with simulated TPM).
+- [Q] **OPS-MAINT-PHYS-01**: Validate execution on non-virtualized physical Linux host with active TPM quote verification (Complete with Qualifications: validated on WSL2 KVM with simulated TPM). *[Historical requirement wording preserved; qualification remains open]*
   - *Remaining work requirements:*
     - Host OS: Confirmed physical non-virtualized Ubuntu/RHEL/Debian install.
     - Presence of `/dev/kvm` and `/dev/tpm0` verified.
@@ -25,7 +25,7 @@
   - Must trigger real network partition/outage, real failover, and real lease fencing (container pauses, mock outages, and proxy simulated outages are banned).
 
 ### Firecracker microVM Certification (OPS-MAINT-FIRECRACKER-RUN)
-- [Q] **OPS-MAINT-FIRECRACKER-RUN-01**: Certify Firecracker runtime microVM launching, guest execution, vsock connectivity, and teardown under 100 consecutive iterations, outputting statistical metrics: (Complete with Qualifications: validated on WSL2 KVM).
+- [Q] **OPS-MAINT-FIRECRACKER-RUN-01**: Certify Firecracker runtime microVM launching, guest execution, vsock connectivity, and teardown under 100 consecutive iterations, outputting statistical metrics: (Complete with Qualifications: validated on WSL2 KVM). *[Historical requirement wording preserved; qualification remains open]*
   - `success_rate`, `mean_launch_ms`, `p95_launch_ms`, `mean_teardown_ms`, and `resource_leaks` (monitoring memory, CPU, and file descriptor leaks across iterations).
 
 ### Security Posture Audit (OPS-MAINT-SECURITY)
@@ -52,13 +52,44 @@
 
 ---
 
-## v1.14.0 Requirements (Active)
+## v1.14.0 Requirements (Completed with Qualifications)
 
-### Qualification Removal & Physical Certification (QUAL-REMOVE)
-- [Q] **QUAL-REMOVE-TPM-01**: Certify physical TPM attestation on a non-virtualized host with `/dev/tpm0`, `tpm2_quote` evidence, and manufacturer EK chain validation (Complete with Qualifications: validated real tpm2-tools execution path and qualification delta on virtualized host).
-- [Q] **QUAL-REMOVE-FC-01**: Certify Firecracker microVM endurance on bare-metal Linux (non-WSL2) with 100-launch campaign, real vsock execution, and resource leak measurements (Complete with Qualifications: validated simulated execution path and qualification delta on virtualized host).
-- [Q] **QUAL-REMOVE-REPRO-01**: Complete genuine independent third-party reproduction audit with a separate operator, fresh environment, no repository write access, and no author assistance (Complete with Qualifications: validated simulated operator execution and isolated sandbox setup).
-- [x] **QUAL-REMOVE-CLOSE-01**: Verify all historical qualifications (Phase 13, 15, 18) have been removed and update requirements from "Complete with Qualifications" to "Complete".
+### Qualification Removal Framework Implementation (QUAL-REMOVE)
+- [Q] **QUAL-REMOVE-TPM-01**: Implement and validate physical TPM attestation framework on a non-virtualized host with `/dev/tpm0`, `tpm2_quote` evidence, and manufacturer EK chain validation (Complete with Qualifications: validated real tpm2-tools execution path and qualification delta on virtualized host).
+- [Q] **QUAL-REMOVE-FC-01**: Implement and validate Firecracker microVM endurance framework on bare-metal Linux (non-WSL2) with 100-launch campaign, real vsock execution, and resource leak measurements (Complete with Qualifications: validated simulated execution path and qualification delta on virtualized host).
+- [Q] **QUAL-REMOVE-REPRO-01**: Implement and validate independent reproduction audit framework with a separate operator, fresh environment, no repository write access, and no author assistance (Complete with Qualifications: validated simulated operator execution and isolated sandbox setup).
+- [x] **QUAL-REMOVE-CLOSE-01**: Reconcile and assess qualification status and track unresolved gaps (Complete: verified qualification-removal frameworks exist, status is accurately documented, unresolved qualifications remain explicitly tracked, and evidence chains and remaining gaps are documented).
+
+---
+
+## v1.15.0 Requirements (In Progress)
+
+### External Pilot Deployment (EVIDENCE-PILOT)
+- [ ] **EVIDENCE-PILOT-01**: Deploy the ZTAN control plane for 1 low-risk enterprise tenant with real traffic, real telemetry, real incidents, and a 30-day observation window.
+  - *Success criteria:*
+    - Real tenant traffic processed for 30 consecutive days.
+    - At least 3 recovery drills executed with measured RTO/RPO.
+    - At least 1 real or injected incident handled with documented response.
+    - Drift metrics collected daily with zero unresolved alerts.
+    - Post-mortem package assembled.
+
+### Independent Operator Validation (EVIDENCE-OPERATOR)
+- [ ] **EVIDENCE-OPERATOR-01**: Demonstrate system deployment and verification by an independent human operator (not the repository author) on a fresh machine with no author assistance.
+  - *Success criteria:*
+    - Operator is not a repository author or contributor.
+    - Fresh machine with no prior repository state.
+    - No repository write access.
+    - Zero author assistance during setup and execution.
+    - All verify-kit stages pass. Operator produces signed attestation.
+
+### Physical Hardware Qualification (EVIDENCE-HARDWARE)
+- [ ] **EVIDENCE-HARDWARE-01**: Execute existing validation scripts on physical bare-metal Linux hardware with real TPM 2.0 (`/dev/tpm0`) and KVM (`/dev/kvm`), retiring hardware qualifications.
+  - *Success criteria:*
+    - `systemd-detect-virt` returns `none`.
+    - `/dev/tpm0` accessible, real `tpm2_quote` succeeds.
+    - `/dev/kvm` accessible, Firecracker microVM boots.
+    - 100-launch endurance run completes with zero resource leaks.
+    - Hardware attestation evidence produced with real PCR values.
 
 ---
 
@@ -108,15 +139,18 @@ Which phases cover which requirements. Updated during roadmap creation.
 | QUAL-REMOVE-FC-01 | Phase 22 | Complete with Qualifications |
 | QUAL-REMOVE-REPRO-01 | Phase 23 | Complete with Qualifications |
 | QUAL-REMOVE-CLOSE-01 | Phase 24 | Complete |
+| EVIDENCE-PILOT-01 | Phase 25 | Pending |
+| EVIDENCE-OPERATOR-01 | Phase 26 | Pending |
+| EVIDENCE-HARDWARE-01 | Phase 27 | Pending |
 
 **Coverage:**
 - Completed v1.12.0 requirements: 6 total
 - Completed v1.13.0 requirements: 2 total
-- Active v1.14.0 requirements: 4 total
-- Mapped to phases: 18
+- Completed v1.14.0 requirements (with qualifications): 4 total
+- Mapped to phases: 21
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-06-08*
-*Last updated: 2026-07-11 after v1.13.0 archival and v1.14.0 initialization*
+*Last updated: 2026-07-11 after v1.14.0 closure reconciliation review*
 

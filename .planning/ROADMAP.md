@@ -6,7 +6,8 @@ Following the successful validation of live cryptographic trust-chains and multi
 
 ## Milestones
 
-- ✅ **v1.14.0 Qualification Removal & Physical Certification** - Phases 21-24 (Shipped with Qualifications: 2026-07-11)
+- 🔄 **v1.15.0 Evidence Accumulation Campaign** - Phases 25-27 (In Progress: 2026-06-12)
+- ✅ **v1.14.0 Qualification Removal Framework Implementation** - Phases 21-24 (Shipped with Qualifications: 2026-07-11)
 - ✅ **v1.13.0 Operational Hardening & Long-Term Stewardship** - Phases 19-20 (Shipped: 2026-07-11)
 - ✅ **v1.12.0 Physical Runtime & Operational Verification** - Phases 13-18 (Shipped: 2026-07-10)
 - ✅ **v1.11.0 Maintenance, Debt Reduction & Portability Validation** - Phases 8-12 (Shipped: 2026-06-08)
@@ -21,12 +22,46 @@ Following the successful validation of live cryptographic trust-chains and multi
 > [!NOTE]
 > Phases are ordered logically by phase number. Historical completion dates of phases may differ based on operational scheduling and validation dependencies.
 
-### ✅ v1.14.0 Qualification Removal & Physical Certification (Complete with Qualifications)
+### 🔄 v1.15.0 Evidence Accumulation Campaign (In Progress)
 
-**Milestone Goal:** Convert qualified and simulated evidence into fully certified physical evidence by replacing WSL2-dependent and simulation-assisted validation paths with bare-metal hardware verification.
+**Milestone Goal:** Retire remaining open qualifications by accumulating external evidence — real operators, real hardware, real pilot environments. Additional simulations provide diminishing returns.
 
-#### Phase 21: Physical TPM Attestation Certification (Complete with Qualifications)
-**Goal**: Certify physical TPM attestation on a non-virtualized host.
+#### Phase 25: External Pilot Deployment (Not Started)
+**Goal**: Deploy the control plane to the first low-risk live enterprise tenant.
+**Success Criteria**:
+  1. Real tenant traffic processed for 30 consecutive days.
+  2. At least 3 recovery drills executed with measured RTO/RPO.
+  3. At least 1 real or injected incident handled with documented response.
+  4. Drift metrics collected daily with zero unresolved alerts.
+  5. Post-mortem package assembled.
+**Deliverables**: `evidence/2026-pilot-deployment/pilot-deployment-report.json`
+
+#### Phase 26: Independent Operator Validation (Not Started)
+**Goal**: Demonstrate that an independent human operator can deploy, operate, and verify the system without author assistance.
+**Success Criteria**:
+  1. Operator is not a repository author or contributor.
+  2. Fresh machine with no prior repository state.
+  3. No repository write access.
+  4. Zero author assistance during setup and execution.
+  5. All verify-kit stages pass. Operator produces signed attestation.
+**Deliverables**: `operator-independent-attestation.json`
+
+#### Phase 27: Physical Hardware Qualification (Not Started)
+**Goal**: Execute existing validation scripts on physical bare-metal Linux hardware with real TPM 2.0 and KVM.
+**Success Criteria**:
+  1. `systemd-detect-virt` returns `none`.
+  2. `/dev/tpm0` accessible, real `tpm2_quote` succeeds.
+  3. `/dev/kvm` accessible, Firecracker microVM boots.
+  4. 100-launch endurance run completes with zero resource leaks.
+  5. Hardware attestation evidence produced with real PCR values.
+**Deliverables**: `evidence/physical-hardware/physical-tpm-attestation.json`, `evidence/physical-hardware/firecracker-endurance-native.json`
+
+### ✅ v1.14.0 Qualification Removal Framework Implementation (Complete with Qualifications)
+
+**Milestone Goal:** Convert qualified and simulated evidence into qualification-removal frameworks, mapping validation paths for bare-metal hardware verification while documenting open qualifications.
+
+#### Phase 21: Physical TPM Attestation Framework (Complete with Qualifications)
+**Goal**: Implement and validate physical TPM attestation framework on a non-virtualized host.
 **Success Criteria**:
   1. Physical Ubuntu/RHEL/Debian host confirmed via `systemd-detect-virt`, `dmidecode`, `lscpu`.
   2. `/dev/tpm0` accessible and TPM EK chain extracted.
@@ -34,8 +69,8 @@ Following the successful validation of live cryptographic trust-chains and multi
   4. Hardware attestation evidence produced.
 **Deliverables**: `PHYSICAL_TPM_CERTIFICATION.md`, `physical-attestation-evidence.json`
 
-#### Phase 22: Bare-Metal Firecracker Certification (Complete with Qualifications)
-**Goal**: Certify Firecracker microVM endurance on bare-metal Linux without WSL2.
+#### Phase 22: Bare-Metal Firecracker Endurance Framework (Complete with Qualifications)
+**Goal**: Implement and validate Firecracker microVM endurance framework on bare-metal Linux without WSL2.
 **Success Criteria**:
   1. Non-WSL2 Linux host with `/dev/kvm`.
   2. 100-launch endurance campaign with real vsock execution.
@@ -43,8 +78,8 @@ Following the successful validation of live cryptographic trust-chains and multi
   4. Statistical report generated.
 **Deliverables**: `FIRECRACKER_BARE_METAL_CERTIFICATION.md`, `firecracker-endurance-results.json`
 
-#### Phase 23: Independent Reproduction Audit (Complete with Qualifications)
-**Goal**: Complete genuine independent third-party reproduction audit.
+#### Phase 23: Independent Reproduction Audit Framework (Complete with Qualifications)
+**Goal**: Implement and validate independent reproduction audit framework.
 **Success Criteria**:
   1. Different operator (not the original author).
   2. Fresh environment with no prior repository state.
@@ -53,13 +88,13 @@ Following the successful validation of live cryptographic trust-chains and multi
   5. Complete verification run producing operator attestation.
 **Deliverables**: `THIRD_PARTY_CERTIFICATION_REPORT.md`, `operator-attestation.json`
 
-#### Phase 24: Qualification Closure Review (Complete)
-**Goal**: Verify all historical qualifications have been removed.
+#### Phase 24: Qualification Status Reconciliation Review (Complete)
+**Goal**: Reconcile and assess qualification status and track unresolved gaps.
 **Success Criteria**:
-  1. Phase 13 qualification (physical TPM) removed.
-  2. Phase 15 qualification (bare-metal Firecracker) removed.
-  3. Phase 18 qualification (simulated operator) removed.
-  4. Requirements updated from "Complete with Qualifications" to "Complete".
+  1. Verify qualification-removal frameworks exist.
+  2. Verify qualification status is accurately documented.
+  3. Verify unresolved qualifications remain explicitly tracked.
+  4. Verify evidence chains and remaining gaps are documented.
 **Deliverables**: `QUALIFICATION_CLOSURE_REVIEW.md`
 
 <details>
@@ -259,4 +294,7 @@ Following the successful validation of live cryptographic trust-chains and multi
 | 21. Physical TPM Attestation | v1.14.0 | 1/1 | Complete with Qualifications | 2026-07-11 |
 | 22. Bare-Metal Firecracker | v1.14.0 | 1/1 | Complete with Qualifications | 2026-07-11 |
 | 23. Independent Reproduction | v1.14.0 | 1/1 | Complete with Qualifications | 2026-07-11 |
-| 24. Qualification Closure | v1.14.0 | 1/1 | Complete | 2026-07-11 |
+| 24. Qualification Status Reconciliation | v1.14.0 | 1/1 | Complete | 2026-07-11 |
+| 25. External Pilot Deployment | v1.15.0 | 0/0 | Not Started | — |
+| 26. Independent Operator Validation | v1.15.0 | 0/0 | Not Started | — |
+| 27. Physical Hardware Qualification | v1.15.0 | 0/0 | Not Started | — |
