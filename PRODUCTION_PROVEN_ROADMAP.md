@@ -7,6 +7,10 @@ Achieve **PRODUCTION-PROVEN** certification through single-writer transaction se
 
 ## 🏛️ Commercial & Customer-Facing Roadmap
 
+> [!NOTE]
+> **Versioning Taxonomy Alignment:**  
+> The commercial roadmap below uses a simplified stakeholder-facing versioning sequence (Milestones v1.15 to v1.18B). The internal engineering repository planning documents (such as `.planning/STATE.md` and `.planning/ROADMAP.md`) use semver planning codes, where the unified engineering milestone is tracked as **v1.15.0 (Evidence Accumulation Campaign)**. This engineering campaign encompasses the execution plans and checklists to collect evidence for physical hardware (v1.16), operator validation (v1.17), and tenant pilot (v1.18B) once target environments are provisioned.
+
 To guide enterprise due-diligence, procurement, and executive stakeholders, we sequence our production readiness across four clear commercial milestones:
 
 ### 🚀 Milestone v1.15: Production Evidence Campaign (COMPLETED ✅)

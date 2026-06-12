@@ -1,5 +1,18 @@
 # Milestones
 
+## v1.14.0 Qualification Removal Framework Implementation (Shipped: 2026-07-11)
+
+**Phases completed:** 4 phases (Phases 21-24)
+
+**Key accomplishments:**
+
+- Implemented physical TPM attestation framework on a non-virtualized host with EK chain validation (Phase 21).
+- Implemented Firecracker microVM endurance framework on bare-metal Linux with a 100-launch campaign and leak measurements (Phase 22).
+- Implemented independent reproduction audit framework with simulated operator and isolated sandbox (Phase 23).
+- Completed a qualification status reconciliation review documenting evidence chains and remaining gaps (Phase 24).
+
+---
+
 ## v1.12.0 Physical Runtime & Operational Verification (Shipped: 2026-07-10)
 
 **Phases completed:** 6 phases (Phases 13-18)
