@@ -6,9 +6,9 @@
 
 **Key accomplishments:**
 
-- Implemented physical TPM attestation framework on a non-virtualized host with EK chain validation (Phase 21).
-- Implemented Firecracker microVM endurance framework on bare-metal Linux with a 100-launch campaign and leak measurements (Phase 22).
-- Implemented independent reproduction audit framework with simulated operator and isolated sandbox (Phase 23).
+- Implemented physical TPM attestation qualification-removal framework on a non-virtualized host with EK chain validation under simulation (Phase 21).
+- Implemented bare-metal Firecracker qualification-removal framework on Linux with a 100-launch campaign and leak measurements under simulation (Phase 22).
+- Implemented independent reproduction qualification-removal framework with simulated operator and isolated sandbox (Phase 23).
 - Completed a qualification status reconciliation review documenting evidence chains and remaining gaps (Phase 24).
 
 ---
