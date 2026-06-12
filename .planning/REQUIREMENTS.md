@@ -74,7 +74,7 @@
     - Post-mortem package assembled.
 
 ### Independent Operator Validation (EVIDENCE-OPERATOR)
-- [ ] **EVIDENCE-OPERATOR-01**: Demonstrate system deployment and verification by an independent human operator (not the repository author) on a fresh machine with no author assistance.
+- [x] **EVIDENCE-OPERATOR-01**: Demonstrate system deployment and verification by an independent human operator (not the repository author) on a fresh machine with no author assistance.
   - *Success criteria:*
     - Operator is not a repository author or contributor.
     - Fresh machine with no prior repository state.
@@ -140,7 +140,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | QUAL-REMOVE-REPRO-01 | Phase 23 | Complete with Qualifications |
 | QUAL-REMOVE-CLOSE-01 | Phase 24 | Complete |
 | EVIDENCE-PILOT-01 | Phase 25 | Pending |
-| EVIDENCE-OPERATOR-01 | Phase 26 | Pending |
+| EVIDENCE-OPERATOR-01 | Phase 26 | Complete |
 | EVIDENCE-HARDWARE-01 | Phase 27 | Pending |
 
 **Coverage:**

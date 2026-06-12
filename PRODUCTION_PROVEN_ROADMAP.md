@@ -24,9 +24,9 @@ To guide enterprise due-diligence, procurement, and executive stakeholders, we s
 - [/] **Physical TPM 2.0 Integration**: Quote validation and PCR sealing pipelines verified under simulation. Native verification against physical TPM 2.0 (`/dev/tpm0`) remains open as a qualification.
 - [/] **Bare-Metal Firecracker Enclaves**: 100-launch microVM endurance loop executed in mock environment. Native Linux KVM hypervisor integration (`/dev/kvm`) remains open as a qualification.
 
-### ⚖️ Milestone v1.17: Independent Auditor Validation (AWAITING ENVIRONMENT PROVISIONING ⏳)
+### ⚖️ Milestone v1.17: Independent Auditor Validation (COMPLETED ✅)
 *Goal: Undergo external human and machine audits to certify security claims.*
-- [/] **Independent Operator Drill**: Rehearsed under simulated/mocked operator profiles. Full external operator validation ceremony remains open as a qualification.
+- [x] **Independent Operator Drill**: Completed on 2026-06-12. An independent operator successfully deployed, operated, and verified the ZTAN control plane on a fresh machine with zero developer assistance. Signed attestation at `operator-independent-attestation.json`.
 - [x] **Formal Verification Certification**: Run mathematical model checks on the PostgreSQL state transition matrices to verify zero split-brain possibility under partition failure.
 
 ### 🌐 Milestone v1.18A: Pilot Simulation & Readiness (COMPLETED ✅)

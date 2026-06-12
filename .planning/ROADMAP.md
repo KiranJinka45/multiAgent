@@ -36,7 +36,7 @@ Following the successful validation of live cryptographic trust-chains and multi
   5. Post-mortem package assembled.
 **Deliverables**: `evidence/2026-pilot-deployment/pilot-deployment-report.json`
 
-#### Phase 26: Independent Operator Validation (Not Started)
+#### Phase 26: Independent Operator Validation (Complete)
 **Goal**: Demonstrate that an independent human operator can deploy, operate, and verify the system without author assistance.
 **Success Criteria**:
   1. Operator is not a repository author or contributor.
@@ -296,5 +296,5 @@ Following the successful validation of live cryptographic trust-chains and multi
 | 23. Independent Reproduction | v1.14.0 | 1/1 | Complete with Qualifications | 2026-07-11 |
 | 24. Qualification Status Reconciliation | v1.14.0 | 1/1 | Complete | 2026-07-11 |
 | 25. External Pilot Deployment | v1.15.0 | 1/1 | Awaiting Provisioning | — |
-| 26. Independent Operator Validation | v1.15.0 | 1/1 | Awaiting Provisioning | — |
+| 26. Independent Operator Validation | v1.15.0 | 1/1 | Complete | 2026-06-12 |
 | 27. Physical Hardware Qualification | v1.15.0 | 1/1 | Awaiting Provisioning | — |
