@@ -26,6 +26,6 @@ All artifacts generated during the campaign are stored in:
 - **Sigstore Bundle:** [bundle.json](file:///c:/multiagentic_project/multiAgent-main/evidence/2026-production-trust-campaign/sigstore/bundle.json)
 
 ### 4. External Pilot Deployment Evidence
-- **Status:** **PRODUCTION VERIFIED**
+- **Status:** **PILOT VERIFIED**
 - **K8s Namespace:** `ztan-pilot`
 - **Deployment Report:** [pilot-deployment-report.json](file:///c:/multiagentic_project/multiAgent-main/evidence/2026-pilot-deployment/pilot-deployment-report.json)

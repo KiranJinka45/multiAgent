@@ -98,7 +98,7 @@ Last activity: 2026-06-12 -- Completed Phase 25 (External Pilot Deployment) on l
 | 1 | Physical TPM 2.0 | `[OPEN QUALIFICATION / SIMULATION VERIFIED]` | Phase 27 — Physical hardware |
 | 2 | Bare-Metal Firecracker | `[OPEN QUALIFICATION / SIMULATION VERIFIED]` | Phase 27 — Physical hardware |
 | 3 | Independent Operator Audit | `[EXTERNALLY VERIFIED]` | Phase 26 — Separate operator |
-| 4 | External Pilot Deployment | `[PRODUCTION VERIFIED]` | Phase 25 — Real tenant |
+| 4 | External Pilot Deployment | `[PILOT VERIFIED]` | Phase 25 — Real tenant |
 
 ## Operational Maintenance Surface
 

@@ -115,7 +115,7 @@ In accordance with our claims matrix, ZTAN distinguishes between software-verifi
 - **Verification Path:** Completed. An independent operator successfully deployed, operated, and verified the ZTAN control plane on a fresh machine with zero developer assistance. Attestation: \`operator-independent-attestation.json\`.
 
 ### 4. External Pilot Deployment
-- **Current Status:** \`[PRODUCTION VERIFIED]\`
+- **Current Status:** \`[PILOT VERIFIED]\`
 - **Description:** Deploying the control plane to the first live enterprise tenant under real-world traffic and monitoring.
 - **Environment Assumption:** Requires a low-risk tenant, real telemetry, real incident-handling, and a 30-day observation window.
 - **Verification Path:** Completed. Deployed the ZTAN control plane to local Kubernetes ztan-pilot namespace, verifying gateway, auth-service, worker, and databases under strict network policy isolation. Evidence: \`pilot-deployment-report.json\`.
@@ -172,7 +172,7 @@ All artifacts generated during the campaign are stored in:
 - **Sigstore Bundle:** [bundle.json](file:///c:/multiagentic_project/multiAgent-main/evidence/2026-production-trust-campaign/sigstore/bundle.json)
 
 ### 4. External Pilot Deployment Evidence
-- **Status:** **PRODUCTION VERIFIED**
+- **Status:** **PILOT VERIFIED**
 - **K8s Namespace:** \`ztan-pilot\`
 - **Deployment Report:** [pilot-deployment-report.json](file:///c:/multiagentic_project/multiAgent-main/evidence/2026-pilot-deployment/pilot-deployment-report.json)
 `;
