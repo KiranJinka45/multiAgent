@@ -2,7 +2,7 @@
 gsd_state_version: 1.0
 milestone: v1.15.0
 milestone_name: Evidence Accumulation Campaign
-status: in_progress
+status: awaiting_environment_provisioning
 stopped_at: "v1.15.0 milestone initialized. Roadmap, qualification register, and due-diligence package updated. Evidence accumulation runbook created."
 last_updated: "2026-06-12T08:30:00.000Z"
 last_activity: 2026-06-12
