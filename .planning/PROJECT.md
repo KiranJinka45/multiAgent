@@ -99,21 +99,14 @@ Nexus ZTAN is an auditable, production-oriented research platform designed for l
 - Add CI validation path (Clean GitHub Actions runner verification job).
 - Verify independent host portability (AWS EC2 Ubuntu 26.04 instance).
 
-## Current Post-Milestone Posture: Platform Stabilization Baseline
+## Current Post-Milestone Posture: Evidence-Ready, Awaiting External Provisioning
 
-Following the completion of **Milestone v1.7.0: Platform Stabilization & CI Integrity**, the repository has established a clean, passing CI pipeline across all 58 workspace packages, ensuring successful typechecking and test integrity. The platform continues under its strict governance freeze with no functional alterations to virtualization (Firecracker/TPM) or core cryptographic primitives.
+Following the completion of **Milestone v1.14.0: Qualification Removal Framework Implementation**, the repository has reached an "evidence-ready, externally blocked" state. All internal verification, architecture stabilization, and validation frameworks are fully complete. The next status change requires external provisioning of real target environments rather than additional repository development.
 
-### Key accomplishments for v1.7.0:
-1. **CI Pipeline Stabilization**: Restored legacy ESLint and AJV compatibility by pinning ESLint to v8.57.0 with custom overrides.
-2. **Frontend Testing Repair**: Migrated Angular 19 test configuration to Vitest to bypass broken builder dependency issues.
-3. **Witness Fencing Bypass**: Resolved active lease triggers in Postgres by adopting HSM operator ID prefixes in witness tests.
-4. **Clean Baseline**: Verified 100% test and build pass rates across the entire workspace.
-
-### Key accomplishments for v1.6.0:
-1. **Operational Soak Validation**: Confirmed memory stability (peak RSS 47.28 MB) and WAL growth bounds.
-2. **Observability Hardening**: Integrated high-fidelity causal lineage tracking and replica lag instrumentation.
-3. **PostgreSQL Pathology Hardening**: Validated fencing and fail-closed lease states under WAL corruption.
-4. **Complexity Budgeting Gates**: Enforced strict rules in PROJECT.md and CI checkers.
+### Key accomplishments for v1.14.0:
+1. **Qualification Frameworks**: Built native physical validation frameworks for TPM 2.0 attestation, bare-metal Firecracker microVM execution, and third-party reproduction.
+2. **State & Requirements Reconciliation**: Closed historical discrepancies and mapped all 21 system requirements cleanly to active phases.
+3. **Governance & Execution Verification**: Validated full build reproducibility and verified smoke test compliance across all ZTAN services.
 
 ### Out of Scope
 
@@ -188,4 +181,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-11 after v1.13.0 archival and v1.14.0 initialization*
+*Last updated: 2026-06-12 after v1.14.0 closure and v1.15.0 evidence readiness campaign initialization*

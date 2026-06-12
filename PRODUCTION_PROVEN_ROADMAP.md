@@ -15,12 +15,12 @@ To guide enterprise due-diligence, procurement, and executive stakeholders, we s
 - [x] **Technical Due-Diligence Package**: Assemble the unified security binder (`DUE_DILIGENCE_PACKAGE/`) containing active threat models, verification ledgers, and auditor instructions.
 - [x] **Flagship Interactive Demo**: Package and release the automated 10-minute end-to-end agent verification walkthrough ([NEXUS_ZTAN_10_MINUTE_DEMO.md](file:///c:/multiagentic_project/multiAgent-main/NEXUS_ZTAN_10_MINUTE_DEMO.md)).
 
-### 🛡️ Milestone v1.16: Physical Hardware Qualification (IN PROGRESS 🔄)
+### 🛡️ Milestone v1.16: Physical Hardware Qualification (AWAITING ENVIRONMENT PROVISIONING ⏳)
 *Goal: Retire open environment qualifications on dedicated physical execution nodes.*
 - [/] **Physical TPM 2.0 Integration**: Quote validation and PCR sealing pipelines verified under simulation. Native verification against physical TPM 2.0 (`/dev/tpm0`) remains open as a qualification.
 - [/] **Bare-Metal Firecracker Enclaves**: 100-launch microVM endurance loop executed in mock environment. Native Linux KVM hypervisor integration (`/dev/kvm`) remains open as a qualification.
 
-### ⚖️ Milestone v1.17: Independent Auditor Validation (IN PROGRESS 🔄)
+### ⚖️ Milestone v1.17: Independent Auditor Validation (AWAITING ENVIRONMENT PROVISIONING ⏳)
 *Goal: Undergo external human and machine audits to certify security claims.*
 - [/] **Independent Operator Drill**: Rehearsed under simulated/mocked operator profiles. Full external operator validation ceremony remains open as a qualification.
 - [x] **Formal Verification Certification**: Run mathematical model checks on the PostgreSQL state transition matrices to verify zero split-brain possibility under partition failure.
@@ -31,7 +31,7 @@ To guide enterprise due-diligence, procurement, and executive stakeholders, we s
 - [x] **Pilot Simulation**: Executed first pilot workload run (`scripts/run-pilot-simulation.ts`) consisting of 10 tenant missions under RLS isolation.
 - [x] **Continuous Compliance Reporting**: Generated live metrics scorecard (`pilot-metrics-report.json`) validating all ZTAN compliance and drift invariants.
 
-### 🌐 Milestone v1.18B: External Pilot Deployment (NOT YET STARTED ❌)
+### 🌐 Milestone v1.18B: External Pilot Deployment (AWAITING ENVIRONMENT PROVISIONING ⏳)
 *Goal: Deploy to first low-risk live enterprise tenant.*
 - [ ] **Real Tenant Deployment**: Deploy 1 low-risk tenant with a 30-day observation window, real telemetry, real incidents, and real recovery drills.
 

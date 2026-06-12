@@ -295,6 +295,6 @@ Following the successful validation of live cryptographic trust-chains and multi
 | 22. Bare-Metal Firecracker | v1.14.0 | 1/1 | Complete with Qualifications | 2026-07-11 |
 | 23. Independent Reproduction | v1.14.0 | 1/1 | Complete with Qualifications | 2026-07-11 |
 | 24. Qualification Status Reconciliation | v1.14.0 | 1/1 | Complete | 2026-07-11 |
-| 25. External Pilot Deployment | v1.15.0 | 0/0 | Not Started | — |
-| 26. Independent Operator Validation | v1.15.0 | 0/0 | Not Started | — |
-| 27. Physical Hardware Qualification | v1.15.0 | 0/0 | Not Started | — |
+| 25. External Pilot Deployment | v1.15.0 | 1/1 | Awaiting Provisioning | — |
+| 26. Independent Operator Validation | v1.15.0 | 1/1 | Awaiting Provisioning | — |
+| 27. Physical Hardware Qualification | v1.15.0 | 1/1 | Awaiting Provisioning | — |
