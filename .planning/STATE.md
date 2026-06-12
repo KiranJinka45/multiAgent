@@ -10,11 +10,15 @@ progress:
   total_phases: 3
   completed_phases: 0
   qualified_phases: 0
-  in_progress_phases: 3
+  planned_phases: 3
+  in_progress_phases: 0
+  blocked_phases: 3
   total_plans: 3
   completed_plans: 0
   qualified_plans: 0
-  in_progress_plans: 3
+  planned_plans: 3
+  in_progress_plans: 0
+  blocked_plans: 3
 ---
 
 # Project State — Evidence Accumulation Campaign
