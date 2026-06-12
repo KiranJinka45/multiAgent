@@ -28,7 +28,7 @@
     "@temporalio/worker": "1.15.0",
     "@types/cookie-parser": "1.4.10",
     "archiver": "7.0.1",
-    "axios": "1.13.6",
+    "axios": "1.16.0",
     "bullmq": "5.71.0",
     "cookie-parser": "1.4.7",
     "cors": "2.8.6",
